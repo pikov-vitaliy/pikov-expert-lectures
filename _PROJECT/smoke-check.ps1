@@ -59,7 +59,7 @@ if ($quarantineDirs.Count -ne 1) {
     Fail "Expected at most one quarantine directory, got $($quarantineDirs.Count)"
   }
 }
-$allowedRootDirs = @('.git', '.github', '_PROJECT', 'release') + $quarantineDirs + $domainFolders
+$allowedRootDirs = @('.git', '.github', '_PROJECT', 'release', 'docs') + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
