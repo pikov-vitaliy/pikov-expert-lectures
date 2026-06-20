@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Принципы построения ЭВМ | УЦ МАСКОМ</title>
+  <style>
+    :root {
+      --bg: #ffffff;
+      --txt: #000000;
+      --acc: #2e7d32;
+      --sub: #f5f5f5;
+      --font: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--txt);
+      -webkit-font-smoothing: antialiased;
+    }
+    .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      padding: 40px 60px; display: flex; flex-direction: column;
+      background: var(--bg); opacity: 0; pointer-events: none;
+      transform: translateX(30px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 10; }
+    .slide.prev { transform: translateX(-30px); }
+
+    #slide-1 {
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('Подложка.png') center/cover no-repeat;
+      color: #ffffff; justify-content: center; align-items: center; text-align: center; padding: 30px;
+    }
+    #slide-1 .year { position: absolute; top: 30px; font-size: 28px; opacity: 0.9; font-weight: 300; }
+    #slide-1 .title { font-size: clamp(28px, 4.5vw, 48px); font-weight: 700; margin: 20px 0; line-height: 1.25; max-width: 92%; }
+    #slide-1 .subtitle { font-size: clamp(18px, 2.2vw, 26px); margin-bottom: 40px; opacity: 0.95; }
+    #slide-1 .speaker { position: absolute; bottom: 40px; font-size: clamp(16px, 1.8vw, 22px); line-height: 1.5; max-width: 85%; text-align: center; }
+    #slide-1 .speaker strong { font-weight: 600; display: block; margin-bottom: 6px; font-size: 1.1em; }
+
+    .slide-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 25px; padding-bottom: 12px;
+      border-bottom: 3px solid var(--acc); gap: 20px; flex-wrap: wrap;
+    }
+    .slide-logo { max-height: 60px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .slide-title { font-size: clamp(22px, 3vw, 34px); font-weight: 700; color: var(--acc); margin: 0; flex: 1; }
+
+    .slide-content {
+      flex: 1; font-size: clamp(17px, 1.7vw, 22px); line-height: 1.6;
+      overflow-y: auto; padding-right: 15px;
+    }
+    .slide-content ul, .slide-content ol { margin-left: 26px; margin-bottom: 14px; }
+    .slide-content li { margin-bottom: 7px; }
+    .slide-content .hl {
+      background: #e8f5e9; padding: 4px 8px; border-radius: 4px;
+      font-weight: 600; border-left: 4px solid var(--acc); display: inline-block; margin: 6px 0;
+    }
+    .slide-content table {
+      width: 100%; border-collapse: collapse; margin: 15px 0;
+      font-size: clamp(15px, 1.5vw, 19px);
+    }
+    .slide-content th, .slide-content td {
+      border: 1px solid #ccc; padding: 9px 11px; text-align: left; vertical-align: top;
+    }
+    .slide-content th { background: var(--sub); font-weight: 600; }
+
+    .slide-footer {
+      position: absolute; bottom: 20px; left: 30px; font-size: 17px; color: #666;
+      background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 4px;
+    }
+
+    /* Зоны кликов */
+    .click-zones { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 15; }
+    .click-left, .click-right {
+      position: absolute; top: 0; height: 100%; width: 40%;
+      pointer-events: auto; cursor: pointer;
+    }
+    .click-left { left: 0; }
+    .click-right { right: 0; }
+
+    /* Навигация */
+    .nav-buttons {
+      position: fixed; bottom: 25px; right: 30px; display: flex; gap: 12px; z-index: 20;
+    }
+    .nav-btn {
+      width: 50px; height: 50px; border: none; border-radius: 50%;
+      background: var(--acc); color: #fff; font-size: 22px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+    .nav-btn:hover { background: #1b5e20; transform: scale(1.1); }
+    .nav-btn:active { transform: scale(0.9); }
+    .nav-btn:disabled { background: #9e9e9e; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Контакты */
+    #slide-final { justify-content: center; align-items: center; text-align: center; }
+    .contact-card {
+      background: var(--sub); border: 2px solid var(--acc); border-radius: 14px;
+      padding: clamp(30px, 5vw, 50px); max-width: 860px; width: 90%;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.1);
+    }
+    .contact-card h2 { font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 25px; color: var(--acc); }
+    .contact-row { font-size: clamp(20px, 2.2vw, 26px); margin: 12px 0; line-height: 1.5; }
+    .contact-row strong { color: var(--acc); display: inline-block; min-width: 150px; text-align: right; margin-right: 12px; }
+    .contact-row a { color: var(--acc); text-decoration: none; font-weight: 600; }
+    .contact-row a:hover { text-decoration: underline; }
+    .logo-final { max-height: 80px; margin: 25px auto 10px; display: block; }
+
+    /* Адаптив */
+    @media (max-width: 1024px) {
+      .slide { padding: 25px 20px; }
+      .slide-header { flex-direction: column; gap: 8px; }
+      .nav-buttons { bottom: 15px; right: 15px; gap: 8px; }
+      .nav-btn { width: 44px; height: 44px; font-size: 18px; }
+      .click-left, .click-right { width: 45%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; transform: none !important; }
+    }
+    @media print {
+      .click-zones, .nav-buttons { display: none !important; }
+      .slide { position: relative !important; opacity: 1 !important; transform: none !important; pointer-events: auto !important; page-break-after: always; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="click-zones" aria-hidden="true">
+  <div class="click-left" id="zonePrev" title="Предыдущий слайд (клик слева)"></div>
+  <div class="click-right" id="zoneNext" title="Следующий слайд (клик справа)"></div>
+</div>
+
+<nav class="nav-buttons" role="navigation" aria-label="Управление презентацией">
+  <button class="nav-btn" id="btnFirst" title="Первый слайд" aria-label="Первый слайд">⏮</button>
+  <button class="nav-btn" id="btnPrev" title="Предыдущий слайд" aria-label="Предыдущий слайд">◀</button>
+  <button class="nav-btn" id="btnNext" title="Следующий слайд" aria-label="Следующий слайд">▶</button>
+  <button class="nav-btn" id="btnLast" title="Последний слайд" aria-label="Последний слайд">⏭</button>
+</nav>
+
+<main id="pres" role="main">
+
+  <section class="slide active" id="slide-1">
+    <div class="year" id="yrDisplay"></div>
+    <h1 class="title">Принципы построения ЭВМ.<br>Архитектура ЭВМ</h1>
+    <p class="subtitle">Эволюция, базовые компоненты и векторы угроз аппаратного уровня</p>
+    <div class="speaker">
+      <strong>Виталий Александрович Пиков</strong>
+      руководитель направления обучения по РБПО, преподаватель<br>
+      НОУ ДПО «УЦБИ «МАСКОМ»
+    </div>
+  </section>
+
+  <section class="slide" id="slide-2">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Введение и цели лекции</h2>
+    </div>
+    <div class="slide-content">
+      <p>Понимание архитектуры ЭВМ — фундамент для реализации мер технической защиты информации.</p>
+      <ul>
+        <li>Рассмотреть историческую эволюцию вычислительных систем</li>
+        <li>Изучить принципы фон Неймана и Гарвардскую архитектуру</li>
+        <li>Определить основные аппаратные компоненты и их взаимодействие</li>
+        <li>Выявить уязвимости аппаратного уровня (Side-Channel, аппаратные закладки)</li>
+        <li>Связать архитектурные решения с требованиями регуляторов</li>
+      </ul>
+    </div>
+    <div class="slide-footer">2 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-3">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Эволюция вычислительных систем</h2>
+    </div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Поколение</th><th>Элементная база</th><th>Годы</th></tr></thead>
+        <tbody>
+          <tr><td>I</td><td>Электронные лампы</td><td>1945–1955</td></tr>
+          <tr><td>II</td><td>Транзисторы</td><td>1955–1965</td></tr>
+          <tr><td>III</td><td>Интегральные схемы (ИС)</td><td>1965–1975</td></tr>
+          <tr><td>IV</td><td>БИС/СБИС (микропроцессоры)</td><td>1975–наст. время</td></tr>
+          <tr><td>V</td><td>Нейро- и квантовые архитектуры</td><td>Разработка</td></tr>
+        </tbody>
+      </table>
+      <p class="hl">Переход к IV поколению позволил реализовать сложные криптографические алгоритмы непосредственно на чипе.</p>
+    </div>
+    <div class="slide-footer">3 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-4">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Принципы фон Неймана</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Программное управление:</strong> команды выполняются последовательно</li>
+        <li><strong>Однородная память:</strong> команды и данные хранятся в одном адресном пространстве</li>
+        <li><strong>Адресность:</strong> каждая ячейка памяти имеет уникальный адрес</li>
+        <li><strong>Двоичное кодирование:</strong> информация представляется в виде битов</li>
+      </ul>
+      <p class="hl">Безопасность: однородность памяти создаёт вектор для атак переполнения буфера и инъекции кода.</p>
+    </div>
+    <div class="slide-footer">4 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-5">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Гарвардская и модифицированные архитектуры</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Физическое разделение памяти команд и данных</li>
+        <li>Параллельная выборка инструкций и операндов</li>
+        <li>Широкое применение в микроконтроллерах и DSP</li>
+        <li>Повышает устойчивость к эксплуатации уязвимостей ПО</li>
+      </ul>
+      <p>Современные процессоры (x86, ARM) используют модифицированную Гарвардскую архитектуру на уровне кэшей L1.</p>
+    </div>
+    <div class="slide-footer">5 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-6">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Структура центрального процессора (ЦП)</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Арифметико-логическое устройство (АЛУ):</strong> выполнение вычислений</li>
+        <li><strong>Устройство управления (УУ):</strong> декодирование и координация</li>
+        <li><strong>Регистры:</strong> сверхбыстрая внутренняя память</li>
+        <li><strong>Кэш-память L1/L2/L3:</strong> буфер между ядром и ОЗУ</li>
+        <li><strong>Блок предсказания переходов:</strong> оптимизация конвейера</li>
+      </ul>
+      <p>Архитектурные уязвимости: Spectre, Meltdown, Foreshadow.</p>
+    </div>
+    <div class="slide-footer">6 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-7">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Системные шины и интерфейсы</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Шина данных:</strong> передача информации между компонентами</li>
+        <li><strong>Адресная шина:</strong> указание ячеек памяти/регистров устройств</li>
+        <li><strong>Шина управления:</strong> сигналы чтения, записи, прерываний</li>
+        <li>Архитектура PCIe, USB, Thunderbolt</li>
+        <li>Уязвимости: DMA-атаки, перехват шины, подмена устройств</li>
+      </ul>
+    </div>
+    <div class="slide-footer">7 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-8">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Иерархия памяти</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Регистры → Кэш L1/L2/L3 → ОЗУ → NVMe/SSD → HDD</li>
+        <li>Принцип локальности (временной и пространственной)</li>
+        <li>Задержки доступа: от &lt;1 нс (регистры) до мс (накопители)</li>
+        <li>Безопасность: изоляция кэшей, очистка после переключения контекста</li>
+      </ul>
+    </div>
+    <div class="slide-footer">8 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-9">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Устройства ввода-вывода (I/O)</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Прерывания (IRQ):</strong> асинхронная обработка событий</li>
+        <li><strong>Прямой доступ к памяти (DMA):</strong> обмен без участия ЦП</li>
+        <li>Программируемый ввод-вывод (PIO)</li>
+        <li>Контроллеры: южные мосты, PCH, IOMMU</li>
+      </ul>
+      <p class="hl">Уязвимость IOMMU: недостаточная изоляция DMA позволяет чтение ОЗУ из устройств расширения.</p>
+    </div>
+    <div class="slide-footer">9 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-10">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Угрозы аппаратного уровня</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Аппаратные закладки:</strong> модификация на этапе производства</li>
+        <li><strong>Side-Channel:</strong> анализ энергопотребления, ЭМИ, времени выполнения</li>
+        <li><strong>Fault Injection:</strong> сбой работы лазером, напряжением, температурой</li>
+        <li><strong>Подмена компонентов:</strong> контрафактные чипы в цепочке поставок</li>
+      </ul>
+    </div>
+    <div class="slide-footer">10 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-11">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Side-Channel атаки: примеры</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Power Analysis:</strong> анализ потребления при криптооперациях</li>
+        <li><strong>EM Analysis:</strong> перехват электромагнитного излучения</li>
+        <li><strong>Timing:</strong> измерение времени выполнения ветвлений кода</li>
+        <li><strong>Acoustic:</strong> анализ звука кулеров и дросселей</li>
+      </ul>
+      <p>Защита: маскирование, выравнивание потребления, шумогенерация.</p>
+    </div>
+    <div class="slide-footer">11 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-12">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Trusted Platform Module (TPM)</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Аппаратный криптопроцессор на материнской плате</li>
+        <li>Хранение ключей, измерение состояния загрузки</li>
+        <li>Реализация Secure Boot, BitLocker, TPM sealing</li>
+        <li>Версии: 1.2 (устар.), 2.0 (актуальная, алгоритмы SHA-256, ECC)</li>
+      </ul>
+      <p>Требования регуляторов: использование СКЗИ в доверенной среде исполнения.</p>
+    </div>
+    <div class="slide-footer">12 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-13">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Secure Boot и цепочка доверия</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Проверка цифровой подписи загрузчика, ядра, драйверов</li>
+        <li>Использование UEFI вместо Legacy BIOS</li>
+        <li>Защита от руткитов на этапе загрузки</li>
+        <li>Интеграция с ОС и политиками ИБ</li>
+      </ul>
+      <p class="hl">Необходимость верификации ключей поставщиков для соответствия требованиям ФСТЭК.</p>
+    </div>
+    <div class="slide-footer">13 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-14">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Виртуализация и изоляция</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Тип 1 (Hyper-V, ESXi):</strong> гипервизор на «железе»</li>
+        <li><strong>Тип 2 (VirtualBox, VMware):</strong> поверх ОС</li>
+        <li>Аппаратная поддержка: Intel VT-x, AMD-V</li>
+        <li>Уязвимости: VM escape, shared folders, snapshot leakage</li>
+      </ul>
+    </div>
+    <div class="slide-footer">14 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-15">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Защита от атак на уровне ядра</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>KASLR:</strong> рандомизация адресов ядра</li>
+        <li><strong>SMEP/SMAP:</strong> запрет исполнения/доступа из режима ядра к пользовательскому пространству</li>
+        <li><strong>Page Table Isolation (PTI):</strong> защита от Meltdown</li>
+        <li><strong>Control Flow Integrity (CFI):</strong> контроль потока выполнения</li>
+      </ul>
+    </div>
+    <div class="slide-footer">15 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-16">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Требования ФСТЭК к аппаратной базе</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Использование сертифицированных СЗИ (СДЗ, СКЗИ)</li>
+        <li>Аттестация АС: проверка целостности аппаратной конфигурации</li>
+        <li>Контроль несанкционированного доступа к портам</li>
+        <li>Соответствие Приказам № 17, № 21, № 239</li>
+      </ul>
+    </div>
+    <div class="slide-footer">16 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-17">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Требования ФСБ к криптографической защите</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Использование СКЗИ, сертифицированных ФСБ</li>
+        <li>Запрет на использование иностранных криптобиблиотек в ГИС</li>
+        <li>Обеспечение контроля целостности на этапе загрузки</li>
+        <li>Соответствие Приказам № 378, № 117</li>
+      </ul>
+    </div>
+    <div class="slide-footer">17 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-18">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Моделирование угроз аппаратного уровня</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Источники угроз:</strong> внешние, внутренние, техногенные</li>
+        <li><strong>Каналы утечки:</strong> ВТСС, ПЭМИН, акустика</li>
+        <li><strong>Методы:</strong> СП (спецпроверки), СИ (специсследования)</li>
+        <li>Документы: Методика оценки угроз БИ (ФСТЭК, 2021)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">18 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-19">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Аппаратные генераторы случайных чисел</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Использование физических шумов (тепловых, квантовых)</li>
+        <li>Критичность для генерации криптографических ключей</li>
+        <li>Сертификация по требованиям ФСБ</li>
+        <li>Программные ГСЧ (PRNG) не заменяют аппаратные</li>
+      </ul>
+    </div>
+    <div class="slide-footer">19 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-20">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Управление конфигурацией оборудования</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Инвентаризация, маркировка, пломбирование</li>
+        <li>Контроль замен компонентов (RAID, NIC, SSD)</li>
+        <li>Мониторинг SMART, логов BMC/IPMI</li>
+        <li>Политика вывода из эксплуатации (дегауссирование, уничтожение)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">20 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-21">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Импортозамещение и суверенные платформы</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Переход на отечественные процессоры: Эльбрус, Байкал</li>
+        <li>Архитектура VLIW (Elbrus) vs ARM/x86</li>
+        <li>Отечественные ОС: Astra Linux, РЕД ОС, Альт</li>
+        <li>Реестр Минцифры, требования к КИИ</li>
+      </ul>
+    </div>
+    <div class="slide-footer">21 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-22">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Доверенная среда исполнения (TEE)</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Intel SGX, ARM TrustZone, AMD SEV</li>
+        <li>Изоляция чувствительных вычислений от ОС и гипервизора</li>
+        <li>Защита ключей и биометрии</li>
+        <li>Риск: side-channel внутри TEE, firmware backdoors</li>
+      </ul>
+    </div>
+    <div class="slide-footer">22 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-23">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Физическая защита серверных</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Контроль доступа (СКУД, биометрия)</li>
+        <li>Защищённые помещения (ЗП), категории по ГОСТ</li>
+        <li>Видеонаблюдение, охранная сигнализация</li>
+        <li>Контроль ВТСС в периметре (Приказ ФСТЭК № 79)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">23 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-24">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Контроль целостности ПО на этапе загрузки</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Измерение хэшей компонентов (PCR регистры TPM)</li>
+        <li>Remote Attestation: проверка состояния удалённым сервером</li>
+        <li>Интеграция с SIEM/SOAR</li>
+        <li>Реагирование на mismatch: блокировка, оповещение</li>
+      </ul>
+    </div>
+    <div class="slide-footer">24 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-25">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Управление микрокодом и прошивками</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>UEFI, BMC, IPMI, NIC firmware</li>
+        <li>Обновление: только из доверенных источников</li>
+        <li>Подпись обновлений, проверка перед прошивкой</li>
+        <li>Риск: LoJax, MoonBounce, BlackLotus</li>
+      </ul>
+    </div>
+    <div class="slide-footer">25 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-26">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Роль ФСТЭК в контроле аппаратного обеспечения</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Сертификация СЗИ по требованиям № 55</li>
+        <li>Лицензирование деятельности по ТЗКИ</li>
+        <li>Требования к аттестации ОИ (Приказ № 77)</li>
+        <li>Банк данных угроз (БДУ), рекомендации по уязвимостям</li>
+      </ul>
+    </div>
+    <div class="slide-footer">26 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-27">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Практические рекомендации по защите</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Отключение неиспользуемых портов (USB, Thunderbolt)</li>
+        <li>Включение Secure Boot, TPM 2.0, DEP, ASLR</li>
+        <li>Регулярное обновление микрокода</li>
+        <li>Использование доверенных поставщиков, проверка поставок</li>
+      </ul>
+    </div>
+    <div class="slide-footer">27 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-28">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Кейс: Атака через периферийное устройство</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Сценарий:</strong> вредоносная прошивка USB-контроллера</li>
+        <li><strong>Реализация:</strong> эмуляция клавиатуры, загрузка payload</li>
+        <li><strong>Обход:</strong> защита на уровне ядра, контроль устройств</li>
+        <li><strong>Вывод:</strong> аппаратная защита должна дополнять программную</li>
+      </ul>
+    </div>
+    <div class="slide-footer">28 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-29">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Заключение и выводы</h2>
+    </div>
+    <div class="slide-content">
+      <ul>
+        <li>Архитектура ЭВМ определяет базовые векторы угроз</li>
+        <li>Изоляция и контроль целостности — ключевые механизмы</li>
+        <li>Соответствие требованиям регуляторов обязательно</li>
+        <li>Переход на доверенные платформы снижает риски</li>
+      </ul>
+    </div>
+    <div class="slide-footer">29 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-30">
+    <div class="slide-header">
+      <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'">
+      <h2 class="slide-title">Вопросы и обсуждение</h2>
+    </div>
+    <div class="slide-content">
+      <p style="font-size:28px; text-align:center; margin:40px 0">Готов ответить на вопросы по содержанию лекции.</p>
+      <ul>
+        <li>Особенности защиты серверной инфраструктуры</li>
+        <li>Тонкости аттестации аппаратного обеспечения</li>
+        <li>Практические примеры внедрения TPM и Secure Boot</li>
+        <li>Требования регуляторов к доверенным платформам</li>
+      </ul>
+    </div>
+    <div class="slide-footer">30 из 32</div>
+  </section>
+
+  <section class="slide" id="slide-final">
+    <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="logo-final" onerror="this.style.display='none'">
+    <div class="contact-card">
+      <h2>Контактная информация</h2>
+      <div class="contact-row"><strong>Преподаватель:</strong> Виталий Александрович Пиков</div>
+      <div class="contact-row"><strong>Должность:</strong> Руководитель направления обучения по РБПО</div>
+      <div class="contact-row"><strong>Email:</strong> <a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a></div>
+      <div class="contact-row"><strong>Telegram:</strong> <a href="https://t.me/UnderLineSecurity">@UnderLineSecurity</a></div>
+      <div class="contact-row"><strong>Организация:</strong> НОУ ДПО «УЦБИ «МАСКОМ»</div>
+      <div class="contact-row"><strong>Сайт:</strong> <a href="https://mascom-uc.ru" target="_blank" rel="noopener">mascom-uc.ru</a></div>
+    </div>
+    <div class="slide-footer" style="visibility:hidden">32 из 32</div>
+  </section>
+
+</main>
+
+<script>
+(function() {
+  'use strict';
+
+  var allSlides = document.querySelectorAll('.slide');
+  var total = allSlides.length;
+  var current = 0;
+
+  var bFirst = document.getElementById('btnFirst');
+  var bPrev  = document.getElementById('btnPrev');
+  var bNext  = document.getElementById('btnNext');
+  var bLast  = document.getElementById('btnLast');
+  var zPrev  = document.getElementById('zonePrev');
+  var zNext  = document.getElementById('zoneNext');
+  var yrEl   = document.getElementById('yrDisplay');
+
+  if (yrEl) { yrEl.textContent = new Date().getFullYear(); }
+
+  function render() {
+    var i, sl;
+    for (i = 0; i < total; i++) {
+      sl = allSlides[i];
+      sl.classList.remove('active', 'prev');
+      if (i === current) {
+        sl.classList.add('active');
+      } else if (i < current) {
+        sl.classList.add('prev');
+      }
+    }
+    if (bFirst) bFirst.disabled = (current === 0);
+    if (bPrev)  bPrev.disabled  = (current === 0);
+    if (bNext)  bNext.disabled  = (current === total - 1);
+    if (bLast)  bLast.disabled  = (current === total - 1);
+  }
+
+  function goTo(idx) {
+    if (idx < 0 || idx >= total) return;
+    current = idx;
+    render();
+  }
+
+  function goNext() { goTo(current + 1); }
+  function goPrev() { goTo(current - 1); }
+
+  /* Кнопки */
+  if (bFirst) bFirst.addEventListener('click', function() { goTo(0); });
+  if (bPrev)  bPrev.addEventListener('click', goPrev);
+  if (bNext)  bNext.addEventListener('click', goNext);
+  if (bLast)  bLast.addEventListener('click', function() { goTo(total - 1); });
+
+  /* Зоны клика */
+  if (zNext) zNext.addEventListener('click', function(e) { e.preventDefault(); goNext(); });
+  if (zPrev) zPrev.addEventListener('click', function(e) { e.preventDefault(); goPrev(); });
+
+  /* Клавиатура */
+  document.addEventListener('keydown', function(e) {
+    var key = e.key;
+    if (key === 'ArrowRight' || key === 'PageDown') { e.preventDefault(); goNext(); }
+    else if (key === 'ArrowLeft' || key === 'PageUp') { e.preventDefault(); goPrev(); }
+    else if (key === 'Home') { e.preventDefault(); goTo(0); }
+    else if (key === 'End') { e.preventDefault(); goTo(total - 1); }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
+

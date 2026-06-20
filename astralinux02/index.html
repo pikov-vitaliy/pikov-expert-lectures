@@ -1,0 +1,1293 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Компьютерная безопасность. Модуль 1 — УЦ Маском</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="stage" id="stage">
+
+  <!-- ============ SLIDE 1: TITLE WITH BACKGROUND ============ -->
+  <section class="slide slide-cover" data-screen-label="01 Обложка">
+    <img class="cover-bg" src="assets/podlogka.png" alt="">
+    <div class="cover-content">
+      <div class="cover-eyebrow" style="text-align: center">Учебный центр МАСКОМ&nbsp;&nbsp;·&nbsp;&nbsp;Модуль&nbsp;1</div>
+      <h1 class="cover-title">
+        Компьютерная<br>безопасность
+      </h1>
+      <h2 class="cover-subtitle">
+        Общие сведения. Формальные модели<br>
+        и моделирование безопасности современных&nbsp;ОС
+      </h2>
+      <div class="cover-meta">
+        Лекция · Основные сведения об ОС Astra Linux Special Edition
+      </div>
+      <div class="cover-author">
+        <div class="cover-author-label">Лектор</div>
+        <div class="cover-author-name">Пиков Виталий Александрович</div>
+        <div class="cover-author-role">Эксперт в области ИТ, ИБ, преподаватель</div>
+        <div class="cover-author-tg">telegram:&nbsp;<b>@UnderLineSecurity</b></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 2: AGENDA ============ -->
+  <section class="slide slide-text" data-screen-label="02 Содержание">
+    <div class="slide-inner">
+      <div class="kicker">Содержание занятия</div>
+      <h2 class="h2">О чём поговорим</h2>
+      <ol class="big-list">
+        <li>История развития компьютерной безопасности</li>
+        <li>Основные понятия и определения</li>
+        <li>Модели безопасности: DAC, MAC, RBAC</li>
+        <li>Принципы построения защищённой ОС</li>
+        <li>Архитектура подсистемы защиты</li>
+        <li>Идентификация, аутентификация, авторизация</li>
+        <li>Управление доступом к объектам ОС</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 3: GOALS ============ -->
+  <section class="slide slide-text" data-screen-label="03 Цели">
+    <div class="slide-inner">
+      <div class="kicker">Цели занятия</div>
+      <h2 class="h2">К концу лекции вы будете&nbsp;знать</h2>
+      <ul class="check-list">
+        <li>историю развития теории и практики обеспечения компьютерной&nbsp;безопасности;</li>
+        <li>основные модели безопасности;</li>
+        <li>принципы построения защищённой операционной&nbsp;системы;</li>
+        <li>подходы к построению защищённых&nbsp;ОС;</li>
+        <li>идентификацию, аутентификацию и авторизацию субъектов&nbsp;доступа;</li>
+        <li>принципы управления доступом к объектам операционной&nbsp;системы.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 1 ============ -->
+  <section class="slide slide-divider" data-screen-label="04 Раздел 1">
+    <div class="slide-inner">
+      <div class="divider-num">01</div>
+      <h2 class="divider-title">История развития<br>компьютерной<br>безопасности</h2>
+      <div class="divider-tag">Раздел&nbsp;1 · Откуда всё началось</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 5 ============ -->
+  <section class="slide slide-text" data-screen-label="05 Истоки">
+    <div class="slide-inner">
+      <div class="kicker">1970-е годы</div>
+      <h2 class="h2">Когда появилась задача защиты информации</h2>
+      <p class="lede">
+        Задачи обеспечения безопасности информации возникли в&nbsp;<b>1970-х&nbsp;годах</b> в&nbsp;связи с&nbsp;созданием и&nbsp;внедрением автоматизированных информационных систем в&nbsp;процессы предприятий и&nbsp;организаций.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 6: 3 directions ============ -->
+  <section class="slide slide-text" data-screen-label="06 Три направления">
+    <div class="slide-inner">
+      <div class="kicker">Три направления защиты</div>
+      <h2 class="h2">Защита компьютерной информации стоит на&nbsp;трёх китах</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Конфиденциальность</div>
+          <div class="card-text">Информация доступна только тем, кому она предназначена.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Целостность</div>
+          <div class="card-text">Данные не изменены и не искажены без разрешения.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Доступность</div>
+          <div class="card-text">Сохранность и работоспособность данных в&nbsp;нужный момент.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 7: late 1970s ============ -->
+  <section class="slide slide-text" data-screen-label="07 Конец 70-х">
+    <div class="slide-inner">
+      <div class="kicker">Конец 1970-х</div>
+      <h2 class="h2">Появились исходные модели безопасности</h2>
+      <ul class="check-list">
+        <li>Технологии и протоколы парольной аутентификации;</li>
+        <li>Криптографические методы и средства защиты информации;</li>
+        <li>Модели дискреционного и мандатного разграничения&nbsp;доступа.</li>
+      </ul>
+      <p class="footnote">Эти модели легли в&nbsp;основу будущих стандартов безопасности.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 8: Orange book ============ -->
+  <section class="slide slide-text" data-screen-label="08 Оранжевая книга">
+    <div class="slide-inner">
+      <div class="kicker">1983 год</div>
+      <h2 class="h2">Оранжевая книга</h2>
+      <p class="lede">
+        Модели DAC и&nbsp;MAC послужили методологической основой для&nbsp;разработки первых стандартов безопасности компьютерных систем&nbsp;— в&nbsp;частности, известной <b>«Оранжевой книги»</b>, впервые опубликованной в&nbsp;<b>1983&nbsp;году</b>.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 9: foundational models ============ -->
+  <section class="slide slide-text" data-screen-label="09 Основополагающие модели">
+    <div class="slide-inner">
+      <div class="kicker">Основополагающие модели</div>
+      <h2 class="h2">Что легло в&nbsp;основу теории</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Модель Хариссона&nbsp;— Руззо&nbsp;— Ульмана</div>
+          <div class="card-text">Дискреционное разграничение&nbsp;доступа.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Модель Белла&nbsp;— ЛаПадулы</div>
+          <div class="card-text">Мандатное (полномочное) разграничение&nbsp;доступа.</div>
+        </div>
+      </div>
+      <p class="footnote">Эти модели стали отправной точкой для&nbsp;исследований 1980–1990-х&nbsp;годов.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 10: Russian schools ============ -->
+  <section class="slide slide-text" data-screen-label="10 Российские школы">
+    <div class="slide-inner">
+      <div class="kicker">1990-е годы</div>
+      <h2 class="h2">Подключились отечественные исследователи</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Санкт-Петербургская школа</div>
+          <div class="card-text">Во главе с&nbsp;<b>П.&nbsp;Д.&nbsp;Зегждой</b>.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Школа ИКСИ Академии ФСБ&nbsp;России</div>
+          <div class="card-text">Во главе с&nbsp;<b>Б.&nbsp;А.&nbsp;Погореловым</b>.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 2 ============ -->
+  <section class="slide slide-divider" data-screen-label="11 Раздел 2">
+    <div class="slide-inner">
+      <div class="divider-num">02</div>
+      <h2 class="divider-title">Основные понятия<br>и определения</h2>
+      <div class="divider-tag">Раздел&nbsp;2 · Терминология ГОСТ&nbsp;Р&nbsp;50922-96</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 12: Information security def ============ -->
+  <section class="slide slide-text" data-screen-label="12 Информационная безопасность">
+    <div class="slide-inner">
+      <div class="kicker">Определение</div>
+      <h2 class="h2">Информационная безопасность</h2>
+      <p class="quote">
+        «Состояние защищённости информационной сферы (предприятия, организации, общества, государства) от&nbsp;внутренних и&nbsp;внешних угроз».
+      </p>
+      <div class="three-tags">
+        <span class="tag">Информационная сфера</span>
+        <span class="tag">Угрозы внутренние и&nbsp;внешние</span>
+        <span class="tag">Состояние защищённости</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 13: GOST ============ -->
+  <section class="slide slide-text" data-screen-label="13 ГОСТ">
+    <div class="slide-inner">
+      <div class="kicker">Источник терминологии</div>
+      <h2 class="h2">ГОСТ&nbsp;Р&nbsp;50922-96</h2>
+      <p class="lede">
+        «Защита информации. Основные термины и&nbsp;определения». Дата введения&nbsp;— <b>01.07.1997</b>.
+      </p>
+      <p class="footnote">
+        Стандарт обязателен для&nbsp;применения во&nbsp;всех видах документации и&nbsp;литературе по&nbsp;защите&nbsp;информации.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 14: Защищаемая информация ============ -->
+  <section class="slide slide-term" data-screen-label="14 Термин: защищаемая информация">
+    <div class="slide-inner">
+      <div class="kicker">Термин 1 / 8</div>
+      <h2 class="term-title">Защищаемая информация</h2>
+      <p class="term-def">
+        Информация, являющаяся предметом собственности и&nbsp;подлежащая защите в&nbsp;соответствии с&nbsp;требованиями правовых документов или&nbsp;требованиями, устанавливаемыми собственником информации.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 15: Защита информации ============ -->
+  <section class="slide slide-term" data-screen-label="15 Термин: защита информации">
+    <div class="slide-inner">
+      <div class="kicker">Термин 2 / 8</div>
+      <h2 class="term-title">Защита информации</h2>
+      <p class="term-def">
+        Деятельность по&nbsp;предотвращению утечки защищаемой информации, несанкционированных и&nbsp;непреднамеренных воздействий на&nbsp;защищаемую информацию.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 16: От утечки ============ -->
+  <section class="slide slide-term" data-screen-label="16 Термин: от утечки">
+    <div class="slide-inner">
+      <div class="kicker">Термин 3 / 8</div>
+      <h2 class="term-title">Защита от&nbsp;утечки</h2>
+      <p class="term-def">
+        Деятельность по&nbsp;предотвращению неконтролируемого распространения защищаемой информации&nbsp;— от&nbsp;разглашения, несанкционированного доступа и&nbsp;получения её&nbsp;иностранными разведками.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 17: НСВ ============ -->
+  <section class="slide slide-term" data-screen-label="17 Термин: НСВ">
+    <div class="slide-inner">
+      <div class="kicker">Термин 4 / 8</div>
+      <h2 class="term-title">Защита от&nbsp;НСВ</h2>
+      <p class="term-sub">несанкционированного воздействия</p>
+      <p class="term-def">
+        Деятельность по&nbsp;предотвращению воздействия на&nbsp;информацию с&nbsp;нарушением правил, приводящего к&nbsp;её&nbsp;искажению, уничтожению, копированию, блокированию доступа, утрате или&nbsp;сбою функционирования носителя.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 18: Непреднамеренное ============ -->
+  <section class="slide slide-term" data-screen-label="18 Термин: непреднамеренное">
+    <div class="slide-inner">
+      <div class="kicker">Термин 5 / 8</div>
+      <h2 class="term-title">Защита от&nbsp;непреднамеренного воздействия</h2>
+      <p class="term-def">
+        Предотвращение последствий ошибок пользователя, сбоев технических и&nbsp;программных средств, природных явлений и&nbsp;иных нецеленаправленных воздействий, приводящих к&nbsp;искажению, уничтожению или&nbsp;блокированию информации.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 19: Разглашение ============ -->
+  <section class="slide slide-term" data-screen-label="19 Термин: разглашение">
+    <div class="slide-inner">
+      <div class="kicker">Термин 6 / 8</div>
+      <h2 class="term-title">Защита от&nbsp;разглашения</h2>
+      <p class="term-def">
+        Деятельность по&nbsp;предотвращению несанкционированного доведения защищаемой информации до&nbsp;неконтролируемого количества получателей.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 20: НСД ============ -->
+  <section class="slide slide-term" data-screen-label="20 Термин: НСД">
+    <div class="slide-inner">
+      <div class="kicker">Термин 7 / 8</div>
+      <h2 class="term-title">Защита от&nbsp;НСД</h2>
+      <p class="term-sub">несанкционированного доступа</p>
+      <p class="term-def">
+        Деятельность по&nbsp;предотвращению получения защищаемой информации заинтересованным субъектом с&nbsp;нарушением установленных правовыми документами или&nbsp;собственником прав или&nbsp;правил доступа.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 21: Цель ============ -->
+  <section class="slide slide-term" data-screen-label="21 Термин: цель">
+    <div class="slide-inner">
+      <div class="kicker">Термин 8 / 8</div>
+      <h2 class="term-title">Цель защиты информации</h2>
+      <p class="term-def">
+        Желаемый результат защиты информации&nbsp;— предотвращение ущерба собственнику, владельцу или&nbsp;пользователю информации от&nbsp;возможной утечки и&nbsp;несанкционированного или&nbsp;непреднамеренного воздействия.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 22: Levels of importance ============ -->
+  <section class="slide slide-text" data-screen-label="22 Уровни важности">
+    <div class="slide-inner">
+      <div class="kicker">Категории информации</div>
+      <h2 class="h2">Деление по&nbsp;уровню важности</h2>
+      <ol class="big-list numbered">
+        <li><b>Жизненно важная незаменимая</b>&nbsp;— без неё организация не&nbsp;функционирует.</li>
+        <li><b>Важная</b>&nbsp;— может быть восстановлена, но&nbsp;это трудно и&nbsp;дорого.</li>
+        <li><b>Полезная</b>&nbsp;— трудно восстановить, но&nbsp;организация может работать без неё.</li>
+        <li><b>Несущественная</b>&nbsp;— больше не&nbsp;нужна организации.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 23: Three groups ============ -->
+  <section class="slide slide-text" data-screen-label="23 Три группы лиц">
+    <div class="slide-inner">
+      <div class="kicker">Лица, связанные с&nbsp;информацией</div>
+      <h2 class="h2">Три группы относятся к&nbsp;информации по-разному</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Держатель</div>
+          <div class="card-text">Организация или&nbsp;лицо&nbsp;— обладатель информации.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Источник</div>
+          <div class="card-text">Поставляет информацию (например, пациент).</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Нарушитель</div>
+          <div class="card-text">Лицо или&nbsp;организация, стремящиеся получить информацию.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 24: Уровень секретности ============ -->
+  <section class="slide slide-text" data-screen-label="24 Уровень секретности">
+    <div class="slide-inner">
+      <div class="kicker">Уровень секретности</div>
+      <h2 class="h2">Административная или&nbsp;законодательная мера</h2>
+      <p class="lede">
+        Соответствует мере ответственности лица за&nbsp;утечку или&nbsp;потерю конкретной секретной информации.
+      </p>
+      <div class="three-tags">
+        <span class="tag">Государственная тайна</span>
+        <span class="tag">Военная тайна</span>
+        <span class="tag">Коммерческая тайна</span>
+        <span class="tag">Служебная тайна</span>
+        <span class="tag">Личная тайна</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 25: Pyramid ============ -->
+  <section class="slide slide-text" data-screen-label="25 Пирамида важности">
+    <div class="slide-inner">
+      <div class="kicker">Представление по&nbsp;категориям</div>
+      <h2 class="h2">Пирамида важности и&nbsp;секретности</h2>
+      <div class="pyramid">
+        <div class="pyramid-row r1"><span>Жизненно важная</span></div>
+        <div class="pyramid-row r2"><span>Важная</span></div>
+        <div class="pyramid-row r3"><span>Полезная</span></div>
+        <div class="pyramid-row r4"><span>Несущественная (несекретная)</span></div>
+      </div>
+      <p class="footnote">Каждый слой делится по&nbsp;горизонтали&nbsp;— по&nbsp;функциональным обязанностям пользователей.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 3 ============ -->
+  <section class="slide slide-divider" data-screen-label="26 Раздел 3">
+    <div class="slide-inner">
+      <div class="divider-num">03</div>
+      <h2 class="divider-title">Модели<br>безопасности</h2>
+      <div class="divider-tag">Раздел&nbsp;3 · DAC, MAC, RBAC</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 27: Subject/Object ============ -->
+  <section class="slide slide-text" data-screen-label="27 Объект и субъект">
+    <div class="slide-inner">
+      <div class="kicker">Базовые понятия</div>
+      <h2 class="h2">Объект и&nbsp;субъект доступа</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Объект доступа</div>
+          <div class="card-text">Единица информационного ресурса автоматизированной системы, доступ к&nbsp;которой регламентируется правилами разграничения доступа.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Субъект доступа</div>
+          <div class="card-text">Лицо или&nbsp;процесс, действия которого регламентируются правилами разграничения доступа.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 28: Why model ============ -->
+  <section class="slide slide-text" data-screen-label="28 Зачем модель">
+    <div class="slide-inner">
+      <div class="kicker">Зачем нужна модель безопасности</div>
+      <h2 class="h2">Модель помогает&nbsp;…</h2>
+      <ul class="check-list">
+        <li>Выбрать и&nbsp;обосновать базовые принципы архитектуры защиты;</li>
+        <li>Доказать защищённость системы&nbsp;— формально;</li>
+        <li>Составить формальную спецификацию политики безопасности.</li>
+      </ul>
+      <p class="footnote">Хорошая модель безопасности&nbsp;— абстрактная, простая и&nbsp;адекватная моделируемой системе.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 29: Four models ============ -->
+  <section class="slide slide-text" data-screen-label="29 Четыре модели">
+    <div class="slide-inner">
+      <div class="kicker">Основные модели безопасности</div>
+      <h2 class="h2">Четыре подхода к&nbsp;разграничению&nbsp;доступа</h2>
+      <div class="four-grid">
+        <div class="card">
+          <div class="card-mono">DAC</div>
+          <div class="card-title">Дискреционная</div>
+          <div class="card-text">Discretionary Access Control</div>
+        </div>
+        <div class="card">
+          <div class="card-mono">MAC</div>
+          <div class="card-title">Мандатная</div>
+          <div class="card-text">Mandatory Access Control</div>
+        </div>
+        <div class="card">
+          <div class="card-mono">RBAC</div>
+          <div class="card-title">Ролевая</div>
+          <div class="card-text">Role Based Access Control</div>
+        </div>
+        <div class="card">
+          <div class="card-mono">СРД</div>
+          <div class="card-title">Система разграничения</div>
+          <div class="card-text">Security Policy Realization</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 30: DAC subjects/objects ============ -->
+  <section class="slide slide-text" data-screen-label="30 DAC примеры">
+    <div class="slide-inner">
+      <div class="kicker">Модель DAC · 1 / 3</div>
+      <h2 class="h2">Дискреционная модель: что&nbsp;есть&nbsp;что</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Субъекты</div>
+          <ul class="bullets">
+            <li>Пользователь</li>
+            <li>Программа от&nbsp;имени пользователя</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="card-title">Объекты</div>
+          <ul class="bullets">
+            <li>Файлы и&nbsp;каталоги</li>
+            <li>Внешние накопители (CD, DVD, USB)</li>
+            <li>Принтер, сетевой адаптер</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 31: DAC closed/open ============ -->
+  <section class="slide slide-text" data-screen-label="31 DAC закрытая открытая">
+    <div class="slide-inner">
+      <div class="kicker">Модель DAC · 2 / 3</div>
+      <h2 class="h2">Закрытые и&nbsp;открытые системы</h2>
+      <div class="two-cards">
+        <div class="card accent">
+          <div class="card-mono">Closed</div>
+          <div class="card-title">Windows</div>
+          <div class="card-text">По&nbsp;умолчанию никто не&nbsp;имеет доступа. В&nbsp;ACL описывается набор разрешений.</div>
+        </div>
+        <div class="card accent">
+          <div class="card-mono">Open</div>
+          <div class="card-title">Linux</div>
+          <div class="card-text">По&nbsp;умолчанию все имеют полный доступ. В&nbsp;ACL описывается набор ограничений.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 32: DAC operations ============ -->
+  <section class="slide slide-text" data-screen-label="32 DAC операции">
+    <div class="slide-inner">
+      <div class="kicker">Модель DAC · 3 / 3</div>
+      <h2 class="h2">Три операции доступа</h2>
+      <div class="three-cards">
+        <div class="card big">
+          <div class="card-letter">r</div>
+          <div class="card-title">Read</div>
+          <div class="card-text">Чтение</div>
+        </div>
+        <div class="card big">
+          <div class="card-letter">w</div>
+          <div class="card-title">Write</div>
+          <div class="card-text">Запись</div>
+        </div>
+        <div class="card big">
+          <div class="card-letter">x</div>
+          <div class="card-title">Execute</div>
+          <div class="card-text">Выполнение</div>
+        </div>
+      </div>
+      <p class="footnote">Для&nbsp;каждой пары «субъект&nbsp;— объект» устанавливается набор разрешённых операций.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 33: ls -l example ============ -->
+  <section class="slide slide-image" data-screen-label="33 ls -l пример">
+    <div class="image-bleed">
+      <div class="terminal">
+        <div class="terminal-bar">
+          <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+          <span class="terminal-title">root@astra:~# ls&nbsp;-l</span>
+        </div>
+        <pre class="terminal-body">
+<span class="t-perm">drwxr-xr-x.</span>  2 root root    4096 янв. 30 18:37 anaconda
+<span class="t-perm">drwxr-x---.</span>  2 root root    4096 апр.  1 21:27 audit
+<span class="t-perm">-rw-r--r--.</span>  1 root root   12094 апр.  2 03:33 boot.log
+<span class="t-perm">-rw-------.</span>  1 root utmp     384 апр.  2 15:25 btmp
+<span class="t-perm">-rw-------.</span>  1 root utmp    1536 марта 15 07:41 btmp-20120401
+<span class="t-perm">-rw--w----.</span>  1 root  997      0 янв. 30 18:35 clamav-milter.log
+<span class="t-perm">drwxr-xr-x.</span>  2 root root    4096 янв. 30 14:44 ConsoleKit
+<span class="t-perm">-rw-r--r--.</span>  1 root root  267059 апр.  2 15:25 cron
+<span class="t-perm">-rw-r--r--.</span>  1 root root 1241791 апр.  1 03:22 cron-20120401
+<span class="t-perm">-r--------.</span>  1 root root   94710 марта 13 12:51 dracut.l</pre>
+      </div>
+    </div>
+    <div class="image-caption">
+      <div class="caption-kicker">Пример</div>
+      <div class="caption-title">Дискреционное управление доступом в&nbsp;Linux</div>
+      <div class="caption-text">Вывод <code>ls&nbsp;-l</code>: первые символы&nbsp;— тип файла и&nbsp;права для&nbsp;трёх категорий: владелец, группа, остальные.</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 34: ACL example ============ -->
+  <section class="slide slide-text" data-screen-label="34 ACL разбор">
+    <div class="slide-inner">
+      <div class="kicker">Расширенные разрешения (ACL)</div>
+      <h2 class="h2">Что обозначает каждая строка</h2>
+      <div class="acl-list">
+        <div class="acl-row"><span class="acl-num">1</span><span class="acl-text">Информация о&nbsp;файле, владельце, группе и&nbsp;режимах доступа</span></div>
+        <div class="acl-row"><span class="acl-num">2</span><span class="acl-text">Базовые разрешения</span></div>
+        <div class="acl-row"><span class="acl-num">3</span><span class="acl-text">Расширенные разрешения</span></div>
+        <div class="acl-row"><span class="acl-num">4</span><span class="acl-text">Разрешения по&nbsp;умолчанию</span></div>
+        <div class="acl-row"><span class="acl-num">5</span><span class="acl-text">Эффективные разрешения, определяемые маской</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 35: rwxr-xr- example ============ -->
+  <section class="slide slide-text" data-screen-label="35 rwxr-xr">
+    <div class="slide-inner">
+      <div class="kicker">Чтение прав</div>
+      <h2 class="h2">Пример: <span class="mono">rwxr-xr<span class="muted">--</span></span></h2>
+      <div class="rwx-grid">
+        <div class="rwx-col"><div class="rwx-head">Владелец</div><div class="rwx-perm">rwx</div><div class="rwx-text">всё что угодно</div></div>
+        <div class="rwx-col"><div class="rwx-head">Группа</div><div class="rwx-perm">r-x</div><div class="rwx-text">читать и&nbsp;исполнять</div></div>
+        <div class="rwx-col"><div class="rwx-head">Прочие</div><div class="rwx-perm">r--</div><div class="rwx-text">только чтение</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 36: DAC pros/cons ============ -->
+  <section class="slide slide-text" data-screen-label="36 DAC плюсы минусы">
+    <div class="slide-inner">
+      <div class="kicker">Достоинства и&nbsp;недостатки DAC</div>
+      <h2 class="h2">У&nbsp;дискреционной модели есть свои стороны</h2>
+      <div class="two-cards">
+        <div class="card good">
+          <div class="card-title">Достоинства</div>
+          <ul class="bullets">
+            <li>Простота реализации</li>
+            <li>Гибкость&nbsp;— владелец сам управляет доступом</li>
+            <li>Хорошая изученность</li>
+          </ul>
+        </div>
+        <div class="card bad">
+          <div class="card-title">Недостатки</div>
+          <ul class="bullets">
+            <li>Излишняя детализация → запутанность</li>
+            <li>Сложность администрирования</li>
+            <li>Возможность ошибки при&nbsp;назначении прав</li>
+            <li>Нет защиты от&nbsp;утечки конфиденциальных данных</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 37: Bell-LaPadula intro ============ -->
+  <section class="slide slide-text" data-screen-label="37 Белл-ЛаПадула">
+    <div class="slide-inner">
+      <div class="kicker">Модель Белла&nbsp;— ЛаПадулы</div>
+      <h2 class="h2">Одна из&nbsp;самых известных моделей безопасности</h2>
+      <p class="lede">
+        Это модель <b>мандатного управления доступом</b>. Знаменита двумя основными правилами безопасности&nbsp;— одно относится к&nbsp;<b>чтению</b>, другое к&nbsp;<b>записи</b> данных.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 38: NRU rule ============ -->
+  <section class="slide slide-rule" data-screen-label="38 Правило NRU">
+    <div class="slide-inner">
+      <div class="kicker">Правило 1</div>
+      <h2 class="rule-title">Свойство простой безопасности</h2>
+      <div class="rule-formula">No&nbsp;Read&nbsp;Up</div>
+      <p class="rule-text">
+        Несекретный пользователь (или&nbsp;процесс от&nbsp;его имени) <b>не&nbsp;может читать</b> данные из&nbsp;секретного файла.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 39: NWD rule ============ -->
+  <section class="slide slide-rule" data-screen-label="39 Правило NWD">
+    <div class="slide-inner">
+      <div class="kicker">Правило 2</div>
+      <h2 class="rule-title">Свойство «не&nbsp;записывать&nbsp;вниз»</h2>
+      <div class="rule-formula">No&nbsp;Write&nbsp;Down</div>
+      <p class="rule-text">
+        Пользователь с&nbsp;уровнем доступа к&nbsp;секретным данным <b>не&nbsp;может записывать</b> данные в&nbsp;несекретный файл.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 40: Bell-LaPadula visualised ============ -->
+  <section class="slide slide-text" data-screen-label="40 Белл-ЛаПадула схема">
+    <div class="slide-inner">
+      <div class="kicker">Иерархия уровней</div>
+      <h2 class="h2">Как работают правила в&nbsp;иерархии</h2>
+      <div class="bl-levels">
+        <div class="bl-row"><span class="bl-tag">Совершенно секретно</span></div>
+        <div class="bl-row"><span class="bl-tag">Секретно</span></div>
+        <div class="bl-row"><span class="bl-tag">Конфиденциально</span></div>
+        <div class="bl-row"><span class="bl-tag">Несекретно</span></div>
+      </div>
+      <p class="footnote">
+        Пользователи могут <b>читать</b> только документы не&nbsp;выше своего допуска и&nbsp;<b>не&nbsp;могут создавать</b> документы ниже уровня своего допуска.
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 41: Bell-LaPadula notes ============ -->
+  <section class="slide slide-text" data-screen-label="41 Белл-ЛаПадула итог">
+    <div class="slide-inner">
+      <div class="kicker">Что важно знать</div>
+      <h2 class="h2">Особенности модели Белла&nbsp;— ЛаПадулы</h2>
+      <ul class="check-list">
+        <li>Первая значительная модель политики безопасности для&nbsp;компьютеров;</li>
+        <li>До&nbsp;сих пор применяется в&nbsp;военной отрасли (в&nbsp;изменённом виде);</li>
+        <li>Полностью формализована математически;</li>
+        <li>Основа модели&nbsp;— конфиденциальность;</li>
+        <li>Игнорирует проблему изменения классификации.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 42: RBAC intro ============ -->
+  <section class="slide slide-text" data-screen-label="42 RBAC">
+    <div class="slide-inner">
+      <div class="kicker">Ролевая модель — RBAC</div>
+      <h2 class="h2">Доступ&nbsp;— по&nbsp;ролям, а&nbsp;не&nbsp;по&nbsp;пользователям</h2>
+      <p class="lede">
+        Ролевой метод управления доступом контролирует доступ пользователей к&nbsp;информации <b>на&nbsp;основе типов их&nbsp;активностей в&nbsp;системе&nbsp;— ролей</b>.
+      </p>
+      <div class="three-tags">
+        <span class="tag">Администратор БД</span>
+        <span class="tag">Менеджер</span>
+        <span class="tag">Начальник отдела</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 43: RBAC diagram ============ -->
+  <section class="slide slide-image" data-screen-label="43 RBAC схема">
+    <div class="image-bleed">
+      <div class="rbac-diagram">
+        <div class="rbac-col">
+          <div class="rbac-head">Пользователи</div>
+          <div class="rbac-node">Иванов</div>
+          <div class="rbac-node">Петров</div>
+          <div class="rbac-node">Сидоров</div>
+        </div>
+        <div class="rbac-arrow">→</div>
+        <div class="rbac-col">
+          <div class="rbac-head">Роли</div>
+          <div class="rbac-node accent">Администратор</div>
+          <div class="rbac-node accent">Бухгалтер</div>
+          <div class="rbac-node accent">Аудитор</div>
+        </div>
+        <div class="rbac-arrow">→</div>
+        <div class="rbac-col">
+          <div class="rbac-head">Разрешения</div>
+          <div class="rbac-node">Чтение БД</div>
+          <div class="rbac-node">Запись БД</div>
+          <div class="rbac-node">Печать отчётов</div>
+        </div>
+      </div>
+    </div>
+    <div class="image-caption">
+      <div class="caption-kicker">Схема</div>
+      <div class="caption-title">Пример ролевой модели (RBAC)</div>
+      <div class="caption-text">Между пользователями и&nbsp;разрешениями появляется промежуточный слой&nbsp;— роли. Это упрощает администрирование.</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 44: RBAC pros ============ -->
+  <section class="slide slide-text" data-screen-label="44 RBAC достоинства">
+    <div class="slide-inner">
+      <div class="kicker">Достоинства RBAC</div>
+      <h2 class="h2">Почему ролевая модель удобна</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Простота администрирования</div>
+          <div class="card-text">Не&nbsp;нужно прописывать разрешения для&nbsp;каждой пары «объект&nbsp;— пользователь».</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Принцип наименьшей привилегии</div>
+          <div class="card-text">Пользователь регистрируется ролью, минимально необходимой для&nbsp;задачи.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Разделение обязанностей</div>
+          <div class="card-text">Управление привилегиями в&nbsp;пределах системы или&nbsp;приложения.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 45: RBAC examples ============ -->
+  <section class="slide slide-text" data-screen-label="45 RBAC примеры">
+    <div class="slide-inner">
+      <div class="kicker">Где применяется RBAC</div>
+      <h2 class="h2">Примеры систем</h2>
+      <div class="logo-grid">
+        <div class="logo-cell">Microsoft<br>Active Directory</div>
+        <div class="logo-cell">SELinux</div>
+        <div class="logo-cell">FreeBSD</div>
+        <div class="logo-cell">Solaris</div>
+        <div class="logo-cell">СУБД<br>Oracle</div>
+        <div class="logo-cell">PostgreSQL</div>
+        <div class="logo-cell">SAP&nbsp;R/3</div>
+        <div class="logo-cell">…</div>
+      </div>
+      <p class="footnote">С&nbsp;помощью RBAC могут быть смоделированы дискреционные и&nbsp;мандатные системы управления доступом.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 4 ============ -->
+  <section class="slide slide-divider" data-screen-label="46 Раздел 4">
+    <div class="slide-inner">
+      <div class="divider-num">04</div>
+      <h2 class="divider-title">Угрозы<br>безопасности&nbsp;ОС</h2>
+      <div class="divider-tag">Раздел&nbsp;4 · Классификация и&nbsp;типичные атаки</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 47: Threat classification ============ -->
+  <section class="slide slide-text" data-screen-label="47 Классификация угроз">
+    <div class="slide-inner">
+      <div class="kicker">Классификация угроз</div>
+      <h2 class="h2">По&nbsp;каким аспектам можно классифицировать</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-title">По&nbsp;цели атаки</div>
+          <div class="card-text">Что хочет получить злоумышленник.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">По&nbsp;принципу воздействия</div>
+          <div class="card-text">Каким способом атака реализуется.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">По&nbsp;типу уязвимости</div>
+          <div class="card-text">Архитектурная или&nbsp;уязвимость кода.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 48: Typical attacks ============ -->
+  <section class="slide slide-text" data-screen-label="48 Типичные атаки">
+    <div class="slide-inner">
+      <div class="kicker">Типичные атаки на&nbsp;ОС</div>
+      <h2 class="h2">Семь сценариев, к&nbsp;которым нужно&nbsp;быть готовым</h2>
+      <ul class="attack-list">
+        <li><span class="att-num">1</span><span class="att-text"><b>Сканирование файловой системы</b>&nbsp;— перебор всех файлов в&nbsp;поисках доступных.</span></li>
+        <li><span class="att-num">2</span><span class="att-text"><b>Подбор пароля</b>&nbsp;— перебор, словарь, знания о&nbsp;пользователе.</span></li>
+        <li><span class="att-num">3</span><span class="att-text"><b>Кража ключевой информации</b>&nbsp;— смарт-карт, токенов, подсматривание паролей.</span></li>
+        <li><span class="att-num">4</span><span class="att-text"><b>Сборка мусора</b>&nbsp;— восстановление удалённых, но&nbsp;не&nbsp;стёртых данных.</span></li>
+        <li><span class="att-num">5</span><span class="att-text"><b>Превышение полномочий</b>&nbsp;— использование ошибок в&nbsp;ПО.</span></li>
+        <li><span class="att-num">6</span><span class="att-text"><b>Программные закладки</b>&nbsp;— внедрение вредоносного кода.</span></li>
+        <li><span class="att-num">7</span><span class="att-text"><b>«Жадные» программы</b>&nbsp;— захват ресурсов, приводящий к&nbsp;краху ОС.</span></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 49: Protected OS ============ -->
+  <section class="slide slide-text" data-screen-label="49 Защищённая ОС">
+    <div class="slide-inner">
+      <div class="kicker">Защищённая ОС</div>
+      <h2 class="h2">ОС называют защищённой, если&nbsp;она&nbsp;…</h2>
+      <ul class="check-list">
+        <li>Содержит средства разграничения доступа пользователей к&nbsp;ресурсам;</li>
+        <li>Содержит средства проверки подлинности пользователя;</li>
+        <li>Содержит средства противодействия выводу ОС из&nbsp;строя.</li>
+      </ul>
+      <p class="footnote">Если ОС защищена не&nbsp;от&nbsp;всех классов угроз, её&nbsp;называют <b>частично защищённой</b>.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 5 ============ -->
+  <section class="slide slide-divider" data-screen-label="50 Раздел 5">
+    <div class="slide-inner">
+      <div class="divider-num">05</div>
+      <h2 class="divider-title">Архитектура<br>защищённой&nbsp;ОС</h2>
+      <div class="divider-tag">Раздел&nbsp;5 · Принципы построения</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 51: Two approaches ============ -->
+  <section class="slide slide-text" data-screen-label="51 Два подхода">
+    <div class="slide-inner">
+      <div class="kicker">Подходы к&nbsp;построению</div>
+      <h2 class="h2">Два пути создания защищённой&nbsp;ОС</h2>
+      <div class="two-cards">
+        <div class="card bad">
+          <div class="card-title">Фрагментарный</div>
+          <div class="card-text">Сначала защита от&nbsp;одной угрозы, затем от&nbsp;другой. Набор разрозненных продуктов&nbsp;— часто несовместимых.</div>
+        </div>
+        <div class="card good">
+          <div class="card-title">Комплексный</div>
+          <div class="card-text">Защитные функции вносятся в&nbsp;ОС <b>на&nbsp;этапе проектирования</b> и&nbsp;являются её&nbsp;неотъемлемой частью.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 52: Subsystem functions ============ -->
+  <section class="slide slide-text" data-screen-label="52 Функции подсистемы">
+    <div class="slide-inner">
+      <div class="kicker">Архитектура безопасности</div>
+      <h2 class="h2">Основные функции подсистемы защиты&nbsp;ОС</h2>
+      <div class="four-grid">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Идентификация и&nbsp;аутентификация</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Разграничение доступа</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Аудит</div>
+        </div>
+        <div class="card">
+          <div class="card-num">04</div>
+          <div class="card-title">Управление политикой безопасности</div>
+        </div>
+      </div>
+      <p class="footnote">Дополнительно: <b>криптографические</b> и&nbsp;<b>сетевые</b> функции.</p>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 6 ============ -->
+  <section class="slide slide-divider" data-screen-label="53 Раздел 6">
+    <div class="slide-inner">
+      <div class="divider-num">06</div>
+      <h2 class="divider-title">Идентификация,<br>аутентификация,<br>авторизация</h2>
+      <div class="divider-tag">Раздел&nbsp;6 · Кто? и&nbsp;на&nbsp;что имеет право?</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 54: I/A/A ============ -->
+  <section class="slide slide-text" data-screen-label="54 IAA">
+    <div class="slide-inner">
+      <div class="kicker">Три шага входа в&nbsp;систему</div>
+      <h2 class="h2">Перед началом работы пользователь проходит&nbsp;…</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-num">01</div>
+          <div class="card-title">Идентификация</div>
+          <div class="card-text">Сообщает имя или&nbsp;учётный&nbsp;номер.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">02</div>
+          <div class="card-title">Аутентификация</div>
+          <div class="card-text">Подтверждает, что он&nbsp;— это&nbsp;он.</div>
+        </div>
+        <div class="card">
+          <div class="card-num">03</div>
+          <div class="card-title">Авторизация</div>
+          <div class="card-text">Получает права для&nbsp;работы в&nbsp;системе.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 55: Methods of auth ============ -->
+  <section class="slide slide-text" data-screen-label="55 Методы аутентификации">
+    <div class="slide-inner">
+      <div class="kicker">Методы аутентификации</div>
+      <h2 class="h2">Чем доказывают свою&nbsp;личность</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-title">Знание</div>
+          <div class="card-text">Имя и&nbsp;пароль</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Владение</div>
+          <div class="card-text">Внешние носители ключевой информации (смарт-карты, токены)</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Биометрия</div>
+          <div class="card-text">Биометрические характеристики пользователей</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SECTION DIVIDER 7 ============ -->
+  <section class="slide slide-divider" data-screen-label="56 Раздел 7">
+    <div class="slide-inner">
+      <div class="divider-num">07</div>
+      <h2 class="divider-title">Разграничение<br>доступа к&nbsp;объектам</h2>
+      <div class="divider-tag">Раздел&nbsp;7 · Объект, метод, субъект</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 57: O/M/S ============ -->
+  <section class="slide slide-text" data-screen-label="57 Объект метод субъект">
+    <div class="slide-inner">
+      <div class="kicker">Три понятия</div>
+      <h2 class="h2">Кто, к&nbsp;чему, и&nbsp;как</h2>
+      <div class="three-cards">
+        <div class="card">
+          <div class="card-title">Объект</div>
+          <div class="card-text"><b>То, к&nbsp;чему</b> осуществляется доступ.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Субъект</div>
+          <div class="card-text"><b>Тот, кто</b> осуществляет доступ.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Метод</div>
+          <div class="card-text"><b>То, как</b> осуществляется доступ.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 58: Owner / superuser ============ -->
+  <section class="slide slide-text" data-screen-label="58 Владелец и суперпользователь">
+    <div class="slide-inner">
+      <div class="kicker">Владелец и&nbsp;суперпользователь</div>
+      <h2 class="h2">Особые роли в&nbsp;модели доступа</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Владелец объекта</div>
+          <div class="card-text">Субъект, которому принадлежит объект и&nbsp;который несёт ответственность за&nbsp;конфиденциальность, целостность и&nbsp;доступность.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Суперпользователь</div>
+          <div class="card-text">Субъект, имеющий возможность <b>игнорировать</b> правила разграничения доступа к&nbsp;объектам.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 59: Requirements for ACL rules ============ -->
+  <section class="slide slide-text" data-screen-label="59 Требования к правилам">
+    <div class="slide-inner">
+      <div class="kicker">Требования к&nbsp;правилам</div>
+      <h2 class="h2">Каким должно быть разграничение доступа</h2>
+      <ul class="check-list">
+        <li>Соответствует правилам, принятым в&nbsp;организации;</li>
+        <li>Не&nbsp;допускает разрушающих воздействий на&nbsp;объекты ОС;</li>
+        <li>У&nbsp;любого объекта есть владелец;</li>
+        <li>Нет недоступных объектов&nbsp;— к&nbsp;каждому может обратиться хотя&nbsp;бы один субъект;</li>
+        <li>Не&nbsp;допускает утечки информации конфиденциального характера.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 60: DAC vs MAC summary ============ -->
+  <section class="slide slide-text" data-screen-label="60 DAC vs MAC">
+    <div class="slide-inner">
+      <div class="kicker">Две основные модели</div>
+      <h2 class="h2">Как ОС разграничивают доступ</h2>
+      <div class="two-cards">
+        <div class="card accent">
+          <div class="card-mono">DAC</div>
+          <div class="card-title">Избирательное (дискреционное)</div>
+          <div class="card-text">Определённые операции над&nbsp;ресурсом запрещаются или&nbsp;разрешаются субъектам или&nbsp;группам субъектов. Большинство ОС реализуют именно эту модель.</div>
+        </div>
+        <div class="card accent">
+          <div class="card-mono">MAC</div>
+          <div class="card-title">Полномочное (мандатное)</div>
+          <div class="card-text">Все объекты имеют уровни секретности. Субъекты делятся на&nbsp;группы по&nbsp;уровню допуска. Модель многоуровневой безопасности.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 61: DAC rules ============ -->
+  <section class="slide slide-text" data-screen-label="61 DAC правила">
+    <div class="slide-inner">
+      <div class="kicker">Избирательное разграничение</div>
+      <h2 class="h2">Четыре правила DAC</h2>
+      <ol class="big-list numbered">
+        <li>Для&nbsp;любого объекта существует <b>владелец</b>;</li>
+        <li>Владелец может произвольно <b>ограничивать доступ</b> других субъектов;</li>
+        <li>Для&nbsp;каждой тройки <b>«субъект — объект — метод»</b> доступ определён однозначно;</li>
+        <li>Существует хотя&nbsp;бы один <b>привилегированный пользователь</b> (администратор).</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 62: Domain ============ -->
+  <section class="slide slide-text" data-screen-label="62 Домен безопасности">
+    <div class="slide-inner">
+      <div class="kicker">Домен безопасности</div>
+      <h2 class="h2">Контейнер, в&nbsp;котором работает одна политика</h2>
+      <p class="lede">
+        Домен безопасности&nbsp;— часть автоматизированной системы, которая реализует одни и&nbsp;те&nbsp;же политики безопасности (ГОСТ&nbsp;Р&nbsp;ИСО/МЭК&nbsp;ТО&nbsp;19791-2008).
+      </p>
+      <div class="domain-grid">
+        <div class="domain-box">
+          <div class="domain-head">Домен 1 · Бухгалтерия</div>
+          <div class="domain-list">Компьютеры, учётки, ресурсы<br>отдела бухгалтерии</div>
+        </div>
+        <div class="domain-box">
+          <div class="domain-head">Домен 2 · Руководство</div>
+          <div class="domain-list">Компьютеры, учётки, ресурсы<br>руководства</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 63: MAC rules ============ -->
+  <section class="slide slide-text" data-screen-label="63 MAC правила">
+    <div class="slide-inner">
+      <div class="kicker">Полномочное разграничение</div>
+      <h2 class="h2">Правила MAC&nbsp;— с&nbsp;контролем потоков</h2>
+      <ul class="check-list">
+        <li>Для&nbsp;любого объекта существует владелец;</li>
+        <li>Владелец может ограничивать доступ других субъектов;</li>
+        <li>Для&nbsp;каждой <b>четвёрки</b> «субъект — объект — метод — процесс» возможность доступа определена однозначно;</li>
+        <li>Существует привилегированный пользователь, имеющий возможность удалить любой объект.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 64: Levels and labels ============ -->
+  <section class="slide slide-text" data-screen-label="64 Грифы и допуски">
+    <div class="slide-inner">
+      <div class="kicker">Грифы секретности и&nbsp;уровни допуска</div>
+      <h2 class="h2">У&nbsp;каждого объекта&nbsp;— гриф, у&nbsp;каждого субъекта&nbsp;— допуск</h2>
+      <div class="two-cards">
+        <div class="card">
+          <div class="card-title">Гриф секретности объекта</div>
+          <div class="card-text">Чем выше числовое значение&nbsp;— тем секретнее объект. <b>0</b>&nbsp;— несекретен.</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Уровень допуска субъекта</div>
+          <div class="card-text">Чем выше числовое значение&nbsp;— тем больший допуск. <b>0</b>&nbsp;— нет допуска.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 65: NRU rule formal ============ -->
+  <section class="slide slide-rule" data-screen-label="65 NRU правило">
+    <div class="slide-inner">
+      <div class="kicker">Правило в&nbsp;MAC</div>
+      <h2 class="rule-title">Доступ запрещён, если&nbsp;…</h2>
+      <div class="rule-formula">NRU&nbsp;· Not Read Up</div>
+      <ul class="check-list small">
+        <li>Объект&nbsp;— объект полномочного разграничения доступа;</li>
+        <li>Гриф секретности объекта <b>выше</b> уровня допуска субъекта;</li>
+        <li>Субъект открывает объект в&nbsp;режиме <b>чтения</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 66: NWD rule formal ============ -->
+  <section class="slide slide-rule" data-screen-label="66 NWD правило">
+    <div class="slide-inner">
+      <div class="kicker">Правило в&nbsp;MAC</div>
+      <h2 class="rule-title">Доступ запрещён, если&nbsp;…</h2>
+      <div class="rule-formula">NWD&nbsp;· Not Write Down</div>
+      <ul class="check-list small">
+        <li>Объект&nbsp;— объект полномочного разграничения доступа;</li>
+        <li>Гриф секретности объекта <b>ниже</b> уровня конфиденциальности процесса;</li>
+        <li>Субъект собирается <b>записывать</b> в&nbsp;объект.</li>
+      </ul>
+      <p class="footnote">Это правило предотвращает утечку секретной информации.</p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 67: Trade-offs MAC ============ -->
+  <section class="slide slide-text" data-screen-label="67 Особенности MAC">
+    <div class="slide-inner">
+      <div class="kicker">Особенности MAC</div>
+      <h2 class="h2">Что нужно учитывать при&nbsp;использовании</h2>
+      <ul class="check-list">
+        <li>Страдает <b>производительность ОС</b>: права проверяются при&nbsp;каждой операции чтения / записи;</li>
+        <li>Возникают <b>неудобства</b> при&nbsp;работе с&nbsp;объектами разной секретности;</li>
+        <li>Прикладное ПО должно быть <b>разработано с&nbsp;учётом этой модели</b>;</li>
+        <li>Понизить гриф объекта может только субъект со&nbsp;<b>специальной привилегией</b>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 68: Section divider — questions ============ -->
+  <section class="slide slide-divider" data-screen-label="68 Раздел 8">
+    <div class="slide-inner">
+      <div class="divider-num">08</div>
+      <h2 class="divider-title">Вопросы<br>для&nbsp;проверки</h2>
+      <div class="divider-tag">Раздел&nbsp;8 · Закрепляем материал</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 69: Q1 ============ -->
+  <section class="slide slide-question" data-screen-label="69 Вопрос 1">
+    <div class="slide-inner">
+      <div class="kicker">Вопрос 1 / 3</div>
+      <h2 class="q-title">
+        Как называется деятельность по&nbsp;предотвращению утечки защищаемой информации, несанкционированных и&nbsp;непреднамеренных воздействий на&nbsp;неё?
+      </h2>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 70: Q2 ============ -->
+  <section class="slide slide-question" data-screen-label="70 Вопрос 2">
+    <div class="slide-inner">
+      <div class="kicker">Вопрос 2 / 3</div>
+      <h2 class="q-title">
+        Как называется часть автоматизированной системы, которая реализует одни и&nbsp;те&nbsp;же политики безопасности?
+      </h2>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 71: Q3 ============ -->
+  <section class="slide slide-question" data-screen-label="71 Вопрос 3">
+    <div class="slide-inner">
+      <div class="kicker">Вопрос 3 / 3</div>
+      <h2 class="q-title">
+        В&nbsp;какой модели контролируется доступ субъектов к&nbsp;объектам, представляющим собой различные информационные ресурсы&nbsp;— файлы, приложения, устройства вывода?
+      </h2>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 72: Final ============ -->
+  <section class="slide slide-final" data-screen-label="72 Спасибо">
+    <div class="slide-inner">
+      <div class="kicker">Конец модуля&nbsp;1</div>
+      <h2 class="h-final">Спасибо<br>за&nbsp;внимание</h2>
+      <p class="final-text">
+        Учебный центр <b>МАСКОМ</b><br>
+        Курс «Основные сведения об&nbsp;ОС&nbsp;Astra&nbsp;Linux&nbsp;SE»
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 73: Quote ============ -->
+  <section class="slide slide-quote" data-screen-label="73 Цитата">
+    <div class="slide-inner">
+      <div class="kicker">Вместо эпиграфа</div>
+      <blockquote class="big-quote">
+        «Ты должен чётко понимать, чего&nbsp;ты&nbsp;хочешь добиться,<br>
+        иначе ты&nbsp;просто течёшь по&nbsp;течению…»
+      </blockquote>
+      <p class="big-quote-en">
+        “If you don’t have a&nbsp;goal, if&nbsp;you&nbsp;don’t have a&nbsp;vision,<br>
+        you just drift around and&nbsp;you’re never going to&nbsp;end&nbsp;up&nbsp;anywhere…”
+      </p>
+      <div class="big-quote-author">— Арнольд Шварценеггер</div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 74: Contacts (1/2) ============ -->
+  <section class="slide slide-contact" data-screen-label="74 Контакты 1">
+    <div class="slide-inner">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="kicker">Лектор</div>
+          <h2 class="contact-name">Пиков<br>Виталий<br>Александрович</h2>
+          <div class="contact-role">Эксперт в&nbsp;области ИТ, ИБ, преподаватель</div>
+          <div class="contact-tg">
+            <span class="tg-label">telegram</span>
+            <span class="tg-handle">@UnderLineSecurity</span>
+          </div>
+        </div>
+        <div class="contact-right">
+          <div class="contact-block">
+            <div class="cb-head">Опыт</div>
+            <ul class="cb-list cb-list-lg">
+              <li>Общий стаж работы&nbsp;— <b>более 26&nbsp;лет</b></li>
+              <li>Преподавательский стаж&nbsp;— <b>более 10&nbsp;лет</b></li>
+              <li>Заслуженный доцент Российского нового университета</li>
+              <li>Преподаватель высшей школы</li>
+              <li>Автор более <b>40&nbsp;научных публикаций</b></li>
+            </ul>
+          </div>
+          <div class="contact-block">
+            <div class="cb-head">Чему обучает</div>
+            <ul class="cb-list cb-list-lg">
+              <li>Информационная безопасность и&nbsp;защита информации</li>
+              <li>Информационные технологии</li>
+              <li>Курсы по&nbsp;<b>ОС Astra Linux Special Edition&nbsp;1.8</b></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ SLIDE 75: Contacts (2/2) ============ -->
+  <section class="slide slide-contact" data-screen-label="75 Контакты 2">
+    <div class="slide-inner">
+      <div class="contact-grid">
+        <div class="contact-left">
+          <div class="kicker">Лектор · продолжение</div>
+          <h2 class="contact-name">Пиков<br>Виталий<br>Александрович</h2>
+          <div class="contact-role">Эксперт в&nbsp;области ИТ, ИБ, преподаватель</div>
+          <div class="contact-tg">
+            <span class="tg-label">telegram</span>
+            <span class="tg-handle">@UnderLineSecurity</span>
+          </div>
+        </div>
+        <div class="contact-right">
+          <div class="contact-block">
+            <div class="cb-head">Образование и&nbsp;переподготовка</div>
+            <ul class="cb-list cb-list-lg">
+              <li>Тамбовский военный авиационный инженерный институт&nbsp;— «Автоматизированные системы обработки информации и&nbsp;управления»</li>
+              <li><b>2017</b>&nbsp;— МГТУ им.&nbsp;Н.&nbsp;Э.&nbsp;Баумана, «Информационная безопасность»</li>
+              <li><b>2019</b>&nbsp;— «Противодействие иностранным техническим разведкам»</li>
+              <li><b>2020</b>&nbsp;— «Педагогика профессионального обучения и&nbsp;образования»</li>
+              <li><b>2021</b>&nbsp;— ДПП «ТЗИ»</li>
+              <li><b>2022</b>&nbsp;— «Практическая психология»</li>
+            </ul>
+          </div>
+          <div class="contact-block">
+            <div class="cb-head">Сертификации и&nbsp;экспертиза</div>
+            <ul class="cb-list cb-list-lg">
+              <li>Microsoft Certifications: <b>MCT, MCPS, MCSA, MCTS</b></li>
+              <li>Авторизованный преподаватель «Группы&nbsp;Астра» по&nbsp;<b>ОС Astra Linux SE&nbsp;1.8</b></li>
+              <li>Постоянный спикер: Positive Hack Days, «Инфофорум», форум «АРМИЯ», InfoSecurity Russia</li>
+              <li>Награды и&nbsp;звания Минобороны&nbsp;России</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- Persistent UI: logo, counter, nav -->
+<div class="chrome">
+  <a class="brand" href="#" aria-label="Учебный центр Маском">
+    <img src="assets/logo.jpg" alt="Учебный центр МАСКОМ">
+  </a>
+  <div class="counter" id="counter">01&nbsp;/&nbsp;72</div>
+  <button class="nav nav-prev" id="prev" aria-label="Назад">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 6l-6 6 6 6"/></svg>
+  </button>
+  <button class="nav nav-next" id="next" aria-label="Вперёд">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 6l6 6-6 6"/></svg>
+  </button>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

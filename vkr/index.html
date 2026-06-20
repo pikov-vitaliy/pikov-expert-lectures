@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0F2A4F">
+<title>Методика формулирования тем ВКР · Кафедра 304 МАИ · В.А. Пиков</title>
+<meta name="description" content="Авторская методика В.А. Пикова: 12-элементный тезаурус, формула темы, иерархия основного результата и контрольные листы для нормоконтроля выпускных квалификационных работ.">
+<link rel="canonical" href="https://vkr.pikov.expert/">
+<link rel="icon" href="favicon.ico" sizes="any">
+
+<meta property="og:title" content="Методика формулирования тем ВКР · Кафедра 304 МАИ">
+<meta property="og:description" content="Авторская методика В.А. Пикова. 61 слайд, 11 блоков, 5 чек-листов, 10 разборов ошибок.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://vkr.pikov.expert/">
+<meta property="og:image" content="https://vkr.pikov.expert/og-cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="ru_RU">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Методика формулирования тем ВКР · Кафедра 304 МАИ">
+<meta name="twitter:description" content="Авторская методика В.А. Пикова. 61 слайд, 11 блоков, 5 чек-листов, 10 разборов ошибок.">
+<meta name="twitter:image" content="https://vkr.pikov.expert/og-cover.jpg">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Golos+Text:wght@400;500;600&display=swap" rel="stylesheet">
+
+<link rel="preload" as="image" href="slides/slide-01.jpg">
+<link rel="preload" as="image" href="slides/slide-02.jpg">
+
+<style>
+:root {
+  --navy: #0F2A4F;
+  --navy-deep: #091B36;
+  --navy-soft: #1B3863;
+  --accent: #F4B400;
+  --accent-soft: #FCD96D;
+  --rule: rgba(255,255,255,0.08);
+  --rule-strong: rgba(255,255,255,0.18);
+  --text: #E8EEF7;
+  --text-dim: #95A6BD;
+  --text-faint: #6B7B95;
+  --slide-bg: #FFFFFF;
+  --slide-shadow: 0 30px 80px -10px rgba(0,0,0,0.5), 0 4px 20px rgba(0,0,0,0.3);
+
+  --font-display: 'Manrope', system-ui, sans-serif;
+  --font-body: 'Golos Text', system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  background: var(--navy-deep);
+  color: var(--text);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  user-select: none;
+}
+
+button {
+  font: inherit; color: inherit;
+  background: none; border: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+a { color: var(--accent); text-decoration: none; }
+
+/* === LAYOUT === */
+.app {
+  height: 100vh; height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(30, 90, 167, 0.18), transparent 70%),
+    var(--navy-deep);
+}
+
+/* === HEADER === */
+.header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 24px;
+  border-bottom: 1px solid var(--rule);
+  z-index: 10;
+}
+.brand {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--font-display);
+}
+.brand-mark {
+  width: 12px; height: 12px;
+  background: var(--accent);
+}
+.brand-text { display: flex; flex-direction: column; line-height: 1.2; }
+.brand-text strong {
+  font-weight: 700; font-size: 13px;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+.brand-text span {
+  font-size: 11px; color: var(--text-faint);
+  letter-spacing: 0.02em;
+}
+.header-actions {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-display);
+}
+.h-btn {
+  display: flex; align-items: center; gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--rule-strong);
+  background: transparent;
+  color: var(--text-dim);
+  font-size: 12px; font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: all 0.15s;
+  border-radius: 2px;
+}
+.h-btn:hover { color: var(--text); border-color: var(--accent); background: rgba(244,180,0,0.08); }
+.h-btn svg { width: 14px; height: 14px; }
+.h-btn.primary {
+  background: var(--accent); color: var(--navy-deep); border-color: var(--accent);
+}
+.h-btn.primary:hover { background: var(--accent-soft); border-color: var(--accent-soft); }
+.h-btn .label-md { display: inline; }
+@media (max-width: 720px) { .h-btn .label-md { display: none; } .h-btn { padding: 8px 10px; } }
+
+.counter {
+  font-family: var(--font-display);
+  font-size: 13px; font-weight: 600;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+  padding: 0 16px;
+  letter-spacing: 0.05em;
+}
+.counter strong { color: var(--accent); font-weight: 700; }
+
+/* === STAGE === */
+.stage {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 80px;
+  overflow: hidden;
+}
+@media (max-width: 720px) { .stage { padding: 12px 12px; } }
+
+.slide-frame {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  max-width: min(calc(100vh * 1.7), 1400px);
+  max-height: 100%;
+  background: var(--slide-bg);
+  box-shadow: var(--slide-shadow);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 6px;
+  overflow: hidden;
+}
+.slide-img {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: contain;
+  background: var(--slide-bg);
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+.slide-img.is-active { opacity: 1; }
+.slide-img.is-loading { opacity: 0; }
+
+.spinner {
+  position: absolute; top: 50%; left: 50%;
+  width: 32px; height: 32px;
+  margin: -16px 0 0 -16px;
+  border: 3px solid var(--rule-strong);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  opacity: 0;
+  transition: opacity 0.2s 0.3s;
+  pointer-events: none;
+}
+.is-loading .spinner { opacity: 1; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* === ARROWS === */
+.arrow {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  width: 56px; height: 56px;
+  display: flex; align-items: center; justify-content: center;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--rule-strong);
+  color: var(--text-dim);
+  transition: all 0.15s;
+  z-index: 5;
+  border-radius: 50%;
+}
+.arrow:hover {
+  background: var(--accent); color: var(--navy-deep);
+  border-color: var(--accent);
+  transform: translateY(-50%) scale(1.05);
+}
+.arrow:active { transform: translateY(-50%) scale(0.96); }
+.arrow:disabled {
+  opacity: 0.25; cursor: not-allowed;
+  background: transparent; transform: translateY(-50%);
+}
+.arrow:disabled:hover {
+  background: transparent; color: var(--text-dim);
+  border-color: var(--rule-strong); transform: translateY(-50%);
+}
+.arrow svg { width: 20px; height: 20px; }
+.arrow.prev { left: 12px; }
+.arrow.next { right: 12px; }
+@media (max-width: 720px) {
+  .arrow { width: 44px; height: 44px; }
+  .arrow.prev { left: 6px; }
+  .arrow.next { right: 6px; }
+}
+
+/* === FOOTER === */
+.footer {
+  display: flex; align-items: center;
+  padding: 12px 24px;
+  border-top: 1px solid var(--rule);
+  gap: 18px;
+}
+.progress-track {
+  flex: 1;
+  height: 3px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: var(--accent);
+  transition: width 0.25s;
+}
+.hint {
+  font-family: var(--font-display);
+  font-size: 11px; color: var(--text-faint);
+  letter-spacing: 0.05em;
+  display: flex; align-items: center; gap: 10px;
+}
+.hint kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 22px; height: 22px; padding: 0 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 600;
+  color: var(--text-dim);
+}
+@media (max-width: 720px) { .hint { display: none; } }
+
+/* === OVERVIEW === */
+.overview {
+  position: fixed; inset: 0;
+  background: rgba(9, 27, 54, 0.96);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 100;
+  display: none;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.overview.is-open { display: flex; opacity: 1; }
+.overview-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--rule);
+}
+.overview-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.04em;
+  color: var(--text);
+}
+.overview-title small {
+  display: block; font-weight: 500; font-size: 11px; color: var(--text-faint);
+  margin-top: 2px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.overview-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 18px;
+  align-content: start;
+}
+@media (max-width: 600px) {
+  .overview-grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 12px; padding: 16px;
+  }
+}
+.thumb {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--rule);
+  border-radius: 4px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.thumb:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.thumb.is-current {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent);
+}
+.thumb img {
+  width: 100%; height: 100%; object-fit: contain;
+  display: block;
+}
+.thumb-num {
+  position: absolute; top: 6px; left: 6px;
+  background: rgba(15,42,79,0.85);
+  color: var(--accent);
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 700;
+  padding: 3px 7px; border-radius: 3px;
+  letter-spacing: 0.05em;
+}
+
+/* === HELP MODAL === */
+.help {
+  position: fixed; inset: 0;
+  background: rgba(9, 27, 54, 0.92);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center; justify-content: center;
+  z-index: 200;
+  padding: 24px;
+}
+.help.is-open { display: flex; }
+.help-card {
+  background: var(--navy);
+  border: 1px solid var(--rule-strong);
+  padding: 32px;
+  max-width: 480px; width: 100%;
+  border-radius: 6px;
+}
+.help-card h2 {
+  font-family: var(--font-display);
+  font-size: 18px; font-weight: 700;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.help-card p { font-size: 13px; color: var(--text-dim); margin-bottom: 20px; }
+.help-keys { display: grid; grid-template-columns: 1fr 1fr; gap: 14px 20px; }
+.help-key { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-dim); }
+.help-key kbd {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 24px; padding: 0 8px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--rule-strong);
+  border-radius: 3px;
+  font-family: var(--font-display);
+  font-size: 11px; font-weight: 600;
+  color: var(--text);
+}
+
+/* === ACCESSIBILITY === */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app" id="app">
+
+  <header class="header">
+    <a class="brand" href="/" aria-label="vkr.pikov.expert">
+      <span class="brand-mark"></span>
+      <span class="brand-text">
+        <strong>Методика ВКР</strong>
+        <span>Кафедра 304 МАИ · В.А. Пиков</span>
+      </span>
+    </a>
+
+    <div class="counter" aria-live="polite" aria-atomic="true">
+      <strong id="cur">1</strong>
+      <span> / </span>
+      <span id="total">61</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="h-btn" id="btn-overview" title="Обзор всех слайдов (Esc)" aria-label="Обзор всех слайдов">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        <span class="label-md">Обзор</span>
+      </button>
+      <button class="h-btn" id="btn-help" title="Горячие клавиши (?)" aria-label="Горячие клавиши">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </button>
+      <a class="h-btn primary" href="VKR_Methodology_Pikov.pptx" download title="Скачать PPTX (1.4 МБ)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        <span class="label-md">Скачать&nbsp;PPTX</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+    <button class="arrow prev" id="prev" aria-label="Предыдущий слайд (стрелка влево)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+
+    <div class="slide-frame" id="frame" role="region" aria-label="Слайд презентации">
+      <span class="sr-only" id="slide-aria" aria-live="polite">Слайд 1 из 61</span>
+      <div class="spinner" aria-hidden="true"></div>
+      <img class="slide-img" id="img-a" alt="">
+      <img class="slide-img" id="img-b" alt="">
+    </div>
+
+    <button class="arrow next" id="next" aria-label="Следующий слайд (стрелка вправо)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </main>
+
+  <footer class="footer">
+    <div class="progress-track" role="progressbar" aria-valuemin="1" aria-valuemax="61" aria-valuenow="1" id="progress-bar">
+      <div class="progress-fill" id="progress"></div>
+    </div>
+    <div class="hint">
+      <span><kbd>←</kbd><kbd>→</kbd> листать</span>
+      <span><kbd>Esc</kbd> обзор</span>
+      <span><kbd>?</kbd> справка</span>
+    </div>
+  </footer>
+
+</div>
+
+<!-- OVERVIEW MODE -->
+<div class="overview" id="overview" role="dialog" aria-label="Обзор слайдов" aria-modal="true">
+  <div class="overview-header">
+    <div class="overview-title">
+      Все слайды
+      <small>61 слайд · 11 блоков · 5 чек-листов · 10 разборов ошибок</small>
+    </div>
+    <button class="h-btn" id="btn-close-overview" aria-label="Закрыть обзор (Esc)">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      <span class="label-md">Закрыть</span>
+    </button>
+  </div>
+  <div class="overview-grid" id="overview-grid"></div>
+</div>
+
+<!-- HELP MODAL -->
+<div class="help" id="help" role="dialog" aria-label="Горячие клавиши" aria-modal="true">
+  <div class="help-card">
+    <h2>Управление</h2>
+    <p>Используйте клавиатуру или жесты для перемещения по слайдам.</p>
+    <div class="help-keys">
+      <div class="help-key"><kbd>←</kbd> предыдущий</div>
+      <div class="help-key"><kbd>→</kbd> следующий</div>
+      <div class="help-key"><kbd>Space</kbd> следующий</div>
+      <div class="help-key"><kbd>Home</kbd> в начало</div>
+      <div class="help-key"><kbd>End</kbd> в конец</div>
+      <div class="help-key"><kbd>Esc</kbd> обзор / выход</div>
+      <div class="help-key"><kbd>F</kbd> на весь экран</div>
+      <div class="help-key"><kbd>?</kbd> эта справка</div>
+    </div>
+    <button class="h-btn" id="btn-close-help" style="margin-top:24px">Закрыть</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+
+  const TOTAL = 61;
+  const PAD = (n) => String(n).padStart(2, '0');
+  const slidePath = (n) => `slides/slide-${PAD(n)}.jpg`;
+  const thumbPath = (n) => `thumbs/thumb-${PAD(n)}.jpg`;
+
+  const $ = (id) => document.getElementById(id);
+  const $cur = $('cur');
+  const $progress = $('progress');
+  const $progressBar = $('progress-bar');
+  const $aria = $('slide-aria');
+  const $prev = $('prev');
+  const $next = $('next');
+  const $frame = $('frame');
+  const $imgA = $('img-a');
+  const $imgB = $('img-b');
+  const $overview = $('overview');
+  const $overviewGrid = $('overview-grid');
+  const $help = $('help');
+
+  let current = 0;  // start at 0 so first showSlide(1) doesn't early-return
+  let activeImg = $imgA;
+  let inactiveImg = $imgB;
+  let preloadCache = new Set();
+
+  // === IMAGE LOADING ===
+  function preload(n) {
+    if (n < 1 || n > TOTAL || preloadCache.has(n)) return;
+    preloadCache.add(n);
+    const img = new Image();
+    img.src = slidePath(n);
+  }
+
+  function showSlide(n, { fromHash = false } = {}) {
+    n = Math.max(1, Math.min(TOTAL, n));
+    if (n === current) return;  // no-op if already showing
+    current = n;
+
+    // crossfade load
+    $frame.classList.add('is-loading');
+    inactiveImg.alt = `Слайд ${n} из ${TOTAL}`;
+    inactiveImg.onload = () => {
+      $frame.classList.remove('is-loading');
+      activeImg.classList.remove('is-active');
+      inactiveImg.classList.add('is-active');
+      [activeImg, inactiveImg] = [inactiveImg, activeImg];
+    };
+    inactiveImg.onerror = () => {
+      $frame.classList.remove('is-loading');
+    };
+    inactiveImg.src = slidePath(n);
+
+    // ui updates
+    $cur.textContent = n;
+    $progress.style.width = ((n / TOTAL) * 100) + '%';
+    $progressBar.setAttribute('aria-valuenow', n);
+    $aria.textContent = `Слайд ${n} из ${TOTAL}`;
+    $prev.disabled = (n === 1);
+    $next.disabled = (n === TOTAL);
+
+    // url hash
+    if (!fromHash) {
+      history.replaceState(null, '', '#' + n);
+    }
+
+    // preload neighbors
+    preload(n + 1);
+    preload(n + 2);
+    preload(n - 1);
+
+    // sync overview if open
+    syncOverview();
+  }
+
+  function syncOverview() {
+    if (!$overview.classList.contains('is-open')) return;
+    $overviewGrid.querySelectorAll('.thumb').forEach((t) => {
+      t.classList.toggle('is-current', Number(t.dataset.n) === current);
+    });
+  }
+
+  function next() { if (current < TOTAL) showSlide(current + 1); }
+  function prev() { if (current > 1)     showSlide(current - 1); }
+
+  // === OVERVIEW ===
+  function buildOverview() {
+    const frag = document.createDocumentFragment();
+    for (let i = 1; i <= TOTAL; i++) {
+      const t = document.createElement('button');
+      t.className = 'thumb';
+      t.dataset.n = i;
+      t.setAttribute('aria-label', `Перейти к слайду ${i}`);
+
+      const img = document.createElement('img');
+      img.loading = 'lazy';
+      img.alt = '';
+      img.src = thumbPath(i);
+
+      const num = document.createElement('span');
+      num.className = 'thumb-num';
+      num.textContent = i;
+
+      t.appendChild(img);
+      t.appendChild(num);
+      t.addEventListener('click', () => {
+        showSlide(i);
+        closeOverview();
+      });
+      frag.appendChild(t);
+    }
+    $overviewGrid.appendChild(frag);
+  }
+
+  function openOverview() {
+    $overview.classList.add('is-open');
+    syncOverview();
+    requestAnimationFrame(() => {
+      const cur = $overviewGrid.querySelector('.thumb.is-current');
+      if (cur) cur.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    });
+  }
+  function closeOverview() {
+    $overview.classList.remove('is-open');
+  }
+  function toggleOverview() {
+    if ($overview.classList.contains('is-open')) closeOverview();
+    else openOverview();
+  }
+
+  // === HELP ===
+  function toggleHelp() { $help.classList.toggle('is-open'); }
+  function closeHelp() { $help.classList.remove('is-open'); }
+
+  // === FULLSCREEN ===
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } else {
+      document.exitFullscreen?.();
+    }
+  }
+
+  // === KEYBOARD ===
+  document.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+    const key = e.key;
+    const helpOpen = $help.classList.contains('is-open');
+    const overviewOpen = $overview.classList.contains('is-open');
+
+    if (key === 'Escape') {
+      e.preventDefault();
+      if (helpOpen) closeHelp();
+      else toggleOverview();
+      return;
+    }
+    if (key === '?' || (e.shiftKey && key === '/')) {
+      e.preventDefault();
+      toggleHelp();
+      return;
+    }
+    if (helpOpen) return;
+    if (overviewOpen) {
+      if (key === 'Enter' || key === ' ') { e.preventDefault(); closeOverview(); }
+      return;
+    }
+
+    switch (key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+      case 'PageDown':
+      case ' ':
+      case 'j':
+      case 'l':
+        e.preventDefault(); next(); break;
+      case 'ArrowLeft':
+      case 'ArrowUp':
+      case 'PageUp':
+      case 'k':
+      case 'h':
+        e.preventDefault(); prev(); break;
+      case 'Home':
+        e.preventDefault(); showSlide(1); break;
+      case 'End':
+        e.preventDefault(); showSlide(TOTAL); break;
+      case 'f':
+      case 'F':
+        e.preventDefault(); toggleFullscreen(); break;
+    }
+  });
+
+  // === BUTTONS ===
+  $prev.addEventListener('click', prev);
+  $next.addEventListener('click', next);
+  $('btn-overview').addEventListener('click', toggleOverview);
+  $('btn-close-overview').addEventListener('click', closeOverview);
+  $('btn-help').addEventListener('click', toggleHelp);
+  $('btn-close-help').addEventListener('click', closeHelp);
+
+  // close help on backdrop click
+  $help.addEventListener('click', (e) => { if (e.target === $help) closeHelp(); });
+  $overview.addEventListener('click', (e) => { if (e.target === $overview) closeOverview(); });
+
+  // === TOUCH/SWIPE ===
+  let touchStartX = 0, touchStartY = 0, touchStartT = 0;
+  $frame.addEventListener('touchstart', (e) => {
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchStartT = Date.now();
+  }, { passive: true });
+  $frame.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    const dt = Date.now() - touchStartT;
+    if (dt > 800) return;
+    if (Math.abs(dx) < 50 || Math.abs(dy) > Math.abs(dx)) return;
+    if (dx < 0) next();
+    else prev();
+  }, { passive: true });
+
+  // === HASH ROUTING ===
+  function readHash() {
+    const m = location.hash.match(/^#(\d+)/);
+    if (m) {
+      const n = Number(m[1]);
+      if (n >= 1 && n <= TOTAL) showSlide(n, { fromHash: true });
+    }
+  }
+  window.addEventListener('hashchange', readHash);
+
+  // === MOUSE WHEEL on stage (optional, throttled) ===
+  let wheelLock = false;
+  $('stage').addEventListener('wheel', (e) => {
+    if (Math.abs(e.deltaY) < 30) return;
+    if (wheelLock) return;
+    wheelLock = true;
+    setTimeout(() => { wheelLock = false; }, 350);
+    if (e.deltaY > 0) next(); else prev();
+  }, { passive: true });
+
+  // === INIT ===
+  buildOverview();
+  readHash();
+  if (current === 0) showSlide(1);  // no hash matched → show slide 1
+
+})();
+</script>
+
+</body>
+</html>

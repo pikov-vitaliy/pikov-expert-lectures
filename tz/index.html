@@ -1,0 +1,2322 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Большой учебный лендинг-презентация В.А. Пикова по написанию технических заданий: ГОСТ, РБПО, требования безопасности, SAST, SCA, SBOM и ПМИ.">
+<meta name="author" content="Виталий Александрович Пиков">
+<meta name="keywords" content="техническое задание, ТЗ, ГОСТ 19.201, ГОСТ 34.602, ГОСТ Р 56939-2024, РБПО, безопасная разработка, SAST, SCA, SBOM, ПМИ">
+<link rel="canonical" href="https://tz.pikov.expert/">
+<meta property="og:title" content="Техническое задание: от идеи до безопасной разработки">
+<meta property="og:description" content="104 крупных учебных экрана и лонгрид по написанию проверяемых ТЗ с учетом ГОСТ и процессов безопасной разработки.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tz.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<title>Техническое задание: от идеи до безопасной разработки | В.А. Пиков</title>
+<link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+<style>
+:root {
+  color-scheme: light;
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --surface-2: #eef4ff;
+  --text: #0f172a;
+  --muted: #475569;
+  --soft: #64748b;
+  --border: #dbe3ef;
+  --border-strong: #c5d1e2;
+  --accent: #2563eb;
+  --accent-strong: #1d4ed8;
+  --accent-soft: #dbeafe;
+  --danger: #dc2626;
+  --danger-soft: #fee2e2;
+  --warning: #b45309;
+  --warning-soft: #fef3c7;
+  --success: #047857;
+  --success-soft: #d1fae5;
+  --info: #0369a1;
+  --info-soft: #e0f2fe;
+  --shadow: 0 18px 48px rgba(15, 23, 42, .10);
+  --radius: 8px;
+  --header-h: 58px;
+  --slide-w: 1220px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Inter, Roboto, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --body-size: 22px;
+  --lead-size: clamp(28px, 2.35vw, 34px);
+  --h1-size: clamp(68px, 7.8vw, 116px);
+  --h2-size: clamp(54px, 5.1vw, 76px);
+  --h3-size: clamp(25px, 2vw, 31px);
+}
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #0b1120;
+  --surface: #111827;
+  --surface-2: #1e293b;
+  --text: #f8fafc;
+  --muted: #cbd5e1;
+  --soft: #94a3b8;
+  --border: #263244;
+  --border-strong: #334155;
+  --accent: #60a5fa;
+  --accent-strong: #93c5fd;
+  --accent-soft: rgba(96, 165, 250, .16);
+  --danger: #f87171;
+  --danger-soft: rgba(248, 113, 113, .18);
+  --warning: #fbbf24;
+  --warning-soft: rgba(251, 191, 36, .16);
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, .16);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, .16);
+  --shadow: 0 18px 48px rgba(0, 0, 0, .32);
+}
+body[data-fs="large"] {
+  --body-size: 24px;
+  --lead-size: clamp(30px, 2.55vw, 37px);
+  --h1-size: clamp(74px, 8.1vw, 124px);
+  --h2-size: clamp(60px, 5.4vw, 84px);
+  --h3-size: clamp(28px, 2.15vw, 34px);
+}
+body[data-fs="xl"] {
+  --body-size: 26px;
+  --lead-size: clamp(32px, 2.75vw, 40px);
+  --h1-size: clamp(80px, 8.6vw, 132px);
+  --h2-size: clamp(64px, 5.8vw, 90px);
+  --h3-size: clamp(30px, 2.25vw, 36px);
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  font-family: var(--font);
+  font-size: var(--body-size);
+  line-height: 1.5;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-strong); text-decoration: underline; }
+button, a { font: inherit; }
+button { cursor: pointer; }
+img { display: block; max-width: 100%; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.skip-link { position: absolute; left: -999px; top: 10px; z-index: 300; background: var(--accent); color: #fff; padding: 8px 12px; border-radius: var(--radius); }
+.skip-link:focus { left: 10px; }
+.app-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--header-h);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 20px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(14px);
+}
+.brand-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: max-content;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 650;
+}
+.brand-logo {
+  width: 164px;
+  height: 38px;
+  padding: 5px 9px;
+  object-fit: contain;
+  border-radius: var(--radius);
+  background: #fff;
+  border: 1px solid var(--border);
+}
+.brand-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+.brand-title {
+  font-size: 16px;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 520px;
+}
+.brand-sub { font-size: 13px; color: var(--soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.toolbar { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+.tool-group {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-2);
+}
+.tool-btn, .tool-link {
+  min-height: 38px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, .04);
+}
+.tool-btn:hover, .tool-link:hover, .tool-btn.is-active { background: var(--accent-soft); color: var(--accent-strong); text-decoration: none; }
+.tool-btn svg, .tool-link svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.progress { position: fixed; top: var(--header-h); left: 0; right: 0; height: 3px; z-index: 120; background: transparent; }
+.progress-bar { height: 100%; width: 0; background: linear-gradient(90deg, var(--accent), #6366f1, var(--danger)); transition: width .2s ease; }
+main { padding-top: var(--header-h); }
+.deck { min-width: 0; }
+.slide {
+  width: 100%;
+  padding: 58px 56px 84px;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: calc(var(--header-h) + 12px);
+  background:
+    radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--accent) 10%, transparent), transparent 32rem),
+    linear-gradient(180deg, var(--bg), color-mix(in srgb, var(--surface) 24%, var(--bg)));
+}
+.slide-inner {
+  position: relative;
+  max-width: var(--slide-w);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--accent);
+  font-size: 16px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.eyebrow::before { content: ""; width: 36px; height: 3px; background: currentColor; border-radius: 999px; }
+h1, h2, h3, p { margin: 0; }
+h1, h2, h3 { letter-spacing: 0; line-height: 1.02; }
+h1 { font-size: var(--h1-size); font-weight: 850; max-width: 1060px; }
+h2 { font-size: var(--h2-size); font-weight: 840; max-width: 1120px; }
+h3 { font-size: var(--h3-size); font-weight: 790; }
+.lead {
+  max-width: 1040px;
+  font-size: var(--lead-size);
+  line-height: 1.34;
+  color: var(--muted);
+}
+.hero-title {
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 48%, #dc2626 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+[data-theme="dark"] .hero-title {
+  background: linear-gradient(135deg, #fff 0%, #60a5fa 48%, #f87171 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.grid { display: grid; gap: 18px; }
+.grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.grid.cols-5 { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.card {
+  min-height: 100%;
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+}
+.card-num {
+  margin-bottom: 14px;
+  color: var(--accent);
+  font-family: var(--mono);
+  font-size: 16px;
+  font-weight: 800;
+}
+.card p { margin-top: 12px; color: var(--muted); font-size: calc(var(--body-size) * .9); line-height: 1.42; }
+.callout {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr);
+  gap: 18px;
+  padding: 22px 26px;
+  border: 1px solid var(--border);
+  border-left: 8px solid var(--accent);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+}
+.callout-mark {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius);
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--accent);
+  font-weight: 900;
+}
+.callout-body { font-size: calc(var(--body-size) * .95); line-height: 1.46; color: var(--muted); }
+.callout-body strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--accent);
+  font-size: calc(var(--body-size) * .78);
+  letter-spacing: .06em;
+  text-transform: uppercase;
+}
+.callout.danger { border-left-color: var(--danger); background: color-mix(in srgb, var(--danger-soft) 42%, var(--surface)); }
+.callout.danger .callout-mark { background: var(--danger); }
+.callout.danger .callout-body strong { color: var(--danger); }
+.callout.warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning-soft) 42%, var(--surface)); }
+.callout.warning .callout-mark { background: var(--warning); }
+.callout.warning .callout-body strong { color: var(--warning); }
+.callout.success { border-left-color: var(--success); background: color-mix(in srgb, var(--success-soft) 42%, var(--surface)); }
+.callout.success .callout-mark { background: var(--success); }
+.callout.success .callout-body strong { color: var(--success); }
+.checklist, .numlist { margin: 0; display: grid; gap: 13px; }
+.checklist { padding: 0; list-style: none; }
+.checklist li {
+  position: relative;
+  padding: 16px 18px 16px 52px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font-size: calc(var(--body-size) * .96);
+  line-height: 1.38;
+}
+.checklist li::before {
+  content: "✓";
+  position: absolute;
+  left: 16px;
+  top: 14px;
+  width: 26px;
+  height: 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 900;
+}
+.numlist { padding-left: 1.3em; }
+.numlist li { padding-left: .25em; color: var(--text); font-size: calc(var(--body-size) * .96); line-height: 1.42; }
+.tbl-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+}
+table.tbl { width: 100%; border-collapse: collapse; min-width: 760px; font-size: calc(var(--body-size) * .82); }
+.tbl th, .tbl td { padding: 15px 17px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); line-height: 1.34; }
+.tbl th { background: var(--surface-2); color: var(--text); font-size: calc(var(--body-size) * .68); text-transform: uppercase; letter-spacing: .04em; }
+.tbl tr:last-child td { border-bottom: 0; }
+.split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; align-items: stretch; }
+.flow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.flow-item {
+  position: relative;
+  min-height: 54px;
+  padding: 0 22px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-size: calc(var(--body-size) * .92);
+  font-weight: 780;
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .05);
+}
+.flow-item:not(:last-child)::after {
+  content: "→";
+  margin-left: 18px;
+  color: var(--accent);
+}
+.big-statement {
+  padding: 34px 38px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: linear-gradient(135deg, var(--surface), color-mix(in srgb, var(--accent-soft) 55%, var(--surface)));
+  box-shadow: var(--shadow);
+}
+.big-statement strong {
+  display: block;
+  max-width: 1080px;
+  font-size: clamp(36px, 4.2vw, 62px);
+  line-height: 1.08;
+}
+.big-statement span { display: block; margin-top: 16px; color: var(--muted); font-size: calc(var(--body-size) * .92); }
+pre.code {
+  margin: 0;
+  padding: 24px 28px;
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: #0f172a;
+  color: #e2e8f0;
+  box-shadow: var(--shadow);
+  font-family: var(--mono);
+  font-size: calc(var(--body-size) * .78);
+  line-height: 1.45;
+}
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+  max-width: 860px;
+}
+.metrics div { padding: 18px 0; border-top: 3px solid var(--border-strong); }
+.metrics strong { display: block; font-size: clamp(32px, 3.3vw, 48px); line-height: 1; }
+.metrics span { display: block; margin-top: 8px; color: var(--soft); font-size: 15px; text-transform: uppercase; letter-spacing: .04em; }
+.materials-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 28px 34px;
+  border-radius: var(--radius);
+  border: 2px solid var(--accent);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow);
+}
+.materials-cta:hover { text-decoration: none; transform: translateY(-2px); }
+.materials-cta strong { display: block; font-size: clamp(30px, 3.2vw, 46px); line-height: 1.08; }
+.materials-cta em { display: block; margin-top: 10px; color: var(--muted); font-style: normal; font-family: var(--mono); font-size: calc(var(--body-size) * .72); }
+.materials-cta b {
+  flex: 0 0 70px;
+  width: 70px;
+  height: 70px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 38px;
+}
+.materials-list {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.materials-list a {
+  padding: 22px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, .05);
+}
+.materials-list a:hover { text-decoration: none; border-color: var(--accent); transform: translateY(-2px); }
+.materials-list strong { display: block; font-size: calc(var(--body-size) * .96); line-height: 1.16; }
+.materials-list span { display: block; margin-top: 10px; color: var(--muted); font-size: calc(var(--body-size) * .76); line-height: 1.34; }
+.contact-card {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+}
+.contact-card div { padding: 24px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); }
+.contact-card strong { display: block; margin-bottom: 12px; color: var(--soft); font-size: 16px; text-transform: uppercase; letter-spacing: .06em; }
+.contact-card a { font-size: calc(var(--body-size) * .9); font-weight: 750; overflow-wrap: anywhere; }
+
+.expert-avatar-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto; }
+.expert-avatar { 
+  width: 100%; height: 100%; 
+  background: linear-gradient(135deg, var(--accent), var(--info)); 
+  border-radius: 32px; 
+  display: grid; place-items: center; 
+  color: #fff; font-size: 92px; font-weight: 900; 
+  box-shadow: var(--shadow);
+}
+.expert-status { 
+  position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); 
+  background: var(--text); color: #fff; padding: 8px 16px; border-radius: 99px; 
+  font-size: 14px; font-weight: 800; white-space: nowrap; 
+}
+.lead-form { 
+  padding: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); 
+  box-shadow: var(--shadow); display: grid; gap: 16px;
+}
+.form-group { display: grid; gap: 8px; }
+.form-group label { font-size: 14px; font-weight: 800; color: var(--soft); text-transform: uppercase; }
+.form-group input, .form-group textarea { 
+  padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); 
+  color: var(--text); font-size: 16px; 
+}
+.form-group textarea { min-height: 100px; resize: vertical; }
+
+.slide-meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  color: var(--soft);
+  font-size: 15px;
+  font-weight: 700;
+}
+.block-tag { color: var(--accent); }
+.slide.cover {
+  background:
+    radial-gradient(circle at 78% 20%, color-mix(in srgb, var(--accent) 12%, transparent), transparent 34rem),
+    radial-gradient(circle at 12% 92%, color-mix(in srgb, var(--danger) 7%, transparent), transparent 32rem),
+    var(--bg);
+}
+.slide.cover .slide-inner { gap: 36px; }
+.slide.block-cover {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 55%, transparent), transparent 55%),
+    var(--surface);
+}
+.slide.block-cover h2 { max-width: 1120px; }
+.slide.block-cover .slide-inner { gap: 30px; }
+body.mode-slides { overflow: hidden; }
+body.mode-slides main { height: 100vh; }
+body.mode-slides .slide {
+  min-height: calc(100vh - var(--header-h));
+  max-height: calc(100vh - var(--header-h));
+  display: none;
+  overflow-y: auto;
+}
+body.mode-slides .slide.is-current { display: flex; align-items: center; }
+body.mode-slides .slide-inner { width: 100%; margin: auto; }
+body.mode-longread { overflow: auto; }
+body.mode-longread main { display: grid; grid-template-columns: 280px minmax(0, 1fr); align-items: start; }
+body.mode-longread .deck { min-width: 0; }
+body.mode-longread .slide { min-height: auto; padding-top: 44px; padding-bottom: 64px; }
+body.mode-longread .slide-meta { position: static; }
+body.mode-longread .nav-controls, body.mode-longread .click-zone { display: none; }
+.toc-sidebar {
+  display: none;
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  padding: 22px 14px 28px 20px;
+  border-right: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 82%, var(--bg));
+}
+body.mode-longread .toc-sidebar { display: block; }
+.toc-sidebar h4 { margin: 20px 8px 8px; font-size: 13px; color: var(--soft); text-transform: uppercase; letter-spacing: .08em; }
+.toc-sidebar a {
+  display: block;
+  padding: 8px 10px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.25;
+  font-weight: 650;
+}
+.toc-sidebar a:hover, .toc-sidebar a.is-active { background: var(--accent-soft); color: var(--accent-strong); text-decoration: none; }
+.click-zone { position: fixed; top: var(--header-h); bottom: 0; width: 28%; z-index: 40; }
+.click-zone.left { left: 0; cursor: w-resize; }
+.click-zone.right { right: 0; cursor: e-resize; }
+.nav-controls {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 120;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--surface) 92%, transparent);
+  box-shadow: var(--shadow);
+}
+.nav-controls button {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--text);
+  display: grid;
+  place-items: center;
+}
+.nav-controls button:hover { background: var(--surface-2); }
+.nav-controls button:disabled { opacity: .35; cursor: not-allowed; }
+.nav-controls svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.nav-counter { min-width: 92px; text-align: center; color: var(--muted); font-size: 15px; font-weight: 800; }
+.overview {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 220;
+  background: color-mix(in srgb, var(--bg) 96%, transparent);
+  overflow-y: auto;
+}
+.overview.is-open { display: block; }
+.overview-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+.overview-head h3 { font-size: 22px; margin: 0; }
+.overview-grid { padding: 24px; display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 16px; }
+.overview-card {
+  min-height: 132px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+}
+.overview-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+.overview-card strong { display: block; color: var(--accent); font-family: var(--mono); font-size: 14px; margin-bottom: 10px; }
+.overview-card span { display: block; color: var(--text); font-size: 17px; font-weight: 750; line-height: 1.25; }
+@media (max-width: 1100px) {
+  :root, body[data-fs="large"], body[data-fs="xl"] {
+    --body-size: 21px;
+    --lead-size: clamp(24px, 4.5vw, 32px);
+    --h1-size: clamp(48px, 10vw, 86px);
+    --h2-size: clamp(40px, 8vw, 64px);
+  }
+  .brand-title { max-width: 320px; }
+  .tool-btn span, .tool-link span { display: none; }
+  .grid.cols-4, .grid.cols-5, .materials-list, .contact-card { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .grid.cols-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .split { grid-template-columns: 1fr; }
+  body.mode-longread main { grid-template-columns: 1fr; }
+  body.mode-longread .toc-sidebar { display: none; }
+}
+@media (max-width: 720px) {
+  :root, body[data-fs="large"], body[data-fs="xl"] {
+    --header-h: 62px;
+    --body-size: 19px;
+    --lead-size: 23px;
+    --h1-size: 44px;
+    --h2-size: 36px;
+    --h3-size: 24px;
+  }
+  .app-header { padding: 0 10px; gap: 8px; }
+  .brand-logo { display: none; }
+  .brand-title { max-width: 150px; font-size: 14px; }
+  .brand-sub { display: none; }
+  .brand-back { font-size: 0; padding-right: 4px; }
+  .tool-link { display: none; }
+  .slide { padding: 42px 16px 88px; }
+  body.mode-slides .slide { padding-bottom: 132px; }
+  .grid.cols-2, .grid.cols-3, .grid.cols-4, .grid.cols-5, .metrics, .materials-list, .contact-card { grid-template-columns: 1fr; }
+  .flow { display: grid; }
+  .flow-item:not(:last-child)::after { display: none; }
+  .materials-cta { padding: 22px; }
+  .materials-cta b { display: none; }
+  .nav-controls { left: 12px; right: 12px; justify-content: center; }
+  .click-zone { display: none; }
+}
+@media print {
+  .app-header, .progress, .nav-controls, .click-zone, .toc-sidebar, .overview { display: none !important; }
+  main { padding-top: 0 !important; display: block !important; }
+  .slide { page-break-after: always; min-height: auto !important; max-height: none !important; display: block !important; border-bottom: none; }
+  body.mode-slides { overflow: auto; }
+}
+</style>
+</head>
+<body class="mode-slides" data-theme="light" data-fs="large">
+<a class="skip-link" href="#main">Перейти к содержанию</a>
+<header class="app-header">
+  <a class="brand-back" href="https://pikov.expert/" aria-label="Вернуться на pikov.expert">← <span>pikov.expert</span></a>
+  <img class="brand-logo" src="assets/images/logo-mascom.png" alt="УЦ МАСКОМ">
+  <div class="brand-text">
+    <div class="brand-title">Техническое задание: от идеи до безопасной разработки</div>
+    <div class="brand-sub">В.А. Пиков · УЦ МАСКОМ · ГОСТ · РБПО · ПМИ</div>
+  </div>
+  <div class="toolbar" aria-label="Управление презентацией">
+    <a class="tool-link" href="materials/лекции/методичка-по-написанию-ТЗ.md" download title="Скачать методичку Markdown"><span>Markdown</span></a>
+    <div class="tool-group">
+      <button class="tool-btn is-active" id="btn-mode-slides" aria-pressed="true" title="Режим слайдов"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="13" rx="2"/><path d="M3 19h18"/></svg><span>Слайды</span></button>
+      <button class="tool-btn" id="btn-mode-longread" aria-pressed="false" title="Режим лонгрида"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 10h16M4 14h10M4 18h16"/></svg><span>Лонгрид</span></button>
+    </div>
+    <button class="tool-btn" id="btn-overview" title="Обзор всех слайдов"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></button>
+    <button class="tool-btn" id="btn-fullscreen" title="Полный экран"><svg viewBox="0 0 24 24"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/></svg></button>
+    <button class="tool-btn" id="btn-fs" title="Размер шрифта"><svg viewBox="0 0 24 24"><path d="M5 20l5-14 5 14M7 15h6M16 12h5M18.5 9.5v5"/></svg><span id="fs-label">A+</span></button>
+    <button class="tool-btn" id="btn-theme" title="Сменить тему"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg></button>
+  </div>
+</header>
+<div class="progress" aria-hidden="true"><div class="progress-bar" id="progress-bar"></div></div>
+<div class="click-zone left" id="zone-prev" aria-hidden="true"></div>
+<div class="click-zone right" id="zone-next" aria-hidden="true"></div>
+<main id="main">
+  <aside class="toc-sidebar" aria-label="Содержание"><h4>Открытие</h4><a href="#slide-1">01 · Титул</a><a href="#slide-2">02 · Как пользоваться</a><a href="#slide-3">03 · Материалы</a><a href="#slide-4">04 · Карта курса</a><a href="#slide-5">05 · Главная формула</a><h4>Оффер · Обучение и консалтинг</h4><a href="#slide-6">06 · Оффер</a><a href="#slide-7">07 · Эксперт</a><a href="#slide-8">08 · Доверие</a><a href="#slide-9">09 · Связь</a><h4>Блок 1 · Зачем ТЗ</h4><a href="#slide-10">10 · Блок 1</a><a href="#slide-11">11 · Не документ ради документа</a><a href="#slide-12">12 · Красная зона: “и так понятно”</a><a href="#slide-13">13 · ТЗ как контракт смысла</a><a href="#slide-14">14 · Ошибка старта</a><a href="#slide-15">15 · Кейс: спор вокруг ТЗ</a><a href="#slide-16">16 · ТЗ как финал первичного проектирования</a><a href="#slide-17">17 · Польза для заказчика</a><a href="#slide-18">18 · Польза для исполнителя</a><a href="#slide-19">19 · ТЗ и деньги</a><a href="#slide-20">20 · ТЗ и безопасность</a><a href="#slide-21">21 · Не путать документ и систему</a><a href="#slide-22">22 · Итог блока 1</a><h4>Блок 2 · Нормативная рамка</h4><a href="#slide-23">23 · Блок 2</a><a href="#slide-24">24 · Зачем нормативка</a><a href="#slide-25">25 · ГОСТ 19.201-78</a><a href="#slide-26">26 · ГОСТ 34.602-2020</a><a href="#slide-27">27 · ГОСТ Р 59792-2021</a><a href="#slide-28">28 · ГОСТ Р 56939-2024</a><a href="#slide-29">29 · Пункт 4.15</a><a href="#slide-30">30 · ГОСТ Р 58412-2019</a><a href="#slide-31">31 · OWASP и CWE</a><a href="#slide-32">32 · CERT и MISRA</a><a href="#slide-33">33 · NIST SSDF</a><a href="#slide-34">34 · ISO/IEC 27001 и 27034</a><a href="#slide-35">35 · Как выбрать стандарт</a><a href="#slide-36">36 · Итог блока 2</a><h4>Блок 3 · До написания ТЗ</h4><a href="#slide-37">37 · Блок 3</a><a href="#slide-38">38 · Бизнес-слой</a><a href="#slide-39">39 · Пользовательский слой</a><a href="#slide-40">40 · Функциональный слой</a><a href="#slide-41">41 · Интерфейсный слой</a><a href="#slide-42">42 · Backend и администрирование</a><a href="#slide-43">43 · Модель угроз до ТЗ</a><a href="#slide-44">44 · Архитектурные ограничения</a><a href="#slide-45">45 · Исходные артефакты</a><a href="#slide-46">46 · Красная зона: шаблон вместо анализа</a><a href="#slide-47">47 · Минимальный порядок работы</a><a href="#slide-48">48 · Итог блока 3</a><h4>Блок 4 · Качество требований</h4><a href="#slide-49">49 · Блок 4</a><a href="#slide-50">50 · Требование как обязанность</a><a href="#slide-51">51 · Атомарность</a><a href="#slide-52">52 · Однозначность</a><a href="#slide-53">53 · Проверяемость</a><a href="#slide-54">54 · Реализуемость</a><a href="#slide-55">55 · Обоснованность</a><a href="#slide-56">56 · Полнота и неизбыточность</a><a href="#slide-57">57 · Непротиворечивость</a><a href="#slide-58">58 · Трассируемость</a><a href="#slide-59">59 · Приоритет</a><a href="#slide-60">60 · Карточка требования</a><a href="#slide-61">61 · Пример требования</a><a href="#slide-62">62 · Статусы требований</a><a href="#slide-63">63 · Антипаттерны</a><a href="#slide-64">64 · Проверка качества</a><a href="#slide-65">65 · Итог блока 4</a><h4>Блок 5 · Типы требований</h4><a href="#slide-66">66 · Блок 5</a><a href="#slide-67">67 · Функциональные требования</a><a href="#slide-68">68 · Нефункциональные требования</a><a href="#slide-69">69 · Требования безопасности</a><a href="#slide-70">70 · Как различать</a><a href="#slide-71">71 · Источники безопасности</a><a href="#slide-72">72 · Поверхность атаки</a><a href="#slide-73">73 · C/C++ и память</a><a href="#slide-74">74 · SCA и лицензии</a><a href="#slide-75">75 · Красная зона: безопасность потом</a><a href="#slide-76">76 · Security acceptance</a><a href="#slide-77">77 · Итог блока 5</a><h4>Блок 6 · РБПО</h4><a href="#slide-78">78 · Блок 6</a><a href="#slide-79">79 · Процесс 5.3</a><a href="#slide-80">80 · Что требует регламент</a><a href="#slide-81">81 · Поля требования безопасности</a><a href="#slide-82">82 · Пересмотр требований</a><a href="#slide-83">83 · Входы и выходы 5.3</a><a href="#slide-84">84 · 5.4 Конфигурация</a><a href="#slide-85">85 · 5.5 Недостатки и изменения</a><a href="#slide-86">86 · 5.10 SAST</a><a href="#slide-87">87 · 5.12-5.13 Сборка</a><a href="#slide-88">88 · 5.14 Код и доступ</a><a href="#slide-89">89 · 5.15 Секреты</a><a href="#slide-90">90 · 5.16 SCA и SBOM</a><a href="#slide-91">91 · 5.18 Тестирование</a><a href="#slide-92">92 · 5.22-5.23 Уязвимости</a><a href="#slide-93">93 · 5.25 Вывод из эксплуатации</a><a href="#slide-94">94 · Приемка РБПО</a><a href="#slide-95">95 · Итог блока 6</a><h4>Блок 7 · ПМИ и материалы</h4><a href="#slide-96">96 · Блок 7</a><a href="#slide-97">97 · Матрица трассируемости</a><a href="#slide-98">98 · Методы проверки</a><a href="#slide-99">99 · Финальный quality gate</a><a href="#slide-100">100 · Как использовать комплект</a><a href="#slide-101">101 · Материалы курса</a><a href="#slide-102">102 · Красная зона: последний контроль</a><a href="#slide-103">103 · Итог курса</a><a href="#slide-104">104 · Контакты</a></aside>
+  <div class="deck" id="deck">
+<section class="slide cover" id="slide-1" data-block="Открытие" data-screen-label="01 Титул">
+    <div class="slide-inner">
+      <span class="eyebrow">Авторский курс · технические задания · безопасная разработка</span>
+      <h1 class="hero-title">Техническое задание:<br>разработать,<br>проверить,<br>защитить</h1>
+      <p class="lead">Большой учебный лендинг В.А. Пикова о том, как превращать идеи, пользовательские сценарии, ГОСТы и требования РБПО в проверяемое ТЗ.</p>
+      <div class="metrics"><div><strong>104</strong><span>крупных экранов</span></div><div><strong>12</strong><span>смысловых разделов</span></div><div><strong>ГОСТ</strong><span>19 · 34 · 56939</span></div><div><strong>2026</strong><span>версия курса</span></div></div>
+      <div class="slide-meta"><span class="block-tag">Открытие</span><span>01 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-2" data-block="Открытие" data-screen-label="02 Как пользоваться">
+    <div class="slide-inner">
+      <span class="eyebrow">Навигация</span>
+      <h2 class="">Два режима: лекция на проекторе и самостоятельное чтение</h2>
+      <p class="lead">По умолчанию открыт режим слайдов с крупными шрифтами. Лонгрид нужен слушателю после занятия: поиск, копирование, печать и повторение.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Слайды</h3>
+    <p>Один крупный экран на проекторе. Переходы стрелками, колесом мыши, свайпом или кнопками снизу.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Лонгрид</h3>
+    <p>Все экраны идут вертикально. Слева появляется содержание, активная тема подсвечивается при прокрутке.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Размер шрифта</h3>
+    <p>Кнопка A переключает крупный и очень крупный режим. Базовый вариант сразу рассчитан на аудиторию.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Открытие</span><span>02 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-3" data-block="Открытие" data-screen-label="03 Материалы">
+    <div class="slide-inner">
+      <span class="eyebrow">Markdown доступен сразу</span>
+      <h2 class="">Методичку можно скачать в формате Markdown</h2>
+      <p class="lead">Раздаточный материал лежит рядом с лендингом и открывается без сервера, базы данных и внешних зависимостей.</p>
+      <a class="materials-cta" href="materials/лекции/методичка-по-написанию-ТЗ.md" download>
+    <span><strong>Скачать методичку Markdown</strong><em>materials/лекции/методичка-по-написанию-ТЗ.md</em></span>
+    <b>↓</b>
+  </a><div class="callout success">
+    <div class="callout-mark" aria-hidden="true">✓</div>
+    <div class="callout-body"><strong>Важно для публикации</strong>На хостинг загружается обычная статическая папка. Стили, логика слайдов и SVG-иконки встроены в один HTML.</div>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Открытие</span><span>03 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-4" data-block="Открытие" data-screen-label="04 Карта курса">
+    <div class="slide-inner">
+      <span class="eyebrow">7 больших блоков</span>
+      <h2 class="">От смысла ТЗ к проверке требований безопасности</h2>
+      <p class="lead">Курс построен как инженерный маршрут: сначала понять продукт, потом написать требования, потом связать их с приемкой и РБПО.</p>
+      <div class="flow"><div class="flow-item">Зачем ТЗ</div><div class="flow-item">Нормативная рамка</div><div class="flow-item">Пять слоев продукта</div><div class="flow-item">Качество требований</div><div class="flow-item">Безопасность</div><div class="flow-item">РБПО</div><div class="flow-item">ПМИ и приемка</div></div>
+      <div class="slide-meta"><span class="block-tag">Открытие</span><span>04 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-5" data-block="Открытие" data-screen-label="05 Главная формула">
+    <div class="slide-inner">
+      <span class="eyebrow">Одна мысль на весь курс</span>
+      <h2 class="">ТЗ не заменяет проектирование. Оно фиксирует то, что уже понято</h2>
+      <p class="lead">Если нет пользователя, сценариев, интерфейсов, архитектурных ограничений и модели угроз, документ будет имитировать определенность.</p>
+      <div class="big-statement"><strong>User Story + интерфейс + архитектурные ограничения + модель угроз + ГОСТ + критерии приемки = проверяемое ТЗ</strong><span>Формула курса: требование должно быть полезно разработчику, испытателю, заказчику и аудитору.</span></div>
+      <div class="slide-meta"><span class="block-tag">Открытие</span><span>05 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-6" data-block="Оффер · Обучение и консалтинг" data-screen-label="06 Оффер">
+    <div class="slide-inner">
+      <span class="eyebrow">Специальное предложение</span>
+      <h2 class="">Как превратить ТЗ из бюрократии в преимущество?</h2>
+      <p class="lead">Закажите аудит текущего ТЗ или проведите корпоративное обучение для вашей команды. Мы внедрим практики РБПО и ГОСТ без остановки разработки.</p>
+      <div class="offer-cta-group">
+    <button class="materials-cta" onclick="document.getElementById('slide-9').scrollIntoView({behavior:'smooth'})">
+      <span><strong>Записаться на консультацию</strong><em>Обсудить проект с экспертом</em></span>
+      <b>→</b>
+    </button>
+  </div><div class="callout info">
+    <div class="callout-mark" aria-hidden="true">i</div>
+    <div class="callout-body"><strong>Для кого это?</strong>Для руководителей разработки, системных аналитиков и отделов ИБ, которым нужно соответствовать ГОСТ Р 56939-2024 и выпускать защищенное ПО.</div>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Оффер · Обучение и консалтинг</span><span>06 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-7" data-block="Оффер · Обучение и консалтинг" data-screen-label="07 Эксперт">
+    <div class="slide-inner">
+      <span class="eyebrow">Автор курса</span>
+      <h2 class="">Виталий Александрович Пиков</h2>
+      <p class="lead">Методолог, эксперт по информационной безопасности и разработке безопасного ПО (РБПО).</p>
+      <div class="expert-bio">
+    <p>Более 15 лет в ИТ и ИБ. Специализируется на стыке государственных стандартов (ГОСТ) и современных практик разработки (Agile, DevSecOps).</p>
+    <ul class="checklist success">
+      <li>Преподаватель УЦ МАСКОМ</li>
+      <li>Автор методологии «ТЗ + РБПО»</li>
+      <li>Практик внедрения ГОСТ Р 56939-2024</li>
+      <li>Консультант по сертификации ПО</li>
+    </ul>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Оффер · Обучение и консалтинг</span><span>07 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-8" data-block="Оффер · Обучение и консалтинг" data-screen-label="08 Доверие">
+    <div class="slide-inner">
+      <span class="eyebrow">Почему мы</span>
+      <h2 class="">УЦ МАСКОМ: промышленная экспертиза в безопасности</h2>
+      <p class="lead">Обучение проводится на базе одного из ведущих учебных центров страны в области защиты информации.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Лицензия</h3>
+    <p>Образовательная деятельность по программам повышения квалификации и профпереподготовки.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Сертификат</h3>
+    <p>Слушатели получают документы установленного образца, признаваемые регуляторами.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Практика</h3>
+    <p>Разбор реальных кейсов, работа с инструментами анализа (SAST/SCA) и шаблонами ГОСТ.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Оффер · Обучение и консалтинг</span><span>08 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-9" data-block="Оффер · Обучение и консалтинг" data-screen-label="09 Связь">
+    <div class="slide-inner">
+      <span class="eyebrow">Свяжитесь со мной</span>
+      <h2 class="">Обсудите ваш проект или обучение команды</h2>
+      <p class="lead">Я открыт для предложений по аудиту ТЗ, внедрению процессов РБПО и корпоративному обучению.</p>
+      <div class="offer-cta-group">
+    <a href="https://t.me/UnderLineSecurity" target="_blank" class="materials-cta" style="border-color:#0088cc; background: color-mix(in srgb, #0088cc 5%, var(--surface));">
+      <span><strong>Написать в Telegram</strong><em>@UnderLineSecurity — обсудить проект напрямую</em></span>
+      <b style="background:#0088cc;"><svg viewBox="0 0 24 24" style="fill:none; stroke:#fff; stroke-width:2.5;"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/></svg></b>
+    </a>
+  </div><div class="callout info">
+    <div class="callout-mark" aria-hidden="true">i</div>
+    <div class="callout-body"><strong>Другие способы</strong>Если вам удобнее почта, пишите на <a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a>. Обычно я отвечаю в течение рабочего дня.</div>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Оффер · Обучение и консалтинг</span><span>09 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-10" data-block="Блок 1 · Зачем ТЗ" data-screen-label="10 Блок 1">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 1</span>
+      <h2 class="">Зачем техническое задание, если все и так “понятно”</h2>
+      <p class="lead">ТЗ становится рабочим инструментом только тогда, когда оно управляет границами, сроками, приемкой и безопасностью.</p>
+      <ul class="checklist "><li>Документ удерживает договоренность между заказчиком и исполнителем.</li><li>Документ превращает ожидания в проверяемые критерии.</li><li>Документ защищает проект от бесконечных устных трактовок.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>10 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-11" data-block="Блок 1 · Зачем ТЗ" data-screen-label="11 Не документ ради документа">
+    <div class="slide-inner">
+      <span class="eyebrow">Позиция курса</span>
+      <h2 class="">Хорошее ТЗ пишется не для архива, а для разработки</h2>
+      <p class="lead">В нем должны быть не красивые формулировки, а управляемые единицы работ: что реализуем, почему, как проверяем, кто принимает.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Заказчик</h3>
+    <p>Получает контроль результата, бюджета, сроков и состава приемки.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Исполнитель</h3>
+    <p>Получает однозначный объем работ и защиту от бесконечных переделок.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Аудитор</h3>
+    <p>Получает трассируемые критерии соответствия и подтверждающие артефакты.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>11 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-12" data-block="Блок 1 · Зачем ТЗ" data-screen-label="12 Красная зона: “и так понятно”">
+    <div class="slide-inner">
+      <span class="eyebrow">Красная зона</span>
+      <h2 class="">Фраза “все понятно” почти всегда означает, что требования еще не готовы</h2>
+      <p class="lead">Понимание должно быть проверяемым: одинаковая трактовка у заказчика, аналитика, разработчика, тестировщика и специалиста по ИБ.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Остановить аудиторию</strong>Если читающий документ может сказать “я понял это иначе”, значит требование не прошло базовый контроль качества.</div>
+  </div><div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Неоднозначность</h3>
+    <p>Один текст допускает разные варианты реализации.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Непроверяемость</h3>
+    <p>Нельзя построить тест, измерение, инспекцию или демонстрацию.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Неполная область</h3>
+    <p>Не описаны роли, ограничения, данные, исключения и критерии приемки.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>12 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-13" data-block="Блок 1 · Зачем ТЗ" data-screen-label="13 ТЗ как контракт смысла">
+    <div class="slide-inner">
+      <span class="eyebrow">Роли документа</span>
+      <h2 class="">ТЗ связывает бизнес, разработку, испытания и эксплуатацию</h2>
+      <p class="lead">Один и тот же пункт должен быть понятен разным участникам проекта, но в каждой роли он отвечает на свой вопрос.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Роль</th><th>Вопрос</th><th>Что должно быть в ТЗ</th></tr></thead>
+    <tbody><tr><td>Бизнес</td><td>Какой результат покупаем?</td><td>Цель, границы, критерии успеха, ограничения бюджета и сроков.</td></tr><tr><td>Разработка</td><td>Что именно делать?</td><td>Функции, интерфейсы, данные, статусы, ошибки, интеграции.</td></tr><tr><td>Испытания</td><td>Как принять?</td><td>Методы проверки, ожидаемые результаты, связь с ПМИ.</td></tr><tr><td>ИБ</td><td>Что защищаем?</td><td>Угрозы, меры, процессы РБПО, SAST/SCA/SBOM, артефакты.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>13 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-14" data-block="Блок 1 · Зачем ТЗ" data-screen-label="14 Ошибка старта">
+    <div class="slide-inner">
+      <span class="eyebrow">Методическая ловушка</span>
+      <h2 class="">Открывать шаблон ТЗ до проектирования — плохая привычка</h2>
+      <p class="lead">Шаблон помогает оформить результат размышления. Он не должен подменять исследование продукта, пользователя, архитектуры и рисков.</p>
+      <div class="split"><div><div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Плохо</strong>Начать с разделов ГОСТа и пытаться заполнить пустоты общими словами.</div>
+  </div></div><div><div class="callout success">
+    <div class="callout-mark" aria-hidden="true">✓</div>
+    <div class="callout-body"><strong>Правильно</strong>Сначала собрать входные данные: цель, роли, сценарии, ограничения, угрозы, критерии приемки.</div>
+  </div></div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>14 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-15" data-block="Блок 1 · Зачем ТЗ" data-screen-label="15 Кейс: спор вокруг ТЗ">
+    <div class="slide-inner">
+      <span class="eyebrow">Из авторской лекции</span>
+      <h2 class="">Споры по ТЗ возникают не из-за объема текста, а из-за слабых требований</h2>
+      <p class="lead">Даже длинный документ может не защищать заказчика, если в нем нет однозначных критериев приемки и границ трактования.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Лекционный акцент</strong>Компания может считать, что она выполнила ТЗ, а заказчик — что получил не то. В споре решает не ожидание, а текст требования и критерий приемки.</div>
+  </div><ul class="checklist "><li>Не смешивать пожелания и обязательства.</li><li>Не оставлять субъективные слова без метрики.</li><li>Не принимать требование без способа проверки.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>15 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-16" data-block="Блок 1 · Зачем ТЗ" data-screen-label="16 ТЗ как финал первичного проектирования">
+    <div class="slide-inner">
+      <span class="eyebrow">Порядок работы</span>
+      <h2 class="">Сначала продуктовая ясность, потом документная дисциплина</h2>
+      <p class="lead">ТЗ фиксирует договоренности о продукте, а не заменяет обсуждение продукта.</p>
+      <div class="flow"><div class="flow-item">Проблема</div><div class="flow-item">Пользователь</div><div class="flow-item">Сценарий</div><div class="flow-item">Интерфейс</div><div class="flow-item">Архитектура</div><div class="flow-item">Угроза</div><div class="flow-item">Требование</div><div class="flow-item">ПМИ</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>16 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-17" data-block="Блок 1 · Зачем ТЗ" data-screen-label="17 Польза для заказчика">
+    <div class="slide-inner">
+      <span class="eyebrow">Практический результат</span>
+      <h2 class="">Заказчик получает управляемую приемку, а не надежду</h2>
+      <p class="lead">Качественное ТЗ заранее определяет, что будет считаться готовым результатом.</p>
+      <ul class="checklist "><li>Состав результата зафиксирован.</li><li>Критерии приемки известны до разработки.</li><li>Изменения проходят через понятный порядок.</li><li>Скрытые работы безопасности становятся видимыми.</li><li>Спорные трактовки можно разрешать по тексту.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>17 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-18" data-block="Блок 1 · Зачем ТЗ" data-screen-label="18 Польза для исполнителя">
+    <div class="slide-inner">
+      <span class="eyebrow">Защита разработки</span>
+      <h2 class="">Исполнитель получает границы ответственности</h2>
+      <p class="lead">Четкое ТЗ защищает команду от ситуации, когда после реализации выясняется, что “имелось в виду другое”.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Объем</h3>
+    <p>Понятно, какие функции, интерфейсы и процессы входят в работу.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Ограничения</h3>
+    <p>Видны технологические, организационные, безопасностные и эксплуатационные рамки.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Приемка</h3>
+    <p>Команда понимает, какие проверки завершат работу и какие артефакты нужны.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>18 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-19" data-block="Блок 1 · Зачем ТЗ" data-screen-label="19 ТЗ и деньги">
+    <div class="slide-inner">
+      <span class="eyebrow">Экономика требований</span>
+      <h2 class="">Неясное требование — это будущая переделка</h2>
+      <p class="lead">Чем позже обнаружена неоднозначность, тем дороже ее исправление: меняется код, тесты, документация, сроки и доверие.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Стадия</th><th>Что ломается</th><th>Цена исправления</th></tr></thead>
+    <tbody><tr><td>До ТЗ</td><td>Формулировка и сценарий</td><td>Низкая: меняем текст и договоренность.</td></tr><tr><td>Во время разработки</td><td>Код, задачи, архитектурные решения</td><td>Средняя: меняем реализацию и план.</td></tr><tr><td>На приемке</td><td>Результат и договорные ожидания</td><td>Высокая: спор, переработка, перенос сроков.</td></tr><tr><td>После внедрения</td><td>Эксплуатация и безопасность</td><td>Критическая: инциденты, простой, уязвимости.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>19 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-20" data-block="Блок 1 · Зачем ТЗ" data-screen-label="20 ТЗ и безопасность">
+    <div class="slide-inner">
+      <span class="eyebrow">Security by design</span>
+      <h2 class="">Безопасность нельзя “добавить потом” общим разделом</h2>
+      <p class="lead">Требования безопасности должны появляться из угроз, регуляторики, архитектуры, состава компонентов и процессов разработки.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Красная зона</strong>Фраза “система должна быть защищенной” не создает защищенность. Она создает иллюзию, пока не указаны угрозы, меры, проверки и артефакты.</div>
+  </div><div class="flow"><div class="flow-item">Активы</div><div class="flow-item">Угрозы</div><div class="flow-item">Меры</div><div class="flow-item">Требования</div><div class="flow-item">SAST/SCA</div><div class="flow-item">ПМИ</div><div class="flow-item">Артефакты</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>20 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-21" data-block="Блок 1 · Зачем ТЗ" data-screen-label="21 Не путать документ и систему">
+    <div class="slide-inner">
+      <span class="eyebrow">Методическая граница</span>
+      <h2 class="">ТЗ не делает систему правильной само по себе</h2>
+      <p class="lead">Документ задает проверяемую рамку. Качество появляется, когда требования связаны с архитектурой, кодом, тестами, сборкой и приемкой.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Требование</h3>
+    <p>Что должно быть выполнено.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Реализация</h3>
+    <p>Как команда воплотит требование в коде и конфигурации.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Подтверждение</h3>
+    <p>Каким тестом, анализом или документом будет доказано выполнение.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>21 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-22" data-block="Блок 1 · Зачем ТЗ" data-screen-label="22 Итог блока 1">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">Хорошее ТЗ уменьшает неопределенность, а не увеличивает бюрократию</h2>
+      <p class="lead">Если документ помогает понять, реализовать, проверить и принять результат, он работает. Если нет — это просто текст.</p>
+      <div class="big-statement"><strong>ТЗ готово только тогда, когда требование можно одинаково понять, реализовать, проверить и принять.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 1 · Зачем ТЗ</span><span>22 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-23" data-block="Блок 2 · Нормативная рамка" data-screen-label="23 Блок 2">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 2</span>
+      <h2 class="">ГОСТы и инженерные практики: не конкуренты, а слои одной системы</h2>
+      <p class="lead">ГОСТы задают дисциплину документа, а инженерные практики помогают формулировать требования так, чтобы они работали в разработке.</p>
+      <ul class="checklist "><li>ГОСТ 19.201-78 — программа или программное изделие.</li><li>ГОСТ 34.602-2020 — автоматизированная система.</li><li>ГОСТ Р 59792-2021 — испытания и опытная эксплуатация.</li><li>ГОСТ Р 56939-2024 — процессы разработки безопасного ПО.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>23 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-24" data-block="Блок 2 · Нормативная рамка" data-screen-label="24 Зачем нормативка">
+    <div class="slide-inner">
+      <span class="eyebrow">Документная дисциплина</span>
+      <h2 class="">Нормативка не заменяет мышление, но задает проверяемый каркас</h2>
+      <p class="lead">Стандарт помогает не забыть обязательные разделы, стадии, контроль и приемку. Но содержание требований все равно рождается из проекта.</p>
+      <div class="split"><div><ul class="checklist "><li>Единая структура документа.</li><li>Понятные разделы для заказчика и исполнителя.</li><li>Связь со стадиями и испытаниями.</li><li>Проверяемые артефакты.</li></ul></div><div><div class="callout warning">
+    <div class="callout-mark" aria-hidden="true">?</div>
+    <div class="callout-body"><strong>Ограничение</strong>Стандарт не напишет за нас user story, модель угроз, API-контракт и критерий приемки.</div>
+  </div></div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>24 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-25" data-block="Блок 2 · Нормативная рамка" data-screen-label="25 ГОСТ 19.201-78">
+    <div class="slide-inner">
+      <span class="eyebrow">Программное изделие</span>
+      <h2 class="">ГОСТ 19.201-78: базовый язык ТЗ на программу</h2>
+      <p class="lead">Подходит, когда основной объект разработки — программа, программное изделие или компонент.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Назначение</h3>
+    <p>Для чего создается программа и какие задачи должна решать.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Требования</h3>
+    <p>Функции, надежность, условия эксплуатации, совместимость, документация.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Контроль</h3>
+    <p>Порядок испытаний, приемки и подтверждения соответствия.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>25 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-26" data-block="Блок 2 · Нормативная рамка" data-screen-label="26 ГОСТ 34.602-2020">
+    <div class="slide-inner">
+      <span class="eyebrow">Автоматизированная система</span>
+      <h2 class="">ГОСТ 34.602-2020: когда важна не только программа, но и система</h2>
+      <p class="lead">АС включает пользователей, процессы, данные, технические средства, интеграции, эксплуатацию и ввод в действие.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Раздел</th><th>Что дает проекту</th></tr></thead>
+    <tbody><tr><td>Общие сведения</td><td>Основание, заказчик, исполнитель, сроки, источники финансирования.</td></tr><tr><td>Назначение и цели</td><td>Зачем создается система и как измерить результат.</td></tr><tr><td>Требования к системе</td><td>Функции, надежность, безопасность, эргономика, интерфейсы.</td></tr><tr><td>Состав работ</td><td>Стадии, этапы, контроль, приемка, подготовка объекта автоматизации.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>26 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-27" data-block="Блок 2 · Нормативная рамка" data-screen-label="27 ГОСТ Р 59792-2021">
+    <div class="slide-inner">
+      <span class="eyebrow">Испытания АС</span>
+      <h2 class="">ГОСТ Р 59792-2021 связывает ТЗ с опытной эксплуатацией и приемкой</h2>
+      <p class="lead">Если ТЗ не переводится в программу и методику испытаний, оно не готово к управлению результатом.</p>
+      <div class="flow"><div class="flow-item">ТЗ</div><div class="flow-item">Предварительные испытания</div><div class="flow-item">Опытная эксплуатация</div><div class="flow-item">Приемочные испытания</div><div class="flow-item">Решение о вводе</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>27 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-28" data-block="Блок 2 · Нормативная рамка" data-screen-label="28 ГОСТ Р 56939-2024">
+    <div class="slide-inner">
+      <span class="eyebrow">Безопасная разработка ПО</span>
+      <h2 class="">ГОСТ Р 56939-2024 добавляет в ТЗ процессы РБПО</h2>
+      <p class="lead">Для безопасной разработки мало описать функции продукта. Нужно предъявить требования к процессам разработки, сборки, анализа, компонентов и поддержки.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>5.3</h3>
+    <p>Формирование и предъявление требований безопасности к ПО.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>5.10</h3>
+    <p>Статический анализ исходного кода и управление результатами.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>5.16</h3>
+    <p>Композиционный анализ, зависимости, SBOM/PPK, лицензии и уязвимости.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>28 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-29" data-block="Блок 2 · Нормативная рамка" data-screen-label="29 Пункт 4.15">
+    <div class="slide-inner">
+      <span class="eyebrow">Ключ для ОКР</span>
+      <h2 class="">Для НИР/ОКР процессы ГОСТ Р 56939 предъявляются явно</h2>
+      <p class="lead">В ТЗ нужно не ссылаться на стандарт общими словами, а перечислять процессы, условия применимости и состав подтверждающих артефактов.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Красная зона</strong>Фраза “исполнитель должен учитывать ГОСТ Р 56939-2024” не задает ни объем работ, ни критерии приемки, ни артефакты.</div>
+  </div><ul class="checklist "><li>Перечислить процессы.</li><li>Описать условия применимости.</li><li>Указать регламенты и проектные артефакты.</li><li>Связать с ПМИ и приемкой.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>29 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-30" data-block="Блок 2 · Нормативная рамка" data-screen-label="30 ГОСТ Р 58412-2019">
+    <div class="slide-inner">
+      <span class="eyebrow">Угрозы безопасности информации</span>
+      <h2 class="">ГОСТ Р 58412 помогает превратить угрозы в требования безопасности</h2>
+      <p class="lead">Модель угроз нужна не для приложения к ТЗ, а для вывода конкретных мер, ограничений и критериев проверки.</p>
+      <div class="flow"><div class="flow-item">Актив</div><div class="flow-item">Нарушитель</div><div class="flow-item">Угроза</div><div class="flow-item">Сценарий</div><div class="flow-item">Мера</div><div class="flow-item">Требование</div><div class="flow-item">Проверка</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>30 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-31" data-block="Блок 2 · Нормативная рамка" data-screen-label="31 OWASP и CWE">
+    <div class="slide-inner">
+      <span class="eyebrow">Практические источники</span>
+      <h2 class="">OWASP и CWE дают язык требований для веб, API и типовых уязвимостей</h2>
+      <p class="lead">Эти источники полезны, когда ГОСТ задает процесс, а проекту нужны конкретные требования к аутентификации, авторизации, сессиям, журналам и API.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>OWASP ASVS</h3>
+    <p>Проверяемые требования к прикладной безопасности.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>OWASP Top 10</h3>
+    <p>Карта распространенных классов рисков веб-приложений.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>CWE</h3>
+    <p>Словарь классов ошибок, который связывает требования, SAST и обучение разработчиков.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>31 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-32" data-block="Блок 2 · Нормативная рамка" data-screen-label="32 CERT и MISRA">
+    <div class="slide-inner">
+      <span class="eyebrow">C/C++</span>
+      <h2 class="">Для C/C++ требования безопасности должны учитывать память, API и неопределенное поведение</h2>
+      <p class="lead">В проектах системного ПО и САПР нельзя ограничиться веб-чеклистом. Нужны правила безопасного C/C++ и контроль компиляции.</p>
+      <ul class="checklist "><li>CERT C/C++ — ошибки памяти, целочисленные переполнения, обработка ошибок, API.</li><li>MISRA C/C++ — ограничение опасных конструкций и повышенная предсказуемость кода.</li><li>SAST и sanitizers — инструментальная проверка требований к коду.</li><li>Compiler hardening — требования к сборочной конфигурации.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>32 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-33" data-block="Блок 2 · Нормативная рамка" data-screen-label="33 NIST SSDF">
+    <div class="slide-inner">
+      <span class="eyebrow">Международная рамка SSDLC</span>
+      <h2 class="">NIST SSDF помогает описывать безопасную разработку как управляемый процесс</h2>
+      <p class="lead">Рамка полезна для сопоставления российских требований РБПО с понятными практиками secure software development.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Prepare</h3>
+    <p>Политики, роли, инструменты, обучение, критерии готовности.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Protect</h3>
+    <p>Защита кода, секретов, сборочной среды и цепочки поставки.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Respond</h3>
+    <p>Уязвимости, исправления, уведомления, lessons learned.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>33 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-34" data-block="Блок 2 · Нормативная рамка" data-screen-label="34 ISO/IEC 27001 и 27034">
+    <div class="slide-inner">
+      <span class="eyebrow">Система управления</span>
+      <h2 class="">ISO/IEC 27001 и 27034 связывают ТЗ с управлением безопасностью</h2>
+      <p class="lead">Требования продукта должны жить в системе управления: роли, риски, контроль изменений, поставщики, инциденты и улучшения.</p>
+      <div class="split"><div><div class="callout info">
+    <div class="callout-mark" aria-hidden="true">i</div>
+    <div class="callout-body"><strong>ISO/IEC 27001</strong>Контекст организации, риск-ориентированный подход и контрольные меры СУИБ.</div>
+  </div></div><div><div class="callout info">
+    <div class="callout-mark" aria-hidden="true">i</div>
+    <div class="callout-body"><strong>ISO/IEC 27034</strong>Безопасность приложений и прикладные требования на протяжении жизненного цикла.</div>
+  </div></div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>34 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-35" data-block="Блок 2 · Нормативная рамка" data-screen-label="35 Как выбрать стандарт">
+    <div class="slide-inner">
+      <span class="eyebrow">Решение в начале проекта</span>
+      <h2 class="">Выбор ГОСТа зависит от объекта: программа, система или безопасная разработка</h2>
+      <p class="lead">Часто нужен не один документ, а комбинация: структура ТЗ по ГОСТ 19/34 плюс процессы безопасности по ГОСТ Р 56939.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Ситуация</th><th>Базовый каркас</th><th>Что добавить</th></tr></thead>
+    <tbody><tr><td>Программный компонент</td><td>ГОСТ 19.201-78</td><td>РБПО, SAST, SCA, требования к сборке.</td></tr><tr><td>Автоматизированная система</td><td>ГОСТ 34.602-2020</td><td>Интерфейсы, ввод в действие, эксплуатация, безопасность.</td></tr><tr><td>ОКР с безопасным ПО</td><td>ГОСТ 19/34 + ГОСТ Р 56939</td><td>Явное перечисление процессов и артефактов по п. 4.15.</td></tr><tr><td>MVP или малый проект</td><td>Упрощенный шаблон</td><td>User stories, критерии приемки, security baseline.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>35 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-36" data-block="Блок 2 · Нормативная рамка" data-screen-label="36 Итог блока 2">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">Стандарт задает форму. Качество задает содержание</h2>
+      <p class="lead">ТЗ сильное тогда, когда нормативный каркас соединен с реальными сценариями, угрозами, ограничениями и проверками.</p>
+      <div class="big-statement"><strong>Не “сослаться на ГОСТ”, а предъявить конкретные процессы, требования и артефакты.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 2 · Нормативная рамка</span><span>36 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-37" data-block="Блок 3 · До написания ТЗ" data-screen-label="37 Блок 3">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 3</span>
+      <h2 class="">Пять слоев продукта до открытия шаблона ТЗ</h2>
+      <p class="lead">Бизнес, пользователь, функционал, интерфейсы, backend/администрирование и безопасность должны быть понятны до формализации требований.</p>
+      <div class="flow"><div class="flow-item">Бизнес</div><div class="flow-item">Пользователь</div><div class="flow-item">Функционал</div><div class="flow-item">Интерфейсы</div><div class="flow-item">Backend</div><div class="flow-item">Угрозы</div><div class="flow-item">Приемка</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>37 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-38" data-block="Блок 3 · До написания ТЗ" data-screen-label="38 Бизнес-слой">
+    <div class="slide-inner">
+      <span class="eyebrow">Слой 1</span>
+      <h2 class="">Бизнес-цель отвечает на вопрос “зачем”</h2>
+      <p class="lead">Без цели требования превращаются в набор несвязанных пожеланий. Цель задает границы, приоритеты и критерии успеха.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Проблема</h3>
+    <p>Что изменится после внедрения системы.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Результат</h3>
+    <p>Как измерить, что проект действительно сработал.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Ограничения</h3>
+    <p>Сроки, бюджет, регуляторика, контур эксплуатации, доступность ресурсов.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>38 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-39" data-block="Блок 3 · До написания ТЗ" data-screen-label="39 Пользовательский слой">
+    <div class="slide-inner">
+      <span class="eyebrow">Слой 2</span>
+      <h2 class="">Пользователь — это роль, контекст и сценарий, а не абстрактный “клиент”</h2>
+      <p class="lead">Требование должно быть связано с тем, кто выполняет действие, зачем и в какой ситуации.</p>
+      <pre class="code"><code>Как &lt;роль&gt;, я хочу &lt;действие&gt;, чтобы &lt;ценность/результат&gt;.
+Критерий: сценарий можно продемонстрировать и принять.</code></pre>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>39 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-40" data-block="Блок 3 · До написания ТЗ" data-screen-label="40 Функциональный слой">
+    <div class="slide-inner">
+      <span class="eyebrow">Слой 3</span>
+      <h2 class="">Функции нужно описывать через сценарии и правила</h2>
+      <p class="lead">Перечень функций сам по себе слаб. Нужны входные данные, действия пользователя, бизнес-правила, исключения и ожидаемый результат.</p>
+      <ul class="checklist "><li>Основной сценарий.</li><li>Альтернативные сценарии.</li><li>Ошибочные ситуации.</li><li>Права доступа.</li><li>Связанные данные и статусы.</li><li>События аудита.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>40 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-41" data-block="Блок 3 · До написания ТЗ" data-screen-label="41 Интерфейсный слой">
+    <div class="slide-inner">
+      <span class="eyebrow">Слой 4</span>
+      <h2 class="">Интерфейс — это место, где требование становится видимым</h2>
+      <p class="lead">Для UI, API и интеграций нужно заранее понимать точки взаимодействия и контракты.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Интерфейс</th><th>Что фиксировать</th></tr></thead>
+    <tbody><tr><td>Пользовательский UI</td><td>Экран, состояние, ошибка, роль, доступность, язык сообщений.</td></tr><tr><td>API</td><td>Метод, endpoint, схема данных, коды ответов, лимиты, аутентификация.</td></tr><tr><td>Интеграция</td><td>Стороны обмена, формат, расписание, retries, журналирование.</td></tr><tr><td>Админка</td><td>Роли, настройки, аудит, экспорт, блокировки, ручные операции.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>41 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-42" data-block="Блок 3 · До написания ТЗ" data-screen-label="42 Backend и администрирование">
+    <div class="slide-inner">
+      <span class="eyebrow">Слой 5</span>
+      <h2 class="">Внутренняя работа системы тоже должна быть требованием</h2>
+      <p class="lead">Многие критичные требования не видны пользователю: данные, роли, журналы, фоновые задачи, конфигурация и эксплуатационные процедуры.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Данные</h3>
+    <p>Сущности, жизненный цикл, хранение, резервирование, удаление.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Роли</h3>
+    <p>Права доступа, администраторы, операторы, аудиторы, сервисные учетные записи.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Операции</h3>
+    <p>Импорт, экспорт, настройки, мониторинг, журналы, восстановление.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>42 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-43" data-block="Блок 3 · До написания ТЗ" data-screen-label="43 Модель угроз до ТЗ">
+    <div class="slide-inner">
+      <span class="eyebrow">Security-by-design</span>
+      <h2 class="">Угрозы нужно учитывать до формулирования требований безопасности</h2>
+      <p class="lead">ТЗ должно отражать активы, нарушителей, поверхность атаки и меры защиты, иначе раздел безопасности будет декларативным.</p>
+      <div class="flow"><div class="flow-item">Активы</div><div class="flow-item">Границы доверия</div><div class="flow-item">Нарушители</div><div class="flow-item">Поверхность атаки</div><div class="flow-item">Сценарии</div><div class="flow-item">Меры</div><div class="flow-item">Требования</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>43 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-44" data-block="Блок 3 · До написания ТЗ" data-screen-label="44 Архитектурные ограничения">
+    <div class="slide-inner">
+      <span class="eyebrow">Реализуемость</span>
+      <h2 class="">Требование должно быть выполнимым в заданной архитектуре</h2>
+      <p class="lead">Нельзя требовать поведение, которое противоречит выбранной платформе, интеграционному контуру, режиму эксплуатации или безопасной сборке.</p>
+      <ul class="checklist "><li>Операционные системы и платформы.</li><li>Языки и технологический стек.</li><li>Сетевой контур и интернет-доступ.</li><li>Контейнеры, сборочная среда и репозитории.</li><li>Ограничения поставки, сертификации и эксплуатации.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>44 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-45" data-block="Блок 3 · До написания ТЗ" data-screen-label="45 Исходные артефакты">
+    <div class="slide-inner">
+      <span class="eyebrow">Перед ТЗ</span>
+      <h2 class="">Минимальный комплект входов перед написанием ТЗ</h2>
+      <p class="lead">Если этих материалов нет, ТЗ будет строиться на догадках и быстро начнет конфликтовать с реальностью проекта.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Артефакт</th><th>Зачем нужен</th></tr></thead>
+    <tbody><tr><td>Описание проблемы</td><td>Понимать ценность и границы результата.</td></tr><tr><td>Список ролей</td><td>Вывести сценарии и права доступа.</td></tr><tr><td>User stories</td><td>Связать требования с пользовательской ценностью.</td></tr><tr><td>Wireframes/API</td><td>Уточнить интерфейсы и контракты.</td></tr><tr><td>Модель угроз</td><td>Вывести требования безопасности.</td></tr><tr><td>Черновик ПМИ</td><td>Проверить приемочность требований.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>45 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-46" data-block="Блок 3 · До написания ТЗ" data-screen-label="46 Красная зона: шаблон вместо анализа">
+    <div class="slide-inner">
+      <span class="eyebrow">Красная зона</span>
+      <h2 class="">Если команда заполняет разделы ГОСТа без понимания продукта, ТЗ имитирует работу</h2>
+      <p class="lead">Визуально документ выглядит солидно, но не отвечает на вопросы разработки и приемки.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Остановить аудиторию</strong>Шаблон — это форма. Содержание рождается из анализа продукта, сценариев, угроз, архитектуры и приемки.</div>
+  </div><ul class="checklist "><li>Нет цели — нет приоритетов.</li><li>Нет сценариев — нет функций.</li><li>Нет интерфейсов — нет проверяемых контрактов.</li><li>Нет модели угроз — нет настоящей безопасности.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>46 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-47" data-block="Блок 3 · До написания ТЗ" data-screen-label="47 Минимальный порядок работы">
+    <div class="slide-inner">
+      <span class="eyebrow">Практический алгоритм</span>
+      <h2 class="">Семь шагов до первой версии ТЗ</h2>
+      <p class="lead">Эта последовательность удерживает документ от преждевременной формализации.</p>
+      <ol class="numlist"><li>Зафиксировать проблему и измеримый результат.</li><li>Описать заинтересованные стороны и роли пользователей.</li><li>Собрать пользовательские сценарии и бизнес-правила.</li><li>Разделить функциональные, нефункциональные и требования безопасности.</li><li>Определить интерфейсы, данные и ограничения.</li><li>Провести первичное моделирование угроз.</li><li>Согласовать критерии приемки до передачи в разработку.</li></ol>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>47 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-48" data-block="Блок 3 · До написания ТЗ" data-screen-label="48 Итог блока 3">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">ТЗ начинается не с титульного листа, а с ясности продукта</h2>
+      <p class="lead">Когда входные артефакты собраны, документ становится инструментом фиксации, а не средством коллективного угадывания.</p>
+      <div class="big-statement"><strong>Плохое ТЗ начинается с шаблона. Хорошее — с понимания продукта и приемки.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 3 · До написания ТЗ</span><span>48 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-49" data-block="Блок 4 · Качество требований" data-screen-label="49 Блок 4">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 4</span>
+      <h2 class="">Кодекс качества требований</h2>
+      <p class="lead">Требование — это рабочая единица проектирования, разработки, тестирования и приемки. У нее есть ID, источник, критерий и статус.</p>
+      <ul class="checklist "><li>Атомарность.</li><li>Однозначность.</li><li>Проверяемость.</li><li>Реализуемость.</li><li>Обоснованность.</li><li>Трассируемость.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>49 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-50" data-block="Блок 4 · Качество требований" data-screen-label="50 Требование как обязанность">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 1</span>
+      <h2 class="">Формулировка должна задавать обязанность</h2>
+      <p class="lead">Описание текущего состояния, пожелание или рассуждение не являются требованием.</p>
+      <div class="split"><div><div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Плохо</strong>“В системе желательно предусмотреть удобную авторизацию”.</div>
+  </div></div><div><div class="callout success">
+    <div class="callout-mark" aria-hidden="true">✓</div>
+    <div class="callout-body"><strong>Лучше</strong>“Система должна предоставлять пользователю возможность аутентификации по адресу электронной почты и паролю”.</div>
+  </div></div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>50 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-51" data-block="Блок 4 · Качество требований" data-screen-label="51 Атомарность">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 2</span>
+      <h2 class="">Один пункт — одно требование</h2>
+      <p class="lead">Если пункт нельзя проверить одним тестом или одной связанной группой проверок, его надо разделить.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Красная зона</strong>Сложное требование с несколькими “и” часто прячет несколько разных работ, разных владельцев и разные способы проверки.</div>
+  </div><ul class="checklist "><li>Одна функция.</li><li>Одно свойство.</li><li>Один критерий приемки.</li><li>Один источник или управляемая связка источников.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>51 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-52" data-block="Блок 4 · Качество требований" data-screen-label="52 Однозначность">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 3</span>
+      <h2 class="">Термины должны допускать одну трактовку</h2>
+      <p class="lead">Если заказчик, разработчик и испытатель понимают слово по-разному, требование не готово.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Глоссарий</h3>
+    <p>Определяет термины: пользователь, администратор, заявка, инцидент, компонент.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Контекст</h3>
+    <p>Указывает роли, состояние системы, исключения и ограничения.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Пример</h3>
+    <p>Показывает, как требование будет выглядеть в сценарии или тесте.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>52 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-53" data-block="Блок 4 · Качество требований" data-screen-label="53 Проверяемость">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 4</span>
+      <h2 class="">У каждого требования должен быть способ проверки</h2>
+      <p class="lead">Проверка может быть тестом, демонстрацией, измерением, анализом или инспекцией. Без проверки это не требование, а пожелание.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Метод</th><th>Когда применять</th></tr></thead>
+    <tbody><tr><td>Демонстрация</td><td>Поведение видно в интерфейсе или сценарии.</td></tr><tr><td>Тест</td><td>Поведение воспроизводится по шагам.</td></tr><tr><td>Измерение</td><td>Нужны численные показатели: время, нагрузка, доступность.</td></tr><tr><td>Анализ</td><td>Проверяется код, архитектура, модель угроз или конфигурация.</td></tr><tr><td>Инспекция</td><td>Проверяются документы, журналы, настройки и артефакты.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>53 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-54" data-block="Блок 4 · Качество требований" data-screen-label="54 Реализуемость">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 5</span>
+      <h2 class="">Требование должно быть выполнимым в заданных ограничениях</h2>
+      <p class="lead">Реализуемость зависит от технологий, сроков, квалификации, регуляторики, контуров эксплуатации и инструментов.</p>
+      <ul class="checklist "><li>Проверить технологическую возможность.</li><li>Проверить ресурсы и квалификацию.</li><li>Проверить сроки и зависимость от внешних поставщиков.</li><li>Проверить конфликт с безопасностью и архитектурой.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>54 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-55" data-block="Блок 4 · Качество требований" data-screen-label="55 Обоснованность">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 6</span>
+      <h2 class="">У требования должен быть источник</h2>
+      <p class="lead">Источник объясняет, почему требование существует и кто имеет право его изменить.</p>
+      <div class="grid cols-4"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Бизнес</h3>
+    <p>Цель, эффект, договоренность, KPI.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Пользователь</h3>
+    <p>Сценарий, роль, боль, контекст работы.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Безопасность</h3>
+    <p>Модель угроз, ГОСТ, OWASP, CWE, BDU/NVD/OSV.</p>
+  </article><article class="card">
+    <div class="card-num">04</div>
+    <h3>Архитектура</h3>
+    <p>Платформа, контур, интеграции, ограничения эксплуатации.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>55 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-56" data-block="Блок 4 · Качество требований" data-screen-label="56 Полнота и неизбыточность">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 7</span>
+      <h2 class="">Требования должны закрывать сценарий без лишнего дублирования</h2>
+      <p class="lead">Пробелы создают догадки, а дубли создают конфликты при изменениях.</p>
+      <div class="split"><div><ul class="checklist "><li>Покрыты основные и альтернативные сценарии.</li><li>Описаны ошибки и исключения.</li><li>Указаны роли и права.</li><li>Определены данные и статусы.</li></ul></div><div><div class="callout warning">
+    <div class="callout-mark" aria-hidden="true">?</div>
+    <div class="callout-body"><strong>Риск</strong>Если одно требование повторяется в трех местах, через месяц в одном месте его изменят, а в двух забудут.</div>
+  </div></div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>56 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-57" data-block="Блок 4 · Качество требований" data-screen-label="57 Непротиворечивость">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 8</span>
+      <h2 class="">Требования должны смотреться как система</h2>
+      <p class="lead">Конфликт может быть функциональным, архитектурным, безопасностным, эксплуатационным или договорным.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Красная зона</strong>“Разрешить всем экспорт данных” и “запретить выгрузку без роли аудитора” не могут одновременно работать без уточнения условий.</div>
+  </div><ul class="checklist "><li>Проверить конфликты доступа.</li><li>Проверить конфликты производительности и безопасности.</li><li>Проверить конфликты форматов и интерфейсов.</li><li>Проверить конфликт сроков и состава работ.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>57 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-58" data-block="Блок 4 · Качество требований" data-screen-label="58 Трассируемость">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 9</span>
+      <h2 class="">Требование должно иметь путь от источника до приемки</h2>
+      <p class="lead">Трассируемость нужна не для красоты. Она отвечает на вопрос: почему это есть, кто делает, где проверяется и чем подтверждено.</p>
+      <div class="flow"><div class="flow-item">Источник</div><div class="flow-item">ID требования</div><div class="flow-item">Задача</div><div class="flow-item">Код/конфигурация</div><div class="flow-item">Тест</div><div class="flow-item">ПМИ</div><div class="flow-item">Протокол приемки</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>58 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-59" data-block="Блок 4 · Качество требований" data-screen-label="59 Приоритет">
+    <div class="slide-inner">
+      <span class="eyebrow">Критерий 10</span>
+      <h2 class="">Приоритет помогает принимать инженерные решения</h2>
+      <p class="lead">Не все требования одинаково важны. Критичность нужна для планирования, компромиссов, приемки и обработки дефектов.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Словарь</th><th>Когда удобен</th></tr></thead>
+    <tbody><tr><td>Must / Should / Could</td><td>MVP, продуктовая разработка, гибкие проекты.</td></tr><tr><td>Critical / High / Medium / Low</td><td>Безопасность, уязвимости, дефекты, SAST/SCA.</td></tr><tr><td>Обязательное / рекомендуемое</td><td>Нормативные и договорные требования.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>59 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-60" data-block="Блок 4 · Качество требований" data-screen-label="60 Карточка требования">
+    <div class="slide-inner">
+      <span class="eyebrow">Практический шаблон</span>
+      <h2 class="">Карточка требования делает пункт управляемым</h2>
+      <p class="lead">Минимальные поля должны позволять найти источник, понять формулировку, проверить выполнение и управлять статусом.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Поле</th><th>Смысл</th></tr></thead>
+    <tbody><tr><td>ID</td><td>Стабильная ссылка на требование.</td></tr><tr><td>Источник</td><td>Почему требование существует.</td></tr><tr><td>Формулировка</td><td>Что должно быть выполнено.</td></tr><tr><td>Критерий приемки</td><td>Как понять, что выполнено.</td></tr><tr><td>Метод проверки</td><td>Тест, анализ, инспекция, демонстрация или измерение.</td></tr><tr><td>Приоритет и статус</td><td>Как управлять жизненным циклом.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>60 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-61" data-block="Блок 4 · Качество требований" data-screen-label="61 Пример требования">
+    <div class="slide-inner">
+      <span class="eyebrow">SEC-REQ</span>
+      <h2 class="">Пример: регистрация неуспешных попыток входа</h2>
+      <p class="lead">Одно требование, один источник, один критерий приемки и понятный метод проверки.</p>
+      <pre class="code"><code>SEC-REQ-014
+Источник: модель угроз TM-03; ГОСТ Р 56939-2024 п. 5.3
+Формулировка: система должна регистрировать все неуспешные попытки аутентификации
+с указанием идентификатора пользователя, времени, IP-адреса и причины отказа.
+Критерий приемки: запись появляется в журнале аудита и доступна роли администратора безопасности.
+Метод проверки: функциональное испытание + инспекция журнала.
+Приоритет: High.</code></pre>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>61 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-62" data-block="Блок 4 · Качество требований" data-screen-label="62 Статусы требований">
+    <div class="slide-inner">
+      <span class="eyebrow">Жизненный цикл</span>
+      <h2 class="">Статус требования должен быть виден и управляем</h2>
+      <p class="lead">В авторской лекции по РБПО отдельно звучит мысль: требования безопасности имеют статусы, даты, ответственных и историю изменений.</p>
+      <div class="flow"><div class="flow-item">Предъявлено</div><div class="flow-item">Принято</div><div class="flow-item">В реализации</div><div class="flow-item">На проверке</div><div class="flow-item">Проверено</div><div class="flow-item">Отклонено</div><div class="flow-item">Изменено</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>62 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-63" data-block="Блок 4 · Качество требований" data-screen-label="63 Антипаттерны">
+    <div class="slide-inner">
+      <span class="eyebrow">Что ломает ТЗ</span>
+      <h2 class="">Антипаттерны нужно показывать красным</h2>
+      <p class="lead">В лекции такие моменты полезно визуально выделять: аудитория должна увидеть, где начинается риск будущего спора.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Плохо</th><th>Почему плохо</th><th>Как исправить</th></tr></thead>
+    <tbody><tr><td>Система должна быть безопасной</td><td>Нельзя проверить</td><td>Разложить на угрозы, меры и критерии.</td></tr><tr><td>Должна быть удобной</td><td>Субъективно</td><td>Указать сценарий, метрику или критерий доступности.</td></tr><tr><td>Учесть ГОСТ Р 56939</td><td>Нет состава работ</td><td>Перечислить процессы и артефакты.</td></tr><tr><td>Все ошибки должны обрабатываться</td><td>Слишком общо</td><td>Описать классы ошибок, ответы, журналы, уведомления.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>63 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-64" data-block="Блок 4 · Качество требований" data-screen-label="64 Проверка качества">
+    <div class="slide-inner">
+      <span class="eyebrow">Quality gate</span>
+      <h2 class="">Перед передачей в разработку требование проходит мини-gate</h2>
+      <p class="lead">Не надо ждать конца проекта. Слабое требование дешевле исправить до постановки задач.</p>
+      <ul class="checklist "><li>Есть ID.</li><li>Есть источник.</li><li>Формулировка задает обязанность.</li><li>Термины определены.</li><li>Требование атомарно.</li><li>Есть критерий приемки.</li><li>Есть метод проверки.</li><li>Нет конфликта с другими требованиями.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>64 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-65" data-block="Блок 4 · Качество требований" data-screen-label="65 Итог блока 4">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">Качественное требование — это маленький договор внутри большого договора</h2>
+      <p class="lead">Оно сообщает, что нужно сделать, почему это нужно, как проверить и как управлять изменениями.</p>
+      <div class="big-statement"><strong>Если требование нельзя перенести в задачу и ПМИ, оно еще не готово.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 4 · Качество требований</span><span>65 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-66" data-block="Блок 5 · Типы требований" data-screen-label="66 Блок 5">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 5</span>
+      <h2 class="">Функциональные, нефункциональные и требования безопасности</h2>
+      <p class="lead">Смешение типов требований делает ТЗ мутным. Разделение типов помогает выбрать метод проверки и владельца.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Функция</h3>
+    <p>Что система делает.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Качество</h3>
+    <p>С каким уровнем сервиса работает.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Безопасность</h3>
+    <p>Как предотвращает угрозу, снижает риск или выполняет нормативное требование.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>66 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-67" data-block="Блок 5 · Типы требований" data-screen-label="67 Функциональные требования">
+    <div class="slide-inner">
+      <span class="eyebrow">Что делает система</span>
+      <h2 class="">Функциональное требование описывает поведение для пользователя или системы</h2>
+      <p class="lead">Оно проверяется демонстрацией сценария или функциональным тестом.</p>
+      <pre class="code"><code>FT-AUTH-001.
+Система должна предоставлять пользователю возможность входа
+по адресу электронной почты и паролю.</code></pre>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>67 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-68" data-block="Блок 5 · Типы требований" data-screen-label="68 Нефункциональные требования">
+    <div class="slide-inner">
+      <span class="eyebrow">С каким качеством</span>
+      <h2 class="">Нефункциональное требование задает измеримое качество или ограничение</h2>
+      <p class="lead">Слова “быстро”, “удобно”, “надежно” должны быть переведены в метрики, условия и способ измерения.</p>
+      <pre class="code"><code>NFT-PERF-001.
+Время ответа API поиска не должно превышать 500 мс
+для 95 процентиля запросов при нагрузке 100 одновременных пользователей.</code></pre>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>68 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-69" data-block="Блок 5 · Типы требований" data-screen-label="69 Требования безопасности">
+    <div class="slide-inner">
+      <span class="eyebrow">Как снижаем риск</span>
+      <h2 class="">Требование безопасности связывает угрозу, меру и проверку</h2>
+      <p class="lead">Оно может быть функциональным по форме, но его источник — риск, нормативка, модель угроз или известный класс уязвимостей.</p>
+      <pre class="code"><code>SEC-AUTH-003.
+Система должна блокировать учетную запись на 15 минут после
+5 последовательных неуспешных попыток аутентификации в течение 10 минут.</code></pre>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>69 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-70" data-block="Блок 5 · Типы требований" data-screen-label="70 Как различать">
+    <div class="slide-inner">
+      <span class="eyebrow">Лекция на доске</span>
+      <h2 class="">Один экран — три вопроса</h2>
+      <p class="lead">Если участники путаются, возвращаемся к трем диагностическим вопросам.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Тип</th><th>Главный вопрос</th><th>Проверка</th></tr></thead>
+    <tbody><tr><td>Функциональное</td><td>Что система делает?</td><td>Функциональный тест или демонстрация.</td></tr><tr><td>Нефункциональное</td><td>С каким качеством работает?</td><td>Измерение, нагрузка, мониторинг.</td></tr><tr><td>Безопасность</td><td>Какой риск или норматив закрываем?</td><td>Модель угроз, SAST, DAST, SCA, инспекция.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>70 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-71" data-block="Блок 5 · Типы требований" data-screen-label="71 Источники безопасности">
+    <div class="slide-inner">
+      <span class="eyebrow">Откуда брать SEC</span>
+      <h2 class="">Требования безопасности должны иметь понятные источники</h2>
+      <p class="lead">Лучше показать источники на слайде, чем оставлять безопасность как “общий раздел”.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Модель угроз</h3>
+    <p>Активы, нарушители, сценарии атаки, поверхность атаки.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Базы уязвимостей</h3>
+    <p>БДУ ФСТЭК, NVD, OSV: известные CVE и обновления компонентов.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Стандарты</h3>
+    <p>OWASP, CWE, CERT C/C++, MISRA C/C++, ГОСТ Р 56939.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>71 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-72" data-block="Блок 5 · Типы требований" data-screen-label="72 Поверхность атаки">
+    <div class="slide-inner">
+      <span class="eyebrow">Security thinking</span>
+      <h2 class="">Поверхность атаки помогает понять, где нужны требования</h2>
+      <p class="lead">Требования безопасности должны закрывать реальные точки взаимодействия, а не абстрактную “защищенность”.</p>
+      <ul class="checklist "><li>Внешние API и веб-интерфейсы.</li><li>Файловые импорты и экспорты.</li><li>Административные операции.</li><li>Сетевые протоколы и интеграции.</li><li>Плагины, скрипты, макросы.</li><li>Секреты, ключи и учетные записи.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>72 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-73" data-block="Блок 5 · Типы требований" data-screen-label="73 C/C++ и память">
+    <div class="slide-inner">
+      <span class="eyebrow">Secure C/C++</span>
+      <h2 class="">Для C/C++ безопасность начинается с требований к коду и сборке</h2>
+      <p class="lead">Если продукт пишется на C/C++, ТЗ может и должно задавать требования к SAST, sanitizers, compiler hardening и правилам кодирования.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Направление</th><th>Пример требования</th></tr></thead>
+    <tbody><tr><td>Память</td><td>Запрет небезопасных API без обоснования и wrapper-слоя.</td></tr><tr><td>Компиляция</td><td>Включить stack protector, FORTIFY, warnings-as-errors по согласованному профилю.</td></tr><tr><td>Sanitizers</td><td>Регламентировать ASan/UBSan/TSan для тестовых сборок.</td></tr><tr><td>Стандарты кода</td><td>CERT C/C++ или MISRA C/C++ как источник правил.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>73 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-74" data-block="Блок 5 · Типы требований" data-screen-label="74 SCA и лицензии">
+    <div class="slide-inner">
+      <span class="eyebrow">Компоненты</span>
+      <h2 class="">Компоненты тоже являются частью требований безопасности и поставки</h2>
+      <p class="lead">Без SCA и SBOM заказчик не понимает, что входит в продукт, какие лицензии используются и какие уязвимости уже известны.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Перечень зависимостей</h3>
+    <p>Наименование, версия, поставщик, лицензия, источник получения.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>SBOM/PPK</h3>
+    <p>Формализованный состав поставки и база для проверок.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Уязвимости</h3>
+    <p>BDU/NVD/OSV, критичность, статус исправления или принятия риска.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>74 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-75" data-block="Блок 5 · Типы требований" data-screen-label="75 Красная зона: безопасность потом">
+    <div class="slide-inner">
+      <span class="eyebrow">Красная зона</span>
+      <h2 class="">“Безопасность добавим потом” — это архитектурный долг</h2>
+      <p class="lead">Поздняя безопасность почти всегда дороже, слабее и конфликтует с уже принятыми решениями.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Остановить аудиторию</strong>Если в ТЗ нет модели угроз, требований к компонентам, секретам, сборке и проверкам, безопасность не управляется.</div>
+  </div><div class="flow"><div class="flow-item">Поздно заметили угрозу</div><div class="flow-item">Меняем архитектуру</div><div class="flow-item">Ломаем сроки</div><div class="flow-item">Удорожаем приемку</div><div class="flow-item">Получаем спор</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>75 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-76" data-block="Блок 5 · Типы требований" data-screen-label="76 Security acceptance">
+    <div class="slide-inner">
+      <span class="eyebrow">Приемка безопасности</span>
+      <h2 class="">Безопасность должна иметь критерии приемки, как и функциональность</h2>
+      <p class="lead">Отчет SAST, SBOM, протокол тестирования, журнал исправлений и решение о риске — это приемочные артефакты, а не внутренние заметки команды.</p>
+      <ul class="checklist "><li>Нет неисправленных Critical/High без согласованного решения.</li><li>Есть SBOM/PPK и отчет SCA.</li><li>Секреты не присутствуют в репозитории и поставке.</li><li>Сборка воспроизводима и промаркирована.</li><li>Результаты SAST разобраны и имеют статусы.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>76 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-77" data-block="Блок 5 · Типы требований" data-screen-label="77 Итог блока 5">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">Тип требования определяет способ проверки</h2>
+      <p class="lead">Пока тип не определен, команда спорит не о реализации, а о самом смысле пункта.</p>
+      <div class="big-statement"><strong>Функция демонстрируется, качество измеряется, безопасность доказывается угрозами, анализом и артефактами.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 5 · Типы требований</span><span>77 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-78" data-block="Блок 6 · РБПО" data-screen-label="78 Блок 6">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 6</span>
+      <h2 class="">РБПО в ТЗ: от общих фраз к процессам и артефактам</h2>
+      <p class="lead">ГОСТ Р 56939-2024 требует управлять не только продуктом, но и процессом разработки безопасного ПО.</p>
+      <ul class="checklist "><li>Формирование требований безопасности.</li><li>Конфигурация и изменения.</li><li>Анализ кода и сборка.</li><li>Секреты и компоненты.</li><li>Поддержка и уязвимости.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>78 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-79" data-block="Блок 6 · РБПО" data-screen-label="79 Процесс 5.3">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939-2024</span>
+      <h2 class="">5.3: формирование и предъявление требований безопасности к ПО</h2>
+      <p class="lead">Это центральный процесс для темы ТЗ: требования безопасности должны быть сформированы, предъявлены, отслежены и пересмотрены.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Регламент</h3>
+    <p>Как организация управляет требованиями безопасности.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Реестр</h3>
+    <p>ID, формулировка, даты, приоритеты, ответственные и статусы.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Пересмотр</h3>
+    <p>Критерии изменения набора требований при событиях проекта.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>79 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-80" data-block="Блок 6 · РБПО" data-screen-label="80 Что требует регламент">
+    <div class="slide-inner">
+      <span class="eyebrow">Из авторской транскрипции</span>
+      <h2 class="">Регламент определяет состав, порядок, ответственность и контроль</h2>
+      <p class="lead">В лекции отдельно подчеркивается: регламент не должен быть формальностью, он описывает, кто, что, как и когда делает.</p>
+      <ul class="checklist "><li>Область действия процесса.</li><li>Порядок выполнения задач.</li><li>Ответственные лица и полномочия.</li><li>Необходимые ресурсы и инструменты.</li><li>Критерии качества процесса.</li><li>Порядок контроля и эскалации.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>80 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-81" data-block="Блок 6 · РБПО" data-screen-label="81 Поля требования безопасности">
+    <div class="slide-inner">
+      <span class="eyebrow">Реестр SEC</span>
+      <h2 class="">Требование безопасности должно быть управляемой записью</h2>
+      <p class="lead">ГОСТовая логика требует не только текст, но и атрибуты жизненного цикла.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Поле</th><th>Зачем</th></tr></thead>
+    <tbody><tr><td>ID</td><td>Стабильная трассировка требования.</td></tr><tr><td>Формулировка</td><td>Что предъявлено исполнителю.</td></tr><tr><td>Дата</td><td>Когда требование появилось или изменилось.</td></tr><tr><td>Приоритет</td><td>Как планировать реализацию и приемку.</td></tr><tr><td>Срок</td><td>Когда требование должно быть выполнено.</td></tr><tr><td>Предъявивший / принявший</td><td>Кто отвечает за постановку и принятие.</td></tr><tr><td>Статус</td><td>Предъявлено, принято, реализуется, проверено, отклонено.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>81 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-82" data-block="Блок 6 · РБПО" data-screen-label="82 Пересмотр требований">
+    <div class="slide-inner">
+      <span class="eyebrow">Изменения</span>
+      <h2 class="">Набор требований безопасности должен пересматриваться по критериям</h2>
+      <p class="lead">Пересмотр нужен не только по расписанию, но и при событиях: изменениях архитектуры, угроз, компонентов, назначения ПО.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Архитектура</h3>
+    <p>Появились новые интерфейсы, контуры, интеграции, роли.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Уязвимости</h3>
+    <p>Новая CVE/BDU/OSV затрагивает компонент или платформу.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Назначение</h3>
+    <p>Изменились бизнес-функции, класс данных, режим эксплуатации.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>82 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-83" data-block="Блок 6 · РБПО" data-screen-label="83 Входы и выходы 5.3">
+    <div class="slide-inner">
+      <span class="eyebrow">Процессное мышление</span>
+      <h2 class="">У процесса должны быть входы, действия и выходные артефакты</h2>
+      <p class="lead">Вопрос аудитора: что было на входе, что сделали, что получили и где это проверяется.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Элемент</th><th>Пример</th></tr></thead>
+    <tbody><tr><td>Вход</td><td>ТЗ, модель угроз, нормативные требования, архитектура, сведения о компонентах.</td></tr><tr><td>Действие</td><td>Анализ, формирование, согласование, предъявление, пересмотр.</td></tr><tr><td>Выход</td><td>Реестр требований безопасности, изменения, статусы, задачи, артефакты приемки.</td></tr><tr><td>Контроль</td><td>ПМИ, документарная проверка, выборочная инструментальная проверка.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>83 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-84" data-block="Блок 6 · РБПО" data-screen-label="84 5.4 Конфигурация">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.4</span>
+      <h2 class="">Управление конфигурацией защищает требования от хаоса</h2>
+      <p class="lead">Если меняется код, сборка, инструмент или требование, это должно быть управляемым изменением.</p>
+      <ul class="checklist "><li>Правила ветвления и защиты веток.</li><li>Маркировка сборок и версий.</li><li>Состав поставки и исходных материалов.</li><li>Связь требований, задач и коммитов.</li><li>Контроль изменений инструментов анализа и сборки.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>84 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-85" data-block="Блок 6 · РБПО" data-screen-label="85 5.5 Недостатки и изменения">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.5</span>
+      <h2 class="">Дефекты и запросы на изменение должны иметь понятный жизненный цикл</h2>
+      <p class="lead">Иначе требования безопасности теряются между трекером, перепиской и устными договоренностями.</p>
+      <div class="flow"><div class="flow-item">Обнаружено</div><div class="flow-item">Зарегистрировано</div><div class="flow-item">Оценено</div><div class="flow-item">Назначено</div><div class="flow-item">Исправлено</div><div class="flow-item">Проверено</div><div class="flow-item">Закрыто</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>85 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-86" data-block="Блок 6 · РБПО" data-screen-label="86 5.10 SAST">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.10</span>
+      <h2 class="">Статический анализ должен быть требованием, а не добровольной практикой</h2>
+      <p class="lead">В ТЗ нужно указать профиль правил, периодичность, пороги, разбор срабатываний и финальный отчет.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Что требовать</th><th>Как проверять</th></tr></thead>
+    <tbody><tr><td>Профиль правил</td><td>Соответствие языкам, критичности и типам проекта.</td></tr><tr><td>Первичный анализ</td><td>Отчет baseline и план обработки.</td></tr><tr><td>Финальный анализ</td><td>Отчет перед поставкой и статусы Critical/High.</td></tr><tr><td>Разметка срабатываний</td><td>True positive, false positive, accepted risk, fixed.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>86 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-87" data-block="Блок 6 · РБПО" data-screen-label="87 5.12-5.13 Сборка">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · сборка</span>
+      <h2 class="">Безопасная сборка — часть доверия к поставке</h2>
+      <p class="lead">Если сборка не описана и не воспроизводима, трудно доказать, что поставлен именно проверенный результат.</p>
+      <ul class="checklist "><li>Описание сборочной среды.</li><li>Состав компиляторов, инструментов и версий.</li><li>Журналы сборки.</li><li>Контроль целостности артефактов.</li><li>Правила доступа к pipeline и секретам.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>87 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-88" data-block="Блок 6 · РБПО" data-screen-label="88 5.14 Код и доступ">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.14</span>
+      <h2 class="">Доступ к исходному коду и результатам анализа должен быть ограничен</h2>
+      <p class="lead">В лекции отдельно звучит вопрос: кто может читать, менять, удалять и передавать исходный код и результаты проверки.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Роли</h3>
+    <p>Разработчик, reviewer, security, release manager, auditor.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Права</h3>
+    <p>Чтение, запись, merge, release, просмотр отчетов.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Контроль</h3>
+    <p>Журналы доступа, защита веток, обязательное ревью.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>88 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-89" data-block="Блок 6 · РБПО" data-screen-label="89 5.15 Секреты">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.15</span>
+      <h2 class="">Секреты не должны попадать в код, сборку и поставку</h2>
+      <p class="lead">Требование должно описывать хранение, доступ, ротацию и проверку секретов.</p>
+      <ul class="checklist "><li>Запрет секретов в исходном коде.</li><li>Secret scanning до merge и перед поставкой.</li><li>Разделение тестовых и продуктивных секретов.</li><li>Порядок ротации и отзыва.</li><li>Журнал доступа к секретам.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>89 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-90" data-block="Блок 6 · РБПО" data-screen-label="90 5.16 SCA и SBOM">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.16</span>
+      <h2 class="">Композиционный анализ показывает реальный состав продукта</h2>
+      <p class="lead">ТЗ должно требовать перечень компонентов, лицензии, версии, источники, уязвимости и статус реагирования.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>Артефакт</th><th>Содержание</th></tr></thead>
+    <tbody><tr><td>SBOM/PPK</td><td>Компоненты, версии, поставщики, лицензии, источники.</td></tr><tr><td>Отчет SCA</td><td>Уязвимости, критичность, затронутые версии, рекомендации.</td></tr><tr><td>License review</td><td>Совместимость лицензий и ограничения распространения.</td></tr><tr><td>Решение по риску</td><td>Исправить, обновить, заменить, принять риск с обоснованием.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>90 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-91" data-block="Блок 6 · РБПО" data-screen-label="91 5.18 Тестирование">
+    <div class="slide-inner">
+      <span class="eyebrow">ГОСТ Р 56939 · 5.18</span>
+      <h2 class="">Функциональное тестирование должно быть связано с требованиями</h2>
+      <p class="lead">Тесты не должны жить отдельно. Каждое требование получает проверку, а каждый тест имеет ожидаемый результат.</p>
+      <div class="flow"><div class="flow-item">Требование</div><div class="flow-item">Тест-кейс</div><div class="flow-item">Данные</div><div class="flow-item">Ожидаемый результат</div><div class="flow-item">Протокол</div><div class="flow-item">Статус приемки</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>91 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-92" data-block="Блок 6 · РБПО" data-screen-label="92 5.22-5.23 Уязвимости">
+    <div class="slide-inner">
+      <span class="eyebrow">Поддержка</span>
+      <h2 class="">После поставки нужен порядок приема и обработки уязвимостей</h2>
+      <p class="lead">Без регламента поддержки уязвимость превращается в переписку без владельца, срока и решения.</p>
+      <ul class="checklist "><li>Канал приема сообщений.</li><li>Регистрация и triage.</li><li>Оценка критичности.</li><li>План исправления.</li><li>Уведомление заказчика.</li><li>Выпуск обновления и контроль установки.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>92 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-93" data-block="Блок 6 · РБПО" data-screen-label="93 5.25 Вывод из эксплуатации">
+    <div class="slide-inner">
+      <span class="eyebrow">Завершение поддержки</span>
+      <h2 class="">Даже конец жизненного цикла должен быть управляемым</h2>
+      <p class="lead">Пользователь должен понимать, когда прекращается поддержка, как мигрировать и что происходит с уязвимостями после EOL.</p>
+      <div class="grid cols-3"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Уведомление</h3>
+    <p>Сроки, адресаты, каналы, последствия.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Миграция</h3>
+    <p>Рекомендации по обновлению или замене.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Риски</h3>
+    <p>Что остается на стороне пользователя после завершения поддержки.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>93 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-94" data-block="Блок 6 · РБПО" data-screen-label="94 Приемка РБПО">
+    <div class="slide-inner">
+      <span class="eyebrow">Документарный контроль</span>
+      <h2 class="">РБПО принимается по артефактам, а не по обещанию</h2>
+      <p class="lead">В ПМИ нужно включить документарный контроль регламентов, отчетов, журналов и решений по рискам.</p>
+      <ul class="checklist "><li>Регламенты процессов предоставлены.</li><li>Реестр требований безопасности актуален.</li><li>Отчеты SAST/SCA приложены.</li><li>SBOM/PPK сформирован.</li><li>Журналы сборки и маркировка поставки есть.</li><li>Отклонения имеют владельца, срок или решение о принятии риска.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>94 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-95" data-block="Блок 6 · РБПО" data-screen-label="95 Итог блока 6">
+    <div class="slide-inner">
+      <span class="eyebrow">Запомнить</span>
+      <h2 class="">РБПО в ТЗ — это перечень процессов, условий и артефактов</h2>
+      <p class="lead">Если процесс не назван и артефакт не указан, приемка безопасности будет спорной.</p>
+      <div class="big-statement"><strong>Не “учесть безопасность”, а предъявить процесс, артефакт и критерий приемки.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 6 · РБПО</span><span>95 / 104</span></div>
+    </div>
+  </section>
+<section class="slide block-cover" id="slide-96" data-block="Блок 7 · ПМИ и материалы" data-screen-label="96 Блок 7">
+    <div class="slide-inner">
+      <span class="eyebrow">Блок 7</span>
+      <h2 class="">Связь ТЗ с ПМИ и раздаточными материалами</h2>
+      <p class="lead">Финальная проверка курса: каждое требование должно перейти в метод проверки, пункт ПМИ и приемочный артефакт.</p>
+      <div class="flow"><div class="flow-item">ТЗ</div><div class="flow-item">Требование</div><div class="flow-item">Метод проверки</div><div class="flow-item">ПМИ</div><div class="flow-item">Протокол</div><div class="flow-item">Решение приемки</div></div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>96 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-97" data-block="Блок 7 · ПМИ и материалы" data-screen-label="97 Матрица трассируемости">
+    <div class="slide-inner">
+      <span class="eyebrow">ТЗ → ПМИ</span>
+      <h2 class="">Матрица трассируемости делает приемку управляемой</h2>
+      <p class="lead">Она связывает ID требования, источник, метод проверки, пункт ПМИ и ожидаемый результат.</p>
+      <div class="tbl-wrap"><table class="tbl">
+    <thead><tr><th>ID</th><th>Источник</th><th>Метод</th><th>ПМИ</th><th>Ожидаемый результат</th></tr></thead>
+    <tbody><tr><td>FT-ORD-001</td><td>User Story US-05</td><td>Тест</td><td>PMI-FT-012</td><td>Пользователь создает заказ.</td></tr><tr><td>NFT-PERF-002</td><td>SLA проекта</td><td>Измерение</td><td>PMI-NFT-004</td><td>p95 API не выше 500 мс.</td></tr><tr><td>SEC-SCA-001</td><td>ГОСТ Р 56939 п. 5.16</td><td>SCA + инспекция</td><td>PMI-SEC-008</td><td>Есть SBOM/PPK без критичных неисправленных уязвимостей.</td></tr></tbody>
+  </table></div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>97 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-98" data-block="Блок 7 · ПМИ и материалы" data-screen-label="98 Методы проверки">
+    <div class="slide-inner">
+      <span class="eyebrow">Приемка</span>
+      <h2 class="">Метод проверки выбирается под тип требования</h2>
+      <p class="lead">Нельзя все проверять демонстрацией. Безопасность и качество часто требуют анализа, измерения и инспекции.</p>
+      <div class="grid cols-5"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Демонстрация</h3>
+    <p>Показываем сценарий в интерфейсе.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Тест</h3>
+    <p>Выполняем шаги и сверяем результат.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Измерение</h3>
+    <p>Фиксируем численные показатели.</p>
+  </article><article class="card">
+    <div class="card-num">04</div>
+    <h3>Анализ</h3>
+    <p>Проверяем код, архитектуру, модель угроз.</p>
+  </article><article class="card">
+    <div class="card-num">05</div>
+    <h3>Инспекция</h3>
+    <p>Проверяем документы, журналы, отчеты и настройки.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>98 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-99" data-block="Блок 7 · ПМИ и материалы" data-screen-label="99 Финальный quality gate">
+    <div class="slide-inner">
+      <span class="eyebrow">Перед разработкой</span>
+      <h2 class="">ТЗ можно передавать в разработку только после проверки готовности</h2>
+      <p class="lead">Gate нужен не для бюрократии, а для защиты проекта от неясных требований и неуправляемой безопасности.</p>
+      <ul class="checklist "><li>Цель проекта и границы работ зафиксированы.</li><li>Роли пользователей и заинтересованные стороны описаны.</li><li>Функциональные, нефункциональные и требования безопасности разделены.</li><li>У каждого требования есть ID, источник и критерий приемки.</li><li>Термины вынесены в глоссарий.</li><li>Для ОКР процессы ГОСТ Р 56939 перечислены явно.</li><li>Составлена матрица трассируемости ТЗ → ПМИ.</li></ul>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>99 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-100" data-block="Блок 7 · ПМИ и материалы" data-screen-label="100 Как использовать комплект">
+    <div class="slide-inner">
+      <span class="eyebrow">Маршрут слушателя</span>
+      <h2 class="">После занятия слушатель должен уйти с рабочим маршрутом</h2>
+      <p class="lead">Лендинг не только показывает слайды, но и ведет к материалам, шаблонам, чек-листам и примерам.</p>
+      <ol class="numlist"><li>Скачать методичку Markdown.</li><li>Открыть чек-лист качества ТЗ.</li><li>Выбрать шаблон под тип проекта.</li><li>Заполнить пять слоев продукта.</li><li>Сформировать требования с ID и критериями.</li><li>Отдельно выделить безопасность и РБПО.</li><li>Проверить связку ТЗ → ПМИ.</li></ol>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>100 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-101" data-block="Блок 7 · ПМИ и материалы" data-screen-label="101 Материалы курса">
+    <div class="slide-inner">
+      <span class="eyebrow">Скачать и открыть</span>
+      <h2 class="">Раздаточные материалы остаются рядом с лендингом</h2>
+      <p class="lead">Слушатель может открыть Markdown, чек-листы, шаблоны и примеры прямо с сайта.</p>
+      <div class="materials-list">
+    <a href="materials/лекции/методичка-по-написанию-ТЗ.md" download><strong>Методичка Markdown</strong><span>Основной учебный материал</span></a>
+    <a href="materials/дополнительно/чек-лист-ТЗ.md"><strong>Чек-лист ТЗ</strong><span>Проверка качества требований</span></a>
+    <a href="materials/дополнительно/сравнение-ГОСТов.md"><strong>Сравнение ГОСТов</strong><span>Как выбрать каркас документа</span></a>
+    <a href="materials/шаблоны/шаблон-универсальный-ТЗ.md"><strong>Шаблон ТЗ</strong><span>Стартовая структура документа</span></a>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>101 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-102" data-block="Блок 7 · ПМИ и материалы" data-screen-label="102 Красная зона: последний контроль">
+    <div class="slide-inner">
+      <span class="eyebrow">Красная зона</span>
+      <h2 class="">Если требование нельзя принять, его нельзя отдавать в разработку</h2>
+      <p class="lead">Перед финалом лекции это удобно выделить красным: аудитория должна унести строгий критерий готовности.</p>
+      <div class="callout danger">
+    <div class="callout-mark" aria-hidden="true">!</div>
+    <div class="callout-body"><strong>Финальная проверка</strong>Если требование нельзя одинаково понять, реализовать, проверить и принять, оно еще не готово для ТЗ.</div>
+  </div><div class="grid cols-4"><article class="card">
+    <div class="card-num">01</div>
+    <h3>Понять</h3>
+    <p>Одна трактовка у всех участников.</p>
+  </article><article class="card">
+    <div class="card-num">02</div>
+    <h3>Реализовать</h3>
+    <p>Есть техническая возможность и границы.</p>
+  </article><article class="card">
+    <div class="card-num">03</div>
+    <h3>Проверить</h3>
+    <p>Есть метод и ожидаемый результат.</p>
+  </article><article class="card">
+    <div class="card-num">04</div>
+    <h3>Принять</h3>
+    <p>Есть пункт ПМИ и артефакт приемки.</p>
+  </article></div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>102 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-103" data-block="Блок 7 · ПМИ и материалы" data-screen-label="103 Итог курса">
+    <div class="slide-inner">
+      <span class="eyebrow">Что должно остаться</span>
+      <h2 class="">ТЗ — это инженерная договоренность, а не литературный документ</h2>
+      <p class="lead">Курс соединяет продуктовую ясность, нормативную дисциплину, качество требований, РБПО и приемку.</p>
+      <div class="big-statement"><strong>Хорошее ТЗ делает разработку проверяемой, безопасность предъявленной, а приемку защищенной.</strong></div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>103 / 104</span></div>
+    </div>
+  </section>
+<section class="slide" id="slide-104" data-block="Блок 7 · ПМИ и материалы" data-screen-label="104 Контакты">
+    <div class="slide-inner">
+      <span class="eyebrow">Виталий Александрович Пиков</span>
+      <h2 class="">Спасибо за внимание</h2>
+      <p class="lead">Авторский курс по техническим заданиям, ГОСТ и разработке безопасного программного обеспечения.</p>
+      <div class="contact-card">
+    <div><strong>Email</strong><a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a></div>
+    <div><strong>Telegram</strong><a href="https://t.me/UnderLineSecurity">@UnderLineSecurity</a></div>
+    <div><strong>Сайт</strong><a href="https://pikov.expert/">pikov.expert</a></div>
+    <div><strong>Материалы</strong><a href="materials/лекции/методичка-по-написанию-ТЗ.md" download>Скачать Markdown</a></div>
+  </div>
+      <div class="slide-meta"><span class="block-tag">Блок 7 · ПМИ и материалы</span><span>104 / 104</span></div>
+    </div>
+  </section>
+  </div>
+</main>
+<div class="nav-controls" aria-label="Навигация по слайдам">
+  <button id="nav-first" title="В начало"><svg viewBox="0 0 24 24"><path d="M6 5v14M18 6l-6 6 6 6"/></svg></button>
+  <button id="nav-prev" title="Назад"><svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg></button>
+  <div class="nav-counter" id="nav-counter">01 / 104</div>
+  <button id="nav-next" title="Вперед"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></button>
+  <button id="nav-last" title="В конец"><svg viewBox="0 0 24 24"><path d="M18 5v14M6 6l6 6-6 6"/></svg></button>
+</div>
+<div class="overview" id="overview" aria-label="Обзор слайдов">
+  <div class="overview-head"><h3>Обзор всех слайдов</h3><button class="tool-btn" id="overview-close">Закрыть</button></div>
+  <div class="overview-grid" id="overview-grid"></div>
+</div>
+<script>
+(function() {
+  'use strict';
+  const TOTAL = 100;
+  const STORAGE = {
+    slide: 'tz_pikov_slide',
+    mode: 'tz_pikov_mode',
+    theme: 'tz_pikov_theme',
+    fs: 'tz_pikov_fs'
+  };
+  const FS = ['normal', 'large', 'xl'];
+  const FS_LABEL = { normal: 'A', large: 'A+', xl: 'A++' };
+  const body = document.body;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const tocLinks = Array.from(document.querySelectorAll('.toc-sidebar a[href^="#slide-"]'));
+  const btnSlides = document.getElementById('btn-mode-slides');
+  const btnLongread = document.getElementById('btn-mode-longread');
+  const btnOverview = document.getElementById('btn-overview');
+  const btnFullscreen = document.getElementById('btn-fullscreen');
+  const btnTheme = document.getElementById('btn-theme');
+  const btnFs = document.getElementById('btn-fs');
+  const fsLabel = document.getElementById('fs-label');
+  const overview = document.getElementById('overview');
+  const overviewGrid = document.getElementById('overview-grid');
+  const overviewClose = document.getElementById('overview-close');
+  const counter = document.getElementById('nav-counter');
+  const progress = document.getElementById('progress-bar');
+  const btnPrev = document.getElementById('nav-prev');
+  const btnNext = document.getElementById('nav-next');
+  const btnFirst = document.getElementById('nav-first');
+  const btnLast = document.getElementById('nav-last');
+  const zonePrev = document.getElementById('zone-prev');
+  const zoneNext = document.getElementById('zone-next');
+  let current = 1;
+  let mode = 'slides';
+  let fsIndex = 1;
+  let overviewBuilt = false;
+  let wheelLock = false;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let scrollTicking = false;
+
+  function clamp(n) { return Math.max(1, Math.min(TOTAL, Number.isFinite(n) ? n : 1)); }
+  function pad(n) { return n < 10 ? '0' + n : String(n); }
+  function save(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+  function readState() {
+    try {
+      const savedMode = localStorage.getItem(STORAGE.mode);
+      if (savedMode === 'slides' || savedMode === 'longread') mode = savedMode;
+      const savedTheme = localStorage.getItem(STORAGE.theme);
+      if (savedTheme === 'dark' || savedTheme === 'light') body.setAttribute('data-theme', savedTheme);
+      else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) body.setAttribute('data-theme', 'dark');
+      const savedFs = localStorage.getItem(STORAGE.fs);
+      const idx = FS.indexOf(savedFs);
+      if (idx >= 0) fsIndex = idx;
+      const hash = location.hash.match(/^#slide-(\d+)$/);
+      if (hash) current = clamp(parseInt(hash[1], 10));
+      else current = clamp(parseInt(localStorage.getItem(STORAGE.slide) || '1', 10));
+    } catch (e) {}
+  }
+  function applyFs() {
+    const value = FS[fsIndex];
+    if (value === 'normal') body.removeAttribute('data-fs');
+    else body.setAttribute('data-fs', value);
+    if (fsLabel) fsLabel.textContent = FS_LABEL[value];
+    save(STORAGE.fs, value);
+  }
+  function updateCounter() {
+    counter.textContent = pad(current) + ' / ' + TOTAL;
+    btnPrev.disabled = current <= 1;
+    btnFirst.disabled = current <= 1;
+    btnNext.disabled = current >= TOTAL;
+    btnLast.disabled = current >= TOTAL;
+  }
+  function updateProgress() {
+    progress.style.width = (((current - 1) / (TOTAL - 1)) * 100) + '%';
+  }
+  function updateToc() {
+    tocLinks.forEach(a => {
+      const m = (a.getAttribute('href') || '').match(/^#slide-(\d+)$/);
+      a.classList.toggle('is-active', !!m && parseInt(m[1], 10) === current);
+    });
+  }
+  function showSlide(n, persist = true) {
+    current = clamp(n);
+    slides.forEach(slide => {
+      const num = parseInt(slide.id.replace('slide-', ''), 10);
+      slide.classList.toggle('is-current', num === current);
+      if (num === current && mode === 'slides') slide.scrollTop = 0;
+    });
+    if (persist) {
+      save(STORAGE.slide, String(current));
+      try { history.replaceState(null, '', '#slide-' + current); } catch (e) {}
+    }
+    updateCounter();
+    updateProgress();
+    updateToc();
+  }
+  function setMode(nextMode) {
+    mode = nextMode;
+    body.classList.toggle('mode-slides', mode === 'slides');
+    body.classList.toggle('mode-longread', mode === 'longread');
+    btnSlides.classList.toggle('is-active', mode === 'slides');
+    btnLongread.classList.toggle('is-active', mode === 'longread');
+    btnSlides.setAttribute('aria-pressed', mode === 'slides');
+    btnLongread.setAttribute('aria-pressed', mode === 'longread');
+    save(STORAGE.mode, mode);
+    if (mode === 'slides') showSlide(current, false);
+    else {
+      slides.forEach(slide => slide.classList.add('is-current'));
+      requestAnimationFrame(() => document.getElementById('slide-' + current)?.scrollIntoView({ block: 'start' }));
+      updateCounter();
+      updateProgress();
+      updateToc();
+    }
+  }
+  function goTo(n) {
+    n = clamp(n);
+    current = n;
+    if (mode === 'slides') showSlide(n);
+    else {
+      document.getElementById('slide-' + n)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      save(STORAGE.slide, String(n));
+      try { history.replaceState(null, '', '#slide-' + n); } catch (e) {}
+      updateCounter();
+      updateProgress();
+      updateToc();
+    }
+  }
+  function next() { if (current < TOTAL) goTo(current + 1); }
+  function prev() { if (current > 1) goTo(current - 1); }
+  function buildOverview() {
+    if (overviewBuilt) return;
+    const frag = document.createDocumentFragment();
+    slides.forEach(slide => {
+      const num = parseInt(slide.id.replace('slide-', ''), 10);
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'overview-card';
+      const label = slide.getAttribute('data-screen-label') || slide.querySelector('h1,h2')?.textContent || ('Слайд ' + num);
+      card.innerHTML = '<strong>' + pad(num) + '</strong><span>' + label.replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])) + '</span>';
+      card.addEventListener('click', () => { closeOverview(); goTo(num); });
+      frag.appendChild(card);
+    });
+    overviewGrid.appendChild(frag);
+    overviewBuilt = true;
+  }
+  function openOverview() { buildOverview(); overview.classList.add('is-open'); btnOverview.classList.add('is-active'); }
+  function closeOverview() { overview.classList.remove('is-open'); btnOverview.classList.remove('is-active'); }
+  function toggleOverview() { overview.classList.contains('is-open') ? closeOverview() : openOverview(); }
+  function toggleFullscreen() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+  function toggleTheme() {
+    const next = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    body.setAttribute('data-theme', next);
+    save(STORAGE.theme, next);
+  }
+  function cycleFs() { fsIndex = (fsIndex + 1) % FS.length; applyFs(); }
+  function onKey(e) {
+    if (e.target && /^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    if (overview.classList.contains('is-open')) {
+      if (e.key === 'Escape') { e.preventDefault(); closeOverview(); }
+      return;
+    }
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); next(); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); prev(); }
+    else if (e.key === 'Home') { e.preventDefault(); goTo(1); }
+    else if (e.key === 'End') { e.preventDefault(); goTo(TOTAL); }
+    else if (e.key === 'Escape') { e.preventDefault(); openOverview(); }
+    else if (e.key.toLowerCase() === 'g') { e.preventDefault(); setMode(mode === 'slides' ? 'longread' : 'slides'); }
+    else if (e.key.toLowerCase() === 't') { e.preventDefault(); toggleTheme(); }
+    else if (e.key.toLowerCase() === 'f') { e.preventDefault(); toggleFullscreen(); }
+    else if (e.key.toLowerCase() === 'a') { e.preventDefault(); cycleFs(); }
+  }
+  function onWheel(e) {
+    if (mode !== 'slides' || overview.classList.contains('is-open') || wheelLock) return;
+    if (Math.abs(e.deltaY) < 22) return;
+    e.preventDefault();
+    wheelLock = true;
+    e.deltaY > 0 ? next() : prev();
+    setTimeout(() => { wheelLock = false; }, 360);
+  }
+  function onTouchStart(e) {
+    if (mode !== 'slides') return;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+  }
+  function onTouchEnd(e) {
+    if (mode !== 'slides') return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+    if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) dx < 0 ? next() : prev();
+  }
+  function onScroll() {
+    if (mode !== 'longread' || scrollTicking) return;
+    scrollTicking = true;
+    requestAnimationFrame(() => {
+      let best = current;
+      let bestDist = Infinity;
+      slides.forEach(slide => {
+        const rect = slide.getBoundingClientRect();
+        const dist = Math.abs(rect.top - 90);
+        if (dist < bestDist) {
+          bestDist = dist;
+          best = parseInt(slide.id.replace('slide-', ''), 10);
+        }
+      });
+      if (best !== current) {
+        current = best;
+        save(STORAGE.slide, String(current));
+        updateCounter();
+        updateProgress();
+        updateToc();
+      }
+      scrollTicking = false;
+    });
+  }
+  window.addEventListener('keydown', onKey);
+  window.addEventListener('wheel', onWheel, { passive: false });
+  window.addEventListener('touchstart', onTouchStart, { passive: true });
+  window.addEventListener('touchend', onTouchEnd, { passive: true });
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('hashchange', () => {
+    const m = location.hash.match(/^#slide-(\d+)$/);
+    if (m) goTo(parseInt(m[1], 10));
+  });
+  btnPrev.addEventListener('click', prev);
+  btnNext.addEventListener('click', next);
+  btnFirst.addEventListener('click', () => goTo(1));
+  btnLast.addEventListener('click', () => goTo(TOTAL));
+  btnSlides.addEventListener('click', () => setMode('slides'));
+  btnLongread.addEventListener('click', () => setMode('longread'));
+  btnOverview.addEventListener('click', toggleOverview);
+  overviewClose.addEventListener('click', closeOverview);
+  btnFullscreen.addEventListener('click', toggleFullscreen);
+  btnTheme.addEventListener('click', toggleTheme);
+  btnFs.addEventListener('click', cycleFs);
+  zonePrev.addEventListener('click', prev);
+  zoneNext.addEventListener('click', next);
+  readState();
+  applyFs();
+  setMode(mode);
+  showSlide(current, false);
+})();
+</script>
+</body>
+</html>

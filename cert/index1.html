@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Система сертификации средств защиты информации</title>
+<style>
+  :root{
+    --accent:#1f5c4a;
+    --accent-2:#2d7a63;
+    --text:#111;
+    --muted:#5d656d;
+    --bg:#ffffff;
+    --line:#dfe6e3;
+    --nav-bg:rgba(17,17,17,.78);
+    --shadow:0 18px 44px rgba(0,0,0,.12);
+    --slide-pad: clamp(28px, 4vw, 58px);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
+  body{
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+    background:#0d1512;
+    color:var(--text);
+  }
+  .deck{position:relative;width:100%;height:100%}
+  .slide{
+    position:absolute; inset:0;
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    padding:var(--slide-pad);
+    opacity:0; visibility:hidden; pointer-events:none;
+    transform:translateX(24px);
+    transition:opacity .35s ease, transform .35s ease, visibility .35s ease;
+    background:var(--bg);
+  }
+  .slide.active{
+    opacity:1; visibility:visible; pointer-events:auto; transform:translateX(0);
+  }
+  .title-slide{
+    color:#fff;
+    background:
+      linear-gradient(rgba(9,15,13,.58), rgba(9,15,13,.78)),
+      url('Подложка.png') center center / cover no-repeat;
+    grid-template-rows:1fr auto;
+  }
+  .title-inner{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:flex-start;
+    max-width:min(1080px, 88vw);
+    gap:20px;
+  }
+  .eyebrow{
+    display:inline-block;
+    padding:10px 16px;
+    border:1px solid rgba(255,255,255,.28);
+    border-radius:999px;
+    font-size:clamp(16px,1.5vw,22px);
+    letter-spacing:.04em;
+    background:rgba(255,255,255,.08);
+  }
+  h1{
+    margin:0;
+    font-size:clamp(42px,4.6vw,74px);
+    line-height:1.05;
+    font-weight:800;
+    max-width:12ch;
+    text-wrap:balance;
+  }
+  .subtitle{
+    margin:0;
+    font-size:clamp(21px,2vw,31px);
+    line-height:1.35;
+    max-width:30ch;
+    color:#f1f4f3;
+  }
+  .speaker{
+    font-size:clamp(18px,1.55vw,25px);
+    line-height:1.45;
+    max-width:42ch;
+    color:#eef6f2;
+  }
+  .title-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    font-size:clamp(15px,1.2vw,18px);
+    color:#e7efeb;
+  }
+  .slide-header{
+    display:grid;
+    grid-template-columns:1fr auto;
+    align-items:start;
+    gap:20px;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--line);
+  }
+  .slide-title-wrap{max-width:min(78vw, 1180px)}
+  .section-kicker{
+    font-size:14px;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    color:var(--accent-2);
+    font-weight:700;
+    margin:0 0 8px;
+  }
+  h2{
+    margin:0;
+    font-size:clamp(30px,2.8vw,42px);
+    line-height:1.15;
+    font-weight:800;
+    color:var(--text);
+    text-wrap:balance;
+  }
+  .logo{
+    max-height:60px;
+    width:auto;
+    object-fit:contain;
+  }
+  .content{
+    padding-top:18px;
+    display:grid;
+    align-content:start;
+    gap:18px;
+  }
+  .content p,
+  .content li,
+  .content td,
+  .content th,
+  .content blockquote{
+    font-size:clamp(24px,1.85vw,31px);
+    line-height:1.42;
+  }
+  .content p{margin:0}
+  ul,ol{margin:0;padding-left:1.2em; display:grid; gap:10px}
+  .lead{
+    font-size:clamp(26px,2vw,34px)!important;
+    font-weight:700;
+    color:var(--accent);
+  }
+  .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:24px}
+  .grid-3{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
+  .card{
+    border:1px solid var(--line);
+    border-radius:22px;
+    padding:22px 24px;
+    background:#fff;
+    box-shadow:var(--shadow);
+  }
+  .card h3, .mini h3{
+    margin:0 0 12px;
+    font-size:clamp(22px,1.75vw,30px);
+    line-height:1.2;
+    color:var(--accent);
+  }
+  .mini{
+    border-left:6px solid var(--accent);
+    padding:10px 0 10px 18px;
+  }
+  .note{
+    font-size:clamp(18px,1.25vw,22px)!important;
+    color:var(--muted);
+  }
+  .small{
+    font-size:clamp(18px,1.18vw,22px)!important;
+    line-height:1.35;
+  }
+  table{
+    width:100%; border-collapse:collapse; table-layout:fixed; background:#fff;
+    border:1px solid var(--line); border-radius:18px; overflow:hidden;
+    box-shadow:var(--shadow);
+  }
+  th,td{border:1px solid var(--line); padding:12px 14px; text-align:left; vertical-align:top}
+  th{background:#f2f7f5; color:#15382c; font-weight:800}
+  .timeline{
+    display:grid; gap:12px;
+  }
+  .step{
+    display:grid; grid-template-columns:56px 1fr; gap:16px; align-items:start;
+    border:1px solid var(--line); border-radius:18px; padding:14px 18px; background:#fff;
+  }
+  .step-num{
+    width:56px; height:56px; border-radius:50%; background:var(--accent);
+    color:#fff; display:grid; place-items:center; font-weight:800; font-size:26px;
+  }
+  .qa-box{
+    border:2px dashed var(--accent-2);
+    border-radius:24px;
+    padding:28px;
+    background:#f7fbf9;
+  }
+  .footer{
+    display:flex; justify-content:space-between; align-items:flex-end; gap:18px;
+    padding-top:14px; border-top:2px solid var(--line);
+  }
+  .slide-number{
+    font-size:clamp(18px,1.2vw,22px);
+    color:#1b1f21;
+    font-weight:700;
+  }
+  .footer-right{font-size:clamp(16px,1.05vw,19px); color:var(--muted); text-align:right}
+  .contacts-slide .content{grid-template-columns:1.15fr .85fr; display:grid; gap:26px}
+  .contact-name{
+    font-size:clamp(34px,2.8vw,46px)!important; font-weight:800; line-height:1.12;
+  }
+  .quote{
+    font-size:clamp(24px,1.8vw,30px)!important;
+    font-style:italic;
+    color:#214d3f;
+    border-left:5px solid var(--accent);
+    padding-left:16px;
+  }
+  .nav{
+    position:fixed; right:22px; bottom:18px; z-index:20;
+    display:flex; gap:8px; flex-wrap:wrap;
+    background:var(--nav-bg); padding:10px; border-radius:16px; box-shadow:var(--shadow);
+  }
+  .nav button{
+    appearance:none; border:none; cursor:pointer;
+    min-width:50px; height:48px; border-radius:12px;
+    font-size:22px; font-weight:800;
+    color:#fff; background:rgba(255,255,255,.12);
+    transition:transform .15s ease, background .15s ease;
+  }
+  .nav button:hover,.nav button:focus-visible{background:rgba(255,255,255,.2); transform:translateY(-1px); outline:none}
+  .sr-only{
+    position:absolute!important; width:1px!important; height:1px!important; padding:0!important; margin:-1px!important;
+    overflow:hidden!important; clip:rect(0,0,0,0)!important; white-space:nowrap!important; border:0!important;
+  }
+  @media (max-width: 1100px){
+    .grid-2,.grid-3,.contacts-slide .content{grid-template-columns:1fr}
+    .slide-header{grid-template-columns:1fr;}
+    .footer{align-items:flex-start; flex-direction:column}
+  }
+  @media (max-width: 760px){
+    .slide{padding:20px}
+    .nav{right:10px; bottom:10px}
+    .nav button{min-width:44px; height:42px; font-size:18px}
+    .step{grid-template-columns:44px 1fr}
+    .step-num{width:44px;height:44px;font-size:20px}
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck" aria-live="polite">
+
+<section class="slide title-slide active" aria-label="Титульный слайд">
+  <div class="title-inner">
+    <div class="eyebrow">Лекция для программ ППП и ППК</div>
+    <h1>Система сертификации средств защиты информации</h1>
+    <p class="subtitle">Нормативная база, процедура сертификации, уровни доверия, практическое применение и связь с безопасной разработкой ПО.</p>
+    <div class="speaker">Виталий Александрович Пиков, руководитель направления обучения по РБПО, преподаватель НОУ ДПО «УЦБИ «МАСКОМ»</div>
+  </div>
+  <div class="title-footer">
+    <div>Локальная презентация для автономного запуска в браузере</div>
+    <div>Тема: сертификация СЗИ в системах ФСТЭК и Минобороны</div>
+  </div>
+</section>
+
+<section class="slide" aria-label="Слайд 2">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Введение</p><h2>Зачем нужна сертификация СЗИ</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><p class="lead">Сертификация — это не формальность, а механизм доверия к средству защиты информации.</p><ul><li>подтверждает соответствие обязательным требованиям по безопасности информации;</li><li>связывает разработчика, испытательную лабораторию, орган по сертификации и регулятора;</li><li>даёт основание применять средство в регулируемых контурах;</li><li>уменьшает риск использования неподтверждённых функций безопасности;</li><li>создаёт юридически значимый результат — сертификат соответствия.</li></ul></div>
+  <footer class="footer"><div class="slide-number">2 из 35</div><div class="footer-right">Один слайд — одна ключевая мысль</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 3">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Термины</p><h2>Что понимается под сертификацией СЗИ</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><div class="card"><p>В логике законодательства о техническом регулировании сертификация — форма подтверждения соответствия объекта установленным требованиям. Для СЗИ это подтверждение соответствия требованиям по безопасности информации, установленным профильными нормативными документами и проведённое в установленной системе сертификации.</p></div><p class="note">На практике для слушателя важны три вопроса: что сертифицируется, в какой системе, и для каких контуров это требуется.</p></div>
+  <footer class="footer"><div class="slide-number">3 из 35</div><div class="footer-right">Переходим от общего понятия к объектам сертификации</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 4">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Объекты</p><h2>Что может быть объектом сертификации</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-3"><div class="card"><h3>Средства ТЗИ</h3><p>технические, программные и программно-технические средства защиты информации;</p></div><div class="card"><h3>Средства ОБИТ</h3><p>средства обеспечения безопасности информационных технологий, включая защищённые средства обработки информации;</p></div><div class="card"><h3>Сопутствующие объекты</h3><p>средства контроля эффективности, единичные образцы, партии и серийное производство.</p></div></div>
+  <footer class="footer"><div class="slide-number">4 из 35</div><div class="footer-right">Тип объекта определяет схему и глубину оценки</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 5">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Регулирование</p><h2>Где сертификация СЗИ требуется на практике</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>защита персональных данных в ИСПДн;</li><li>защита государственных информационных систем;</li><li>обеспечение безопасности значимых объектов КИИ;</li><li>защита коммерческой тайны и иной конфиденциальной информации;</li><li>защита служебной тайны в области обороны;</li><li>техническая защита информации ограниченного доступа, не содержащей гостайну.</li></ul><p class="note">Сама обязанность применения конкретного класса/уровня средств выводится из отраслевых требований к объекту защиты.</p></div>
+  <footer class="footer"><div class="slide-number">5 из 35</div><div class="footer-right">Контур защиты определяет требования к средству</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 6">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Нормативная база</p><h2>Опорные акты, на которых строится тема лекции</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><table><tr><th>Документ</th><th>Роль в теме</th></tr><tr><td>Постановление Правительства № 608 от 26.06.1995</td><td>Базовое положение о сертификации средств защиты информации</td></tr><tr><td>Приказ ФСТЭК № 55 от 03.04.2018</td><td>Положение о системе сертификации СЗИ</td></tr><tr><td>Приказ ФСТЭК № 76 от 02.06.2020</td><td>Уровни доверия к средствам ТЗИ и средствам ОБИТ</td></tr><tr><td>Приказ Минобороны № 488 от 29.09.2020</td><td>Ведомственная система сертификации СЗИ Минобороны</td></tr><tr><td>Приказ ФСТЭК № 240 от 01.12.2023</td><td>Сертификация процессов безопасной разработки ПО СЗИ</td></tr></table></div>
+  <footer class="footer"><div class="slide-number">6 из 35</div><div class="footer-right">Далее — разберём их взаимосвязь</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 7">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Система ФСТЭК</p><h2>Кто участвует в системе сертификации ФСТЭК</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-2"><div class="card"><h3>Участники</h3><ul><li>федеральный орган по сертификации — ФСТЭК;</li><li>аккредитованные органы по сертификации;</li><li>аккредитованные испытательные лаборатории;</li><li>изготовители и иные заявители.</li></ul></div><div class="card"><h3>Ключевая логика</h3><ul><li>ФСТЭК организует систему и принимает итоговые решения;</li><li>испытательная лаборатория проводит испытания;</li><li>орган по сертификации оценивает материалы и готовит экспертное заключение.</li></ul></div></div>
+  <footer class="footer"><div class="slide-number">7 из 35</div><div class="footer-right">Структура совпадает с логикой учебной презентации по сертификации</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 8">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Процедура</p><h2>Общий маршрут сертификации средства в системе ФСТЭК</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content timeline"><div class="step"><div class="step-num">1</div><div><p>Подготовка заявки, документации и выбор испытательной лаборатории.</p></div></div><div class="step"><div class="step-num">2</div><div><p>Рассмотрение заявки и решение о проведении сертификации.</p></div></div><div class="step"><div class="step-num">3</div><div><p>Отбор образца, программа и методика испытаний, сертификационные испытания.</p></div></div><div class="step"><div class="step-num">4</div><div><p>Экспертная оценка материалов, проект сертификата, решение о выдаче либо отказе.</p></div></div></div>
+  <footer class="footer"><div class="slide-number">8 из 35</div><div class="footer-right">Важно: испытания не проводятся до решения о сертификации</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 9">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Схемы</p><h2>Какие схемы сертификации применяются</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-3"><div class="card"><h3>Единичный образец</h3><p>Испытания проводятся в отношении конкретного экземпляра средства.</p></div><div class="card"><h3>Партия</h3><p>Испытания охватывают выборку либо всю партию — в зависимости от типа средства.</p></div><div class="card"><h3>Серийное производство</h3><p>Проверяются образцы, организация производства и техническая поддержка.</p></div></div>
+  <footer class="footer"><div class="slide-number">9 из 35</div><div class="footer-right">Для серийного производства важна воспроизводимость безопасности</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 10">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Документы заявителя</p><h2>Что обычно готовит заявитель</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>заявку на сертификацию;</li><li>технические условия;</li><li>техническое задание — если сертификация идёт на соответствие ТЗ;</li><li>задание по безопасности — когда оно требуется по профилю требований;</li><li>формуляр или паспорт средства;</li><li>договоры, подтверждение прав, сведения о лицензиях разработчика/изготовителя.</li></ul></div>
+  <footer class="footer"><div class="slide-number">10 из 35</div><div class="footer-right">Состав пакета определяется схемой и типом средства</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 11">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Испытания</p><h2>Что входит в сертификационные испытания</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>оценка соответствия параметров и функций безопасности требованиям;</li><li>проверка организации технической поддержки;</li><li>для серийного производства — проверка организации производства;</li><li>оформление протоколов испытаний и технического заключения;</li><li>при необходимости — повторные испытания после устранения недостатков.</li></ul><p class="note">Для слушателя важно различать: испытательная лаборатория формирует материалы испытаний, а орган по сертификации — экспертное заключение.</p></div>
+  <footer class="footer"><div class="slide-number">11 из 35</div><div class="footer-right">Это различие часто путают на практике</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 12">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Результат</p><h2>Что означает сертификат соответствия</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><div class="card"><p>Сертификат подтверждает, что конкретное средство, его образец, партия или серийное производство соответствуют установленным требованиям по безопасности информации в пределах указанной схемы сертификации и срока действия.</p></div><ul><li>для серийного производства срок ограничен;</li><li>для единичного образца или партии срок не устанавливается;</li><li>сертифицированным считается именно то, что выпущено в период действия сертификата и поддерживается изготовителем.</li></ul></div>
+  <footer class="footer"><div class="slide-number">12 из 35</div><div class="footer-right">Сертификат нельзя читать в отрыве от схемы сертификации</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 13">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Сроки</p><h2>Срок действия, продление, приостановление и прекращение</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-2"><div class="card"><h3>Базовое правило</h3><p>Срок действия сертификата на серийное производство не превышает пяти лет.</p></div><div class="card"><h3>Почему это важно</h3><p>Истечение срока не означает автоматическую допустимость дальнейшего производства. Нужны продление, подтверждённая техническая поддержка и соблюдение условий применимости.</p></div></div><p class="small">Отдельно предусмотрены процедуры переоформления, выдачи дубликата, приостановления и прекращения действия сертификата.</p></div>
+  <footer class="footer"><div class="slide-number">13 из 35</div><div class="footer-right">В лекции полезно сопоставлять срок сертификата и срок техподдержки</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 14">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Поддержка</p><h2>Почему техническая поддержка стала критическим элементом</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>сертифицированное средство должно оставаться сопровождаемым;</li><li>уязвимости и недостатки должны устраняться в рамках процедур поддержки безопасности;</li><li>обновления и изменения документации должны доводиться до потребителя;</li><li>прекращение поддержки может повлечь приостановление действия сертификата.</li></ul><p class="note">Это особенно важно для программных и программно-технических средств, где риск устаревания функций безопасности высок.</p></div>
+  <footer class="footer"><div class="slide-number">14 из 35</div><div class="footer-right">Сертификация — это не только точка входа, но и жизненный цикл</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 15">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Уровни доверия</p><h2>Зачем нужны уровни доверия по приказу № 76</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><p class="lead">Уровень доверия характеризует глубину уверенности в безопасности средства и строгость требований к его разработке, испытаниям и поддержке.</p><ul><li>установлено 6 уровней доверия;</li><li>6 уровень — самый низкий, 1 уровень — самый высокий;</li><li>уровень доверия выбирается не произвольно, а в привязке к классу/категории защищаемой системы;</li><li>для ряда средств именно уровень доверия становится центральным критерием пригодности.</li></ul></div>
+  <footer class="footer"><div class="slide-number">15 из 35</div><div class="footer-right">Далее — привязка к объектам защиты</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 16">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Применимость</p><h2>Как уровни доверия связаны с классами защищённости</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><table><tr><th>Уровень доверия</th><th>Типовые контуры применения</th></tr><tr><td>6</td><td>ЗО КИИ 3 категории, ГИС 3 класса, АСУ ТП 3 класса, ИСПДн для 3 и 4 уровня защищённости</td></tr><tr><td>5</td><td>ЗО КИИ 2 категории, ГИС 2 класса, АСУ ТП 2 класса, ИСПДн для 2 уровня защищённости</td></tr><tr><td>4</td><td>ЗО КИИ 1 категории, ГИС 1 класса, АСУ ТП 1 класса, ИСПДн для 1 уровня защищённости, ИСОП II класса</td></tr></table><p class="note">Для более высоких уровней применимость расширяется на более чувствительные контуры, включая обработку защищаемой информации более высокого уровня значимости.</p></div>
+  <footer class="footer"><div class="slide-number">16 из 35</div><div class="footer-right">Таблица основана на требованиях приказа № 76</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 17">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Содержание требований</p><h2>Три группы требований уровня доверия</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-3"><div class="card"><h3>Разработка и производство</h3><p>модель безопасности, архитектура, спецификация, проектная документация, конфигурация, безопасная разработка.</p></div><div class="card"><h3>Проведение испытаний</h3><p>тестирование, поиск уязвимостей и НДВ, анализ скрытых каналов — когда он требуется.</p></div><div class="card"><h3>Поддержка безопасности</h3><p>устранение недостатков, обновления, документирование процедур и информирование об окончании поддержки.</p></div></div>
+  <footer class="footer"><div class="slide-number">17 из 35</div><div class="footer-right">Уровень доверия — это не только испытания, но и культура разработки</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 18">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Разработка</p><h2>Какие артефакты разработки ожидаются от средства</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>модель безопасности средства;</li><li>описание архитектуры безопасности;</li><li>функциональная спецификация интерфейсов и функций;</li><li>эскизный и технический проекты;</li><li>документация по управлению конфигурацией;</li><li>документация по безопасной разработке;</li><li>эксплуатационная документация пользователя и администратора.</li></ul></div>
+  <footer class="footer"><div class="slide-number">18 из 35</div><div class="footer-right">Это ядро различий между «простым ПО» и сертифицируемым средством</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 19">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Модель безопасности</p><h2>Что даёт модель безопасности на практике</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><div class="mini"><h3>Практический смысл</h3><p>Она фиксирует, какие политики безопасности реализует средство и почему его механизмы действительно поддерживают эти политики.</p></div><ul><li>для средств с функцией разграничения доступа описываются политики управления доступом;</li><li>для средств фильтрации — политики фильтрации информационных потоков;</li><li>на более высоких уровнях доверия требуется формальное или формализованное описание и доказательство корректности условий безопасности.</li></ul></div>
+  <footer class="footer"><div class="slide-number">19 из 35</div><div class="footer-right">Слайд особенно полезен разработчикам и архитекторам ИБ</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 20">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Архитектура</p><h2>Архитектура безопасности должна отвечать на три вопроса</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ol><li>Можно ли обойти функции безопасности средства?</li><li>Защищены ли сами функции безопасности от несанкционированного доступа?</li><li>Безопасен ли процесс инициализации и запуск средства?</li></ol><div class="card"><p>Именно поэтому в учебной и проектной практике архитектура безопасности — это не «красивая схема», а обоснование невозможности обхода защитных механизмов.</p></div></div>
+  <footer class="footer"><div class="slide-number">20 из 35</div><div class="footer-right">Эта логика напрямую следует из требований уровня доверия</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 21">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Документация</p><h2>Почему сертифицируемое средство неизбежно «тяжёлое» по документированию</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-2"><div class="card"><h3>Нужно показать</h3><ul><li>что реализовано;</li><li>как это реализовано;</li><li>как это тестируется;</li><li>как это поддерживается.</li></ul></div><div class="card"><h3>Нужно доказать</h3><ul><li>неизменность конфигурации;</li><li>прослеживаемость требований;</li><li>управляемость изменений;</li><li>контроль над заимствованными компонентами.</li></ul></div></div>
+  <footer class="footer"><div class="slide-number">21 из 35</div><div class="footer-right">Это один из ключевых практических барьеров входа на рынок СЗИ</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 22">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Испытания</p><h2>Тестирование, уязвимости, НДВ, скрытые каналы</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>тестовая документация должна покрывать интерфейсы, подсистемы и модули — в зависимости от уровня доверия;</li><li>испытания по выявлению уязвимостей и НДВ обязательны для всех уровней доверия;</li><li>для 4 уровня доверия и выше существенным становится анализ скрытых каналов;</li><li>доказательная база оформляется в протоколах и техническом заключении.</li></ul><p class="note">Для разработчика это означает необходимость готовить средство к внешней проверке, а не только к внутреннему QA.</p></div>
+  <footer class="footer"><div class="slide-number">22 из 35</div><div class="footer-right">Испытания всегда опираются на заранее утверждённую методику</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 23">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Поддержка безопасности</p><h2>Как выглядит жизненный цикл сертифицированного средства</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content timeline"><div class="step"><div class="step-num">A</div><div><p>Мониторинг недостатков, уязвимостей и информации из внешних источников.</p></div></div><div class="step"><div class="step-num">B</div><div><p>Разработка компенсирующих мер или ограничений по применению.</p></div></div><div class="step"><div class="step-num">C</div><div><p>Исправление средства, обновление документации и доведение изменений до потребителей.</p></div></div><div class="step"><div class="step-num">D</div><div><p>Подтверждение того, что поддержка безопасности продолжается и средство остаётся допустимым к применению.</p></div></div></div>
+  <footer class="footer"><div class="slide-number">23 из 35</div><div class="footer-right">Поддержка безопасности — не опция, а обязательный элемент соответствия</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 24">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Практический вопрос</p><h2>Почему нельзя подменять сертификацию СЗИ «наличием хорошего SDLC»</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><p class="lead">Безопасная разработка и сертификация продукта связаны, но это разные объекты оценки.</p><div class="grid-2"><div class="card"><h3>Сертификация СЗИ</h3><p>Оценивает конкретное средство, его функции безопасности, документацию, испытания, производство и поддержку.</p></div><div class="card"><h3>Сертификация БРПО</h3><p>Оценивает процессы проектирования и производства ПО средств защиты информации, а не конкретный экземпляр продукта.</p></div></div></div>
+  <footer class="footer"><div class="slide-number">24 из 35</div><div class="footer-right">Это центральная мысль блока «СЗИ vs РБПО»</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 25">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">РБПО</p><h2>Что проверяют при сертификации процессов безопасной разработки</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>наличие руководства и документации по БРПО;</li><li>наличие инструментальных средств разработки и анализа ПО;</li><li>реальное выполнение процессов безопасной разработки, описанных в документации;</li><li>реализацию процедур поддержки безопасности ПО.</li></ul><p class="note">Для среды РБПО базовым ориентиром выступает ГОСТ Р 56939-2024, а сама процедура сертификации процессов закреплена приказом № 240.</p></div>
+  <footer class="footer"><div class="slide-number">25 из 35</div><div class="footer-right">Процессная зрелость не отменяет продуктовую сертификацию</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 26">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Сравнение</p><h2>СЗИ и БРПО: удобная таблица для слушателя</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><table><tr><th>Критерий</th><th>Сертификация СЗИ</th><th>Сертификация БРПО</th></tr><tr><td>Объект</td><td>конкретное средство</td><td>процессы разработки и производства ПО</td></tr><tr><td>Результат</td><td>сертификат на средство / производство</td><td>сертификат на процессы</td></tr><tr><td>Что доказывает</td><td>соответствие функций безопасности и жизненного цикла требованиям</td><td>наличие зрелой и управляемой безопасной разработки</td></tr><tr><td>Заменяет ли другое</td><td>нет</td><td>нет</td></tr></table></div>
+  <footer class="footer"><div class="slide-number">26 из 35</div><div class="footer-right">Слайд удобно использовать в дискуссии со слушателями</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 27">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Минобороны</p><h2>Чем отличается ведомственная система Минобороны</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>система предназначена для средств, планируемых к применению в Вооружённых Силах РФ;</li><li>функции федерального органа по сертификации выполняются в структуре Минобороны;</li><li>есть своя процедура подачи заявки, проведения испытаний, выдачи и продления сертификатов;</li><li>особое значение имеют режим секретности, лицензии и взаимодействие с военным представительством.</li></ul></div>
+  <footer class="footer"><div class="slide-number">27 из 35</div><div class="footer-right">По логике процедуры система во многом сопоставима, но не тождественна системе ФСТЭК</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 28">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Минобороны</p><h2>Что важно помнить о сертификации в системе Минобороны</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content grid-2"><div class="card"><h3>Для заявителя</h3><ul><li>требуются профильные лицензии;</li><li>испытания проводятся на территории РФ;</li><li>сертификат на серийное производство ограничен по сроку.</li></ul></div><div class="card"><h3>Для эксплуатации</h3><ul><li>важны отсутствие изменений средства;</li><li>приостановление и прекращение действия сертификата прямо влияют на производство и применение;</li><li>для продления сертификата требуется согласование в установленном порядке.</li></ul></div></div>
+  <footer class="footer"><div class="slide-number">28 из 35</div><div class="footer-right">Это особенно актуально для средств под служебную тайну в области обороны</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 29">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Регуляторы</p><h2>Как корректно распределять роли ФСТЭК, ФСБ и Минобороны</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li><strong>ФСТЭК</strong> — ключевой регулятор по технической защите информации и сертификации большинства СЗИ вне криптографии;</li><li><strong>ФСБ</strong> — регулятор по криптографической защите информации и ряду смежных вопросов;</li><li><strong>Минобороны</strong> — отдельная система сертификации для средств, предназначенных для применения в Вооружённых Силах РФ.</li></ul><p class="note">В лекции важно не смешивать эти контуры и употреблять только краткие наименования регуляторов.</p></div>
+  <footer class="footer"><div class="slide-number">29 из 35</div><div class="footer-right">Это помогает избежать типичных методических ошибок</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 30">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Практика внедрения</p><h2>Что должен проверить заказчик перед закупкой или внедрением СЗИ</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ol><li>Наличие сертификата и его применимость к нужному контуру.</li><li>Схему сертификации: образец, партия или серийное производство.</li><li>Срок действия сертификата и актуальность технической поддержки.</li><li>Соответствие уровня доверия или класса требованиям объекта защиты.</li><li>Отсутствие ограничений по версии, составу и среде функционирования.</li></ol></div>
+  <footer class="footer"><div class="slide-number">30 из 35</div><div class="footer-right">Этот слайд хорошо работает как чек-лист</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 31">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Типовые ошибки</p><h2>Где организации чаще всего ошибаются</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>смотрят только на наличие сертификата, но не на схему сертификации;</li><li>не проверяют актуальность техподдержки и обновлений;</li><li>используют средство вне пределов заявленной среды функционирования;</li><li>смешивают сертификацию СЗИ с сертификацией процессов разработки;</li><li>не связывают требования к средству с категорией или классом самой системы.</li></ul></div>
+  <footer class="footer"><div class="slide-number">31 из 35</div><div class="footer-right">Эти ошибки удобно обсуждать на примерах из практики</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 32">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Методический вывод</p><h2>Как объяснить тему слушателю «не из сертификации»</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><div class="qa-box"><p class="quote">Сертификация СЗИ отвечает на вопрос: можно ли доверять конкретному средству защиты информации для применения в определённом регулируемом контуре. Сертификация БРПО отвечает на вопрос: умеет ли организация безопасно разрабатывать такое ПО системно и воспроизводимо.</p></div></div>
+  <footer class="footer"><div class="slide-number">32 из 35</div><div class="footer-right">Это удобная формула для устного объяснения на занятии</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 33">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Актуализация</p><h2>Что важно учитывать по состоянию на дату подготовки лекции</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ul><li>приказ № 55 действует с изменениями 2021 и 2022 годов;</li><li>приказ № 76 продолжает использоваться как основа привязки уровней доверия к средствам ТЗИ и средствам ОБИТ;</li><li>приказ № 240 о сертификации процессов БРПО действует и в 2025 году в него внесены изменения;</li><li>ГОСТ Р 56939-2024 введён в действие и применяется как основной стандарт по безопасной разработке в данном контексте;</li><li>для ГИС действуют новые требования приказа № 117 от 11.04.2025, поэтому при учебных примерах ссылаться на приказ № 17 уже нельзя без оговорки.</li></ul></div>
+  <footer class="footer"><div class="slide-number">33 из 35</div><div class="footer-right">Этот слайд нужен именно для актуальной лекции, а не для «вечной» презентации</div></footer>
+</section>
+
+<section class="slide" aria-label="Слайд 34">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Вопросы к аудитории</p><h2>Блок для обсуждения и проверки понимания</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content"><ol><li>Когда сертификат на серийное производство не гарантирует допустимость конкретной поставки?</li><li>Почему уровень доверия нельзя выбирать отдельно от класса или категории системы?</li><li>Чем сертификация процессов БРПО помогает разработчику, но не заменяет сертификацию СЗИ?</li><li>Какие риски возникают при прекращении технической поддержки средства?</li></ol></div>
+  <footer class="footer"><div class="slide-number">34 из 35</div><div class="footer-right">Рекомендуемое время на обсуждение: 8–12 минут</div></footer>
+</section>
+
+<section class="slide contacts-slide" aria-label="Слайд 35">
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Контакты</p><h2>Спасибо за внимание</h2></div><img class="logo" src="Лого.jpg" alt="Логотип УЦ МАСКОМ"></header>
+  <div class="content">
+    <div class="card">
+      <p class="contact-name">Пиков Виталий Александрович</p>
+      <p>Руководитель направления обучения по РБПО, преподаватель НОУ ДПО «УЦБИ «МАСКОМ»</p>
+      <p><strong>Email:</strong> vitaliy@pikov.expert</p>
+      <p><strong>Telegram:</strong> @UnderLineSecurity</p>
+      <p><strong>Сайт УЦ МАСКОМ:</strong> mascom-uc.ru</p>
+      <p class="small">Обучение в УЦ МАСКОМ осуществляется по программам профессиональной переподготовки и повышения квалификации. К началу обучения слушатель должен предоставить копию диплома о высшем или среднем профессиональном образовании либо справку об обучении не ниже третьего курса.</p>
+    </div>
+    <div class="card">
+      <p class="quote">«Ты должен чётко понимать, чего ты хочешь добиться, иначе ты просто течёшь по течению…»</p>
+      <p class="small">Эта лекция рассчитана на слушателя, которому нужно не только знать порядок сертификации, но и уметь применить его в проектах по защите информации.</p>
+    </div>
+  </div>
+  <footer class="footer"><div class="slide-number">35 из 35</div><div class="footer-right">Финальный слайд</div></footer>
+</section>
+
+</div>
+
+<nav class="nav" aria-label="Управление слайдами">
+  <button type="button" id="btnFirst" aria-label="Первый слайд">⏮</button>
+  <button type="button" id="btnPrev" aria-label="Предыдущий слайд">◀</button>
+  <button type="button" id="btnNext" aria-label="Следующий слайд">▶</button>
+  <button type="button" id="btnLast" aria-label="Последний слайд">⏭</button>
+</nav>
+
+<div class="sr-only" id="liveRegion" aria-live="polite"></div>
+
+<script>
+(function(){
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const liveRegion = document.getElementById('liveRegion');
+  let current = 0;
+
+  function update(index){
+    if(index < 0 || index >= slides.length) return;
+    slides[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+    const slideNo = current + 1;
+    liveRegion.textContent = 'Показан слайд ' + slideNo + ' из ' + slides.length;
+  }
+
+  function next(){ if(current < slides.length - 1) update(current + 1); }
+  function prev(){ if(current > 0) update(current - 1); }
+  function first(){ update(0); }
+  function last(){ update(slides.length - 1); }
+
+  document.getElementById('btnNext').addEventListener('click', next);
+  document.getElementById('btnPrev').addEventListener('click', prev);
+  document.getElementById('btnFirst').addEventListener('click', first);
+  document.getElementById('btnLast').addEventListener('click', last);
+
+  document.addEventListener('keydown', function(e){
+    if(['ArrowRight','PageDown'].includes(e.key)){ e.preventDefault(); next(); }
+    if(['ArrowLeft','PageUp'].includes(e.key)){ e.preventDefault(); prev(); }
+    if(e.key === 'Home'){ e.preventDefault(); first(); }
+    if(e.key === 'End'){ e.preventDefault(); last(); }
+  });
+
+  document.addEventListener('click', function(e){
+    const nav = e.target.closest('.nav');
+    if(nav) return;
+    const x = e.clientX;
+    if(x > window.innerWidth / 2){ next(); }
+    else { prev(); }
+  });
+})();
+</script>
+</body>
+</html>

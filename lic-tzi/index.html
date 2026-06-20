@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Лицензирование в сфере технической защиты информации | УЦ МАСКОМ</title>
+  <meta name="description" content="Презентация-лендинг для лекции по лицензированию в сфере ТЗИ. НОУ ДПО «УЦБИ «МАСКОМ».">
+  <style>
+    /* ===== БАЗОВЫЕ СТИЛИ ===== */
+    :root {
+      --color-bg-title: #1a3a2e;
+      --color-text-title: #ffffff;
+      --color-bg-main: #ffffff;
+      --color-text-main: #000000;
+      --color-accent: #2e7d32;
+      --color-border: #cccccc;
+      --color-subtle: #f5f5f5;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --transition-speed: 0.35s;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      width: 100%; height: 100%; overflow: hidden;
+      font-family: var(--font-main);
+      background: var(--color-bg-main);
+      color: var(--color-text-main);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== КОНТЕЙНЕР ПРЕЗЕНТАЦИИ ===== */
+    .presentation {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+
+    /* ===== СЛАЙДЫ ===== */
+    .slide {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      padding: 40px 60px;
+      display: flex; flex-direction: column;
+      background: var(--color-bg-main);
+      color: var(--color-text-main);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+      transform: translateX(20px);
+    }
+    .slide.active {
+      opacity: 1; pointer-events: auto;
+      transform: translateX(0);
+      z-index: 10;
+    }
+    .slide.prev { transform: translateX(-20px); }
+
+    /* ===== ТИТУЛЬНЫЙ СЛАЙД ===== */
+    #slide-1 {
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('Подложка.png') center/cover no-repeat;
+      color: var(--color-text-title);
+      justify-content: center; align-items: center; text-align: center;
+      padding: 30px;
+    }
+    #slide-1 .year { position: absolute; top: 30px; font-size: 28px; font-weight: 300; opacity: 0.9; }
+    #slide-1 .title { font-size: clamp(28px, 5vw, 48px); font-weight: 700; margin: 20px 0; line-height: 1.25; max-width: 90%; }
+    #slide-1 .subtitle { font-size: clamp(20px, 2.5vw, 28px); margin-bottom: 40px; opacity: 0.9; }
+    #slide-1 .speaker { position: absolute; bottom: 40px; font-size: clamp(18px, 2vw, 24px); line-height: 1.4; max-width: 85%; text-align: center; }
+    #slide-1 .speaker strong { font-weight: 600; }
+
+    /* ===== ОСНОВНЫЕ СЛАЙДЫ ===== */
+    .slide-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 25px; padding-bottom: 12px;
+      border-bottom: 3px solid var(--color-accent);
+      gap: 20px;
+    }
+    .slide-logo { max-height: 60px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .slide-title { font-size: clamp(24px, 3vw, 36px); font-weight: 700; color: var(--color-accent); margin: 0; }
+    
+    .slide-content {
+      flex: 1; font-size: clamp(18px, 1.8vw, 24px); line-height: 1.55;
+      overflow-y: auto; padding-right: 15px;
+      scrollbar-width: thin;
+    }
+    .slide-content h3 { font-size: clamp(22px, 2.2vw, 28px); margin: 18px 0 10px; color: var(--color-accent); font-weight: 600; }
+    .slide-content p { margin-bottom: 12px; }
+    .slide-content ul, .slide-content ol { margin-left: 28px; margin-bottom: 12px; }
+    .slide-content li { margin-bottom: 6px; }
+    .slide-content .highlight { background: #e8f5e9; padding: 2px 6px; border-radius: 3px; font-weight: 600; border-left: 3px solid var(--color-accent); }
+    .slide-content .warning { background: #fff3e0; padding: 2px 6px; border-radius: 3px; font-weight: 600; border-left: 3px solid #f57c00; }
+    .slide-content table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: clamp(16px, 1.5vw, 20px); }
+    .slide-content th, .slide-content td { border: 1px solid var(--color-border); padding: 8px 10px; text-align: left; vertical-align: top; }
+    .slide-content th { background: var(--color-subtle); font-weight: 600; }
+    .slide-content img { max-width: 100%; height: auto; margin: 10px 0; border: 1px solid var(--color-border); border-radius: 4px; }
+    .slide-content figcaption { font-size: 0.85em; color: #555; margin-top: 5px; text-align: center; font-style: italic; }
+
+    .slide-footer {
+      position: absolute; bottom: 20px; left: 30px; font-size: 18px; color: #666;
+      background: rgba(255,255,255,0.8); padding: 4px 10px; border-radius: 4px;
+    }
+
+    /* ===== ФИНАЛЬНЫЙ СЛАЙД ===== */
+    #slide-40 {
+      background: var(--color-bg-main); justify-content: center; align-items: center; text-align: center;
+    }
+    #slide-40 .contact-card {
+      background: var(--color-subtle); border: 2px solid var(--color-accent);
+      border-radius: 12px; padding: clamp(30px, 4vw, 50px); max-width: 850px; width: 90%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    #slide-40 h2 { font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 25px; color: var(--color-accent); }
+    #slide-40 .contact-row { font-size: clamp(20px, 2.2vw, 26px); margin: 12px 0; line-height: 1.5; }
+    #slide-40 .contact-row strong { color: var(--color-accent); display: inline-block; min-width: 160px; text-align: right; margin-right: 12px; }
+    #slide-40 .contact-row a { color: var(--color-accent); text-decoration: none; font-weight: 600; }
+    #slide-40 .logo-final { max-height: 80px; margin: 25px auto; display: block; }
+    #slide-40 .footer-note { margin-top: 30px; font-size: 18px; color: #555; }
+
+    /* ===== НАВИГАЦИЯ ===== */
+    .click-zones { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+    .click-left, .click-right { position: absolute; top: 0; height: 100%; width: 35%; pointer-events: auto; cursor: pointer; }
+    .click-left { left: 0; } .click-right { right: 0; }
+    
+    .nav-buttons {
+      position: fixed; bottom: 25px; right: 30px; display: flex; gap: 10px; z-index: 100;
+    }
+    .nav-btn {
+      width: 48px; height: 48px; border: none; border-radius: 50%;
+      background: var(--color-accent); color: white; font-size: 20px;
+      cursor: pointer; transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .nav-btn:hover { background: #1b5e20; transform: scale(1.08); }
+    .nav-btn:active { transform: scale(0.95); }
+    .nav-btn:disabled { background: #9e9e9e; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* ===== АДАПТИВНОСТЬ И ДОСТУПНОСТЬ ===== */
+    @media (max-width: 1280px) { .slide { padding: 30px 40px; } }
+    @media (max-width: 768px) {
+      .slide { padding: 25px 20px; }
+      .slide-header { flex-direction: column; gap: 10px; }
+      .nav-buttons { bottom: 15px; right: 15px; }
+      .click-left, .click-right { width: 45%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      * { transition: none !important; transform: none !important; }
+    }
+    @media print {
+      .click-zones, .nav-buttons { display: none !important; }
+      .slide { position: relative !important; page-break-after: always; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- КЛИКОВЫЕ ЗОНЫ -->
+<div class="click-zones" aria-hidden="true">
+  <div class="click-left" id="zonePrev" title="Предыдущий слайд" aria-label="Перейти к предыдущему слайду"></div>
+  <div class="click-right" id="zoneNext" title="Следующий слайд" aria-label="Перейти к следующему слайду"></div>
+</div>
+
+<!-- КНОПКИ НАВИГАЦИИ -->
+<nav class="nav-buttons" role="navigation" aria-label="Управление презентацией">
+  <button class="nav-btn" id="btnFirst" title="Первый слайд" aria-label="Первый слайд">⏮</button>
+  <button class="nav-btn" id="btnPrev" title="Предыдущий слайд" aria-label="Предыдущий слайд">◀</button>
+  <button class="nav-btn" id="btnNext" title="Следующий слайд" aria-label="Следующий слайд">▶</button>
+  <button class="nav-btn" id="btnLast" title="Последний слайд" aria-label="Последний слайд">⏭</button>
+</nav>
+
+<!-- ОСНОВНОЙ КОНТЕНТ -->
+<main class="presentation" id="presentation" role="main" aria-live="polite">
+  <!-- Слайд 1: Титульный -->
+  <section class="slide active" id="slide-1" role="region" aria-label="Титульный слайд">
+    <div class="year" id="yearDisplay"></div>
+    <h1 class="title">Лицензирование в сфере технической защиты информации</h1>
+    <p class="subtitle">Нормативная база, требования регулятора, практические аспекты получения и сопровождения лицензии</p>
+    <div class="speaker">
+      <strong>Виталий Александрович Пиков</strong><br>
+      руководитель направления обучения по РБПО, преподаватель<br>
+      НОУ ДПО «УЦБИ «МАСКОМ»
+    </div>
+  </section>
+
+  <!-- Слайд 2 -->
+  <section class="slide" id="slide-2" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Введение: цели и задачи лекции</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Разобрать правовую основу лицензирования деятельности в области ТЗИ</li>
+        <li>Определить виды работ, подлежащие обязательному лицензированию</li>
+        <li>Изучить лицензионные требования ФСТЭК к соискателям</li>
+        <li>Рассмотреть порядок получения, переоформления и аннулирования лицензии</li>
+        <li>Показать связь лицензирования с сертификацией и аттестацией</li>
+      </ul>
+    </div>
+    <div class="slide-footer">2 из 40</div>
+  </section>
+
+  <!-- Слайд 3 -->
+  <section class="slide" id="slide-3" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Понятие лицензирования в РФ</h2></div>
+    <div class="slide-content">
+      <p class="highlight">Лицензия — специальное разрешение на право осуществления юридическим лицом или ИП конкретного вида деятельности.</p>
+      <br>
+      <ul>
+        <li>Подтверждается записью в едином реестре лицензий</li>
+        <li>Действует бессрочно (с 2011 г.)</li>
+        <li>Выдаётся уполномоченным федеральным органом</li>
+        <li>Формирует гарантии соблюдения требований безопасности</li>
+      </ul>
+      <br>
+      <p>Основание: <strong>ФЗ № 99-ФЗ от 04.05.2011</strong> «О лицензировании отдельных видов деятельности»</p>
+    </div>
+    <div class="slide-footer">3 из 40</div>
+  </section>
+
+  <!-- Слайд 4 -->
+  <section class="slide" id="slide-4" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Структура нормативной базы лицензирования ТЗИ</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Уровень</th><th>Документ</th><th>Статус</th></tr></thead>
+        <tbody>
+          <tr><td>ФЗ</td><td>№ 99-ФЗ от 04.05.2011</td><td class="highlight">Действующий</td></tr>
+          <tr><td>Постановление</td><td>ПП РФ № 79 от 03.02.2012 (ТЗКИ)</td><td class="highlight">Действующий</td></tr>
+          <tr><td>Постановление</td><td>ПП РФ № 171 от 03.03.2012 (Разработка СЗИ)</td><td class="highlight">Действующий</td></tr>
+          <tr><td>Регламент</td><td>Административные регламенты ФСТЭК</td><td class="highlight">Действующий</td></tr>
+        </tbody>
+      </table>
+      <p class="warning">Лицензионные требования устанавливаются исключительно положениями о лицензировании, утверждаемыми Правительством РФ.</p>
+    </div>
+    <div class="slide-footer">4 из 40</div>
+  </section>
+
+  <!-- Слайд 5 -->
+  <section class="slide" id="slide-5" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Основные направления защиты информации</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>ГИС</strong> — госинформсистемы (ФЗ-149, Приказ ФСТЭК № 17)</li>
+        <li><strong>ИСПДн</strong> — персональные данные (ФЗ-152, Приказ ФСТЭК № 21)</li>
+        <li><strong>КИИ</strong> — критическая информационная инфраструктура (ФЗ-187, Приказы ФСТЭК № 235, 239)</li>
+        <li><strong>Коммерческая/Служебная тайна</strong> — ограниченный доступ, не гостайна</li>
+      </ul>
+      <p>Лицензирование охватывает техническую защиту информации по всем указанным направлениям, кроме сведений, составляющих государственную тайну.</p>
+    </div>
+    <div class="slide-footer">5 из 40</div>
+  </section>
+
+  <!-- Слайд 6 -->
+  <section class="slide" id="slide-6" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Лицензируемые виды деятельности по ТЗКИ</h2></div>
+    <div class="slide-content">
+      <p>Согласно ПП РФ № 79, лицензированию подлежит деятельность по технической защите конфиденциальной информации, включающая:</p>
+      <ul>
+        <li>Контроль защищённости от утечки по техническим каналам</li>
+        <li>Контроль защищённости от НСД и модификации в средствах информатизации</li>
+        <li>Мониторинг информационной безопасности</li>
+        <li>Аттестационные испытания и аттестация объектов</li>
+        <li>Проектирование в защищённом исполнении</li>
+        <li>Установка, монтаж, наладка, ремонт СЗИ</li>
+      </ul>
+    </div>
+    <div class="slide-footer">6 из 40</div>
+  </section>
+
+  <!-- Слайд 7 -->
+  <section class="slide" id="slide-7" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Разработка и производство СЗИ</h2></div>
+    <div class="slide-content">
+      <p>Отдельный лицензируемый вид (ПП РФ № 171):</p>
+      <ul>
+        <li>Создание программных и программно-технических СЗИ</li>
+        <li>Разработка защищённых средств обработки информации</li>
+        <li>Производство технических средств защиты информации</li>
+      </ul>
+      <br>
+      <p class="warning">Техническое обслуживание СЗИ для собственных нужд организации лицензии <strong>не требует</strong>.</p>
+    </div>
+    <div class="slide-footer">7 из 40</div>
+  </section>
+
+  <!-- Слайд 8 -->
+  <section class="slide" id="slide-8" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Лицензирующий орган: ФСТЭК</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Осуществляет лицензирование деятельности по ТЗКИ</li>
+        <li>Ведёт реестр лицензий (публичный, онлайн)</li>
+        <li>Проводит плановые и внеплановые проверки</li>
+        <li>Утверждает формы документов, перечни оборудования и НПА</li>
+        <li>Осуществляет методическое руководство</li>
+      </ul>
+      <br>
+      <p><strong>Адрес:</strong> 105066, г. Москва, ул. Старая Басманная, д. 17<br>
+      <strong>Консультации:</strong> Вт, Чт 10:00–12:00 (495) 632-14-48, 693-68-68</p>
+    </div>
+    <div class="slide-footer">8 из 40</div>
+  </section>
+
+  <!-- Слайд 9 -->
+  <section class="slide" id="slide-9" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Лицензионные требования: общие положения</h2></div>
+    <div class="slide-content">
+      <p>Лицензионные требования направлены на обеспечение целей лицензирования и включают:</p>
+      <ul>
+        <li>Наличие квалифицированных специалистов в штате</li>
+        <li>Соответствующую материально-техническую базу (помещения)</li>
+        <li>Необходимое контрольно-измерительное оборудование (КИО)</li>
+        <li>Аттестованные/сертифицированные АС и СЗИ</li>
+        <li>Актуальную нормативную и техническую документацию</li>
+      </ul>
+    </div>
+    <div class="slide-footer">9 из 40</div>
+  </section>
+
+  <!-- Слайд 10 -->
+  <section class="slide" id="slide-10" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Требования к руководителю работ по лицензированию</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Образование</th><th>Стаж по профилю</th><th>Доп. требование</th></tr></thead>
+        <tbody>
+          <tr><td>Высшее в области ИБ</td><td>≥ 3 лет</td><td>—</td></tr>
+          <tr><td>Высшее тех./естественно-научное</td><td>≥ 5 лет</td><td>—</td></tr>
+          <tr><td>Иное высшее</td><td>≥ 5 лет</td><td>ППП по ИБ (≥ 360 ч.)</td></tr>
+        </tbody>
+      </table>
+      <br>
+      <p class="highlight">Образование подтверждается дипломом/справкой, стаж — трудовой книжкой или договором.</p>
+    </div>
+    <div class="slide-footer">10 из 40</div>
+  </section>
+
+  <!-- Слайд 11 -->
+  <section class="slide" id="slide-11" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Требования к инженерно-техническим работникам</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Минимум <strong>2 специалиста</strong> в штате по основному месту работы</li>
+        <li>Высшее образование в области ИБ + стаж ≥ 3 лет</li>
+        <li>Или иное высшее + стаж ≥ 3 лет + ППП по ИБ (≥ 360 ч.)</li>
+        <li>Все специалисты учитываются в штатном расписании</li>
+      </ul>
+      <p>Допускается привлечение внешних экспертов только для консультаций, но не для выполнения лицензируемых работ.</p>
+    </div>
+    <div class="slide-footer">11 из 40</div>
+  </section>
+
+  <!-- Слайд 12 -->
+  <section class="slide" id="slide-12" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Повышение квалификации персонала</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Обязательно для руководителя и инженеров</li>
+        <li>Периодичность: <strong>не реже 1 раза в 5 лет</strong></li>
+        <li>Объём программ: от 16 до 144 ак. часов</li>
+        <li>Подтверждается удостоверением установленного образца</li>
+      </ul>
+      <br>
+      <p class="warning">Отсутствие действующего удостоверения о повышении квалификации является основанием для приостановления действия лицензии при проверке.</p>
+    </div>
+    <div class="slide-footer">12 из 40</div>
+  </section>
+
+  <!-- Слайд 13 -->
+  <section class="slide" id="slide-13" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Требования к помещениям</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Наличие на праве собственности или законном основании (аренда, субаренда)</li>
+        <li>Достаточная площадь для размещения персонала и оборудования</li>
+        <li>Условия для работы с информацией ограниченного доступа</li>
+        <li>Наличие защищаемых помещений для конфиденциальных переговоров (при необходимости)</li>
+      </ul>
+      <p>Проверяется наличие договоров, правоустанавливающих документов и соответствие санитарным/пожарным нормам.</p>
+    </div>
+    <div class="slide-footer">13 из 40</div>
+  </section>
+
+  <!-- Слайд 14 -->
+  <section class="slide" id="slide-14" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Контрольно-измерительное оборудование (КИО)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Принадлежит соискателю на законном основании</li>
+        <li>Соответствует Перечню ФСТЭК (33 позиции)</li>
+        <li>Обязательная метрологическая поверка или калибровка</li>
+        <li>Сертификаты СЗИ для контроля эффективности</li>
+        <li>Средства статического анализа исходного кода (для разработки)</li>
+      </ul>
+      <p>Примеры: измерительные антенны, микрофоны, вибродатчики, анализаторы спектра.</p>
+    </div>
+    <div class="slide-footer">14 из 40</div>
+  </section>
+
+  <!-- Слайд 15 -->
+  <section class="slide" id="slide-15" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Автоматизированные системы и СЗИ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>АС предназначены для обработки конфиденциальной информации</li>
+        <li>Должны быть аттестованы по требованиям безопасности информации</li>
+        <li>СЗИ, применяемые в АС, должны иметь сертификаты соответствия</li>
+        <li>Допускаются отечественные ОС, СУБД и прикладное ПО</li>
+      </ul>
+      <p>Проверяются аттестаты соответствия, технические паспорта, акты классификации.</p>
+    </div>
+    <div class="slide-footer">15 из 40</div>
+  </section>
+
+  <!-- Слайд 16 -->
+  <section class="slide" id="slide-16" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Перечень нормативных и методических документов</h2></div>
+    <div class="slide-content">
+      <p>Утверждён ФСТЭК (актуальная редакция от 10.12.2024, 76 пунктов). Включает:</p>
+      <ul>
+        <li>Положение о системе сертификации СЗИ (Приказ № 55)</li>
+        <li>Базовая модель угроз БИ ПДн</li>
+        <li>Требования к СОВ, САВЗ, МЭ, ОС, СУБД</li>
+        <li>Методики оценки угроз, уязвимостей, тестирования</li>
+        <li>ГОСТ Р 56939-2024 «Разработка безопасного ПО»</li>
+      </ul>
+    </div>
+    <div class="slide-footer">16 из 40</div>
+  </section>
+
+  <!-- Слайд 17 -->
+  <section class="slide" id="slide-17" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Пакет документов для получения лицензии</h2></div>
+    <div class="slide-content">
+      <ol>
+        <li>Заявление по форме (Приказ ФСТЭК № 3 от 12.01.2023)</li>
+        <li>Сведения о квалификации специалистов + копии дипломов/удостоверений</li>
+        <li>Копии документов на помещения (право собственности/аренда)</li>
+        <li>Сведения об аттестованных защищаемых помещениях</li>
+        <li>Сведения об аттестованных АС (аттестаты, паспорта)</li>
+        <li>Сведения об оборудовании (свидетельства о поверке)</li>
+        <li>Сведения о наличии НПА и методических документов</li>
+      </ol>
+    </div>
+    <div class="slide-footer">17 из 40</div>
+  </section>
+
+  <!-- Слайд 18 -->
+  <section class="slide" id="slide-18" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Форма заявления и порядок подачи</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Подписывается руководителем юридического лица/ИП</li>
+        <li>Указываются виды работ/услуг согласно п. 4 ПП № 79</li>
+        <li>Подаётся лично, по почте с уведомлением или через ЕПГУ</li>
+        <li>Госпошлина за предоставление лицензии: <strong>7 500 руб.</strong></li>
+        <li>Рассматривается до 45 рабочих дней</li>
+      </ul>
+      <p>Неполный пакет возвращается на доработку в течение 3 рабочих дней.</p>
+    </div>
+    <div class="slide-footer">18 из 40</div>
+  </section>
+
+  <!-- Слайд 19 -->
+  <section class="slide" id="slide-19" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Сроки и этапы рассмотрения</h2></div>
+    <div class="slide-content">
+      <ol>
+        <li>Регистрация и проверка комплектности (3 раб. дня)</li>
+        <li>Анализ соответствия требованиям (до 30 раб. дней)</li>
+        <li>Выездная проверка МТБ и квалификации (при необходимости)</li>
+        <li>Принятие решения о выдаче или отказе</li>
+        <li>Внесение в реестр и уведомление заявителя</li>
+      </ol>
+      <br>
+      <p>Результат: электронная лицензия, подписанная ЭП ФСТЭК. Бумажный носитель по запросу.</p>
+    </div>
+    <div class="slide-footer">19 из 40</div>
+  </section>
+
+  <!-- Слайд 20 -->
+  <section class="slide" id="slide-20" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Основания для отказа</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Несоответствие лицензионным требованиям</li>
+        <li>Недостоверные или искажённые сведения в заявке</li>
+        <li>Отсутствие необходимых документов или несоответствие формам</li>
+        <li>Наличие сведений в реестре недобросовестных поставщиков</li>
+        <li>Неустранение замечаний в установленный срок</li>
+      </ul>
+      <p>Решение об отказе мотивируется и может быть обжаловано в суде (3 месяца).</p>
+    </div>
+    <div class="slide-footer">20 из 40</div>
+  </section>
+
+  <!-- Слайд 21 -->
+  <section class="slide" id="slide-21" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Переоформление лицензии: основания</h2></div>
+    <div class="slide-content">
+      <p>Обязательно при изменении:</p>
+      <ul>
+        <li>Наименования или организационно-правовой формы юрлица</li>
+        <li>Юридического адреса или адреса места нахождения</li>
+        <li>Сведений руководителя (ФИО, паспортные данные)</li>
+        <li>Адресов мест осуществления деятельности</li>
+        <li>Перечня выполняемых работ/услуг</li>
+      </ul>
+      <br>
+      <p>Срок переоформления: до 10 рабочих дней. Госпошлина: <strong>3 500 руб.</strong></p>
+    </div>
+    <div class="slide-footer">21 из 40</div>
+  </section>
+
+  <!-- Слайд 22 -->
+  <section class="slide" id="slide-22" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Лицензионный контроль: формы</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Проверка соблюдения лицензионных требований</li>
+        <li>Плановые проверки (не чаще 1 раза в 3 года)</li>
+        <li>Внеплановые проверки (по жалобам, инцидентам, рискам)</li>
+        <li>Документарные и выездные формы</li>
+        <li>Мониторинг реестра лицензий и публичных источников</li>
+      </ul>
+      <p>Проводится ФСТЭК и его территориальными управлениями.</p>
+    </div>
+    <div class="slide-footer">22 из 40</div>
+  </section>
+
+  <!-- Слайд 23 -->
+  <section class="slide" id="slide-23" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Ответственность за нарушения</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Нарушение</th><th>Ответственность</th></tr></thead>
+        <tbody>
+          <tr><td>Осуществление без лицензии</td><td>КоАП 14.1 (штраф, конфискация)</td></tr>
+          <tr><td>Несоответствие требованиям</td><td>Предписание, штраф, приостановление</td></tr>
+          <tr><td>Грубые нарушения / неоднократные</td><td>Аннулирование лицензии через суд</td></tr>
+          <tr><td>Уголовная (ст. 171 УК РФ)</td><td>При крупном ущербе или доходах</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-footer">23 из 40</div>
+  </section>
+
+  <!-- Слайд 24 -->
+  <section class="slide" id="slide-24" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Приостановление и аннулирование</h2></div>
+    <div class="slide-content">
+      <p><strong>Приостановление:</strong></p>
+      <ul>
+        <li>На срок до 90 дней для устранения нарушений</li>
+        <li>Запрет на выполнение новых работ в период приостановки</li>
+      </ul>
+      <p><strong>Аннулирование (прекращение действия):</strong></p>
+      <ul>
+        <li>По решению ФСТЭК или суда</li>
+        <li>При неустранении нарушений в срок</li>
+        <li>При ликвидации юрлица/прекращении деятельности ИП</li>
+        <li>Повторное получение возможно через 1 год</li>
+      </ul>
+    </div>
+    <div class="slide-footer">24 из 40</div>
+  </section>
+
+  <!-- Слайд 25 -->
+  <section class="slide" id="slide-25" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Связь лицензирования и сертификации СЗИ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Лицензия разрешает деятельность, сертификат подтверждает качество СЗИ</li>
+        <li>Для получения лицензии необходимо применять сертифицированные СЗИ</li>
+        <li>Разработчик СЗИ обязан иметь лицензию ФСТЭК</li>
+        <li>Сертификат выдаётся на срок до 5 лет, лицензия — бессрочно</li>
+      </ul>
+      <p class="highlight">Системы взаимосвязаны: отсутствие сертификатов СЗИ у лицензиата ведёт к предписанию ФСТЭК.</p>
+    </div>
+    <div class="slide-footer">25 из 40</div>
+  </section>
+
+  <!-- Слайд 26 -->
+  <section class="slide" id="slide-26" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Система сертификации ФСТЭК (Приказ № 55)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Участники: ФСТЭК (фед. орган), органы по сертификации, испытательные лаборатории, изготовители</li>
+        <li>Схемы: единичный образец, партия, серийное производство</li>
+        <li>Объекты: средства защиты от утечки, НСД, СОВ, антивирусы, СДЗ, МЭ</li>
+        <li>Результат: сертификат соответствия, запись в госреестре</li>
+      </ul>
+    </div>
+    <div class="slide-footer">26 из 40</div>
+  </section>
+
+  <!-- Слайд 27 -->
+  <section class="slide" id="slide-27" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Уровни доверия к СЗИ (Приказ № 76)</h2></div>
+    <div class="slide-content">
+      <p>6 уровней доверия (1 — высший, 6 — низший). Определяют глубину анализа:</p>
+      <ul>
+        <li><strong>6-5 уровни:</strong> КИИ 3-2 категории, ГИС 3-2 класса, ИСПДн 3-2 уровня</li>
+        <li><strong>4 уровень:</strong> КИИ 1 категории, ГИС 1 класса, ИСПДн 1 уровня, ИСОП II класса</li>
+      </ul>
+      <p>Требования включают модель безопасности, анализ скрытых каналов, документацию по разработке, управление конфигурацией, поддержку безопасности.</p>
+    </div>
+    <div class="slide-footer">27 из 40</div>
+  </section>
+
+  <!-- Слайд 28 -->
+  <section class="slide" id="slide-28" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Аттестация объектов информатизации (Приказ № 77)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Подтверждает соответствие объекта требованиям защиты информации</li>
+        <li>Проводится до ввода в эксплуатацию или после модернизации</li>
+        <li>Результат: аттестат соответствия, срок — до 5 лет (или бессрочно для некоторых объектов)</li>
+        <li>Выполняется организациями, имеющими лицензию на аттестационные работы</li>
+      </ul>
+      <p class="warning">Без аттестата эксплуатация ГИС, ИСПДн и КИИ запрещена.</p>
+    </div>
+    <div class="slide-footer">28 из 40</div>
+  </section>
+
+  <!-- Слайд 29 -->
+  <section class="slide" id="slide-29" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Сертификация в системе Минобороны (Приказ № 488)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Применяется для СЗИ, используемых в ВС РФ и оборонном секторе</li>
+        <li>Федеральный орган: Восьмое управление ГШ ВС РФ</li>
+        <li>Участники: органы по сертификации, испытательные лаборатории Минобороны</li>
+        <li>Требования дополняются ведомственными стандартами и ТТЗ</li>
+        <li>Срок действия сертификата — до 5 лет</li>
+      </ul>
+    </div>
+    <div class="slide-footer">29 из 40</div>
+  </section>
+
+  <!-- Слайд 30 -->
+  <section class="slide" id="slide-30" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Разграничение компетенций регуляторов</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Орган</th><th>Сфера</th><th>Документ</th></tr></thead>
+        <tbody>
+          <tr><td>ФСТЭК</td><td>ТЗКИ, ПДн, ГИС, КИИ, СЗИ</td><td>ПП № 79, Приказы № 17, 21, 239</td></tr>
+          <tr><td>ФСБ</td><td>Криптография, ГОС СОПКА</td><td>Приказы № 378, 213, 77</td></tr>
+          <tr><td>Минобороны</td><td>СЗИ для ВС РФ, гостайна в обороне</td><td>Приказ № 488, ПП № 333</td></tr>
+        </tbody>
+      </table>
+      <p>Лицензирование ТЗКИ находится в исключительной компетенции ФСТЭК.</p>
+    </div>
+    <div class="slide-footer">30 из 40</div>
+  </section>
+
+  <!-- Слайд 31 -->
+  <section class="slide" id="slide-31" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Практические шаги подготовки</h2></div>
+    <div class="slide-content">
+      <ol>
+        <li>Аудит текущих ресурсов (кадры, помещения, КИО, НПА)</li>
+        <li>Обучение/наём специалистов (1,5–2 мес.)</li>
+        <li>Закупка/поверка КИО (от 8 нед.)</li>
+        <li>Приобретение лицензионного ПО и сертифицированных СЗИ</li>
+        <li>Аттестация рабочих помещений и АС</li>
+        <li>Формирование пакета документов и подача в ФСТЭК</li>
+      </ol>
+    </div>
+    <div class="slide-footer">31 из 40</div>
+  </section>
+
+  <!-- Слайд 32 -->
+  <section class="slide" id="slide-32" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Типичные ошибки соискателей</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Указание неактуальных или просроченных свидетельств о поверке КИО</li>
+        <li>Несоответствие стажа работы указанным в заявлении сведениям</li>
+        <li>Отсутствие договоров аренды с корректными реквизитами</li>
+        <li>Применение устаревших версий НПА из перечня ФСТЭК</li>
+        <li>Попытка получить лицензию без действующей аттестации АС</li>
+      </ul>
+      <p class="highlight">Рекомендация: предварительная консультация в Управлении ФСТЭК по федеральному округу.</p>
+    </div>
+    <div class="slide-footer">32 из 40</div>
+  </section>
+
+  <!-- Слайд 33 -->
+  <section class="slide" id="slide-33" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Тренды 2024–2025 в регулировании</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Ужесточение требований к импортозамещению СЗИ и ПО</li>
+        <li>Внедрение ГОСТ Р 56939-2024 в практику разработки</li>
+        <li>Цифровизация реестров лицензий и сертификатов</li>
+        <li>Усиление контроля за техподдержкой сертифицированных продуктов</li>
+        <li>Обновление Перечня КИО и методических документов ФСТЭК</li>
+      </ul>
+    </div>
+    <div class="slide-footer">33 из 40</div>
+  </section>
+
+  <!-- Слайд 34 -->
+  <section class="slide" id="slide-34" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Взаимодействие с регулятором</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Официальные консультации по телефону и на сайте fstec.ru</li>
+        <li>Публикация разъяснений и изменений в перечнях</li>
+        <li>Мониторинг Банка данных угроз (БДУ) и уязвимостей</li>
+        <li>Участие в рабочих группах и отраслевых конференциях</li>
+        <li>Своевременное уведомление об изменении реквизитов</li>
+      </ul>
+    </div>
+    <div class="slide-footer">34 из 40</div>
+  </section>
+
+  <!-- Слайд 35 -->
+  <section class="slide" id="slide-35" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Роль учебных центров в подготовке кадров</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Реализация программ ППП (от 256 ч.) и ППК (от 16 ч.)</li>
+        <li>Слушатели: лица с дипломом о высшем/среднем проф. образовании</li>
+        <li>Формирование компетенций по ГОСТ Р 50922-2006, ФЗ-152, ФЗ-187</li>
+        <li>Подготовка к экзаменам и получению документов об образовании</li>
+        <li>Повышение квалификации не реже 1 раза в 5 лет</li>
+      </ul>
+    </div>
+    <div class="slide-footer">35 из 40</div>
+  </section>
+
+  <!-- Слайд 36 -->
+  <section class="slide" id="slide-36" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Заключение: ключевые выводы (1/2)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Лицензия — обязательное условие легальной работы в сфере ТЗИ</li>
+        <li>Требования строго регламентированы ПП РФ № 79 и № 171</li>
+        <li>Квалификация персонала и наличие КИО проверяются в приоритете</li>
+        <li>Лицензионный контроль носит системный характер</li>
+      </ul>
+    </div>
+    <div class="slide-footer">36 из 40</div>
+  </section>
+
+  <!-- Слайд 37 -->
+  <section class="slide" id="slide-37" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Заключение: ключевые выводы (2/2)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Сертификация СЗИ и аттестация объектов неразрывно связаны с лицензированием</li>
+        <li>Актуализация знаний и документов — гарантия сохранения лицензии</li>
+        <li>Соблюдение требований регулятора минимизирует риски штрафов и приостановки</li>
+        <li>Профессиональное обучение в УЦ МАСКОМ формирует базу для успешной карьеры</li>
+      </ul>
+    </div>
+    <div class="slide-footer">37 из 40</div>
+  </section>
+
+  <!-- Слайд 38 -->
+  <section class="slide" id="slide-38" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Блок вопросов и ответов</h2></div>
+    <div class="slide-content">
+      <p style="font-size: 28px; margin-top: 40px; text-align: center;">Готов обсудить:</p>
+      <ul style="margin-top: 20px;">
+        <li>Нюансы подачи заявок в текущих условиях</li>
+        <li>Особенности аттестации АС разных классов</li>
+        <li>Переход на отечественное ПО и СЗИ</li>
+        <li>Планирование программ повышения квалификации</li>
+      </ul>
+      <p style="text-align: center; margin-top: 30px; color: #555;">Задавайте вопросы по содержанию лекции.</p>
+    </div>
+    <div class="slide-footer">38 из 40</div>
+  </section>
+
+  <!-- Слайд 39 -->
+  <section class="slide" id="slide-39" role="region">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Благодарность за внимание</h2></div>
+    <div class="slide-content" style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%;">
+      <p style="font-size: 32px; text-align: center; margin-bottom: 20px;">Спасибо за участие в лекции!</p>
+      <p style="text-align: center; max-width: 80%;">Полученные знания помогут выстроить эффективную систему защиты информации в вашей организации.</p>
+      <p style="margin-top: 40px;">Следующие шаги:<br>1. Проверить актуальность внутренних документов<br>2. Запланировать аудит готовности к лицензированию<br>3. Записаться на курсы повышения квалификации</p>
+    </div>
+    <div class="slide-footer">39 из 40</div>
+  </section>
+
+  <!-- Слайд 40: Контакты -->
+  <section class="slide" id="slide-40" role="region">
+    <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="logo-final" onerror="this.style.display='none'">
+    <div class="contact-card">
+      <h2>Контактная информация</h2>
+      <div class="contact-row"><strong>Преподаватель:</strong> Виталий Александрович Пиков</div>
+      <div class="contact-row"><strong>Должность:</strong> Руководитель направления обучения по РБПО</div>
+      <div class="contact-row"><strong>Email:</strong> <a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a></div>
+      <div class="contact-row"><strong>Telegram:</strong> <a href="https://t.me/UnderLineSecurity">@UnderLineSecurity</a></div>
+      <div class="contact-row"><strong>Организация:</strong> НОУ ДПО «УЦБИ «МАСКОМ»</div>
+      <div class="contact-row"><strong>Сайт:</strong> <a href="https://mascom-uc.ru/" target="_blank" rel="noopener">mascom-uc.ru</a></div>
+      <p class="footer-note">Обращайтесь по вопросам обучения, сертификации и лицензирования.</p>
+    </div>
+    <div class="slide-footer" style="visibility: hidden;">40 из 40</div>
+  </section>
+</main>
+
+<!-- СКРИПТ НАВИГАЦИИ -->
+<script>
+(function() {
+  'use strict';
+  
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentIndex = 0;
+
+  const btnFirst = document.getElementById('btnFirst');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnLast = document.getElementById('btnLast');
+  const zonePrev = document.getElementById('zonePrev');
+  const zoneNext = document.getElementById('zoneNext');
+
+  // Динамический год
+  document.getElementById('yearDisplay').textContent = new Date().getFullYear();
+
+  function updateUI() {
+    slides.forEach((slide, idx) => {
+      slide.classList.remove('active', 'prev');
+      if (idx === currentIndex) slide.classList.add('active');
+      else if (idx < currentIndex) slide.classList.add('prev');
+    });
+    
+    btnFirst.disabled = currentIndex === 0;
+    btnPrev.disabled = currentIndex === 0;
+    btnNext.disabled = currentIndex === totalSlides - 1;
+    btnLast.disabled = currentIndex === totalSlides - 1;
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides) return;
+    currentIndex = index;
+    updateUI();
+  }
+
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  // Обработчики кнопок
+  btnFirst.addEventListener('click', () => goToSlide(0));
+  btnLast.addEventListener('click', () => goToSlide(totalSlides - 1));
+  btnPrev.addEventListener('click', prevSlide);
+  btnNext.addEventListener('click', nextSlide);
+
+  // Клик по зонам
+  zonePrev.addEventListener('click', prevSlide);
+  zoneNext.addEventListener('click', nextSlide);
+
+  // Клавиатура
+  document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+      case 'ArrowRight': case 'PageDown': nextSlide(); break;
+      case 'ArrowLeft': case 'PageUp': prevSlide(); break;
+      case 'Home': goToSlide(0); break;
+      case 'End': goToSlide(totalSlides - 1); break;
+    }
+  });
+
+  // Инициализация
+  updateUI();
+})();
+</script>
+
+<!-- 
+  ===== СПИСОК РЕСУРСОВ =====
+  1. index.html - данный файл презентации
+  2. Подложка.png - фоновое изображение титульного слайда (рекомендуется 1920x1080, тематика ИБ/криптография)
+  3. Лого.jpg - логотип НОУ ДПО «УЦБИ «МАСКОМ» (прозрачный или белый фон, высота ~60px)
+  Все стили и скрипты встроены. Внешние зависимости отсутствуют.
+
+  ===== ИНСТРУКЦИЯ ПО РАЗВЁРТЫВАНИЮ (README.txt) =====
+  Откройте файл index.html в любом современном браузере.
+  Управление:
+    клик справа: следующий слайд
+    клик слева: предыдущий слайд
+    кнопки внизу справа: ⏮ ◀ ▶ ⏭
+    клавиши ← / →, PageUp / PageDown, Home / End
+  Для работы офлайн поместите Подложка.png и Лого.jpg в ту же папку, что и index.html.
+
+  ===== ИСПОЛЬЗОВАННЫЕ НОРМАТИВНЫЕ ИСТОЧНИКИ =====
+  1. ФЗ от 04.05.2011 № 99-ФЗ «О лицензировании отдельных видов деятельности»
+  2. ПП РФ от 03.02.2012 № 79 «О лицензировании деятельности по ТЗКИ»
+  3. ПП РФ от 03.03.2012 № 171 «О лицензировании разработки и производства СЗИ»
+  4. Приказ ФСТЭК от 03.04.2018 № 55 «Положение о системе сертификации СЗИ»
+  5. Приказ ФСТЭК от 02.06.2020 № 76 «Требования по БИ, устанавливающие уровни доверия...»
+  6. Приказ ФСТЭК от 29.04.2021 № 77 «Порядок аттестации объектов информатизации»
+  7. Приказ Минобороны от 29.09.2020 № 488 «Система сертификации СЗИ МО РФ»
+  8. ФЗ-152 «О персональных данных», ФЗ-187 «О безопасности КИИ РФ», ФЗ-98 «О коммерческой тайне»
+  9. ГОСТ Р 50922-2006, ГОСТ Р 56939-2024
+  Статус документов проверен по официальным источникам. Актуально на 2025 г.
+-->
+</body>
+</html>
+

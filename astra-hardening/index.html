@@ -1,0 +1,2256 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>Безопасная настройка Astra Linux и ОС Linux — лекция В.А. Пикова</title>
+<meta name="description" content="Авторская лекция по безопасной настройке (hardening) ОС Astra Linux Special Edition 1.7 и 1.8 и базовой ОС Linux. По методическим документам ФСТЭК России 2022 и согласованным рекомендациям по Astra Linux 1.7 / 1.8.">
+<meta name="author" content="Виталий Александрович Пиков">
+<meta property="og:title" content="Безопасная настройка Astra Linux 1.7/1.8 и ОС Linux (hardening)">
+<meta property="og:description" content="Авторская лекция В.А. Пикова: 3 документа ФСТЭК, 3 уровня защищённости (Орёл/Воронеж/Смоленск), 17+ мер защиты, чек-листы для АРМ и сервера, найди недочёт — 6 кейсов.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2270%22 text-anchor=%22middle%22 font-family=%22Segoe UI, sans-serif%22 font-size=%2245%22 font-weight=%22700%22 fill=%22white%22>АL</text></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .reading-progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: transparent; z-index: 110; pointer-events: none;
+  }
+  .reading-progress-bar {
+    height: 100%; background: var(--accent); width: 0%;
+    transition: width 0.1s ease-out;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container {
+    display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .brand-back {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--text-muted); font-size: 14px; font-weight: 500;
+    padding: 8px 14px; border-radius: 8px; transition: all 0.2s;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 8px; cursor: pointer; color: var(--text-muted);
+    display: inline-flex; align-items: center; transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+  .toc-toggle { display: none; }
+
+  .layout {
+    max-width: 1280px; margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 280px 1fr; gap: 56px; align-items: start;
+  }
+
+  .toc {
+    position: sticky; top: 84px; max-height: calc(100vh - 100px);
+    overflow-y: auto; padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border); padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-subtle); margin-bottom: 14px; padding-left: 14px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex; align-items: baseline; gap: 10px; padding: 7px 14px;
+    border-radius: 6px; color: var(--text-muted); font-size: 13.5px; line-height: 1.4;
+    transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num {
+    font-variant-numeric: tabular-nums; font-size: 11px;
+    color: var(--text-subtle); font-weight: 600; flex-shrink: 0;
+  }
+  .toc-list a.active {
+    color: var(--accent); background: var(--accent-soft);
+    border-left-color: var(--accent); font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+
+  .content { max-width: 760px; padding: 32px 0 80px; }
+
+  .hero { padding: 32px 0 56px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 6px 12px; border-radius: 6px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px); font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55;
+    color: var(--text-muted); margin-bottom: 36px; max-width: 680px;
+  }
+  .hero-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; padding: 20px 24px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-subtle);
+  }
+  .hero-meta-value { font-size: 14.5px; color: var(--text); font-weight: 500; }
+
+  .section { padding: 56px 0 16px; scroll-margin-top: 80px; }
+  .section-eyebrow {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .section-eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--accent); }
+  .section-num { font-variant-numeric: tabular-nums; }
+  .section h2 {
+    font-size: clamp(28px, 3.4vw, 38px); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 20px; color: var(--text);
+  }
+  .section h3 {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+    line-height: 1.25; margin: 36px 0 14px; color: var(--text);
+  }
+  .section h4 {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.005em;
+    margin: 24px 0 10px; color: var(--text);
+  }
+  .section p { font-size: 17px; line-height: 1.7; margin-bottom: 18px; color: var(--text); }
+  .section p.lead {
+    font-size: 19px; line-height: 1.6; color: var(--text-muted); margin-bottom: 28px;
+  }
+  .section ul, .section ol { margin: 16px 0 24px 0; padding-left: 24px; }
+  .section ul li, .section ol li {
+    font-size: 17px; line-height: 1.65; margin-bottom: 10px; color: var(--text);
+  }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+
+  .section :not(pre) > code, .ic {
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.88em; padding: 2px 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text);
+  }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-softer);
+    padding: 18px 22px; margin: 24px 0; border-radius: 0 10px 10px 0;
+  }
+
+  /* Labs download CTA */
+  .labs-cta {
+    display: grid; grid-template-columns: 1fr auto; gap: 24px;
+    align-items: center;
+    padding: 28px 32px;
+    background: linear-gradient(135deg, var(--accent-soft), var(--accent-softer));
+    border: 1px solid var(--accent);
+    border-radius: 16px;
+    margin: 40px 0 24px;
+  }
+  .labs-cta-eyebrow {
+    display: inline-block;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--accent);
+    background: var(--bg); padding: 4px 10px; border-radius: 6px;
+    margin-bottom: 10px;
+  }
+  .labs-cta-title {
+    font-size: 22px; font-weight: 700; color: var(--text);
+    letter-spacing: -0.015em; line-height: 1.2; margin: 0 0 10px;
+  }
+  .labs-cta-desc {
+    font-size: 15px; color: var(--text-muted); line-height: 1.55; margin: 0;
+  }
+  .labs-cta-meta {
+    display: flex; gap: 14px; flex-wrap: wrap;
+    margin-top: 12px; font-size: 13px; color: var(--text-subtle);
+  }
+  .labs-cta-meta strong { color: var(--text); font-weight: 600; }
+  .labs-cta-btn {
+    background: var(--accent); color: #ffffff;
+    padding: 14px 24px; border-radius: 10px;
+    font-size: 15px; font-weight: 600;
+    display: inline-flex; align-items: center; gap: 10px;
+    box-shadow: var(--shadow-md);
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .labs-cta-btn:hover {
+    background: var(--accent-strong); color: #ffffff;
+    transform: translateY(-2px); box-shadow: var(--shadow-lg);
+  }
+  .labs-cta-btn svg { width: 20px; height: 20px; }
+  @media (max-width: 700px) {
+    .labs-cta { grid-template-columns: 1fr; padding: 22px 20px; }
+    .labs-cta-btn { justify-content: center; }
+  }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%; border-collapse: collapse; font-size: 15px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  table.data th, table.data td {
+    text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data th {
+    font-weight: 600; color: var(--text-subtle); text-transform: uppercase;
+    letter-spacing: 0.04em; font-size: 12px; background: var(--surface-2);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td:first-child { font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  table.data .tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--accent-soft);
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  table.data code {
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12.5px; padding: 1px 5px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--accent);
+  }
+
+  pre.code {
+    margin: 20px 0; padding: 18px 20px;
+    background: var(--code-bg); border: 1px solid var(--code-border);
+    border-radius: 10px; overflow-x: auto;
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13.5px; line-height: 1.55; color: var(--text);
+  }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+  pre.code .hl { background: var(--warning-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+  pre.code .hl-bad { background: var(--danger-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 28px 0;
+  }
+  .three-col {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin: 28px 0;
+  }
+  .col-card {
+    padding: 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+  .col-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .col-card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent); flex-shrink: 0;
+  }
+  .col-card-icon svg { width: 20px; height: 20px; }
+  .col-card h3 { margin: 0; font-size: 18px; }
+  .col-card .col-en { font-size: 12px; color: var(--text-subtle); display: block; font-weight: 500; }
+  .col-card p { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  .col-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-tag {
+    font-size: 12px; font-weight: 500; padding: 4px 10px;
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: 6px; color: var(--text-muted);
+  }
+
+  .phases {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px; margin: 28px 0;
+  }
+  .phase {
+    padding: 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .phase-num {
+    font-size: 36px; font-weight: 700; color: var(--accent);
+    opacity: 0.3; line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums;
+  }
+  .phase h4 { font-size: 17px; margin: 0 0 10px; }
+  .phase ul { padding-left: 18px; margin: 0; }
+  .phase li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; color: var(--text-muted); }
+
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item {
+    border: 1px solid var(--border); border-radius: 12px;
+    background: var(--surface); overflow: hidden;
+  }
+  .acc-summary {
+    list-style: none; cursor: pointer; padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 16px; font-weight: 600; color: var(--text);
+    transition: background 0.2s; user-select: none;
+  }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .acc-summary-left > span:last-child { min-width: 0; }
+  .acc-tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 8px; background: var(--accent-soft); color: var(--accent);
+    border-radius: 5px; flex-shrink: 0;
+  }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body {
+    padding: 4px 22px 22px; border-top: 1px solid var(--border); margin-top: -1px;
+  }
+  .acc-body ol, .acc-body ul { margin: 14px 0 0; padding-left: 20px; }
+  .acc-body li {
+    font-size: 15.5px; margin-bottom: 8px; line-height: 1.55; color: var(--text);
+  }
+  .acc-body p {
+    font-size: 15.5px; line-height: 1.6; color: var(--text-muted); margin: 14px 0 0;
+  }
+  .acc-body p:first-child { margin-top: 14px; }
+  .acc-body strong { color: var(--text); }
+  .acc-body table.data { font-size: 14px; margin: 14px 0; }
+  .acc-body table.data th, .acc-body table.data td { padding: 8px 12px; }
+
+  .checklist {
+    list-style: none !important; padding-left: 0 !important; margin: 16px 0 24px !important;
+  }
+  .checklist li {
+    position: relative; padding: 10px 0 10px 32px;
+    font-size: 15.5px !important; line-height: 1.55 !important;
+    border-bottom: 1px solid var(--border); margin-bottom: 0 !important;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: ''; position: absolute; left: 0; top: 14px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--success-soft); border: 1.5px solid var(--success);
+  }
+  .checklist li::after {
+    content: ''; position: absolute; left: 5px; top: 19px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--success); border-bottom: 2px solid var(--success);
+    transform: rotate(-45deg);
+  }
+  .checklist li strong { color: var(--text); }
+  .checklist li code { font-size: 13px !important; }
+
+  .key-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin: 24px 0;
+  }
+  .key-stat {
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .key-stat-value {
+    font-size: 22px; font-weight: 700; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 4px; font-variant-numeric: tabular-nums;
+  }
+  .key-stat-label { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+
+  .props {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin: 24px 0;
+  }
+  .prop {
+    padding: 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .prop-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+  }
+  .prop-icon svg { width: 18px; height: 18px; }
+  .prop h4 { font-size: 15px; margin: 0 0 6px; }
+  .prop p { font-size: 13.5px !important; line-height: 1.5 !important; color: var(--text-muted); margin: 0 !important; }
+
+  .timeline {
+    position: relative; margin: 36px 0; padding: 24px 0;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 2px; background: linear-gradient(90deg, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent);
+    z-index: 0;
+  }
+  .timeline-track {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px; position: relative; z-index: 1;
+  }
+  .timeline-item {
+    text-align: center; padding: 18px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .timeline-item::before {
+    content: ''; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .timeline-date { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 6px; }
+  .timeline-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; color: var(--text); }
+  .timeline-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+
+  /* Bug case cards (для секции «Найди недочёт») */
+  .bug-cases { display: flex; flex-direction: column; gap: 28px; margin: 28px 0; }
+  .bug-case {
+    border: 1px solid var(--border); border-radius: 14px;
+    overflow: hidden; background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bug-case:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .bug-case-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; background: var(--surface);
+    border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px;
+  }
+  .bug-case-title {
+    font-size: 15px; font-weight: 600; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+  .bug-case-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; border-radius: 6px;
+    background: var(--accent); color: #ffffff;
+    font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+  .bug-case-lang {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-subtle); padding: 4px 10px;
+    background: var(--surface-2); border-radius: 5px;
+  }
+  .bug-case pre.code { margin: 0; border: none; border-radius: 0; }
+  .bug-case-desc {
+    padding: 14px 20px 0; font-size: 15px; line-height: 1.55; color: var(--text-muted);
+  }
+  .bug-case-reveal {
+    padding: 14px 20px; background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .bug-spoiler {
+    border: none; background: transparent; color: var(--accent);
+    font-family: inherit; font-size: 14.5px; font-weight: 500;
+    cursor: pointer; display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 0; transition: color 0.2s;
+  }
+  .bug-spoiler:hover { color: var(--accent-strong); }
+  .bug-spoiler svg { width: 14px; height: 14px; transition: transform 0.2s; }
+  .bug-spoiler[aria-expanded="true"] svg { transform: rotate(90deg); }
+  .bug-answer {
+    display: none; margin-top: 12px; padding: 14px 16px;
+    background: var(--warning-soft); border-left: 3px solid var(--warning);
+    border-radius: 0 8px 8px 0; font-size: 15px; line-height: 1.6;
+  }
+  .bug-answer.open { display: block; animation: fadeSlide 0.3s ease-out; }
+  .bug-answer strong { color: var(--warning); }
+  .bug-answer .pvs-code {
+    display: inline-block;
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12.5px; font-weight: 600;
+    padding: 2px 7px; background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: 4px; color: var(--warning); margin-right: 6px;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Levels comparison */
+  .levels {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 28px 0;
+  }
+  .level {
+    padding: 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+    border-top: 4px solid var(--success);
+  }
+  .level.med { border-top-color: var(--warning); }
+  .level.max { border-top-color: var(--danger); }
+  .level-tag {
+    font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--success); margin-bottom: 8px;
+  }
+  .level.med .level-tag { color: var(--warning); }
+  .level.max .level-tag { color: var(--danger); }
+  .level h4 { font-size: 18px; margin: 0 0 4px; }
+  .level .codename {
+    font-size: 13px; color: var(--text-subtle); font-style: italic; margin-bottom: 14px;
+  }
+  .level p { font-size: 14.5px !important; line-height: 1.55 !important; color: var(--text-muted); margin: 0 !important; }
+  .level ul { padding-left: 18px; margin: 14px 0 0; }
+  .level li { font-size: 13.5px !important; line-height: 1.5 !important; margin-bottom: 5px; color: var(--text-muted); }
+
+  .content-footer { margin-top: 80px; padding: 56px 0 0; border-top: 1px solid var(--border); }
+  .content-footer h2 {
+    font-size: clamp(26px, 3vw, 34px); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .content-footer p.lead { color: var(--text-muted); font-size: 17px; margin-bottom: 28px; }
+  .contact-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 20px; border-radius: 10px;
+    font-size: 15px; font-weight: 500;
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: var(--accent); color: #ffffff; box-shadow: var(--shadow-md); }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution {
+    margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-subtle); line-height: 1.6;
+  }
+  .attribution-row {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 10px;
+  }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  .back-to-top {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); color: #ffffff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; visibility: hidden; transform: translateY(8px);
+    transition: all 0.25s; z-index: 90;
+  }
+  .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 240px 1fr; gap: 36px; }
+    .three-col { grid-template-columns: 1fr; }
+    .levels { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc {
+      position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+      background: var(--bg); border-right: none; border-bottom: 1px solid var(--border);
+      padding: 20px 24px; transform: translateY(-100%);
+      transition: transform 0.25s ease-out; z-index: 99;
+      max-height: 100vh; overflow-y: auto;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .card, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .labs-cta-btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats, .integration-grid, .labs-cta { grid-template-columns: 1fr; }
+    .hero-eyebrow, .labs-cta-btn { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .bug-answer { display: block !important; }
+    .acc-item { page-break-inside: avoid; }
+    details > *:not(summary) { display: block !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#why" data-section="why"><span class="toc-num">01</span><span>Зачем эта лекция</span></a></li>
+      <li><a href="#npb" data-section="npb"><span class="toc-num">02</span><span>Три документа ФСТЭК России</span></a></li>
+      <li><a href="#levels" data-section="levels"><span class="toc-num">03</span><span>Три уровня защищённости Astra</span></a></li>
+      <li><a href="#environment" data-section="environment"><span class="toc-num">04</span><span>Безопасная среда функционирования</span></a></li>
+      <li><a href="#linux-base" data-section="linux-base"><span class="toc-num">05</span><span>Базовая настройка Linux: 6 направлений</span></a></li>
+      <li><a href="#install" data-section="install"><span class="toc-num">06</span><span>Установка Astra по Модулю 11</span></a></li>
+      <li><a href="#sysctl" data-section="sysctl"><span class="toc-num">07</span><span>Конфигурация ядра: sysctl</span></a></li>
+      <li><a href="#services" data-section="services"><span class="toc-num">08</span><span>Сетевые службы: SSH / Samba / Apache</span></a></li>
+      <li><a href="#changes" data-section="changes"><span class="toc-num">09</span><span>Что изменилось в Astra 1.8</span></a></li>
+      <li><a href="#measures" data-section="measures"><span class="toc-num">10</span><span>Меры защиты ОПС / ЗИС</span></a></li>
+      <li><a href="#audit" data-section="audit"><span class="toc-num">11</span><span>Аудит и контроль (РСБ)</span></a></li>
+      <li><a href="#workstation" data-section="workstation"><span class="toc-num">12</span><span>Сценарий: настройка АРМ</span></a></li>
+      <li><a href="#server" data-section="server"><span class="toc-num">13</span><span>Сценарий: настройка сервера</span></a></li>
+      <li><a href="#cases" data-section="cases"><span class="toc-num">14</span><span>Найди недочёт: 6 кейсов</span></a></li>
+      <li><a href="#checklist" data-section="checklist"><span class="toc-num">15</span><span>Чек-лист готовности</span></a></li>
+      <li><a href="#faq" data-section="faq"><span class="toc-num">16</span><span>Часто задаваемые вопросы</span></a></li>
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">17</span><span>Связь</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Авторская лекция · Hardening · ОС</span>
+      <h1>Безопасная настройка Astra Linux и ОС Linux</h1>
+      <p class="hero-lead">Систематический разбор трёх документов ФСТЭК России: рекомендаций по безопасной настройке Linux 2022 года и согласованных методических рекомендаций по настройке Astra Linux Special Edition 1.7 и 1.8. С практикой, чек-листами, сценариями для АРМ и сервера, разбором типовых недочётов.</p>
+
+      <div class="key-stats">
+        <div class="key-stat">
+          <div class="key-stat-value">3</div>
+          <div class="key-stat-label">документа ФСТЭК России</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">3</div>
+          <div class="key-stat-label">уровня защищённости Astra</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">17</div>
+          <div class="key-stat-label">мер защиты в Astra 1.8 (раздел 3)</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">30+</div>
+          <div class="key-stat-label">пунктов чек-листа готовности</div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Преподаватель</span>
+          <span class="hero-meta-value">Пиков Виталий Александрович</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Раздел курса</span>
+          <span class="hero-meta-value">Безопасность ОС / Astra Linux</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Нормативная база</span>
+          <span class="hero-meta-value">Метод. документ ФСТЭК 2022, рек. ФСТЭК по Astra 1.7 и 1.8</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Применимо к</span>
+          <span class="hero-meta-value">ГИС, ИСПДн, объекты КИИ, ОС с/без сертификата</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- LABS DOWNLOAD CTA -->
+    <aside class="labs-cta">
+      <div>
+        <span class="labs-cta-eyebrow">Практика для слушателей</span>
+        <div class="labs-cta-title">Лабораторные работы — для самостоятельного выполнения</div>
+        <p class="labs-cta-desc">Три практические работы по нарастающей сложности с пошаговыми инструкциями, тестами проверки и критериями зачёта. Все команды и параметры — для Astra Linux SE 1.7 и 1.8.</p>
+        <div class="labs-cta-meta">
+          <span><strong>Лаба 1</strong> · Парольная политика · 30–45 мин</span>
+          <span><strong>Лаба 2</strong> · Безопасный SSH · 45–60 мин</span>
+          <span><strong>Лаба 3</strong> · Apache hardening · 90–120 мин</span>
+        </div>
+      </div>
+      <a class="labs-cta-btn" href="labs/index.html">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Скачать PDF лабораторных
+      </a>
+    </aside>
+
+    <!-- 01. WHY -->
+    <section id="why" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> · Контекст</div>
+      <h2>Зачем эта лекция</h2>
+      <p class="lead">Настройка ОС «по умолчанию» — почти всегда не настройка для эксплуатации в защищённом контуре. ФСТЭК России выпустила три согласованных документа, которые превращают «голый» Linux и Astra Linux Special Edition в систему, готовую к работе в ГИС, ИСПДн и на объектах КИИ. Эта лекция — навигация по этим документам с практикой и сценариями.</p>
+
+      <h3>Кому адресовано</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <h4>Системные администраторы</h4>
+          <p>Те, кто разворачивает и обслуживает Linux/Astra в защищённом контуре. Чек-листы установки и настройки.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <h4>Специалисты ИБ</h4>
+          <p>Ответственные за защиту информации в ГИС, ИСПДн, на ЗОКИИ. Понимание уровней защищённости и мер ОПС/ЗИС.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h4>Аудиторы и проверяющие</h4>
+          <p>Эксперты, проводящие пентесты и аттестацию объектов информатизации. Готовые опросники для проверок.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+          </div>
+          <h4>Студенты ИБ-направлений</h4>
+          <p>Систематизированный материал для курса по безопасности ОС с практикой по Модулям 2, 9, 11.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Главная мысль.</strong> «Безопасный hardening» — это не один рубильник «сделать защищённо», а системная работа по 5–6 направлениям одновременно: загрузка, авторизация, права, ядро, периметр атаки, аудит. Ниже — карта этой работы по трём документам ФСТЭК России: общие рекомендации для Linux и специальные — для Astra Linux 1.7 и 1.8.</p>
+      </div>
+    </section>
+
+    <!-- 02. NPB -->
+    <section id="npb" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> · Нормативка</div>
+      <h2>Три документа ФСТЭК России</h2>
+      <p class="lead">Все три документа выпущены или согласованы ФСТЭК России. Они применяются на разных типах систем и в разных контекстах сертификации.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Документ</th>
+              <th>Когда применяется</th>
+              <th>Для каких систем</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Методический документ ФСТЭК России</strong> «Рекомендации по безопасной настройке операционных систем Linux» от 25.12.2022</td>
+              <td>До замены на сертифицированную ОС</td>
+              <td><strong>Несертифицированные</strong> ОС на базе ядра Linux в ГИС и на объектах КИИ. Базовая методика для любого Linux.</td>
+            </tr>
+            <tr>
+              <td><strong>Методические рекомендации</strong> по настройке Astra Linux Special Edition <strong>1.7</strong> (согласованы ФСТЭК России)</td>
+              <td>Для Astra 1.7 в эксплуатации</td>
+              <td><strong>Сертифицированная</strong> Astra Linux SE 1.7. <em>Производство завершено 27.01.2026; сертификат ФСТЭК России №&nbsp;2557 продлён, поддержка обновлений безопасности продолжается по утверждённому графику разработчика. Все новые проекты — на 1.8.</em></td>
+            </tr>
+            <tr>
+              <td><strong>Методические рекомендации</strong> по настройке Astra Linux Special Edition <strong>1.8</strong> (согласованы ФСТЭК России)</td>
+              <td>Для Astra 1.8 (актуальная редакция)</td>
+              <td><strong>Сертифицированная</strong> Astra Linux SE 1.8 — действующая версия для новых проектов. Самый объёмный из трёх документов.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Принцип применения</h3>
+      <ul>
+        <li><strong>Linux 2022</strong> — это «базовый минимум» для несертифицированной ОС, который подлежит реализации до её замены на сертифицированную отечественную.</li>
+        <li><strong>Astra 1.7 / 1.8</strong> — это эксплуатационные документы. Настройка сертифицированной ОС всегда осуществляется по документации разработчика; рекомендации ФСТЭК уточняют, что именно из настроек обязательно для эксплуатации в защищённом контуре.</li>
+        <li>Все три документа покрывают одни и те же группы вопросов (загрузка, авторизация, права на файлы, ядро, сеть, журналы) — но с разной глубиной и разными конкретными настройками под платформу.</li>
+      </ul>
+
+      <div class="callout warning">
+        <p><strong>Важно про Astra 1.7.</strong> Производство Astra Linux 1.7 <strong>завершено 27 января 2026 года</strong>. Сертификат ФСТЭК России №&nbsp;2557 при этом продлён — поддержка обновлений безопасности продолжается по графику разработчика. Все новые проекты — только на Astra 1.8. Эксплуатируемые системы на 1.7 — по согласованному плану перехода.</p>
+      </div>
+    </section>
+
+    <!-- 03. LEVELS -->
+    <section id="levels" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> · Уровни защищённости</div>
+      <h2>Три уровня защищённости Astra</h2>
+      <p class="lead">Astra Linux Special Edition поставляется в трёх вариантах лицензирования, соответствующих трём уровням защищённости. Выбор уровня — это решение, которое нужно принять до установки: режим задаётся в инсталляторе и определяет набор включаемых функций безопасности.</p>
+
+      <div class="levels">
+        <div class="level">
+          <div class="level-tag">Уровень 1</div>
+          <h4>Базовый</h4>
+          <div class="codename">«Орёл»</div>
+          <p>Функциональные возможности базового варианта. <strong>В режиме «Орёл» отсутствуют МКЦ, ЗПС, мандатное управление и принудительная очистка памяти.</strong> Применим только для:</p>
+          <ul>
+            <li>систем, обрабатывающих <strong>общедоступную информацию</strong>;</li>
+            <li>учебных и тестовых стендов;</li>
+            <li>систем без обязательных требований к МРД/МКЦ.</li>
+          </ul>
+          <p><em>Для ГИС, ИСПДн и значимых объектов КИИ требуется минимум «Воронеж».</em></p>
+        </div>
+        <div class="level med">
+          <div class="level-tag">Уровень 2</div>
+          <h4>Усиленный</h4>
+          <div class="codename">«Воронеж»</div>
+          <p>Усиленный уровень безопасности. Применяется для обработки и защиты информации <strong>ограниченного доступа</strong>, не составляющей государственную тайну:</p>
+          <ul>
+            <li>ГИС любого класса защищённости</li>
+            <li>ИСПДн любого уровня защищённости</li>
+            <li>Значимые объекты КИИ любой категории</li>
+          </ul>
+        </div>
+        <div class="level max">
+          <div class="level-tag">Уровень 3</div>
+          <h4>Максимальный</h4>
+          <div class="codename">«Смоленск»</div>
+          <p>Режим максимальной защищённости. Обеспечивает защиту <strong>государственной тайны любой степени секретности</strong>:</p>
+          <ul>
+            <li>Информация любой категории доступа</li>
+            <li>ГИС, ИСПДн, ЗОКИИ — без ограничений</li>
+            <li>Все механизмы защиты включены</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Как выбирается уровень.</strong> На этапе установки Astra Linux в инсталляторе явно выбирается режим защищённости. После установки изменить уровень нельзя — нужна переустановка. Поэтому выбор делается заранее, исходя из категории обрабатываемой информации и требований к классу защищённости системы.</p>
+      </div>
+    </section>
+
+    <!-- 04. ENVIRONMENT -->
+    <section id="environment" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> · Среда функционирования</div>
+      <h2>Безопасная среда функционирования</h2>
+      <p class="lead">Раздел 1 рекомендаций ФСТЭК по Astra 1.7 и 1.8 — про то, что должно быть сделано <em>до</em> ОС: доверенная загрузка, защита BIOS, защита самого СВТ, защита сетевого взаимодействия. Без этого даже корректно настроенная ОС не выдержит атаки на загрузчик или физический доступ к диску.</p>
+
+      <h3>Четыре направления защиты среды</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h4>1.1 Доверенная загрузка</h4>
+          <p>Контроль целостности MBR, PBR, секторов 1–63, ESP. Сертифицированные средства доверенной загрузки (СДЗ).</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+          </div>
+          <h4>1.2 Защита BIOS</h4>
+          <p>Пароль на вход в BIOS/UEFI, отключение загрузки с внешних носителей, контроль настроек Secure Boot.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h4>1.3 Защита СВТ</h4>
+          <p>Опечатывание корпуса СВТ, контроль физического доступа, защита от подключения посторонних устройств.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          </div>
+          <h4>1.4 Защита сетевого взаимодействия</h4>
+          <p>Изоляция сегментов сети, межсетевое экранирование, шифрование канала (СКЗИ), контроль трафика.</p>
+        </div>
+      </div>
+
+      <h3>Что контролировать на загрузке</h3>
+      <ul class="checklist">
+        <li><strong>MBR (главная загрузочная запись)</strong> — целостность критична на BIOS-системах.</li>
+        <li><strong>PBR (загрузочный сектор раздела)</strong> — целостность для каждого активного раздела.</li>
+        <li><strong>Сектора 1–63</strong> относительно начала диска — место типового размещения буткитов.</li>
+        <li><strong>Раздел ESP (EFI System Partition)</strong> — содержит загрузчики UEFI, целостность критична.</li>
+        <li><strong>Настройки UEFI</strong> — ограничение модификации, отслеживание изменений.</li>
+      </ul>
+    </section>
+
+    <!-- 05. LINUX BASE -->
+    <section id="linux-base" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> · Базовый Linux</div>
+      <h2>Базовая настройка Linux: 6 направлений</h2>
+      <p class="lead">Методический документ ФСТЭК России 2022 года описывает 6 направлений безопасной настройки любого Linux-дистрибутива. Это «база» — то, что должно быть сделано на любой системе на базе ядра Linux.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.1</span>
+              <span>Настройка авторизации</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><strong>Не допускать пустые пароли</strong> — каждый пользователь либо имеет пароль, либо заблокирован. Контроль через <code>/etc/shadow</code>.</li>
+              <li><strong>Запретить SSH-вход root</strong> — в <code>/etc/ssh/sshd_config</code> установить <code>PermitRootLogin no</code>.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.2</span>
+              <span>Ограничение механизмов получения привилегий</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><strong>Ограничить доступ к <code>su</code></strong> — добавить в <code>/etc/pam.d/su</code> строку <code>auth required pam_wheel.so use_uid</code>; задать список пользователей в группе <code>wheel</code> в <code>/etc/group</code>.</li>
+              <li><strong>Пересмотреть <code>/etc/sudoers</code></strong> — список пользователей и команд для <code>sudo</code> должен быть минимальным.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.3</span>
+              <span>Права доступа к объектам файловой системы (11 пунктов)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><strong>Файлы пользователей и групп:</strong> <code>chmod 644 /etc/passwd</code>, <code>chmod 644 /etc/group</code>, <code>chmod go-rwx /etc/shadow</code>.</li>
+              <li><strong>Запущенные процессы:</strong> <code>chmod go-w /путь/к/файлу</code> для всех исполняемых файлов; директории по пути не доступны для записи непривилегированным пользователям.</li>
+              <li><strong>Cron-задачи:</strong> <code>chmod go-w путь_к_файлу</code> — иначе риск выполнения произвольного кода от имени владельца cron-задания (включая root).</li>
+              <li><strong>sudo-исполняемые файлы:</strong> <code>chown root путь_к_файлу</code>; <code>chmod go-w путь_к_файлу</code>.</li>
+              <li><strong>Стартовые скрипты:</strong> <code>chmod o-w</code> в <code>/etc/rc#.d</code> и для всех <code>.service</code>-файлов.</li>
+              <li><strong>Системные cron-файлы:</strong> <code>chmod go-wx</code> для <code>/etc/crontab</code>, <code>/etc/cron.{d,hourly,daily,weekly,monthly}</code>.</li>
+              <li><strong>SUID/SGID-приложения:</strong> аудит — права не должны позволять изменять содержимое; «белый» список SUID-приложений.</li>
+              <li><strong>Домашние директории:</strong> <code>chmod 700</code>; файлы истории и оболочки (<code>.bash_history</code>, <code>.bashrc</code>, <code>.profile</code>) — <code>chmod go-rwx</code>.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.4</span>
+              <span>Защита ядра Linux (8 параметров)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><code>kernel.dmesg_restrict=1</code> — журнал ядра доступен только пользователям с <code>CAP_SYSLOG</code>.</li>
+              <li><code>kernel.kptr_restrict=2</code> — ядерные адреса в <code>/proc</code> заменяются нулями.</li>
+              <li><code>init_on_alloc=1</code> (опция загрузки) — инициализация динамической памяти ядра нулём при выделении.</li>
+              <li><code>slab_nomerge</code> (опция загрузки) — запрет слияния кэшей slab-аллокатора.</li>
+              <li><code>iommu=force iommu.strict=1 iommu.passthrough=0</code> — инициализация IOMMU.</li>
+              <li><code>randomize_kstack_offset=1</code> — рандомизация ядерного стека.</li>
+              <li><code>mitigations=auto,nosmt</code> — защита от аппаратных уязвимостей CPU (x86).</li>
+              <li><code>net.core.bpf_jit_harden=2</code> — защита подсистемы eBPF JIT.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.5</span>
+              <span>Уменьшение периметра атаки ядра (11 пунктов)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><code>vsyscall=none</code> — отключить устаревший интерфейс vsyscall.</li>
+              <li><code>kernel.perf_event_paranoid=3</code> — ограничение доступа к событиям производительности.</li>
+              <li><code>debugfs=no-mount</code> — отключить монтирование debugfs.</li>
+              <li><code>kernel.kexec_load_disabled=1</code> — отключить системный вызов <code>kexec_load</code>.</li>
+              <li><code>user.max_user_namespaces=0</code> — ограничить user namespaces (если не используются).</li>
+              <li><code>kernel.unprivileged_bpf_disabled=1</code> — запрет <code>bpf</code> для непривилегированных.</li>
+              <li><code>vm.unprivileged_userfaultfd=0</code> — запрет <code>userfaultfd</code> для непривилегированных.</li>
+              <li><code>dev.tty.ldisc_autoload=0</code> — запрет автозагрузки модулей TTY ldisc.</li>
+              <li><code>tsx=off</code> (опция загрузки) — отключение Intel TSX.</li>
+              <li><code>vm.mmap_min_addr=4096</code> или больше — минимальный виртуальный адрес для mmap.</li>
+              <li><code>kernel.randomize_va_space=2</code> — полная рандомизация ASLR.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">2.6</span>
+              <span>Защита пользовательского пространства со стороны ядра (6 пунктов)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><code>kernel.yama.ptrace_scope=3</code> — запрет <code>ptrace</code> подключения к чужим процессам.</li>
+              <li><code>fs.protected_symlinks=1</code> — защита небезопасных вариантов symlink.</li>
+              <li><code>fs.protected_hardlinks=1</code> — защита небезопасных вариантов hardlink.</li>
+              <li><code>fs.protected_fifos=2</code> — защита от непреднамеренной записи в FIFO.</li>
+              <li><code>fs.protected_regular=2</code> — защита от непреднамеренной записи в файлы.</li>
+              <li><code>fs.suid_dumpable=0</code> — запрет создания core dump для SUID-файлов.</li>
+            </ul>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="callout success">
+        <p><strong>Это применимо везде.</strong> Все эти настройки — для базового Linux. Для Astra Linux 1.7/1.8 они также применимы (большинство уже включены в дистрибутив по умолчанию для соответствующего уровня защищённости), но с дополнительными уточнениями из специализированных документов ФСТЭК.</p>
+      </div>
+    </section>
+
+    <!-- 06. INSTALL -->
+    <section id="install" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> · Практика</div>
+      <h2>Безопасная установка Astra (по Модулю 11)</h2>
+      <p class="lead">Пошаговая практика установки Astra Linux в максимальном режиме защищённости («Смоленск»). Это упражнение из практического сборника Группы Астра, которое студенты выполняют на учебной виртуальной машине.</p>
+
+      <h3>Этап 1. Установка с учётом настроек безопасности</h3>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">1</div>
+          <h4>Образ и режим</h4>
+          <ul>
+            <li>ISO в графическом режиме (по умолчанию)</li>
+            <li>Выбор: максимальный режим защищённости («Смоленск»)</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">2</div>
+          <h4>Компоненты установки</h4>
+          <ul>
+            <li>Ядро ОС: <code>linux-6.1-generic</code></li>
+            <li>МРД (мандатное), МКЦ (целостности), пароль sudo, запрет ptrace — оставить включёнными</li>
+            <li>Прочее — после установки</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">3</div>
+          <h4>Профиль разметки</h4>
+          <ul>
+            <li>Разметить вручную</li>
+            <li>Отдельные разделы для <code>/boot/efi</code>, <code>/boot</code>, <code>/</code>, <code>/tmp</code>, <code>/var</code>, <code>/var/tmp</code>, <code>/parsec</code>, <code>/home</code></li>
+            <li><strong>Без swap-раздела</strong>; при необходимости — файл <code>/swap</code> ~ 1,5× ОП</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">4</div>
+          <h4>Пароли</h4>
+          <ul>
+            <li>Взломостойкий пароль администратора</li>
+            <li>Взломостойкий пароль на GRUB (снять отметку совпадения паролей)</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Рекомендуемая разметка диска (Модуль 11)</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Раздел</th>
+              <th>ФС / опции</th>
+              <th>Минимальный размер</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><code>/boot/efi</code></td><td>FAT32, ESP. <strong>Без ЗПД</strong>, не в LVM</td><td>не менее 512 MiB</td></tr>
+            <tr><td><code>/boot</code></td><td>ext2. <strong>Без ЗПД</strong>, не в LVM</td><td>не менее 512 MiB (предпочтительно 1 GiB)</td></tr>
+            <tr><td><code>/</code></td><td>ext4 (xfs). LVM, ЗПД (если <code>/boot</code> отдельно)</td><td>не менее 15 GiB при установке графики</td></tr>
+            <tr><td><code>/tmp</code></td><td>ext4 (xfs). LVM, ЗПД</td><td>не менее размера ОП</td></tr>
+            <tr><td><code>/var</code></td><td>ext4 (xfs). LVM, ЗПД</td><td>не менее 2 GiB</td></tr>
+            <tr><td><code>/var/tmp</code></td><td>ext4 (xfs). LVM, ЗПД</td><td>не менее 512 MiB</td></tr>
+            <tr><td><code>/parsec</code></td><td>ext4 (xfs). LVM, ЗПД</td><td>не менее 512 MiB</td></tr>
+            <tr><td><code>/home</code></td><td>ext4 (xfs). LVM, ЗПД</td><td>по потребности</td></tr>
+            <tr><td><code>swap</code></td><td><strong>Раздел не рекомендуется</strong>; <strong>файл</strong> на ЗПД-корне — допустимо</td><td>при необходимости — файл <code>/swap</code> ~ 1,5× ОП. <em>Важно: swap-файл должен лежать на разделе с ЗПД (например, на <code>/</code> с включённым ЗПД), иначе содержимое памяти будет писаться на диск в открытом виде.</em></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 14.5px; color: var(--text-subtle);"><em>ЗПД — защитное преобразование данных (шифрование раздела на уровне Astra Linux по алгоритмам ГОСТ).</em></p>
+
+      <h3>Этап 2. Настройки после установки</h3>
+      <ol>
+        <li><strong>Применить параметры безопасности</strong> по «Руководству администратора по КСЗ, часть 1, п. 18.2».</li>
+        <li><strong>Удалить драйверы беспроводных устройств</strong> на сервере: <code>sudo rm -r /lib/modules/$(uname -r)/kernel/drivers/net/wireless</code>.</li>
+        <li><strong>Конфигурирование параметров ядра</strong> через <code>/etc/sysctl.d/99-sysctl.conf</code> (см. раздел 07 ниже — таблица 16 параметров).</li>
+        <li><strong>Применить рекомендованную конфигурацию</strong> — двумя способами на выбор:
+          <ul>
+            <li><strong>Вариант А.</strong> Настроить параметры по таблице 3.1 «Методических рекомендаций по безопасной настройке Astra Linux SE» (раздел 10 этой лекции).</li>
+            <li><strong>Вариант Б.</strong> Применить готовый профиль безопасности системы (тип профиля задаёт преподаватель).</li>
+          </ul>
+        </li>
+        <li><strong>Перезагрузить</strong> ОС.</li>
+        <li><strong>Проверить настройки подсистем КСЗ</strong> с помощью Монитора безопасности и Профиля системы.</li>
+        <li><strong>Тестирование СЗИ встроенными средствами:</strong> в каталоге <code>/usr/lib/parsec/tests/</code> расположены проверочные скрипты КСЗ (<code>secdelrm.sh</code>, тесты PARSEC и др.). Конкретный набор и команды запуска — по «Руководству по КСЗ. Часть 2».</li>
+      </ol>
+
+      <div class="callout">
+        <p><strong>Сборник Группы Астра.</strong> Подробный сценарий и пояснения к этому упражнению — в учебном сборнике Группы Астра «Сборник практических заданий с ответами. Модуль 11. Методические рекомендации по безопасной настройке ОС Astra Linux Special Edition» (редакция от 10.12.2024).</p>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Расширенная практика для слушателей.</strong> К лекции прилагается отдельный набор из трёх лабораторных работ нарастающей сложности (парольная политика → безопасный SSH → Apache hardening) с пошаговыми инструкциями и критериями зачёта. <a href="labs/index.html"><strong>Открыть лабораторные работы</strong></a> или см. блок-CTA в начале страницы.</p>
+      </div>
+    </section>
+
+    <!-- 07. SYSCTL -->
+    <section id="sysctl" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> · Параметры ядра</div>
+      <h2>Конфигурация ядра: 16 параметров (sysctl + опции загрузки)</h2>
+      <p class="lead">Эта таблица — практический минимум параметров безопасности ядра для Astra Linux в защищённом контуре, предписанный в Модуле 11 и в рекомендациях ФСТЭК России. <strong>Большинство — это sysctl-параметры</strong> (применяются через <code>/etc/sysctl.d/99-sysctl.conf</code> и <code>sysctl --system</code>); <strong>две позиции (№ 12 и № 13)</strong> — опции загрузки ядра (прописываются в <code>GRUB_CMDLINE_LINUX</code> файла <code>/etc/default/grub</code>, применяются через <code>update-grub</code> и перезагрузку).</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th style="width: 5%">№</th>
+              <th style="width: 45%">Что делает</th>
+              <th style="width: 50%">Параметр и значение</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="num">1</span></td>
+              <td>Отключение переадресации IP-пакетов (для узлов без маршрутизации)</td>
+              <td><code>net.ipv4.ip_forward=0</code><br><code>net.ipv6.conf.all.forwarding=0</code><br><code>net.ipv6.conf.default.forwarding=0</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">2</span></td>
+              <td>Отключение ICMP Redirect (выдача и приём)</td>
+              <td><code>net.ipv4.conf.all.accept_redirects=0</code><br><code>net.ipv4.conf.all.secure_redirects=0</code><br><code>net.ipv4.conf.all.send_redirects=0</code><br><code>net.ipv4.conf.default.accept_redirects=0</code><br><code>net.ipv4.conf.default.secure_redirects=0</code><br><code>net.ipv4.conf.default.send_redirects=0</code><br><code>net.ipv6.conf.all.accept_redirects=0</code><br><code>net.ipv6.conf.default.accept_redirects=0</code><br><code>net.ipv6.conf.all.accept_ra=0</code><br><code>net.ipv6.conf.default.accept_ra=0</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">3</span></td>
+              <td>Отключение IPv6 (если не используется)</td>
+              <td><code>net.ipv6.conf.all.disable_ipv6=1</code><br><code>net.ipv6.conf.default.disable_ipv6=1</code><br><code>net.ipv6.conf.lo.disable_ipv6=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">4</span></td>
+              <td>Защита небезопасных hardlink</td>
+              <td><code>fs.protected_hardlinks=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">5</span></td>
+              <td>Защита небезопасных symlink</td>
+              <td><code>fs.protected_symlinks=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">6</span></td>
+              <td>Запрет core dump для SUID-файлов</td>
+              <td><code>fs.suid_dumpable=0</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">7</span></td>
+              <td>Полный ASLR (защита от переполнений)</td>
+              <td><code>kernel.randomize_va_space=2</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">8</span></td>
+              <td>Фильтрация обратного пути (default)</td>
+              <td><code>net.ipv4.conf.default.rp_filter=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">9</span></td>
+              <td>Фильтрация обратного пути (все интерфейсы)</td>
+              <td><code>net.ipv4.conf.all.rp_filter=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">10</span></td>
+              <td>Ограничение доступа к журналу ядра</td>
+              <td><code>kernel.dmesg_restrict=1</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">11</span></td>
+              <td>Запрет ptrace к чужим процессам</td>
+              <td><code>kernel.yama.ptrace_scope=3</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">12</span></td>
+              <td>Инициализация ядерной памяти нулём</td>
+              <td><code>init_on_alloc=1</code><br><small style="color: var(--text-subtle)">опция загрузки ядра, не sysctl</small></td>
+            </tr>
+            <tr>
+              <td><span class="num">13</span></td>
+              <td>Защита от аппаратных уязвимостей CPU</td>
+              <td><code>mitigations=auto</code><br><small style="color: var(--text-subtle)">опция загрузки ядра</small></td>
+            </tr>
+            <tr>
+              <td><span class="num">14</span></td>
+              <td>Ограничение событий производительности</td>
+              <td><code>kernel.perf_event_paranoid=3</code><br><small style="color: var(--text-subtle)">3 — максимум для Debian-ядер (полный запрет непривилегированным)</small></td>
+            </tr>
+            <tr>
+              <td><span class="num">15</span></td>
+              <td>Запрет userfaultfd для непривилегированных</td>
+              <td><code>vm.unprivileged_userfaultfd=0</code></td>
+            </tr>
+            <tr>
+              <td><span class="num">16</span></td>
+              <td>Минимальный адрес для mmap (&gt; 4096)</td>
+              <td><code>vm.mmap_min_addr=65536</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Применение и проверка</h3>
+<pre class="code"><code><span class="cm"># 1) Внести параметры в файл</span>
+sudo nano /etc/sysctl.d/99-sysctl.conf
+
+<span class="cm"># 2) Применить без перезагрузки</span>
+sudo sysctl --system
+
+<span class="cm"># 3) Опции загрузки ядра — добавить в /etc/default/grub в GRUB_CMDLINE_LINUX</span>
+sudo nano /etc/default/grub
+sudo update-grub
+
+<span class="cm"># 4) Проверка применения</span>
+sudo sysctl kernel.yama.ptrace_scope
+sudo sysctl fs.protected_symlinks</code></pre>
+
+      <div class="callout warning">
+        <p><strong>Не рекомендуется в случае несимметричной маршрутизации.</strong> Параметры <code>rp_filter</code> (№ 8 и 9) могут заблокировать легитимный трафик в сетях с асимметричными маршрутами. Перед включением — протестировать в учебной сети.</p>
+      </div>
+    </section>
+
+    <!-- 08. SERVICES -->
+    <section id="services" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> · Сетевые службы</div>
+      <h2>Сетевые службы: SSH / Samba / Apache</h2>
+      <p class="lead">Раздел 2.4 рекомендаций ФСТЭК по Astra 1.7/1.8 — конфигурирование наиболее уязвимых системных служб. Здесь — конкретные параметры, которые превращают «голый» сервис в защищённую конфигурацию.</p>
+
+      <h3>SSH-сервер (<code>/etc/ssh/sshd_config</code>)</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th style="width: 50%">Что настроить</th><th>Параметр</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Сменить порт по умолчанию</td><td><code>Port &lt;номер&gt;</code></td></tr>
+            <tr><td>Запрет удалённого подключения root</td><td><code>PermitRootLogin no</code></td></tr>
+            <tr><td>Список разрешённых пользователей или групп</td><td><code>AllowUsers &lt;имя_пользователя 1&gt; ...</code><br><code>AllowGroups &lt;группа&gt;</code></td></tr>
+            <tr><td>Запрет SSH версии 1</td><td><em>в современных OpenSSH (≥7.6) поддержка SSHv1 удалена; директива <code>Protocol 2</code> устарела</em></td></tr>
+            <tr><td>Тайм-аут подключения</td><td><code>ServerAliveInterval 15</code><br><code>ServerAliveCountMax 1</code></td></tr>
+            <tr><td>Ограничение одновременных подключений</td><td><code>MaxSessions &lt;N&gt;</code><br><code>MaxStartups &lt;N&gt;</code></td></tr>
+            <tr><td>Аутентификация только по ключам</td><td><code>PasswordAuthentication no</code><br><code>PubkeyAuthentication yes</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Samba (<code>/etc/samba/smb.conf</code>)</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th style="width: 50%">Что настроить</th><th>Параметр</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Отключение гостевой учётной записи</td><td><code>guest ok = no</code></td></tr>
+            <tr><td>Отключение доступа для root</td><td><code>invalid users = root</code></td></tr>
+            <tr><td>Запрет подключения по SMB с произвольных IP</td><td><code>hosts allow = &lt;IP&gt;, 127.0.0.1</code></td></tr>
+            <tr><td>Ограничение совместного доступа к файлам</td><td><code>[share]<br>valid users = &lt;имя_пользователя1&gt;</code></td></tr>
+            <tr><td>Запрет совместного доступа к принтеру</td><td><code>load printers = no</code><br><code>printing = bsd</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Apache 2 (<code>/etc/apache2/apache2.conf</code>)</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th style="width: 50%">Что настроить</th><th>Параметр</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Скрыть версию Apache при сетевых запросах</td><td><code>ServerTokens Prod</code><br><code>ServerSignature Off</code></td></tr>
+            <tr><td>Запуск Apache от специального пользователя</td><td><code>User ${APACHE_RUN_USER}</code></td></tr>
+            <tr><td>Выключить просмотр директорий</td><td><code>Options -Indexes</code></td></tr>
+            <tr><td>Запретить персистентные соединения</td><td><code>KeepAlive Off</code></td></tr>
+            <tr><td>Тайм-аут не более 45 сек</td><td><code>Timeout 45</code></td></tr>
+            <tr><td>Ограничение запросов с передачей данных</td><td><code>LimitXMLRequestBody 10485760</code></td></tr>
+            <tr><td>Включение обязательной аутентификации</td><td><code>AuthType Basic</code><br><code>Require valid-user</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <p><strong>Astra-специфика для Apache.</strong> В Astra Linux у Apache есть отдельный режим <code>AstraMode</code> (включён по умолчанию). Для отключения мандатных меток в веб-сервере — <code>AstraMode off</code> в файле <code>/etc/apache2/apache2.conf</code> (см. практику в Модуле 9).</p>
+      </div>
+    </section>
+
+    <!-- 09. CHANGES -->
+    <section id="changes" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> · Сравнение версий</div>
+      <h2>Что изменилось в Astra 1.8 относительно 1.7</h2>
+      <p class="lead">Документ ФСТЭК по Astra 1.8 в несколько раз объёмнее аналогичного по 1.7. Это отражает не «новые требования», а более детальную проработку мер защиты с явной привязкой к мерам ФСТЭК (ОПС, ЗИС, РСБ).</p>
+
+      <h3>Ключевые отличия</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Аспект</th>
+              <th>Astra 1.7</th>
+              <th>Astra 1.8</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Объём рекомендаций ФСТЭК</td><td>~50 страниц</td><td>~150 страниц</td></tr>
+            <tr><td>Детализация раздела «Применение конфигураций»</td><td>Раздел 3 — общие подходы</td><td>Раздел 3 — <strong>17 конкретных мер</strong> с привязкой к ОПС/ЗИС</td></tr>
+            <tr><td>Очистка памяти</td><td>Контекстно</td><td>Раздел 4 — <strong>отдельные требования</strong> (ЗИС.21)</td></tr>
+            <tr><td>Аудит</td><td>Контекстно</td><td>Раздел 5 — <strong>8 настроек подсистемы аудита</strong> (РСБ.3, РСБ.4)</td></tr>
+            <tr><td>Привязка к мерам ФСТЭК</td><td>Неявная</td><td><strong>Явные коды мер</strong> в каждой настройке</td></tr>
+            <tr><td>Версия ядра</td><td>linux-5.15-generic</td><td><strong>linux-6.1-generic</strong></td></tr>
+            <tr><td>Поддержка по сертификату ФСТЭК</td><td>Сертификат №&nbsp;2557 <strong>продлён</strong>; производство завершено 27.01.2026</td><td>Действующая, для новых проектов</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Что осталось общим</h3>
+      <ul>
+        <li>Структура документа (5 разделов: среда → установка → применение → очистка → аудит).</li>
+        <li>Три уровня защищённости (Базовый «Орёл» / Усиленный «Воронеж» / Максимальный «Смоленск»).</li>
+        <li>Общие принципы настройки сетевых служб (SSH, Samba, Apache).</li>
+        <li>Большая часть sysctl-параметров (раздел 2.5).</li>
+      </ul>
+
+      <div class="callout success">
+        <p><strong>Стратегия миграции.</strong> Если у вас эксплуатируется Astra 1.7 — вся настройка «по бумаге» переносится на 1.8 практически без изменений; добавляются явные меры из раздела 3 нового документа и более строгие требования к аудиту (раздел 5).</p>
+      </div>
+    </section>
+
+    <!-- 10. MEASURES -->
+    <section id="measures" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> · Меры защиты</div>
+      <h2>Меры защиты ОПС / ЗИС в Astra 1.8</h2>
+      <p class="lead">Раздел 3 рекомендаций ФСТЭК по Astra 1.8 — 17 конкретных мер защиты, каждая привязана к коду меры ФСТЭК (<strong>ОПС</strong> — ограничение программной среды; <strong>ЗИС</strong> — защита информационной системы; <strong>ОПС.1, ОПС.2, ЗИС.18, ЗИС.22, РСБ.3, РСБ.4</strong> и др.).</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.1 / ОПС.3</span>
+              <span>Права на установку ПО в информационной системе</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Установка ПО в информационной системе должна выполняться только администратором; непривилегированные пользователи не имеют возможности устанавливать произвольное ПО в системе.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.2 / ОПС.1</span>
+              <span>Включение замкнутой программной среды (ЗПС)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Замкнутая программная среда — режим, в котором можно запускать только разрешённые исполняемые файлы. В Astra Linux включается через <code>astra-modeswitch</code> и связанные подсистемы. Список путей и режим работы определяются политикой защиты.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.5–3.6 / ЗИС.22</span>
+              <span>Установка и настройка средств защиты от НСД</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Установка дополнительных средств защиты информации (антивирусы, межсетевые экраны узлового уровня и др.), их настройка с учётом эксплуатационной документации и требований к классу защищённости.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.10 / ЗИС.18</span>
+              <span>Управление носителями информации</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Контроль монтирования внешних носителей, шифрование закрытых разделов на дисках, ограничение использования USB-устройств, очистка носителей после использования.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.12–3.13 / ОПС.1</span>
+              <span>Блокировка интерпретаторов (включая bash)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Блокировка интерпретаторов (включая <code>bash</code>) для непривилегированных пользователей в условиях замкнутой программной среды. Цель — предотвратить выполнение произвольного скрипта через интерпретатор, обходя ЗПС.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.14–3.15 / ОПС.1</span>
+              <span>Применение мандатного контроля целостности (МКЦ)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Включение и настройка мандатного контроля целостности — механизма Astra Linux, ограничивающего модификацию системных файлов даже привилегированными пользователями. Уровни целостности задаются политикой; нарушение целостности фиксируется в аудите.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">3.16–3.17 / ОПС.1, ОПС.2</span>
+              <span>Применение мандатного разграничения доступа (МРД)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Включение и настройка мандатного разграничения доступа (МРД) — механизма Astra Linux для работы с грифованной информацией. Уровни секретности и целостности задаются для пользователей, файлов, процессов; запрещается перенос данных между уровнями.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">4.1–4.2 / ЗИС.21</span>
+              <span>Очистка памяти и носителей информации</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Включение механизма очистки оперативной памяти при освобождении (защита от утечек после завершения процессов) и принудительная очистка дисковых разделов перед списанием носителей.</p>
+          </div>
+        </details>
+
+      </div>
+
+      <p>Раздел 3 содержит 17 мер; раздел 4 — 2 меры (очистка памяти); раздел 5 — 8+ настроек подсистемы аудита (см. секцию 11 этой лекции). Для полного списка с пошаговыми указаниями — обращайтесь к оригинальному документу ФСТЭК по Astra Linux 1.8.</p>
+    </section>
+
+    <!-- 11. AUDIT -->
+    <section id="audit" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> · Аудит</div>
+      <h2>Аудит и контроль (раздел 5 Astra 1.8)</h2>
+      <p class="lead">Аудит — это «глаза» защищённой системы. Без правильно настроенного аудита нельзя установить факт компрометации, обнаружить инсайдера или подтвердить соответствие требованиям. Раздел 5 рекомендаций ФСТЭК по Astra 1.8 содержит 8+ настроек, привязанных к мерам РСБ.3 и РСБ.4.</p>
+
+      <h3>Меры подсистемы регистрации событий безопасности (РСБ)</h3>
+      <ul class="checklist">
+        <li><strong>5.1 — Включение подсистемы аудита</strong> (РСБ.3). Запуск службы <code>auditd</code>, проверка статуса.</li>
+        <li><strong>5.2 — Включение событий по умолчанию</strong>. Настройка набора правил <code>auditctl</code> для типовых событий.</li>
+        <li><strong>5.3 — Производительность</strong>. Подсистема аудита может оказывать существенное влияние; оценка нагрузки и оптимизация.</li>
+        <li><strong>5.4–5.5 — Настройка правил аудита</strong> (РСБ.3). Определение, какие события системы регистрируются (вход/выход, изменение настроек, доступ к чувствительным файлам).</li>
+        <li><strong>5.6 — Управление журналами</strong>. Параметры <code>max_log_file</code>, <code>max_log_file_action</code>, ротация.</li>
+        <li><strong>5.7 — Дополнительные настройки регистрации</strong> (РСБ.3).</li>
+        <li><strong>5.8 — Контроль и анализ событий</strong> (РСБ.4). Регулярный просмотр и анализ журналов.</li>
+      </ul>
+
+      <h3>Что проверять регулярно</h3>
+      <ol>
+        <li><strong>Целостность журналов</strong> — журналы аудита защищены от модификации.</li>
+        <li><strong>Сроки хранения</strong> — соответствуют политике (типично 1 год).</li>
+        <li><strong>Размер свободного места</strong> для журналов — не доходит до критической отметки.</li>
+        <li><strong>События привилегированных пользователей</strong> — все действия root и sudo фиксируются.</li>
+        <li><strong>События подсистем безопасности</strong> — изменения МРД, МКЦ, ЗПС.</li>
+        <li><strong>Ошибки и аварийные ситуации</strong> — отдельный мониторинг неудачных аутентификаций, попыток повышения привилегий.</li>
+      </ol>
+
+      <div class="callout">
+        <p><strong>Монитор безопасности и Профиль системы.</strong> В Astra Linux включены штатные графические инструменты для контроля состояния подсистем КСЗ. Они показывают, какие защитные функции активны, а какие — отключены. Использование этих инструментов — обязательная часть работы администратора защищённой системы.</p>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Аудит уровня «Смоленск» — не ограничивается <code>auditd</code>.</strong> В режиме максимальной защищённости Astra Linux фиксирует события КСЗ — мандатного разграничения доступа (МРД), мандатного контроля целостности (МКЦ), замкнутой программной среды (ЗПС) — через собственные подсистемы PARSEC, отдельные от стандартного Linux Audit. Эти журналы защищены механизмами целостности самого КСЗ. При планировании аудита для «Смоленска» учитывайте оба канала: стандартный <code>auditd</code> (системные события) + PARSEC-аудит КСЗ (события защитных подсистем). Конкретные команды и пути — в «Руководстве по КСЗ. Часть 2».</p>
+      </div>
+    </section>
+
+    <!-- 12. WORKSTATION -->
+    <section id="workstation" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> · Сценарий</div>
+      <h2>Сценарий: настройка АРМ пользователя</h2>
+      <p class="lead">АРМ (автоматизированное рабочее место) пользователя — самый массовый объект развёртывания Astra Linux. Здесь — типовой чек-лист настройки одного АРМ с нуля для работы в защищённом контуре.</p>
+
+      <h3>Чек-лист настройки АРМ (15 пунктов)</h3>
+      <ul class="checklist">
+        <li>Уровень защищённости выбран на установке: <strong>«Воронеж»</strong> для большинства АРМ; <strong>«Смоленск»</strong> — если работа с гостайной.</li>
+        <li>Установлен сертифицированный СДЗ или включён Secure Boot.</li>
+        <li>Задан пароль на BIOS/UEFI; отключена загрузка с внешних носителей.</li>
+        <li>Задан взломостойкий пароль на GRUB.</li>
+        <li>Разметка диска — по рекомендациям Модуля 11 (отдельные разделы <code>/tmp</code>, <code>/var</code>, <code>/parsec</code>, <code>/home</code>; LVM + ЗПД).</li>
+        <li>Удалены драйверы беспроводных устройств (если беспроводная сеть не требуется).</li>
+        <li>Применены 16 параметров безопасности ядра — sysctl + опции загрузки GRUB (см. раздел 07).</li>
+        <li>Опции загрузки ядра прописаны в GRUB: <code>init_on_alloc=1</code>, <code>mitigations=auto</code>, <code>slab_nomerge</code>.</li>
+        <li>Отключены неиспользуемые сервисы (Bluetooth, Avahi, CUPS если нет принтера и т.д.).</li>
+        <li>Включён Монитор безопасности; настроены контрольные срабатывания.</li>
+        <li>МРД и МКЦ включены и настроены под политику предприятия.</li>
+        <li>Замкнутая программная среда (ЗПС) включена; интерпретаторы заблокированы для непривилегированных.</li>
+        <li>Подсистема аудита (auditd) запущена; правила аудита настроены под нужный профиль.</li>
+        <li>Установлен сертифицированный антивирус (если требуется по классу системы).</li>
+        <li>Регулярные проверки: <code>/usr/lib/parsec/tests/run.sh -v</code>, контроль журналов.</li>
+      </ul>
+
+      <h3>Особенности для ноутбуков и мобильных АРМ</h3>
+      <ul>
+        <li>Шифрование <strong>всех</strong> разделов с данными — обязательно (ЗПД на уровне Astra или LUKS).</li>
+        <li>Дополнительный пароль на ввод/вывод из спящего режима.</li>
+        <li>Запрет работы с внешними беспроводными сетями (если требуется политикой).</li>
+        <li>Контроль попадания за пределы охраняемой зоны (отдельные средства защиты).</li>
+      </ul>
+    </section>
+
+    <!-- 13. SERVER -->
+    <section id="server" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> · Сценарий</div>
+      <h2>Сценарий: настройка сервера</h2>
+      <p class="lead">Сервер на Astra Linux чаще всего обслуживает другие защищённые узлы или предоставляет ресурсы пользователям. Hardening здесь идёт глубже, чем для АРМ — особое внимание сетевым службам и журналам аудита.</p>
+
+      <h3>Чек-лист настройки сервера (18 пунктов)</h3>
+      <ul class="checklist">
+        <li>Уровень защищённости — <strong>«Воронеж»</strong> минимум; для сервера с гостайной — <strong>«Смоленск»</strong>.</li>
+        <li>Физическая защита: серверная с контролем доступа, опечатывание корпуса.</li>
+        <li>Доверенная загрузка (СДЗ) обязательно.</li>
+        <li>Только проводное сетевое подключение; беспроводные драйверы удалены.</li>
+        <li>Все 16 параметров безопасности ядра (sysctl + GRUB) применены, в том числе сетевые: <code>rp_filter</code>, отключение ICMP redirect, отключение IPv6 если не используется.</li>
+        <li>SSH настроен по образцу: смена порта, <code>PermitRootLogin no</code>, аутентификация по ключам, <code>AllowUsers</code> со списком, тайм-ауты.</li>
+        <li>Если используется Samba — настройки по образцу: <code>guest ok = no</code>, <code>invalid users = root</code>, <code>hosts allow</code> со списком.</li>
+        <li>Если используется Apache — <code>AstraMode off</code> при необходимости, <code>ServerTokens Prod</code>, <code>Options -Indexes</code>, тайм-аут 45 сек.</li>
+        <li>Межсетевой экран (узловой) включён; политика <strong>deny by default</strong>.</li>
+        <li>Все ненужные сетевые службы отключены — проверка через <code>ss -tlnp</code>.</li>
+        <li>Включена и настроена подсистема аудита: <code>auditd</code>, правила под нужный профиль.</li>
+        <li>Журналы аудита направляются на отдельный сервер (centralized logging).</li>
+        <li>МРД, МКЦ, ЗПС включены и настроены под роль сервера.</li>
+        <li>Сертификаты (TLS/SSL) выпущены доверенным УЦ; самоподписанные — только для тестов.</li>
+        <li>Резервное копирование настроено; копии шифруются и хранятся отдельно.</li>
+        <li>Регулярные обновления через сертифицированный канал.</li>
+        <li>План реагирования на инциденты — отработан, контактные лица назначены.</li>
+        <li>Документация на сервер — заполнена, согласована, актуальна.</li>
+      </ul>
+
+      <h3>Типовые серверные роли — что добавить</h3>
+      <div class="three-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            </div>
+            <div>
+              <h3>Web-сервер</h3>
+              <span class="col-en">Apache 2 / nginx</span>
+            </div>
+          </div>
+          <p>Apache: <code>AstraMode off</code> при работе через прокси; настройки из табл. в разделе 08; обязательный TLS; защита от типовых атак (mod_security или аналоги).</p>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div>
+              <h3>Файловый сервер</h3>
+              <span class="col-en">Samba / NFS</span>
+            </div>
+          </div>
+          <p>Samba: настройки из табл. в разделе 08; шифрование SMB-трафика; контроль гостевого доступа; интеграция с FreeIPA/AD.</p>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            </div>
+            <div>
+              <h3>Контроллер домена</h3>
+              <span class="col-en">FreeIPA / Samba AD</span>
+            </div>
+          </div>
+          <p>Защита Kerberos-ключей, репликация в безопасном канале, ограничение административных учётных записей, аудит изменений политик безопасности.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Особое внимание.</strong> Сервер — это точка доверия для множества клиентов. Любая ошибка в hardening сервера превращается в массовый риск. До ввода в эксплуатацию — обязательная проверка всех 18 пунктов чек-листа и пентест в учебной сети.</p>
+      </div>
+    </section>
+
+    <!-- 14. CASES -->
+    <section id="cases" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> · Найди недочёт</div>
+      <h2>Найди недочёт: 6 кейсов из практики</h2>
+      <p class="lead">Шесть фрагментов реальных конфигураций или вывода команд. В каждом есть нарушение рекомендаций ФСТЭК или явный недочёт hardening. Прочитайте, попробуйте найти проблему сами, потом раскройте подсказку.</p>
+
+      <div class="bug-cases">
+
+        <!-- Case 1 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">1</span> Дамп файла /etc/shadow</div>
+            <span class="bug-case-lang">filesystem · права</span>
+          </div>
+          <div class="bug-case-desc">Эксперт зашёл на сервер под учётной записью обычного пользователя и проверил права на ключевые файлы:</div>
+<pre class="code"><code>$ ls -la /etc/shadow
+<span class="hl-bad">-rw-r--r--</span> 1 root shadow 1825 апр 12 14:32 /etc/shadow
+
+$ cat /etc/shadow
+root:$6$abc.../...:19821:0:99999:7:::
+postgres:$6$xyz.../...:19805:0:99999:7:::
+sa:$6$qwe.../...:19815:0:99999:7:::</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">2.3.1</span> <strong>Хеши паролей доступны на чтение всем пользователям системы.</strong> По требованиям п. 2.3.1 рекомендаций ФСТЭК для Linux 2022 на файл <code>/etc/shadow</code> должно быть <code>chmod go-rwx</code>. Сейчас права <code>644</code> — это значит, что любой пользователь может прочитать хеши паролей и попытаться подобрать их офлайн (hashcat / John the Ripper). Команда исправления: <code>sudo chmod go-rwx /etc/shadow</code> (станет <code>600</code>).
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 2 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">2</span> Конфигурация SSH</div>
+            <span class="bug-case-lang">/etc/ssh/sshd_config</span>
+          </div>
+          <div class="bug-case-desc">Содержимое файла настроек SSH-сервера на боевом узле:</div>
+<pre class="code"><code><span class="cm">#       $OpenBSD: sshd_config,v 1.103 2018/04/09 20:41:22 tj Exp $</span>
+Port 22
+<span class="hl-bad">PermitRootLogin yes</span>
+<span class="hl-bad">PasswordAuthentication yes</span>
+PubkeyAuthentication yes
+ChallengeResponseAuthentication no
+UsePAM yes
+X11Forwarding yes
+PrintMotd no
+AcceptEnv LANG LC_*</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">2.1.2</span> <strong>Разрешён SSH-вход root и парольная аутентификация.</strong> Прямое нарушение п. 2.1.2 ФСТЭК — необходимо <code>PermitRootLogin no</code>. Кроме того, не отключена парольная аутентификация (<code>PasswordAuthentication yes</code>) — это делает систему уязвимой к брутфорсу. Дополнительно: порт по умолчанию (22) не сменён, не указан <code>AllowUsers</code>. Минимальный fix: <code>PermitRootLogin no</code>, <code>PasswordAuthentication no</code>, <code>AllowUsers sa</code>, <code>Port &lt;нестандартный&gt;</code>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 3 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">3</span> Параметры ядра</div>
+            <span class="bug-case-lang">sysctl · ядро</span>
+          </div>
+          <div class="bug-case-desc">Администратор настроил sysctl, эксперт проверяет реальные значения:</div>
+<pre class="code"><code>$ sudo sysctl -a 2&gt;/dev/null | grep -E "ptrace_scope|dmesg_restrict|kptr_restrict|randomize_va_space"
+<span class="hl-bad">kernel.dmesg_restrict = 0</span>
+<span class="hl-bad">kernel.kptr_restrict = 0</span>
+<span class="hl-bad">kernel.randomize_va_space = 0</span>
+<span class="hl-bad">kernel.yama.ptrace_scope = 0</span></code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">2.4 / 2.5 / 2.6</span> <strong>Все четыре параметра защиты ядра выключены.</strong> Это «дефолт»: журнал ядра доступен всем, ядерные адреса в <code>/proc</code> видны (помогает разработке эксплоитов), ASLR полностью отключён (атаки на переполнение буфера тривиальны), <code>ptrace</code> разрешён ко всем процессам (отладочные средства как канал НСД). Минимальный fix согласно ФСТЭК: <code>kernel.dmesg_restrict=1</code>, <code>kernel.kptr_restrict=2</code>, <code>kernel.randomize_va_space=2</code>, <code>kernel.yama.ptrace_scope=3</code>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 4 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">4</span> Cron-задание</div>
+            <span class="bug-case-lang">cron · права</span>
+          </div>
+          <div class="bug-case-desc">Эксперт проверяет права на скрипты, запускаемые из cron от root:</div>
+<pre class="code"><code>$ cat /etc/crontab
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+* */6 * * *  root  /opt/backups/run-backup.sh
+
+$ ls -la /opt/backups/run-backup.sh
+<span class="hl-bad">-rwxrwxrwx</span> 1 root root 1832 фев  5 09:14 /opt/backups/run-backup.sh
+
+$ ls -ld /opt/backups
+<span class="hl-bad">drwxrwxrwx</span> 2 root root 4096 фев  5 09:14 /opt/backups</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">2.3.3</span> <strong>Полная компрометация системы через cron.</strong> Любой пользователь может перезаписать <code>/opt/backups/run-backup.sh</code> (права <code>777</code>) или просто заменить файл целиком (директория <code>/opt/backups</code> тоже <code>777</code>). Через 6 часов cron запустит подменённый скрипт от имени <strong>root</strong> — это полная компрометация ОС. Fix согласно п. 2.3.3 ФСТЭК: <code>chmod go-w /opt/backups/run-backup.sh</code> и <code>chmod go-w /opt/backups</code>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 5 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">5</span> Беспроводная сеть на сервере</div>
+            <span class="bug-case-lang">сервер · сеть</span>
+          </div>
+          <div class="bug-case-desc">Сервер для обработки гостайны в защищённом контуре. Вывод команды:</div>
+<pre class="code"><code>$ ls /lib/modules/$(uname -r)/kernel/drivers/net/wireless/
+ath/        broadcom/   intersil/   marvell/    rsi/
+ath10k/     <span class="hl-bad">cisco/</span>     iwlwifi/    mediatek/   rt2x00/
+ath11k/     <span class="hl-bad">intel/</span>     iwldvm/     <span class="hl-bad">realtek/</span>    rtl818x/
+ath6kl/     <span class="hl-bad">intersil/</span> iwlmvm/     <span class="hl-bad">ti/</span>         rtw88/
+
+$ lsmod | grep -E "iwl|ath|wlan|wireless"
+<span class="hl-bad">iwlwifi              368640  1 iwlmvm</span>
+<span class="hl-bad">cfg80211             946176  3 iwlmvm,iwlwifi</span></code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">Модуль 11, шаг 2</span> <strong>На сервере для гостайны не удалены драйверы беспроводных устройств.</strong> Драйвер <code>iwlwifi</code> загружен — это значит, что физически вставленная в сервер беспроводная карта Intel будет автоматически работать, и любой, кто получит физический доступ к серверной, может настроить с него точку доступа Wi-Fi (или подключить к скрытой). Для сервера в защищённом контуре беспроводных интерфейсов быть не должно. Fix Модуля 11 — <code>sudo rm -r /lib/modules/$(uname -r)/kernel/drivers/net/wireless</code> + перезагрузка. <strong>Дополнительно</strong> (для устойчивости к обновлениям ядра): удалить пакеты <code>linux-modules-extra-*</code>, <code>firmware-iwlwifi</code>, <code>firmware-realtek</code> и добавить в <code>/etc/modprobe.d/blacklist-wireless.conf</code> строки <code>blacklist iwlwifi</code>, <code>blacklist cfg80211</code> — иначе после <code>apt upgrade</code> модули вернутся.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 6 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">6</span> SUID-приложения</div>
+            <span class="bug-case-lang">SUID · ядро / приложения</span>
+          </div>
+          <div class="bug-case-desc">Аудит SUID-приложений на пользовательском АРМ:</div>
+<pre class="code"><code>$ find / -perm -4000 -type f 2&gt;/dev/null
+/usr/bin/sudo
+/usr/bin/su
+/usr/bin/passwd
+/usr/bin/chsh
+/usr/bin/chfn
+/usr/bin/newgrp
+/usr/bin/gpasswd
+<span class="hl-bad">/usr/bin/python3.11</span>
+<span class="hl-bad">/opt/internal/admin-tool</span>
+<span class="hl-bad">/home/sa/scripts/check-system</span>
+
+$ ls -la /opt/internal/admin-tool
+<span class="hl-bad">-rwsr-xr-x</span> 1 root root 28456 май  3 11:24 /opt/internal/admin-tool</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">2.3.9</span> <strong>Три недопустимых SUID-приложения.</strong> <strong>(1)</strong> <code>/usr/bin/python3.11</code> с SUID — катастрофа: в штатной поставке Astra 1.8 (Python 3.11) и 1.7 (Python 3.7) интерпретатор <em>никогда</em> не имеет SUID-бита — это значит, что бит установлен вручную (ошибка администратора либо результат компрометации). Эксплуатация тривиальна: <code>python3 -c "import os; os.setuid(0); os.execvp('bash', ['bash'])"</code>. <strong>(2)</strong> <code>/opt/internal/admin-tool</code> — самописный SUID-бинарник, требует ручного аудита кода (риск инъекций, переполнений). <strong>(3)</strong> <code>/home/sa/scripts/check-system</code> в домашней директории пользователя с SUID root — типичный путь повышения привилегий. Fix согласно п. 2.3.9: <code>sudo chmod u-s</code> для каждого; «белый список» SUID-приложений зафиксировать документально.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <p><strong>Что объединяет все шесть кейсов.</strong> Все они — типовые недочёты hardening, которые встречаются в реальной практике у изготовителей и операторов защищённых систем. Каждый — нарушение конкретного пункта рекомендаций ФСТЭК России. Опросник в следующем разделе помогает систематически проверить, не повторили ли вы эти ошибки на своей системе.</p>
+      </div>
+    </section>
+
+    <!-- 15. CHECKLIST -->
+    <section id="checklist" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> · Чек-лист</div>
+      <h2>Чек-лист готовности: 30+ контрольных вопросов</h2>
+      <p class="lead">Финальный чек-лист — для самопроверки перед вводом системы в эксплуатацию или для эксперта при проведении аудита. Группа «нет» в любом разделе — это пробел, который нужно закрыть до выхода в эксплуатацию.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 1–5</span>
+              <span>Установка и среда функционирования</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol>
+              <li>Уровень защищённости (Орёл/Воронеж/Смоленск) выбран в соответствии с категорией обрабатываемой информации?</li>
+              <li>Доверенная загрузка обеспечена (СДЗ установлено или Secure Boot включён и настроен)?</li>
+              <li>BIOS/UEFI защищён паролем, загрузка с внешних носителей отключена?</li>
+              <li>GRUB защищён взломостойким паролем?</li>
+              <li>Разметка диска соответствует Модулю 11 (отдельные разделы, LVM, ЗПД для системных)?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 6–10</span>
+              <span>Авторизация и привилегии</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="6">
+              <li>Все учётные записи имеют пароль или явно заблокированы (нет пустых паролей в <code>/etc/shadow</code>)?</li>
+              <li>SSH вход root запрещён (<code>PermitRootLogin no</code>)?</li>
+              <li>Доступ к <code>su</code> ограничен через <code>pam_wheel.so</code>; список в группе <code>wheel</code> минимален?</li>
+              <li>Файл <code>/etc/sudoers</code> пересмотрен; список пользователей и команд для <code>sudo</code> минимален?</li>
+              <li>Парольная политика настроена (длина, срок действия, история, сложность)?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 11–17</span>
+              <span>Права доступа к файлам</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="11">
+              <li>Права на <code>/etc/passwd</code>, <code>/etc/group</code> — <code>644</code>; на <code>/etc/shadow</code> — <code>600</code> (или <code>go-rwx</code>)?</li>
+              <li>Права на исполняемые файлы запущенных процессов и их библиотеки — без записи для остальных (<code>go-w</code>)?</li>
+              <li>Права на cron-задачи (включая <code>/etc/crontab</code>, <code>/etc/cron.{d,hourly,...}</code>) — <code>go-wx</code>?</li>
+              <li>Права на стартовые скрипты <code>/etc/rc#.d</code> и <code>.service</code>-файлы — <code>o-w</code>?</li>
+              <li>Права на пользовательские файлы заданий cron — <code>go-w</code>?</li>
+              <li>Аудит SUID/SGID-приложений проведён; «белый» список зафиксирован?</li>
+              <li>Права на домашние директории — <code>700</code>; файлы оболочки (<code>.bashrc</code> и т.п.) — <code>go-rwx</code>?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 18–22</span>
+              <span>Параметры ядра (sysctl и опции загрузки)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="18">
+              <li>16 параметров безопасности ядра из таблицы Модуля 11 применены — sysctl-параметры через <code>/etc/sysctl.d/99-sysctl.conf</code>, опции загрузки через <code>/etc/default/grub</code>?</li>
+              <li>Опции загрузки ядра (<code>init_on_alloc=1</code>, <code>mitigations=auto</code>, <code>slab_nomerge</code>, <code>iommu=force</code>) прописаны в <code>/etc/default/grub</code>?</li>
+              <li>ASLR полностью включён (<code>kernel.randomize_va_space=2</code>)?</li>
+              <li>Защита от ptrace включена (<code>kernel.yama.ptrace_scope=3</code>)?</li>
+              <li>Журнал ядра ограничен (<code>kernel.dmesg_restrict=1</code>); ядерные адреса скрыты (<code>kernel.kptr_restrict=2</code>)?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 23–27</span>
+              <span>Сетевые службы и периметр</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="23">
+              <li>Драйверы беспроводных устройств удалены (для серверов и АРМ без Wi-Fi)?</li>
+              <li>Неиспользуемые сервисы отключены (Bluetooth, Avahi, CUPS если нет принтера, etc.)?</li>
+              <li>SSH настроен по чек-листу (см. раздел 08): порт, root запрет, ключи, AllowUsers, тайм-ауты?</li>
+              <li>Если используется Samba — настройки по образцу (guest off, root invalid, hosts allow)?</li>
+              <li>Если используется Apache — настройки по образцу (ServerTokens Prod, Options -Indexes, тайм-аут)?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 28–32</span>
+              <span>Подсистемы безопасности Astra и аудит</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="28">
+              <li>МРД (мандатное разграничение доступа) включён и настроен (для систем с грифованной информацией)?</li>
+              <li>МКЦ (мандатный контроль целостности) включён и настроен?</li>
+              <li>Замкнутая программная среда (ЗПС) включена; интерпретаторы (bash, python и др.) заблокированы для непривилегированных?</li>
+              <li>Подсистема аудита (auditd) запущена; правила настроены под профиль системы?</li>
+              <li>Журналы аудита защищены от модификации; срок хранения соответствует политике; выполняется регулярный анализ?</li>
+            </ol>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="callout success">
+        <p><strong>Как пользоваться чек-листом.</strong> Заполните все 32 пункта по принципу «да/нет». Каждое «нет» — задача, которую нужно закрыть до ввода системы в эксплуатацию. Прогон чек-листа повторяется при каждой существенной настройке (новый сервис, обновление ОС, смена конфигурации).</p>
+      </div>
+    </section>
+
+    <!-- 16. FAQ -->
+    <section id="faq" class="section">
+      <div class="section-eyebrow"><span class="section-num">16</span> · Вопросы</div>
+      <h2>Часто задаваемые вопросы</h2>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>Можно ли применить рекомендации ФСТЭК для Linux 2022 к Astra Linux?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Да, базовые рекомендации применимы к любому Linux, включая Astra. Но для сертифицированной Astra Linux <strong>основной документ — рекомендации ФСТЭК по соответствующей версии</strong> (1.7 или 1.8); они уточняют и дополняют общие требования. Кроме того, документация разработчика Astra (Руководство администратора КСЗ) содержит ещё более детальные указания по конкретным механизмам защиты.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>Что выбрать: Орёл, Воронеж или Смоленск?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Зависит от категории информации, обрабатываемой в системе:</p>
+            <ul>
+              <li><strong>Орёл (базовый)</strong> — только для систем с <strong>общедоступной информацией</strong> и учебных/тестовых стендов. В этом режиме нет МКЦ, ЗПС, мандатного управления — для ГИС/ИСПДн/ЗОКИИ требуется как минимум «Воронеж».</li>
+              <li><strong>Воронеж (усиленный)</strong> — универсальный выбор для информации ограниченного доступа (не гостайны).</li>
+              <li><strong>Смоленск (максимальный)</strong> — обязателен при обработке гостайны любой степени секретности.</li>
+            </ul>
+            <p>Сменить уровень после установки нельзя — нужна переустановка. Поэтому решение принимается заранее.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>Astra 1.7 уже не поддерживается. Что делать с эксплуатируемыми системами?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Производство Astra Linux 1.7 завершено 27 января 2026 года. При этом сертификат ФСТЭК России №&nbsp;2557 продлён — поддержка обновлений безопасности продолжается по графику разработчика. Для эксплуатируемых систем:</p>
+            <ul>
+              <li>Согласовать с регулятором (ФСТЭК России) план миграции на Astra 1.8.</li>
+              <li>До миграции — продолжать применение рекомендаций ФСТЭК по 1.7 в полном объёме.</li>
+              <li>Новые проекты разворачивать только на Astra 1.8.</li>
+              <li>Все механизмы защиты в 1.8 — преемственны с 1.7, миграция обычно не требует переучивания администраторов.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>16 параметров ядра — это всё, что нужно настроить?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Это <strong>практический минимум для учебной практики Модуля 11</strong>. Полный список параметров для разных уровней защищённости — в самих рекомендациях ФСТЭК и в документации Astra Linux. Кроме того, опции загрузки ядра (init_on_alloc, mitigations, slab_nomerge, iommu) задаются не через sysctl, а через GRUB — их тоже нужно учитывать.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>Что такое МРД, МКЦ, ЗПС, КСЗ?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ul>
+              <li><strong>МРД</strong> — мандатное разграничение доступа. Уровни секретности и категории информации задаются для пользователей и файлов; запрещается перенос данных «вверх» по иерархии.</li>
+              <li><strong>МКЦ</strong> — мандатный контроль целостности. Уровни целостности; ограничивает модификацию системных файлов даже привилегированными процессами.</li>
+              <li><strong>ЗПС</strong> — замкнутая программная среда. Только разрешённые исполняемые файлы могут быть запущены; защита от запуска неразрешённого ПО.</li>
+              <li><strong>КСЗ</strong> — комплекс средств защиты Astra Linux. Объединяет МРД, МКЦ, ЗПС и ряд других подсистем; настраивается как целое.</li>
+            </ul>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">FAQ</span>
+              <span>Как проверить, что hardening применён правильно?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Несколько уровней проверки:</p>
+            <ol>
+              <li><strong>Чек-лист готовности</strong> (раздел 15) — самопроверка по 32 пунктам.</li>
+              <li><strong>Монитор безопасности и Профиль системы</strong> в Astra — графические штатные инструменты.</li>
+              <li><strong>Встроенные тесты СЗИ:</strong> скрипты в <code>/usr/lib/parsec/tests/</code> (см. «Руководство по КСЗ. Часть 2» для конкретных команд).</li>
+              <li><strong>Проверка sysctl:</strong> <code>sudo sysctl -a | grep ...</code>.</li>
+              <li><strong>Аудит прав:</strong> <code>find / -perm -4000 -type f</code>, <code>find / -perm -2 ! -type l</code>.</li>
+              <li><strong>Пентест в учебной сети</strong> — лучший способ найти то, что прошло мимо чек-листа.</li>
+            </ol>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- CONTACTS / FOOTER -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам лекции, проведения курсов по безопасности ОС Astra Linux и Linux, консультаций по проведению hardening для конкретных проектов.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:pikov@yandex.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          pikov@yandex.ru
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Лекция · Astra Linux Hardening</span>
+        </div>
+        <div>
+          В основу лекции положены три согласованных документа ФСТЭК России: «Рекомендации по безопасной настройке операционных систем Linux» от 25.12.2022 и методические рекомендации по настройке Astra Linux Special Edition 1.7 и 1.8. Практические сценарии — по учебному сборнику Группы Астра «Сборник практических заданий с ответами. Модуль 11» (редакция от 10.12.2024).
+        </div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+
+  document.querySelectorAll('.bug-spoiler').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+      const answer = btn.parentElement.querySelector('.bug-answer');
+      if (answer) {
+        answer.classList.toggle('open');
+        btn.querySelector('svg').nextSibling.textContent = expanded ? ' Показать подсказку' : ' Скрыть подсказку';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

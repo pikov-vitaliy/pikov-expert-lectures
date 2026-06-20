@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>Архитектурный анализ. Формирование и предоставление ППК ФСТЭК России — лекция В.А. Пикова</title>
+<meta name="description" content="Авторская лекция по архитектурному анализу и формированию Перечня программных компонентов (ППК) для ФСТЭК России. Процессы №7 и №16 ГОСТ Р 56939-2024.">
+<meta name="author" content="Виталий Александрович Пиков">
+<link rel="canonical" href="https://ppk.pikov.expert/">
+<meta property="og:title" content="Архитектурный анализ. Формирование и предоставление ППК ФСТЭК России">
+<meta property="og:description" content="Авторская лекция В.А. Пикова: архитектурный анализ, поверхность атаки, КАПО, ППК / SBOM, нормативная база ФСТЭК России.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://ppk.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2270%22 text-anchor=%22middle%22 font-family=%22Segoe UI, sans-serif%22 font-size=%2238%22 font-weight=%22700%22 fill=%22white%22>ППК</text></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .reading-progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: transparent; z-index: 110; pointer-events: none;
+  }
+  .reading-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width 0.1s ease-out; }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container { display: flex; align-items: center; justify-content: space-between; height: 60px; }
+  .brand-back { display: inline-flex; align-items: center; gap: 10px; color: var(--text-muted); font-size: 14px; font-weight: 500; padding: 8px 14px; border-radius: 8px; transition: all 0.2s; }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn { background: transparent; border: 1px solid var(--border-strong); border-radius: 10px; padding: 8px; cursor: pointer; color: var(--text-muted); display: inline-flex; align-items: center; transition: all 0.2s; }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+  .toc-toggle { display: none; }
+
+  .layout {
+    max-width: 1280px; margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 260px 1fr; gap: 56px; align-items: start;
+  }
+
+  .toc {
+    position: sticky; top: 84px;
+    max-height: calc(100vh - 100px); overflow-y: auto;
+    padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border);
+    padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-subtle); margin-bottom: 14px; padding-left: 14px; }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex; align-items: baseline; gap: 10px;
+    padding: 7px 14px; border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13.5px; line-height: 1.4;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num { font-variant-numeric: tabular-nums; font-size: 11px; color: var(--text-subtle); font-weight: 600; flex-shrink: 0; }
+  .toc-list a.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); font-weight: 500; }
+  .toc-list a.active .toc-num { color: var(--accent); }
+  .toc-divider { height: 1px; background: var(--border); margin: 12px 14px; }
+  .toc-part { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-subtle); padding: 8px 14px 4px; }
+
+  .content { max-width: 760px; padding: 32px 0 80px; }
+
+  .hero { padding: 32px 0 56px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-eyebrow { display: inline-block; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); background: var(--accent-soft); padding: 6px 12px; border-radius: 6px; margin-bottom: 24px; }
+  .hero h1 {
+    font-size: clamp(30px, 4.6vw, 48px);
+    font-weight: 700; letter-spacing: -0.025em; line-height: 1.1; margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-lead { font-size: clamp(16px, 1.55vw, 19px); line-height: 1.55; color: var(--text-muted); margin-bottom: 36px; max-width: 700px; }
+  .hero-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; padding: 20px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-subtle); }
+  .hero-meta-value { font-size: 14.5px; color: var(--text); font-weight: 500; }
+
+  .section { padding: 56px 0 16px; scroll-margin-top: 80px; }
+  .section-eyebrow { display: flex; align-items: center; gap: 14px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 16px; }
+  .section-eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--accent); }
+  .section-num { font-variant-numeric: tabular-nums; }
+  .part-divider {
+    margin: 64px 0 24px;
+    padding: 24px 28px;
+    background: linear-gradient(135deg, var(--accent-soft), transparent);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    border-left: 4px solid var(--accent);
+  }
+  .part-divider .part-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; color: var(--accent); margin-bottom: 6px; }
+  .part-divider .part-title { font-size: 22px; font-weight: 700; letter-spacing: -0.015em; color: var(--text); margin-bottom: 8px; }
+  .part-divider .part-desc { font-size: 14.5px; color: var(--text-muted); line-height: 1.5; }
+  .section h2 { font-size: clamp(26px, 3.2vw, 36px); font-weight: 700; letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 20px; color: var(--text); }
+  .section h3 { font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.25; margin: 36px 0 14px; color: var(--text); }
+  .section h4 { font-size: 16px; font-weight: 600; letter-spacing: -0.005em; margin: 24px 0 10px; color: var(--text); }
+  .section p { font-size: 17px; line-height: 1.7; margin-bottom: 18px; color: var(--text); }
+  .section p.lead { font-size: 19px; line-height: 1.6; color: var(--text-muted); margin-bottom: 28px; }
+  .section ul, .section ol { margin: 16px 0 24px 0; padding-left: 24px; }
+  .section ul li, .section ol li { font-size: 17px; line-height: 1.65; margin-bottom: 10px; color: var(--text); }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+  .section :not(pre) > code, .ic { font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 0.88em; padding: 2px 6px; background: var(--surface-2); border: 1px solid var(--border); border-radius: 5px; color: var(--text); }
+
+  .callout { border-left: 3px solid var(--accent); background: var(--accent-softer); padding: 18px 22px; margin: 24px 0; border-radius: 0 10px 10px 0; }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+  table.data th, table.data td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.data th { font-weight: 600; color: var(--text-subtle); text-transform: uppercase; letter-spacing: 0.04em; font-size: 12px; background: var(--surface-2); }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  table.data .status-active { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: var(--success-soft); color: var(--success); white-space: nowrap; }
+  table.data .status-draft { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: 5px; background: var(--warning-soft); color: var(--warning); white-space: nowrap; }
+
+  pre.code { margin: 20px 0; padding: 18px 20px; background: var(--code-bg); border: 1px solid var(--code-border); border-radius: 10px; overflow-x: auto; font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 13.5px; line-height: 1.55; color: var(--text); }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+
+  .key-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; margin: 24px 0; }
+  .key-stat { padding: 16px 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  .key-stat-value { font-size: 22px; font-weight: 700; color: var(--accent); letter-spacing: -0.02em; line-height: 1.1; margin-bottom: 4px; font-variant-numeric: tabular-nums; }
+  .key-stat-label { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+
+  .technique-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 28px 0; }
+  .technique {
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    transition: all 0.2s;
+    display: flex; flex-direction: column;
+  }
+  .technique:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--shadow-md); }
+  .technique-num {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+    margin-bottom: 12px;
+  }
+  .technique h4 { font-size: 16px; margin: 0 0 8px; color: var(--text); }
+  .technique p { font-size: 14px !important; line-height: 1.55 !important; color: var(--text-muted); margin: 0 0 12px !important; flex: 1; }
+  .technique-tools { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+  .tool-tag {
+    font-size: 12px; font-weight: 500;
+    padding: 3px 9px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 5px;
+    color: var(--text-muted);
+    text-decoration: none;
+    transition: all 0.15s;
+  }
+  a.tool-tag:hover { color: var(--accent); border-color: var(--accent); background: var(--accent-soft); }
+
+  .arch-cases { display: flex; flex-direction: column; gap: 28px; margin: 28px 0; }
+  .arch-case {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .arch-case:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .arch-case-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 8px;
+  }
+  .arch-case-title { font-size: 15px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 10px; }
+  .arch-case-num { display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; border-radius: 6px; background: var(--accent); color: #ffffff; font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .arch-case-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-subtle); padding: 4px 10px; background: var(--surface-2); border-radius: 5px; }
+  .arch-case-scenario { padding: 16px 20px; font-size: 15px; line-height: 1.55; color: var(--text); border-bottom: 1px solid var(--border); }
+  .arch-options { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--border); }
+  .arch-opt { padding: 16px 20px; background: var(--bg); }
+  .arch-opt-label { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .arch-opt-label .opt-letter { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 5px; font-size: 13px; }
+  .arch-opt.bad .opt-letter { background: var(--danger-soft); color: var(--danger); }
+  .arch-opt.good .opt-letter { background: var(--success-soft); color: var(--success); }
+  .arch-opt.bad .arch-opt-label { color: var(--danger); }
+  .arch-opt.good .arch-opt-label { color: var(--success); }
+  .arch-opt pre.code { margin: 0; font-size: 12.5px; padding: 14px 16px; }
+  .arch-opt .opt-text { font-size: 14px; line-height: 1.55; color: var(--text); }
+  .arch-case-reveal { padding: 14px 20px; background: var(--surface); border-top: 1px solid var(--border); }
+  .arch-spoiler { border: none; background: transparent; color: var(--accent); font-family: inherit; font-size: 14.5px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; padding: 4px 0; transition: color 0.2s; }
+  .arch-spoiler:hover { color: var(--accent-strong); }
+  .arch-spoiler svg { width: 14px; height: 14px; transition: transform 0.2s; }
+  .arch-spoiler[aria-expanded="true"] svg { transform: rotate(90deg); }
+  .arch-answer { display: none; margin-top: 12px; padding: 14px 16px; background: var(--success-soft); border-left: 3px solid var(--success); border-radius: 0 8px 8px 0; font-size: 15px; line-height: 1.6; }
+  .arch-answer.open { display: block; animation: fadeSlide 0.3s ease-out; }
+  .arch-answer strong { color: var(--success); }
+  .arch-answer .gost-ref { display: inline-block; font-family: "SF Mono", Monaco, Consolas, monospace; font-size: 12.5px; font-weight: 600; padding: 2px 7px; background: var(--bg); border: 1px solid var(--border-strong); border-radius: 4px; color: var(--success); margin-right: 6px; }
+  @keyframes fadeSlide { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item { border: 1px solid var(--border); border-radius: 12px; background: var(--surface); overflow: hidden; }
+  .acc-summary { list-style: none; cursor: pointer; padding: 18px 22px; display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 16px; font-weight: 600; color: var(--text); transition: background 0.2s; user-select: none; }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left { display: flex; align-items: center; gap: 12px; }
+  .acc-tag { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; padding: 4px 8px; background: var(--accent-soft); color: var(--accent); border-radius: 5px; flex-shrink: 0; }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body { padding: 4px 22px 22px; border-top: 1px solid var(--border); margin-top: -1px; }
+  .acc-body p { font-size: 15.5px; line-height: 1.6; color: var(--text-muted); margin: 14px 0 0; }
+  .acc-body ul, .acc-body ol { margin: 14px 0 0; padding-left: 20px; }
+  .acc-body li { font-size: 15.5px; margin-bottom: 8px; line-height: 1.55; color: var(--text); }
+
+  .timeline-vert {
+    position: relative;
+    margin: 32px 0;
+    padding-left: 28px;
+    border-left: 2px solid var(--border);
+  }
+  .timeline-event { position: relative; padding-bottom: 24px; }
+  .timeline-event::before {
+    content: '';
+    position: absolute;
+    left: -34px; top: 6px;
+    width: 12px; height: 12px;
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 50%;
+  }
+  .timeline-event.draft::before { border-color: var(--warning); }
+  .timeline-date { font-size: 12px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 4px; text-transform: uppercase; }
+  .timeline-event.draft .timeline-date { color: var(--warning); }
+  .timeline-title { font-size: 15.5px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; color: var(--text); }
+  .timeline-desc { font-size: 14px; color: var(--text-muted); line-height: 1.5; }
+
+  .three-angles { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 28px 0; }
+  .angle { padding: 22px; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; }
+  .angle-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .angle-icon.dev { background: var(--accent-soft); color: var(--accent); }
+  .angle-icon.lab { background: var(--warning-soft); color: var(--warning); }
+  .angle-icon.reg { background: var(--success-soft); color: var(--success); }
+  .angle-icon svg { width: 20px; height: 20px; }
+  .angle h4 { font-size: 16px; margin: 0 0 10px; }
+  .angle p { font-size: 14px !important; line-height: 1.55 !important; color: var(--text-muted); margin: 0 !important; }
+
+  .props { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 24px 0; }
+  .prop { padding: 18px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+  .prop-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+  .prop-icon svg { width: 18px; height: 18px; }
+  .prop h4 { font-size: 15px; margin: 0 0 6px; }
+  .prop p { font-size: 13.5px !important; line-height: 1.5 !important; color: var(--text-muted); margin: 0 !important; }
+
+  .checklist { list-style: none !important; padding-left: 0 !important; margin: 16px 0 24px !important; }
+  .checklist li { position: relative; padding: 10px 0 10px 32px; font-size: 15.5px !important; line-height: 1.55 !important; border-bottom: 1px solid var(--border); margin-bottom: 0 !important; }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: ''; position: absolute; left: 0; top: 14px; width: 18px; height: 18px; border-radius: 50%; background: var(--success-soft); border: 1.5px solid var(--success); }
+  .checklist li::after { content: ''; position: absolute; left: 5px; top: 19px; width: 8px; height: 4px; border-left: 2px solid var(--success); border-bottom: 2px solid var(--success); transform: rotate(-45deg); }
+
+  .processes-block {
+    margin: 32px 0 8px;
+    padding: 22px 24px;
+    background: linear-gradient(135deg, var(--accent-soft), transparent);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 14px;
+  }
+  .processes-block-label {
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .processes-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+  }
+  .proc {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: border-color 0.2s;
+  }
+  .proc:hover { border-color: var(--accent); }
+  .proc-num {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px; height: 30px;
+    padding: 0 8px;
+    border-radius: 7px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .proc-text {
+    font-size: 13.5px;
+    line-height: 1.4;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .map-graph {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    margin: 28px 0;
+  }
+  .map-node {
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .map-node.center { background: var(--accent-soft); border-color: var(--accent); }
+  .map-node-tag { font-size: 11px; font-weight: 600; color: var(--accent); margin-bottom: 4px; letter-spacing: 0.04em; }
+  .map-node.center .map-node-tag { color: var(--accent-strong); }
+  .map-node-title { font-size: 13.5px; font-weight: 500; color: var(--text); line-height: 1.35; }
+
+  .content-footer { margin-top: 80px; padding: 56px 0 0; border-top: 1px solid var(--border); }
+  .content-footer h2 { font-size: clamp(26px, 3vw, 34px); font-weight: 700; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .content-footer p.lead { color: var(--text-muted); font-size: 17px; margin-bottom: 28px; }
+  .contact-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 20px; border-radius: 10px; font-size: 15px; font-weight: 500; transition: all 0.2s; border: 1px solid transparent; }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: var(--accent); color: #ffffff; box-shadow: var(--shadow-md); }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-subtle); line-height: 1.6; }
+  .attribution-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 10px; }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  .back-to-top { position: fixed; bottom: 24px; right: 24px; width: 44px; height: 44px; border-radius: 50%; background: var(--accent); color: #ffffff; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translateY(8px); transition: all 0.25s; z-index: 90; }
+  .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  @media (max-width: 1100px) { .layout { grid-template-columns: 220px 1fr; gap: 36px; } }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc { position: fixed; top: 60px; left: 0; right: 0; bottom: 0; background: var(--bg); border-right: none; border-bottom: 1px solid var(--border); padding: 20px 24px; transform: translateY(-100%); transition: transform 0.25s ease-out; z-index: 99; max-height: 100vh; overflow-y: auto; }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .arch-options { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .card, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats, .arch-options { grid-template-columns: 1fr; }
+    .hero-eyebrow { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .arch-answer { display: block !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#why" data-section="why"><span class="toc-num">01</span><span>Зачем эта лекция</span></a></li>
+      <li><a href="#fstek" data-section="fstek"><span class="toc-num">02</span><span>Требования ФСТЭК России</span></a></li>
+      <li><a href="#npb-map" data-section="npb-map"><span class="toc-num">03</span><span>Карта актуальной НПБ</span></a></li>
+      <div class="toc-part">Часть I · Архитектурный анализ</div>
+      <li><a href="#what-aa" data-section="what-aa"><span class="toc-num">04</span><span>Что такое архитектурный анализ</span></a></li>
+      <li><a href="#attack-surface" data-section="attack-surface"><span class="toc-num">05</span><span>Поверхность атаки и приоритизация</span></a></li>
+      <li><a href="#static-aa" data-section="static-aa"><span class="toc-num">06</span><span>Статический анализ — 6 техник</span></a></li>
+      <li><a href="#dynamic-aa" data-section="dynamic-aa"><span class="toc-num">07</span><span>Динамический анализ — 3 техники</span></a></li>
+      <li><a href="#containers" data-section="containers"><span class="toc-num">08</span><span>Контейнеры и Kubernetes</span></a></li>
+      <li><a href="#automation" data-section="automation"><span class="toc-num">09</span><span>Автоматизация анализа</span></a></li>
+      <li><a href="#cases" data-section="cases"><span class="toc-num">10</span><span>Найди архитектурную ошибку: 6 кейсов</span></a></li>
+      <div class="toc-part">Часть II · ППК и КАПО</div>
+      <li><a href="#kapo" data-section="kapo"><span class="toc-num">11</span><span>Композиционный анализ (КАПО)</span></a></li>
+      <li><a href="#ppk-sbom" data-section="ppk-sbom"><span class="toc-num">12</span><span>ППК и SBOM</span></a></li>
+      <li><a href="#ppk-form" data-section="ppk-form"><span class="toc-num">13</span><span>Формирование ППК</span></a></li>
+      <li><a href="#ppk-fstek" data-section="ppk-fstek"><span class="toc-num">14</span><span>Предоставление ППК ФСТЭК</span></a></li>
+      <li><a href="#kapo-problems" data-section="kapo-problems"><span class="toc-num">15</span><span>Проблематика КАПО</span></a></li>
+      <li><a href="#standards-map" data-section="standards-map"><span class="toc-num">16</span><span>Связь с другими стандартами</span></a></li>
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">17</span><span>Связь</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Авторская лекция · РБПО · полный день</span>
+      <h1>Архитектурный анализ. Формирование и предоставление ППК ФСТЭК России</h1>
+      <p class="hero-lead">Полный курс по практикам РБПО за пределами фаззинга и статического анализа кода: что входит в архитектурный анализ, как оценивать поверхность атаки, какие защитные опции компилятора и привилегии анализировать, как формировать Перечень программных компонентов и предоставлять его в ФСТЭК России.</p>
+
+      <div class="key-stats">
+        <div class="key-stat">
+          <div class="key-stat-value">17</div>
+          <div class="key-stat-label">разделов лекции</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">9</div>
+          <div class="key-stat-label">техник анализа</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">4</div>
+          <div class="key-stat-label">процесса РБПО ГОСТ 56939</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">10</div>
+          <div class="key-stat-label">нормативных документов</div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Преподаватель</span>
+          <span class="hero-meta-value">Пиков Виталий Александрович</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Раздел курса</span>
+          <span class="hero-meta-value">Безопасная разработка ПО (РБПО)</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Нормативная база</span>
+          <span class="hero-meta-value">ГОСТ Р 56939-2024, Методика ВУ и НДВ, Приказы ФСТЭК №76, №121, №240</span>
+        </div>
+      </div>
+
+      <div class="processes-block">
+        <div class="processes-block-label">Лекция охватывает 4 связанных процесса РБПО по ГОСТ Р 56939-2024</div>
+        <div class="processes-list">
+          <div class="proc">
+            <div class="proc-num">№6</div>
+            <div class="proc-text">Разработка, уточнение и анализ архитектуры программного обеспечения</div>
+          </div>
+          <div class="proc">
+            <div class="proc-num">№7</div>
+            <div class="proc-text">Моделирование угроз и разработка описания поверхности атаки</div>
+          </div>
+          <div class="proc">
+            <div class="proc-num">№16</div>
+            <div class="proc-text">Использование инструментов композиционного анализа</div>
+          </div>
+          <div class="proc">
+            <div class="proc-num">№17</div>
+            <div class="proc-text">Проверка кода на предмет внедрения вредоносного ПО через цепочки поставок</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- 01. WHY -->
+    <section id="why" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> · Мотивация</div>
+      <h2>Зачем эта лекция</h2>
+      <p class="lead">Современная разработка средств защиты информации в России проходит в условиях, когда «наложенные» средства защиты (NGFW, антивирусы, SOC) необходимы, но недостаточны. Безопасность должна быть встроена в продукт с этапа проектирования.</p>
+
+      <h3>Стратегия: технологическая независимость + доверенность</h3>
+      <p>Президентом РФ поставлена задача достижения технологической независимости. Импортозамещение — лишь первый шаг. На уровне разработки СЗИ критически важны:</p>
+      <ul>
+        <li><strong>Суверенизация критических разработок</strong> с одновременным усилением позиций в мировом OpenSource.</li>
+        <li><strong>Разработка систем в парадигме доверенности</strong> как базового принципа.</li>
+      </ul>
+
+      <h3>Системный подход на практике</h3>
+      <ul>
+        <li><strong>Secure by Design</strong> — проектирование и разработка приложений в парадигме безопасной разработки.</li>
+        <li><strong>Школа продуктовой безопасности</strong> — формирование инженерной и образовательной культуры.</li>
+        <li><strong>Центры компетенций</strong> — объединение усилий по углублённому анализу критических компонентов.</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Почему «архитектурный анализ»?</strong> Исторически название связано с развитием курсов ФСТЭК России на базе ИСП РАН по практикам РБПО и наименованиями разделов Методики ВУ и НДВ. Всё то, что не «фаззинг и сценарное/модульное тестирование» и не «статический анализ кода», было объединено в курс с таким названием.</p>
+      </div>
+    </section>
+
+    <!-- 02. FSTEK REQUIREMENTS -->
+    <section id="fstek" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> · Регулирование</div>
+      <h2>Требования ФСТЭК России</h2>
+      <p class="lead">Архитектурный анализ — не «ритуал лаборатории», а обязанность разработчика. Это закреплено в трёх ключевых документах ФСТЭК.</p>
+
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <h4>Приказ №76</h4>
+          <p>«Требования по безопасности информации…», раздел IV, п. 17. Тестирование, испытания по выявлению уязвимостей и НДВ <strong>проводятся изготовителем</strong> в ходе приёмочных испытаний.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+          <h4>Приказ №121</h4>
+          <p>«О внесении изменений в положение о системе сертификации…», п. 12. При проверке организации производства <strong>проверяется внедрение заявителем процедур безопасной разработки</strong> в соответствии с требованиями.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <h4>Методика ВУ и НДВ</h4>
+          <p>Если по совокупности пунктов дана положительная оценка работы разработчика, исследования лаборатории <strong>ограничиваются верификацией результатов</strong>, предоставленных разработчиком.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Ключевой принцип:</strong> разработчик отвечает, лаборатория переиспользует, контролирует, частично дополняет. В проекте новой Методики ВУ и НДВ 2024 этот принцип сделан явным и недвусмысленным.</p>
+      </div>
+    </section>
+
+    <!-- 03. NPB MAP -->
+    <section id="npb-map" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> · Нормативная база</div>
+      <h2>Карта актуальной нормативной базы</h2>
+      <p class="lead">10 ключевых документов, формирующих регулирование РБПО и сертификации СЗИ. Часть документов уже действует, часть в поздних стадиях разработки — но рекомендуется ознакомиться с обоими типами для понимания вектора развития требований.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr><th>Документ</th><th>Статус</th><th>Что регламентирует</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>ГОСТ Р 56939-2024</strong> «Безопасная разработка. Общие требования»</td>
+              <td><span class="status-active">действует с 20.12.2024</span></td>
+              <td>Сертификационные испытания РБПО. Заменил редакцию 2016 года.</td>
+            </tr>
+            <tr>
+              <td><strong>ГОСТ Р 71207-2024</strong> «Статический анализ ПО. Общие требования»</td>
+              <td><span class="status-active">действует с 01.04.2024</span></td>
+              <td>Защитные меры РБПО, требования к статическим анализаторам и процессу их применения.</td>
+            </tr>
+            <tr>
+              <td><strong>ГОСТ Р 71206-2024</strong> «Безопасный компилятор C/C++»</td>
+              <td><span class="status-active">действует</span></td>
+              <td>Защитные меры РБПО в части компиляции (см. опции компилятора в разделе 06).</td>
+            </tr>
+            <tr>
+              <td><strong>ГОСТ Р 59548-2022</strong> «Регистрация событий безопасности»</td>
+              <td><span class="status-active">действует</span></td>
+              <td>Сертификационные испытания СЗИ, формат и состав событий — особенно для SIEM.</td>
+            </tr>
+            <tr>
+              <td><strong>Приказ ФСТЭК №240</strong> от 01.12.2023 <em>(с изменениями от Приказа №230 от 30.06.2025)</em></td>
+              <td><span class="status-active">действует</span></td>
+              <td>Порядок проведения сертификации процессов РБПО СЗИ. Изменения 2025 года привели сертификацию в соответствие с ГОСТ Р 56939-2024 и ввели обязательное Руководство по РБПО.</td>
+            </tr>
+            <tr>
+              <td><strong>Информационное письмо ФСТЭК</strong> от 25.09.2024</td>
+              <td><span class="status-active">действует</span></td>
+              <td>О порядке испытаний и поддержки безопасности СЗИ. Взаимодействие с Центром исследования безопасности системного ПО.</td>
+            </tr>
+            <tr>
+              <td><strong>Информационное письмо ФСТЭК</strong> от 25.10.2024 <em>(формализовано как №240/24/39 от 10.01.2025)</em></td>
+              <td><span class="status-active">действует</span></td>
+              <td>О повышении безопасности СЗИ с интерпретаторами, веб-серверами и серверами приложений.</td>
+            </tr>
+            <tr>
+              <td><strong>Методика ВУ и НДВ ФСТЭК России 2024</strong></td>
+              <td><span class="status-draft">в разработке</span></td>
+              <td>Сертификационные испытания СЗИ. Вводит концепцию ППК на входе в испытания, требования к ПОД.1, КАО.1, КАО.2.</td>
+            </tr>
+            <tr>
+              <td><strong>ГОСТ КАПО</strong> «Композиционный анализ ПО. Общие требования»</td>
+              <td><span class="status-draft">в разработке</span></td>
+              <td>Регламентация процессов композиционного анализа. Учитывается в сертификации СЗИ в части формата ППК.</td>
+            </tr>
+            <tr>
+              <td><strong>ГОСТ Р</strong> «Методика оценки уровней зрелости РБПО»</td>
+              <td><span class="status-draft">в разработке</span></td>
+              <td>Три уровня зрелости: соответствие 56939-2024 + два повышенных. Разрабатывается АО «Лаборатория Касперского».</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <p><strong>Главная мысль:</strong> регулирование разрабатывается рабочей группой при ФСТЭК России на базе ИСП РАН с участием АО «Лаборатория Касперского», АО «ИнфоТеКС», АО «Позитив Текнолоджиз», ООО «РусБИТех-Астра», АО «СберТех», ООО НТЦ «Фобос-НТ», ООО «ЦБИ», АО НПО «Эшелон». Тексты находятся в поздних стадиях, возможны коррективы — рекомендуется отслеживать.</p>
+      </div>
+    </section>
+
+    <!-- PART I DIVIDER -->
+    <div class="part-divider">
+      <div class="part-label">Часть I · процессы №6 и №7</div>
+      <div class="part-title">Архитектурный анализ</div>
+      <div class="part-desc">Разработка и анализ архитектуры ПО (процесс №6), моделирование угроз и описание поверхности атаки (процесс №7). Какие техники статического и динамического анализа применять, как автоматизировать процесс.</div>
+    </div>
+
+    <!-- 04. WHAT IS AA -->
+    <section id="what-aa" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> · Определение</div>
+      <h2>Что такое архитектурный анализ</h2>
+      <p class="lead">Архитектурный анализ — это совокупность практик исследования продукта на уровне архитектуры, конфигураций, привилегий, компонентного состава и поведения, дополняющая фаззинг и статический анализ кода.</p>
+
+      <h3>Где он находится в общей картине РБПО</h3>
+      <p>Если разделить все практики поиска уязвимостей и НДВ на крупные классы, картина получается такая:</p>
+
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <h4>Статический анализ кода</h4>
+          <p>Поиск дефектов и уязвимостей по исходному коду без его выполнения. См. отдельную лекцию по SAST.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/></svg></div>
+          <h4>Фаззинг и сценарное тестирование</h4>
+          <p>Поиск уязвимостей через подачу некорректных или граничных входных данных. См. лекцию по нефункциональному тестированию (процесс №18).</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h4>Архитектурный анализ</h4>
+          <p>Всё остальное: конфигурации, опции компилятора, привилегии, известные уязвимости, хардкод, бинарный поиск ВПО, web-пентест, песочница, КАПО.</p>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Главный вывод:</strong> архитектурный анализ — это не «один инструмент» и не «одна методика». Это <em>зонтичное название</em> для нескольких техник, у каждой свои инструменты и свои нормативные требования.</p>
+      </div>
+    </section>
+
+    <!-- 05. ATTACK SURFACE -->
+    <section id="attack-surface" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> · Стратегия и тактика</div>
+      <h2>Поверхность атаки и приоритизация</h2>
+      <p class="lead">Перед тем как запускать инструменты, нужно понять — что именно анализировать. Поверхность атаки — это набор точек, через которые недоверенные данные могут попасть в систему.</p>
+
+      <h3>85% уязвимостей — в транзитивных зависимостях</h3>
+      <p>По данным CodeScoring, <strong>85% уязвимостей</strong> находятся в транзитивных зависимостях (библиотеках, которые импортируют ваши прямые зависимости). При определении поверхности атаки критически важно отслеживать, куда именно попадает поток данных — в какие сторонние приложения и библиотеки, а не только в очевидный исполняемый файл.</p>
+
+      <h3>Стратегия: с каких компонентов начинать</h3>
+      <p>Анализ начинаем с компонентов, наиболее подверженных угрозам и доступных наиболее слабым нарушителям:</p>
+      <ul>
+        <li><strong>Вспомогательные сервисы</strong>, не реализующие функции безопасности и бизнес-логику. Например: мессенджер или SIP-сервер, «для удобства» встроенный в межсетевой экран типа «А».</li>
+        <li><strong>Web-сервисы</strong> — каждый второй мнит себя пентестером, нарушителей много.</li>
+        <li><strong>Парсеры пользовательского ввода</strong> — обработчики файлов, изображений, документов. Любой код, разбирающий внешние данные.</li>
+      </ul>
+
+      <h3>Тактика: приоритет по языкам программирования</h3>
+      <ul>
+        <li><strong>C/C++</strong> — высокий приоритет анализа (нет управляемой памяти, классические уязвимости переполнений).</li>
+        <li><strong>C#, Java, Python</strong> — обычно безопаснее (управляемая память), но в управляемом коде бывают вставки на нативных языках (unsafe C#, JNI в Java и т. д.).</li>
+        <li><strong>Движки интерпретаторов и SDK</strong> — как правило написаны в том числе на нативных языках программирования.</li>
+      </ul>
+
+      <h3>Советы бывалого</h3>
+      <ul>
+        <li>Смотрите <strong>документацию</strong> — скриншоты тестирования и рекламные материалы на сайте разработчика. Там всплывает функционал, который прячут в сертификационной документации.</li>
+        <li>Различные подменю загрузки картинок для аватарки, функции загрузки превью документов и иные «незначительные» возможности часто скрывают за собой огромные библиотеки-парсеры.</li>
+        <li>Парсеры исходных текстов / байткода в составе интерпретатора, как правило, <em>не</em> являются поверхностью атаки на СЗИ — в типовых сценариях запуск доступен только администратору, а не произвольному пользователю.</li>
+      </ul>
+    </section>
+
+    <!-- 06. STATIC ARCHITECTURAL ANALYSIS -->
+    <section id="static-aa" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> · Статический анализ</div>
+      <h2>Статический архитектурный анализ — 6 техник</h2>
+      <p class="lead">Шесть направлений анализа, не связанных с выполнением кода. Каждое направление — отдельная техника со своими инструментами.</p>
+
+      <div class="technique-grid">
+
+        <div class="technique">
+          <div class="technique-num">1</div>
+          <h4>Анализ конфигураций</h4>
+          <p>Многие популярные службы (sshd, nginx, прокси-серверы) могут быть настроены небезопасно. Анализаторы конфигураций оценивают соответствие рекомендациям по безопасности — обычно ищутся прямо на GitHub под нужный сервис.</p>
+          <div class="technique-tools">
+            <span class="tool-tag">sshd-config-check</span>
+            <span class="tool-tag">nginx-amplify</span>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">2</div>
+          <h4>Опции компилятора и бинарных файлов</h4>
+          <p>Защитные опции, задаваемые при компиляции: ASLR (случайное размещение памяти), STACK-PROT (защита от переполнения стека), READ-ONLY-RELOC (запрет записи в исполняемые страницы), IMMEDIATE-BIND (привязка символов при загрузке), FORTIFY-SOURCE.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://github.com/koutheir/binary-security-check" target="_blank" rel="noopener">binary-security-check</a>
+            <a class="tool-tag" href="https://github.com/microsoft/binskim" target="_blank" rel="noopener">binskim</a>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">3</div>
+          <h4>Анализ прав и возможностей</h4>
+          <p>DAC (дискреционный принцип); SUID/SGID (любой пользователь запускает с правами владельца); Linux capabilities (минимально необходимые привилегии — bind &lt; 1024, raw-сокеты); параметры монтирования noexec, nosuid, nodev для доп. барьеров защиты.</p>
+          <div class="technique-tools">
+            <span class="tool-tag">getfacl</span>
+            <span class="tool-tag">getcap</span>
+            <span class="tool-tag">mount</span>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">4</div>
+          <h4>Анализ известных уязвимостей</h4>
+          <p>Альфа и Омега работы эксперта. Постановка процесса вычищения CVE из состава продукта — самая болезненная активность для команды, впервые сталкивающейся с сертификацией. <strong>За CVE отвечает разработчик</strong>, не лаборатория: устранение либо обоснование неприменимости.</p>
+          <div class="technique-tools">
+            <span class="tool-tag">Dependency-Track</span>
+            <span class="tool-tag">Trivy</span>
+            <a class="tool-tag" href="https://gitlab.community.ispras.ru/" target="_blank" rel="noopener">ИСП РАН gitlab</a>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">5</div>
+          <h4>Поиск хардкода и лексем</h4>
+          <p>Поиск в исходных текстах СЗИ хардкодной чувствительной информации (пароли, ключи, токены) и текстовых комментариев, потенциально указывающих на присутствие НДВ. Базовый анализ коммитов на маркерные слова, диапазоны IP. Встраивание в сборочный конвейер для каждого коммита.</p>
+          <div class="technique-tools">
+            <span class="tool-tag">gitleaks</span>
+            <span class="tool-tag">trufflehog</span>
+            <span class="tool-tag">detect-secrets</span>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">6</div>
+          <h4>Бинарный поиск признаков ВПО</h4>
+          <p>Поиск бинарных последовательностей, потенциально свидетельствующих о наличии типового вредоносного кода. В кодовой базе СЗИ могут быть бинарные вставки, конкретный вредоносный исходный код, механизмы динамической кодогенерации. Нельзя исключать НДВ в тулчейнах.</p>
+          <div class="technique-tools">
+            <span class="tool-tag">YARA</span>
+            <span class="tool-tag">ClamAV</span>
+            <span class="tool-tag">центры компетенций</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Важно про CVE.</strong> При выявлении уязвимой версии пакета именно разработчик, а не лаборатория, отвечает за разбор ситуации. Рекомендуется (в ряде случаев требуется) внедрение средств автоматизированного отслеживания известных уязвимостей в пакетной базе — они в том числе могут помочь в формировании машиночитаемого формата ППК.</p>
+      </div>
+    </section>
+
+    <!-- 07. DYNAMIC ARCHITECTURAL ANALYSIS -->
+    <section id="dynamic-aa" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> · Динамический анализ</div>
+      <h2>Динамический архитектурный анализ — 3 техники</h2>
+      <p class="lead">Анализ работающего кода. В отличие от фаззинга, акцент не на подаче входных данных, а на наблюдении за поведением системы и выявлении нежелательных эффектов.</p>
+
+      <div class="technique-grid">
+
+        <div class="technique">
+          <div class="technique-num">1</div>
+          <h4>Web-пентест</h4>
+          <p>«Несмотря на все методики и классификаторы — хороший пентест это творчество». Однако перед творческой частью необходимо проанализировать систему всеми имеющимися сканерами на предмет выявления типовых проблем.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://www.zaproxy.org/" target="_blank" rel="noopener">OWASP ZAP</a>
+            <a class="tool-tag" href="https://portswigger.net/burp" target="_blank" rel="noopener">Burp Suite</a>
+            <a class="tool-tag" href="https://nmap.org/" target="_blank" rel="noopener">nmap</a>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">2</div>
+          <h4>Песочница</h4>
+          <p>Что ищем (выборочно): соединения с недекларированными сетевыми ресурсами; недекларированные чтение и запись файлов; запуск недекларированных процессов; присутствие чувствительной информации в открытом виде; использование небезопасных протоколов.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://strace.io/" target="_blank" rel="noopener">strace</a>
+            <span class="tool-tag">sysdig</span>
+            <span class="tool-tag">eBPF tooling</span>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">3</div>
+          <h4>«Блесна» — анализ помеченных данных</h4>
+          <p>Специализированный инструмент ИСП РАН для поиска утечек чувствительных данных (паролей, ключей) в памяти. Полносистемный анализ — исследуется весь стек развёрнутого ПО, выявляются утечки через границы виртуальных адресных пространств. Учёт особенностей аппаратуры (конвейер команд, прерывания, трансляция адресов, DMA).</p>
+          <div class="technique-tools">
+            <span class="tool-tag">ИСП РАН</span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <p><strong>Ключевая идея «Блесны»</strong> — автоматизация экспертизы исполняемого кода с минимальными требованиями к квалификации пользователей. Достаточно наличия исполняемого бинарного кода и описания сигнатур анализируемых функций.</p>
+      </div>
+    </section>
+
+    <!-- 08. CONTAINERS -->
+    <section id="containers" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> · Контейнеризация</div>
+      <h2>Контейнеры и Kubernetes</h2>
+      <p class="lead">Реализация СЗИ в контейнерном исполнении не освобождает разработчика от обязанностей по анализу компонентов. Контейнер — не «вещь в себе».</p>
+
+      <h3>Что нельзя делать</h3>
+      <ul>
+        <li><strong>Скачивать пресобранные образы</strong> с недоверенных репозиториев.</li>
+        <li><strong>Собирать наполнение образов самостоятельно</strong> (за исключением переиспользования компонентной базы из состава сертифицированных сред исполнения).</li>
+        <li><strong>Не выполнять</strong> статический и динамический анализ составляющих ПА или реализующих ФБ компонентов, запущенных в контейнерах.</li>
+      </ul>
+
+      <div class="callout warning">
+        <p><strong>Главный принцип:</strong> компонентная база контейнеров точно так же входит в состав СЗИ и подлежит анализу. Не является «вещью в себе».</p>
+      </div>
+
+      <h3>Оркестраторы (Kubernetes)</h3>
+      <p>В оркестраторах добавляются свои парадигмы управления доступом субъектов к объектам — микросервисы, поды, ServiceAccount, RBAC, NetworkPolicy. На архитектуру и её безопасность необходимо смотреть <strong>дополнительно</strong> в парадигме выбранного оркестратора.</p>
+    </section>
+
+    <!-- 09. AUTOMATION -->
+    <section id="automation" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> · Автоматизация</div>
+      <h2>Автоматизация архитектурного анализа</h2>
+      <p class="lead">Больше автоматизации — меньше «сертификации». Регулярность анализа заложена в Требованиях. Автоматизация позволяет встроить проверки в процесс разработки и не возвращаться к ним вручную.</p>
+
+      <h3>Декларативный подход</h3>
+      <p>Существует множество систем автоматизации и готовых шаблонов поиска недостатков и уязвимостей. Один из вариантов — использование декларативного языка разметки сценариев тестирования, что позволяет создавать наборы сценариев для различных семейств ОС.</p>
+
+      <div class="technique-grid">
+        <div class="technique">
+          <div class="technique-num">A</div>
+          <h4>Ansible</h4>
+          <p>Движок автоматизации с готовыми плейбуками для проверки конфигураций безопасности на множестве серверов одновременно. Реюзабельные роли — сообщество публикует на Ansible Galaxy.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://www.ansible.com/" target="_blank" rel="noopener">ansible.com</a>
+            <a class="tool-tag" href="https://galaxy.ansible.com/" target="_blank" rel="noopener">Ansible Galaxy</a>
+          </div>
+        </div>
+
+        <div class="technique">
+          <div class="technique-num">B</div>
+          <h4>Inspec</h4>
+          <p>Среда тестирования с открытым исходным кодом, в которой для реализации сценариев и описания конфигураций тестирования используется декларативный язык разметки. Особенно хороша для compliance-проверок.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://docs.chef.io/inspec/" target="_blank" rel="noopener">docs.chef.io/inspec</a>
+            <span class="tool-tag">CIS Benchmarks</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10. CASES -->
+    <section id="cases" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> · Практика</div>
+      <h2>Найди архитектурную ошибку: 6 кейсов</h2>
+      <p class="lead">Шесть архитектурных решений, типичных для разработки СЗИ. В каждом — два варианта: один с дефектом, другой соответствующий требованиям РБПО. Прочитайте сценарий, выберите вариант, который кажется правильным, затем раскройте подсказку.</p>
+
+      <div class="arch-cases">
+
+        <!-- Case 1: Парсер -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">1</span> Парсер недоверенных данных в СЗИ</div>
+            <span class="arch-case-tag">Изоляция</span>
+          </div>
+          <div class="arch-case-scenario">Веб-интерфейс СЗИ принимает загрузку JSON-файлов конфигурации от администратора. Где разместить парсер JSON?</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+              <div class="opt-text">Парсер встроен в основной процесс СЗИ и работает с правами этого процесса (часто — администратор системы). «Удобно и быстро».</div>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+              <div class="opt-text">Парсер вынесен в изолированный процесс с минимальными привилегиями (NoNewPrivileges, ограничение памяти, без доступа к сети). Результат передаётся в основной процесс через IPC.</div>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · №7</span> Парсеры — критическая часть поверхности атаки (см. процесс №7 «Моделирование угроз и разработка описания поверхности атаки» ГОСТ Р 56939-2024 и ПОД.1 Методики ВУ и НДВ). При компрометации парсера в варианте A атакующий получает контроль над всем СЗИ. Изоляция в варианте B ограничивает blast radius и соответствует принципу <strong>least privilege</strong>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 2: Хардкод секретов -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">2</span> Хранение секретов</div>
+            <span class="arch-case-tag">Хардкод vs Vault</span>
+          </div>
+          <div class="arch-case-scenario">СЗИ нужен пароль для подключения к внутренней БД. Где его хранить?</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+<pre class="code"><code><span class="cm"># config.py</span>
+DB_PASSWORD = <span class="str">"S3cur3P@ss2024!"</span>  <span class="cm"># удобно для разработки</span>
+DB_HOST = <span class="str">"db.internal.local"</span></code></pre>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+<pre class="code"><code><span class="cm"># config.py</span>
+<span class="kw">from</span> vault_client <span class="kw">import</span> get_secret
+
+DB_PASSWORD = get_secret(<span class="str">"db/credentials/password"</span>)
+DB_HOST = get_secret(<span class="str">"db/connection/host"</span>)</code></pre>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · техника №5</span> Поиск хардкода — обязательная часть архитектурного анализа. Хардкод секретов = потенциальная компрометация при доступе к коду или артефактам сборки. Любой случайный коммит, любая публикация скриншота с куском конфига, любой утёкший образ контейнера = инцидент. Vault, sealed-secrets, переменные окружения с restricted-доступом — все они правильнее. Базовый сканер хардкода (<code>gitleaks</code>, <code>detect-secrets</code>) должен стоять в pre-commit hook.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 3: Privileges -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">3</span> Привилегии исполняемого файла</div>
+            <span class="arch-case-tag">SUID vs Capabilities</span>
+          </div>
+          <div class="arch-case-scenario">Утилите управления СЗИ нужно слушать порт 80 (привилегированный) и читать защищённые файлы конфигурации.</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+<pre class="code"><code><span class="cm"># Установить SUID-бит — любой пользователь</span>
+<span class="cm"># запустит утилиту с правами root</span>
+$ chmod u+s /usr/local/bin/szi-tool
+$ ls -l /usr/local/bin/szi-tool
+-rw<span class="num">s</span>r-xr-x 1 root root 12345 ... szi-tool</code></pre>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+<pre class="code"><code><span class="cm"># Минимально необходимые capabilities</span>
+$ setcap <span class="str">'cap_net_bind_service,cap_dac_read_search=+ep'</span> \
+    /usr/local/bin/szi-tool
+
+$ getcap /usr/local/bin/szi-tool
+/usr/local/bin/szi-tool = cap_net_bind_service,cap_dac_read_search+ep</code></pre>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · техника №3</span> SUID — расширение DAC, при котором <em>любой пользователь</em> запускает программу с правами владельца. При наличии в утилите хоть одной уязвимости вся система компрометируется. Linux capabilities — расширение DAC, реализующее принцип <strong>минимально необходимых привилегий</strong>: при запросе привилегированной операции ядро проверяет наличие конкретной capability. Утилита получает только нужные права (привязка к порту &lt; 1024 = <code>CAP_NET_BIND_SERVICE</code>), а не «всё root».
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 4: Dependency installation -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">4</span> Установка стороннего компонента</div>
+            <span class="arch-case-tag">Цепочка поставки</span>
+          </div>
+          <div class="arch-case-scenario">В сборочный конвейер СЗИ нужно подключить npm-пакет <code>fs-extra</code> для удобной работы с файловой системой.</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+<pre class="code"><code><span class="cm"># build.yml</span>
+- run: npm install fs-extra@latest
+
+<span class="cm"># package.json</span>
+{
+  <span class="str">"dependencies"</span>: {
+    <span class="str">"fs-extra"</span>: <span class="str">"latest"</span>
+  }
+}</code></pre>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+<pre class="code"><code><span class="cm"># .npmrc — внутренний реестр</span>
+registry=https://registry.internal.local/npm
+
+<span class="cm"># package.json — фиксированная версия</span>
+{
+  <span class="str">"dependencies"</span>: { <span class="str">"fs-extra"</span>: <span class="str">"11.2.0"</span> }
+}
+
+<span class="cm"># build.yml — формирование ППК</span>
+- run: cyclonedx-bom &gt; ppk.cdx.json
+- run: verify-ppk ppk.cdx.json</code></pre>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · №16, №17</span> ГОСТ КАПО + ГОСТ Р 56939-2024 (процесс №16 «Использование инструментов композиционного анализа», процесс №17 «Проверка кода на предмет внедрения вредоносного программного обеспечения через цепочки поставок») требуют контролируемой цепочки поставки и формирования ППК. <code>@latest</code> — это <strong>supply-chain-уязвимость в потенциале</strong>: завтра злоумышленник публикует версию 11.2.1 с закладкой, и ваш CI её затягивает. Контролируемый репозиторий + фиксированная версия + регулярная сверка ППК с базами CVE — обязательная практика.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 5: Container -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">5</span> Контейнерный образ СЗИ</div>
+            <span class="arch-case-tag">Контролируемая сборка</span>
+          </div>
+          <div class="arch-case-scenario">СЗИ поставляется в виде Docker-образа. Как описать <code>Dockerfile</code>?</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+<pre class="code"><code><span class="kw">FROM</span> ubuntu:latest
+
+<span class="kw">RUN</span> apt-get update &amp;&amp; apt-get install -y \
+    python3 nginx postgresql redis \
+    curl wget jq vim less ...
+
+<span class="kw">COPY</span> . /app
+<span class="kw">CMD</span> [<span class="str">"python3"</span>, <span class="str">"/app/main.py"</span>]</code></pre>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+<pre class="code"><code><span class="kw">FROM</span> registry.internal.local/ubuntu:22.04@sha256:abc123...
+
+<span class="kw">COPY</span> ppk.cdx.json /opt/szi/
+<span class="kw">RUN</span> apt-install --from-ppk /opt/szi/ppk.cdx.json \
+    --no-install-recommends
+
+<span class="kw">USER</span> 10001
+<span class="kw">COPY</span> --chown=10001:10001 . /app
+<span class="kw">CMD</span> [<span class="str">"python3"</span>, <span class="str">"/app/main.py"</span>]</code></pre>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · раздел 08</span> Реализация СЗИ в контейнерном исполнении не тождественна возможности скачивать пресобранные образы с недоверенных репозиториев. Компонентная база контейнеров входит в состав СЗИ и подлежит анализу. <code>FROM ubuntu:latest</code> — это «движущаяся цель» (что внутри сегодня — неизвестно). Фиксация digest-а образа (<code>@sha256:...</code>), внутренний registry, установка строго из ППК и запуск под непривилегированным пользователем — минимально необходимый набор практик.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 6: Logging -->
+        <div class="arch-case">
+          <div class="arch-case-head">
+            <div class="arch-case-title"><span class="arch-case-num">6</span> Логирование событий безопасности</div>
+            <span class="arch-case-tag">ГОСТ Р 59548-2022</span>
+          </div>
+          <div class="arch-case-scenario">СЗИ должно фиксировать события входа пользователя в систему. Какой формат лога выбрать?</div>
+          <div class="arch-options">
+            <div class="arch-opt bad">
+              <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
+<pre class="code"><code><span class="cm"># текстовая строка в логе</span>
+logger.info(
+    <span class="str">f"User {user.name} logged in"</span>
+    <span class="str">f" from {request.ip} at {ts}"</span>
+)</code></pre>
+            </div>
+            <div class="arch-opt good">
+              <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
+<pre class="code"><code><span class="cm"># событие безопасности по 59548-2022</span>
+log_security_event(
+    event_id=<span class="str">"AUT.LOGIN.SUCCESS"</span>,
+    subject_id=user.id,
+    subject_type=<span class="str">"user"</span>,
+    timestamp=ts,
+    source_ip=request.ip,
+    severity=<span class="str">"info"</span>,
+    extra={...}
+)</code></pre>
+            </div>
+          </div>
+          <div class="arch-case-reveal">
+            <button class="arch-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать правильный вариант
+            </button>
+            <div class="arch-answer">
+              <span class="gost-ref">B · 59548-2022</span> ГОСТ Р 59548-2022 «Регистрация событий безопасности» регламентирует обязательные поля события: идентификатор, тип субъекта/объекта, источник, временная метка, серьёзность. Текстовая строка в варианте A не парсится автоматически и не агрегируется в SIEM. В варианте B событие машиночитаемо, попадает в SIEM в стандартизированном виде. Особенно критично для СЗИ, основная функция которых — накопление и обработка событий безопасности.
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PART II DIVIDER -->
+    <div class="part-divider">
+      <div class="part-label">Часть II · процессы №16 и №17</div>
+      <div class="part-title">Формирование и предоставление ППК ФСТЭК России</div>
+      <div class="part-desc">Использование инструментов композиционного анализа (процесс №16) и проверка кода на внедрение вредоносного ПО через цепочки поставок (процесс №17). Что такое Перечень программных компонентов, как его формировать и куда отправлять.</div>
+    </div>
+
+    <!-- 11. KAPO -->
+    <section id="kapo" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> · КАПО</div>
+      <h2>Композиционный анализ ПО (КАПО)</h2>
+      <p class="lead">КАПО — отдельный процесс №16 в ГОСТ Р 56939-2024 («Использование инструментов композиционного анализа»). Концепция ППК как машиночитаемого перечня программных компонентов прорабатывалась в рабочей группе при ФСТЭК России с 2022 года.</p>
+
+      <h3>Цели композиционного анализа</h3>
+      <ul>
+        <li><strong>Инвентаризация</strong> всех видов сторонних компонентов в продукте.</li>
+        <li><strong>Обогащение</strong> данных компонентов информацией из баз известных уязвимостей (CVE, БДУ ФСТЭК).</li>
+        <li><strong>Проверка</strong> лицензионной чистоты, репутации компонентов и иных особенностей.</li>
+        <li><strong>Регулярный процесс</strong> в организации — не разовая активность перед сертификацией.</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Ключевое решение рабочей группы:</strong> уйти от собственной нотации формата ППК и использовать расширенный стандартизованный <strong>CycloneDX</strong> — на момент решения была актуальна версия 1.6, в марте 2026 вышла версия 1.7 (с поддержкой Traffic Light Protocol для распространения BOM). Использование стандарта позволяет переиспользовать существующий tooling экосистемы SBOM.</p>
+      </div>
+    </section>
+
+    <!-- 12. PPK / SBOM -->
+    <section id="ppk-sbom" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> · Формат</div>
+      <h2>ППК и SBOM</h2>
+      <p class="lead">ППК — Перечень программных компонентов. По смыслу это российский эквивалент SBOM (Software Bill of Materials). Формат — CycloneDX, содержит обязательные поля для каждого компонента.</p>
+
+      <h3>Что обязано быть в ППК</h3>
+      <ul class="checklist">
+        <li><strong>Имя и версия компонента</strong> — точная фиксация, без диапазонов.</li>
+        <li><strong>Тип компонента</strong> — библиотека, контейнерный образ, исполняемый файл, fragment кода.</li>
+        <li><strong>Source repository / origin</strong> — откуда взят компонент.</li>
+        <li><strong>Хэш</strong> — для верификации целостности.</li>
+        <li><strong>Лицензия</strong> — для проверки совместимости и лицензионной чистоты.</li>
+        <li><strong>Связи между компонентами</strong> — кто зависит от кого (transitive deps).</li>
+      </ul>
+
+      <h3>Формат CycloneDX</h3>
+      <p>CycloneDX — открытый стандарт SBOM, который российская рабочая группа выбрала за основу. Текущая версия — 1.7 (релиз марта 2026), также продолжает применяться 1.6. Расширения для ФСТЭК добавляют специфичные поля (классификатор по БДУ, уровень доверия и т. п.).</p>
+      <div class="technique-tools">
+        <a class="tool-tag" href="https://cyclonedx.org/" target="_blank" rel="noopener">cyclonedx.org</a>
+        <a class="tool-tag" href="https://cyclonedx.org/specification/overview/" target="_blank" rel="noopener">CycloneDX spec</a>
+      </div>
+    </section>
+
+    <!-- 13. PPK FORMATION -->
+    <section id="ppk-form" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> · Формирование</div>
+      <h2>Формирование ППК</h2>
+      <p class="lead">Звучит просто — «соберите список компонентов в формате CycloneDX». На практике большинство команд натыкаются на одни и те же грабли.</p>
+
+      <h3>Типовые сценарии формирования</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <h4>На этапе сборки</h4>
+          <p>SBOM-генератор (<code>cdxgen</code>, <code>syft</code>) подключается к build-конвейеру и формирует ППК автоматически по результатам разрешения зависимостей.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div>
+          <h4>Из готового артефакта</h4>
+          <p>Анализ собранного бинарника / контейнерного образа для формирования ППК «постфактум». Менее точно, но применимо для legacy-продуктов.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <h4>Ручная разметка</h4>
+          <p>Для компонентов, не охваченных автоматическими инструментами (закрытые библиотеки, кастомные сборки) — ручное добавление в ППК с обоснованием.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Главная боль:</strong> разработчики, как правило, не знают точно, из каких компонентов состоит их продукт. Особенно это касается транзитивных зависимостей и тех компонентов, что попали в продукт «случайно» (через base-образы, через языковые runtime'ы, через embedded-инструменты сборки). Первый запуск SBOM-генератора часто — это <em>откровение</em>.</p>
+      </div>
+
+      <h3>Инструменты формирования ППК</h3>
+      <div class="technique-grid">
+        <div class="technique">
+          <div class="technique-num">1</div>
+          <h4>cdxgen</h4>
+          <p>Универсальный SBOM-генератор от OWASP. Поддерживает Java, JavaScript, Python, Go, Rust, .NET и десятки других стеков. Выдаёт CycloneDX из коробки.</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://github.com/CycloneDX/cdxgen" target="_blank" rel="noopener">github.com/CycloneDX/cdxgen</a>
+          </div>
+        </div>
+        <div class="technique">
+          <div class="technique-num">2</div>
+          <h4>Syft</h4>
+          <p>Анализатор контейнерных образов и файловых систем. Хорошо подходит для анализа готовых артефактов «постфактум».</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://github.com/anchore/syft" target="_blank" rel="noopener">github.com/anchore/syft</a>
+          </div>
+        </div>
+        <div class="technique">
+          <div class="technique-num">3</div>
+          <h4>Dependency-Track</h4>
+          <p>Платформа для приёма ППК и непрерывного мониторинга компонентов на наличие новых уязвимостей. Подключается к НБД (CVE, OSS Index, Snyk DB).</p>
+          <div class="technique-tools">
+            <a class="tool-tag" href="https://dependencytrack.org/" target="_blank" rel="noopener">dependencytrack.org</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 14. PPK to FSTEK -->
+    <section id="ppk-fstek" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> · Предоставление</div>
+      <h2>Предоставление ППК в ФСТЭК России</h2>
+      <p class="lead">Сформированный ППК подаётся в составе сертификационных материалов. Существует выделенная инфраструктура для приёма и проверки ППК — на платформе ИСП РАН.</p>
+
+      <h3>Инфраструктура</h3>
+      <ul>
+        <li><strong>Платформа SBOM-инструментов:</strong> <a href="https://gitlab.community.ispras.ru/" target="_blank" rel="noopener">gitlab.community.ispras.ru</a> — gitlab-инстанс ИСП РАН, где разрабатывается tooling для работы с ППК.</li>
+        <li><strong>SBoM-updater / sbom-checker:</strong> инструменты для верификации формата и содержания ППК до отправки.</li>
+        <li><strong>Центр исследования безопасности системного ПО</strong> — подразделение ФСТЭК России. Контакт публиковался в выступлении Д. Н. Шевцова на Kaspersky CyberDay 2024.</li>
+      </ul>
+
+      <h3>Дискуссия и обсуждения</h3>
+      <p>Активная дискуссия по инструментам и практикам генерации ППК / SBOM ведётся в открытом сообществе — в Telegram-чате <code>t.me/sdl_fld</code> (ветка <code>/6495</code>), в gitlab-issues ИСП РАН, на встречах сообщества, посвящённых особенностям внедрения.</p>
+
+      <div class="callout success">
+        <p><strong>Что важно понимать:</strong> подача ППК — не «отправил файл и забыл», а живой процесс. ППК продукта обновляется при каждом изменении состава компонентов; для каждого CVE, найденного в компоненте, разработчик готовит обоснование (устранили / обоснованно неприменимо / ложное срабатывание). Регулярность анализа — обязательное требование.</p>
+      </div>
+    </section>
+
+    <!-- 15. KAPO PROBLEMS -->
+    <section id="kapo-problems" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> · Реальность</div>
+      <h2>Проблематика КАПО — три угла зрения</h2>
+      <p class="lead">КАПО как процесс одновременно болезнен для всех трёх сторон — разработчика, лаборатории и регулятора. Понимание боли каждой стороны помогает выстроить процесс так, чтобы не множить её.</p>
+
+      <div class="three-angles">
+        <div class="angle">
+          <div class="angle-icon dev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <h4>Разработчик</h4>
+          <p>Не знает, из каких компонентов состоит его продукт. Неправильно собирает ППК — пропускает транзитивные зависимости, не фиксирует версии, не подключает обогащение CVE.</p>
+        </div>
+        <div class="angle">
+          <div class="angle-icon lab"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <h4>Лаборатория</h4>
+          <p>Сталкивается с большим количеством ложных срабатываний при анализе ППК. Сложно выдавать экспертную оценку для тысяч предупреждений — особенно когда часть из них исходят от некорректно сформированного ППК.</p>
+        </div>
+        <div class="angle">
+          <div class="angle-icon reg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+          <h4>Регулятор</h4>
+          <p>Сталкивается с большим объёмом материалов в исследовании отрасли open-source. Каждый разработчик подаёт ППК со «своими» компонентами — а одни и те же популярные библиотеки повторяются у всех.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Стратегический ответ ФСТЭК:</strong> создание Центра исследования безопасности системного ПО на базе ИСП РАН. Идея в том, чтобы анализ популярных компонентов открытого кода выполнялся <em>централизованно</em>, а конкретные разработчики переиспользовали результаты этого анализа в своих ППК. В Методике ВУ и НДВ 2024 сделан явный акцент: уровень качества и полноты исследований привязан к работам Центра.</p>
+      </div>
+    </section>
+
+    <!-- 16. STANDARDS MAP -->
+    <section id="standards-map" class="section">
+      <div class="section-eyebrow"><span class="section-num">16</span> · Картография</div>
+      <h2>Связь с другими стандартами</h2>
+      <p class="lead">ГОСТ Р 56939-2024 — не одиночный документ, а центр созвездия. Эта лекция охватывает 4 процесса (№6, №7, №16, №17), и они опираются на серию связанных стандартов и методик.</p>
+
+      <div class="map-graph">
+        <div class="map-node">
+          <div class="map-node-tag">ИСПЫТАНИЯ СЗИ</div>
+          <div class="map-node-title">Методика ВУ и НДВ ФСТЭК России 2024</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">№6</div>
+          <div class="map-node-title">Разработка и анализ архитектуры ПО</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">№7</div>
+          <div class="map-node-title">Моделирование угроз и поверхность атаки</div>
+        </div>
+        <div class="map-node center">
+          <div class="map-node-tag">ОСНОВА</div>
+          <div class="map-node-title">ГОСТ Р 56939-2024 РБПО</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">№16</div>
+          <div class="map-node-title">КАПО — композиционный анализ</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">№17</div>
+          <div class="map-node-title">Проверка кода на ВПО через цепочки поставок</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">№18</div>
+          <div class="map-node-title"><a href="https://p18.pikov.expert" target="_blank" rel="noopener">Нефункциональное тестирование</a></div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">71207</div>
+          <div class="map-node-title"><a href="https://sast.pikov.expert" target="_blank" rel="noopener">Статический анализ ПО</a></div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">71206</div>
+          <div class="map-node-title">Безопасный компилятор C/C++</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">59548</div>
+          <div class="map-node-title">Регистрация событий безопасности</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">ФОРМАТ ППК</div>
+          <div class="map-node-title">ГОСТ КАПО (в разработке)</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">ОЦЕНКА</div>
+          <div class="map-node-title">Методика уровней зрелости РБПО (в разработке)</div>
+        </div>
+        <div class="map-node">
+          <div class="map-node-tag">ПРИКАЗ №240</div>
+          <div class="map-node-title">Сертификация процессов РБПО</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Что это значит на практике.</strong> Команда, которая внедряет процессы РБПО, должна одновременно держать в голове все эти документы. Архитектурный анализ — это про №7 (поверхность атаки), КАПО — про №16, нефункциональное тестирование — про №18 (отдельная лекция), статанализ — про требования ГОСТ 71207. И всё это в рамках ГОСТ 56939-2024 как единого нормативного зонтика.</p>
+      </div>
+    </section>
+
+    <!-- CONTACTS -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам лекции, проведения курсов и консультаций по внедрению процессов архитектурного анализа и формирования ППК.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:pikov@yandex.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          pikov@yandex.ru
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Лекция · РБПО</span>
+        </div>
+        <div>При подготовке лекции использовались материалы курсов ФСТЭК России на базе ИСП РАН.</div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+
+  document.querySelectorAll('.arch-spoiler').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+      const reveal = btn.parentElement;
+      const answer = reveal.querySelector('.arch-answer');
+      if (answer) {
+        answer.classList.toggle('open');
+        const labelNode = btn.childNodes[btn.childNodes.length - 1];
+        if (labelNode && labelNode.nodeType === 3) {
+          labelNode.textContent = expanded ? ' Показать правильный вариант' : ' Скрыть подсказку';
+        }
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

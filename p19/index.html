@@ -1,0 +1,2098 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Проверка безопасности приложения — лекция В.А. Пикова</title>
+<meta name="description" content="Авторская лекция по проверке безопасности приложения (процесс №18 ГОСТ Р 56939-2024): ручной направленный анализ кода как метод нефункционального тестирования.">
+<meta name="author" content="Виталий Александрович Пиков">
+<link rel="canonical" href="https://p19.pikov.expert/">
+<meta property="og:title" content="Проверка безопасности приложения (Процесс №18 ГОСТ Р 56939)">
+<meta property="og:description" content="Авторская лекция В.А. Пикова: ручной направленный анализ кода, 11 классов типовых уязвимостей и 38 контрольных вопросов эксперта.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://p19.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><path d=%22M50 18 L78 30 V54 C78 70 65 80 50 84 C35 80 22 70 22 54 V30 Z%22 fill=%22white%22/><circle cx=%2245%22 cy=%2247%22 r=%2210%22 fill=%22none%22 stroke=%22%232563eb%22 stroke-width=%224%22/><line x1=%2253%22 y1=%2255%22 x2=%2262%22 y2=%2264%22 stroke=%22%232563eb%22 stroke-width=%224%22 stroke-linecap=%22round%22/></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--text); }
+
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* Reading progress */
+  .reading-progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 110;
+    pointer-events: none;
+  }
+  .reading-progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s ease-out;
+  }
+
+  /* Header */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .brand-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+
+  .toc-toggle { display: none; }
+
+  /* Layout */
+  .layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* TOC sidebar */
+  .toc {
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border);
+    padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-subtle);
+    margin-bottom: 14px;
+    padding-left: 14px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .toc-list a.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+
+  /* Content */
+  .content {
+    max-width: 760px;
+    padding: 32px 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 32px 0 56px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: clamp(17px, 1.6vw, 20px);
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    max-width: 680px;
+  }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+  }
+  .hero-meta-value {
+    font-size: 14.5px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Sections */
+  .section {
+    padding: 56px 0 16px;
+    scroll-margin-top: 80px;
+  }
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1.5px;
+    background: var(--accent);
+  }
+  .section-num {
+    font-variant-numeric: tabular-nums;
+  }
+  .section h2 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .section h3 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    margin: 36px 0 14px;
+    color: var(--text);
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    margin: 24px 0 10px;
+    color: var(--text);
+  }
+  .section p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+  .section p.lead {
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+  .section ul, .section ol {
+    margin: 16px 0 24px 0;
+    padding-left: 24px;
+  }
+  .section ul li, .section ol li {
+    font-size: 17px;
+    line-height: 1.65;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+
+  /* Inline code */
+  .section :not(pre) > code, .ic {
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.88em;
+    padding: 2px 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+  }
+
+  /* Pull quote / callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-softer);
+    padding: 18px 22px;
+    margin: 24px 0;
+    border-radius: 0 10px 10px 0;
+  }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  table.data th, table.data td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data th {
+    font-weight: 600;
+    color: var(--text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 12px;
+    background: var(--surface-2);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td:first-child { font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+
+  /* Code blocks */
+  pre.code {
+    margin: 20px 0;
+    padding: 18px 20px;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+  pre.code .hl {
+    background: var(--warning-soft);
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+  pre.code .hl-bad {
+    background: var(--danger-soft);
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+
+  /* Bug case cards (для секции «Найди уязвимость») */
+  .bug-cases { display: flex; flex-direction: column; gap: 28px; margin: 28px 0; }
+  .bug-case {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bug-case:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .bug-case-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bug-case-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bug-case-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .bug-case-lang {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-subtle);
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border-radius: 5px;
+  }
+  .bug-case pre.code { margin: 0; border: none; border-radius: 0; }
+  .bug-case-desc {
+    padding: 14px 20px 0;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+  .bug-case-reveal {
+    padding: 14px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .bug-spoiler {
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+  .bug-spoiler:hover { color: var(--accent-strong); }
+  .bug-spoiler svg { width: 14px; height: 14px; transition: transform 0.2s; }
+  .bug-spoiler[aria-expanded="true"] svg { transform: rotate(90deg); }
+  .bug-answer {
+    display: none;
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: var(--warning-soft);
+    border-left: 3px solid var(--warning);
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .bug-answer.open { display: block; animation: fadeSlide 0.3s ease-out; }
+  .bug-answer strong { color: var(--warning); }
+  .bug-answer .pvs-code {
+    display: inline-block;
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--warning);
+    margin-right: 6px;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Two-column comparison */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 28px 0;
+  }
+  .col-card {
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .col-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .col-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .col-card-icon svg { width: 20px; height: 20px; }
+  .col-card h3 { margin: 0; font-size: 18px; }
+  .col-card .col-en { font-size: 12px; color: var(--text-subtle); display: block; font-weight: 500; }
+  .col-card p { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  .col-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--text-muted);
+  }
+
+  /* Phase cards */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+  .phase {
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+  }
+  .phase-num {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase h4 { font-size: 17px; margin: 0 0 10px; }
+  .phase ul { padding-left: 18px; margin: 0; }
+  .phase li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; color: var(--text-muted); }
+
+  /* Accordion */
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .acc-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 0;
+  }
+  .acc-summary-left > span:last-child { min-width: 0; }
+  .acc-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body {
+    padding: 4px 22px 22px;
+    border-top: 1px solid var(--border);
+    margin-top: -1px;
+  }
+  .acc-body ol, .acc-body ul {
+    margin: 14px 0 0;
+    padding-left: 20px;
+  }
+  .acc-body li {
+    font-size: 15.5px;
+    margin-bottom: 8px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .acc-body p {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 14px 0 0;
+  }
+  .acc-body p:first-child { margin-top: 14px; }
+  .acc-body strong { color: var(--text); }
+
+  /* Checklist */
+  .checklist {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 16px 0 24px !important;
+  }
+  .checklist li {
+    position: relative;
+    padding: 10px 0 10px 32px;
+    font-size: 15.5px !important;
+    line-height: 1.55 !important;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0 !important;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 14px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--success-soft);
+    border: 1.5px solid var(--success);
+  }
+  .checklist li::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 19px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--success);
+    border-bottom: 2px solid var(--success);
+    transform: rotate(-45deg);
+  }
+  .checklist li strong { color: var(--text); }
+  .checklist li code { font-size: 13px !important; }
+
+  /* Stats row in hero */
+  .key-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin: 24px 0;
+  }
+  .key-stat {
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .key-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .key-stat-label {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  /* Property list */
+  .props {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .prop {
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .prop-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .prop-icon svg { width: 18px; height: 18px; }
+  .prop h4 { font-size: 15px; margin: 0 0 6px; }
+  .prop p { font-size: 13.5px !important; line-height: 1.5 !important; color: var(--text-muted); margin: 0 !important; }
+
+  /* Path list (для путей утечки/обхода) */
+  .path-list { margin: 24px 0; display: flex; flex-direction: column; gap: 8px; }
+  .path-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .path-mark {
+    flex-shrink: 0;
+    width: 8px; height: 8px;
+    border-radius: 2px;
+    background: var(--danger);
+    margin-top: 8px;
+  }
+  .path-content { flex: 1; }
+  .path-title {
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .path-desc { font-size: 14.5px; color: var(--text-muted); line-height: 1.55; }
+  .path-desc code { font-size: 12.5px; }
+
+  /* Footer / contacts */
+  .content-footer {
+    margin-top: 80px;
+    padding: 56px 0 0;
+    border-top: 1px solid var(--border);
+  }
+  .content-footer h2 {
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .content-footer p.lead {
+    color: var(--text-muted);
+    font-size: 17px;
+    margin-bottom: 28px;
+  }
+  .contact-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: var(--shadow-md);
+  }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-subtle);
+    line-height: 1.6;
+  }
+  .attribution-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 90;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 240px 1fr; gap: 36px; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc {
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      bottom: 0;
+      background: var(--bg);
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      transform: translateY(-100%);
+      transition: transform 0.25s ease-out;
+      z-index: 99;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .card, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats { grid-template-columns: 1fr; }
+    .hero-eyebrow { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .bug-answer { display: block !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#context" data-section="context"><span class="toc-num">01</span><span>Процесс №18 в ГОСТ 56939</span></a></li>
+      <li><a href="#task" data-section="task"><span class="toc-num">02</span><span>Задача эксперта</span></a></li>
+      <li><a href="#method" data-section="method"><span class="toc-num">03</span><span>Принцип работы</span></a></li>
+      <li><a href="#auth" data-section="auth"><span class="toc-num">04</span><span>Аутентификация</span></a></li>
+      <li><a href="#cases" data-section="cases"><span class="toc-num">05</span><span>Найди уязвимость: 6 кейсов</span></a></li>
+      <li><a href="#sql" data-section="sql"><span class="toc-num">06</span><span>SQL-инъекции</span></a></li>
+      <li><a href="#xss" data-section="xss"><span class="toc-num">07</span><span>XSS</span></a></li>
+      <li><a href="#path" data-section="path"><span class="toc-num">08</span><span>Path traversal</span></a></li>
+      <li><a href="#drivers" data-section="drivers"><span class="toc-num">09</span><span>Драйверы и модули ядра</span></a></li>
+      <li><a href="#dbus" data-section="dbus"><span class="toc-num">10</span><span>D-Bus и COM/DCOM</span></a></li>
+      <li><a href="#gui" data-section="gui"><span class="toc-num">11</span><span>Графические интерфейсы</span></a></li>
+      <li><a href="#mac" data-section="mac"><span class="toc-num">12</span><span>Мандатное управление доступом</span></a></li>
+      <li><a href="#sandbox" data-section="sandbox"><span class="toc-num">13</span><span>Замкнутая программная среда</span></a></li>
+      <li><a href="#debug" data-section="debug"><span class="toc-num">14</span><span>Средства отладки и ASLR</span></a></li>
+      <li><a href="#checklist" data-section="checklist"><span class="toc-num">15</span><span>Чек-лист: 38 вопросов</span></a></li>
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">16</span><span>Связь</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Авторская лекция · РБПО · Процесс №18</span>
+      <h1>Проверка безопасности приложения</h1>
+      <p class="hero-lead">Ручной направленный анализ кода как метод нефункционального тестирования. Эксперт играет роль нарушителя и систематически перебирает классы уязвимостей, ища их признаки в коде, конфигурациях, протоколах и интерфейсах исследуемого ПО.</p>
+
+      <div class="callout warning">
+        <p><strong>Граница законного применения.</strong> Все техники и кейсы этой лекции предназначены только для разрешенной проверки: в рамках договора, утвержденной программы испытаний, учебного стенда, внутреннего процесса РБПО или согласованной оценки защищенности. Без явного разрешения такие действия могут быть квалифицированы как неправомерный доступ или нарушение правил эксплуатации информационной системы.</p>
+      </div>
+
+      <div class="key-stats">
+        <div class="key-stat">
+          <div class="key-stat-value">№18</div>
+          <div class="key-stat-label">процесс в ГОСТ Р 56939</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">11</div>
+          <div class="key-stat-label">классов типовых уязвимостей</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">38</div>
+          <div class="key-stat-label">вопросов чек-листа эксперта</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">6</div>
+          <div class="key-stat-label">кейсов из реальной практики</div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Преподаватель</span>
+          <span class="hero-meta-value">Пиков Виталий Александрович</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Раздел курса</span>
+          <span class="hero-meta-value">Безопасная разработка ПО (РБПО)</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Нормативная база</span>
+          <span class="hero-meta-value">ГОСТ Р 56939-2024, процесс №18</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 01. CONTEXT -->
+    <section id="context" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> · Контекст</div>
+      <h2>Процесс №18 в жизненном цикле РБПО</h2>
+      <p class="lead">В ГОСТ Р 56939-2024 разработка безопасного ПО разбита на десятки взаимосвязанных процессов. Большинство из них работают на этапах проектирования, кодирования и тестирования — там же, где работают SAST, DAST, фаззинг и код-ревью. Процесс №18 — «Проверка безопасности приложения» — стоит особняком: это последний рубеж, где живой эксперт ищет то, что пропустили автоматические инструменты.</p>
+
+      <h3>Где этот процесс в жизненном цикле</h3>
+      <p>Проверка безопасности приложения относится к нефункциональному тестированию: она проверяет не «работает ли ПО так, как задумано», а «нельзя ли использовать ПО против его пользователей». Запускается после функционального тестирования, обычно — на стадии готового кандидата в релиз.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Когда запускается</th>
+              <th>Что проверяет</th>
+              <th>Кто выполняет</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>На этапе кодирования</td><td>Свойства кода (SAST, ревью)</td><td>Разработчик / SAST-инструмент</td></tr>
+            <tr><td>На этапе тестирования</td><td>Поведение работающего ПО (DAST, фаззинг)</td><td>Тестировщик / DAST-инструмент</td></tr>
+            <tr><td><strong>Перед выпуском (процесс №18)</strong></td><td><strong>Стойкость к атакам в модели нарушителя</strong></td><td><strong>Эксперт по безопасности</strong></td></tr>
+            <tr><td>В эксплуатации</td><td>Реакция на инциденты, мониторинг</td><td>SOC, AppSec-инженер</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Зачем нужен ручной анализ, если есть автоматика</h3>
+      <p>Автоматические инструменты ищут шаблоны: то, что разработчик алгоритма заранее назвал уязвимостью. Эксперт ищет нестандартное: бизнес-логику, нарушенные инварианты, плохую модель угроз, специфику конкретного продукта. Эти классы дефектов хорошо описываются словесно, но плохо алгоритмизируются.</p>
+
+      <div class="callout">
+        <p><strong>Главное отличие:</strong> SAST/DAST ловят то, что уже занесено в каталог их правил. Эксперт ловит то, чего в каталогах нет — например, что в защищённой системе документооборота приватный TLS-ключ оказался в общедоступном файле, потому что разработчик так распаковал архив.</p>
+      </div>
+    </section>
+
+    <!-- 02. TASK -->
+    <section id="task" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> · Задача</div>
+      <h2>Представить себя нарушителем</h2>
+      <p class="lead">Главная задача эксперта — представить себя нарушителем и попытаться нарушить безопасность исследуемой системы в рамках разумной модели нарушителя.</p>
+
+      <p>Под «разумной моделью нарушителя» обычно понимается:</p>
+      <ul>
+        <li><strong>непривилегированный локальный пользователь</strong> — имеет доступ к рабочему столу, может запускать любые свои программы;</li>
+        <li><strong>удалённый неаутентифицированный пользователь</strong> — может посылать сетевые запросы по любым открытым портам;</li>
+        <li><strong>удалённый аутентифицированный пользователь</strong> — имеет валидную учётную запись с минимальными правами;</li>
+        <li><strong>инсайдер с доступом к коду</strong> — может изучить исходники, бинарники, конфигурации, файлы данных.</li>
+      </ul>
+
+      <p>Эксперт не пытается «сломать всё подряд». Он принимает модель угроз, договорённую с заказчиком, и систематически проверяет, может ли нарушитель указанного уровня обойти декларируемые механизмы защиты.</p>
+
+      <div class="callout warning">
+        <p><strong>Важное замечание докладчика.</strong> Все приведённые далее примеры — из реальных случаев исследования ПО. К какому продукту и какому разработчику относится каждый пример, не упоминается; участки скриншотов, раскрывающие эту информацию, замазаны.</p>
+      </div>
+    </section>
+
+    <!-- 03. METHOD -->
+    <section id="method" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> · Метод</div>
+      <h2>Систематический перебор классов уязвимостей</h2>
+      <p class="lead">Принципиально различных типов уязвимостей и мест их расположения не очень много. Работа эксперта в основном сводится к тому, чтобы последовательно перебирать типы и места уязвимостей и для каждого искать в анализируемом ПО признаки наличия уязвимости данного типа.</p>
+
+      <h3>Из чего состоит метод</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h4>Знание класса</h4>
+          <p>Эксперт держит в голове 11 типовых классов: от обхода аутентификации до некорректной ASLR. Это не словарь сигнатур, а «карта типичных мест».</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </div>
+          <h4>Знание признака</h4>
+          <p>Для каждого класса — набор быстрых индикаторов: подозрительно короткий хеш, конкатенация в SQL, незакрытое отладочное API, лишнее имя в выводе <code>dbus-send</code>.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h20v14H2z"/><path d="M8 21h8M12 17v4"/></svg>
+          </div>
+          <h4>Поверхностный осмотр</h4>
+          <p>На каждое подозрительное место — 1–2 минуты. Файлы конфигурации, листинги директорий, вывод <code>ps</code>, <code>netstat</code>, <code>strings</code>, поиск по бинарникам.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h4>Целевой эксперимент</h4>
+          <p>Если поверхностный осмотр зацепил — эксперт пишет короткий PoC: подсовывает кавычку, генерирует «недопустимый» запрос, перехватывает трафик, пробует <code>dbus-send</code> от имени непривилегированного пользователя.</p>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Почему это работает.</strong> Любая уязвимость — это нарушение какого-то предположения, сделанного автором кода. Предположений конечное число: «клиент валидирует данные», «никто не читает приватный ключ», «никто не знает протокол сервиса». Эксперт идёт по списку этих предположений и проверяет каждое.</p>
+      </div>
+    </section>
+
+    <!-- 04. AUTH -->
+    <section id="auth" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> · Уязвимости</div>
+      <h2>Аутентификация</h2>
+      <p class="lead">Самая массовая категория. Условно делится на четыре подкласса: возможен обход; применяется не та криптография; криптография применяется, но неправильно; криптография не применяется там, где нужна.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">4.1</span>
+              <span>Возможности обхода</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Самая частая ошибка — забыть проверить, прошла ли аутентификация. Бывает, что аутентификация реализуется только в клиентской программе, а сервер полагает: «если запрос пришёл — значит, всё в порядке». Бывает, что в протокол добавляют много повышающих безопасность дополнительных параметров, которые не проверяются или проверяются неправильно.</p>
+            <p>Часто обходы заметны при визуальном просмотре исходного текста. Если ПО небольшое — удобнее всего сгенерировать каждый поддерживаемый запрос сторонней программой и посмотреть, что будет. Если ПО большое, а протокол не очень сложный — пишется простой сканер:</p>
+<pre class="code"><code><span class="kw">for</span> (перебор по параметрам запросов)
+  { <span class="fn">Send</span> (текущий вариант);
+    Error = <span class="fn">Receive</span> ();
+    <span class="kw">if</span> (Error != NOT_IMPLEMENTED &amp;&amp; Error != ACCESS_DENIED)
+      cout &lt;&lt; параметры запроса;
+  }</code></pre>
+            <p>Любой ответ, отличный от «не реализовано» или «доступ запрещён», — повод копнуть глубже.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">4.2</span>
+              <span>Применяется не та криптография</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>По документам для хеширования паролей применяется только ГОСТ 34.11-12, а реально — как повезёт. Или отечественная криптография вообще отсутствует, хотя должна присутствовать.</p>
+            <p>Реальный кейс: в одной отечественной сборке Linux отечественная криптография отсутствовала из-за ошибки при сборке — прилинковали не ту библиотеку.</p>
+            <p>Что делает эксперт: ищет по исходникам и бинарникам строки наподобие <code>gost</code>, <code>crypt</code>, проверяет версии заимствованных библиотек — могут быть устаревшие, с неустранёнными уязвимостями.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">4.3</span>
+              <span>Криптография применяется неправильно</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Часто для хеширования паролей применяют слабые хеш-функции (например, MD5) без марканта/соли. В таких случаях сразу обращает на себя внимание необычно короткий хеш. Для проверки, используется ли соль, достаточно создать две учётные записи с одинаковыми паролями и сравнить хеши. Алгоритм шифрования/подписи в большинстве случаев проще всего установить с помощью одного из многочисленных онлайн-калькуляторов.</p>
+            <p>Попадались случаи, когда секретный ключ хранился в общедоступном файле (см. кейс №1 ниже).</p>
+            <div class="callout warning">
+              <p><strong>Правило безопасности.</strong> Нормальному человеку не под силу самостоятельно реализовать нетривиальный криптопротокол. Если видите самописный код, делающий что-то криптографическое, — там, скорее всего, много ужасных ошибок. Единственный правильный подход — целиком заимствовать чужое программное решение, подготовленное профессионалами.</p>
+            </div>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">4.4</span>
+              <span>Криптография не применяется когда надо</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Базовые ошибки, которые ловятся одним <code>tcpdump</code> или Wireshark:</p>
+            <ul>
+              <li>пароль передаётся по сети в открытом виде;</li>
+              <li>по сети передают не пароль, а незашифрованный хеш — это позволяет перехватить его и передать повторно (pass-the-hash);</li>
+              <li>для идентификации сетевого соединения используется легкоугадываемое значение, например порядковый номер.</li>
+            </ul>
+            <p>Эксперт обязательно перехватывает трафик пары «клиент — сервер» во всех штатных сценариях: вход, выход, смена пароля, восстановление сессии. Странности видны сразу.</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- 05. CASES -->
+    <section id="cases" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> · Практика</div>
+      <h2>Найди уязвимость: шесть кейсов из реальной практики</h2>
+      <p class="lead">Шесть фрагментов из реальных проверок: листинг файлов, хеш пароля, сетевой пакет, JWT-токен, окно файлового менеджера, вывод D-Bus. В каждом — характерный признак уязвимости, который опытный эксперт видит за секунды. Прочитайте, попробуйте найти проблему сами, потом раскройте подсказку.</p>
+
+      <div class="bug-cases">
+
+        <!-- Case 1 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">1</span> Листинг каталога с сертификатами</div>
+            <span class="bug-case-lang">file system · защищённый документооборот</span>
+          </div>
+          <div class="bug-case-desc">Отечественная система защищённого документооборота. JWT-токены в трафике. Дамп каталога <code>/.../archive/install/unix/Release/bin/cert/</code>:</div>
+<pre class="code"><code>-rw-r--r-- 1 radmin radmin 1266 авг 31 10:21 10.168.250.201.crt
+-rw-r--r-- 1 radmin radmin 1018 авг 31 10:21 10.168.250.201.key
+-rw-r--r-- 1 radmin radmin 1702 авг 31 10:21 10.168.250.67.crt
+-rw-r--r-- 1 radmin radmin 1241 авг 31 10:21 10.168.250.67.csr
+-rw-r--r-- 1 radmin radmin  989 авг 31 10:21 10.168.250.67.key
+-rw-r--r-- 1 radmin radmin 1675 авг 31 10:21 10.168.253.21.crt
+-rw-r--r-- 1 radmin radmin 1316 авг 31 10:21 10.168.253.21.csr
+-rw-r--r-- 1 radmin radmin 1058 авг 31 10:21 10.168.253.21.key
+-rw-r--r-- 1 radmin radmin 1706 авг 31 10:21 <span class="hl-bad">privatekey.txt</span>
+-rw-r--r-- 1 radmin radmin   32 авг 31 10:21 rootCA.crt
+-rw-r--r-- 1 radmin radmin 1456 авг 31 10:21 rootCA.key
+-rw-r--r-- 1 radmin radmin 1702 авг 31 10:21 rootCA.srl
+-rw-r--r-- 1 radmin radmin   18 авг 31 10:21 server.crt
+-rw-r--r-- 1 radmin radmin 1332 авг 31 10:21 server.csr
+-rw-r--r-- 1 radmin radmin 1142 авг 31 10:21 server.key</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-312</span> <strong>Хранение чувствительной информации в открытом виде.</strong> Файл <code>privatekey.txt</code> с правами <code>-rw-r--r--</code> доступен на чтение всем пользователям системы. Для секретного ключа JWT это эквивалентно полной компрометации механизма подписи: любой локальный пользователь может выпустить токены любого уровня доступа. Самописная криптография регулярно сопровождается такими ошибками — стандартные библиотеки таких файлов не создают.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 2 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">2</span> MD5-хеш пароля в БД</div>
+            <span class="bug-case-lang">database · отечественная СЗИ</span>
+          </div>
+          <div class="bug-case-desc">Дамп таблицы пользователей. В одной из колонок видно:</div>
+<pre class="code"><code>Your String  →  Qwerty-123
+MD5 Hash     →  <span class="hl-bad">f7f12464d28bec02951b713dd016cb58</span>
+
+current request user: Администратор
+                pwd: f7f12464d28bec02951b713dd016cb58</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-916</span> <strong>Хеширование пароля без соли и слабым алгоритмом.</strong> Подозрительно короткий хеш (32 hex-символа) — почти наверняка MD5. Прогон через любой онлайн-калькулятор подтверждает: <code>md5("Qwerty-123") = f7f12464d28bec02951b713dd016cb58</code>. Соль не используется (две учётные записи с одинаковыми паролями имеют одинаковый хеш). Радужные таблицы для MD5 без соли — массовый ширпотреб; пароль восстанавливается за секунды.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 3 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">3</span> Перехваченный HTTP-запрос</div>
+            <span class="bug-case-lang">network · Wireshark · корпоративный портал</span>
+          </div>
+          <div class="bug-case-desc">Трафик между клиентом и сервером, поток TCP в Wireshark:</div>
+<pre class="code"><code>POST /spring-security-jdbc-example/login.html HTTP/1.1
+Host: java-srv:8080
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:84.0) Gecko/20100101 Firefox/84.0
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9
+Accept-Language: ru-RU,ru;q=0.8,en-US;q=0.5,en;q=0.3
+Accept-Encoding: gzip, deflate
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 75
+Origin: http://java-srv:8080
+Connection: keep-alive
+Upgrade-Insecure-Requests: 1
+
+_csrf=fbd7a3d8-d139-4764-8e23-f12fee9f95e2&amp;<span class="hl-bad">username=admin&amp;password=password</span></code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-319</span> <strong>Передача чувствительных данных в открытом виде.</strong> Логин и пароль передаются обычным HTTP без TLS — в рамках корпоративной сети их видит любой, кто имеет доступ к снифферу или к промежуточному маршрутизатору. CSRF-токен присутствует, что создаёт ложное ощущение безопасности, но он не защищает от перехвата. Параллельно — слабый пароль <code>password</code>: либо тестовая учётка не была удалена в проде, либо политика паролей отсутствует.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 4 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">4</span> Самописный JWT-токен</div>
+            <span class="bug-case-lang">JWT · payload · подписанная нагрузка</span>
+          </div>
+          <div class="bug-case-desc">Декодированный payload JWT-токена, выпущенного отечественной системой защиты:</div>
+<pre class="code"><code>{
+  <span class="str">"alg"</span>: <span class="str">"HS512"</span>,
+  <span class="str">"typ"</span>: <span class="str">"JWT"</span>
+}
+.
+{
+  <span class="str">"AccessLevel"</span>:        <span class="str">"0"</span>,
+  <span class="str">"FileCommandId"</span>:      <span class="str">"1"</span>,
+  <span class="str">"FileId"</span>:             <span class="str">"346"</span>,
+  <span class="str">"FileSourceVersionId"</span>: <span class="str">"0"</span>,
+  <span class="str">"FileVersionId"</span>:      <span class="str">"1"</span>,
+  <span class="str">"IpAddress"</span>:          <span class="hl-bad">"Слава России!"</span>,
+  <span class="str">"UserGuid"</span>:           <span class="hl-bad">"' or 1=1; drop table"</span>,
+  <span class="str">"iat"</span>:               <span class="hl-bad">"меня заставляют отправлять сетевые пакеты"</span>,
+  <span class="str">"sub"</span>:               <span class="hl-bad">"УПЯЧКА!!!111 ЖЕПЬ ЕБРИЛО! ХЫВТОНЕ ПОЛЯЧСЫ!!!!"</span>
+}</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-345</span> <strong>Поля JWT-токена не валидируются на стороне сервера.</strong> Эксперт подменил содержимое полей <code>IpAddress</code>, <code>UserGuid</code>, <code>iat</code>, <code>sub</code> на произвольный текст и SQL-инъекцию — токен принят сервером без замечаний. Это значит: подпись проверяется, но содержимое — нет. Ни один из этих параметров не используется в логике авторизации, либо используется без санитизации. Параллельно проверяется главное — что секретный ключ подписи лежит в <code>privatekey.txt</code> с правами <code>644</code> (см. кейс №1).
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 5 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">5</span> Файловый менеджер мессенджера</div>
+            <span class="bug-case-lang">file system · мессенджер · path traversal</span>
+          </div>
+          <div class="bug-case-desc">В корпоративном мессенджере есть передача файлов. Получатель видит окно «Files Received», нажимает «Show in Folder» — открывается стандартный проводник Windows. Эксперт отправил файл с именем:</div>
+<pre class="code"><code>\..\..\..\..\Resources\<span class="hl-bad">Translation.xaml</span>
+
+# А затем посмотрел, куда он попал:
+C:\tmp2\Resources\
+  Translation(1).xaml   14.04.2020
+  Translation(2).xaml   14.04.2020
+  <span class="hl-bad">Translation.xaml</span>      18.08.2013</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-22</span> <strong>Path traversal при сохранении вложений.</strong> Имя файла принимается от другого пользователя «как есть» и склеивается с базовым путём — обратные слеши и <code>..</code> не санитизируются. Файл с переданным именем «выпрыгнул» из своего каталога и перезаписал ресурс приложения <code>Translation.xaml</code> от 18.08.2013. Аналогичным образом можно перезаписать конфиги, исполняемые файлы, файлы автозагрузки. То же самое демонстрируется фейковым именем <code>\..\..\..\..\..\..\..\..\..\..\etc\shadow</code> в Linux-варианте.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 6 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">6</span> D-Bus интроспекция стороннего сервиса</div>
+            <span class="bug-case-lang">D-Bus · непривилегированный пользователь</span>
+          </div>
+          <div class="bug-case-desc">Эксперт от имени обычного пользователя выполняет два запроса к шине:</div>
+<pre class="code"><code>$ dbus-send --print-reply --dest=org.freedesktop.DBus \
+            /org/freedesktop/DBus \
+            org.freedesktop.DBus.ListActivatableNames
+
+   ... ru.hornshooves.app  ...
+
+$ dbus-send --print-reply --dest=ru.hornshooves.app / \
+            org.freedesktop.DBus.Introspectable.Introspect
+
+&lt;node&gt;
+  &lt;interface name=<span class="str">"ru.hornshooves.app"</span>&gt;
+    &lt;method name=<span class="str">"Hello"</span>&gt;
+      &lt;arg direction=<span class="str">"out"</span> type=<span class="str">"s"</span>/&gt;
+    &lt;/method&gt;
+    &lt;method name=<span class="str">"GetSomeName"</span>&gt;
+      &lt;arg direction=<span class="str">"in"</span>  type=<span class="str">"s"</span>/&gt;
+      &lt;arg direction=<span class="str">"in"</span>  type=<span class="str">"u"</span>/&gt;
+      &lt;arg direction=<span class="str">"out"</span> type=<span class="str">"s"</span>/&gt;
+    &lt;/method&gt;
+  &lt;/interface&gt;
+&lt;/node&gt;
+
+$ dbus-send --print-reply --dest=ru.hornshooves.app / \
+            ru.hornshooves.app.GetSomeName <span class="hl">string:"aaa" uint32:666</span></code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать подсказку
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">CWE-862</span> <strong>Отсутствие авторизации на D-Bus-интерфейсе.</strong> Стороннее приложение зарегистрировало в системной шине метод <code>GetSomeName</code> — и не выставило политику доступа. Любой непривилегированный пользователь может вызвать его с произвольными параметрами, не пройдя никакой проверки. Это типичная картина для open-source библиотек, чьи D-Bus-интерфейсы попадают в продукт «по умолчанию» вместе с библиотекой. Реальный пример того же класса: в Astra Linux 1.6 D-Bus давал доступ к меню «Пуск» версии 1.4 — не уязвимость, но иллюстрация случайно вставленного НДВ «в хорошем смысле».
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <p><strong>Что объединяет все шесть кейсов.</strong> Ни один из них не обнаруживается обычным SAST-сканером: листинг каталога, хеш в дампе БД, перехваченный трафик, payload JWT, окно мессенджера, вывод <code>dbus-send</code> — всё это <em>контекст</em>, а не <em>код</em>. Зато для эксперта, прошедшего через сотни проверок, каждый из этих шести случаев — характерный признак, который сразу запускает «копать сюда».</p>
+      </div>
+    </section>
+
+    <!-- 06. SQL -->
+    <section id="sql" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> · Уязвимости</div>
+      <h2>SQL-инъекции</h2>
+      <p class="lead">Хороший обзор: <a href="https://ru.wikipedia.org/wiki/Внедрение_SQL-кода" target="_blank" rel="noopener">Википедия — Внедрение SQL-кода</a>. Тема старая, но встречается до сих пор почти в каждой проверке.</p>
+
+      <h3>Простой эмпирический тест</h3>
+      <p>Проще всего выявить, введя в форму ввода кавычку, апостроф и т. п. Появление синтаксической ошибки сигнализирует о SQL-инъекции:</p>
+
+      <div class="callout warning">
+        <p><strong>Ошибка!</strong> При проверке пользователя обнаружена ошибка: <code>[DBERRCODE(42601)]</code></p>
+        <p>ОШИБКА: ошибка синтаксиса (примерное положение: «А»)<br>СТРОКА 2: <code>state = 'A'</code></p>
+      </div>
+
+      <p>Параллельно потенциальные SQL-инъекции часто видны визуально в коде. Признак — ручная конкатенация строк запроса:</p>
+
+<pre class="code"><code><span class="cm">// Так делать нельзя — конкатенация даёт SQL-инъекцию:</span>
+<span class="ty">String</span> sql = <span class="str">"SELECT * FROM Users WHERE UserName = '"</span>
+              + userName + <span class="str">"'"</span>;
+<span class="kw">var</span> command = <span class="kw">new</span> <span class="ty">SqlCommand</span>(sql, connection);
+
+<span class="cm">// Так — корректно, через параметризацию:</span>
+<span class="kw">public boolean</span> <span class="fn">login</span>(<span class="ty">String</span> username, <span class="ty">String</span> password) {
+    PreparedStatement stmt = connection.prepareStatement(
+        <span class="str">"SELECT * FROM users WHERE username = ? AND password = ?"</span>);
+    stmt.setString(<span class="num">1</span>, username);
+    stmt.setString(<span class="num">2</span>, password);
+    ResultSet rs = stmt.executeQuery();
+    ...
+}</code></pre>
+
+      <p>При построении SQL-запроса должны применяться специальные средства, реализующие все необходимые проверки. Эти средства не должны быть самописными.</p>
+    </section>
+
+    <!-- 07. XSS -->
+    <section id="xss" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> · Уязвимости</div>
+      <h2>XSS</h2>
+      <p class="lead">Хороший обзор: <a href="https://owasp.org/www-community/attacks/xss/" target="_blank" rel="noopener">OWASP Community — XSS</a>. В общем случае ищутся с большим трудом, но иногда их наличие очевидно.</p>
+
+      <p>Реальный пример из проверки — параметр <code>back_url</code> на странице авторизации:</p>
+
+<pre class="code"><code><span class="cm">// Безобидный вариант:</span>
+http://127.0.0.1/login.html?back_url=http://127.0.0.1/
+
+<span class="cm">// А что, если подставить javascript:?</span>
+http://127.0.0.1/login.html?back_url=<span class="hl-bad">javascript:%0Aalert(document.cookie)</span></code></pre>
+
+      <p>В реальной системе ввод второго URL приводил к выполнению JavaScript в контексте сайта — alert с содержимым cookie. Дальше это превращается в кражу сессии любого пользователя, перешедшего по подделанной ссылке.</p>
+
+      <div class="callout">
+        <p><strong>Универсальный индикатор.</strong> Ошибка при вводе в форму кавычки или апострофа может сигнализировать не только об SQL-инъекции, но и о XSS — на сервере что-то «не съело» специальный символ и вернуло его в ответ. Это сигнал копать.</p>
+      </div>
+    </section>
+
+    <!-- 08. PATH TRAVERSAL -->
+    <section id="path" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> · Уязвимости</div>
+      <h2>Path traversal</h2>
+      <p class="lead">В любом месте, где пользователю предлагается указать имя файла, эксперт пробует ввести имя с путём — и смотрит, что получится.</p>
+
+      <h3>Что подставлять</h3>
+      <ul>
+        <li><code>../</code>, <code>./</code> — переход на уровень выше;</li>
+        <li><code>\</code> в начале строки (актуально для Windows);</li>
+        <li><code>/etc/shadow</code>, <code>C:\Windows\System32\config\SAM</code> — абсолютные пути к чувствительным файлам;</li>
+        <li>странные кодировки Unicode для обхода фильтров (<code>%c0%ae%c0%ae</code>, <code>%252e%252e</code>);</li>
+        <li>длинные пути с превышением <code>MAX_PATH</code>;</li>
+        <li>NTFS-потоки данных вида <code>file.txt:hidden</code>.</li>
+      </ul>
+
+      <p>Реальный кейс — окно поиска файлов в защищённой системе. Введя <code>\..\..\..\..\..\..\..\..\..\..\etc\shadow</code> в поле поиска, эксперт получил окно, предлагающее «скачать /etc/shadow» (см. также кейс №5 выше — то же самое в формате имени присоединяемого файла).</p>
+
+      <p>Если делается санитизация — стоит проверить, можно ли её обойти необычными кодировками или какими-то другими ухищрениями. Стандартный тест: подставить <code>%2e%2e%2f</code>, <code>..%2f</code>, <code>%c0%ae%c0%ae%c0%af</code> и сравнить, обрабатывает ли их сервер так же, как чистые <code>../</code>.</p>
+    </section>
+
+    <!-- 09. DRIVERS -->
+    <section id="drivers" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> · Уязвимости</div>
+      <h2>Самописные драйверы и модули ядра</h2>
+      <p class="lead">Любой самописный драйвер — гарантированный источник проблем. Три типичных подкласса.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">9.1</span>
+              <span>Неисчерпаемый источник сбоев</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Включаем максимальное количество функций драйвера/модуля и запускаем SyzKaller, либо пишем простейший «фаззер»:</p>
+<pre class="code"><code><span class="kw">for</span> (;;)
+  <span class="kw">for</span> (i = <span class="num">0</span>; i &lt; MAX_SYSCALL; i++)
+    { <span class="kw">if</span> (<span class="fn">NonFuzzable</span> (i))
+        <span class="kw">continue</span>;
+      r1 = <span class="fn">rand</span> (); r2 = <span class="fn">rand</span> ();
+      r3 = <span class="fn">rand</span> (); r4 = <span class="fn">rand</span> ();
+      r5 = <span class="fn">rand</span> (); r6 = <span class="fn">rand</span> ();
+      <span class="fn">syscall</span> (i, r1, r2, r3, r4, r5, r6);
+    }</code></pre>
+            <p>Результат предсказуем: BSOD на Windows, kernel oops на Linux, паника ядра — за минуты. Драйвер, который не выживает после такой проверки, не должен попадать в продукт.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">9.2</span>
+              <span>Утечки данных (Heartbleed-паттерн)</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Корректный код IOCTL-обработчика выставляет размер выходного буфера <em>после</em> валидации параметров каждой команды:</p>
+<pre class="code"><code><span class="kw">switch</span> (code)
+  { <span class="kw">case</span> CODE1:
+      <span class="kw">if</span> (!<span class="fn">CheckParameters1</span> ()) <span class="kw">return</span> ошибка;
+      <span class="fn">SetOutBufferSize</span> (как хочет клиент);
+      <span class="kw">return</span> <span class="fn">DoRequest1</span> ();
+    <span class="kw">case</span> CODE2:
+      <span class="kw">if</span> (!<span class="fn">CheckParameters2</span> ()) <span class="kw">return</span> ошибка;
+      <span class="fn">SetOutBufferSize</span> (как хочет клиент);
+      <span class="kw">return</span> <span class="fn">DoRequest2</span> ();
+    <span class="kw">default</span>:
+      <span class="kw">return</span> ошибка;
+  }</code></pre>
+            <p>На каком-то этапе автор делает «безобидный» рефакторинг — выносит общий вызов <code>SetOutBufferSize</code> наружу. А спустя пару релизов добавляет команду без параметров:</p>
+<pre class="code"><code><span class="hl-bad"><span class="fn">SetOutBufferSize</span> (как хочет клиент);</span>
+<span class="kw">switch</span> (code)
+  { <span class="kw">case</span> CODE1: <span class="kw">if</span> (!<span class="fn">CheckParameters1</span>()) <span class="kw">return</span> ошибка; <span class="kw">return</span> <span class="fn">DoRequest1</span> ();
+    <span class="kw">case</span> CODE2: <span class="kw">if</span> (!<span class="fn">CheckParameters2</span> ()) <span class="kw">return</span> ошибка; <span class="kw">return</span> <span class="fn">DoRequest2</span> ();
+    <span class="kw">case</span> CODE3_NO_PARAMETERS:
+      <span class="kw">return</span> <span class="fn">DoRequest3</span> ();   <span class="cm">// нет CheckParameters — буфер уже выставлен!</span>
+    <span class="kw">default</span>:  <span class="kw">return</span> ошибка;
+  }</code></pre>
+            <p>В результате при обработке запроса с кодом <code>CODE3</code> клиент получает столько байт случайной памяти ядра, сколько попросит. Реальный кейс — драйвер промышленного ПО под Windows отдавал до мегабайта памяти ядра одной командой.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">9.3</span>
+              <span>Недостаточно ограниченные права</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Часто забывают ограничить права непривилегированных пользователей к самописным устройствам. Эксперт смотрит листинг <code>/dev/</code> или <code>\\.\</code>, ищет устройства с правами <code>666</code> / <code>FILE_ANY_ACCESS</code> и пробует обращаться к ним от имени обычного пользователя.</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- 10. D-BUS -->
+    <section id="dbus" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> · Уязвимости</div>
+      <h2>D-Bus и COM/DCOM</h2>
+      <p class="lead">Многие библиотеки open source предоставляют доступ к своим функциям через D-Bus. Доступ пользователей к этим функциям, как правило, предоставляется без разграничения, на основе случайной политики безопасности, самопроизвольно возникшей при заимствовании сторонних библиотек.</p>
+
+      <h3>Опасные сервисы по умолчанию</h3>
+      <p>Практически во всех Linux-системах присутствуют сервисы, позволяющие непривилегированному приложению блокировать графические сессии пользователей:</p>
+      <ul>
+        <li><code>org.freedesktop.login1</code></li>
+        <li><code>org.freedesktop.ScreenSaver</code></li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Пример «случайного НДВ».</strong> В Astra Linux 1.6 D-Bus давал доступ к меню «Пуск» версии 1.4 — не уязвимость, просто пример случайно вставленного НДВ «в хорошем смысле»: библиотека графического стека экспортировала больше методов, чем ожидал интегратор.</p>
+      </div>
+
+      <h3>Стандартный осмотр шины</h3>
+      <p>Получить список сервисов:</p>
+<pre class="code"><code>$ dbus-send [--system] --print-reply --dest=org.freedesktop.DBus \
+            /org/freedesktop/DBus \
+            org.freedesktop.DBus.List[Activatable]Names</code></pre>
+
+      <p>Получить список узлов и интерфейсов конкретного сервиса:</p>
+<pre class="code"><code>$ dbus-send [--system] --print-reply --dest=сервис /узел \
+            org.freedesktop.DBus.Introspectable.Introspect</code></pre>
+
+      <p>Дальше — пробовать каждый интерфейс от имени непривилегированного нарушителя (см. кейс №6 выше). Можно обнаружить много чёрных ходов, позволяющих делать странные вещи.</p>
+
+      <div class="callout warning">
+        <p><strong>D-Bus можно прослушивать,</strong> если это специально не запрещено. Потенциально по D-Bus могут передаваться пароли и другая чувствительная информация. В Windows ближайшим аналогом D-Bus является <strong>COM/DCOM</strong> — те же вопросы задаются и о нём.</p>
+      </div>
+    </section>
+
+    <!-- 11. GUI -->
+    <section id="gui" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> · Уязвимости</div>
+      <h2>Графические интерфейсы</h2>
+      <p class="lead">Графический стек — отдельный мир уязвимостей. Сценарии «приложение видит чужие окна», «приложение посылает чужому окну сообщение», «приложение перехватывает клавиатуру» — на разных платформах решаются по-разному.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/></svg>
+            </div>
+            <div>
+              <h3>X Window System</h3>
+              <span class="col-en">Linux desktop · традиционный</span>
+            </div>
+          </div>
+          <p>На рабочем столе все приложения видят все окна. Любое приложение может отправить любое сообщение любому окну. Можно накрыть чужое окно своим и перехватывать клавиатурный ввод.</p>
+          <p>Готовые «фокусы» для проверки:</p>
+          <div class="col-tags">
+            <span class="col-tag">XSendEvent</span>
+            <span class="col-tag">xkey</span>
+            <span class="col-tag">xwatchwin</span>
+            <span class="col-tag">XQueryTree</span>
+          </div>
+        </div>
+
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <h3>Wayland · Android · Win Vista+</h3>
+              <span class="col-en">Современные стеки</span>
+            </div>
+          </div>
+          <p>Защита от описанных атак есть на уровне самого стека. В Windows, начиная с Vista, введены специальные средства защиты от атак через графический интерфейс. В Wayland и Android с безопасностью вроде всё хорошо.</p>
+          <p>Эксперт проверяет: используется ли уязвимый стек по умолчанию (Astra/RedOS могут поставляться с Xorg), и не открыт ли «X-сервер для совместимости» в рабочих сценариях.</p>
+          <div class="col-tags">
+            <span class="col-tag">Wayland</span>
+            <span class="col-tag">UIPI</span>
+            <span class="col-tag">UAC</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Окна привилегированных приложений на общем рабочем столе</h3>
+      <p>Сумел запустить из привилегированного приложения файловый менеджер или консоль — захватил контроль над ОС. Актуально в любом графическом интерфейсе, не только в X Window System. Самый известный пример прошлого — <a href="https://ru.wikipedia.org/wiki/Shatter_attack" target="_blank" rel="noopener">Shatter attack</a>; в прошлом таких уязвимых приложений было много (например, Agnitum Outpost, Symantec Antivirus).</p>
+
+      <div class="callout">
+        <p><strong>Что проверяет эксперт.</strong> Открывает «Системный монитор» / диспетчер задач, ищет процессы привилегированного ПО, у которых есть видимые окна на общем рабочем столе. Затем смотрит, к какому пользователю эти окна принадлежат, и пробует послать им сообщения от имени непривилегированного пользователя.</p>
+      </div>
+    </section>
+
+    <!-- 12. MAC -->
+    <section id="mac" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> · Уязвимости</div>
+      <h2>Мандатное управление доступом</h2>
+      <p class="lead">Мандатное управление доступом (МУД) — отдельный класс защитных механизмов. У него два характерных вида проблем: программа просто не работает в МУД-окружении, либо работает, но позволяет утечки.</p>
+
+      <h3>12.1. «Чума секретности» — программа не работает</h3>
+      <p>Как правило, программы, изначально не предназначавшиеся для работы в условиях мандатного управления доступом, в них не работают. Обычно достаточно построить нетривиальную политику работы с секретами, поработать несколько дней — и всё рушится само собой. Нормальных реализаций МУД, пригодных для повседневного использования, видимо, нет.</p>
+
+      <div class="callout warning">
+        <p><strong>Простейший пример «чумы секретности».</strong> В орфографический словарь попало слово, помеченное как секретное. Засекретился весь словарь. Засекретились все документы, где проверялась орфография. Засекретился шаблон нового документа по умолчанию. Засекретилась вся система документооборота. Откатить — невозможно.</p>
+      </div>
+
+      <h3>12.2. Утечки помеченной информации</h3>
+      <p>Как правило, информация, помеченная как секретная, всё равно может утекать в несекретные области ОС. Типичные пути:</p>
+
+      <div class="path-list">
+        <div class="path-item">
+          <div class="path-mark"></div>
+          <div class="path-content">
+            <div class="path-title">Поисковые индексы</div>
+            <div class="path-desc">Indexer индексирует <em>содержимое</em> файла, а индекс хранит как обычный файл. Поиск секретного слова возвращает положительный результат и в несекретной сессии.</div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-mark"></div>
+          <div class="path-content">
+            <div class="path-title">Журнальные файлы</div>
+            <div class="path-desc">Системные журналы пишутся обычно с правами root и без учёта мандатных меток. Имена файлов, ID процессов, фрагменты команд — всё это попадает в <code>journalctl</code> в открытом виде.</div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-mark"></div>
+          <div class="path-content">
+            <div class="path-title">Графические интерфейсы</div>
+            <div class="path-desc">Заголовок окна с именем секретного файла, превью в Alt-Tab, история «недавних документов» — типичные каналы утечки на уровне DE.</div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-mark"></div>
+          <div class="path-content">
+            <div class="path-title">Привилегированные системные процессы</div>
+            <div class="path-desc">Простой пример: <code>set /p a=&lt;c:\secret\secret.doc &amp; runas /user:%username% "cmd /c echo %a% &gt; c:\not_secret\not_secret.doc"</code>. Высокопривилегированный процесс читает секрет и пишет туда, где у вас прав нет, — а потом результат остаётся доступным.</div>
+          </div>
+        </div>
+        <div class="path-item">
+          <div class="path-mark"></div>
+          <div class="path-content">
+            <div class="path-title">Внешние накопители информации</div>
+            <div class="path-desc">USB-флешки, сетевые диски, облачное хранилище — если МУД не покрывает их монтирование, всё содержимое выходит за периметр без меток.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 13. SANDBOX -->
+    <section id="sandbox" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> · Уязвимости</div>
+      <h2>Замкнутая программная среда</h2>
+      <p class="lead">Замкнутая (изолированная) программная среда — режим, в котором можно запускать только разрешённые исполняемые файлы. На бумаге — неприступно. На практике — неисчерпаемый источник обходов.</p>
+
+      <h3>13.1. Типичные пути обхода</h3>
+      <ul>
+        <li><strong>Файлы-исключения,</strong> доступные для записи непривилегированным пользователям. Очень характерно для «защищённых» надстроек над Windows.</li>
+        <li><strong>Скрипты:</strong>
+<pre class="code"><code>$ bash script.txt
+&gt; for /f "delims=;" %i in (file.txt) do %i</code></pre>
+        </li>
+        <li><strong>Эксплойт <a href="https://www.exploit-db.com/" target="_blank" rel="noopener">38473 из ExploitDB</a></strong> — классическая публичная техника обхода.</li>
+        <li><strong>Ярлыки на рабочем столе,</strong> если запрещено запускать файловый менеджер: ярлык можно создать вручную или подменить чужой.</li>
+        <li><strong>Файлы конфигурации</strong>, например <code>~/.bashrc</code>: попадают в нагрузку оболочки и могут содержать произвольные команды.</li>
+        <li><strong>Перенаправление ввода-вывода,</strong> если запрещён доступ к консольным устройствам.</li>
+        <li><strong>Журнальные файлы:</strong> вывод программы, не получившей доступа к консоли, может оказываться в доступном на чтение журнальном файле.</li>
+      </ul>
+
+      <h3>13.2. Обход через фронтенд</h3>
+      <p>Если фронтенд приложения реализован веб-подобными технологиями, файлы HTML, JS и т. п., как правило, не рассматриваются замкнутой программной средой как исполняемые и могут невозбранно модифицироваться.</p>
+      <p>Запреты на обращения к опасным интерфейсам могут обходиться динамической генерацией интерпретируемого программного кода: даже если запрещён прямой <code>eval</code>, можно собрать строку из частей и передать в безобидно выглядящий обработчик событий.</p>
+
+      <div class="callout warning">
+        <p><strong>Кроме того,</strong> замкнутая программная среда — неисчерпаемый источник сбоев в основной работе пользователя: периодически блокируются нужные операции, тормозят легитимные приложения, падают сторонние компоненты. Эксперт смотрит не только на пути обхода, но и на удобство — слишком жёсткая ЗПС всё равно будет отключена администраторами «потому что мешает».</p>
+      </div>
+    </section>
+
+    <!-- 14. DEBUG + ASLR -->
+    <section id="debug" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> · Защитные механизмы</div>
+      <h2>Средства отладки и ASLR</h2>
+      <p class="lead">Двa механизма из «инфраструктуры безопасности» ОС, которые эксперт всегда проверяет: блокировка отладочных интерфейсов и качество рандомизации адресных пространств.</p>
+
+      <h3>14.1. Средства отладки</h3>
+      <p>Отладочные интерфейсы могут использоваться как непосредственно для НСД, так и для преодоления отдельных элементов защиты. Что должно быть:</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+            </div>
+            <div>
+              <h3>В Linux-системах</h3>
+              <span class="col-en">обязательный минимум</span>
+            </div>
+          </div>
+          <ul style="font-size: 14.5px; line-height: 1.55;">
+            <li>Ядро собрано с поддержкой <strong>Yama</strong> или аналогичного модуля.</li>
+            <li>Интерфейс <code>ptrace</code>, файлы <code>maps</code> и <code>mem</code> недоступны непривилегированным приложениям.</li>
+          </ul>
+        </div>
+
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6v6H9z"/></svg>
+            </div>
+            <div>
+              <h3>В Windows-системах</h3>
+              <span class="col-en">разумный компромисс</span>
+            </div>
+          </div>
+          <p style="font-size: 14.5px;">В идеале нельзя делать <code>OpenProcess</code> и <code>OpenThread</code> на компоненты защищённого ПО. В реальности полностью добиться этого, скорее всего, не получится — должен быть какой-то разумный компромисс. В любом случае, стороннее непривилегированное приложение не должно иметь возможности применять средства отладки к защищённому ПО.</p>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Реальный кейс.</strong> Однажды в эксплуатируемом промышленном ПО нашёлся неудалённый стенд отладки веб-интерфейса — позволял отлаживать SQL-инъекции прямо через GET-параметры. Стенд оставался доступен по сети без какой-либо аутентификации.</p>
+      </div>
+
+      <h3>14.2. ASLR — рандомизация адресных пространств</h3>
+      <p>Основное средство защиты от эксплуатации переполнений буферов и некоторых других видов уязвимостей. Что проверяется:</p>
+
+      <ul class="checklist">
+        <li><strong>Достаточная энтропия:</strong> известны случаи успешного подбора распределения памяти при количестве вариантов до примерно 100 000.</li>
+        <li><strong>Различие между процессами:</strong> в одновременно выполняющихся процессах распределение должно отличаться. Сходное или полностью одинаковое распределение — типичный недостаток.</li>
+        <li><strong>Отсутствие злоупотребления отключением:</strong> средства отключения ASLR для отдельных процессов не должны применяться без необходимости.</li>
+        <li><strong>Защита от обхода через обработку исключений:</strong> злоупотребление средствами обработки исключений позволяет нарушителю угадывать варианты неограниченно долго невзирая на ASLR.</li>
+      </ul>
+    </section>
+
+    <!-- 15. CHECKLIST -->
+    <section id="checklist" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> · Инструмент</div>
+      <h2>Чек-лист эксперта: 38 контрольных вопросов</h2>
+      <p class="lead">Практический опросник для проведения процесса №18. Ниже — все 38 вопросов, сгруппированные по тематическим разделам. Каждый вопрос — это и тест для разработчика, и пункт плана для эксперта по безопасности.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 1–4</span>
+              <span>Аутентификация и протоколы</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol>
+              <li>Какие запросы к серверу доступны без аутентификации? Достаточно ли ограничен перечень таких запросов? Как это проверялось — визуальным просмотром кода, вводом тестовых запросов вручную, созданием автоматического сканера на основе системы тестов?</li>
+              <li>Допустимо ли, если сервер получает пакеты не от штатной клиентской программы, а от сторонней программы? Если нет — каким образом реализуется запрет подключения таких клиентов? Если да — точно ли это не приводит к нарушениям безопасности (например, если функция безопасности реализована не на сервере, а только в клиентской программе)?</li>
+              <li>Какой протокол аутентификации применяется? Если самописный — кто его разрабатывал и тестировал? Если стандартный — точно ли он подходит к данной конкретной ситуации?</li>
+              <li>Есть ли в протоколе дополнительные параметры, повышающие безопасность (ограничения по адресам подключения, времени подключения, сроку действия ключей и т. п.)? Они точно используются? Как это проверялось?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 5–15</span>
+              <span>Криптография и работа с ключами</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="5">
+              <li>Как сервер устанавливает длины буферов с передаваемыми клиенту данными? Нет ли HeartBleed-подобных уязвимостей?</li>
+              <li>Какие криптосистемы применяются? Точно ли реальность соответствует документации? Как это проверялось? Проверялись ли особые случаи (например, в Linux-совместимой ОС самый первый пользователь, создаваемый при установке)? Не применяются ли самописные криптоалгоритмы?</li>
+              <li>Какой заимствованный код используется в проекте? Какие в нём известны уязвимости? Проводилась ли работа по анализу заимствованного кода как минимум на уровне мониторинга открытых источников? Проводится ли такая работа на регулярной основе? Какая реакция предусмотрена в случае обнаружения в заимствованной библиотеке критической уязвимости?</li>
+              <li>Применяются ли в проекте устаревшие криптосистемы наподобие DES, MD5, RC4? Если да — безопасно ли это?</li>
+              <li>При хешировании паролей используется ли маркант (соль, salt, seed)? Если нет — почему? Проверялось ли это прямым сравнением хешей одинаковых паролей у разных пользователей?</li>
+              <li>Как вводятся ключи шифрования? Если они хранятся внутри системы — как реализовано это хранение? Кому могут быть доступны эти данные в каких ситуациях?</li>
+              <li>Передаются ли пароли по сети в открытом виде? Проверялось ли это перехватом и анализом трафика?</li>
+              <li>Передаются ли по сети хеши аутентификации в открытом виде? Проверялось ли это перехватом и анализом трафика?</li>
+              <li>Если защита трафика полагается на полное его шифрование сторонним протоколом (например, SSL) — как обрабатывается ситуация, когда шифрование по каким-то причинам невозможно? Не пойдёт ли трафик в открытом виде?</li>
+              <li>Как сервер идентифицирует сетевые соединения клиентов? Не используются ли легкоугадываемые идентификаторы (например, порядковые номера), передаваемые прямо в пакете с данными?</li>
+              <li>Какие генераторы случайных чисел применяются в проекте? Не применяются ли для криптографических задач линейные рекурренты или другие неподходящие алгоритмы?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 16–18</span>
+              <span>Инъекции и валидация ввода</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="16">
+              <li>Проводились ли проверки кода на наличие SQL-инъекций? Какие средства формирования SQL-запросов применяются в проекте? Не формируются ли SQL-запросы вручную (<code>sprintf</code> и т. п.)? Если подавать на вход непарные кавычки, апострофы и т. п. — не появляются ли в ответах сервера ошибки SQL?</li>
+              <li>Проводились ли проверки кода на предмет наличия XSS-уязвимостей? Как сервер реагирует на вручную сформированные пакеты, похожие на штатные, но с необычными заполнениями полей? Как сервер реагирует на команды JavaScript, размещаемые внутри пакета? Может ли нарушитель добиться их некритичного размещения внутри веб-системы? Если имитировать ввод в формы непарных кавычек, апострофов и т. п. — не появляются ли в ответах ошибки веб-интерфейса? Насколько корректно сервер принимает пакеты с текстом в необычных кодировках?</li>
+              <li>Как обрабатываются ситуации, когда клиент указывает имя файла вместе с путём? Не пытается ли сервер применить этот путь к своей файловой системе? Как при этом обрабатываются подстроки <code>..</code>, строки, начинающиеся с <code>\</code> в Windows и т. п.? Если делается санитизация — можно ли её обойти необычными кодировками текста или какими-то другими ухищрениями?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 19–25</span>
+              <span>Драйверы, права доступа, IPC и интерфейсы ОС</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="19">
+              <li>Драйверы и модули ядра, содержащиеся в проекте, проверялись ли SyzKaller-подобными фаззерами?</li>
+              <li>Как ограничиваются права доступа к файлам приложения? Что может сделать с файлами приложения непривилегированный пользователь, используя предоставленные права? Если приложение работает в Windows — те же вопросы задаются в отношении ключей реестра и объектов корневой файловой системы (<code>\??\*</code> и т. п.).</li>
+              <li>Как ограничиваются права доступа к устройствам, обслуживаемым исследуемым драйвером? Драйвер полностью полагается на права доступа, заданные в ОС, или дополнительно реализует собственные проверки? Что может сделать с драйвером непривилегированный пользователь?</li>
+              <li>Как ограничивается доступ к реализованным в проекте сервисам D-Bus или интерфейсам COM/DCOM? Что может делать непривилегированный пользователь, используя предоставленные права?</li>
+              <li>Принимаются ли в проекте специальные меры, блокирующие доступ сторонних приложений через отладочные интерфейсы операционной системы? Не стоит ли их принять?</li>
+              <li>Принимаются ли в проекте специальные меры, блокирующие доступ сторонних приложений через графический интерфейс операционной системы? Не стоит ли их принять?</li>
+              <li>Не создаёт ли анализируемое ПО на общем рабочем столе окна, обслуживаемые высокопривилегированным процессом? Могут ли такие окна создаваться непредумышленно — например, при запуске справки или после аварийного завершения Windows Explorer? Что может сделать непривилегированный пользователь, направляя в эти окна специально подобранные комбинации сообщений? Не стоит ли избавиться от таких окон?</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">№ 26–38</span>
+              <span>Защитные механизмы, анализ кода, чувствительные данные</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <ol start="26">
+              <li>Поддерживает ли анализируемое ПО мандатное управление доступом? Если да — все ли функции работают в секретных сессиях? Как это проверялось? Возможны ли утечки информации, помеченной как секретная, через поисковые индексы, журнальные файлы, графические интерфейсы, привилегированные системные процессы, внешние накопители информации, другими путями?</li>
+              <li>Поддерживает ли анализируемое ПО изолированную (замкнутую) программную среду? Если да — блокированы ли типичные пути обхода через файлы-исключения, скрипты, эксплойт 38473 из ExploitDB, ярлыки на рабочем столе, файлы конфигурации, перенаправление ввода-вывода, журнальные файлы и т. д.? Распространяются ли правила ЗПС на интерпретируемый и динамически генерируемый программный код, COM-подобные интерфейсы и т. д.? Не вызывают ли правила ЗПС сбоев при доступе к принтерам, внешним накопителям, сети и т. д.?</li>
+              <li>Скомпилирован ли проект с поддержкой рандомизации распределения адресных пространств (ASLR)? Насколько качественна эта рандомизация — устранены ли типичные недостатки? Может ли нарушитель игнорировать ASLR, используя злоупотребление средствами обработки исключений?</li>
+              <li>Проводился ли статический анализ исходных текстов проекта? Проводится ли он на регулярной основе? Как организовано реагирование на предупреждения статического анализатора?</li>
+              <li>Какие принимаются меры для защиты от переполнений буфера? Используются ли в коде проекта небезопасные функции обработки строк? Присутствуют ли в программе переполнения буферов?</li>
+              <li>Какие принимаются меры для защиты от обращений к освобождённой памяти? Присутствуют ли в программе ошибки обращения к освобождённой памяти?</li>
+              <li>Какие принимаются меры для защиты от ошибок двойного освобождения памяти? Присутствуют ли в программе ошибки двойного освобождения памяти?</li>
+              <li>Используются ли в проекте форматные строки (<code>printf</code> и т. п.)? Какие принимаются меры для защиты от ошибок в работе с форматными строками? Присутствуют ли в программе ошибки работы с форматными строками?</li>
+              <li>Какие принимаются меры для защиты от утечек памяти? Присутствуют ли в программе утечки памяти?</li>
+              <li>Какие принимаются меры для обеспечения корректной многопоточности (недопущение race conditions и deadlocks)? Присутствуют ли в программе ошибки обеспечения корректной многопоточности?</li>
+              <li>Построена ли для приложения поверхность атаки? Предпринимались ли попытки её построить? Полностью ли она покрыта вышеперечисленными вопросами?</li>
+              <li>Проводилось ли фаззинг-тестирование приложения? Планируется ли его проводить? Учитывалась ли перспектива проведения фаззинг-тестирования при проектировании архитектуры и в ходе разработки приложения?</li>
+              <li>Работает ли приложение с чувствительными данными (пароли, ключи шифрования, идентификаторы банковских счетов и т. п.)? Какими? Проводилось ли для приложения автоматизированное выявление утечек чувствительных данных? Были ли выявлены утечки и какие?</li>
+            </ol>
+          </div>
+        </details>
+
+      </div>
+
+      <div class="callout success">
+        <p><strong>Как пользоваться чек-листом.</strong> Опросник работает в двух режимах. Разработчику — как контрольный самотест перед сдачей продукта. Эксперту — как план интервью с командой разработки и план собственных проверок. Каждый «нет» в ответах — повод для отдельного исследования.</p>
+      </div>
+    </section>
+
+    <!-- CONTACTS / FOOTER -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам лекции, проведения курсов и консультаций по проведению процесса №18 — проверки безопасности приложения по ГОСТ Р 56939-2024.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:pikov@yandex.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          pikov@yandex.ru
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Лекция · РБПО · Процесс №18</span>
+        </div>
+        <div>При подготовке лекции использовались материалы Проскурина Вадима Геннадьевича (ИСП РАН, <a href="mailto:vadim@ispras.ru">vadim@ispras.ru</a>, Telegram <a href="https://t.me/wadim_pro" target="_blank" rel="noopener">@wadim_pro</a>).</div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  // Theme
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  // Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Reading progress
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // Back to top
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // TOC active section via IntersectionObserver
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  // Mobile TOC toggle
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  // Close TOC on link click (mobile)
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+
+  // Bug spoilers
+  document.querySelectorAll('.bug-spoiler').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+      const answer = btn.parentElement.querySelector('.bug-answer');
+      if (answer) {
+        answer.classList.toggle('open');
+        btn.querySelector('svg').nextSibling.textContent = expanded ? ' Показать подсказку' : ' Скрыть подсказку';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

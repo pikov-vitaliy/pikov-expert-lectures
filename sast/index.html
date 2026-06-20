@@ -1,0 +1,2280 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>Статический анализ безопасности приложений (SAST) — лекция В.А. Пикова</title>
+<meta name="description" content="Авторская лекция по статическому анализу безопасности приложений (SAST): зачем нужен, что находит, как внедряется по требованиям ГОСТ Р 71207-2024.">
+<meta name="author" content="Виталий Александрович Пиков">
+<link rel="canonical" href="https://sast.pikov.expert/">
+<meta property="og:title" content="Статический анализ безопасности приложений (SAST)">
+<meta property="og:description" content="Авторская лекция В.А. Пикова: SAST, ГОСТ Р 71207-2024, классификация критических ошибок, требования к инструментам.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://sast.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2270%22 text-anchor=%22middle%22 font-family=%22Segoe UI, sans-serif%22 font-size=%2250%22 font-weight=%22700%22 fill=%22white%22>{}</text></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection { background: var(--accent-soft); color: var(--text); }
+
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  /* Reading progress */
+  .reading-progress {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: transparent;
+    z-index: 110;
+    pointer-events: none;
+  }
+  .reading-progress-bar {
+    height: 100%;
+    background: var(--accent);
+    width: 0%;
+    transition: width 0.1s ease-out;
+  }
+
+  /* Header */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+  }
+  .brand-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+    transition: all 0.2s;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+
+  .toc-toggle { display: none; }
+
+  /* Layout */
+  .layout {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 56px;
+    align-items: start;
+  }
+
+  /* TOC sidebar */
+  .toc {
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 100px);
+    overflow-y: auto;
+    padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border);
+    padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-subtle);
+    margin-bottom: 14px;
+    padding-left: 14px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    padding: 7px 14px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 13.5px;
+    line-height: 1.4;
+    transition: all 0.15s;
+    border-left: 2px solid transparent;
+    margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num {
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    color: var(--text-subtle);
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  .toc-list a.active {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-left-color: var(--accent);
+    font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+
+  /* Content */
+  .content {
+    max-width: 760px;
+    padding: 32px 0 80px;
+  }
+
+  /* Hero */
+  .hero {
+    padding: 32px 0 56px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    background: var(--accent-soft);
+    padding: 6px 12px;
+    border-radius: 6px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: clamp(17px, 1.6vw, 20px);
+    line-height: 1.55;
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    max-width: 680px;
+  }
+  .hero-meta {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+    padding: 20px 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+  }
+  .hero-meta-value {
+    font-size: 14.5px;
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  /* Sections */
+  .section {
+    padding: 56px 0 16px;
+    scroll-margin-top: 80px;
+  }
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    margin-bottom: 16px;
+  }
+  .section-eyebrow::before {
+    content: '';
+    width: 24px;
+    height: 1.5px;
+    background: var(--accent);
+  }
+  .section-num {
+    font-variant-numeric: tabular-nums;
+  }
+  .section h2 {
+    font-size: clamp(28px, 3.4vw, 38px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+    margin-bottom: 20px;
+    color: var(--text);
+  }
+  .section h3 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.25;
+    margin: 36px 0 14px;
+    color: var(--text);
+  }
+  .section h4 {
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: -0.005em;
+    margin: 24px 0 10px;
+    color: var(--text);
+  }
+  .section p {
+    font-size: 17px;
+    line-height: 1.7;
+    margin-bottom: 18px;
+    color: var(--text);
+  }
+  .section p.lead {
+    font-size: 19px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin-bottom: 28px;
+  }
+  .section ul, .section ol {
+    margin: 16px 0 24px 0;
+    padding-left: 24px;
+  }
+  .section ul li, .section ol li {
+    font-size: 17px;
+    line-height: 1.65;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+
+  /* Inline code */
+  .section :not(pre) > code, .ic {
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.88em;
+    padding: 2px 6px;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: var(--text);
+  }
+
+  /* Pull quote / callout */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: var(--accent-softer);
+    padding: 18px 22px;
+    margin: 24px 0;
+    border-radius: 0 10px 10px 0;
+  }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  /* Tables */
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  table.data th, table.data td {
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+  table.data th {
+    font-weight: 600;
+    color: var(--text-subtle);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    font-size: 12px;
+    background: var(--surface-2);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td:first-child { font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+
+  /* Code blocks */
+  pre.code {
+    margin: 20px 0;
+    padding: 18px 20px;
+    background: var(--code-bg);
+    border: 1px solid var(--code-border);
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+  pre.code .hl {
+    background: var(--warning-soft);
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+  pre.code .hl-bad {
+    background: var(--danger-soft);
+    border-radius: 3px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+  }
+
+  /* Bug case cards */
+  .bug-cases { display: flex; flex-direction: column; gap: 28px; margin: 28px 0; }
+  .bug-case {
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .bug-case:hover { border-color: var(--border-strong); box-shadow: var(--shadow-md); }
+  .bug-case-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .bug-case-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .bug-case-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px; height: 24px;
+    border-radius: 6px;
+    background: var(--accent);
+    color: #ffffff;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .bug-case-lang {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-subtle);
+    padding: 4px 10px;
+    background: var(--surface-2);
+    border-radius: 5px;
+  }
+  .bug-case pre.code { margin: 0; border: none; border-radius: 0; }
+  .bug-case-reveal {
+    padding: 14px 20px;
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+  }
+  .bug-spoiler {
+    border: none;
+    background: transparent;
+    color: var(--accent);
+    font-family: inherit;
+    font-size: 14.5px;
+    font-weight: 500;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 0;
+    transition: color 0.2s;
+  }
+  .bug-spoiler:hover { color: var(--accent-strong); }
+  .bug-spoiler svg { width: 14px; height: 14px; transition: transform 0.2s; }
+  .bug-spoiler[aria-expanded="true"] svg { transform: rotate(90deg); }
+  .bug-answer {
+    display: none;
+    margin-top: 12px;
+    padding: 14px 16px;
+    background: var(--warning-soft);
+    border-left: 3px solid var(--warning);
+    border-radius: 0 8px 8px 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  .bug-answer.open { display: block; animation: fadeSlide 0.3s ease-out; }
+  .bug-answer strong { color: var(--warning); }
+  .bug-answer .pvs-code {
+    display: inline-block;
+    font-family: "SF Mono", Monaco, Consolas, monospace;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 2px 7px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--warning);
+    margin-right: 6px;
+  }
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Two-column comparison */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 28px 0;
+  }
+  .col-card {
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .col-card-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .col-card-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-soft);
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .col-card-icon svg { width: 20px; height: 20px; }
+  .col-card h3 { margin: 0; font-size: 18px; }
+  .col-card .col-en { font-size: 12px; color: var(--text-subtle); display: block; font-weight: 500; }
+  .col-card p { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  .col-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-tag {
+    font-size: 12px;
+    font-weight: 500;
+    padding: 4px 10px;
+    background: var(--bg);
+    border: 1px solid var(--border-strong);
+    border-radius: 6px;
+    color: var(--text-muted);
+  }
+
+  /* SVG charts */
+  .chart-wrap {
+    margin: 28px 0;
+    padding: 24px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+  }
+  .chart-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .chart-source {
+    font-size: 12px;
+    color: var(--text-subtle);
+    margin-bottom: 18px;
+  }
+  .chart svg { width: 100%; height: auto; display: block; }
+  .chart-bar { fill: var(--accent); transition: fill 0.2s; }
+  .chart-bar-label { fill: var(--text); font-size: 12px; font-weight: 500; font-family: inherit; font-variant-numeric: tabular-nums; }
+  .chart-axis { fill: var(--text-subtle); font-size: 11px; font-family: inherit; }
+  .chart-grid { stroke: var(--border); stroke-width: 1; }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    margin: 36px 0;
+    padding: 24px 0;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    top: 50%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent);
+    z-index: 0;
+  }
+  .timeline-track {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    position: relative;
+    z-index: 1;
+  }
+  .timeline-item {
+    text-align: center;
+    padding: 18px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .timeline-date {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-bottom: 6px;
+  }
+  .timeline-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; color: var(--text); }
+  .timeline-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+
+  /* Phase cards */
+  .phases {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 28px 0;
+  }
+  .phase {
+    padding: 22px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+  }
+  .phase-num {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--accent);
+    opacity: 0.3;
+    line-height: 1;
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .phase h4 { font-size: 17px; margin: 0 0 10px; }
+  .phase ul { padding-left: 18px; margin: 0; }
+  .phase li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; color: var(--text-muted); }
+
+  /* Deadlines list */
+  .deadlines {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .deadline {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .deadline-time {
+    flex-shrink: 0;
+    width: 70px;
+    text-align: center;
+    padding: 8px 4px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 1.1;
+  }
+  .deadline-time small { display: block; font-size: 10px; font-weight: 500; opacity: 0.85; margin-top: 2px; }
+  .deadline-text { font-size: 14px; line-height: 1.5; color: var(--text); }
+
+  /* Accordion */
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--surface);
+    overflow: hidden;
+  }
+  .acc-summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 18px 22px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    transition: background 0.2s;
+    user-select: none;
+  }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .acc-tag {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    padding: 4px 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border-radius: 5px;
+    flex-shrink: 0;
+  }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body {
+    padding: 4px 22px 22px;
+    border-top: 1px solid var(--border);
+    margin-top: -1px;
+  }
+  .acc-body ol, .acc-body ul {
+    margin: 14px 0 0;
+    padding-left: 20px;
+  }
+  .acc-body li {
+    font-size: 15.5px;
+    margin-bottom: 8px;
+    line-height: 1.55;
+    color: var(--text);
+  }
+  .acc-body p {
+    font-size: 15.5px;
+    line-height: 1.6;
+    color: var(--text-muted);
+    margin: 14px 0 0;
+  }
+
+  /* Checklist */
+  .checklist {
+    list-style: none !important;
+    padding-left: 0 !important;
+    margin: 16px 0 24px !important;
+  }
+  .checklist li {
+    position: relative;
+    padding: 10px 0 10px 32px;
+    font-size: 15.5px !important;
+    line-height: 1.55 !important;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 0 !important;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 14px;
+    width: 18px; height: 18px;
+    border-radius: 50%;
+    background: var(--success-soft);
+    border: 1.5px solid var(--success);
+  }
+  .checklist li::after {
+    content: '';
+    position: absolute;
+    left: 5px; top: 19px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--success);
+    border-bottom: 2px solid var(--success);
+    transform: rotate(-45deg);
+  }
+  .checklist li strong { color: var(--text); }
+  .checklist li code { font-size: 13px !important; }
+
+  /* Logo grid */
+  .integrations { margin: 28px 0; }
+  .integrations h4 {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-subtle);
+    margin: 24px 0 12px !important;
+  }
+  .integration-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .int-item {
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--text);
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .int-item:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+    transform: translateY(-1px);
+  }
+
+  /* Stats row in hero */
+  .key-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    margin: 24px 0;
+  }
+  .key-stat {
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .key-stat-value {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+  .key-stat-label {
+    font-size: 12.5px;
+    color: var(--text-muted);
+    line-height: 1.35;
+  }
+
+  /* Method list */
+  .methods { display: flex; flex-direction: column; gap: 8px; margin: 28px 0; }
+  .method {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 16px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    transition: all 0.2s;
+  }
+  .method.highlight {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+  }
+  .method-mark {
+    flex-shrink: 0;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--text-subtle);
+    margin-top: 8px;
+    opacity: 0.5;
+  }
+  .method.highlight .method-mark {
+    background: var(--accent);
+    opacity: 1;
+    box-shadow: 0 0 0 3px var(--accent-soft);
+  }
+  .method-content { flex: 1; }
+  .method-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .method.highlight .method-title { color: var(--accent); }
+  .method-desc { font-size: 14.5px; color: var(--text-muted); line-height: 1.55; }
+
+  /* Property list (for SAST props) */
+  .props {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+  .prop {
+    padding: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .prop-icon {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  .prop-icon svg { width: 18px; height: 18px; }
+  .prop h4 { font-size: 15px; margin: 0 0 6px; }
+  .prop p { font-size: 13.5px !important; line-height: 1.5 !important; color: var(--text-muted); margin: 0 !important; }
+
+  /* Footer / contacts */
+  .content-footer {
+    margin-top: 80px;
+    padding: 56px 0 0;
+    border-top: 1px solid var(--border);
+  }
+  .content-footer h2 {
+    font-size: clamp(26px, 3vw, 34px);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 12px;
+  }
+  .content-footer p.lead {
+    color: var(--text-muted);
+    font-size: 17px;
+    margin-bottom: 28px;
+  }
+  .contact-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary {
+    background: var(--accent);
+    color: #ffffff;
+    box-shadow: var(--shadow-md);
+  }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary {
+    background: var(--surface);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution {
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text-subtle);
+    line-height: 1.6;
+  }
+  .attribution-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  /* Back to top */
+  .back-to-top {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: all 0.25s;
+    z-index: 90;
+  }
+  .back-to-top.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  /* Responsive */
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 220px 1fr; gap: 36px; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc {
+      position: fixed;
+      top: 60px;
+      left: 0; right: 0;
+      bottom: 0;
+      background: var(--bg);
+      border-right: none;
+      border-bottom: 1px solid var(--border);
+      padding: 20px 24px;
+      transform: translateY(-100%);
+      transition: transform 0.25s ease-out;
+      z-index: 99;
+      max-height: 100vh;
+      overflow-y: auto;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .two-col { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    .integration-grid { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .card, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats, .integration-grid { grid-template-columns: 1fr; }
+    .hero-eyebrow { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .bug-answer { display: block !important; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#why" data-section="why"><span class="toc-num">01</span><span>Зачем нужен статический анализ</span></a></li>
+      <li><a href="#methods" data-section="methods"><span class="toc-num">02</span><span>Способы поиска ошибок</span></a></li>
+      <li><a href="#what" data-section="what"><span class="toc-num">03</span><span>Что такое статический анализ</span></a></li>
+      <li><a href="#cases" data-section="cases"><span class="toc-num">04</span><span>Найди ошибку: 6 кейсов</span></a></li>
+      <li><a href="#safety-vs-security" data-section="safety-vs-security"><span class="toc-num">05</span><span>Safety и Security</span></a></li>
+      <li><a href="#sast" data-section="sast"><span class="toc-num">06</span><span>Что такое SAST</span></a></li>
+      <li><a href="#cwe-cve" data-section="cwe-cve"><span class="toc-num">07</span><span>CWE и CVE</span></a></li>
+      <li><a href="#sql-injection" data-section="sql-injection"><span class="toc-num">08</span><span>Пример SAST: SQL-инъекция</span></a></li>
+      <li><a href="#regulation" data-section="regulation"><span class="toc-num">09</span><span>Регуляторный контекст</span></a></li>
+      <li><a href="#implementation" data-section="implementation"><span class="toc-num">10</span><span>Внедрение по ГОСТ Р 71207</span></a></li>
+      <li><a href="#critical-errors" data-section="critical-errors"><span class="toc-num">11</span><span>Критические ошибки</span></a></li>
+      <li><a href="#requirements" data-section="requirements"><span class="toc-num">12</span><span>Требования к инструментам</span></a></li>
+      <li><a href="#integration" data-section="integration"><span class="toc-num">13</span><span>Интеграция в разработку</span></a></li>
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">14</span><span>Связь</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Авторская лекция · РБПО</span>
+      <h1>Статический анализ безопасности приложений</h1>
+      <p class="hero-lead">Зачем нужно автоматическое код-ревью, какие ошибки и уязвимости оно находит, чем SAST отличается от обычного статанализа и как организовать его внедрение в соответствии с ГОСТ Р 71207-2024.</p>
+
+      <div class="key-stats">
+        <div class="key-stat">
+          <div class="key-stat-value">14</div>
+          <div class="key-stat-label">разделов лекции</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">6</div>
+          <div class="key-stat-label">разборов реальных ошибок</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">71207</div>
+          <div class="key-stat-label">ГОСТ Р от 2024 года</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">№10</div>
+          <div class="key-stat-label">процесс в ГОСТ Р 56939</div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Преподаватель</span>
+          <span class="hero-meta-value">Пиков Виталий Александрович</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Раздел курса</span>
+          <span class="hero-meta-value">Безопасная разработка ПО (РБПО)</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Нормативная база</span>
+          <span class="hero-meta-value">ГОСТ Р 71207-2024, ГОСТ Р 56939-2024</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 01. WHY -->
+    <section id="why" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> · Мотивация</div>
+      <h2>Зачем нужен статический анализ</h2>
+      <p class="lead">За последние 30 лет программное обеспечение прошло путь от десятков тысяч строк кода до миллионов и десятков миллионов. Вместе с размером кодовых баз изменилась и природа ошибок в них.</p>
+
+      <h3>Кодовые базы растут — плотность ошибок тоже</h3>
+      <p>Промышленные исследования показывают: чем больше проект, тем выше типичная плотность дефектов на тысячу строк кода. Это нелинейная зависимость — после некоторого порога ошибки начинают «множиться» быстрее, чем растёт сам код.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Размер проекта (строк кода)</th>
+              <th>Типичная плотность ошибок (на 1 000 строк)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>менее 2 000</td><td><span class="num">0–25</span></td></tr>
+            <tr><td>2 000 – 16 000</td><td><span class="num">0–40</span></td></tr>
+            <tr><td>16 000 – 64 000</td><td><span class="num">0,5–50</span></td></tr>
+            <tr><td>64 000 – 512 000</td><td><span class="num">2–70</span></td></tr>
+            <tr><td>512 000 и более</td><td><span class="num">4–100</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Объём контролировать вручную становится физически невозможно. К тому же появляются разные классы ошибок — те, что ловят тесты, и те, что не ловят; критичные для безопасности и косметические; явные и скрытые.</p>
+
+      <h3>Стоимость исправления уязвимости растёт экспоненциально</h3>
+      <p>По данным NIST (National Institute of Standards and Technology), стоимость исправления одной и той же ошибки на разных стадиях жизненного цикла программного обеспечения отличается в десятки и сотни раз.</p>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Относительная стоимость исправления уязвимости по этапам жизненного цикла</div>
+        <div class="chart-source">Источник: NIST. Значение «требования» приято за 1× — базовый ориентир.</div>
+        <div class="chart">
+          <svg viewBox="0 0 720 280" preserveAspectRatio="xMidYMid meet" role="img" aria-label="График стоимости исправления">
+            <line x1="60" y1="20" x2="60" y2="220" class="chart-grid"/>
+            <line x1="60" y1="220" x2="700" y2="220" class="chart-grid"/>
+            <line x1="60" y1="60" x2="700" y2="60" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="120" x2="700" y2="120" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="180" x2="700" y2="180" class="chart-grid" stroke-dasharray="4 4"/>
+            <text x="50" y="225" text-anchor="end" class="chart-axis">0×</text>
+            <text x="50" y="185" text-anchor="end" class="chart-axis">50×</text>
+            <text x="50" y="125" text-anchor="end" class="chart-axis">100×</text>
+            <text x="50" y="65" text-anchor="end" class="chart-axis">150×</text>
+            <text x="50" y="25" text-anchor="end" class="chart-axis">200×</text>
+            <rect x="100" y="216" width="80" height="4" class="chart-bar" rx="2"/>
+            <text x="140" y="240" text-anchor="middle" class="chart-axis">Требования</text>
+            <text x="140" y="210" text-anchor="middle" class="chart-bar-label">1×</text>
+            <rect x="220" y="200" width="80" height="20" class="chart-bar" rx="2"/>
+            <text x="260" y="240" text-anchor="middle" class="chart-axis">Проектирование</text>
+            <text x="260" y="194" text-anchor="middle" class="chart-bar-label">5×</text>
+            <rect x="340" y="180" width="80" height="40" class="chart-bar" rx="2"/>
+            <text x="380" y="240" text-anchor="middle" class="chart-axis">Реализация</text>
+            <text x="380" y="174" text-anchor="middle" class="chart-bar-label">10×</text>
+            <rect x="460" y="100" width="80" height="120" class="chart-bar" rx="2"/>
+            <text x="500" y="240" text-anchor="middle" class="chart-axis">Тестирование</text>
+            <text x="500" y="94" text-anchor="middle" class="chart-bar-label">50×</text>
+            <rect x="580" y="20" width="80" height="200" class="chart-bar" rx="2"/>
+            <text x="620" y="240" text-anchor="middle" class="chart-axis">Эксплуатация</text>
+            <text x="620" y="14" text-anchor="middle" class="chart-bar-label">200×</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Главный вывод:</strong> чем раньше обнаружена ошибка, тем дешевле её исправление. Поэтому имеет смысл <a href="https://pvs-studio.ru/ru/blog/terms/7013/" target="_blank" rel="noopener">сдвигать поиск ошибок «влево»</a> — на самые ранние этапы разработки. Статический анализ работает уже на этапе написания кода и поэтому даёт максимальную экономию.</p>
+      </div>
+    </section>
+
+    <!-- 02. METHODS -->
+    <section id="methods" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> · Контекст</div>
+      <h2>Способы поиска ошибок</h2>
+      <p class="lead">Статический анализ — лишь один из методов поиска ошибок. Он дополняет, а не заменяет другие практики обеспечения качества.</p>
+
+      <div class="methods">
+        <div class="method">
+          <div class="method-mark"></div>
+          <div class="method-content">
+            <div class="method-title">Модульное тестирование (unit testing)</div>
+            <div class="method-desc">Проверка отдельных функций и классов в изоляции. Помогает зафиксировать ожидаемое поведение, но не находит ошибки за пределами того, что разработчик догадался протестировать.</div>
+          </div>
+        </div>
+        <div class="method">
+          <div class="method-mark"></div>
+          <div class="method-content">
+            <div class="method-title">Интеграционное тестирование</div>
+            <div class="method-desc">Проверка взаимодействия нескольких компонентов вместе. Требует подготовки окружения и исполняемой версии системы.</div>
+          </div>
+        </div>
+        <div class="method">
+          <div class="method-mark"></div>
+          <div class="method-content">
+            <div class="method-title">Системное тестирование</div>
+            <div class="method-desc">Проверка всей системы целиком на соответствие требованиям. Самый дорогой и поздний этап — стоимость исправления ошибок здесь уже высока.</div>
+          </div>
+        </div>
+        <div class="method">
+          <div class="method-mark"></div>
+          <div class="method-content">
+            <div class="method-title">Динамический анализ</div>
+            <div class="method-desc">Анализ выполняющегося кода — поиск утечек памяти, гонок данных, проблем производительности. Ловит реальные ошибки, но требует сценариев исполнения.</div>
+          </div>
+        </div>
+        <div class="method highlight">
+          <div class="method-mark"></div>
+          <div class="method-content">
+            <div class="method-title">Статический анализ</div>
+            <div class="method-desc">Анализ исходного кода без его выполнения. Полное покрытие проекта, раннее обнаружение, минимальная стоимость — поэтому ему посвящена эта лекция.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Эти методы работают вместе.</strong> Статический анализ закрывает класс ошибок, который сложно поймать тестами; тесты находят логические дефекты, которые нельзя обнаружить статически. В зрелом процессе разработки используются все методы.</p>
+      </div>
+    </section>
+
+    <!-- 03. WHAT IS STATIC ANALYSIS -->
+    <section id="what" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> · Определение</div>
+      <h2>Что такое статический анализ</h2>
+      <p class="lead">В начале был код-ревью — ручной просмотр кода коллегами. Статический анализ — это автоматизированное код-ревью, которое выполняет специальный инструмент.</p>
+
+      <h3>Определение по ГОСТ Р 71207-2024</h3>
+      <div class="callout">
+        <p><strong>Статический анализ</strong> — вид работ по инструментальному исследованию программы, основанный на анализе исходных кодов в режиме, не предусматривающем реального выполнения кода, и выполняемый для определения свойств программы.</p>
+        <p>(п. 3.1.33)</p>
+      </div>
+
+      <h3>Ключевые свойства</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h4>Нужен только код</h4>
+          <p>Не требуется работающее окружение, тестовые данные или сценарии исполнения. Достаточно исходных файлов проекта.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 11l3 3L22 4"/></svg>
+          </div>
+          <h4>Полное покрытие</h4>
+          <p>Анализатор просматривает каждый файл, каждую функцию, каждую ветку. Не нужно «угадывать», какие сценарии важны.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h4>Раннее обнаружение</h4>
+          <p>Запуск можно встроить прямо в IDE или в pre-commit hook — ошибка обнаруживается ещё до того, как код попадёт в репозиторий.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          </div>
+          <h4>Исправление до тестирования</h4>
+          <p>Ошибки устраняются ещё на этапе разработки, когда стоимость исправления минимальна — а значит, до этапа тестирования и эксплуатации они просто не доходят.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04. BUG CASES -->
+    <section id="cases" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> · Практика</div>
+      <h2>Найди ошибку: шесть реальных кейсов</h2>
+      <p class="lead">Шесть фрагментов кода из открытых проектов. В каждом есть ошибка, которую сложно заметить глазом, но статический анализатор обнаруживает её за миллисекунды. Прочитайте код, попытайтесь найти проблему сами, а затем раскройте подсказку.</p>
+
+      <div class="bug-cases">
+
+        <!-- Case 1 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">1</span> Установка учётных данных</div>
+            <span class="bug-case-lang">C# · OnlyOffice</span>
+          </div>
+<pre class="code"><code><span class="kw">public void</span> <span class="fn">SetCredentials</span>(<span class="ty">string</span> userName, <span class="ty">string</span> password, <span class="ty">string</span> domain)
+{
+    <span class="kw">if</span> (<span class="ty">string</span>.IsNullOrEmpty(userName))
+    {
+        <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="str">"Empty user name."</span>, <span class="str">"userName"</span>);
+    }
+
+    <span class="kw">if</span> (<span class="ty">string</span>.IsNullOrEmpty(<span class="str">"password"</span>))
+    {
+        <span class="kw">throw new</span> <span class="ty">ArgumentException</span>(<span class="str">"Empty password."</span>, <span class="str">"password"</span>);
+    }
+
+    CredentialsUserName     = userName;
+    CredentialsUserPassword = password;
+    CredentialsDomain       = domain;
+}</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3022</span> <strong>Выражение <code>string.IsNullOrEmpty("password")</code> всегда равно <code>false</code>.</strong> Вместо переменной <code>password</code> в проверку попал её строковый литерал — кавычки скопировали из соседней строки. Проверка ничего не делает, и пустой пароль молча принимается.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 2 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">2</span> Сравнение объектов BlobSasBuilder</div>
+            <span class="bug-case-lang">C# · Azure SDK</span>
+          </div>
+<pre class="code"><code><span class="kw">public bool</span> <span class="fn">Equals</span>(<span class="ty">BlobSasBuilder</span> other) =&gt;
+    BlobName          == other.BlobName &amp;&amp;
+    CacheControl      == other.CacheControl &amp;&amp;
+    BlobContainerName == other.BlobContainerName &amp;&amp;
+    ContentDisposition== other.ContentDisposition &amp;&amp;
+    ContentEncoding   == other.ContentEncoding &amp;&amp;
+    ContentLanguage   == other.ContentEncoding &amp;&amp;
+    ContentType       == other.ContentType &amp;&amp;
+    ExpiryTime        == other.ExpiryTime &amp;&amp;
+    Identifier        == other.Identifier &amp;&amp;
+    IPRange           == other.IPRange &amp;&amp;
+    Permissions       == other.Permissions &amp;&amp;
+    Protocol          == other.Protocol &amp;&amp;
+    StartTime         == other.StartTime &amp;&amp;
+    Version           == other.Version;</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3112</span> <strong>Аномалия в схеме сравнений.</strong> На строке про <code>ContentLanguage</code> объект сравнивается не с <code>other.ContentLanguage</code>, а с <code>other.ContentEncoding</code> (повтор предыдущей строки). Классическая ошибка copy-paste, типичная для длинных перечислений. Глазами в 14 одинаковых строках такое не находится — а анализатор видит мгновенно.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 3 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">3</span> Валидация процента</div>
+            <span class="bug-case-lang">C# · BTCPay Server</span>
+          </div>
+<pre class="code"><code><span class="kw">if</span> (request.PaymentTolerance &lt; <span class="num">0</span> &amp;&amp; request.PaymentTolerance &gt; <span class="num">100</span>)
+{
+    ModelState.AddModelError(
+        <span class="kw">nameof</span>(request.PaymentTolerance),
+        <span class="str">"PaymentTolerance can only be between 0 and 100 percent"</span>
+    );
+}</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3022</span> <strong>Выражение всегда равно <code>false</code>.</strong> Условие требует, чтобы число одновременно было меньше нуля и больше 100 — это невозможно. Должно быть <code>||</code> (или) вместо <code>&amp;&amp;</code> (и). Сообщение об ошибке валидации никогда не покажется, и невалидные значения молча принимаются.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 4 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">4</span> Проверка значения float на конечность</div>
+            <span class="bug-case-lang">C# · UnityCsReference</span>
+          </div>
+<pre class="code"><code><span class="kw">protected static bool</span> <span class="fn">IsFinite</span>(<span class="ty">float</span> f)
+{
+    <span class="kw">if</span> (   f == <span class="ty">Mathf</span>.Infinity
+        || f == <span class="ty">Mathf</span>.NegativeInfinity
+        || f == <span class="ty">float</span>.NaN)
+    {
+        <span class="kw">return false</span>;
+    }
+    <span class="kw">return true</span>;
+}</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3076</span> <strong>Сравнение с <code>float.NaN</code> бессмысленно.</strong> По стандарту IEEE 754 любое сравнение с NaN (включая <code>NaN == NaN</code>) возвращает <code>false</code>. Третья ветка условия никогда не сработает: NaN-значения молча проскальзывают через <code>IsFinite</code> и считаются «конечными». Правильный способ — <code>float.IsNaN(f)</code>.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 5 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">5</span> Сравнение URL у webhook</div>
+            <span class="bug-case-lang">C# · eShopOnContainers</span>
+          </div>
+<pre class="code"><code><span class="kw">var</span> firstUrl  = <span class="kw">new</span> <span class="ty">Uri</span>(urlHook, <span class="ty">UriKind</span>.Absolute);
+<span class="kw">var</span> secondUrl = <span class="kw">new</span> <span class="ty">Uri</span>(url,     <span class="ty">UriKind</span>.Absolute);
+
+<span class="kw">return</span> firstUrl.Scheme == secondUrl.Scheme
+    &amp;&amp; firstUrl.Port   == secondUrl.Port
+    &amp;&amp; firstUrl.Host   == firstUrl.Host;</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3001</span> <strong>Идентичные подвыражения <code>firstUrl.Host</code> слева и справа от оператора <code>==</code>.</strong> На последней строке должно быть <code>secondUrl.Host</code>. Сравнение объекта самого с собой всегда возвращает <code>true</code>, поэтому хост из проверки фактически выпадает — webhook принимает запросы с любого хоста, лишь бы совпали схема и порт. Это потенциальная уязвимость безопасности.
+            </div>
+          </div>
+        </div>
+
+        <!-- Case 6 -->
+        <div class="bug-case">
+          <div class="bug-case-head">
+            <div class="bug-case-title"><span class="bug-case-num">6</span> Свойство ParagraphFormat</div>
+            <span class="bug-case-lang">C# · FastReport</span>
+          </div>
+<pre class="code"><code>ParagraphFormat paragraphFormat;
+
+<span class="kw">public</span> <span class="ty">ParagraphFormat</span> ParagraphFormat
+{
+    <span class="kw">get</span> { <span class="kw">return</span> paragraphFormat; }
+    <span class="kw">set</span> { ParagraphFormat = value; }
+}</code></pre>
+          <div class="bug-case-reveal">
+            <button class="bug-spoiler" aria-expanded="false">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+              Показать предупреждение
+            </button>
+            <div class="bug-answer">
+              <span class="pvs-code">V3010</span> <strong>Возможна бесконечная рекурсия в свойстве <code>ParagraphFormat</code> [CWE-674: Uncontrolled Recursion].</strong> В сеттере вместо приватного поля <code>paragraphFormat</code> с маленькой буквы используется само свойство <code>ParagraphFormat</code> с большой. Запись свойства приводит к вызову того же сеттера — переполнение стека. Это уже не просто ошибка качества, а классифицированная по CWE уязвимость.
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="callout">
+        <p><strong>Что объединяет все шесть кейсов.</strong> Это не «дурацкие ошибки начинающих» — это код из реальных открытых проектов: OnlyOffice, Azure SDK, BTCPay Server, UnityCsReference, eShopOnContainers, FastReport. Их написали профессионалы, прошёл код-ревью, проект используется в production. И всё равно — внимание разработчика конечно, а статический анализатор не устаёт.</p>
+      </div>
+    </section>
+
+    <!-- 05. SAFETY VS SECURITY -->
+    <section id="safety-vs-security" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> · Терминология</div>
+      <h2>Safety и Security: две разные «безопасности»</h2>
+      <p class="lead">В русском языке оба слова переводятся как «безопасность», но в инженерном контексте это разные дисциплины — с разной целью и разными стандартами.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <h3>Безопасность</h3>
+              <span class="col-en">Safety</span>
+            </div>
+          </div>
+          <p>Надёжная работа приложения в любых условиях, без вмешательства извне. Цель — чтобы программа не сбойнула сама по себе, не повредила данные, не привела к аварии в физическом мире.</p>
+          <p><strong>Типичная сфера:</strong> авионика, автомобилестроение, медицинская электроника, промышленная автоматика.</p>
+          <div class="col-tags">
+            <span class="col-tag">MISRA C</span>
+            <span class="col-tag">MISRA C++</span>
+            <span class="col-tag">AUTOSAR C++</span>
+            <span class="col-tag">CERT C</span>
+          </div>
+        </div>
+
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            </div>
+            <div>
+              <h3>Защищённость</h3>
+              <span class="col-en">Security</span>
+            </div>
+          </div>
+          <p>Стойкость ко внешним воздействиям и попыткам вмешательства. Цель — чтобы атакующий не смог использовать программу против её пользователей, не похитил данные, не получил несанкционированный доступ.</p>
+          <p><strong>Типичная сфера:</strong> веб-приложения, мобильные приложения, корпоративные системы, ИТ-инфраструктура.</p>
+          <div class="col-tags">
+            <span class="col-tag">OWASP ASVS</span>
+            <span class="col-tag">SEI CERT</span>
+            <span class="col-tag">CWE</span>
+            <span class="col-tag">ГОСТ Р 71207</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Граница не строгая.</strong> Многие дефекты попадают в обе категории: например, переполнение буфера может привести и к падению (safety), и к удалённому исполнению кода (security). Современный SAST-инструмент обычно работает в обеих плоскостях.</p>
+      </div>
+    </section>
+
+    <!-- 06. WHAT IS SAST -->
+    <section id="sast" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> · Определение</div>
+      <h2>Что такое SAST</h2>
+      <p class="lead"><strong>SAST</strong> — Static Application Security Testing. Это статический анализ, специально нацеленный на поиск потенциальных уязвимостей.</p>
+
+      <h3>Уязвимость как особый класс ошибок</h3>
+      <p>Любая уязвимость — это ошибка в коде, но не любая ошибка — уязвимость. Разделение проходит по последствиям: если ошибка может быть использована атакующим для нарушения безопасности обрабатываемой информации (получение доступа, утечка данных, выполнение чужого кода), то она классифицируется как <strong>критическая</strong>.</p>
+
+      <div class="callout">
+        <p><strong>Критическая ошибка</strong> — ошибка, которая может привести к нарушению безопасности обрабатываемой информации (ГОСТ Р 71207-2024, п. 3.1.13).</p>
+        <p>Стандарт намеренно <em>не разграничивает</em> ошибки по последствиям — важен сам факт наличия и необходимости исправления.</p>
+      </div>
+
+      <h3>Свойства SAST</h3>
+      <p>SAST наследует все полезные свойства статического анализа:</p>
+      <ul>
+        <li>Нужен только исходный код — не требуется развёрнутое приложение или тестовые данные.</li>
+        <li>Полное покрытие — анализируются все ветки исполнения, включая редко срабатывающие.</li>
+        <li>Раннее обнаружение — ещё на этапе разработки, до этапа тестирования.</li>
+        <li>Исправление до того, как уязвимость попадёт в эксплуатацию — пока стоимость минимальна.</li>
+      </ul>
+    </section>
+
+    <!-- 07. CWE / CVE -->
+    <section id="cwe-cve" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> · Терминология</div>
+      <h2>CWE и CVE: каталоги уязвимостей</h2>
+      <p class="lead">Чтобы говорить об уязвимостях на одном языке, индустрия выработала два стандартных каталога: один для типов слабостей, другой — для конкретных найденных уязвимостей.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+            </div>
+            <div>
+              <h3>CWE</h3>
+              <span class="col-en">Common Weakness Enumeration</span>
+            </div>
+          </div>
+          <p><strong>Каталог типов слабостей.</strong> Описывает категории ошибок, которые в принципе могут привести к уязвимости — но абстрактно, без привязки к конкретному продукту.</p>
+          <p>Например, <em>CWE-89</em> — SQL-инъекция, <em>CWE-674</em> — неконтролируемая рекурсия, <em>CWE-119</em> — переполнение буфера. Это потенциальные уязвимости.</p>
+          <div class="col-tags">
+            <span class="col-tag">типы</span>
+            <span class="col-tag">потенциальные</span>
+          </div>
+        </div>
+
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            </div>
+            <div>
+              <h3>CVE</h3>
+              <span class="col-en">Common Vulnerabilities and Exposures</span>
+            </div>
+          </div>
+          <p><strong>Каталог конкретных уязвимостей.</strong> Каждая запись — это отдельная уязвимость в конкретной версии конкретного продукта, найденная и зарегистрированная.</p>
+          <p>Например, <em>CVE-2021-44228</em> — log4shell в Apache Log4j 2.x. Уязвимость уже существует и эксплуатируется.</p>
+          <div class="col-tags">
+            <span class="col-tag">экземпляры</span>
+            <span class="col-tag">существующие</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Уязвимостей становится больше</h3>
+      <p>Число регистрируемых CVE растёт каждый год — и темп ускоряется. По данным cvedetails.com и CVE.org, за последнее десятилетие количество ежегодных публикаций уязвимостей увеличилось более чем в семь раз: с ~6,5 тысяч в 2015 году до ~48 тысяч в 2025-м.</p>
+
+      <div class="chart-wrap">
+        <div class="chart-title">Число опубликованных CVE по годам</div>
+        <div class="chart-source">Источник: cvedetails.com, CVE.org (приближённые значения)</div>
+        <div class="chart">
+          <svg viewBox="0 0 720 280" preserveAspectRatio="xMidYMid meet" role="img" aria-label="График роста CVE">
+            <line x1="60" y1="20" x2="60" y2="220" class="chart-grid"/>
+            <line x1="60" y1="220" x2="700" y2="220" class="chart-grid"/>
+            <line x1="60" y1="60"  x2="700" y2="60"  class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="100" x2="700" y2="100" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="140" x2="700" y2="140" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="180" x2="700" y2="180" class="chart-grid" stroke-dasharray="4 4"/>
+            <text x="50" y="225" text-anchor="end" class="chart-axis">0</text>
+            <text x="50" y="185" text-anchor="end" class="chart-axis">10K</text>
+            <text x="50" y="145" text-anchor="end" class="chart-axis">20K</text>
+            <text x="50" y="105" text-anchor="end" class="chart-axis">30K</text>
+            <text x="50" y="65"  text-anchor="end" class="chart-axis">40K</text>
+            <text x="50" y="25"  text-anchor="end" class="chart-axis">50K</text>
+            <rect x="80"  y="194" width="58" height="26"  class="chart-bar" rx="2"/>
+            <text x="109" y="240" text-anchor="middle" class="chart-axis">2015</text>
+            <text x="109" y="188" text-anchor="middle" class="chart-bar-label">6,5K</text>
+            <rect x="148" y="164" width="58" height="56"  class="chart-bar" rx="2"/>
+            <text x="177" y="240" text-anchor="middle" class="chart-axis">2017</text>
+            <text x="177" y="158" text-anchor="middle" class="chart-bar-label">14K</text>
+            <rect x="216" y="152" width="58" height="68"  class="chart-bar" rx="2"/>
+            <text x="245" y="240" text-anchor="middle" class="chart-axis">2019</text>
+            <text x="245" y="146" text-anchor="middle" class="chart-bar-label">17K</text>
+            <rect x="284" y="148" width="58" height="72"  class="chart-bar" rx="2"/>
+            <text x="313" y="240" text-anchor="middle" class="chart-axis">2020</text>
+            <text x="313" y="142" text-anchor="middle" class="chart-bar-label">18K</text>
+            <rect x="352" y="140" width="58" height="80"  class="chart-bar" rx="2"/>
+            <text x="381" y="240" text-anchor="middle" class="chart-axis">2021</text>
+            <text x="381" y="134" text-anchor="middle" class="chart-bar-label">20K</text>
+            <rect x="420" y="120" width="58" height="100" class="chart-bar" rx="2"/>
+            <text x="449" y="240" text-anchor="middle" class="chart-axis">2022</text>
+            <text x="449" y="114" text-anchor="middle" class="chart-bar-label">25K</text>
+            <rect x="488" y="104" width="58" height="116" class="chart-bar" rx="2"/>
+            <text x="517" y="240" text-anchor="middle" class="chart-axis">2023</text>
+            <text x="517" y="98"  text-anchor="middle" class="chart-bar-label">29K</text>
+            <rect x="556" y="60"  width="58" height="160" class="chart-bar" rx="2"/>
+            <text x="585" y="240" text-anchor="middle" class="chart-axis">2024</text>
+            <text x="585" y="54"  text-anchor="middle" class="chart-bar-label">40K</text>
+            <rect x="624" y="28"  width="58" height="192" class="chart-bar" rx="2"/>
+            <text x="653" y="240" text-anchor="middle" class="chart-axis">2025</text>
+            <text x="653" y="22"  text-anchor="middle" class="chart-bar-label">48K</text>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08. SQL INJECTION -->
+    <section id="sql-injection" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> · Кейс SAST</div>
+      <h2>Пример SAST-предупреждения: SQL-инъекция</h2>
+      <p class="lead">Рассмотрим, как SAST находит классическую уязвимость — SQL-инъекцию. Ключевая идея SAST — отслеживание <strong>помеченных данных</strong> (taint analysis): данные от пользователя помечаются как «опасные» и анализатор следит за их распространением по программе.</p>
+
+      <h3>Уязвимый код</h3>
+<pre class="code"><code><span class="kw">using</span> (<span class="ty">SqlConnection</span> connection = <span class="kw">new</span> <span class="ty">SqlConnection</span>(....))
+{
+    ....
+    <span class="ty">String</span> userName = Request.Form[<span class="str">"userName"</span>];   <span class="cm">// SOURCE — данные от пользователя</span>
+
+    <span class="kw">using</span> (<span class="kw">var</span> command = <span class="kw">new</span> <span class="ty">SqlCommand</span>()
+    {
+        Connection  = connection,
+        CommandText = <span class="str">"SELECT * FROM Users WHERE UserName = '"</span>
+                    + userName                                        <span class="cm">// TAINT — конкатенация в SQL</span>
+                    + <span class="str">"'"</span>,
+        CommandType = <span class="ty">System</span>.<span class="ty">Data</span>.<span class="ty">CommandType</span>.Text
+    })
+    {
+        <span class="kw">var</span> reader = command.ExecuteReader();                         <span class="cm">// SINK — выполнение запроса</span>
+    }
+}</code></pre>
+
+      <h3>Что происходит</h3>
+      <ol>
+        <li><strong>Источник (source)</strong> — <code>Request.Form["userName"]</code>: данные пришли от пользователя, доверять им нельзя.</li>
+        <li><strong>Распространение (taint flow)</strong> — переменная <code>userName</code> подставляется напрямую в строку SQL-запроса через конкатенацию <code>+</code>.</li>
+        <li><strong>Сток (sink)</strong> — итоговая строка передаётся в <code>SqlCommand.CommandText</code> и исполняется как SQL.</li>
+      </ol>
+      <p>Атакующий может ввести в форму строку вида <code>' OR '1'='1' --</code> и превратить её в произвольный SQL-запрос, обходя авторизацию или вытаскивая данные из других таблиц.</p>
+
+      <div class="callout warning">
+        <p><span class="pvs-code">V5608</span> <strong>Possible SQL injection.</strong> Potentially tainted data in the <code>'userName'</code> variable is used to create SQL command.</p>
+        <p>Анализатор отследил весь маршрут от источника пользовательских данных до места их использования в SQL-запросе и автоматически выдал предупреждение. Чтобы исправить — использовать параметризованные запросы (<code>SqlParameter</code>).</p>
+      </div>
+
+      <p>Этот же подход (taint-анализ) лежит в основе поиска большинства injection-уязвимостей: Command injection, Path traversal, XSS, LDAP injection и т. д. Везде SAST ищет связку source → flow → sink с проверкой санитизации на пути.</p>
+    </section>
+
+    <!-- 09. REGULATION -->
+    <section id="regulation" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> · Российское регулирование</div>
+      <h2>Регуляторный контекст</h2>
+      <p class="lead">В России разработка безопасного ПО (РБПО) и применение статического анализа регулируются национальными стандартами серии ГОСТ Р. Их соблюдение — обязательное условие для поставщиков средств защиты информации и значительной части государственных и корпоративных заказчиков.</p>
+
+      <h3>Эволюция стандартов РБПО</h3>
+      <p>За девять лет — от первой редакции базового стандарта до обновлённой версии 2024 года, дополненной специализированным стандартом по статическому анализу.</p>
+      <div class="timeline">
+        <div class="timeline-track">
+          <div class="timeline-item">
+            <div class="timeline-date">01.06.2017</div>
+            <div class="timeline-title">ГОСТ Р 56939-2016</div>
+            <div class="timeline-desc">Первая редакция базового стандарта РБПО. Действовал до 20 декабря 2024 года. Сейчас отменён и заменён редакцией 2024 года.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">01.04.2024</div>
+            <div class="timeline-title">ГОСТ Р 71207-2024</div>
+            <div class="timeline-desc">Защита информации. РБПО. <strong>Статический анализ ПО. Общие требования.</strong> Специализированный стандарт — детализирует именно процесс статанализа: инструменты, методы, специалисты, методика проверки. Введён впервые.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">20.12.2024</div>
+            <div class="timeline-title">ГОСТ Р 56939-2024</div>
+            <div class="timeline-desc">Защита информации. Разработка безопасного ПО. <strong>Общие требования</strong> (новая редакция). Заменил ГОСТ Р 56939-2016. Утверждён приказом Росстандарта от 24.10.2024 № 1504-ст. Действующая базовая норма.</div>
+          </div>
+        </div>
+      </div>
+
+      <h3>Кто разработал</h3>
+      <p>ГОСТ Р 71207-2024 разработан совместно:</p>
+      <ul>
+        <li><strong>ФСТЭК России</strong> — Федеральная служба по техническому и экспортному контролю.</li>
+        <li><strong>ИСП РАН</strong> — Институт системного программирования им. В. П. Иванникова Российской академии наук.</li>
+      </ul>
+      <p>Стандарт внесён <strong>ТК 362 «Защита информации»</strong>, утверждён приказом Росстандарта от 18 января 2024 года № 25-ст и введён в действие с 1 апреля 2024 года.</p>
+
+      <div class="callout">
+        <p><strong>ГОСТ Р 71207 применяется совместно с ГОСТ Р 56939.</strong> Стандарт не отменяет базовый, а дополняет его — конкретизирует процесс статического анализа в рамках общего жизненного цикла РБПО.</p>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Важный нюанс редакций.</strong> ГОСТ Р 71207-2024 был утверждён в январе 2024 года и в своих нормативных ссылках упоминает ГОСТ Р 56939 без указания года — то есть <em>действующую на момент применения</em> редакцию. На момент публикации 71207 это была версия 2016 года; с 20 декабря 2024 года применяется редакция 2024 года.</p>
+      </div>
+
+      <h3>Кому адресован стандарт</h3>
+      <ul>
+        <li>Разработчикам статических анализаторов — задаёт обязательный набор реализуемых методов анализа и качественные показатели.</li>
+        <li>Разработчикам средств защиты информации и средств обеспечения безопасности ИТ — задаёт требования к процессу применения статанализа.</li>
+        <li>Разработчикам ПО общего назначения, поставляющим продукты под требования РБПО.</li>
+      </ul>
+    </section>
+
+    <!-- 10. IMPLEMENTATION -->
+    <section id="implementation" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> · Процесс</div>
+      <h2>Внедрение статического анализа по ГОСТ Р 71207</h2>
+      <p class="lead">Стандарт предписывает чёткую схему внедрения: три последовательных этапа и набор контрольных сроков для регулярной работы.</p>
+
+      <h3>Три этапа внедрения</h3>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">01</div>
+          <h4>Подготовительный</h4>
+          <ul>
+            <li>Выбор инструмента (или набора инструментов) статического анализа</li>
+            <li>Анализ документации проекта, языков программирования, систем сборки</li>
+            <li>Подготовка сборочной среды и среды анализа</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">02</div>
+          <h4>Начальный</h4>
+          <ul>
+            <li>Настройка инструмента под конкретный проект</li>
+            <li>Первичный запуск статического анализа</li>
+            <li>Разметка результатов: истинные / ложные / не требующие исправления предупреждения</li>
+            <li>Формирование начальной базы предупреждений (baseline)</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">03</div>
+          <h4>Регулярный</h4>
+          <ul>
+            <li>Постоянный анализ всего кода и изменений</li>
+            <li>Интеграция в систему непрерывной интеграции (CI)</li>
+            <li>Регулярный пересмотр конфигурации и настроек</li>
+            <li>Контроль устранения подтверждённых ошибок</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Контрольные сроки регулярного анализа</h3>
+      <p>Стандарт устанавливает чёткие временные рамки, которые превращают анализ из эпизодического запуска в встроенную часть процесса разработки:</p>
+
+      <div class="deadlines">
+        <div class="deadline">
+          <div class="deadline-time">10<small>раб. дней</small></div>
+          <div class="deadline-text"><strong>Полный анализ</strong> всего кода — не реже одного раза, если за этот период код менялся.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">после<small>каждого</small></div>
+          <div class="deadline-text"><strong>Анализ изменённых частей</strong> ПО — после каждого внесённого изменения. В CI-процессе автоматически.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">3<small>раб. дня</small></div>
+          <div class="deadline-text"><strong>Просмотр предупреждений</strong> от анализа изменённых частей — не позже трёх рабочих дней.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">10<small>раб. дней</small></div>
+          <div class="deadline-text"><strong>Просмотр предупреждений</strong> от анализа целиком — не позже десяти рабочих дней.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">10<small>раб. дней</small></div>
+          <div class="deadline-text"><strong>Исправление истинных ошибок</strong> или планирование сроков их устранения — не позже десяти дней после разметки.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">1<small>в месяц</small></div>
+          <div class="deadline-text"><strong>Контроль устранения</strong> — не реже раза в месяц, привлечёнными независимыми специалистами.</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">≤2<small>суток</small></div>
+          <div class="deadline-text"><strong>Время полного анализа</strong> ПО на технических средствах разработчика — требование к самому инструменту (п. 8.3).</div>
+        </div>
+        <div class="deadline">
+          <div class="deadline-time">до<small>тестирования</small></div>
+          <div class="deadline-text"><strong>Устранение критических ошибок</strong> — не позднее начала квалификационного тестирования ПО.</div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Что это значит на практике.</strong> Если у вас нет CI-системы, выполняющей статический анализ на каждый коммит, вы не сможете уложиться в сроки 71207. Поэтому стандарт неявно предписывает наличие зрелого процесса DevOps с автоматизацией.</p>
+      </div>
+    </section>
+
+    <!-- 11. CRITICAL ERRORS -->
+    <section id="critical-errors" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> · Классификация</div>
+      <h2>Критические ошибки по ГОСТ Р 71207</h2>
+      <p class="lead">Раздел 6 стандарта устанавливает обязательный перечень типов критических ошибок, которые должен искать статический анализатор. Список зависит от языка программирования.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">п. 6.3</span>
+              <span>Компилируемые языки: общие типы</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Для всех компилируемых языков (C, C++, Rust, Go, Pascal, Ada и т. п.) обязательны следующие типы критических ошибок:</p>
+            <ol>
+              <li><strong>Непроверенное использование чувствительных данных</strong> — ввод пользователя, данные из файлов, сети и т. п. без должной валидации.</li>
+              <li><strong>Целочисленное переполнение</strong> и некорректное совместное использование знаковых и беззнаковых чисел.</li>
+              <li><strong>Переполнение буфера</strong> — запись или чтение за пределами выделенной памяти.</li>
+              <li><strong>Некорректное использование системных процедур и интерфейсов безопасности</strong> — шифрование, разграничение доступа и пр.</li>
+              <li><strong>Ошибки многопоточности</strong> — гонки данных, некорректная синхронизация, deadlock'и.</li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">п. 6.4</span>
+              <span>Интерпретируемые языки</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Для интерпретируемых языков (Python, JavaScript, PHP, Ruby, Perl и т. п.) перечень короче — отсутствуют пункты, специфичные для управления памятью и низкоуровневой арифметики:</p>
+            <ol>
+              <li><strong>Непроверенное использование чувствительных данных.</strong></li>
+              <li><strong>Некорректное использование интерфейсов безопасности</strong> — крипто, ACL.</li>
+              <li><strong>Ошибки работы с многопоточными примитивами.</strong></li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">п. 6.5</span>
+              <span>C и C++: дополнительные типы</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Для C и C++ к общему списку добавляются специфические для языка типы — все они связаны с ручным управлением памятью и слабой типизацией:</p>
+            <ol>
+              <li><strong>Разыменование нулевого указателя.</strong></li>
+              <li><strong>Деление на ноль.</strong></li>
+              <li><strong>Ошибки управления динамической памятью</strong> — выделение, освобождение, использование освобождённой памяти (use-after-free).</li>
+              <li><strong>Ошибки использования форматной строки</strong> — небезопасные <code>printf</code>-подобные функции.</li>
+              <li><strong>Использование неинициализированных переменных.</strong></li>
+              <li><strong>Утечки памяти, незакрытые файловые дескрипторы и сетевые соединения.</strong></li>
+            </ol>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">п. 7.4</span>
+              <span>Обязательные методы анализа</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Анализатор должен реализовывать <strong>все следующие методы</strong>:</p>
+            <ul>
+              <li>Внутрипроцедурный анализ потоков данных и управления.</li>
+              <li>Межпроцедурный и межмодульный <em>контекстно-чувствительный</em> анализ потока данных.</li>
+              <li>Чувствительный к путям выполнения анализ потоков данных и управления.</li>
+              <li>Межпроцедурный и межмодульный контекстно-чувствительный <strong>анализ помеченных данных</strong> (taint analysis).</li>
+              <li>Анализ программы на синтаксическом уровне.</li>
+            </ul>
+            <p>Дополнительно <em>рекомендуется</em> включать: сигнатурный поиск, анализ псевдонимов, анализ косвенных вызовов, статистический анализ, анализ иерархии классов.</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- 12. REQUIREMENTS -->
+    <section id="requirements" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> · Требования</div>
+      <h2>Требования к инструментам и специалистам</h2>
+      <p class="lead">Стандарт предъявляет конкретные численные и функциональные требования — как к самому статическому анализатору, так и к людям, которые с ним работают.</p>
+
+      <h3>Чек-лист для инструмента (п. 8)</h3>
+      <ul class="checklist">
+        <li><strong>Качество анализа:</strong> доля ложноположительных срабатываний (FP) ≤ 50%, доля ложноотрицательных (FN, пропусков) ≤ 50% — на квалификационном наборе тестов.</li>
+        <li><strong>Скорость:</strong> полный анализ ПО с заимствованными компонентами на средствах разработчика — не более 2 суток.</li>
+        <li><strong>Поддержка заимствованных компонентов:</strong> анализ должен охватывать ПО целиком, включая сторонние библиотеки.</li>
+        <li><strong>Состав предупреждения:</strong> описание ошибки, тип, точное место в исходном коде, рекомендация по исправлению.</li>
+        <li><strong>Связь с CWE:</strong> для каждого типа ошибки в документации указано соответствие одному или нескольким идентификаторам MITRE CWE.</li>
+        <li><strong>Открытый формат вывода:</strong> результаты анализа доступны в машиночитаемом формате — например, <code>SARIF</code> (Static Analysis Results Interchange Format).</li>
+        <li><strong>Автоматизация:</strong> доступен консольный или программный интерфейс для CI/CD-интеграции.</li>
+        <li><strong>Хранение и сравнение результатов:</strong> сохранение запусков с уникальными идентификаторами предупреждений и сравнение между запусками.</li>
+        <li><strong>Поддержка разметки:</strong> возможность пометить предупреждение как «истинное», «ложное», «не требует исправления» с автоматизацией повторных решений.</li>
+        <li><strong>Документация:</strong> описание всех типов ошибок с причинами, примерами кода и способами исправления.</li>
+      </ul>
+
+      <h3>Две роли специалистов (п. 9)</h3>
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            </div>
+            <div>
+              <h3>DevOps / системное администрирование</h3>
+              <span class="col-en">Внедрение и сопровождение анализа</span>
+            </div>
+          </div>
+          <p>Отвечает за инфраструктуру: настройку среды, интеграцию в CI, ресурсное планирование. Участвует в подразделах 5.3 и 5.6 стандарта.</p>
+          <ul style="font-size: 14.5px; line-height: 1.55;">
+            <li>Программная инженерия и жизненный цикл ПО</li>
+            <li>Архитектура ЭВМ и устройство технических средств</li>
+            <li>Сетевые протоколы и сервисы</li>
+            <li>Оценка временных и вычислительных ресурсов</li>
+          </ul>
+        </div>
+
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+            </div>
+            <div>
+              <h3>Безопасность ПО / разметка предупреждений</h3>
+              <span class="col-en">Анализ результатов и устранение</span>
+            </div>
+          </div>
+          <p>Отвечает за содержательную часть: выбор анализатора, настройку, экспертизу предупреждений, оценку влияния на безопасность. Подразделы 5.2, 5.4, 5.7–5.12.</p>
+          <ul style="font-size: 14.5px; line-height: 1.55;">
+            <li>Основы безопасности ПО и систем</li>
+            <li>Языки программирования анализируемого ПО</li>
+            <li>Алгоритмы и теория сложности</li>
+            <li>POSIX и устройство ОС</li>
+            <li>Опыт работы со статическими анализаторами или повышение квалификации</li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 13. INTEGRATION -->
+    <section id="integration" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> · Экосистема</div>
+      <h2>Интеграция в процесс разработки</h2>
+      <p class="lead">Современный SAST-инструмент перестаёт быть «отдельной программой, в которую раз в месяц приходят». Он встраивается во все ключевые точки разработки — от IDE до облачного CI.</p>
+
+      <p>Ниже — <a href="https://pvs-studio.ru/ru/blog/posts/cpp/1335/" target="_blank" rel="noopener">карта экосистемы интеграций на примере PVS-Studio</a>. Аналогичный список характерен для большинства зрелых SAST-решений.</p>
+
+      <div class="integrations">
+        <h4>IDE и редакторы кода</h4>
+        <div class="integration-grid">
+          <div class="int-item">Visual Studio</div>
+          <div class="int-item">IntelliJ IDEA</div>
+          <div class="int-item">Rider</div>
+          <div class="int-item">CLion</div>
+          <div class="int-item">VS Code</div>
+          <div class="int-item">Qt Creator</div>
+          <div class="int-item">OpenIDE</div>
+        </div>
+
+        <h4>Системы сборки</h4>
+        <div class="integration-grid">
+          <div class="int-item">MSBuild</div>
+          <div class="int-item">CMake</div>
+          <div class="int-item">Make</div>
+          <div class="int-item">Ninja</div>
+          <div class="int-item">Maven</div>
+          <div class="int-item">Gradle</div>
+          <div class="int-item">JSON Compilation DB</div>
+        </div>
+
+        <h4>Платформы качества кода</h4>
+        <div class="integration-grid">
+          <div class="int-item">SonarQube</div>
+          <div class="int-item">DefectDojo</div>
+          <div class="int-item">CodeChecker</div>
+        </div>
+
+        <h4>Облачные и локальные CI</h4>
+        <div class="integration-grid">
+          <div class="int-item">GitLab CI</div>
+          <div class="int-item">Jenkins</div>
+          <div class="int-item">Azure DevOps</div>
+          <div class="int-item">TeamCity</div>
+          <div class="int-item">Travis CI</div>
+          <div class="int-item">CircleCI</div>
+        </div>
+
+        <h4>Игровые движки</h4>
+        <div class="integration-grid">
+          <div class="int-item">Unreal Engine</div>
+          <div class="int-item">Unity</div>
+        </div>
+
+        <h4>Embedded-платформы</h4>
+        <div class="integration-grid">
+          <div class="int-item">Keil µVision</div>
+          <div class="int-item">DS-MDK</div>
+          <div class="int-item">IAR Embedded</div>
+          <div class="int-item">PlatformIO</div>
+          <div class="int-item">QNX Momentics</div>
+          <div class="int-item">TI ARM Code</div>
+        </div>
+
+        <h4>Виртуализация и распределённая сборка</h4>
+        <div class="integration-grid">
+          <div class="int-item">Docker</div>
+          <div class="int-item">WSL</div>
+          <div class="int-item">Incredibuild</div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Что это значит на практике.</strong> Разработчик видит предупреждения прямо в IDE при наборе кода. CI-пайплайн блокирует merge-request, если в изменённых файлах появились новые критические предупреждения. Платформа качества (SonarQube / DefectDojo) агрегирует результаты со всех проектов в едином дашборде. Получается замкнутый контур, в котором ошибка не может незаметно «просочиться» в production.</p>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Gate для Secure C/C++.</strong> Для системного ПО SAST лучше закреплять как обязательный контроль сборки: профиль правил CERT C/C++ или MISRA C/C++, запрет новых Critical/High без решения владельца риска, отдельный статус для false positive, nightly-прогон полного проекта и быстрый diff-анализ в merge request.</p>
+        <p>Статический анализ не заменяет инструментирование. Его стоит связывать с ASan/UBSan/TSan в тестовых сборках, compiler hardening (`-fstack-protector-strong`, `-D_FORTIFY_SOURCE`, PIE/RELRO/NX) и трассируемостью предупреждения до требования, дефекта, исправления и повторной проверки.</p>
+      </div>
+    </section>
+
+    <!-- CONTACTS / FOOTER -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам лекции, проведения курсов и консультаций по внедрению статического анализа в процесс разработки.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:pikov@yandex.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          pikov@yandex.ru
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Лекция · РБПО</span>
+        </div>
+        <div>При подготовке лекции использовались материалы PVS-Studio.</div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  // Theme
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  // Year
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Reading progress
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  // Back to top
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  // TOC active section via IntersectionObserver
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  // Mobile TOC toggle
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  // Close TOC on link click (mobile)
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+
+  // Bug spoilers
+  document.querySelectorAll('.bug-spoiler').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+      const answer = btn.parentElement.querySelector('.bug-answer');
+      if (answer) {
+        answer.classList.toggle('open');
+        btn.querySelector('svg').nextSibling.textContent = expanded ? ' Показать предупреждение' : ' Скрыть предупреждение';
+      }
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

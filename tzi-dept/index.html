@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Подразделения ТЗИ и их основные функции | УЦ МАСКОМ</title>
+  <meta name="description" content="Презентация-лендинг для лекции по организации подразделений технической защиты информации. НОУ ДПО «УЦБИ «МАСКОМ».">
+  <style>
+    :root {
+      --color-bg-main: #ffffff;
+      --color-text-main: #000000;
+      --color-accent: #2e7d32;
+      --color-subtle: #f5f5f5;
+      --font-main: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      --transition-speed: 0.35s;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; overflow: hidden; font-family: var(--font-main); background: var(--color-bg-main); color: var(--color-text-main); -webkit-font-smoothing: antialiased; }
+    
+    .presentation { position: relative; width: 100%; height: 100%; }
+    .slide {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      padding: 40px 60px; display: flex; flex-direction: column;
+      background: var(--color-bg-main); color: var(--color-text-main);
+      opacity: 0; pointer-events: none;
+      transition: opacity var(--transition-speed) ease, transform var(--transition-speed) ease;
+      transform: translateX(20px);
+    }
+    .slide.active { opacity: 1; pointer-events: auto; transform: translateX(0); z-index: 10; }
+    .slide.prev { transform: translateX(-20px); }
+
+    #slide-1 {
+      background: linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url('Подложка.png') center/cover no-repeat;
+      color: #ffffff; justify-content: center; align-items: center; text-align: center; padding: 30px;
+    }
+    #slide-1 .year { position: absolute; top: 30px; font-size: 28px; font-weight: 300; opacity: 0.9; }
+    #slide-1 .title { font-size: clamp(26px, 4vw, 44px); font-weight: 700; margin: 20px 0; line-height: 1.25; max-width: 90%; }
+    #slide-1 .subtitle { font-size: clamp(18px, 2.2vw, 26px); margin-bottom: 40px; opacity: 0.95; max-width: 85%; }
+    #slide-1 .speaker { position: absolute; bottom: 40px; font-size: clamp(16px, 1.8vw, 22px); line-height: 1.4; max-width: 85%; text-align: center; }
+    #slide-1 .speaker strong { font-weight: 600; display: block; margin-bottom: 5px; font-size: 1.1em; }
+
+    .slide-header {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      margin-bottom: 25px; padding-bottom: 12px; border-bottom: 3px solid var(--color-accent); gap: 20px;
+    }
+    .slide-logo { max-height: 60px; width: auto; object-fit: contain; flex-shrink: 0; }
+    .slide-title { font-size: clamp(22px, 2.8vw, 34px); font-weight: 700; color: var(--color-accent); margin: 0; }
+    
+    .slide-content { flex: 1; font-size: clamp(17px, 1.6vw, 22px); line-height: 1.6; overflow-y: auto; padding-right: 15px; scrollbar-width: thin; }
+    .slide-content p { margin-bottom: 12px; }
+    .slide-content ul, .slide-content ol { margin-left: 26px; margin-bottom: 12px; }
+    .slide-content li { margin-bottom: 6px; }
+    .slide-content .highlight { background: #e8f5e9; padding: 3px 6px; border-radius: 4px; font-weight: 600; border-left: 4px solid var(--color-accent); display: inline-block; margin: 4px 0; }
+    .slide-content .warning { background: #fff3e0; padding: 3px 6px; border-radius: 4px; font-weight: 600; border-left: 4px solid #f57c00; display: inline-block; margin: 4px 0; }
+    .slide-content table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: clamp(15px, 1.4vw, 19px); }
+    .slide-content th, .slide-content td { border: 1px solid #cccccc; padding: 8px 10px; text-align: left; vertical-align: top; }
+    .slide-content th { background: var(--color-subtle); font-weight: 600; }
+    
+    .slide-footer { position: absolute; bottom: 20px; left: 30px; font-size: 18px; color: #666; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 4px; }
+
+    .click-zones { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; }
+    .click-left, .click-right { position: absolute; top: 0; height: 100%; width: 35%; pointer-events: auto; cursor: pointer; }
+    .click-left { left: 0; } .click-right { right: 0; }
+    
+    .nav-buttons { position: fixed; bottom: 25px; right: 30px; display: flex; gap: 10px; z-index: 100; }
+    .nav-btn {
+      width: 48px; height: 48px; border: none; border-radius: 50%;
+      background: var(--color-accent); color: white; font-size: 20px;
+      cursor: pointer; transition: all 0.2s ease;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+    }
+    .nav-btn:hover { background: #1b5e20; transform: scale(1.08); }
+    .nav-btn:active { transform: scale(0.95); }
+    .nav-btn:disabled { background: #9e9e9e; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    #slide-final {
+      background: var(--color-bg-main); justify-content: center; align-items: center; text-align: center;
+    }
+    #slide-final .contact-card {
+      background: var(--color-subtle); border: 2px solid var(--color-accent);
+      border-radius: 12px; padding: clamp(30px, 4vw, 50px); max-width: 850px; width: 90%;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+    }
+    #slide-final h2 { font-size: clamp(28px, 3.5vw, 40px); margin-bottom: 25px; color: var(--color-accent); }
+    #slide-final .contact-row { font-size: clamp(20px, 2.2vw, 26px); margin: 12px 0; line-height: 1.5; }
+    #slide-final .contact-row strong { color: var(--color-accent); display: inline-block; min-width: 160px; text-align: right; margin-right: 12px; }
+    #slide-final .contact-row a { color: var(--color-accent); text-decoration: none; font-weight: 600; }
+    #slide-final .logo-final { max-height: 80px; margin: 25px auto; display: block; }
+
+    @media (max-width: 1280px) { .slide { padding: 30px 40px; } }
+    @media (max-width: 768px) {
+      .slide { padding: 20px 15px; }
+      .slide-header { flex-direction: column; gap: 8px; }
+      .nav-buttons { bottom: 15px; right: 15px; }
+      .click-left, .click-right { width: 45%; }
+    }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; transform: none !important; } }
+    @media print {
+      .click-zones, .nav-buttons { display: none !important; }
+      .slide { position: relative !important; page-break-after: always; opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="click-zones" aria-hidden="true">
+  <div class="click-left" id="zonePrev" title="Предыдущий слайд"></div>
+  <div class="click-right" id="zoneNext" title="Следующий слайд"></div>
+</div>
+
+<nav class="nav-buttons" role="navigation">
+  <button class="nav-btn" id="btnFirst" title="Первый слайд">⏮</button>
+  <button class="nav-btn" id="btnPrev" title="Предыдущий слайд">◀</button>
+  <button class="nav-btn" id="btnNext" title="Следующий слайд">▶</button>
+  <button class="nav-btn" id="btnLast" title="Последний слайд">⏭</button>
+</nav>
+
+<main class="presentation" id="presentation" role="main">
+  <section class="slide active" id="slide-1">
+    <div class="year" id="yearDisplay"></div>
+    <h1 class="title">Подразделения технической защиты информации<br>и их основные функции</h1>
+    <p class="subtitle">Организация, задачи и взаимодействие в современных условиях</p>
+    <div class="speaker">
+      <strong>Виталий Александрович Пиков</strong>
+      руководитель направления обучения по РБПО, преподаватель<br>
+      НОУ ДПО «УЦБИ «МАСКОМ»
+    </div>
+  </section>
+
+  <section class="slide" id="slide-2">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Введение: Роль подразделения ТЗИ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Обеспечение безопасности информационных ресурсов (ИР) организации</li>
+        <li>Управление комплексной системой защиты информации (ЗИ)</li>
+        <li>Снижение рисков утечки, искажения и блокирования данных</li>
+        <li>Контроль выполнения требований регуляторов и внутренних политик</li>
+      </ul>
+      <p>Подразделение ТЗИ — ключевое звено в архитектуре корпоративной ИБ.</p>
+    </div>
+    <div class="slide-footer">2 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-3">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Цель и основные задачи</h2></div>
+    <div class="slide-content">
+      <p class="highlight"><strong>Главная цель:</strong> снижение ущерба обладателю ИР от реализации угроз безопасности.</p>
+      <br>
+      <ul>
+        <li>Планирование, организация и координация работ по ИБ</li>
+        <li>Выявление угроз и уязвимостей ИС, ПО и ПАК</li>
+        <li>Предотвращение утечки по техническим каналам и НСД</li>
+        <li>Нормативно-правовое обеспечение использования ИР</li>
+      </ul>
+    </div>
+    <div class="slide-footer">3 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-4">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Нормативная база: Указ Президента РФ № 250</h2></div>
+    <div class="slide-content">
+      <p><strong>Указ Президента РФ от 01.05.2022 № 250:</strong></p>
+      <ul>
+        <li>Создать структурное подразделение, осуществляющее функции по обеспечению ИБ</li>
+        <li>Либо возложить данные функции на существующее подразделение</li>
+        <li>Обязательно для ФОИВ, госкорпораций, стратегических предприятий, субъектов КИИ</li>
+      </ul>
+      <br>
+      <p class="warning">Обязанность включает реагирование на компьютерные инциденты.</p>
+    </div>
+    <div class="slide-footer">4 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-5">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Требования ФСТЭК к защите информации</h2></div>
+    <div class="slide-content">
+      <p>ФСТЭК устанавливает обязательные требования к организации защиты:</p>
+      <ul>
+        <li>Назначение ответственных за защиту информации (Приказ ФСТЭК № 17)</li>
+        <li>Создание системы безопасности ЗО КИИ (Приказ ФСТЭК № 235)</li>
+        <li>Обеспечение безопасности ИСПДн (ПП РФ № 1119)</li>
+        <li>Контроль выполнения организационных и технических мер</li>
+      </ul>
+    </div>
+    <div class="slide-footer">5 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-6">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Роль ФСБ и Минобороны в организации ТЗИ</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Регулятор</th><th>Сфера ответственности</th></tr></thead>
+        <tbody>
+          <tr><td>ФСБ</td><td>Защита сведений, составляющих государственную тайну. Криптография (СКЗИ). ГосСОПКА.</td></tr>
+          <tr><td>Минобороны</td><td>Защита информации в сфере обороны и гособоронзаказа (ГОЗ). Сертификация СЗИ МО.</td></tr>
+        </tbody>
+      </table>
+      <p>Взаимодействие с данными органами обязательно при работе с соответствующими категориями информации.</p>
+    </div>
+    <div class="slide-footer">6 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-7">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Защита ГИС (Приказ ФСТЭК № 17)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Оператор обязан назначить структурное подразделение или должностное лицо</li>
+        <li>Ответственность за обеспечение защиты информации в ГИС</li>
+        <li>Уровень защиты зависит от класса защищенности ГИС (1, 2 или 3 класс)</li>
+      </ul>
+      <p class="highlight">Подразделение ТЗИ координирует мероприятия по классу защищенности.</p>
+    </div>
+    <div class="slide-footer">7 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-8">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Защита ПДн (ПП РФ № 1119)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>1 уровень защищенности:</strong> создание структурного подразделения, ответственного за безопасность ПДн</li>
+        <li><strong>2 и 3 уровни:</strong> назначение ответственного должностного лица</li>
+        <li>Подразделение ТЗИ обеспечивает выбор и внедрение средств защиты ПДн</li>
+        <li>Контроль за соблюдением прав субъектов ПДн</li>
+      </ul>
+    </div>
+    <div class="slide-footer">8 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-9">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Защита КИИ (Приказ ФСТЭК № 235)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Руководитель субъекта КИИ создает структурное подразделение или назначает отдельных работников</li>
+        <li>Подразделение выполняет функции по безопасности ЗО КИИ</li>
+        <li>Обязательное взаимодействие с ГосСОПКА (ФСБ)</li>
+        <li>Проведение категорирования ЗО КИИ</li>
+      </ul>
+    </div>
+    <div class="slide-footer">9 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-10">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Защита АСУ ТП (Приказ ФСТЭК № 31)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Назначается структурное подразделение или должностное лицо, ответственное за защиту информации в АСУ ТП</li>
+        <li>Особые требования к непрерывности технологических процессов</li>
+        <li>Защита от специальных воздействий и утечек по техническим каналам</li>
+      </ul>
+    </div>
+    <div class="slide-footer">10 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-11">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Основные задачи подразделения ТЗИ</h2></div>
+    <div class="slide-content">
+      <ol>
+        <li>Планирование, организация и координация работ по ИБ</li>
+        <li>Выявление угроз и уязвимостей</li>
+        <li>Предотвращение утечек и НСД</li>
+        <li>Нормативно-правовое обеспечение</li>
+        <li>Взаимодействие с регуляторами (НКЦКИ, ФСТЭК, ФСБ)</li>
+      </ol>
+    </div>
+    <div class="slide-footer">11 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-12">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Задача 1: Планирование и координация</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Разработка комплексных планов обеспечения ИБ</li>
+        <li>Координация действий смежных подразделений (ИТ, кадры, физ. охрана)</li>
+        <li>Контроль исполнения плановых мероприятий</li>
+        <li>Анализ текущего состояния ЗИ и формирование предложений по его улучшению</li>
+      </ul>
+    </div>
+    <div class="slide-footer">12 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-13">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Задача 2: Выявление угроз и уязвимостей</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Построение и актуализация моделей угроз</li>
+        <li>Проведение сканирования уязвимостей ИС</li>
+        <li>Анализ уязвимостей ПО и ПАК</li>
+        <li>Оценка защищенности помещений и технических каналов</li>
+      </ul>
+    </div>
+    <div class="slide-footer">13 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-14">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Задача 3: Предотвращение утечек и НСД</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Внедрение и настройка СЗИ (СДЗ, МЭ, СОВ, средства контейнеризации)</li>
+        <li>Контроль защищенности от утечки по акустическим и электромагнитным каналам</li>
+        <li>Организация пропускного режима в защищаемые помещения</li>
+        <li>Контроль использования машинных носителей информации</li>
+      </ul>
+    </div>
+    <div class="slide-footer">14 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-15">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Задача 4: Нормативно-правовое обеспечение</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Разработка внутренних политик, регламентов и инструкций</li>
+        <li>Актуализация организационно-распорядительной документации (ОРД)</li>
+        <li>Подготовка к аттестационным испытаниям объектов информатизации</li>
+        <li>Контроль актуальности нормативных актов ФСТЭК, ФСБ, Минобороны</li>
+      </ul>
+    </div>
+    <div class="slide-footer">15 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-16">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Задача 5: Взаимодействие с НКЦКИ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Своевременное информирование о компьютерных инцидентах</li>
+        <li>Получение информации об угрозах и уязвимостях от регулятора</li>
+        <li>Реализация предписаний и рекомендаций НКЦКИ</li>
+        <li>Участие в учениях по реагированию на киберинциденты</li>
+      </ul>
+      <p class="warning">Нарушение сроков информирования влечет административную ответственность.</p>
+    </div>
+    <div class="slide-footer">16 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-17">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Основные функции подразделения ТЗИ</h2></div>
+    <div class="slide-content">
+      <p>Функции подразделения делятся на несколько ключевых направлений:</p>
+      <ul>
+        <li><strong>Организационно-управленческая</strong> (координация, планирование)</li>
+        <li><strong>Организационно-техническая</strong> (внедрение СЗИ, контроль)</li>
+        <li><strong>Информационно-аналитическая</strong> (анализ угроз, отчетность)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">17 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-18">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 1: Координация работ по ИБ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Разработка и утверждение программ обеспечения ИБ</li>
+        <li>Распределение ответственности между сотрудниками</li>
+        <li>Контроль за соблюдением установленных правил</li>
+        <li>Взаимодействие с внешними аудиторами и регуляторами</li>
+      </ul>
+    </div>
+    <div class="slide-footer">18 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-19">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 2: Реагирование на инциденты</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Обнаружение компьютерных атак и инцидентов ИБ</li>
+        <li>Оперативное предупреждение и локализация угроз</li>
+        <li>Ликвидация последствий сбоев и несанкционированных действий</li>
+        <li>Формирование отчетов об инцидентах и передача их в НКЦКИ</li>
+      </ul>
+    </div>
+    <div class="slide-footer">19 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-20">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 3: Обеспечение ЗИ средствами и мерами</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Выбор сертифицированных СЗИ в соответствии с требованиями регулятора</li>
+        <li>Настройка политик безопасности и средств разграничения доступа</li>
+        <li>Обеспечение антивирусной защиты и обновления ПО</li>
+        <li>Защита от специальных технических средств перехвата информации</li>
+      </ul>
+    </div>
+    <div class="slide-footer">20 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-21">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 4: Контроль защищенности и модернизация</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Проведение регулярных проверок и внутренних аудитов</li>
+        <li>Контроль состояния защищенности систем и сетей</li>
+        <li>Подготовка предложений по модернизации процессов и инфраструктуры</li>
+        <li>Мониторинг соответствия требованиям регуляторов</li>
+      </ul>
+    </div>
+    <div class="slide-footer">21 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-22">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 5: Обучение и развитие навыков</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Проведение инструктажей по основам ИБ для персонала</li>
+        <li>Организация занятий с руководящим составом</li>
+        <li>Обучение специалистов по ТЗИ новым методам защиты</li>
+        <li>Формирование культуры информационной безопасности</li>
+      </ul>
+    </div>
+    <div class="slide-footer">22 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-23">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Функция 6: Исполнение указаний регуляторов</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Получение и анализ предписаний ФСТЭК и ФСБ</li>
+        <li>Разработка и реализация планов устранения нарушений</li>
+        <li>Подготовка отчетности о состоянии защищенности</li>
+        <li>Участие в плановых и внеплановых проверках</li>
+      </ul>
+      <p class="warning">Неисполнение указаний влечет административную и уголовную ответственность.</p>
+    </div>
+    <div class="slide-footer">23 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-24">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Структура подразделения ТЗИ</h2></div>
+    <div class="slide-content">
+      <table>
+        <thead><tr><th>Функциональный блок</th><th>Основные задачи</th></tr></thead>
+        <tbody>
+          <tr><td>Начальник отдела ТЗИ</td><td>Стратегическое планирование, взаимодействие с руководством</td></tr>
+          <tr><td>Сектор защиты от утечек</td><td>Акустика, ПЭМИН, защищенные помещения</td></tr>
+          <tr><td>Сектор защиты от НСД</td><td>Аутентификация, СЗИ ОС, СОВ, СДЗ</td></tr>
+          <tr><td>Группа реагирования (CERT)</td><td>Мониторинг, расследование инцидентов</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="slide-footer">24 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-25">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Организационно-управленческая функция</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Разработка положений о подразделении ТЗИ</li>
+        <li>Управление рисками информационной безопасности</li>
+        <li>Координация внедрения новых технологий защиты</li>
+        <li>Контроль за сроками выполнения мероприятий по ИБ</li>
+      </ul>
+    </div>
+    <div class="slide-footer">25 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-26">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Организационно-техническая функция</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Проведение специальных проверок (СП) и специальных исследований (СИ)</li>
+        <li>Аттестация объектов информатизации</li>
+        <li>Контроль эффективности применяемых СЗИ</li>
+        <li>Эксплуатация средств защиты от утечек (генераторы шума, анализаторы)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">26 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-27">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Информационно-аналитическая функция</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Сбор и анализ данных о состоянии ИБ организации</li>
+        <li>Прогнозирование развития угроз и уязвимостей</li>
+        <li>Подготовка аналитических справок для руководства</li>
+        <li>Взаимодействие с БДУ ФСТЭК (Банк данных угроз)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">27 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-28">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Социально-кадровая и хозяйственная функции</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li><strong>Социально-кадровая:</strong> подбор специалистов по ТЗИ, проверка благонадежности, допуск к гостайне</li>
+        <li><strong>Хозяйственная:</strong> закупка оборудования, ведение учета СЗИ, организация ремонта и поверки КИО</li>
+        <li><strong>Учетно-контрольная:</strong> учет средств защиты, машинных носителей, контроль за их использованием</li>
+      </ul>
+    </div>
+    <div class="slide-footer">28 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-29">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Квалификационные требования к специалистам</h2></div>
+    <div class="slide-content">
+      <p>Согласно ЕКС (Приказ Минздравсоцразвития № 205 от 22.04.2009):</p>
+      <ul>
+        <li>Высшее профессиональное образование</li>
+        <li>Знание законов и иных нормативных актов в области защиты информации</li>
+        <li>Знание методов выявления угроз и каналов утечки</li>
+        <li>Понимание структуры управления и технологических процессов организации</li>
+      </ul>
+    </div>
+    <div class="slide-footer">29 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-30">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Взаимодействие с ИТ-подразделением</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>ИТ отвечает за доступность и работоспособность систем</li>
+        <li>ТЗИ отвечает за их защищенность и конфиденциальность</li>
+        <li>Совместное тестирование обновлений безопасности</li>
+        <li>Координация при внедрении новых сервисов (принцип Security by Design)</li>
+      </ul>
+    </div>
+    <div class="slide-footer">30 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-31">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Взаимодействие с Отделом безопасности (ОБ)</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>ОБ обеспечивает физическую безопасность и экономическую безопасность</li>
+        <li>ТЗИ обеспечивает техническую защиту информации</li>
+        <li>Совместный контроль пропускного режима в контролируемые зоны</li>
+        <li>Расследование инцидентов утечки информации</li>
+      </ul>
+    </div>
+    <div class="slide-footer">31 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-32">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Контроль выполнения требований регуляторов</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Регулярный самоаудит соответствия требованиям ФСТЭК</li>
+        <li>Подготовка к инспекционным проверкам</li>
+        <li>Своевременное продление лицензий и сертификатов</li>
+        <li>Устранение замечаний в установленные сроки</li>
+      </ul>
+      <p class="highlight">Подразделение ТЗИ — главная точка контакта при проверках.</p>
+    </div>
+    <div class="slide-footer">32 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-33">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Типичные ошибки при организации ТЗИ</h2></div>
+    <div class="slide-content">
+      <ul>
+        <li>Отсутствие формализованной структуры и распределения ролей</li>
+        <li>Дублирование функций между ИТ и ТЗИ</li>
+        <li>Нехватка квалифицированных кадров</li>
+        <li>Формальный подход к обучению персонала</li>
+        <li>Игнорирование требований по защите КИИ и ГосСОПКА</li>
+      </ul>
+    </div>
+    <div class="slide-footer">33 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-34">
+    <div class="slide-header"><img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="slide-logo" onerror="this.style.display='none'"><h2 class="slide-title">Блок вопросов и ответов</h2></div>
+    <div class="slide-content">
+      <p style="font-size: 28px; margin-top: 40px; text-align: center;">Готов обсудить:</p>
+      <ul style="margin-top: 20px;">
+        <li>Нюансы назначения ответственных лиц</li>
+        <li>Особенности организации работы CERT в коммерческих структурах</li>
+        <li>Практические примеры взаимодействия с ФСТЭК и ФСБ</li>
+        <li>Планирование бюджета на техническую защиту</li>
+      </ul>
+      <p style="text-align: center; margin-top: 30px; color: #555;">Задавайте вопросы по содержанию лекции.</p>
+    </div>
+    <div class="slide-footer">34 из 35</div>
+  </section>
+
+  <section class="slide" id="slide-final">
+    <img src="Лого.jpg" alt="Логотип УЦ МАСКОМ" class="logo-final" onerror="this.style.display='none'">
+    <div class="contact-card">
+      <h2>Контактная информация</h2>
+      <div class="contact-row"><strong>Преподаватель:</strong> Виталий Александрович Пиков</div>
+      <div class="contact-row"><strong>Должность:</strong> Руководитель направления обучения по РБПО</div>
+      <div class="contact-row"><strong>Email:</strong> <a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a></div>
+      <div class="contact-row"><strong>Telegram:</strong> <a href="https://t.me/UnderLineSecurity">@UnderLineSecurity</a></div>
+      <div class="contact-row"><strong>Организация:</strong> НОУ ДПО «УЦБИ «МАСКОМ»</div>
+      <div class="contact-row"><strong>Сайт:</strong> <a href="https://mascom-uc.ru/" target="_blank" rel="noopener">mascom-uc.ru</a></div>
+      <p class="footer-note">Обращайтесь по вопросам обучения, сертификации и организации подразделений ТЗИ.</p>
+    </div>
+    <div class="slide-footer" style="visibility: hidden;">35 из 35</div>
+  </section>
+</main>
+
+<script>
+(function() {
+  'use strict';
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+  let currentIndex = 0;
+
+  const btnFirst = document.getElementById('btnFirst');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+  const btnLast = document.getElementById('btnLast');
+
+  document.getElementById('yearDisplay').textContent = new Date().getFullYear();
+
+  function updateUI() {
+    slides.forEach((slide, idx) => {
+      slide.classList.remove('active', 'prev');
+      if (idx === currentIndex) slide.classList.add('active');
+      else if (idx < currentIndex) slide.classList.add('prev');
+    });
+    btnFirst.disabled = currentIndex === 0;
+    btnPrev.disabled = currentIndex === 0;
+    btnNext.disabled = currentIndex === totalSlides - 1;
+    btnLast.disabled = currentIndex === totalSlides - 1;
+  }
+
+  function goToSlide(index) {
+    if (index < 0 || index >= totalSlides) return;
+    currentIndex = index;
+    updateUI();
+  }
+
+  function nextSlide() { goToSlide(currentIndex + 1); }
+  function prevSlide() { goToSlide(currentIndex - 1); }
+
+  document.getElementById('zoneNext').addEventListener('click', nextSlide);
+  document.getElementById('zonePrev').addEventListener('click', prevSlide);
+  btnFirst.addEventListener('click', () => goToSlide(0));
+  btnLast.addEventListener('click', () => goToSlide(totalSlides - 1));
+  btnPrev.addEventListener('click', prevSlide);
+  btnNext.addEventListener('click', nextSlide);
+
+  document.addEventListener('keydown', (e) => {
+    switch(e.key) {
+      case 'ArrowRight': case 'PageDown': nextSlide(); break;
+      case 'ArrowLeft': case 'PageUp': prevSlide(); break;
+      case 'Home': goToSlide(0); break;
+      case 'End': goToSlide(totalSlides - 1); break;
+    }
+  });
+  updateUI();
+})();
+</script>
+
+<!-- 
+  РЕСУРСЫ:
+  - index1.html (данный файл)
+  - Подложка.png (фон титульного слайда)
+  - Лого.jpg (логотип УЦ МАСКОМ, высота ~60px)
+
+  НОРМАТИВНАЯ БАЗА:
+  1. Указ Президента РФ № 250 от 01.05.2022
+  2. Приказ ФСТЭК России № 17 от 11.02.2013
+  3. Постановление Правительства РФ № 1119 от 01.11.2012
+  4. Приказ ФСТЭК России № 235 от 25.12.2017
+  5. Приказ ФСТЭК России № 31 от 28.02.2017
+  6. ЕКС (Приказ Минздравсоцразвития РФ № 205 от 22.04.2009)
+-->
+</body>
+</html>
+

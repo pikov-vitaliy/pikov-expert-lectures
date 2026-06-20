@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+  (function(m,e,t,r,i,k,a){
+    m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+  })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+  ym(109116119, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>KOMRAD Enterprise SIEM 4.5 — учебные материалы В.А. Пикова</title>
+<meta name="description" content="Учебная страница по KOMRAD Enterprise SIEM 4.5: обзор SIEM, нормативная база, VirtualBox-стенд, Astra Linux 1.7/1.8, Windows 10, WMI-агент и практические задания.">
+<meta name="author" content="Виталий Александрович Пиков">
+<meta property="og:title" content="KOMRAD Enterprise SIEM 4.5">
+<meta property="og:description" content="Материалы к лекции и практическому занятию по KOMRAD Enterprise SIEM 4.5 для слушателей профессиональной переподготовки по ИБ.">
+<meta property="og:type" content="article">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%23e62f3b%22/><text x=%2250%22 y=%2264%22 text-anchor=%22middle%22 font-family=%22Segoe UI, sans-serif%22 font-size=%2232%22 font-weight=%22700%22 fill=%22white%22>K</text></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #e62f3b;
+    --accent-strong: #b91c1c;
+    --accent-soft: rgba(230, 47, 59, 0.09);
+    --accent-softer: rgba(230, 47, 59, 0.04);
+    --blue: #2563eb;
+    --success: #059669;
+    --warning: #d97706;
+    --code-bg: #f8fafc;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #ff6973;
+    --accent-strong: #fecaca;
+    --accent-soft: rgba(255, 105, 115, 0.14);
+    --accent-softer: rgba(255, 105, 115, 0.07);
+    --blue: #60a5fa;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --code-bg: #0f172a;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  a { color: var(--accent); text-decoration: none; transition: color .2s ease; }
+  a:hover { color: var(--accent-strong); }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+  .reading-progress { position: fixed; inset: 0 0 auto 0; height: 3px; z-index: 110; pointer-events: none; }
+  .reading-progress-bar { height: 100%; background: var(--accent); width: 0%; transition: width .1s ease-out; }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container { height: 60px; display: flex; align-items: center; justify-content: space-between; }
+  .brand-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 8px;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg, .icon-btn svg { width: 18px; height: 18px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--text-muted);
+    display: inline-flex;
+    align-items: center;
+    transition: all .2s ease;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+  .toc-toggle { display: none; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 56px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 40px 24px 80px;
+  }
+  .toc {
+    position: sticky;
+    top: 84px;
+    height: calc(100vh - 108px);
+    overflow-y: auto;
+    padding-right: 12px;
+  }
+  .toc-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--text-subtle); margin-bottom: 14px; }
+  .toc-list { list-style: none; display: flex; flex-direction: column; gap: 4px; }
+  .toc-list a {
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 8px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    color: var(--text-muted);
+    font-size: 14px;
+    line-height: 1.35;
+    border-left: 3px solid transparent;
+  }
+  .toc-list a:hover, .toc-list a.active { color: var(--accent); background: var(--accent-soft); border-left-color: var(--accent); }
+  .toc-num { font-variant-numeric: tabular-nums; color: var(--text-subtle); }
+  .toc-list a.active .toc-num { color: var(--accent); }
+  .toc-part { margin: 14px 0 4px; padding-left: 10px; font-size: 11px; font-weight: 700; color: var(--text-subtle); text-transform: uppercase; letter-spacing: .08em; }
+
+  .content { min-width: 0; max-width: 900px; }
+  .hero { padding: 42px 0 46px; border-bottom: 1px solid var(--border); }
+  .hero-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
+    border-radius: 999px;
+    padding: 6px 12px;
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-size: clamp(40px, 6vw, 68px);
+    line-height: 1.04;
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    max-width: 980px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 22px;
+  }
+  [data-theme="dark"] .hero h1 { background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%); -webkit-background-clip: text; background-clip: text; }
+  .hero-lead { font-size: clamp(19px, 2.2vw, 24px); line-height: 1.55; color: var(--text-muted); max-width: 860px; margin-bottom: 30px; }
+  .key-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 28px 0 28px; }
+  .key-stat { padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow-sm); }
+  .key-stat-value { font-size: 30px; line-height: 1; font-weight: 800; color: var(--accent); margin-bottom: 8px; }
+  .key-stat-label { color: var(--text-muted); font-size: 13px; line-height: 1.35; }
+  .hero-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 24px; }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label { color: var(--text-subtle); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700; }
+  .hero-meta-value { color: var(--text); font-weight: 600; }
+
+  .notice {
+    margin: 28px 0 0;
+    padding: 18px 20px;
+    border-left: 4px solid var(--accent);
+    border-radius: 12px;
+    background: var(--accent-softer);
+    color: var(--text-muted);
+  }
+  .notice strong { color: var(--text); }
+
+  .section { padding: 58px 0 0; }
+  .section-eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--accent);
+    font-size: 13px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    margin-bottom: 12px;
+  }
+  .section-eyebrow::before { content: ""; width: 34px; height: 2px; background: var(--accent); border-radius: 999px; }
+  .section h2 { font-size: clamp(30px, 3.6vw, 42px); line-height: 1.15; letter-spacing: -0.025em; margin-bottom: 16px; }
+  .section h3 { font-size: 22px; line-height: 1.3; margin: 28px 0 10px; }
+  .section p { color: var(--text-muted); font-size: 17px; margin-bottom: 14px; }
+  .section p.lead { font-size: 20px; line-height: 1.55; color: var(--text-muted); margin-bottom: 24px; }
+  .section ul, .section ol { margin: 12px 0 20px 22px; color: var(--text-muted); font-size: 17px; }
+  .section li { margin-bottom: 8px; }
+  .section strong { color: var(--text); }
+  code {
+    font-family: "Cascadia Mono", "Consolas", monospace;
+    font-size: .92em;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 1px 5px;
+    color: var(--text);
+  }
+  .callout { padding: 18px 20px; border-left: 3px solid var(--accent); border-radius: 12px; background: var(--accent-softer); margin: 22px 0; }
+  .callout.warning { border-left-color: var(--warning); background: color-mix(in srgb, var(--warning) 10%, transparent); }
+  .callout p:last-child { margin-bottom: 0; }
+
+  .table-wrap { overflow-x: auto; margin: 22px 0; border: 1px solid var(--border); border-radius: 12px; }
+  table.data { width: 100%; border-collapse: collapse; min-width: 640px; font-size: 15px; }
+  table.data th, table.data td { padding: 13px 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+  table.data th { background: var(--surface); color: var(--text); font-weight: 700; }
+  table.data tr:last-child td { border-bottom: 0; }
+  table.data td { color: var(--text-muted); }
+
+  .props { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 22px 0; }
+  .prop { border: 1px solid var(--border); background: var(--surface); border-radius: 14px; padding: 18px; box-shadow: var(--shadow-sm); }
+  .prop-title { color: var(--text); font-weight: 800; font-size: 17px; margin-bottom: 8px; }
+  .prop-desc { color: var(--text-muted); font-size: 15px; line-height: 1.55; }
+  .prop-mark { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; color: var(--accent); background: var(--accent-soft); margin-bottom: 12px; }
+  .prop-mark svg { width: 19px; height: 19px; }
+
+  .materials-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+  .material-card {
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--surface);
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 210px;
+    box-shadow: var(--shadow-sm);
+  }
+  .material-card h3 { margin: 0; font-size: 20px; }
+  .material-card p { margin: 0; font-size: 15px; }
+  .material-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: auto; }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 9px 13px;
+    border-radius: 10px;
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    background: var(--bg);
+    font-weight: 700;
+    font-size: 14px;
+  }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: white; }
+  .btn:hover { border-color: var(--accent); color: var(--accent); }
+  .btn.primary:hover { color: white; background: var(--accent-strong); }
+
+  .timeline { display: grid; gap: 14px; margin: 24px 0; }
+  .step { display: grid; grid-template-columns: 54px 1fr; gap: 16px; padding: 18px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); }
+  .step-num { width: 42px; height: 42px; border-radius: 12px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 800; }
+  .step-title { color: var(--text); font-weight: 800; margin-bottom: 4px; }
+  .step p { margin: 0; font-size: 15px; }
+
+  .arch-figure { margin: 24px 0; border: 1px solid var(--border); background: var(--surface); border-radius: 16px; padding: 18px; }
+  .arch-figure img { display: block; width: 100%; height: auto; border-radius: 10px; background: white; }
+  .arch-figure figcaption { margin-top: 10px; color: var(--text-subtle); font-size: 13px; }
+
+  .content-footer { margin-top: 80px; padding: 56px 0 0; border-top: 1px solid var(--border); }
+  .content-footer h2 { font-size: clamp(26px, 3vw, 34px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .content-footer p.lead { color: var(--text-muted); font-size: 17px; margin-bottom: 22px; }
+  .footer-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+  .footer-box { border: 1px solid var(--border); border-radius: 14px; background: var(--surface); padding: 18px; }
+  .footer-box h3 { margin: 0 0 8px; font-size: 17px; }
+  .footer-box p { color: var(--text-muted); margin: 0 0 8px; font-size: 15px; }
+  .copyright { margin-top: 34px; color: var(--text-subtle); font-size: 13px; }
+
+  @media (max-width: 1024px) {
+    .layout { grid-template-columns: 1fr; gap: 24px; padding-top: 24px; }
+    .toc {
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      height: calc(100vh - 60px);
+      background: var(--bg);
+      z-index: 90;
+      padding: 24px;
+      border-bottom: 1px solid var(--border);
+      transform: translateY(-110%);
+      transition: transform .25s ease;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: none; }
+  }
+  @media (max-width: 720px) {
+    .container { padding: 0 16px; }
+    .layout { padding: 22px 16px 60px; }
+    .hero { padding-top: 28px; }
+    .key-stats, .hero-meta, .props, .materials-grid, .footer-grid { grid-template-columns: 1fr; }
+    .step { grid-template-columns: 1fr; }
+    .hero h1 { font-size: clamp(34px, 11vw, 48px); }
+    .section { padding-top: 44px; }
+    .section h2 { font-size: 29px; }
+    .site-header .container { padding: 0 12px; }
+    .brand-back span { max-width: 190px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { scroll-behavior: auto !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="M12 19l-7-7 7-7"/></svg>
+      <span>pikov.expert</span>
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#about" data-section="about"><span class="toc-num">01</span><span>Зачем эта страница</span></a></li>
+      <li><a href="#siem" data-section="siem"><span class="toc-num">02</span><span>Что делает SIEM</span></a></li>
+      <li><a href="#regulation" data-section="regulation"><span class="toc-num">03</span><span>Нормативная рамка</span></a></li>
+      <li><a href="#product" data-section="product"><span class="toc-num">04</span><span>KOMRAD Enterprise SIEM</span></a></li>
+      <li><a href="#stand" data-section="stand"><span class="toc-num">05</span><span>Учебный стенд</span></a></li>
+      <li><a href="#practice" data-section="practice"><span class="toc-num">06</span><span>Три варианта практики</span></a></li>
+      <li><a href="#materials" data-section="materials"><span class="toc-num">07</span><span>Материалы</span></a></li>
+      <li><a href="#faq" data-section="faq"><span class="toc-num">08</span><span>FAQ</span></a></li>
+      <li><a href="#vendor" data-section="vendor"><span class="toc-num">09</span><span>Авторство и реквизиты</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+    <header class="hero">
+      <span class="hero-eyebrow">Учебная лекция · SIEM · KOMRAD 4.5</span>
+      <h1>KOMRAD Enterprise SIEM 4.5</h1>
+      <p class="hero-lead">Обзор системы управления событиями информационной безопасности и практическое занятие: установка в VirtualBox, Astra Linux 1.7/1.8, подключение Windows 10 и Linux-источников, генерация событий и анализ в SIEM.</p>
+      <div class="key-stats">
+        <div class="key-stat"><div class="key-stat-value">4.5.X</div><div class="key-stat-label">версия документации, выбранная для занятия</div></div>
+        <div class="key-stat"><div class="key-stat-value">3</div><div class="key-stat-label">варианта практики по сложности</div></div>
+        <div class="key-stat"><div class="key-stat-value">6</div><div class="key-stat-label">ГОСТов по мониторингу и инцидентам</div></div>
+        <div class="key-stat"><div class="key-stat-value">VB</div><div class="key-stat-label">стенд на Oracle VM VirtualBox</div></div>
+      </div>
+      <div class="hero-meta">
+        <div class="hero-meta-item"><span class="hero-meta-label">Преподаватель</span><span class="hero-meta-value">Пиков Виталий Александрович</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Формат</span><span class="hero-meta-value">обзор + практическая работа</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Продукт</span><span class="hero-meta-value">KOMRAD Enterprise SIEM, АО НПО «Эшелон»</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Для кого</span><span class="hero-meta-value">слушатели профессиональной переподготовки по ИБ</span></div>
+      </div>
+      <div class="notice">
+        <strong>Важно.</strong> Эта страница является учебной навигацией по занятию. KOMRAD Enterprise SIEM является продуктом АО НПО «Эшелон». Официальные сведения о продукте, демоверсии, документации, сертификатах и реквизитах размещены на ресурсах вендора.
+      </div>
+    </header>
+
+    <section id="about" class="section">
+      <div class="section-eyebrow">01 · Контекст</div>
+      <h2>Зачем эта страница</h2>
+      <p class="lead">На занятии мы связываем три вещи: процесс мониторинга информационной безопасности, нормативные требования к регистрации событий и практическую работу с отечественной SIEM-системой KOMRAD Enterprise SIEM.</p>
+      <div class="props">
+        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V4a2 2 0 0 1 2-2h11v20H6a2 2 0 0 1-2-2.5Z"/><path d="M8 6h5M8 10h7M8 14h5"/></svg></div><div class="prop-title">Разобраться в классе SIEM</div><div class="prop-desc">События, нормализация, хранение, фильтрация, корреляция, инциденты и реагирование.</div></div>
+        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></svg></div><div class="prop-title">Увидеть связь с нормативкой</div><div class="prop-desc">ГОСТ Р 59547-2021, 59548-2022 и серия ГОСТ Р 59709-59712 дают язык мониторинга и управления инцидентами.</div></div>
+        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 22h8M12 18v4"/></svg></div><div class="prop-title">Развернуть стенд</div><div class="prop-desc">VirtualBox, Extension Pack, Astra Linux 1.7/1.8, Windows 10 и при необходимости вторая Linux/Astra VM.</div></div>
+        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-7"/></svg></div><div class="prop-title">Проверить события</div><div class="prop-desc">Создание пользователя, смена пароля, очистка журнала Windows, syslog-сообщение Linux и просмотр событий в KOMRAD.</div></div>
+      </div>
+    </section>
+
+    <section id="siem" class="section">
+      <div class="section-eyebrow">02 · SIEM</div>
+      <h2>Что делает SIEM</h2>
+      <p class="lead">SIEM нужна не для «складирования логов», а для превращения событий из разных систем в материал для анализа, расследования и реагирования.</p>
+      <div class="timeline">
+        <div class="step"><div class="step-num">1</div><div><div class="step-title">Источники</div><p>Операционные системы, сетевые устройства, средства защиты, приложения и агенты создают события.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div><div class="step-title">Сбор и нормализация</div><p>События поступают в разных форматах и приводятся к единой внутренней структуре.</p></div></div>
+        <div class="step"><div class="step-num">3</div><div><div class="step-title">Поиск, фильтрация, корреляция</div><p>Аналитик выделяет значимые события, ищет связи и признаки инцидента.</p></div></div>
+        <div class="step"><div class="step-num">4</div><div><div class="step-title">Инцидент и реагирование</div><p>По результатам анализа назначаются действия, фиксируется история и формируется отчет.</p></div></div>
+      </div>
+    </section>
+
+    <section id="regulation" class="section">
+      <div class="section-eyebrow">03 · ГОСТы</div>
+      <h2>Нормативная рамка занятия</h2>
+      <p class="lead">ГОСТы нужны нам как профессиональный язык: что считать мониторингом, что регистрировать и как связывать события с управлением компьютерными инцидентами.</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Документ</th><th>Роль на занятии</th></tr></thead>
+          <tbody>
+            <tr><td>ГОСТ Р 59547-2021</td><td>Общие положения мониторинга информационной безопасности.</td></tr>
+            <tr><td>ГОСТ Р 59548-2022</td><td>Регистрация событий безопасности: зачем и какие события фиксировать.</td></tr>
+            <tr><td>ГОСТ Р 59709-2022</td><td>Термины и определения по управлению компьютерными инцидентами.</td></tr>
+            <tr><td>ГОСТ Р 59710-2022</td><td>Общие положения управления компьютерными инцидентами.</td></tr>
+            <tr><td>ГОСТ Р 59711-2022</td><td>Организация деятельности по управлению компьютерными инцидентами.</td></tr>
+            <tr><td>ГОСТ Р 59712-2022</td><td>Руководство по реагированию на компьютерные инциденты.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><p><strong>Вывод для практики:</strong> событие само по себе еще не инцидент. Инцидент появляется после анализа, классификации, принятия решения и фиксации реакции.</p></div>
+    </section>
+
+    <section id="product" class="section">
+      <div class="section-eyebrow">04 · Продукт</div>
+      <h2>KOMRAD Enterprise SIEM</h2>
+      <p class="lead">По официальной странице продукта KOMRAD Enterprise SIEM позволяет осуществлять централизованный сбор событий ИБ, выявлять инциденты ИБ и оперативно на них реагировать.</p>
+      <p>В документации 4.5.X отдельно указаны управление событиями, менеджмент инцидентов, масштабирование, аналитика, визуализация и отчеты. Среди технических характеристик перечислены сбор событий Syslog, SNMP, SQL, FTP, WMI, SFTP, SSH, xFlow, HTTP, eBPF; нормализация CEF, RFC 5424, RFC 3164, EVTX; хранилище событий на основе ClickHouse; визуальные конструкторы правил фильтрации и корреляции.</p>
+      <figure class="arch-figure">
+        <div class="callout"><p><strong>Архитектурная схема.</strong> Иллюстрация архитектуры не найдена в локальном комплекте, поэтому для релиза оставлено текстовое описание: сбор событий, нормализация, корреляция, хранилище ClickHouse, аналитика, визуализация и отчеты.</p></div>
+        <figcaption>Текстовая замена отсутствующей учебной иллюстрации KOMRAD.</figcaption>
+      </figure>
+      <div class="callout warning"><p><strong>Версия:</strong> для занятия используется документация ветки 4.5.X. В документации рядом доступна ветка 4.6.X, поэтому при самостоятельной работе проверяйте выбранную версию.</p></div>
+    </section>
+
+    <section id="stand" class="section">
+      <div class="section-eyebrow">05 · Стенд</div>
+      <h2>Как устроена лабораторная среда</h2>
+      <p class="lead">Практика рассчитана на VirtualBox. Слушатели устанавливают VirtualBox, Extension Pack, разворачивают Astra Linux 1.7/1.8, устанавливают KOMRAD 4.5 и подключают Windows 10 как источник событий.</p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>VM</th><th>Назначение</th><th>ОС</th><th>Что проверяем</th></tr></thead>
+          <tbody>
+            <tr><td>VM1</td><td>KOMRAD Enterprise SIEM</td><td>Astra Linux 1.7 или 1.8</td><td>установка, лицензия, вход в UI</td></tr>
+            <tr><td>VM2</td><td>Windows-источник</td><td>Windows 10</td><td>WMI-агент, журнал Security, события учетных записей</td></tr>
+            <tr><td>VM3</td><td>Linux-источник</td><td>Astra Linux или другая Linux VM</td><td>syslog/auditd, SSH, sudo, учетные события</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout"><p><strong>Главная проверка до установки агентов:</strong> все VM должны видеть друг друга по IP. Если нет `ping KOMRAD_IP`, сначала исправляем сеть VirtualBox.</p></div>
+    </section>
+
+    <section id="practice" class="section">
+      <div class="section-eyebrow">06 · Практика</div>
+      <h2>Три варианта практической работы</h2>
+      <div class="timeline">
+        <div class="step"><div class="step-num">0</div><div><div class="step-title">Теоретический минимум</div><p>Изучить SIEM, документацию KOMRAD, ГОСТы и заполнить отчет без установки стенда.</p></div></div>
+        <div class="step"><div class="step-num">1</div><div><div class="step-title">KOMRAD + Windows 10</div><p>Установить KOMRAD, импортировать Windows 10, поставить WMI-агент, сгенерировать события и найти их в SIEM.</p></div></div>
+        <div class="step"><div class="step-num">2</div><div><div class="step-title">KOMRAD + Windows + Linux</div><p>Добавить вторую Linux/Astra VM, отправить тестовые события и сравнить поведение разных источников.</p></div></div>
+      </div>
+      <div class="callout warning"><p><strong>Только учебная VM:</strong> команды вроде <code>wevtutil cl Security</code> очищают журнал безопасности Windows. В реальной инфраструктуре это подозрительное действие, а в лаборатории оно используется как демонстрационный пример.</p></div>
+    </section>
+
+    <section id="materials" class="section">
+      <div class="section-eyebrow">07 · Раздатка</div>
+      <h2>Материалы для занятия</h2>
+      <p class="lead">Раздаточные материалы открываются в браузере. В локальном комплекте часть материалов доступна в Markdown, один шаблон отчета и Windows-материал доступны в PDF.</p>
+      <div class="materials-grid">
+        <div class="material-card"><h3>Раздаточный конспект</h3><p>Краткая вводная по мониторингу ИБ, SIEM, ГОСТам и KOMRAD Enterprise SIEM 4.5.</p><div class="material-actions"><a class="btn primary" href="docs/01-komrad-handout.md" target="_blank" rel="noopener">Markdown</a></div></div>
+        <div class="material-card"><h3>Памятка VirtualBox</h3><p>Последовательность стенда: VirtualBox, Extension Pack, Astra Linux 1.7/1.8, Windows 10 и сеть.</p><div class="material-actions"><a class="btn primary" href="docs/02-virtualbox-komrad-stand.md" target="_blank" rel="noopener">Markdown</a></div></div>
+        <div class="material-card"><h3>Практическая работа</h3><p>Три варианта выполнения: без установки, KOMRAD + Windows, KOMRAD + Windows + Linux.</p><div class="material-actions"><a class="btn primary" href="docs/03-practice-variants.md" target="_blank" rel="noopener">Markdown</a></div></div>
+        <div class="material-card"><h3>Шаблон отчета</h3><p>Форма, которую слушатель заполняет по итогам практики: стенд, действия, события, выводы.</p><div class="material-actions"><a class="btn primary" href="docs/04-practice-report-template.pdf" target="_blank" rel="noopener">PDF</a><a class="btn" href="docs/04-practice-report-template.md" target="_blank" rel="noopener">Markdown</a></div></div>
+        <div class="material-card"><h3>FAQ слушателя</h3><p>Ответы на типовые вопросы по установке, сети, WMI-агенту и событиям.</p><div class="material-actions"><a class="btn primary" href="docs/05-student-faq.md" target="_blank" rel="noopener">Markdown</a></div></div>
+        <div class="material-card"><h3>Источники</h3><p>Список локальных и официальных источников, на которых основаны учебные материалы.</p><div class="material-actions"><a class="btn primary" href="docs/06-sources.md" target="_blank" rel="noopener">Markdown</a></div></div>
+      </div>
+      <h3>Материалы вендора и справочные PDF</h3>
+      <div class="materials-grid">
+        <div class="material-card"><h3>Буклет / datasheet KOMRAD</h3><p>PDF не найден в локальном комплекте; требуется ручная сверка перед публикацией.</p><div class="material-actions"><span class="btn">нет файла</span></div></div>
+        <div class="material-card"><h3>Презентация KOMRAD</h3><p>PDF не найден в локальном комплекте; требуется ручная сверка перед публикацией.</p><div class="material-actions"><span class="btn">нет файла</span></div></div>
+        <div class="material-card"><h3>Соответствие требованиям ФСТЭК</h3><p>PDF не найден в локальном комплекте; требуется ручная сверка перед публикацией.</p><div class="material-actions"><span class="btn">нет файла</span></div></div>
+        <div class="material-card"><h3>Quickstart Guide</h3><p>PDF не найден в локальном комплекте; требуется ручная сверка перед публикацией.</p><div class="material-actions"><span class="btn">нет файла</span></div></div>
+        <div class="material-card"><h3>Мониторинг Windows / Linux</h3><p>В локальном комплекте найден PDF по Windows; материал Linux требует ручной сверки.</p><div class="material-actions"><a class="btn primary" href="docs/vendor-monitoring-windows.pdf" target="_blank" rel="noopener">Windows</a><span class="btn">Linux: нет файла</span></div></div>
+      </div>
+    </section>
+
+    <section id="faq" class="section">
+      <div class="section-eyebrow">08 · Вопросы</div>
+      <h2>FAQ по практике</h2>
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Вопрос</th><th>Короткий ответ</th></tr></thead>
+          <tbody>
+            <tr><td>Какой режим сети VirtualBox выбрать?</td><td>Главное, чтобы все VM видели друг друга по IP. Обычно удобны «Сетевой мост» или «Внутренняя сеть».</td></tr>
+            <tr><td>Astra 1.7 или 1.8?</td><td>Документация 4.5.X указывает поддержку Astra Linux SE 1.7-1.8. Используйте установщик, соответствующий полученному дистрибутиву.</td></tr>
+            <tr><td>Имя установщика отличается от примера?</td><td>Используйте фактическое имя файла: <code>chmod +x ./ИМЯ.run</code>, затем <code>sudo ./ИМЯ.run</code>.</td></tr>
+            <tr><td>Windows не видит KOMRAD?</td><td>Проверить IP, режим сети VirtualBox, firewall и <code>ping KOMRAD_IP</code> до установки WMI-агента.</td></tr>
+            <tr><td>События не появились сразу?</td><td>Проверить сеть, время VM, состояние агента/службы, выбранный журнал, сертификаты и включение сбора в интерфейсе.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer id="vendor" class="content-footer">
+      <div class="section-eyebrow">09 · Авторство</div>
+      <h2>Авторство, вендор и реквизиты</h2>
+      <p class="lead">Страница подготовлена как учебная навигация для слушателей. Продуктовые сведения, названия, товарные обозначения, документация, демоверсия, сертификаты и официальные материалы KOMRAD относятся к АО НПО «Эшелон».</p>
+      <div class="footer-grid">
+        <div class="footer-box">
+          <h3>АО НПО «Эшелон»</h3>
+          <p>Официальная страница продукта: <a href="https://npo-echelon.ru/komrad-siem/" target="_blank" rel="noopener">npo-echelon.ru/komrad-siem</a></p>
+          <p>Документация KOMRAD 4.5.X: <a href="https://docs.etecs.ru/komrad/docs/intro/" target="_blank" rel="noopener">docs.etecs.ru/komrad</a></p>
+          <p>Адрес с сайта вендора: 107023, г. Москва, ул. Электрозаводская, д. 24. Телефон: +7 (495) 223-23-92.</p>
+        </div>
+        <div class="footer-box">
+          <h3>Учебные материалы</h3>
+          <p>Автор учебной страницы и методической навигации: Пиков Виталий Александрович.</p>
+          <p>Материалы предназначены для занятия по обзору и практическому применению KOMRAD Enterprise SIEM в НОУ ДПО «УЦБИ "МАСКОМ"», г. Москва.</p>
+          <p>Для получения демоверсии используйте официальную форму вендора: <a href="https://npo-echelon.ru/komrad-siem/" target="_blank" rel="noopener">«Скачать демоверсию»</a>.</p>
+        </div>
+      </div>
+      <p class="copyright">© Учебная страница В.А. Пикова. KOMRAD Enterprise SIEM, документация и официальные материалы продукта принадлежат правообладателю АО НПО «Эшелон». Официальная строка правообладателя на сайте вендора: © 2007–2026 АО НПО «Эшелон». Все права защищены.</p>
+    </footer>
+  </article>
+</div>
+
+<script>
+  (function() {
+    const root = document.documentElement;
+    const themeToggle = document.getElementById('themeToggle');
+    const stored = localStorage.getItem('theme');
+    if (stored === 'dark' || stored === 'light') root.setAttribute('data-theme', stored);
+    themeToggle.addEventListener('click', function() {
+      const current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    });
+
+    const progressBar = document.getElementById('progressBar');
+    function updateProgress() {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const pct = docHeight > 0 ? Math.min(100, Math.max(0, (scrollTop / docHeight) * 100)) : 0;
+      progressBar.style.width = pct + '%';
+    }
+    document.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+
+    const toc = document.getElementById('toc');
+    const tocToggle = document.getElementById('tocToggle');
+    tocToggle.addEventListener('click', function() { toc.classList.toggle('open'); });
+    document.querySelectorAll('.toc-list a').forEach(function(link) {
+      link.addEventListener('click', function() { toc.classList.remove('open'); });
+    });
+
+    const links = new Map();
+    document.querySelectorAll('.toc-list a[data-section]').forEach(function(link) { links.set(link.dataset.section, link); });
+    const observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (!entry.isIntersecting) return;
+        document.querySelectorAll('.toc-list a.active').forEach(function(a) { a.classList.remove('active'); });
+        const link = links.get(entry.target.id);
+        if (link) link.classList.add('active');
+      });
+    }, { rootMargin: '-35% 0px -55% 0px', threshold: 0.01 });
+    document.querySelectorAll('section[id], footer[id]').forEach(function(section) { observer.observe(section); });
+  })();
+</script>
+</body>
+</html>

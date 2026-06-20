@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Безопасность ОС Windows</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helvetica Neue',Arial,sans-serif;background:#0a1628;color:#1a1a2e}
+.presentation{width:100%;height:100%;position:relative}
+.slide{position:absolute;top:0;left:0;width:100%;height:100%;display:none;flex-direction:column;opacity:0;transition:opacity .4s ease}
+.slide.active{display:flex;opacity:1}
+.slide-title{background:linear-gradient(135deg,#0a1628 0%,#132744 50%,#0a1628 100%);justify-content:center;align-items:center;text-align:center;position:relative;overflow:hidden}
+.slide-title::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:url('Подложка.png') center center/cover no-repeat;opacity:.12;z-index:0}
+.slide-title .content{position:relative;z-index:1;padding:40px;max-width:1000px}
+.slide-title .year{font-size:1.3rem;color:#00c853;letter-spacing:4px;margin-bottom:28px;font-weight:300}
+.slide-title h1{font-size:clamp(1.6rem,3.8vw,3rem);font-weight:700;color:#fff;line-height:1.3;margin-bottom:16px;text-shadow:0 2px 24px rgba(0,0,0,.6)}
+.slide-title .subtitle{font-size:clamp(1rem,1.8vw,1.3rem);color:#78909c;margin-bottom:40px;line-height:1.5}
+.slide-title .author{font-size:clamp(.9rem,1.3vw,1.1rem);color:#78909c;line-height:1.6}
+.slide-content{background:#ffffff;color:#1a1a2e;padding:0;position:relative}
+.slide-header{display:flex;align-items:flex-start;padding:16px 32px 12px 32px;background:linear-gradient(135deg,#0d47a1 0%,#1565c0 100%);color:#fff;min-height:72px;flex-shrink:0;position:relative}
+.slide-header .logo-area{position:absolute;top:12px;right:28px;display:flex;align-items:center}
+.slide-header .logo-area img{max-height:48px;width:auto}
+.slide-header .logo-fb{width:44px;height:44px;background:rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.5rem;color:rgba(255,255,255,.5);text-align:center;line-height:1.1}
+.slide-header h2{font-size:clamp(1rem,2vw,1.55rem);font-weight:600;line-height:1.3;padding-right:180px}
+.slide-header .section-tag{font-size:.75rem;opacity:.7;margin-bottom:2px}
+.slide-body{flex:1;padding:24px 40px 48px 40px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.slide-body h3{font-size:clamp(.9rem,1.5vw,1.15rem);color:#0d47a1;margin-bottom:4px;font-weight:600}
+.slide-body p{font-size:clamp(.88rem,1.3vw,1.05rem);line-height:1.65;color:#2a2a3e}
+.slide-body ul,.slide-body ol{padding-left:24px;font-size:clamp(.88rem,1.3vw,1.05rem);line-height:1.75;color:#2a2a3e}
+.slide-body li{margin-bottom:4px}
+.slide-body li strong{color:#0d47a1}
+.hl{background:#e3f2fd;border-left:4px solid #1565c0;padding:12px 18px;border-radius:0 8px 8px 0;font-size:clamp(.85rem,1.25vw,.98rem);line-height:1.55;color:#1565c0}
+.wb{background:#fff3e0;border-left:4px solid #f57c00;padding:12px 18px;border-radius:0 8px 8px 0;font-size:clamp(.85rem,1.25vw,.98rem);line-height:1.55;color:#e65100}
+.ib{background:#e8f5e9;border-left:4px solid #2e7d32;padding:12px 18px;border-radius:0 8px 8px 0;font-size:clamp(.85rem,1.25vw,.98rem);line-height:1.55;color:#1b5e20}
+.slide-body table{width:100%;border-collapse:collapse;font-size:clamp(.76rem,1.15vw,.93rem)}
+.slide-body table th{background:#0d47a1;color:#fff;padding:8px 10px;text-align:left;font-weight:600}
+.slide-body table td{padding:8px 10px;border-bottom:1px solid #e0e0e0;color:#2a2a3e}
+.slide-body table tr:nth-child(even) td{background:#f5f7fa}
+.tc{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.tc .col{padding:12px;background:#f8f9fb;border-radius:8px}
+.tc .col h4{color:#0d47a1;margin-bottom:6px;font-size:.9rem}
+.tc .col ul{padding-left:16px}
+.tc .col li{font-size:clamp(.8rem,1.15vw,.92rem);margin-bottom:2px}
+.snc{position:absolute;bottom:16px;left:28px;color:#9090a0;font-size:.88rem;z-index:1}
+.slide-contact{background:linear-gradient(135deg,#0a1628 0%,#132744 50%,#0a1628 100%);color:#fff;justify-content:center;align-items:center;text-align:center;padding:36px}
+.slide-contact .cc{max-width:680px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:40px}
+.slide-contact h2{font-size:clamp(1.2rem,2vw,1.7rem);margin-bottom:24px;color:#00c853}
+.slide-contact .pn{font-size:clamp(1rem,1.7vw,1.3rem);font-weight:600;margin-bottom:4px}
+.slide-contact .pt{font-size:clamp(.82rem,1.2vw,1rem);color:#78909c;margin-bottom:22px;line-height:1.5}
+.slide-contact .ci{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:12px;font-size:clamp(.88rem,1.3vw,1.05rem);color:#b0bec5}
+.slide-contact .ci a{color:#00c853;text-decoration:none}
+.slide-contact .ci a:hover{text-decoration:underline}
+.slide-contact .cico{font-size:1.1rem;width:24px;text-align:center}
+.slide-contact .oi{margin-top:24px;padding-top:18px;border-top:1px solid rgba(255,255,255,.1);font-size:.82rem;color:#546e7a;line-height:1.5}
+.slide-contact .sl{position:absolute;bottom:16px;right:24px;color:#455a64;font-size:.82rem}
+.nav-controls{position:fixed;bottom:14px;right:18px;display:flex;gap:4px;z-index:1000;opacity:.3;transition:opacity .3s}
+.nav-controls:hover{opacity:1}
+.nb{width:40px;height:40px;border:none;border-radius:9px;background:rgba(13,71,161,.85);color:#fff;font-size:1rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;backdrop-filter:blur(8px)}
+.nb:hover{background:rgba(13,71,161,1);transform:scale(1.08)}
+.nb:active{transform:scale(.95)}
+.nb:disabled{opacity:.3;cursor:default;transform:none}
+.pb{position:fixed;top:0;left:0;height:3px;background:#00c853;z-index:1001;transition:width .3s ease}
+.cz{position:fixed;top:0;height:100%;width:22%;z-index:999;cursor:pointer}
+.cz-l{left:0}.cz-r{right:0}
+.sb::-webkit-scrollbar{width:4px}.sb::-webkit-scrollbar-track{background:transparent}.sb::-webkit-scrollbar-thumb{background:#bbb;border-radius:2px}
+@media(max-width:768px){.slide-body{padding:14px 18px 52px 18px}.slide-header{padding:12px 14px 8px 14px}.slide-header h2{padding-right:140px}.tc{grid-template-columns:1fr!important}.nav-controls{bottom:8px;right:8px}.nb{width:34px;height:34px;font-size:.85rem}}
+@media(min-width:2560px){.slide-body{padding:40px 72px 56px 72px}.slide-header{padding:24px 56px 18px 56px;min-height:100px}}
+</style>
+</head>
+<body>
+<div class="pb" id="progressBar"></div>
+<div class="cz cz-l" id="clickLeft" title="Предыдущий слайд"></div>
+<div class="cz cz-r" id="clickRight" title="Следующий слайд"></div>
+<div class="nav-controls">
+<button class="nb" id="btnFirst" title="В начало">⏮</button>
+<button class="nb" id="btnPrev" title="Назад">◀</button>
+<button class="nb" id="btnNext" title="Вперёд">▶</button>
+<button class="nb" id="btnLast" title="В конец">⏭</button>
+</div>
+
+<div class="presentation" id="presentation">
+
+<!-- ============ SLIDE 1: TITLE ============ -->
+<div class="slide slide-title active" data-slide="1">
+<div class="content">
+<div class="year" id="yearDisplay"></div>
+<h1>Безопасность ОС Windows</h1>
+<div class="subtitle">Защита АРМ · EFS + BitLocker · Антивирусная защита</div>
+<div class="author">Виталий Александрович Пиков<br>руководитель направления обучения по РБПО<br>преподаватель НОУ ДПО «УЦБИ «МАСКОМ»</div>
+</div>
+</div>
+
+<!-- ============ SLIDE 2: CONTENT ============ -->
+<div class="slide slide-content" data-slide="2">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Обзор</div>
+<h2>Содержание лекции</h2>
+</div>
+<div class="slide-body">
+<ol>
+<li><strong>Безопасность в ОС Windows</strong> — архитектура, угрозы, модели безопасности</li>
+<li><strong>Защита АРМ штатными механизмами Windows</strong> — политики, аутентификация, брандмауэр</li>
+<li><strong>Шифрование в Windows</strong> — EFS, BitLocker, управление ключами</li>
+<li><strong>Антивирусная защита АРМ</strong> — Windows Defender, политики защиты</li>
+</ol>
+<div class="hl">Каждая тема рассчитана на 1,5 академических часа (90 минут). Общее количество слайдов: 45.</div>
+</div>
+<div class="snc">2 из 45</div>
+</div>
+
+<!-- ============ TOPIC 1: БЕЗОПАСНОСТЬ В ОС WINDOWS ============ -->
+
+<!-- SLIDE 3 -->
+<div class="slide slide-content" data-slide="3">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1: Безопасность в ОС Windows</div>
+<h2>Введение: архитектура безопасности Windows</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Windows — наиболее распространённая ОС на АРМ в РФ. Понимание её механизмов безопасности критически важно для специалистов по защите информации.</div>
+<h3>Ключевые компоненты безопасности Windows:</h3>
+<ul>
+<li><strong>LSA</strong> (Local Security Authority) — локальная подсистема безопасности</li>
+<li><strong>SRM</strong> (Security Reference Monitor) — дескрипторы безопасности, ACL</li>
+<li><strong>Security Account Manager (SAM)</strong> — хранение учётных записей</li>
+<li><strong>Криптографическая подсистема (CNG)</strong> — шифрование, хэширование</li>
+</ul>
+<div class="ib">Все компоненты работают в режиме ядра и обеспечивают изоляцию процессов и данных.</div>
+</div>
+<div class="snc">3 из 45</div>
+</div>
+
+<!-- SLIDE 4 -->
+<div class="slide slide-content" data-slide="4">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Модель безопасности Windows: DACL и SACL</h2>
+</div>
+<div class="slide-body">
+<h3>Дискреционный контроль доступа (DACL):</h3>
+<ul>
+<li>Каждый объект (файл, процесс, реестр) имеет дескриптор безопасности</li>
+<li>DACL содержит ACE (Access Control Entries) — разрешения и запреты</li>
+<li>ACE включают SID (идентификатор безопасности) и маску доступа</li>
+</ul>
+<h3 class="mt-2">Журналирование (SACL):</h3>
+<ul>
+<li>SACL определяет, какие действия фиксируются в журнале событий</li>
+<li>Аудит успешных и неуспешных попыток доступа</li>
+</ul>
+<div class="wb">Неправильная настройка DACL — одна из самых распространённых уязвимостей в Windows.</div>
+</div>
+<div class="snc">4 из 45</div>
+</div>
+
+<!-- SLIDE 5 -->
+<div class="slide slide-content" data-slide="5">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Уровни целостности (Integrity Levels)</h2>
+</div>
+<div class="slide-body">
+<p>Windows использует <strong>Mandatory Integrity Control (MIC)</strong> — уровни целостности для изоляции процессов:</p>
+<table>
+<thead><tr><th>Уровень</th><th>Примеры</th><th>Доступ к объектам</th></tr></thead>
+<tbody>
+<tr><td><strong>Низкий</strong></td><td>Браузер (sandbox)</td><td>Только к объектам с низким уровнем</td></tr>
+<tr><td><strong>Средний</strong></td><td>Проводник, приложения</td><td>Средний и ниже</td></tr>
+<tr><td><strong>Высокий</strong></td><td>Запуск от имени администратора</td><td>Высокий и ниже</td></tr>
+<tr><td><strong>Системный</strong></td><td>Службы Windows</td><td>Все уровни</td></tr>
+<tr><td><strong>Установщик</strong></td><td>Установщик Windows</td><td>Все уровни</td></tr>
+</tbody>
+</table>
+<div class="hl">Принцип «не читать выше, не писать ниже» — процесс не может читать объекты с более высоким уровнем целостности.</div>
+</div>
+<div class="snc">5 из 45</div>
+</div>
+
+<!-- SLIDE 6 -->
+<div class="slide slide-content" data-slide="6">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>UAC (User Account Control)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">UAC — механизм контроля учётных записей, ограничивающий выполнение действий с повышенными привилегиями без явного согласия.</div>
+<h3>Уровни UAC:</h3>
+<ul>
+<li><strong>Всегда уведомлять</strong> — запрос для любого действия с повышенными правами</li>
+<li><strong>Уведомлять, если приложения пытаются внести изменения</strong> (по умолчанию)</li>
+<li><strong>Уведомлять, если приложения пытаются внести изменения (не затемнять экран)</strong></li>
+<li><strong>Никогда не уведомлять</strong> — UAC отключён (не рекомендуется)</li>
+</ul>
+<div class="wb">Уровень 1 обеспечивает максимальную защиту. Отключение UAC значительно снижает безопасность АРМ.</div>
+<div class="ib">Для систем обработки ПДн и ГИС рекомендуется уровень UAC не ниже 2.</div>
+</div>
+<div class="snc">6 из 45</div>
+</div>
+
+<!-- SLIDE 7 -->
+<div class="slide slide-content" data-slide="7">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Основные угрозы безопасности ОС Windows</h2>
+</div>
+<div class="slide-body">
+<table>
+<thead><tr><th>Класс угрозы</th><th>Описание</th><th>Примеры</th></tr></thead>
+<tbody>
+<tr><td><strong>Вредоносное ПО</strong></td><td>Вирусы, трояны, ransomware</td><td>WannaCry, LockBit, TrickBot</td></tr>
+<tr><td><strong>Эксплуатация уязвимостей</strong></td><td>Использование уязвимостей нулевого дня</td><td>ZeroLogon, PrintNightmare</td></tr>
+<tr><td><strong>Фишинг и социальная инженерия</strong></td><td>Обман пользователей для получения доступа</td><td>Фальшивые письма, вредоносные вложения</td></tr>
+<tr><td><strong>Несанкционированный доступ</strong></td><td>Слабые пароли, учётные записи по умолчанию</td><td>Администратор, Гость</td></tr>
+<tr><td><strong>Утечка данных</strong></td><td>Несанкционированное копирование</td><td>Съёмные носители, облачные хранилища</td></tr>
+</tbody>
+</table>
+<div class="wb">По данным ФСТЭК, до 70% инцидентов ИБ связаны с эксплуатацией уязвимостей и вредоносным ПО.</div>
+</div>
+<div class="snc">7 из 45</div>
+</div>
+
+<!-- SLIDE 8 -->
+<div class="slide slide-content" data-slide="8">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Нормативная база: требования к защите АРМ</h2>
+</div>
+<div class="slide-body">
+<ul>
+<li><strong>ФЗ № 152</strong> от 27.07.2006 «О персональных данных» — защита ПДн (действующий)</li>
+<li><strong>ФЗ № 187</strong> от 26.07.2017 «О безопасности КИИ РФ» — защита ЗО КИИ (действующий)</li>
+<li><strong>Приказ ФСТЭК № 21</strong> от 18.02.2013 — меры защиты ПДн (действующий)</li>
+<li><strong>Приказ ФСТЭК № 239</strong> от 25.12.2017 — требования к защите ЗО КИИ (действующий)</li>
+<li><strong>Приказ ФСТЭК № 117</strong> от 11.04.2025 — требования к защите информации в ГИС и иных ИС госорганов, ГУП и госучреждений (действует с 01.03.2026)</li>
+<li><strong>Приказ ФСТЭК № 31</strong> от 14.03.2014 — требования к защите АСУ ТП (действующий)</li>
+<li><strong>Приказ ФСТЭК № 17</strong> от 11.02.2013 — историческая база требований к ГИС до вступления в силу приказа № 117</li>
+</ul>
+<div class="ib">Требования ФСТЭК устанавливают <strong>уровни доверия</strong> к средствам защиты и СЗИ, используемым на АРМ.</div>
+</div>
+<div class="snc">8 из 45</div>
+</div>
+
+<!-- SLIDE 9 -->
+<div class="slide slide-content" data-slide="9">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Сертифицированные ОС Windows</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Для обработки информации ограниченного доступа (в т.ч. ПДн, ГИС) должны применяться сертифицированные средства защиты, включая ОС.</div>
+<h3>Сертифицированные средства:</h3>
+<ul>
+<li><strong>Windows 10/11</strong> с модулем защиты (СЗИ от НСД) — сертификаты ФСТЭК</li>
+<li><strong>«Соболь»</strong> (СЗИ от НСД для Windows) — сертификат ФСТЭК</li>
+<li><strong>«Secret Net Studio»</strong> — комплексная защита АРМ под Windows</li>
+</ul>
+<div class="wb">Использование несертифицированной ОС для обработки конфиденциальной информации нарушает требования ФСТЭК и может повлечь административную ответственность.</div>
+<div class="ib">Для систем 3 класса ГИС и выше требуется применение сертифицированных СЗИ.</div>
+</div>
+<div class="snc">9 из 45</div>
+</div>
+
+<!-- SLIDE 10 -->
+<div class="slide slide-content" data-slide="10">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Безопасная загрузка (Secure Boot)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Secure Boot — механизм UEFI, обеспечивающий загрузку только подписанных компонентов ОС и драйверов.</div>
+<h3>Принцип работы:</h3>
+<ul>
+<li>При включении UEFI проверяет цифровую подпись загрузчика</li>
+<li>Загрузка разрешена только при совпадении подписи с доверенными ключами</li>
+<li>Неподписанные или изменённые компоненты блокируются</li>
+</ul>
+<div class="tc">
+<div class="col">
+<h4>Преимущества</h4>
+<ul>
+<li>Защита от rootkit и bootkit</li>
+<li>Предотвращение загрузки вредоносного ПО</li>
+<li>Обязательное требование для Windows 11</li>
+</ul>
+</div>
+<div class="col">
+<h4>Рекомендации</h4>
+<ul>
+<li>Secure Boot должен быть включён</li>
+<li>Платформа TPM 2.0 — обязательна</li>
+<li>Регулярно обновлять ключи подписи</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="snc">10 из 45</div>
+</div>
+
+<!-- SLIDE 11 -->
+<div class="slide slide-content" data-slide="11">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>TPM (Trusted Platform Module)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">TPM 2.0 — аппаратный криптографический модуль, обеспечивающий безопасное хранение ключей и измерение целостности платформы.</div>
+<h3>Функции TPM:</h3>
+<ul>
+<li><strong>Хранение ключей</strong> — шифрование, подпись, аутентификация</li>
+<li><strong>Измерение платформы</strong> — проверка целостности BIOS/UEFI и загрузчика</li>
+<li><strong>Связка с BitLocker</strong> — автоматическая разблокировка зашифрованного диска</li>
+<li><strong>Windows Hello</strong> — биометрическая аутентификация</li>
+</ul>
+<div class="wb">TPM 2.0 является обязательным требованием для установки Windows 11. Для систем обработки ПДн и ГИС наличие TPM крайне рекомендуется.</div>
+</div>
+<div class="snc">11 из 45</div>
+</div>
+
+<!-- SLIDE 12 -->
+<div class="slide slide-content" data-slide="12">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 1</div>
+<h2>Подведение итогов: Тема 1</h2>
+</div>
+<div class="slide-body">
+<h3>Ключевые выводы:</h3>
+<ul>
+<li>Архитектура безопасности Windows включает LSA, SRM, SAM и CNG</li>
+<li>DACL/SACL обеспечивают дискреционный контроль доступа к объектам</li>
+<li>Уровни целостности (MIC) изолируют процессы разной степени доверия</li>
+<li>UAC ограничивает несанкционированные действия с повышенными правами</li>
+<li>Secure Boot и TPM 2.0 — фундамент аппаратной безопасности</li>
+</ul>
+<div class="hl">Понимание этих механизмов необходимо для правильной настройки защиты АРМ в соответствии с требованиями ФСТЭК.</div>
+</div>
+<div class="snc">12 из 45</div>
+</div>
+
+<!-- ============ TOPIC 2: ЗАЩИТА АРМ ШТАТНЫМИ МЕХАНИЗМАМИ ============ -->
+
+<!-- SLIDE 13 -->
+<div class="slide slide-content" data-slide="13">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2: Защита АРМ штатными механизмами</div>
+<h2>Введение: штатные механизмы безопасности Windows</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Windows предоставляет набор встроенных инструментов, которые при правильной настройке обеспечивают базовый уровень защиты АРМ.</div>
+<h3>Основные группы механизмов:</h3>
+<ul>
+<li><strong>Управление учётными записями и аутентификация</strong></li>
+<li><strong>Групповые политики (GPO)</strong> — централизованное управление</li>
+<li><strong>Брандмауэр Windows Defender</strong> — сетевая фильтрация</li>
+<li><strong>Аудит и журналирование</strong> — отслеживание событий безопасности</li>
+<li><strong>Защита от эксплойтов</strong> — DEP, ASLR, CFG</li>
+</ul>
+<div class="ib">Штатные механизмы не заменяют специализированные СЗИ от НСД, но являются обязательным базовым уровнем защиты.</div>
+</div>
+<div class="snc">13 из 45</div>
+</div>
+
+<!-- SLIDE 14 -->
+<div class="slide slide-content" data-slide="14">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Управление учётными записями</h2>
+</div>
+<div class="slide-body">
+<h3>Рекомендуемые меры:</h3>
+<ul>
+<li>Отключить встроенную учётную запись <strong>«Администратор»</strong> (Administrator)</li>
+<li>Отключить или переименовать учётную запись <strong>«Гость»</strong> (Guest)</li>
+<li>Использовать стандартные учётные записи для повседневной работы</li>
+<li>Применять принцип <strong>наименьших привилегий</strong> (Least Privilege)</li>
+</ul>
+<div class="tc">
+<div class="col">
+<h4>Локальные политики паролей</h4>
+<ul>
+<li>Минимальная длина: 12 символов</li>
+<li>Сложность: включена</li>
+<li>Срок действия: 90 дней</li>
+<li>История: 24 пароля</li>
+</ul>
+</div>
+<div class="col">
+<h4>Блокировка учётных записей</h4>
+<ul>
+<li>Порог: 5 неудачных попыток</li>
+<li>Время блокировки: 30 минут</li>
+<li>Сброс счётчика: 30 минут</li>
+</ul>
+</div>
+</div>
+<div class="wb">Эти настройки соответствуют требованиям Приказа ФСТЭК № 21 для защиты ПДн.</div>
+</div>
+<div class="snc">14 из 45</div>
+</div>
+
+<!-- SLIDE 15 -->
+<div class="slide slide-content" data-slide="15">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Аутентификация: Windows Hello и биометрия</h2>
+</div>
+<div class="slide-body">
+<h3>Windows Hello — современная система аутентификации:</h3>
+<ul>
+<li><strong>Распознавание лица</strong> — инфракрасная камера (Windows Hello Face)</li>
+<li><strong>Отпечаток пальца</strong> — биометрический датчик (Windows Hello Fingerprint)</li>
+<li><strong>PIN-код</strong> — привязан к устройству, не передаётся по сети</li>
+</ul>
+<div class="hl">PIN-код Windows Hello хранится в TPM и привязан к конкретному устройству, что делает его более безопасным, чем традиционный пароль.</div>
+<div class="ib">Для АРМ, обрабатывающих ПДн и ГИС, рекомендуется использовать двухфакторную аутентификацию (пароль + биометрия/токен).</div>
+</div>
+<div class="snc">15 из 45</div>
+</div>
+
+<!-- SLIDE 16 -->
+<div class="slide slide-content" data-slide="16">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Групповые политики (GPO)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Group Policy — механизм централизованного управления конфигурацией компьютеров и пользователей в домене Active Directory.</div>
+<h3>Ключевые политики безопасности:</h3>
+<table>
+<thead><tr><th>Категория</th><th>Политика</th><th>Рекомендация</th></tr></thead>
+<tbody>
+<tr><td>Учётные записи</td><td>Политика паролей</td><td>Сложность, длина ≥ 12, срок 90 дней</td></tr>
+<tr><td>Учётные записи</td><td>Блокировка</td><td>5 попыток, 30 мин блокировка</td></tr>
+<tr><td>Параметры безопасности</td><td>Анонимный доступ</td><td>Отключён</td></tr>
+<tr><td>Параметры безопасности</td><td>Аудит</td><td>Включён для входа, доступа, изменений</td></tr>
+<tr><td>Система</td><td>Автозапуск</td><td>Отключён для съёмных носителей</td></tr>
+<tr><td>Система</td><td>Обновления</td><td>Автоматические обновления включены</td></tr>
+</tbody>
+</table>
+</div>
+<div class="snc">16 из 45</div>
+</div>
+
+<!-- SLIDE 17 -->
+<div class="slide slide-content" data-slide="17">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Брандмауэр Windows Defender</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Брандмауэр Windows Defender — штатный межсетевой экран, обеспечивающий фильтрацию входящего и исходящего трафика.</div>
+<h3>Три профиля брандмауэра:</h3>
+<ul>
+<li><strong>Доменный</strong> — при подключении к домену Active Directory</li>
+<li><strong>Частный</strong> — доверенные сети (домашняя, офисная)</li>
+<li><strong>Публичный</strong> — общедоступные сети (кафе, аэропорты)</li>
+</ul>
+<div class="tc">
+<div class="col">
+<h4>Рекомендуемые правила</h4>
+<ul>
+<li>Запретить весь входящий трафик по умолчанию</li>
+<li>Разрешить только необходимые службы</li>
+<li>Вести журнал подключений</li>
+</ul>
+</div>
+<div class="col">
+<h4>Требования ФСТЭК</h4>
+<ul>
+<li>Брандмауэр должен быть включён</li>
+<li>Набор правил — минимально необходимый</li>
+<li>Журналирование — обязательно</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="snc">17 из 45</div>
+</div>
+
+<!-- SLIDE 18 -->
+<div class="slide slide-content" data-slide="18">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Аудит и журналирование событий безопасности</h2>
+</div>
+<div class="slide-body">
+<h3>Рекомендуемые категории аудита (GPO → Computer Configuration → Security Settings → Advanced Audit Policy):</h3>
+<ul>
+<li><strong>Вход в систему</strong> — успешные и неуспешные попытки</li>
+<li><strong>Управление учётными записями</strong> — создание, изменение, удаление</li>
+<li><strong>Доступ к объектам</strong> — файлы, реестр, принтеры</li>
+<li><strong>Изменение политик</strong> — изменение GPO и локальных политик</li>
+<li><strong>Использование привилегий</strong> — повышение прав</li>
+<li><strong>Подробное отслеживание</strong> — процессы, RPC</li>
+</ul>
+<div class="wb">Журналы событий хранятся в <strong>%SystemRoot%\System32\winevt\Logs</strong>. Рекомендуемый размер журнала — не менее 128 МБ. Ретейнмент — не менее 90 дней.</div>
+<div class="ib">Журналы аудита должны передаваться в централизованную систему мониторинга (SIEM).</div>
+</div>
+<div class="snc">18 из 45</div>
+</div>
+
+<!-- SLIDE 19 -->
+<div class="slide slide-content" data-slide="19">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Защита от эксплойтов: DEP, ASLR, CFG</h2>
+</div>
+<div class="slide-body">
+<table>
+<thead><tr><th>Механизм</th><th>Описание</th><th>Статус</th></tr></thead>
+<tbody>
+<tr><td><strong>DEP</strong> (Data Execution Prevention)</td><td>Запрещает выполнение кода в областях памяти, предназначенных для данных</td><td>Включён по умолчанию</td></tr>
+<tr><td><strong>ASLR</strong> (Address Space Layout Randomization)</td><td>Случайное расположение модулей в памяти при каждой загрузке</td><td>Включён по умолчанию</td></tr>
+<tr><td><strong>CFG</strong> (Control Flow Guard)</td><td>Контроль потока выполнения, предотвращает перенаправление вызовов</td><td>Включён для системных компонентов</td></tr>
+<tr><td><strong>KASLR</strong> (Kernel ASLR)</td><td>Рандомизация адресного пространства ядра</td><td>Включён по умолчанию</td></tr>
+</tbody>
+</table>
+<div class="hl">Эти механизмы значительно усложняют эксплуатацию уязвимостей типа переполнения буфера и ROP-атак.</div>
+<div class="ib">Для проверки состояния механизмов защиты можно использовать утилиту <strong>Process Explorer</strong> (Sysinternals) или <strong>EMET</strong>.</div>
+</div>
+<div class="snc">19 из 45</div>
+</div>
+
+<!-- SLIDE 20 -->
+<div class="slide slide-content" data-slide="20">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Управление обновлениями (Windows Update)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Своевременная установка обновлений безопасности — критически важная мера защиты АРМ.</div>
+<h3>Рекомендации:</h3>
+<ul>
+<li>Включить <strong>автоматическую установку обновлений</strong> (не откладывать более чем на 7 дней)</li>
+<li>В корпоративной среде использовать <strong>WSUS</strong> или <strong>Microsoft Endpoint Configuration Manager</strong></li>
+<li>Регулярно проверять наличие обновлений драйверов</li>
+<li>Вести учёт установленных обновлений (журнал обновлений)</li>
+</ul>
+<div class="wb">Отсутствие критических обновлений безопасности является нарушением требований ФСТЭК и одним из основных факторов успешных атак.</div>
+<div class="ib">Для систем 1–2 класса ГИС и ЗО КИИ обновления должны устанавливаться в течение 30 дней после выпуска.</div>
+</div>
+<div class="snc">20 из 45</div>
+</div>
+
+<!-- SLIDE 21 -->
+<div class="slide slide-content" data-slide="21">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Ограничение съёмных носителей</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Управление доступом к съёмным носителям — важная мера предотвращения утечки информации и проникновения вредоносного ПО.</div>
+<h3>Настройки GPO:</h3>
+<ul>
+<li><strong>Computer Configuration → Policies → Administrative Templates → System → Removable Storage Access</strong></li>
+<li>«All Removable Storage classes: Deny all access» — полный запрет</li>
+<li>«Removable Disks: Deny write access» — запрет записи (чтение разрешено)</li>
+<li>«CD and DVD: Deny all access» — запрет оптических дисков</li>
+</ul>
+<div class="wb">Для АРМ, обрабатывающих ПДн и ГИС, рекомендуется <strong>полностью запретить</strong> использование съёмных носителей или разрешить только сертифицированные устройства.</div>
+</div>
+<div class="snc">21 из 45</div>
+</div>
+
+<!-- SLIDE 22 -->
+<div class="slide slide-content" data-slide="22">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>AppLocker и Windows Defender Application Control</h2>
+</div>
+<div class="slide-body">
+<div class="hl">AppLocker и WDAC — механизмы белого списка приложений, разрешающие запуск только доверенных программ.</div>
+<table>
+<thead><tr><th>Функция</th><th>AppLocker</th><th>WDAC</th></tr></thead>
+<tbody>
+<tr><td>Версия Windows</td><td>Enterprise/Education</td><td>Windows 10/11 Pro и выше</td></tr>
+<tr><td>Управление</td><td>GPO</td><td>Политика WDAC</td></tr>
+<tr><td>Типы правил</td><td>Путь, хэш, издатель</td><td>Более гибкие: CI-политики</td></tr>
+<tr><td>Безопасность</td><td>Обход через PowerShell</td><td>Более строгий контроль</td></tr>
+</tbody>
+</table>
+<div class="ib">WDAC является рекомендуемым механизмом для новых развёртываний. Microsoft рекомендует использовать WDAC вместо AppLocker.</div>
+<div class="wb">Для систем обработки конфиденциальной информации рекомендуется настройка политики белого списка с минимальным набором разрешённых приложений.</div>
+</div>
+<div class="snc">22 из 45</div>
+</div>
+
+<!-- SLIDE 23 -->
+<div class="slide slide-content" data-slide="23">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Безопасность реестра и служб</h2>
+</div>
+<div class="slide-body">
+<h3>Рекомендуемые меры:</h3>
+<ul>
+<li>Отключить ненужные службы (Telnet, Remote Registry, SNMP и др.)</li>
+<li>Ограничить доступ к веткам реестра: <strong>HKEY_LOCAL_MACHINE\SOFTWARE</strong></li>
+<li>Запретить удалённое управление реестром</li>
+<li>Отключить автозапуск неиспользуемых служб</li>
+</ul>
+<h3 class="mt-2">Важные параметры реестра для безопасности:</h3>
+<table>
+<thead><tr><th>Параметр</th><th>Значение</th><th>Назначение</th></tr></thead>
+<tbody>
+<tr><td>DisableTIP</td><td>1</td><td>Отключение телеметрии</td></tr>
+<tr><td>NoAutoUpdate</td><td>0</td><td>Автоматические обновления включены</td></tr>
+<tr><td>EnableLUA</td><td>1</td><td>UAC включён</td></tr>
+<tr><td>ConsentPromptBehaviorAdmin</td><td>2</td><td>Запрос подтверждения UAC для администратора</td></tr>
+</tbody>
+</table>
+</div>
+<div class="snc">23 из 45</div>
+</div>
+
+<!-- SLIDE 24 -->
+<div class="slide slide-content" data-slide="24">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 2</div>
+<h2>Подведение итогов: Тема 2</h2>
+</div>
+<div class="slide-body">
+<h3>Чек-лист базовой защиты АРМ:</h3>
+<ol>
+<li>✅ UAC включён (уровень не ниже 2)</li>
+<li>✅ Парольная политика: длина ≥ 12, сложность, срок 90 дней</li>
+<li>✅ Блокировка учётных записей: 5 попыток, 30 мин</li>
+<li>✅ Брандмауэр включён для всех профилей</li>
+<li>✅ Аудит включён для ключевых событий</li>
+<li>✅ DEP и ASLR активны</li>
+<li>✅ Обновления устанавливаются автоматически</li>
+<li>✅ Съёмные носители ограничены</li>
+<li>✅ AppLocker / WDAC настроен</li>
+<li>✅ Ненужные службы отключены</li>
+</ol>
+<div class="ib">Выполнение данного чек-листа обеспечивает базовый уровень защиты в соответствии с требованиями ФСТЭК.</div>
+</div>
+<div class="snc">24 из 45</div>
+</div>
+
+<!-- ============ TOPIC 3: ШИФРОВАНИЕ — EFS + BITLOCKER ============ -->
+
+<!-- SLIDE 25 -->
+<div class="slide slide-content" data-slide="25">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3: Шифрование в Windows</div>
+<h2>Введение: шифрование данных в Windows</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Шифрование данных — критически важный механизм защиты информации от несанкционированного доступа, особенно при утере или хищении носителя.</div>
+<h3>Штатные механизмы шифрования Windows:</h3>
+<ul>
+<li><strong>EFS (Encrypting File System)</strong> — шифрование на уровне файловой системы NTFS</li>
+<li><strong>BitLocker</strong> — полное шифрование тома (диска)</li>
+<li><strong>BitLocker To Go</strong> — шифрование съёмных носителей</li>
+<li><strong>Windows Information Protection (WIP)</strong> — защита корпоративных данных</li>
+</ul>
+<div class="wb">Для систем обработки ПДн и ГИС шифрование является <strong>обязательным требованием</strong> (Приказ ФСТЭК № 21, № 31, № 239).</div>
+</div>
+<div class="snc">25 из 45</div>
+</div>
+
+<!-- SLIDE 26 -->
+<div class="slide slide-content" data-slide="26">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>EFS (Encrypting File System): обзор</h2>
+</div>
+<div class="slide-body">
+<div class="hl">EFS — технология шифрования файлов и папок на томах NTFS, прозрачная для пользователя.</div>
+<h3>Основные характеристики:</h3>
+<ul>
+<li>Шифрует отдельные файлы и папки, а не весь том</li>
+<li>Использует симметричное шифрование (AES) для данных</li>
+<li>Ключ шифрования данных (FEK) защищён открытым ключом пользователя (RSA)</li>
+<li>Прозрачная работа: файлы автоматически шифруются/расшифровываются</li>
+</ul>
+<div class="tc">
+<div class="col">
+<h4>Доступные версии Windows</h4>
+<ul>
+<li>Windows 10/11 Pro</li>
+<li>Windows 10/11 Enterprise</li>
+<li>Windows Server</li>
+</ul>
+</div>
+<div class="col">
+<h4>Недоступно в</h4>
+<ul>
+<li>Windows 10/11 Home</li>
+<li>Системных томах (загрузочный)</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="snc">26 из 45</div>
+</div>
+
+<!-- SLIDE 27 -->
+<div class="slide slide-content" data-slide="27">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>EFS: архитектура и ключи шифрования</h2>
+</div>
+<div class="slide-body">
+<h3>Структура шифрования EFS:</h3>
+<ol>
+<li>Генерируется <strong>FEK</strong> (File Encryption Key) — симметричный ключ AES для шифрования файла</li>
+<li>FEK шифруется <strong>открытым ключом</strong> пользователя (RSA) и сохраняется в заголовке файла</li>
+<li>Для расшифровки используется <strong>закрытый ключ</strong> пользователя из хранилища сертификатов</li>
+<li>Дополнительно FEK шифруется <strong>открытым ключом EFS Recovery Agent</strong> (агент восстановления)</li>
+</ol>
+<div class="wb">Обязательно настроить <strong>агента восстановления (EFS Recovery Agent)</strong> — без него при утере сертификата пользователя данные будут <strong>безвозвратно утеряны</strong>.</div>
+<div class="hl">EFS не защищает системные файлы и не шифрует файлы при копировании на FAT32/exFAT.</div>
+</div>
+<div class="snc">27 из 45</div>
+</div>
+
+<!-- SLIDE 28 -->
+<div class="slide slide-content" data-slide="28">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>EFS: настройка и управление</h2>
+</div>
+<div class="slide-body">
+<h3>Настройка EFS:</h3>
+<ul>
+<li>Правый клик на папку → Свойства → Дополнительно → <strong>«Шифровать содержимое для защиты данных»</strong></li>
+<li>Зашифрованные файлы отображаются <strong>зелёным цветом</strong> в проводнике</li>
+<li>Резервное копирование сертификата: <strong>certmgr.msc</strong> → Личное → Сертификаты</li>
+</ul>
+<h3 class="mt-2">Управление через GPO:</h3>
+<ul>
+<li><strong>Computer Configuration → Policies → Windows Settings → Security Settings → Public Key Policies</strong></li>
+<li>Настройка агента восстановления</li>
+<li>Политика шифрования EFS</li>
+</ul>
+<div class="ib">Сертификат и закрытый ключ EFS должны храниться в надёжном месте (вне АРМ). Рекомендуется использование аппаратных токенов.</div>
+</div>
+<div class="snc">28 из 45</div>
+</div>
+
+<!-- SLIDE 29 -->
+<div class="slide slide-content" data-slide="29">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>BitLocker: обзор и требования</h2>
+</div>
+<div class="slide-body">
+<div class="hl">BitLocker — технология полного шифрования тома, обеспечивающая защиту данных на всём диске, включая системные файлы, файл подкачки и гибернации.</div>
+<h3>Требования для использования BitLocker:</h3>
+<table>
+<thead><tr><th>Требование</th><th>Описание</th></tr></thead>
+<tbody>
+<tr><td><strong>Windows Pro / Enterprise</strong></td><td>BitLocker недоступен в Windows Home</td></tr>
+<tr><td><strong>TPM 1.2 / 2.0</strong></td><td>Рекомендуется TPM 2.0 (обязателен для Windows 11)</td></tr>
+<tr><td><strong>UEFI</strong></td><td>Режим Secure Boot рекомендуется</td></tr>
+<tr><td><strong>Раздел восстановления</strong></td><td>Минимум 500 МБ</td></tr>
+<tr><td><strong>Процессор</strong></td><td>x86 или x64</td></tr>
+</tbody>
+</table>
+<div class="wb">BitLocker шифрует <strong>весь том</strong>, включая удалённые файлы и свободное пространство, что делает восстановление данных без ключа невозможным.</div>
+</div>
+<div class="snc">29 из 45</div>
+</div>
+
+<!-- SLIDE 30 -->
+<div class="slide slide-content" data-slide="30">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>BitLocker: алгоритмы шифрования</h2>
+</div>
+<div class="slide-body">
+<h3>Поддерживаемые алгоритмы:</h3>
+<table>
+<thead><tr><th>Алгоритм</th><th>Режим</th><th>Рекомендация</th></tr></thead>
+<tbody>
+<tr><td><strong>AES-CBC</strong> 128 бит</td><td>Cipher Block Chaining</td><td>Базовый уровень</td></tr>
+<tr><td><strong>AES-CBC</strong> 256 бит</td><td>Cipher Block Chaining</td><td>Рекомендуемый для ПДн/ГИС</td></tr>
+<tr><td><strong>XTS-AES</strong> 128 бит</td><td>XEX-based Tweaked CodeBook</td><td>Современный стандарт</td></tr>
+<tr><td><strong>XTS-AES</strong> 256 бит</td><td>XEX-based Tweaked CodeBook</td><td>Максимальная защита</td></tr>
+</tbody>
+</table>
+<div class="hl">XTS-AES является предпочтительным алгоритмом для шифрования дисков, так как обеспечивает защиту от атак на модификацию данных.</div>
+<div class="ib">Для систем 1–2 класса ГИС и ЗО КИИ рекомендуется использовать AES 256 бит в режиме XTS.</div>
+<div class="wb">Проверить текущий алгоритм: <strong>manage-bde -status</strong> в командной строке.</div>
+</div>
+<div class="snc">30 из 45</div>
+</div>
+
+<!-- SLIDE 31 -->
+<div class="slide slide-content" data-slide="31">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>BitLocker: методы разблокировки</h2>
+</div>
+<div class="slide-body">
+<h3>Методы аутентификации при загрузке:</h3>
+<table>
+<thead><tr><th>Метод</th><th>Описание</th><th>Безопасность</th></tr></thead>
+<tbody>
+<tr><td><strong>TPM only</strong></td><td>Автоматическая разблокировка через TPM</td><td>Низкая</td></tr>
+<tr><td><strong>TPM + PIN</strong></td><td>TPM + PIN-код при загрузке</td><td>Высокая</td></tr>
+<tr><td><strong>TPM + USB</strong></td><td>TPM + ключ на USB-накопителе</td><td>Средняя</td></tr>
+<tr><td><strong>TPM + PIN + USB</strong></td><td>TPM + PIN + USB-ключ</td><td>Максимальная</td></tr>
+<tr><td><strong>Только пароль</strong></td><td>Без TPM (не рекомендуется)</td><td>Низкая</td></tr>
+</tbody>
+</table>
+<div class="wb">Для АРМ, обрабатывающих конфиденциальную информацию, рекомендуется метод <strong>TPM + PIN</strong> как оптимальный баланс безопасности и удобства.</div>
+<div class="ib">PIN-код должен соответствовать политике сложности: минимум 6 символов, включая цифры и специальные символы.</div>
+</div>
+<div class="snc">31 из 45</div>
+</div>
+
+<!-- SLIDE 32 -->
+<div class="slide slide-content" data-slide="32">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>BitLocker: ключи восстановления</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Ключ восстановления BitLocker — 48-значный числовой ключ, позволяющий разблокировать зашифрованный том при невозможности стандартной аутентификации.</div>
+<h3>Варианты хранения ключа восстановления:</h3>
+<ul>
+<li><strong>Учётная запись Microsoft</strong> (для домашних пользователей)</li>
+<li><strong>Active Directory</strong> (для корпоративных сред)</li>
+<li><strong>USB-накопитель</strong> (файл .BEK)</li>
+<li><strong>Распечатка</strong> (бумажный носитель)</li>
+</ul>
+<div class="wb">Ключ восстановления <strong>никогда</strong> не должен храниться на том же носителе, что и зашифрованные данные!</div>
+<div class="ib">Для корпоративных сред рекомендуется интеграция с <strong>Active Directory</strong> и хранение ключей в <strong>BitLocker Recovery Password Viewer</strong>.</div>
+<div class="hl">Резервное копирование ключа восстановления — обязательное требование для систем обработки ПДн и ГИС.</div>
+</div>
+<div class="snc">32 из 45</div>
+</div>
+
+<!-- SLIDE 33 -->
+<div class="slide slide-content" data-slide="33">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>BitLocker To Go: шифрование съёмных носителей</h2>
+</div>
+<div class="slide-body">
+<div class="hl">BitLocker To Go позволяет шифровать съёмные USB-накопители и внешние диски.</div>
+<h3>Особенности:</h3>
+<ul>
+<li>Шифрование всего съёмного носителя</li>
+<li>Аутентификация по паролю или смарт-карте</li>
+<li>Чтение на любом компьютере с Windows (распаковщик BitLocker To Go)</li>
+<li>Политики GPO для управления использованием зашифрованных носителей</li>
+</ul>
+<div class="tc">
+<div class="col">
+<h4>GPO для управления</h4>
+<ul>
+<li>Computer Configuration → Policies → Administrative Templates → Windows Components → BitLocker Drive Encryption → Removable Data Drives</li>
+<li>Требовать шифрование съёмных дисков</li>
+<li>Запретить запись на незашифрованные носители</li>
+</ul>
+</div>
+<div class="col">
+<h4>Рекомендации</h4>
+<ul>
+<li>Использовать AES 256 XTS</li>
+<li>Пароль не менее 12 символов</li>
+<li>Хранить ключ восстановления в AD</li>
+<li>Запретить использование незашифрованных носителей</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="snc">33 из 45</div>
+</div>
+
+<!-- SLIDE 34 -->
+<div class="slide slide-content" data-slide="34">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>Device Encryption (шифрование устройства)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Device Encryption — упрощённая версия BitLocker, автоматически включаемая на совместимых устройствах.</div>
+<h3>Требования для автоматического шифрования:</h3>
+<ul>
+<li>Windows 10/11 Pro или Enterprise</li>
+<li>Наличие TPM 2.0 и поддержка Modern Standby</li>
+<li>Вход через учётную запись Microsoft (ключ сохраняется в облаке)</li>
+<li>Secure Boot включён</li>
+</ul>
+<div class="wb">Device Encryption не подходит для корпоративных сред с требованиями ФСТЭК — необходимо использовать <strong>полнофункциональный BitLocker</strong> с управлением через GPO и хранением ключей в AD.</div>
+<div class="ib">Device Encryption использует AES-XTS 128 бит и TPM-only аутентификацию, что не обеспечивает достаточный уровень защиты для конфиденциальных данных.</div>
+</div>
+<div class="snc">34 из 45</div>
+</div>
+
+<!-- SLIDE 35 -->
+<div class="slide slide-content" data-slide="35">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>Сравнение EFS и BitLocker</h2>
+</div>
+<div class="slide-body">
+<table>
+<thead><tr><th>Критерий</th><th>EFS</th><th>BitLocker</th></tr></thead>
+<tbody>
+<tr><td>Область шифрования</td><td>Отдельные файлы и папки</td><td>Весь том (диск)</td></tr>
+<tr><td>Системный диск</td><td>Нет</td><td>Да</td></tr>
+<tr><td>Прозрачность</td><td>Прозрачное для пользователя</td><td>Прозрачное после разблокировки</td></tr>
+<tr><td>Защита при утере носителя</td><td>Частичная</td><td>Полная</td></tr>
+<tr><td>Требует TPM</td><td>Нет</td><td>Рекомендуется</td></tr>
+<tr><td>Версия Windows</td><td>Pro / Enterprise</td><td>Pro / Enterprise</td></tr>
+<tr><td>Агент восстановления</td><td>Обязателен</td><td>Ключ восстановления</td></tr>
+<tr><td>Съёмные носители</td><td>Нет (NTFS)</td><td>Да (BitLocker To Go)</td></tr>
+</tbody>
+</table>
+<div class="hl">Для комплексной защиты рекомендуется использовать <strong>оба механизма</strong>: BitLocker для защиты всего тома + EFS для дополнительной защиты конфиденциальных файлов.</div>
+</div>
+<div class="snc">35 из 45</div>
+</div>
+
+<!-- SLIDE 36 -->
+<div class="slide slide-content" data-slide="36">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>Управление ключами шифрования</h2>
+</div>
+<div class="slide-body">
+<h3>Рекомендации по управлению ключами:</h3>
+<ul>
+<li><strong>Хранение ключей</strong> — в аппаратных модулях безопасности (HSM) или защищённых хранилищах</li>
+<li><strong>Ротация ключей</strong> — регулярная смена ключей шифрования (не реже 1 раза в год)</li>
+<li><strong>Резервное копирование</strong> — ключи восстановления хранить отдельно от зашифрованных данных</li>
+<li><strong>Уничтожение</strong> — при выводе АРМ из эксплуатации — безопасное уничтожение ключей</li>
+</ul>
+<div class="wb">Утечка ключа шифрования эквивалентна утечке всех зашифрованных данных. Защита ключей — приоритетная задача.</div>
+<div class="ib">Для систем 1–2 класса ГИС ключи шифрования должны храниться на сертифицированных ФСТЭК носителях (токенах, HSM).</div>
+</div>
+<div class="snc">36 из 45</div>
+</div>
+
+<!-- SLIDE 37 -->
+<div class="slide slide-content" data-slide="37">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 3</div>
+<h2>Подведение итогов: Тема 3</h2>
+</div>
+<div class="slide-body">
+<h3>Ключевые выводы по шифрованию:</h3>
+<ul>
+<li><strong>EFS</strong> — шифрование на уровне файлов, удобен для выборочной защиты</li>
+<li><strong>BitLocker</strong> — полное шифрование тома, защищает от утери/хищения носителя</li>
+<li><strong>BitLocker To Go</strong> — шифрование съёмных носителей</li>
+<li>Алгоритм: <strong>AES 256 XTS</strong> — рекомендуемый для конфиденциальных данных</li>
+<li>Метод аутентификации: <strong>TPM + PIN</strong> — оптимальный баланс</li>
+<li>Ключи восстановления — хранить <strong>отдельно</strong> от зашифрованных данных</li>
+</ul>
+<div class="hl">Шифрование является обязательным требованием для систем обработки ПДн, ГИС и ЗО КИИ согласно нормативным актам ФСТЭК.</div>
+</div>
+<div class="snc">37 из 45</div>
+</div>
+
+<!-- ============ TOPIC 4: АНТИВИРУСНАЯ ЗАЩИТА ============ -->
+
+<!-- SLIDE 38 -->
+<div class="slide slide-content" data-slide="38">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4: Антивирусная защита АРМ</div>
+<h2>Введение: антивирусная защита в Windows</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Антивирусная защита — обязательный компонент комплексной системы защиты АРМ, предотвращающий проникновение и распространение вредоносного ПО.</div>
+<h3>Штатное решение Microsoft:</h3>
+<ul>
+<li><strong>Microsoft Defender Antivirus</strong> — встроенный антивирус Windows 10/11</li>
+<li>Входит в состав <strong>Microsoft Defender for Endpoint</strong></li>
+<li>Включает защиту в реальном времени, облачную защиту, защиту от эксплойтов</li>
+</ul>
+<div class="wb">Согласно требованиям ФСТЭК, антивирусная защита является обязательной для всех АРМ, обрабатывающих информацию ограниченного доступа (ПДн, ГИС, КИИ).</div>
+</div>
+<div class="snc">38 из 45</div>
+</div>
+
+<!-- SLIDE 39 -->
+<div class="slide slide-content" data-slide="39">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Microsoft Defender Antivirus: компоненты</h2>
+</div>
+<div class="slide-body">
+<h3>Основные компоненты защиты:</h3>
+<table>
+<thead><tr><th>Компонент</th><th>Описание</th></tr></thead>
+<tbody>
+<tr><td><strong>Защита в реальном времени</strong></td><td>Постоянный мониторинг файлов, процессов, сетевого трафика</td></tr>
+<tr><td><strong>Облачная защита</strong></td><td>Microsoft Defender Antivirus Cloud — анализ подозрительных файлов в облаке</td></tr>
+<tr><td><strong>Защита от подделки</strong></td><td>Tamper Protection — предотвращение отключения защиты вредоносным ПО</td></tr>
+<tr><td><strong>Защита от эксплойтов</strong></td><td>Exploit Protection — DEP, ASLR, CFG, Control Flow Guard</td></tr>
+<tr><td><strong>SmartScreen</strong></td><td>Фильтрация вредоносных загрузок и сайтов</td></tr>
+<tr><td><strong>Firewall</strong></td><td>Брандмауэр Windows Defender</td></tr>
+</tbody>
+</table>
+<div class="ib">Microsoft Defender Antivirus регулярно получает высокие оценки в независимых тестах (AV-TEST, AV-Comparatives).</div>
+</div>
+<div class="snc">39 из 45</div>
+</div>
+
+<!-- SLIDE 40 -->
+<div class="slide slide-content" data-slide="40">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Настройка Microsoft Defender через GPO</h2>
+</div>
+<div class="slide-body">
+<h3>Ключевые политики GPO:</h3>
+<ul>
+<li><strong>Computer Configuration → Policies → Administrative Templates → Windows Components → Microsoft Defender Antivirus</strong></li>
+<li>Включить защиту в реальном времени</li>
+<li>Включить облачную защиту</li>
+<li>Уровень обнаружения: <strong>Высокий</strong></li>
+<li>Автоматическая отправка образцов: <strong>Включена</strong></li>
+<li>Расписание полного сканирования: <strong>еженедельно</strong></li>
+<li>Действие при обнаружении: <strong>Удалить или поместить в карантин</strong></li>
+</ul>
+<div class="wb">Защита от подделки (Tamper Protection) должна быть <strong>включена</strong> — она предотвращает отключение антивируса вредоносным ПО или злоумышленником.</div>
+<div class="hl">Для корпоративных сред рекомендуется использование <strong>Microsoft Defender for Endpoint</strong> с централизованным управлением через Microsoft Intune или SCCM.</div>
+</div>
+<div class="snc">40 из 45</div>
+</div>
+
+<!-- SLIDE 41 -->
+<div class="slide slide-content" data-slide="41">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Сертифицированные антивирусные средства</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Для систем обработки конфиденциальной информации (ПДн, ГИС, ЗО КИИ) рекомендуется использование <strong>сертифицированных ФСТЭК</strong> средств антивирусной защиты.</div>
+<h3>Примеры сертифицированных средств:</h3>
+<table>
+<thead><tr><th>Средство</th><th>Разработчик</th><th>Сертификат ФСТЭК</th></tr></thead>
+<tbody>
+<tr><td>Kaspersky Endpoint Security</td><td>Kaspersky Lab</td><td>Действующий</td></tr>
+<tr><td>Dr.Web Enterprise Security Suite</td><td>Doctor Web</td><td>Действующий</td></tr>
+<tr><td>Kaspersky Security для Linux Mail Server</td><td>Kaspersky Lab</td><td>Действующий</td></tr>
+</tbody>
+</table>
+<div class="wb">Microsoft Defender Antivirus <strong>не имеет</strong> сертификата ФСТЭК. Для систем 1–3 класса ГИС и ЗО КИИ необходимо использовать сертифицированные средства защиты от НСД, включающие антивирусную защиту.</div>
+<div class="ib">При использовании сертифицированных СЗИ от НСД штатный антивирус может быть отключён.</div>
+</div>
+<div class="snc">41 из 45</div>
+</div>
+
+<!-- SLIDE 42 -->
+<div class="slide slide-content" data-slide="42">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Защита от ransomware (вымогателей)</h2>
+</div>
+<div class="slide-body">
+<div class="hl">Ransomware — один из наиболее опасных видов вредоносного ПО, шифрующий данные пользователя и требующий выкуп.</div>
+<h3>Меры защиты:</h3>
+<ul>
+<li><strong>Controlled Folder Access</strong> — защита важных папок от несанкционированных изменений</li>
+<li><strong>Регулярное резервное копирование</strong> — правило 3-2-1 (3 копии, 2 носителя, 1 вне офиса)</li>
+<li><strong>Ограничение прав пользователей</strong> — принцип наименьших привилегий</li>
+<li><strong>Обновление ОС и ПО</strong> — устранение уязвимостей</li>
+<li><strong>Обучение пользователей</strong> — распознавание фишинговых писем</li>
+</ul>
+<div class="wb">Controlled Folder Access: настройки в Windows Security → Virus & Threat Protection → Ransomware Protection. Рекомендуется защищать папки с документами, рабочим столом и важными данными.</div>
+</div>
+<div class="snc">42 из 45</div>
+</div>
+
+<!-- SLIDE 43 -->
+<div class="slide slide-content" data-slide="43">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Централизованное управление защитой</h2>
+</div>
+<div class="slide-body">
+<h3>Инструменты централизованного управления:</h3>
+<table>
+<thead><tr><th>Инструмент</th><th>Описание</th><th>Применение</th></tr></thead>
+<tbody>
+<tr><td><strong>Microsoft Intune</strong></td><td>Облачное управление устройствами</td><td>Microsoft Defender for Endpoint</td></tr>
+<tr><td><strong>SCCM</strong></td><td>System Center Configuration Manager</td><td>Корпоративные среды</td></tr>
+<tr><td><strong>Group Policy</strong></td><td>Локальные политики домена</td><td>Active Directory</td></tr>
+<tr><td><strong>PowerShell</strong></td><td>Скрипты автоматизации</td><td>Массовые операции</td></tr>
+</tbody>
+</table>
+<div class="hl">Для крупных организаций рекомендуется развёртывание <strong>Microsoft Defender for Endpoint</strong> с интеграцией в SIEM-систему для централизованного мониторинга угроз.</div>
+<div class="ib">Команды PowerShell для управления Defender: <strong>Get-MpPreference</strong>, <strong>Set-MpPreference</strong>, <strong>Get-MpThreat</strong>, <strong>Start-MpScan</strong>.</div>
+</div>
+<div class="snc">43 из 45</div>
+</div>
+
+<!-- SLIDE 44 -->
+<div class="slide slide-content" data-slide="44">
+<div class="slide-header">
+<div class="logo-area"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none';this.parentElement.innerHTML='<div class=\'logo-fb\'>МАСКОМ</div>'"></div>
+<div class="section-tag">Тема 4</div>
+<h2>Подведение итогов: Тема 4</h2>
+</div>
+<div class="slide-body">
+<h3>Чек-лист антивирусной защиты АРМ:</h3>
+<ol>
+<li>✅ Антивирус установлен и активен (Defender или сертифицированное средство)</li>
+<li>✅ Защита в реальном времени включена</li>
+<li>✅ Облачная защита активна</li>
+<li>✅ Tamper Protection включён</li>
+<li>✅ Расписание полного сканирования настроено</li>
+<li>✅ Controlled Folder Access настроен</li>
+<li>✅ SmartScreen включён</li>
+<li>✅ Брандмауэр активен</li>
+<li>✅ Централизованное управление настроено</li>
+<li>✅ Резервное копирование настроено (правило 3-2-1)</li>
+</ol>
+<div class="wb">Для систем обработки ПДн, ГИС и ЗО КИИ необходимо использовать <strong>сертифицированные ФСТЭК</strong> средства антивирусной защиты или СЗИ от НСД с функцией антивирусной защиты.</div>
+</div>
+<div class="snc">44 из 45</div>
+</div>
+
+<!-- ============ SLIDE 45: CONTACTS ============ -->
+<div class="slide slide-contact" data-slide="45">
+<div class="cc">
+<!-- <div class="org-logo"><img src="Лого.jpg" alt="МАСКОМ" onerror="this.style.display='none'"></div>  -->
+<h2>Контакты</h2>
+<div class="pn">Виталий Александрович Пиков</div>
+<div class="pt">Эксперт в области ИТ, ИБ, преподаватель<br>Руководитель направления обучения по РБПО<br>Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»</div>
+<div class="ci"><span class="cico">✉</span><span>Электронная почта: <a href="mailto:vitaliy@pikov.expert">vitaliy@pikov.expert</a></span></div>
+<div class="ci"><span class="cico">✈</span><span>Telegram: <a href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">@UnderLineSecurity</a></span></div>
+<div class="ci"><span class="cico">🌐</span><span>Сайт: <a href="https://mascom-uc.ru/" target="_blank" rel="noopener">mascom-uc.ru</a></span></div>
+<div class="ci"><span class="cico">📞</span><span>Телефон: (495) 136-40-10 (доб. 1310; доб. 1306)</span></div>
+<div class="oi">НОУ ДПО «Учебный Центр Безопасности Информации «МАСКОМ»<br>Программы профессиональной переподготовки и повышения квалификации<br>в области информационной безопасности</div>
+</div>
+<div class="sl">45 из 45</div>
+</div>
+
+</div>
+
+<script>
+(function(){
+'use strict';
+var cs=1,ts=45,slides=document.querySelectorAll('.slide');
+var ye=document.getElementById('yearDisplay');
+if(ye)ye.textContent=new Date().getFullYear()+' г.';
+function go(n){if(n<1||n>ts)return;if(slides[cs-1])slides[cs-1].classList.remove('active');cs=n;if(slides[cs-1])slides[cs-1].classList.add('active');up();ub();un();}
+function next(){go(cs+1)}function prev(){go(cs-1)}function first(){go(1)}function last(){go(ts)}
+function up(){var b=document.getElementById('progressBar');if(b)b.style.width=((cs-1)/(ts-1)*100)+'%';}
+function ub(){var bp=document.getElementById('btnPrev'),bn=document.getElementById('btnNext'),bf=document.getElementById('btnFirst'),bl=document.getElementById('btnLast');if(bp)bp.disabled=(cs<=1);if(bn)bn.disabled=(cs>=ts);if(bf)bf.disabled=(cs<=1);if(bl)bl.disabled=(cs>=ts);}
+function un(){slides.forEach(function(s,i){var e=s.querySelector('.slide-number-corner')||s.querySelector('.sl');if(e){var n=i+1;if(n===1)e.textContent='';else e.textContent=n+' из '+ts;}});}
+document.addEventListener('keydown',function(e){switch(e.key){case'ArrowRight':case'PageDown':e.preventDefault();next();break;case'ArrowLeft':case'PageUp':e.preventDefault();prev();break;case'Home':e.preventDefault();first();break;case'End':e.preventDefault();last();break;}});
+var cl=document.getElementById('clickLeft'),cr=document.getElementById('clickRight');
+if(cr)cr.addEventListener('click',function(e){if(e.target.closest('.nav-controls'))return;next();});
+if(cl)cl.addEventListener('click',function(e){if(e.target.closest('.nav-controls'))return;prev();});
+var bf=document.getElementById('btnFirst'),bp=document.getElementById('btnPrev'),bn=document.getElementById('btnNext'),bl=document.getElementById('btnLast');
+if(bf)bf.addEventListener('click',first);if(bp)bp.addEventListener('click',prev);if(bn)bn.addEventListener('click',next);if(bl)bl.addEventListener('click',last);
+var sx=0,sx2=0;
+document.addEventListener('touchstart',function(e){sx=e.changedTouches[0].screenX},{passive:true});
+document.addEventListener('touchend',function(e){sx2=e.changedTouches[0].screenX;var d=sx-sx2;if(Math.abs(d)>50){if(d>0)next();else prev();}},{passive:true});
+up();ub();un();
+})();
+</script>
+</body>
+</html>

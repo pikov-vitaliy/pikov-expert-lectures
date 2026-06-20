@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Композиционный анализ программного обеспечения — лекция В.А. Пикова</title>
+  <meta name="description" content="Авторская лекция по композиционному анализу программного обеспечения: КАПО, ППК, SBOM, CycloneDX, SPDX, уязвимости, лицензии и контроль цепочки поставки.">
+  <meta name="author" content="Виталий Александрович Пиков">
+  <link rel="canonical" href="https://kapo.pikov.expert/">
+  <meta property="og:title" content="Композиционный анализ программного обеспечения">
+  <meta property="og:description" content="КАПО, ППК, SBOM, CycloneDX, SPDX, БДУ/NVD/OSV и политика безопасности сторонних компонентов.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://kapo.pikov.expert/">
+  <meta property="og:image" content="https://pikov.expert/photo.jpg">
+  <style>
+    :root{
+      --mai-blue:#0b6cff;
+      --mai-blue-2:#2e8cff;
+      --mai-dark:#0f1b2d;
+      --mai-text:#223754;
+      --mai-muted:#667c9a;
+      --mai-bg:#f3f7ff;
+      --mai-card:rgba(255,255,255,.94);
+      --mai-line:rgba(11,108,255,.14);
+      --mai-shadow:0 20px 60px rgba(11,108,255,.12);
+      --radius:28px;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0;height:100%;font-family:Inter,"Segoe UI",Arial,sans-serif;background:
+      radial-gradient(circle at top right, rgba(11,108,255,.16), transparent 24%),
+      radial-gradient(circle at bottom left, rgba(11,108,255,.09), transparent 30%),
+      linear-gradient(135deg,#edf4ff 0%,#ffffff 48%,#eef5ff 100%);
+      color:var(--mai-text);overflow:hidden}
+    body::before{content:"";position:fixed;inset:0;pointer-events:none;background-image:
+      linear-gradient(rgba(11,108,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11,108,255,.03) 1px, transparent 1px);background-size:44px 44px}
+    .progress{position:fixed;left:0;top:0;height:5px;width:0;background:linear-gradient(90deg,var(--mai-blue),var(--mai-blue-2));z-index:50;transition:width .3s ease}
+    .deck{position:relative;width:100vw;height:100vh;overflow:hidden}
+    .slide{position:absolute;inset:0;padding:28px 34px 56px;display:grid;grid-template-rows:auto 1fr auto;opacity:0;transform:translateX(26px) scale(.985);transition:opacity .42s ease, transform .42s ease;pointer-events:none}
+    .slide.active{opacity:1;transform:translateX(0) scale(1);pointer-events:auto}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:16px}
+    .brand{display:flex;align-items:center;gap:14px}
+    .brand img{height:68px;filter:drop-shadow(0 10px 24px rgba(11,108,255,.14))}
+    .brand-mark{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,var(--mai-blue),var(--mai-blue-2));color:#fff;display:grid;place-items:center;font-weight:900;letter-spacing:.04em;box-shadow:0 10px 24px rgba(11,108,255,.18)}
+    .uni{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--mai-muted);font-weight:800}
+    .sub{font-size:18px;color:var(--mai-dark);font-weight:800}
+    .tag{padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid var(--mai-line);box-shadow:var(--mai-shadow);font-size:14px;font-weight:800;color:var(--mai-blue)}
+    .content{min-height:0;display:grid;gap:22px;align-items:stretch}
+    .hero{grid-template-columns:1.18fr .82fr}
+    .columns-2{grid-template-columns:1fr 1fr}
+    .columns-3{grid-template-columns:repeat(3,1fr)}
+    .card{background:var(--mai-card);border:1px solid var(--mai-line);border-radius:var(--radius);box-shadow:var(--mai-shadow);padding:26px;backdrop-filter:blur(8px)}
+    .kicker{font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--mai-blue);font-weight:900;margin-bottom:12px}
+    .title{font-size:clamp(34px,5vw,60px);line-height:1.03;margin:0 0 16px;font-weight:900;color:var(--mai-dark)}
+    .section-title{font-size:34px;line-height:1.12;margin:0 0 12px;font-weight:900;color:var(--mai-dark)}
+    .lead{font-size:18px;line-height:1.55;color:var(--mai-muted);margin:0}
+    .accent{color:var(--mai-blue)}
+    .agenda-grid,.feature-grid{display:grid;gap:16px}
+    .agenda-grid{grid-template-columns:repeat(2,1fr)}
+    .feature-grid{grid-template-columns:repeat(3,1fr)}
+    .tile,.feature,.step{background:linear-gradient(180deg, rgba(11,108,255,.055), rgba(255,255,255,.9));border:1px solid var(--mai-line);border-radius:22px;padding:18px}
+    .tile h3,.feature h3{margin:0 0 8px;font-size:21px;color:var(--mai-dark)}
+    .tile p,.feature p{margin:0;color:var(--mai-muted);font-size:16px;line-height:1.45}
+    .num{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--mai-blue);color:#fff;font-weight:900;margin-bottom:10px}
+    ul.clean{margin:0;padding-left:20px;font-size:18px;line-height:1.55}
+    ul.clean li{margin-bottom:9px}
+    .steps{display:grid;gap:14px}
+    .step{display:grid;grid-template-columns:46px 1fr;gap:14px;align-items:start}
+    .step .n{width:46px;height:46px;border-radius:14px;background:var(--mai-blue);color:#fff;display:grid;place-items:center;font-weight:900}
+    .step p{margin:0;font-size:17px;line-height:1.48}
+    .quote{margin:16px 0 0;padding-left:18px;border-left:4px solid var(--mai-blue);font-size:21px;line-height:1.5;font-weight:750;color:var(--mai-dark)}
+    .meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px}
+    .pill{padding:10px 14px;border-radius:999px;background:rgba(11,108,255,.08);border:1px solid var(--mai-line);font-size:14px;font-weight:800;color:var(--mai-dark)}
+    .footer{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px}
+    .hint{font-size:14px;color:var(--mai-muted)}
+    .slide-num{position:absolute;right:22px;bottom:16px;width:62px;height:38px;display:grid;place-items:center;border-radius:999px;border:1px solid var(--mai-line);background:rgba(255,255,255,.92);box-shadow:var(--mai-shadow);font-weight:900;color:var(--mai-blue)}
+    .controls{position:fixed;right:22px;bottom:22px;display:flex;gap:10px;z-index:60}
+    .btn{width:56px;height:56px;border-radius:50%;border:none;background:var(--mai-blue);color:#fff;font-size:24px;cursor:pointer;box-shadow:var(--mai-shadow)}
+    .btn:hover{transform:translateY(-1px)}
+    .center{display:grid;place-items:center;text-align:center}
+    .visual-wrap{display:grid;grid-template-rows:auto 1fr auto;gap:12px;min-height:0}
+    .visual-box{min-height:0;background:rgba(255,255,255,.9);border:1px solid var(--mai-line);border-radius:26px;box-shadow:var(--mai-shadow);padding:16px;display:grid;place-items:center}
+    .visual-box img{max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;border-radius:16px}
+    .visual-placeholder{width:100%;min-height:220px;border:2px dashed rgba(11,108,255,.25);border-radius:18px;display:grid;place-items:center;text-align:center;padding:22px;color:var(--mai-muted);font-size:22px;font-weight:800;line-height:1.35;background:rgba(11,108,255,.045)}
+    .visual-caption{font-size:16px;line-height:1.45;color:var(--mai-muted)}
+    .contact-block p{margin:8px 0;font-size:17px;line-height:1.52}
+    .small-note{font-size:14px;color:var(--mai-muted)}
+    .big-text{font-size:22px;line-height:1.55;color:var(--mai-dark)}
+    @media (max-width:1100px){
+      html,body{overflow:auto}
+      .deck{height:auto;min-height:100vh;overflow:auto}
+      .slide{position:relative;display:none;min-height:100vh;padding:22px 18px 54px}
+      .slide.active{display:grid}
+      .hero,.columns-2,.columns-3,.agenda-grid,.feature-grid{grid-template-columns:1fr}
+      .brand img{height:54px}
+      .section-title{font-size:28px}
+      .title{font-size:clamp(28px,8vw,46px)}
+      .controls{right:14px;bottom:14px}
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="deck" id="deck">
+
+    <section class="slide active">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Московский авиационный институт</div><div class="sub">Учебный лендинг по дисциплине</div></div></div>
+        <div class="tag">ГОСТ Р (проект)</div>
+      </div>
+      <div class="content hero">
+        <div class="card">
+          <div class="kicker">Тема занятия</div>
+          <h1 class="title">Композиционный анализ <span class="accent">программного обеспечения</span></h1>
+          <p class="lead">Презентация построена по логике проекта национального стандарта ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Композиционный анализ программного обеспечения. Общие требования» и адаптирована для наглядного объяснения студентам.</p>
+          <div class="meta">
+            <div class="pill">Локальный запуск без интернета</div>
+            <div class="pill">Слайды в формате лендинга</div>
+            <div class="pill">Схемы вынесены отдельно</div>
+            <div class="pill">Приложения добавлены в финал</div>
+          </div>
+          <p class="quote">Задача КАПО — не просто перечислить библиотеки, а сделать использование сторонних компонентов управляемым, проверяемым и безопасным.</p>
+        </div>
+        <div class="card">
+          <div class="kicker">Как работать с презентацией</div>
+          <h2 class="section-title">Навигация</h2>
+          <ul class="clean">
+            <li>Клик по правой половине экрана — следующий слайд.</li>
+            <li>Клик по левой половине — предыдущий.</li>
+            <li>Поддерживаются клавиши ← / →, PageUp / PageDown, Home / End.</li>
+            <li>Внизу справа всегда виден номер текущего слайда.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">Материал основан на пояснительной записке и тексте проекта стандарта.</div><div></div></div>
+      <div class="slide-num">01</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Введение</div><div class="sub">Зачем нужен этот стандарт</div></div></div>
+        <div class="tag">Цели и объект стандартизации</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Из пояснительной записки</div>
+          <h2 class="section-title">Что должен обеспечить КАПО</h2>
+          <ul class="clean">
+            <li>выявление известных уязвимостей в сторонних компонентах;</li>
+            <li>контроль лицензионной чистоты и иных особенностей использования;</li>
+            <li>стандартизацию отчётных материалов и обмена данными о составе ПО;</li>
+            <li>поддержку всех этапов жизненного цикла: от требований до эксплуатации.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Контекст безопасной разработки</div>
+          <h2 class="section-title">Почему это важно</h2>
+          <p class="lead">Современное ПО почти всегда строится из собственных и сторонних компонентов. Поэтому безопасность конечного продукта зависит не только от кода разработчика, но и от всей цепочки поставки, репозиториев, пакетных экосистем, контейнеров и инструментов сборки.</p>
+          <div class="meta">
+            <div class="pill">SBOM / ППК</div>
+            <div class="pill">Цепочка поставки</div>
+            <div class="pill">Контролируемый репозиторий</div>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">Стандарт применяется совместно с ГОСТ Р 56939-2024 и дополняет процессы безопасной разработки.</div><div></div></div>
+      <div class="slide-num">02</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Базовые понятия</div><div class="sub">Термины, которые студент должен знать</div></div></div>
+        <div class="tag">Термины и определения</div>
+      </div>
+      <div class="content">
+        <div class="feature-grid">
+          <div class="feature"><div class="num">1</div><h3>КАПО</h3><p>Анализ, основанный на инвентаризации сторонних компонентов, выявлении их особенностей и составлении перечня уязвимостей и иных недостатков.</p></div>
+          <div class="feature"><div class="num">2</div><h3>ППК</h3><p>Перечень программных компонентов — машиночитаемый документ с информацией о компонентах ПО и отношениях между ними. Отечественный аналог SBOM.</p></div>
+          <div class="feature"><div class="num">3</div><h3>Контролируемый репозиторий</h3><p>Репозиторий, в отношении содержимого которого выполняются проверки безопасности в соответствии с регламентами организации.</p></div>
+          <div class="feature"><div class="num">4</div><h3>Заимствованный компонент</h3><p>Компонент, который включается в разрабатываемое ПО на определённых условиях, включая свободное распространение.</p></div>
+          <div class="feature"><div class="num">5</div><h3>Привлекаемое ПО</h3><p>ПО, используемое в процессе разработки как средство разработки или часть среды функционирования, но не входящее как компонент в итоговый продукт.</p></div>
+          <div class="feature"><div class="num">6</div><h3>Политика безопасности</h3><p>Совокупность правил использования сторонних компонентов: допустимость, критерии проверки, сроки реакции и компенсирующие меры.</p></div>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">На этом этапе удобно показать отличие между «компонентом», «сторонним ПО» и «инструментом анализа».</div><div></div></div>
+      <div class="slide-num">03</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Общие положения</div><div class="sub">Место КАПО в процессах разработки</div></div></div>
+        <div class="tag">Раздел 4</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Ключевая логика стандарта</div>
+          <div class="steps">
+            <div class="step"><div class="n">1</div><p>Разработчик обязан вести КАПО в дополнение к другим мерам безопасной разработки.</p></div>
+            <div class="step"><div class="n">2</div><p>Стороннее ПО должно попадать в разработку только через контролируемый репозиторий.</p></div>
+            <div class="step"><div class="n">3</div><p>Процесс должен обеспечивать ведение ППК, выявление уязвимостей и реакцию на нарушения политики безопасности.</p></div>
+            <div class="step"><div class="n">4</div><p>Если одного инструмента недостаточно, допускается использовать комплект средств, покрывающий обязательные требования.</p></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="kicker">Что важно объяснить студентам</div>
+          <h2 class="section-title">КАПО — это не разовая проверка</h2>
+          <p class="big-text">Композиционный анализ должен работать непрерывно: при сборке, при изменении зависимостей, при загрузке новых артефактов, при сопровождении уже выпущенных версий и при поступлении новой информации об уязвимостях.</p>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">Далее по логике стандарта сначала показывается общая цепочка поставки, а затем порядок выполнения процесса.</div><div></div></div>
+      <div class="slide-num">04</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Рисунок 1</div><div class="sub">Цепочка поставки программного обеспечения</div></div></div>
+        <div class="tag">Отдельный слайд со схемой</div>
+      </div>
+      <div class="content visual-wrap">
+        <div class="card"><div class="kicker">Наглядная схема</div><h2 class="section-title">Откуда компоненты приходят в продукт</h2></div>
+        <div class="visual-box"><div class="visual-placeholder">Рисунок 1: цепочка поставки программного обеспечения</div></div>
+        <div class="visual-caption">Схема показывает, как собственная разработка и стороннее ПО проходят через контролируемый репозиторий, проверки CI/CD и сборку, после чего формируется поставляемое ПО.</div>
+      </div>
+      <div class="slide-num">05</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Раздел 5</div><div class="sub">Порядок внедрения и применения КАПО</div></div></div>
+        <div class="tag">Этапы процесса</div>
+      </div>
+      <div class="content columns-3">
+        <div class="card"><div class="kicker">Этап 1</div><h2 class="section-title">Подготовка внедрения</h2><ul class="clean"><li>назначить ответственных;</li><li>инвентаризировать технологии и репозитории;</li><li>сформировать ППК для поддерживаемых версий ПО;</li><li>принять решения по организации контролируемого репозитория и регламента.</li></ul></div>
+        <div class="card"><div class="kicker">Этап 2</div><h2 class="section-title">Внедрение</h2><ul class="clean"><li>установить и интегрировать инструмент;</li><li>собрать сведения из баз уязвимостей и иных источников;</li><li>сформировать политику безопасности в отношении стороннего ПО;</li><li>обеспечить невозможность обхода проверок.</li></ul></div>
+        <div class="card"><div class="kicker">Этап 3</div><h2 class="section-title">Регулярное применение</h2><ul class="clean"><li>автоматизировать построение ППК и анализ;</li><li>перепроверять компоненты на протяжении всего жизненного цикла;</li><li>реагировать на нарушения политики;</li><li>сопровождать каждую версию ПО собственным ППК.</li></ul></div>
+      </div>
+      <div class="footer"><div class="hint">Роли по стандарту: инженер автоматизации разработки, инженер безопасной разработки и инженер-разработчик ПО.</div><div></div></div>
+      <div class="slide-num">06</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Рисунок 2</div><div class="sub">Рекомендуемый порядок выполнения КАПО разработчиком ПО</div></div></div>
+        <div class="tag">Отдельный слайд со схемой</div>
+      </div>
+      <div class="content visual-wrap">
+        <div class="card"><div class="kicker">Наглядная схема</div><h2 class="section-title">Как выглядит основной рабочий цикл анализа</h2></div>
+        <div class="visual-box"><div class="visual-placeholder">Рисунок 2: рекомендуемый порядок выполнения КАПО разработчиком ПО</div></div>
+        <div class="visual-caption">На схеме виден запуск анализа, формирование или обогащение ППК, проверка на соответствие политике безопасности, формирование отчёта и принятие мер по результатам.</div>
+      </div>
+      <div class="slide-num">07</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Контролируемый репозиторий</div><div class="sub">Что должна определить организация</div></div></div>
+        <div class="tag">Организационные требования</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Политика безопасности</div>
+          <ul class="clean">
+            <li>критерии выбора нового стороннего ПО;</li>
+            <li>правила эксплуатации контролируемого репозитория;</li>
+            <li>критерии отслеживания уязвимостей и лицензий;</li>
+            <li>сроки реакции на нарушения и порядок компенсирующих мер;</li>
+            <li>регулярность перепроверки используемых компонентов.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Практический смысл</div>
+          <h2 class="section-title">Запрет на обход цепочки поставки</h2>
+          <p class="lead">Любой компонент, который попадает в процесс разработки или сборки, должен пройти предусмотренные организацией проверки. Только после этого он может использоваться в проекте. Именно это превращает КАПО из отчётной процедуры в реальный механизм управления риском.</p>
+          <p class="quote">Сторонний компонент без проверки — это не удобство, а неуправляемый риск для всего продукта.</p>
+        </div>
+      </div>
+      <div class="slide-num">08</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Рисунок 3</div><div class="sub">КАПО для репозитория компонентов (артефактов)</div></div></div>
+        <div class="tag">Отдельный слайд со схемой</div>
+      </div>
+      <div class="content visual-wrap">
+        <div class="card"><div class="kicker">Наглядная схема</div><h2 class="section-title">Как организация решает, можно ли использовать компонент</h2></div>
+        <div class="visual-box"><div class="visual-placeholder">Рисунок 3: КАПО для репозитория компонентов и артефактов</div></div>
+        <div class="visual-caption">Схема демонстрирует предварительную загрузку запрашиваемого компонента, его анализ, проверку на соответствие политике и ветвление решения: разрешить или запретить использование.</div>
+      </div>
+      <div class="slide-num">09</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Раздел 6</div><div class="sub">Технология композиционного анализа</div></div></div>
+        <div class="tag">Из чего состоит КАПО</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Четыре базовых операции</div>
+          <ul class="clean">
+            <li>выявление заимствований и идентификация компонентов;</li>
+            <li>построение перечня программных компонентов;</li>
+            <li>обогащение ППК сведениями об уязвимостях и особенностях;</li>
+            <li>актуализация и оповещение о результатах анализа.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Как ищутся компоненты</div>
+          <ul class="clean">
+            <li>обязателен анализ манифестов систем управления компонентами;</li>
+            <li>рекомендуется анализ сборочной среды и среды функционирования;</li>
+            <li>рекомендуется идентификация по хэш-кодам;</li>
+            <li>возможен поиск частичных включений кода и транзитивный анализ зависимостей.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">Базы знаний могут быть совмещёнными или разделёнными: отдельно описание компонентов и отдельно сведения об уязвимостях.</div><div></div></div>
+      <div class="slide-num">10</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Рисунок 4</div><div class="sub">Технология композиционного анализа программного обеспечения</div></div></div>
+        <div class="tag">Отдельный слайд со схемой</div>
+      </div>
+      <div class="content visual-wrap">
+        <div class="card"><div class="kicker">Наглядная схема</div><h2 class="section-title">Полный поток от файлов ПО до оповещения пользователей</h2></div>
+        <div class="visual-box"><div class="visual-placeholder">Рисунок 4: технология композиционного анализа программного обеспечения</div></div>
+        <div class="visual-caption">На схеме видно внутреннее представление анализируемого ПО, идентификацию заимствований, построение ППК, обогащение информацией об уязвимостях и дальнейшее оповещение.</div>
+      </div>
+      <div class="slide-num">11</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Раздел 7</div><div class="sub">Требования к инструменту композиционного анализа</div></div></div>
+        <div class="tag">Функции инструмента</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Обязательные возможности</div>
+          <ul class="clean">
+            <li>формирование, импорт и экспорт ППК в открытом машиночитаемом формате;</li>
+            <li>автоматическое обогащение ППК сведениями об уязвимостях и лицензиях;</li>
+            <li>анализ манифестов систем управления компонентами;</li>
+            <li>анализ контейнерных образов для контейнерного ПО;</li>
+            <li>формирование отчётов и журналирование выполненных операций;</li>
+            <li>уведомление о завершении и результатах анализа.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Рекомендуемые возможности</div>
+          <ul class="clean">
+            <li>поддержка электронной почты и других каналов оповещения;</li>
+            <li>наличие API для встраивания в процессы разработки и CI/CD;</li>
+            <li>загрузка и анализ уже готовых ППК;</li>
+            <li>автоматическое построение ППК по доступным репозиториям разработки;</li>
+            <li>получение сведений из БДУ, NVD, OSV, OSSIndex, GHSA и иных баз.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="slide-num">12</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Раздел 8</div><div class="sub">Требования к перечню программных компонентов</div></div></div>
+        <div class="tag">ППК / SBOM</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Что должно быть в ППК</div>
+          <ul class="clean">
+            <li>актуальный состав компонентов и их версии;</li>
+            <li>возможность однозначной идентификации компонента, включая PURL или аналог;</li>
+            <li>сведения о лицензиях и хэш-кодах компонентов;</li>
+            <li>отметки об уязвимостях и иных нежелательных особенностях;</li>
+            <li>сопровождение каждой выпускаемой версии ПО собственным ППК.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Формат представления</div>
+          <p class="lead">Проект стандарта ориентирует разработчика на машиночитаемый формат по спецификации CycloneDX в нотации JSON. Это позволяет использовать ППК не как статичную таблицу, а как рабочий артефакт процессов CI/CD, контроля поставки и анализа уязвимостей.</p>
+          <div class="meta">
+            <div class="pill">CycloneDX</div>
+            <div class="pill">JSON</div>
+            <div class="pill">PURL</div>
+            <div class="pill">SPDX</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-num">13</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Приложение А</div><div class="sub">Минимальное содержимое перечня программных компонентов</div></div></div>
+        <div class="tag">Приложения стандарта</div>
+      </div>
+      <div class="content visual-wrap">
+        <div class="card"><div class="kicker">Формат ППК</div><h2 class="section-title">Таблица с минимальным набором полей</h2></div>
+        <div class="visual-box"><div class="visual-placeholder">Таблица 1: минимальное содержимое перечня программных компонентов</div></div>
+        <div class="visual-caption">Для объяснения студентам удобно выделить логику полей: идентификация самого компонента, идентификация автора, идентификация автора ППК и фиксация времени формирования перечня.</div>
+      </div>
+      <div class="slide-num">14</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Приложение Б</div><div class="sub">Состав данных описания модели машинного обучения</div></div></div>
+        <div class="tag">Приложения стандарта</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card">
+          <div class="kicker">Таблица Б.1 и Б.2</div>
+          <ul class="clean">
+            <li>название, версия и тип модели;</li>
+            <li>разработчик и лицензия;</li>
+            <li>привлекаемые компоненты и источник получения;</li>
+            <li>ссылки на документацию и цифровая подпись описания;</li>
+            <li>архитектура модели, семейство архитектур, наборы данных;</li>
+            <li>аппаратное и программное обеспечение для тренировки и исполнения;</li>
+            <li>типы входных и выходных данных;</li>
+            <li>требования к дополнительному ПО.</li>
+          </ul>
+        </div>
+        <div class="card">
+          <div class="kicker">Таблица Б.3</div>
+          <h2 class="section-title">Как модель должна использоваться</h2>
+          <ul class="clean">
+            <li>назначение модели;</li>
+            <li>сценарии использования вне основной сферы применения;</li>
+            <li>сценарии неправильного или вредоносного использования.</li>
+          </ul>
+          <p class="quote">Это приложение особенно важно для современного ПО, где модели машинного обучения становятся частью поставляемого продукта и тоже должны быть учтены в ППК.</p>
+        </div>
+      </div>
+      <div class="slide-num">15</div>
+    </section>
+
+    <section class="slide">
+      <div class="topbar">
+        <div class="brand"><span class="brand-mark" aria-label="МАИ">МАИ</span><div><div class="uni">Контактная информация</div><div class="sub">Завершающий слайд</div></div></div>
+        <div class="tag">Преподаватель</div>
+      </div>
+      <div class="content columns-2">
+        <div class="card contact-block">
+          <div class="kicker">Пиков Виталий Александрович</div>
+          <h2 class="section-title">Эксперт в области ИТ и информационной безопасности</h2>
+          <p><strong>Общий стаж работы:</strong> более 26 лет</p>
+          <p><strong>Стаж преподавательской работы:</strong> более 10 лет</p>
+          <p>Автор более 40 научных публикаций, участник и спикер отраслевых мероприятий, авторизованный преподаватель по продуктам «Группы Астра».</p>
+          <p><strong>Telegram:</strong> @UnderLineSecurity</p>
+          <p><strong>Сайт:</strong> https://mascom-uc.ru/</p>
+        </div>
+        <div class="card center">
+          <div>
+            <div class="kicker">Спасибо за внимание</div>
+            <h2 class="section-title">Вопросы по теме КАПО?</h2>
+            <p class="lead">На занятии можно дополнительно обсудить различия между КАПО, SAST, контрольной сборкой, лицензированием OSS-компонентов, а также практику внедрения регламента композиционного анализа в организации.</p>
+            <p class="small-note">«Абсолютной безопасности не существует… Всё взламывается… Рано или поздно. По стоимости, времени или мотивации атакующего.»</p>
+          </div>
+        </div>
+      </div>
+      <div class="footer"><div class="hint">Финальный слайд сохранён с вашими контактными данными.</div><div></div></div>
+      <div class="slide-num">16</div>
+    </section>
+
+  </div>
+
+  <div class="controls">
+    <button class="btn" id="prevBtn" aria-label="Предыдущий слайд">←</button>
+    <button class="btn" id="nextBtn" aria-label="Следующий слайд">→</button>
+  </div>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll('.slide'));
+    const progress = document.getElementById('progress');
+    let current = 0;
+    function showSlide(index){
+      current = Math.max(0, Math.min(index, slides.length - 1));
+      slides.forEach((slide, i) => slide.classList.toggle('active', i === current));
+      progress.style.width = `${((current + 1) / slides.length) * 100}%`;
+    }
+    function nextSlide(){ showSlide(current + 1); }
+    function prevSlide(){ showSlide(current - 1); }
+    document.getElementById('nextBtn').addEventListener('click', nextSlide);
+    document.getElementById('prevBtn').addEventListener('click', prevSlide);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') nextSlide();
+      if (e.key === 'ArrowLeft' || e.key === 'PageUp') prevSlide();
+      if (e.key === 'Home') showSlide(0);
+      if (e.key === 'End') showSlide(slides.length - 1);
+    });
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.controls')) return;
+      if (e.clientX > window.innerWidth / 2) nextSlide(); else prevSlide();
+    });
+    showSlide(0);
+  </script>
+</body>
+</html>
+

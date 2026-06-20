@@ -1,0 +1,35 @@
+name: Site checks
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  smoke:
+    name: Smoke checks
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse project scripts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($script in @(
+            '_PROJECT/smoke-check.ps1',
+            '_PROJECT/update-site-control-files.ps1',
+            '_PROJECT/build-release.ps1',
+            '_PROJECT/hosting-check.ps1',
+            '_PROJECT/deploy-hosting.ps1'
+          )) {
+            [void][scriptblock]::Create((Get-Content -LiteralPath $script -Raw -Encoding UTF8))
+          }
+
+      - name: Run smoke check
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\smoke-check.ps1

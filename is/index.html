@@ -1,0 +1,1205 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Проектирование информационных систем | РосНОУ</title>
+  <meta name="description" content="Слайдовый лендинг для студентов дисциплины «Проектирование информационных систем»: что такое ИС, как проектировать, как выполнить курсовую на отлично.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --rosnou-blue: #0085ca;
+      --rosnou-deep: #00629b;
+      --rosnou-ink: #131821;
+      --white: #ffffff;
+      --soft: rgba(255, 255, 255, .82);
+      --line: rgba(255, 255, 255, .24);
+      --shadow: rgba(0, 38, 73, .24);
+      --accent-green: #37aa65;
+      --accent-gold: #f2a933;
+      --accent-red: #dc3b31;
+      --slide-pad: clamp(88px, 9vw, 128px);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      background: var(--rosnou-deep);
+    }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: "Montserrat", Helvetica, Arial, sans-serif;
+      color: var(--white);
+      background:
+        linear-gradient(135deg, rgba(0, 98, 155, .94), rgba(0, 133, 202, .88)),
+        var(--rosnou-blue);
+      letter-spacing: 0;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; }
+
+    .topbar {
+      position: fixed;
+      z-index: 30;
+      top: 0;
+      left: 0;
+      right: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 18px clamp(18px, 3vw, 44px);
+      background: linear-gradient(180deg, rgba(0, 62, 104, .82), rgba(0, 62, 104, .36) 62%, transparent);
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+      text-decoration: none;
+    }
+
+    .brand img {
+      width: 54px;
+      height: 54px;
+      object-fit: contain;
+      padding: 7px;
+      border-radius: 8px;
+      background: var(--white);
+      box-shadow: 0 10px 28px var(--shadow);
+    }
+
+    .brand span {
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.2;
+      text-transform: uppercase;
+      max-width: 230px;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav a,
+    .nav button {
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      color: var(--white);
+      background: rgba(255, 255, 255, .08);
+      cursor: pointer;
+      display: grid;
+      place-items: center;
+      text-decoration: none;
+      font: inherit;
+      font-weight: 800;
+      transition: transform .18s ease, background .18s ease;
+    }
+
+    .nav a:hover,
+    .nav button:hover {
+      transform: translateY(-2px);
+      background: rgba(255, 255, 255, .18);
+    }
+
+    .slides {
+      position: relative;
+    }
+
+    .slide {
+      min-height: 100vh;
+      position: relative;
+      display: grid;
+      align-items: center;
+      padding: var(--slide-pad) clamp(18px, 5vw, 78px) clamp(70px, 8vw, 110px);
+      border-bottom: 1px solid rgba(255, 255, 255, .14);
+      overflow: hidden;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.09) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 74px 74px;
+      mask-image: linear-gradient(120deg, rgba(0,0,0,.42), transparent 58%);
+    }
+
+    .slide:nth-child(2n) {
+      background: linear-gradient(135deg, rgba(0, 98, 155, .58), rgba(19, 24, 33, .18));
+    }
+
+    .slide-inner {
+      position: relative;
+      z-index: 1;
+      width: min(1180px, 100%);
+      margin: 0 auto;
+    }
+
+    .kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      min-height: 32px;
+      padding: 6px 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .08);
+      color: var(--soft);
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .kicker::before {
+      content: "";
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-gold);
+      box-shadow: 0 0 0 5px rgba(242, 169, 51, .18);
+    }
+
+    h1,
+    h2,
+    h3,
+    p {
+      margin-top: 0;
+    }
+
+    h1 {
+      max-width: 700px;
+      margin-bottom: 24px;
+      font-size: clamp(42px, 5vw, 68px);
+      line-height: .98;
+      font-weight: 900;
+    }
+
+    h2 {
+      max-width: 940px;
+      margin-bottom: 26px;
+      font-size: clamp(31px, 4.6vw, 66px);
+      line-height: 1.04;
+      font-weight: 900;
+    }
+
+    h3 {
+      margin-bottom: 10px;
+      font-size: clamp(19px, 2vw, 28px);
+      line-height: 1.15;
+      font-weight: 800;
+    }
+
+    .lead {
+      max-width: 860px;
+      color: var(--soft);
+      font-size: clamp(18px, 2.1vw, 28px);
+      line-height: 1.45;
+      font-weight: 500;
+    }
+
+    .text {
+      color: var(--soft);
+      font-size: clamp(16px, 1.55vw, 20px);
+      line-height: 1.58;
+    }
+
+    .hero-grid,
+    .two-col {
+      display: grid;
+      grid-template-columns: minmax(0, .86fr) minmax(360px, .56fr);
+      gap: clamp(28px, 5vw, 72px);
+      align-items: center;
+    }
+
+    #slide-5 .two-col,
+    #slide-10 .two-col {
+      width: min(1500px, 100%);
+      grid-template-columns: minmax(0, 1fr) minmax(590px, .72fr);
+    }
+
+    .contact-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 30px;
+      color: var(--white);
+    }
+
+    .contact-strip a,
+    .contact-strip span {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .1);
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .visual-panel {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(18px, 3vw, 32px);
+      background: rgba(255, 255, 255, .1);
+      box-shadow: 0 28px 70px var(--shadow);
+    }
+
+    .system-formula {
+      display: grid;
+      gap: 14px;
+    }
+
+    .formula-item {
+      min-height: 76px;
+      display: grid;
+      grid-template-columns: 46px 1fr;
+      align-items: center;
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .formula-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      color: var(--rosnou-deep);
+      background: var(--white);
+      font-size: 22px;
+      font-weight: 900;
+    }
+
+    .formula-item strong {
+      display: block;
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .formula-item span {
+      display: block;
+      color: var(--soft);
+      line-height: 1.38;
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      gap: 16px;
+    }
+
+    .grid.cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.cols-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .item,
+    .step,
+    .mistake,
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: clamp(16px, 2.2vw, 24px);
+      background: rgba(255, 255, 255, .1);
+      box-shadow: 0 16px 36px rgba(0, 38, 73, .14);
+    }
+
+    .item p,
+    .step p,
+    .mistake p,
+    .metric p {
+      margin-bottom: 0;
+      color: var(--soft);
+      line-height: 1.5;
+    }
+
+    .tag {
+      display: inline-flex;
+      margin-bottom: 16px;
+      padding: 6px 9px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .18);
+      color: var(--white);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .accent {
+      color: #ffffff;
+      text-shadow: 0 3px 22px rgba(0, 42, 78, .26);
+    }
+
+    .route {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+
+    .route .step {
+      position: relative;
+      min-height: 174px;
+    }
+
+    .route h3 {
+      font-size: clamp(22px, 1.7vw, 28px);
+      line-height: 1.18;
+      overflow-wrap: normal;
+      hyphens: manual;
+    }
+
+    .step-number {
+      display: inline-grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      margin-bottom: 18px;
+      border-radius: 8px;
+      color: var(--rosnou-deep);
+      background: var(--white);
+      font-weight: 900;
+    }
+
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .1);
+    }
+
+    .table th,
+    .table td {
+      padding: 15px 16px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      line-height: 1.45;
+    }
+
+    .table th {
+      color: var(--white);
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .table td {
+      color: var(--soft);
+    }
+
+    .diagram {
+      min-height: 380px;
+      display: grid;
+      gap: 14px;
+      align-content: center;
+    }
+
+    .node-row {
+      display: grid;
+      grid-template-columns: minmax(145px, 1fr) minmax(150px, .72fr) minmax(145px, 1fr);
+      gap: 14px;
+      align-items: center;
+    }
+
+    .node,
+    .relation {
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.12);
+      padding: 14px;
+      text-align: center;
+      font-weight: 800;
+      min-height: 66px;
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      font-size: clamp(15px, 1.05vw, 18px);
+      line-height: 1.18;
+      overflow-wrap: normal;
+    }
+
+    .relation {
+      border-radius: 8px;
+      min-width: 150px;
+      min-height: 54px;
+      color: var(--rosnou-deep);
+      background: var(--white);
+      font-size: 14px;
+      line-height: 1.12;
+      white-space: nowrap;
+    }
+
+    .checklist {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .check {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.09);
+      color: var(--soft);
+      line-height: 1.42;
+    }
+
+    .check::before {
+      content: "✓";
+      display: grid;
+      place-items: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      color: var(--white);
+      background: var(--accent-green);
+      font-weight: 900;
+    }
+
+    .danger::before {
+      content: "!";
+      background: var(--accent-red);
+    }
+
+    .quote {
+      max-width: 900px;
+      padding-left: 24px;
+      border-left: 5px solid var(--white);
+      color: var(--soft);
+      font-size: clamp(22px, 3vw, 42px);
+      line-height: 1.25;
+      font-weight: 700;
+    }
+
+    .contact-card {
+      display: grid;
+      gap: 18px;
+      max-width: 820px;
+      margin-top: 28px;
+      padding: clamp(20px, 3vw, 34px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, .12);
+      box-shadow: 0 30px 80px var(--shadow);
+    }
+
+    .contact-card .name {
+      font-size: clamp(30px, 4vw, 56px);
+      line-height: 1.05;
+      font-weight: 900;
+    }
+
+    .contact-card a {
+      width: fit-content;
+      min-height: 44px;
+      padding: 12px 14px;
+      border-radius: 8px;
+      color: var(--rosnou-deep);
+      background: var(--white);
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .slide-number {
+      position: absolute;
+      z-index: 3;
+      left: clamp(18px, 3vw, 44px);
+      bottom: 22px;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .slide-title-small {
+      position: absolute;
+      z-index: 3;
+      right: clamp(18px, 3vw, 44px);
+      bottom: 22px;
+      max-width: min(540px, 50vw);
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .progress {
+      position: fixed;
+      z-index: 40;
+      left: 0;
+      top: 0;
+      height: 4px;
+      width: 0;
+      background: var(--white);
+      box-shadow: 0 0 18px rgba(255,255,255,.72);
+    }
+
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 28px;
+    }
+
+    .toc a {
+      padding: 9px 11px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.1);
+      color: var(--soft);
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .footer-note {
+      color: rgba(255,255,255,.7);
+      font-size: 13px;
+      line-height: 1.5;
+      margin-top: 28px;
+    }
+
+    @media (max-width: 980px) {
+      .hero-grid,
+      .two-col,
+      .grid.cols-2,
+      .grid.cols-3,
+      .grid.cols-4,
+      .route,
+      .checklist {
+        grid-template-columns: 1fr;
+      }
+
+      .route .step {
+        min-height: auto;
+      }
+
+      .brand span {
+        display: none;
+      }
+
+      .slide-title-small {
+        display: none;
+      }
+
+      .nav a {
+        display: none;
+      }
+    }
+
+    @media (max-width: 620px) {
+      :root { --slide-pad: 92px; }
+
+      .topbar {
+        padding: 14px 14px;
+      }
+
+      .brand img {
+        width: 46px;
+        height: 46px;
+      }
+
+      .slide {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      h1 {
+        max-width: 100%;
+        font-size: 32px;
+        line-height: 1.06;
+        overflow-wrap: normal;
+      }
+
+      h2 {
+        font-size: 30px;
+        overflow-wrap: anywhere;
+      }
+
+      .lead {
+        font-size: 18px;
+        overflow-wrap: anywhere;
+      }
+
+      .contact-strip a,
+      .contact-strip span {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+
+      .visual-panel,
+      .item,
+      .step,
+      .mistake,
+      .metric,
+      .contact-card {
+        padding: 16px;
+      }
+
+      .node-row {
+        grid-template-columns: 1fr;
+      }
+
+      #slide-5 .two-col,
+      #slide-10 .two-col {
+        grid-template-columns: 1fr;
+      }
+
+      .relation {
+        width: 66px;
+        margin: 0 auto;
+      }
+
+      .table {
+        display: block;
+        overflow-x: auto;
+      }
+    }
+
+    @media print {
+      .topbar,
+      .progress,
+      .nav { display: none; }
+
+      .slide {
+        min-height: 100vh;
+        break-after: page;
+        background: var(--rosnou-blue) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#slide-1" aria-label="На титульный слайд">
+      <img src="logo/Логотип-02.svg" alt="Логотип РосНОУ">
+      <span>Российский новый университет</span>
+    </a>
+    <nav class="nav" aria-label="Навигация по слайдам">
+      <button type="button" id="prevSlide" aria-label="Предыдущий слайд">↑</button>
+      <button type="button" id="nextSlide" aria-label="Следующий слайд">↓</button>
+      <a href="#slide-18" aria-label="Контакты">✉</a>
+    </nav>
+  </header>
+
+  <main class="slides">
+    <section class="slide" id="slide-1">
+      <div class="slide-inner hero-grid">
+        <div>
+          <span class="kicker">Дисциплина РосНОУ</span>
+          <h1>Проектирование информационных систем</h1>
+          <p class="lead">Как понять предметную область, построить модель данных, связать её с пользователями и защитить курсовую на «отлично».</p>
+          <div class="contact-strip">
+            <span>Пиков Виталий Александрович</span>
+            <a href="https://t.me/UnderLineSecurity">Telegram: @UnderLineSecurity</a>
+          </div>
+        </div>
+        <div class="visual-panel system-formula" aria-label="Формула информационной системы">
+          <div class="formula-item">
+            <div class="formula-icon">И</div>
+            <div><strong>Информация</strong><span>данные, документы, сообщения, сведения</span></div>
+          </div>
+          <div class="formula-item">
+            <div class="formula-icon">ПО</div>
+            <div><strong>Технологии</strong><span>приложение, СУБД, запросы, интерфейсы</span></div>
+          </div>
+          <div class="formula-item">
+            <div class="formula-icon">Т</div>
+            <div><strong>Технические средства</strong><span>рабочие места, серверы, сеть, устройства</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 01 / 18</div>
+      <div class="slide-title-small">Титульная страница и контакты</div>
+    </section>
+
+    <section class="slide" id="slide-2">
+      <div class="slide-inner">
+        <span class="kicker">Навигация</span>
+        <h2>Что вы найдёте в этом лендинге</h2>
+        <p class="lead">Это не просто памятка. Это маршрут выполнения курсовой: от выбора объекта до проверки интерфейса и защиты логики проекта.</p>
+        <div class="toc">
+          <a href="#slide-3">Что такое ИС</a>
+          <a href="#slide-5">Границы системы</a>
+          <a href="#slide-6">Этапы курсовой</a>
+          <a href="#slide-8">Сущности и атрибуты</a>
+          <a href="#slide-10">ER-диаграмма</a>
+          <a href="#slide-12">Транзакции</a>
+          <a href="#slide-16">Оценка «отлично»</a>
+          <a href="#slide-18">Контакты</a>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 02 / 18</div>
+      <div class="slide-title-small">Карта материала</div>
+    </section>
+
+    <section class="slide" id="slide-3">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Базовое определение</span>
+          <h2>Информационная система больше, чем база данных</h2>
+          <p class="lead">В курсовой проектируется система, а не отдельная таблица и не набор экранов. База данных является важной частью, но она не заменяет систему целиком.</p>
+        </div>
+        <div class="visual-panel">
+          <div class="quote">ИС = информация + программные технологии + технические средства</div>
+          <p class="text" style="margin-top:24px;">Если в работе есть только таблицы, но нет функций, пользователей, транзакций и интерфейса, это ещё не проектирование информационной системы.</p>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 03 / 18</div>
+      <div class="slide-title-small">Смысл ИС</div>
+    </section>
+
+    <section class="slide" id="slide-4">
+      <div class="slide-inner">
+        <span class="kicker">Точка старта</span>
+        <h2>Сначала объект и функция</h2>
+        <p class="lead">Хорошая работа начинается с ясного ответа: что автоматизируем и для какой функции проектируем систему.</p>
+        <div class="grid cols-3">
+          <article class="item">
+            <span class="tag">Объект</span>
+            <h3>Где работает система</h3>
+            <p>Организация, подразделение, процесс, участок деятельности: автосервис, библиотека, склад, учебный отдел, клиника.</p>
+          </article>
+          <article class="item">
+            <span class="tag">Функция</span>
+            <h3>Что система помогает делать</h3>
+            <p>Запись клиента, учёт заказов, выдача документов, обработка заявок, контроль оплаты, планирование расписания.</p>
+          </article>
+          <article class="item">
+            <span class="tag">Результат</span>
+            <h3>Что должно измениться</h3>
+            <p>Пользователь быстрее получает данные, меньше ошибается, видит историю операций и формирует нужные документы.</p>
+          </article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 04 / 18</div>
+      <div class="slide-title-small">Объект и функция</div>
+    </section>
+
+    <section class="slide" id="slide-5">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Границы ответственности</span>
+          <h2>Граница ИС проходит по точке контроля</h2>
+          <p class="lead">Внутри границы находится то, чем проектируемая система реально управляет. Внешние сервисы, облака, сети и чужие системы описываются как окружение.</p>
+        </div>
+        <div class="visual-panel diagram">
+          <div class="node-row">
+            <div class="node">Пользователь</div>
+            <div class="relation">ввод</div>
+            <div class="node">Интерфейс ИС</div>
+          </div>
+          <div class="node-row">
+            <div class="node">Приложение</div>
+            <div class="relation">SQL</div>
+            <div class="node">База данных</div>
+          </div>
+          <div class="node-row">
+            <div class="node">Рабочее место</div>
+            <div class="relation">сеть</div>
+            <div class="node">Внешние ресурсы</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 05 / 18</div>
+      <div class="slide-title-small">Границы системы</div>
+    </section>
+
+    <section class="slide" id="slide-6">
+      <div class="slide-inner">
+        <span class="kicker">Маршрут курсовой</span>
+        <h2>Пять связанных этапов проектирования</h2>
+        <div class="route">
+          <article class="step">
+            <div class="step-number">1</div>
+            <h3>Предметная область</h3>
+            <p>Описать процесс, документы, правила, пользователей, объект и функцию.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">2</div>
+            <h3>Концептуальная модель</h3>
+            <p>Выделить сущности, атрибуты, ключи, домены и связи.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">3</div>
+            <h3>ER-диаграмма</h3>
+            <p>Построить первую модель в ERwin, затем провести анализ и улучшить её.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">4</div>
+            <h3>Физическая БД</h3>
+            <p>Выбрать режим Logical/Physical, целевую СУБД, задать типы данных и показать реальную структуру.</p>
+          </article>
+          <article class="step">
+            <div class="step-number">3-5</div>
+            <h3>Интерфейс</h3>
+            <p>Проектировать параллельно с БД: экранные поля, транзакции и атрибуты должны постоянно сверяться.</p>
+          </article>
+        </div>
+        <p class="footer-note">Интерфейс не откладывается «на потом»: он помогает проверить, хватает ли в модели данных для пользовательских сценариев.</p>
+      </div>
+      <div class="slide-number">Слайд 06 / 18</div>
+      <div class="slide-title-small">Этапы работы</div>
+    </section>
+
+    <section class="slide" id="slide-7">
+      <div class="slide-inner">
+        <span class="kicker">Описание предметной области</span>
+        <h2>Это деловая картина процесса, а не формальная страница</h2>
+        <p class="lead">Нужно показать, как сейчас выполняется функция, кто участвует, какие документы входят в процесс и какие документы появляются на выходе.</p>
+        <div class="grid cols-4">
+          <article class="item"><h3>Процесс</h3><p>Что происходит по шагам и почему именно так.</p></article>
+          <article class="item"><h3>Правила</h3><p>Ограничения, условия, исключения, бизнес-логика.</p></article>
+          <article class="item"><h3>Документы</h3><p>Входные формы, выходные отчёты, примеры реквизитов.</p></article>
+          <article class="item"><h3>Пользователи</h3><p>Роли, которые выполняют действия в системе.</p></article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 07 / 18</div>
+      <div class="slide-title-small">Предметная область</div>
+    </section>
+
+    <section class="slide" id="slide-8">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Сущности</span>
+          <h2>Как выделить сущности из текста</h2>
+          <p class="lead">Методика простая: выписываем существительные и устойчивые словосочетания, затем проверяем их двумя вопросами.</p>
+        </div>
+        <div class="visual-panel">
+          <table class="table">
+            <thead>
+              <tr><th>Вопрос</th><th>Решение</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Важно ли это для выбранной функции?</td><td>Если нет, не включаем в модель.</td></tr>
+              <tr><td>Есть ли собственные атрибуты?</td><td>Если да, это кандидат в сущность.</td></tr>
+              <tr><td>Можно ли хранить экземпляры?</td><td>Если да, сущность должна быть описана.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 08 / 18</div>
+      <div class="slide-title-small">Выделение сущностей</div>
+    </section>
+
+    <section class="slide" id="slide-9">
+      <div class="slide-inner">
+        <span class="kicker">Атрибуты, ключи, домены</span>
+        <h2>Каждая сущность должна быть описана строго</h2>
+        <div class="grid cols-3">
+          <article class="item">
+            <span class="tag">Атрибут</span>
+            <h3>Свойство сущности</h3>
+            <p>Берётся из описания процесса, реквизитов документов и данных, нужных пользователю.</p>
+          </article>
+          <article class="item">
+            <span class="tag">Ключ</span>
+            <h3>Однозначная идентификация</h3>
+            <p>Первичный ключ должен быть уникальным, минимальным, устойчивым и удобным для работы.</p>
+          </article>
+          <article class="item">
+            <span class="tag">Домен</span>
+            <h3>Допустимые значения</h3>
+            <p>Тип, размер, диапазон, перечисление, значение по умолчанию или понятное ограничение.</p>
+          </article>
+        </div>
+        <div class="checklist">
+          <div class="check">ФИО обычно плохой первичный ключ: совпадения возможны.</div>
+          <div class="check">Составной ключ допустим, но только когда он действительно нужен.</div>
+          <div class="check">Производные атрибуты нужно отметить и проанализировать.</div>
+          <div class="check">Многозначные атрибуты нельзя оставлять без преобразования.</div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 09 / 18</div>
+      <div class="slide-title-small">Описание данных</div>
+    </section>
+
+    <section class="slide" id="slide-10">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Связи</span>
+          <h2>Связь должна иметь смысл для выбранной функции</h2>
+          <p class="lead">Недостаточно соединить сущности линиями. Нужно назвать связь глаголом, определить кардинальность, степень участия и объяснить их бизнес-правилом.</p>
+        </div>
+        <div class="visual-panel diagram">
+          <div class="node-row">
+            <div class="node">Клиент</div>
+            <div class="relation">заказывает</div>
+            <div class="node">Услуга</div>
+          </div>
+          <div class="node-row">
+            <div class="node">Накладная</div>
+            <div class="relation">содержит</div>
+            <div class="node">Материал</div>
+          </div>
+          <div class="node-row">
+            <div class="node">Мастер</div>
+            <div class="relation">выполняет</div>
+            <div class="node">Ремонт</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 10 / 18</div>
+      <div class="slide-title-small">Связи, кардинальность и степень участия</div>
+    </section>
+
+    <section class="slide" id="slide-11">
+      <div class="slide-inner">
+        <span class="kicker">Анализ ER-диаграммы</span>
+        <h2>Первая диаграмма может быть сырой. Итоговая должна быть обоснованной</h2>
+        <div class="grid cols-3">
+          <article class="mistake">
+            <span class="tag">Проверить</span>
+            <h3>M:N</h3>
+            <p>Связь многие-ко-многим напрямую не оставляют. Её раскрывают через ассоциативную сущность.</p>
+          </article>
+          <article class="mistake">
+            <span class="tag">Удалить или объяснить</span>
+            <h3>1:1</h3>
+            <p>Подозрительные связи один-к-одному требуют проверки: возможно, сущности надо объединить.</p>
+          </article>
+          <article class="mistake">
+            <span class="tag">Проанализировать</span>
+            <h3>Лишние связи</h3>
+            <p>Если связь не нужна для функции и транзакций, она создаёт шум и снижает качество модели.</p>
+          </article>
+        </div>
+        <div class="checklist">
+          <div class="check">Многозначные атрибуты преобразованы.</div>
+          <div class="check">Производные атрибуты не ломают модель.</div>
+          <div class="check">Рекурсивные связи осмыслены или убраны.</div>
+          <div class="check">Итоговая ER-диаграмма отличается от первой.</div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 11 / 18</div>
+      <div class="slide-title-small">Анализ модели</div>
+    </section>
+
+    <section class="slide" id="slide-12">
+      <div class="slide-inner">
+        <span class="kicker">Нормализация</span>
+        <h2>До 3НФ: меньше дублей, меньше логических ошибок</h2>
+        <div class="grid cols-3">
+          <article class="metric">
+            <span class="tag">1НФ</span>
+            <h3>Атомарные значения</h3>
+            <p>В ячейке одно значение, нет списков внутри одного поля.</p>
+          </article>
+          <article class="metric">
+            <span class="tag">2НФ</span>
+            <h3>Зависимость от ключа</h3>
+            <p>Неключевые атрибуты зависят от полного первичного ключа.</p>
+          </article>
+          <article class="metric">
+            <span class="tag">3НФ</span>
+            <h3>Нет транзитивных зависимостей</h3>
+            <p>Атрибуты не должны зависеть от других неключевых атрибутов.</p>
+          </article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 12 / 18</div>
+      <div class="slide-title-small">Нормализация</div>
+    </section>
+
+    <section class="slide" id="slide-13">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Пользователи</span>
+          <h2>Роли описываются по функциям, а не только по должностям</h2>
+          <p class="lead">В курсовой важно показать, кто работает с системой и какие действия выполняет с данными.</p>
+        </div>
+        <div class="visual-panel">
+          <table class="table">
+            <thead>
+              <tr><th>Неудачно</th><th>Лучше</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Сотрудник</td><td>Оператор заявок</td></tr>
+              <tr><td>Менеджер</td><td>Пользователь, который оформляет заказ</td></tr>
+              <tr><td>Администратор</td><td>Пользователь, который ведёт справочники</td></tr>
+              <tr><td>Директор</td><td>Пользователь, который получает отчёты</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 13 / 18</div>
+      <div class="slide-title-small">Роли пользователей</div>
+    </section>
+
+    <section class="slide" id="slide-14">
+      <div class="slide-inner">
+        <span class="kicker">Транзакции</span>
+        <h2>Транзакция показывает, что база поддерживает реальные действия</h2>
+        <p class="lead">Список транзакций связывает модель данных с функцией системы. Хороший ориентир: 20-30 операций, из них около 10 подробно показать на модели или в реализации.</p>
+        <div class="grid cols-2">
+          <article class="item">
+            <h3>Примеры транзакций</h3>
+            <p>Найти клиента по ФИО и телефону. Показать все заказы клиента. Узнать стоимость услуги. Сформировать накладную. Показать материалы по услуге.</p>
+          </article>
+          <article class="item">
+            <h3>Проверка транзакций</h3>
+            <p>Для каждой операции должно хватать сущностей, атрибутов и связей. Если запрос невозможен, модель нужно исправлять.</p>
+          </article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 14 / 18</div>
+      <div class="slide-title-small">Транзакции</div>
+    </section>
+
+    <section class="slide" id="slide-15">
+      <div class="slide-inner two-col">
+        <div>
+          <span class="kicker">Интерфейс</span>
+          <h2>Поля интерфейса должны совпадать с атрибутами БД</h2>
+          <p class="lead">Макет интерфейса нужен не для красоты, а для проверки: пользовательская форма должна работать на данных, которые действительно есть в модели.</p>
+        </div>
+        <div class="visual-panel">
+          <div class="checklist" style="grid-template-columns:1fr;">
+            <div class="check">Если поле есть на форме, оно должно существовать в БД или вычисляться по понятному правилу.</div>
+            <div class="check">Если атрибут важен для функции, он должен использоваться в интерфейсе или транзакциях.</div>
+            <div class="check">Кнопки и элементы управления нужно описать: что делает каждый элемент.</div>
+            <div class="check">Алгоритм решения должен быть понятен: например, как считается итоговая сумма.</div>
+          </div>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 15 / 18</div>
+      <div class="slide-title-small">Проектирование интерфейса</div>
+    </section>
+
+    <section class="slide" id="slide-16">
+      <div class="slide-inner">
+        <span class="kicker">Оценка «отлично»</span>
+        <h2>Сильная курсовая доказывает логику проекта</h2>
+        <div class="grid cols-2">
+          <article class="item">
+            <h3>Что обязательно</h3>
+            <div class="checklist" style="grid-template-columns:1fr;">
+              <div class="check">Подробно описана предметная область.</div>
+              <div class="check">Есть список сущностей, атрибутов, ключей и доменов.</div>
+              <div class="check">Есть первая и итоговая ER-диаграмма в ERwin.</div>
+              <div class="check">Есть анализ модели и нормализация до 3НФ.</div>
+              <div class="check">Создана реальная БД в выбранной СУБД, есть скриншоты структуры.</div>
+              <div class="check">Сформирован список транзакций, связанных с функцией системы.</div>
+              <div class="check">Интерфейс соответствует БД: поля формы связаны с атрибутами и транзакциями.</div>
+            </div>
+          </article>
+          <article class="item">
+            <h3>Что усиливает работу</h3>
+            <div class="checklist" style="grid-template-columns:1fr;">
+              <div class="check">Есть подробный анализ транзакций на логическом и физическом этапах.</div>
+              <div class="check">Прототип или код как дополнительный плюс.</div>
+              <div class="check">Выводы написаны собственной логикой, а не как набор формальных фраз.</div>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 16 / 18</div>
+      <div class="slide-title-small">Как получить отлично</div>
+    </section>
+
+    <section class="slide" id="slide-17">
+      <div class="slide-inner">
+        <span class="kicker">Типовые ошибки</span>
+        <h2>Что чаще всего снижает оценку</h2>
+        <div class="grid cols-3">
+          <article class="mistake"><h3>Нет объекта и функции</h3><p>Тема есть, а что именно автоматизируется и зачем, не ясно.</p></article>
+          <article class="mistake"><h3>Только база данных</h3><p>Нет пользователей, транзакций, интерфейса и границ системы.</p></article>
+          <article class="mistake"><h3>Нет анализа ER</h3><p>Диаграмма сразу «идеальная», без проверки связей и атрибутов.</p></article>
+          <article class="mistake"><h3>M:N напрямую</h3><p>Не введена ассоциативная сущность для раскрытия связи.</p></article>
+          <article class="mistake"><h3>Интерфейс фантазийный</h3><p>Поля формы не совпадают с атрибутами базы данных.</p></article>
+          <article class="mistake"><h3>Нет транзакций</h3><p>Невозможно доказать, что модель поддерживает реальные действия.</p></article>
+        </div>
+      </div>
+      <div class="slide-number">Слайд 17 / 18</div>
+      <div class="slide-title-small">Ошибки</div>
+    </section>
+
+    <section class="slide" id="slide-18">
+      <div class="slide-inner">
+        <span class="kicker">Контакты преподавателя</span>
+        <h2>Вопросы по теме курсовой задавайте заранее</h2>
+        <p class="lead">Чем раньше вы покажете объект, функцию, первую модель и список транзакций, тем проще исправить проект до защиты.</p>
+        <div class="contact-card">
+          <div class="name">Пиков Виталий Александрович</div>
+          <p class="text">Заслуженный доцент Российского нового университета. Преподаватель дисциплин в области информационных систем, информационных технологий и информационной безопасности.</p>
+          <a href="https://t.me/UnderLineSecurity">Telegram: @UnderLineSecurity</a>
+        </div>
+        <p class="footer-note">Фирменные элементы: логотип и палитра РосНОУ. Материалы: конспект занятия, методические указания к курсовому проекту и чек-лист проверки курсовой.</p>
+      </div>
+      <div class="slide-number">Слайд 18 / 18</div>
+      <div class="slide-title-small">Финальный слайд</div>
+    </section>
+  </main>
+
+  <script>
+    const slides = Array.from(document.querySelectorAll(".slide"));
+    const progress = document.getElementById("progress");
+    const prevButton = document.getElementById("prevSlide");
+    const nextButton = document.getElementById("nextSlide");
+
+    function currentIndex() {
+      const middle = window.scrollY + window.innerHeight / 2;
+      let index = 0;
+      slides.forEach((slide, i) => {
+        if (slide.offsetTop <= middle) index = i;
+      });
+      return index;
+    }
+
+    function goToSlide(delta) {
+      const index = Math.min(Math.max(currentIndex() + delta, 0), slides.length - 1);
+      slides[index].scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+
+    function updateProgress() {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const value = max > 0 ? (window.scrollY / max) * 100 : 0;
+      progress.style.width = value + "%";
+    }
+
+    prevButton.addEventListener("click", () => goToSlide(-1));
+    nextButton.addEventListener("click", () => goToSlide(1));
+    window.addEventListener("scroll", updateProgress, { passive: true });
+    window.addEventListener("resize", updateProgress);
+    window.addEventListener("keydown", (event) => {
+      if (event.key === "ArrowDown" || event.key === "PageDown") {
+        event.preventDefault();
+        goToSlide(1);
+      }
+      if (event.key === "ArrowUp" || event.key === "PageUp") {
+        event.preventDefault();
+        goToSlide(-1);
+      }
+      if (event.key === "Home") slides[0].scrollIntoView({ behavior: "smooth" });
+      if (event.key === "End") slides[slides.length - 1].scrollIntoView({ behavior: "smooth" });
+    });
+    updateProgress();
+  </script>
+</body>
+</html>

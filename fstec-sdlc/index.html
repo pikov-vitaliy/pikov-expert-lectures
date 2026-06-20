@@ -1,0 +1,2025 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>Подготовка изготовителя к сертификации процессов РБПО — лекция В.А. Пикова</title>
+<meta name="description" content="Авторская лекция по подготовке изготовителя средств защиты информации к сертификации процессов безопасной разработки ПО по ГОСТ Р 56939-2024 и Приказам ФСТЭК России №240 / №230. Методика УЦ МАСКОМ.">
+<meta name="author" content="Виталий Александрович Пиков">
+<link rel="canonical" href="https://fstec-sdlc.pikov.expert/">
+<meta property="og:title" content="Подготовка изготовителя к сертификации процессов РБПО (Приказы ФСТЭК №240/№230)">
+<meta property="og:description" content="Авторская лекция В.А. Пикова: дорожная карта сертификации, 25 регламентов по процессам 5.1-5.25 ГОСТ Р 56939-2024, проверка по IDEF0, безопасный компилятор C/C++, AppSec.Table.Top.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://fstec-sdlc.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2266%22 text-anchor=%22middle%22 font-family=%22Segoe UI, sans-serif%22 font-size=%2226%22 font-weight=%22700%22 fill=%22white%22>РБПО</text></svg>">
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .reading-progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: transparent; z-index: 110; pointer-events: none;
+  }
+  .reading-progress-bar {
+    height: 100%; background: var(--accent); width: 0%;
+    transition: width 0.1s ease-out;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container {
+    display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .brand-back {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--text-muted); font-size: 14px; font-weight: 500;
+    padding: 8px 14px; border-radius: 8px; transition: all 0.2s;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 8px; cursor: pointer; color: var(--text-muted);
+    display: inline-flex; align-items: center; transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+  .toc-toggle { display: none; }
+
+  .layout {
+    max-width: 1280px; margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 280px 1fr; gap: 56px; align-items: start;
+  }
+
+  .toc {
+    position: sticky; top: 84px; max-height: calc(100vh - 100px);
+    overflow-y: auto; padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border); padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-subtle); margin-bottom: 14px; padding-left: 14px;
+  }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex; align-items: baseline; gap: 10px; padding: 7px 14px;
+    border-radius: 6px; color: var(--text-muted); font-size: 13.5px; line-height: 1.4;
+    transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num {
+    font-variant-numeric: tabular-nums; font-size: 11px;
+    color: var(--text-subtle); font-weight: 600; flex-shrink: 0;
+  }
+  .toc-list a.active {
+    color: var(--accent); background: var(--accent-soft);
+    border-left-color: var(--accent); font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+
+  .content { max-width: 760px; padding: 32px 0 80px; }
+
+  .hero { padding: 32px 0 56px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 6px 12px; border-radius: 6px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px); font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55;
+    color: var(--text-muted); margin-bottom: 36px; max-width: 680px;
+  }
+  .hero-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; padding: 20px 24px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-subtle);
+  }
+  .hero-meta-value { font-size: 14.5px; color: var(--text); font-weight: 500; }
+
+  .section { padding: 56px 0 16px; scroll-margin-top: 80px; }
+  .section-eyebrow {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .section-eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--accent); }
+  .section-num { font-variant-numeric: tabular-nums; }
+  .section h2 {
+    font-size: clamp(28px, 3.4vw, 38px); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 20px; color: var(--text);
+  }
+  .section h3 {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+    line-height: 1.25; margin: 36px 0 14px; color: var(--text);
+  }
+  .section h4 {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.005em;
+    margin: 24px 0 10px; color: var(--text);
+  }
+  .section p { font-size: 17px; line-height: 1.7; margin-bottom: 18px; color: var(--text); }
+  .section p.lead {
+    font-size: 19px; line-height: 1.6; color: var(--text-muted); margin-bottom: 28px;
+  }
+  .section ul, .section ol { margin: 16px 0 24px 0; padding-left: 24px; }
+  .section ul li, .section ol li {
+    font-size: 17px; line-height: 1.65; margin-bottom: 10px; color: var(--text);
+  }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+
+  .section :not(pre) > code, .ic {
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.88em; padding: 2px 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text);
+  }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-softer);
+    padding: 18px 22px; margin: 24px 0; border-radius: 0 10px 10px 0;
+  }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%; border-collapse: collapse; font-size: 15px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  table.data th, table.data td {
+    text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data th {
+    font-weight: 600; color: var(--text-subtle); text-transform: uppercase;
+    letter-spacing: 0.04em; font-size: 12px; background: var(--surface-2);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td:first-child { font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  table.data .tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--accent-soft);
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+
+  pre.code {
+    margin: 20px 0; padding: 18px 20px;
+    background: var(--code-bg); border: 1px solid var(--code-border);
+    border-radius: 10px; overflow-x: auto;
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13.5px; line-height: 1.55; color: var(--text);
+  }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+  pre.code .hl { background: var(--warning-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+  pre.code .hl-bad { background: var(--danger-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 28px 0;
+  }
+  .col-card {
+    padding: 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+  .col-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .col-card-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent); flex-shrink: 0;
+  }
+  .col-card-icon svg { width: 20px; height: 20px; }
+  .col-card h3 { margin: 0; font-size: 18px; }
+  .col-card .col-en { font-size: 12px; color: var(--text-subtle); display: block; font-weight: 500; }
+  .col-card p { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  .col-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-tag {
+    font-size: 12px; font-weight: 500; padding: 4px 10px;
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: 6px; color: var(--text-muted);
+  }
+
+  .phases {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px; margin: 28px 0;
+  }
+  .phase {
+    padding: 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .phase-num {
+    font-size: 36px; font-weight: 700; color: var(--accent);
+    opacity: 0.3; line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums;
+  }
+  .phase h4 { font-size: 17px; margin: 0 0 10px; }
+  .phase ul { padding-left: 18px; margin: 0; }
+  .phase li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; color: var(--text-muted); }
+
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item {
+    border: 1px solid var(--border); border-radius: 12px;
+    background: var(--surface); overflow: hidden;
+  }
+  .acc-summary {
+    list-style: none; cursor: pointer; padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 16px; font-weight: 600; color: var(--text);
+    transition: background 0.2s; user-select: none;
+  }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .acc-summary-left > span:last-child { min-width: 0; }
+  .acc-tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 8px; background: var(--accent-soft); color: var(--accent);
+    border-radius: 5px; flex-shrink: 0;
+  }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body {
+    padding: 4px 22px 22px; border-top: 1px solid var(--border); margin-top: -1px;
+  }
+  .acc-body ol, .acc-body ul { margin: 14px 0 0; padding-left: 20px; }
+  .acc-body li {
+    font-size: 15.5px; margin-bottom: 8px; line-height: 1.55; color: var(--text);
+  }
+  .acc-body p {
+    font-size: 15.5px; line-height: 1.6; color: var(--text-muted); margin: 14px 0 0;
+  }
+  .acc-body p:first-child { margin-top: 14px; }
+  .acc-body strong { color: var(--text); }
+  .acc-body table.data { font-size: 14px; margin: 14px 0; }
+  .acc-body table.data th, .acc-body table.data td { padding: 8px 12px; }
+
+  .checklist {
+    list-style: none !important; padding-left: 0 !important; margin: 16px 0 24px !important;
+  }
+  .checklist li {
+    position: relative; padding: 10px 0 10px 32px;
+    font-size: 15.5px !important; line-height: 1.55 !important;
+    border-bottom: 1px solid var(--border); margin-bottom: 0 !important;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: ''; position: absolute; left: 0; top: 14px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--success-soft); border: 1.5px solid var(--success);
+  }
+  .checklist li::after {
+    content: ''; position: absolute; left: 5px; top: 19px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--success); border-bottom: 2px solid var(--success);
+    transform: rotate(-45deg);
+  }
+  .checklist li strong { color: var(--text); }
+  .checklist li code { font-size: 13px !important; }
+
+  .key-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin: 24px 0;
+  }
+  .key-stat {
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .key-stat-value {
+    font-size: 22px; font-weight: 700; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 4px; font-variant-numeric: tabular-nums;
+  }
+  .key-stat-label { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+
+  .props {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px; margin: 24px 0;
+  }
+  .prop {
+    padding: 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .prop-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: var(--accent-soft); color: var(--accent);
+    display: flex; align-items: center; justify-content: center; margin-bottom: 12px;
+  }
+  .prop-icon svg { width: 18px; height: 18px; }
+  .prop h4 { font-size: 15px; margin: 0 0 6px; }
+  .prop p { font-size: 13.5px !important; line-height: 1.5 !important; color: var(--text-muted); margin: 0 !important; }
+
+  /* Numbered ordered process */
+  .roadmap {
+    margin: 28px 0; display: flex; flex-direction: column; gap: 12px;
+  }
+  .roadmap-step {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    padding: 18px 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    align-items: start;
+  }
+  .roadmap-num {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--accent); color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .roadmap-content h4 { font-size: 16px; margin: 0 0 6px; }
+  .roadmap-content p { font-size: 14.5px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+  .roadmap-content .roadmap-meta {
+    margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap;
+  }
+  .roadmap-tag {
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    background: var(--surface-2); border: 1px solid var(--border-strong);
+    border-radius: 4px; color: var(--text-muted); letter-spacing: 0.04em;
+  }
+  .roadmap-tag.warn { background: var(--warning-soft); border-color: var(--warning); color: var(--warning); }
+  .roadmap-tag.success { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+
+  .timeline {
+    position: relative; margin: 36px 0; padding: 24px 0;
+  }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 2px; background: linear-gradient(90deg, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent);
+    z-index: 0;
+  }
+  .timeline-track {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px; position: relative; z-index: 1;
+  }
+  .timeline-item {
+    text-align: center; padding: 18px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .timeline-item::before {
+    content: ''; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .timeline-date { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 6px; }
+  .timeline-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; color: var(--text); }
+  .timeline-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+
+  .integrations { margin: 28px 0; }
+  .integrations h4 {
+    font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--text-subtle); margin: 24px 0 12px !important;
+  }
+  .integration-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px; margin-bottom: 8px;
+  }
+  .int-item {
+    padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 9px; font-size: 13.5px; font-weight: 500; color: var(--text);
+    text-align: center; transition: all 0.2s;
+  }
+  .int-item:hover {
+    border-color: var(--accent); color: var(--accent); transform: translateY(-1px);
+  }
+
+  .content-footer { margin-top: 80px; padding: 56px 0 0; border-top: 1px solid var(--border); }
+  .content-footer h2 {
+    font-size: clamp(26px, 3vw, 34px); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .content-footer p.lead { color: var(--text-muted); font-size: 17px; margin-bottom: 28px; }
+  .contact-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 20px; border-radius: 10px;
+    font-size: 15px; font-weight: 500;
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: var(--accent); color: #ffffff; box-shadow: var(--shadow-md); }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution {
+    margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-subtle); line-height: 1.6;
+  }
+  .attribution-row {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 10px;
+  }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  .back-to-top {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); color: #ffffff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; visibility: hidden; transform: translateY(8px);
+    transition: all 0.25s; z-index: 90;
+  }
+  .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 240px 1fr; gap: 36px; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc {
+      position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+      background: var(--bg); border-right: none; border-bottom: 1px solid var(--border);
+      padding: 20px 24px; transform: translateY(-100%);
+      transition: transform 0.25s ease-out; z-index: 99;
+      max-height: 100vh; overflow-y: auto;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .two-col { grid-template-columns: 1fr; }
+    .roadmap-step { grid-template-columns: 48px 1fr; gap: 12px; padding: 14px 16px; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    .integration-grid { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .card, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats, .integration-grid { grid-template-columns: 1fr; }
+    .hero-eyebrow { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .acc-item { page-break-inside: avoid; }
+    .acc-body { display: block !important; }
+    details { display: block !important; }
+    details > summary { list-style: none; }
+    details > *:not(summary) { display: block !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание лекции</div>
+    <ol class="toc-list">
+      <li><a href="#why" data-section="why"><span class="toc-num">01</span><span>Зачем эта методика и кому она нужна</span></a></li>
+      <li><a href="#npb" data-section="npb"><span class="toc-num">02</span><span>Нормативная база: 240, 230, 56939, 71206</span></a></li>
+      <li><a href="#roadmap" data-section="roadmap"><span class="toc-num">03</span><span>Дорожная карта сертификации</span></a></li>
+      <li><a href="#assessments" data-section="assessments"><span class="toc-num">04</span><span>Шесть направлений оценки (п. 19)</span></a></li>
+      <li><a href="#guide" data-section="guide"><span class="toc-num">05</span><span>Руководство по РБПО</span></a></li>
+      <li><a href="#regulations" data-section="regulations"><span class="toc-num">06</span><span>25 регламентов и планов (5.1-5.25)</span></a></li>
+      <li><a href="#matrix" data-section="matrix"><span class="toc-num">07</span><span>Матрица соответствия</span></a></li>
+      <li><a href="#tooling" data-section="tooling"><span class="toc-num">08</span><span>Анализ инструментария и систем</span></a></li>
+      <li><a href="#idef0" data-section="idef0"><span class="toc-num">09</span><span>Проверка процессов: модели Д/Ф/референтная</span></a></li>
+      <li><a href="#instr" data-section="instr"><span class="toc-num">10</span><span>Инструментальный контроль среды</span></a></li>
+      <li><a href="#compiler" data-section="compiler"><span class="toc-num">11</span><span>Безопасный компилятор C/C++ (71206)</span></a></li>
+      <li><a href="#people" data-section="people"><span class="toc-num">12</span><span>Анализ обеспеченности людьми</span></a></li>
+      <li><a href="#readiness" data-section="readiness"><span class="toc-num">13</span><span>Критерии готовности 5.X</span></a></li>
+      <li><a href="#additional" data-section="additional"><span class="toc-num">14</span><span>Дополнительные документы</span></a></li>
+      <li><a href="#caveats" data-section="caveats"><span class="toc-num">15</span><span>Подводные камни методики</span></a></li>
+      <li><a href="#tabletop" data-section="tabletop"><span class="toc-num">16</span><span>AppSec.Table.Top</span></a></li>
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">17</span><span>Связь</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Авторская лекция · РБПО · Сертификация ФСТЭК</span>
+      <h1>Подготовка изготовителя к сертификации процессов РБПО</h1>
+      <p class="hero-lead">Практическое руководство по подготовке к сертификации процессов безопасной разработки программного обеспечения средств защиты информации по ГОСТ Р 56939-2024 и Порядку, утверждённому Приказом ФСТЭК России №240 (в редакции №230 от 30.06.2025). Материал — для изготовителей-заявителей и организаций, внедряющих РБПО без обязательств перед ФСТЭК.</p>
+
+      <div class="key-stats">
+        <div class="key-stat">
+          <div class="key-stat-value">№240</div>
+          <div class="key-stat-label">Приказ ФСТЭК (в ред. №230)</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">25</div>
+          <div class="key-stat-label">регламентов и планов по РБПО</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">6</div>
+          <div class="key-stat-label">направлений оценки в п. 19 Порядка</div>
+        </div>
+        <div class="key-stat">
+          <div class="key-stat-value">5 лет</div>
+          <div class="key-stat-label">максимальный срок сертификата</div>
+        </div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Преподаватель</span>
+          <span class="hero-meta-value">Пиков Виталий Александрович</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Раздел курса</span>
+          <span class="hero-meta-value">Безопасная разработка ПО (РБПО)</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Источник методики</span>
+          <span class="hero-meta-value">НОУ ДПО «УЦБИ «МАСКОМ», v.002 от 24.03.2026</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Нормативная база</span>
+          <span class="hero-meta-value">ГОСТ Р 56939-2024, ГОСТ Р 71206-2024, Приказы ФСТЭК №240/№230, №33</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- 01. WHY -->
+    <section id="why" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> · Контекст</div>
+      <h2>Зачем эта методика и кому она нужна</h2>
+      <p class="lead">Методика — это пошаговая «дорожная карта» подготовки организации к сертификации процессов безопасной разработки ПО. Она охватывает работу с документацией, инструментарием, процессами, инструментальным контролем и кадрами — то есть весь объём, который проверяет орган по сертификации в соответствии с пунктом 19 Порядка.</p>
+
+      <h3>Кому адресована</h3>
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 21V7l8-4v18M19 21V11l-6-4"/></svg>
+          </div>
+          <h4>Изготовители-заявители</h4>
+          <p>Лицензиаты ФСТЭК России на разработку СрЗИ, готовящиеся к сертификации процессов проектирования и производства ПО. Цель — успешно пройти проверку и получить сертификат соответствия.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          </div>
+          <h4>Организации, внедряющие РБПО</h4>
+          <p>Команды разработки, выстраивающие процессы безопасной разработки без обязательной сертификации — для соответствия 187-ФЗ, ПП РФ №676/№1236, корпоративным AppSec-стандартам или просто из соображений зрелости.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <h4>Ответственные за сертификацию</h4>
+          <p>Менеджеры проектов, AppSec-инженеры, QMS-специалисты, начальники отделов разработки, на которых возложена координация подготовки и взаимодействие с органом по сертификации.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+          </div>
+          <h4>Эксперты органов по сертификации</h4>
+          <p>Сотрудники аккредитованных ФСТЭК России органов по сертификации (область аккредитации №5 по Приказу №33), которым предстоит проводить сертификацию у изготовителя.</p>
+        </div>
+      </div>
+
+      <h3>Что даёт работа по этой методике</h3>
+      <p>Изготовитель получает чёткий перечень того, что должно существовать к моменту приезда экспертов: один утверждённый Руководящий документ, 25 регламентов и планов по процессам 5.1-5.25, набор матриц соответствия, перечень инструментов с привязкой к процессам, RACI-роли, доказательства компетентности сотрудников и набор артефактов в живых системах (VCS, CI, трекер, журналы). Без подготовки по этому списку проверка превращается в догадку «что им нужно показать»; с подготовкой — в формальную сверку.</p>
+
+      <div class="callout">
+        <p><strong>Ключевой принцип методики:</strong> сертифицируются <em>не продукты</em>, а <em>процессы</em>. Сертификат выдаётся на область действия, описанную в Руководстве по РБПО. Любой продукт из этой области может быть выбран для проверки артефактов — невыполнение требований хотя бы для одного из них означает несоответствие процесса требованиям в целом.</p>
+      </div>
+    </section>
+
+    <!-- 02. NPB -->
+    <section id="npb" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> · Нормативная база</div>
+      <h2>Нормативная база: что регулирует сертификацию</h2>
+      <p class="lead">Сертификация процессов РБПО опирается на стек из четырёх взаимосвязанных нормативных документов: один задаёт область аккредитации органов, второй — Порядок проведения сертификации, третий — собственно требования к процессам, четвёртый — частные требования к безопасному компилятору C/C++.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Документ</th>
+              <th>Что устанавливает</th>
+              <th>Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Приказ ФСТЭК России от 10.04.2015 №&nbsp;33<br><small style="color: var(--text-subtle)">в ред. №148 от 27.07.2023</small></td>
+              <td>Правила аккредитации органов по сертификации СрЗИ. Область аккредитации <strong>пункт 5</strong> — сертификация процессов РБПО.</td>
+              <td><span class="tag">Действующий</span></td>
+            </tr>
+            <tr>
+              <td>Приказ ФСТЭК России от 01.12.2023 №&nbsp;240<br><small style="color: var(--text-subtle)">в ред. №230 от 30.06.2025</small></td>
+              <td>Порядок проведения сертификации процессов РБПО СрЗИ. <strong>38 пунктов</strong> + 3 приложения (заявка, решение ФСТЭК, сертификат). Изменения от №230 действуют с 30.09.2025.</td>
+              <td><span class="tag">Действующий</span></td>
+            </tr>
+            <tr>
+              <td>ГОСТ Р 56939-2024<br><small style="color: var(--text-subtle)">введён 20.12.2024 (приказ Росстандарта №1504-ст)</small></td>
+              <td>«Защита информации. Разработка безопасного программного обеспечения. Общие требования». 25 процессов 5.1-5.25 — собственно предмет сертификации. Заменил редакцию 2016 года.</td>
+              <td><span class="tag">Действующий</span></td>
+            </tr>
+            <tr>
+              <td>ГОСТ Р 71206-2024<br><small style="color: var(--text-subtle)">введён 01.04.2024 (приказ Росстандарта №24-ст)</small></td>
+              <td>«Защита информации. РБПО. Безопасный компилятор языков С/С++. Общие требования». Три класса безопасного компилятора, функции безопасности, квалификационные тесты.</td>
+              <td><span class="tag">Действующий</span></td>
+            </tr>
+            <tr>
+              <td>Постановление Правительства РФ от 26.06.1995 №&nbsp;608</td>
+              <td>«Положение о сертификации средств защиты информации». Базовый документ системы сертификации СЗИ.</td>
+              <td><span class="tag">Действующий</span></td>
+            </tr>
+            <tr>
+              <td>ГОСТ Р 56939 (ПНС)<br><small style="color: var(--text-subtle)">проект новой редакции</small></td>
+              <td>Содержит критерии положительного заключения о реализации требований к процессу (п. 4.13 ПНС). Применять как практический ориентир — но <strong>не как нормативную ссылку</strong> в документах изготовителя.</td>
+              <td><span class="tag" style="background: var(--warning-soft); color: var(--warning)">Проект</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Хронология последних изменений</h3>
+      <div class="timeline">
+        <div class="timeline-track">
+          <div class="timeline-item">
+            <div class="timeline-date">01.04.2024</div>
+            <div class="timeline-title">ГОСТ Р 71206-2024</div>
+            <div class="timeline-desc">Введён впервые. Безопасный компилятор C/C++ — три класса, функции безопасности, квалификационные тесты.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">16.04.2024</div>
+            <div class="timeline-title">№240 зарегистрирован</div>
+            <div class="timeline-desc">Минюст России №77896. Порядок сертификации процессов РБПО СрЗИ вступает в действие.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">20.12.2024</div>
+            <div class="timeline-title">ГОСТ Р 56939-2024</div>
+            <div class="timeline-desc">Заменил редакцию 2016 года. Структура процессов 5.1-5.25 — действующая нормативная база.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">30.09.2025</div>
+            <div class="timeline-title">№230 в действии</div>
+            <div class="timeline-desc">Внесены изменения в №240. Приказ ФСТЭК №230 от 30.06.2025; изменения вступили в силу 30.09.2025.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Тонкость нормативных ссылок.</strong> ГОСТ Р 71207 (статанализ) и ГОСТ Р 56939 ссылаются друг на друга без указания года. На момент введения 71207 действовала редакция 56939-2016; с 20.12.2024 действует 56939-2024. В Руководстве по РБПО изготовителю следует ссылаться на действующую редакцию явно — это снимет вопросы при экспертизе.</p>
+      </div>
+    </section>
+
+    <!-- 03. ROADMAP -->
+    <section id="roadmap" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> · Процесс</div>
+      <h2>Дорожная карта сертификации</h2>
+      <p class="lead">38 пунктов Порядка свёрнуты в пять последовательных фаз — от выбора органа по сертификации до получения сертификата. Сроки на каждой фазе — нормативные, заложенные в Порядок.</p>
+
+      <div class="roadmap">
+        <div class="roadmap-step">
+          <div class="roadmap-num">1</div>
+          <div class="roadmap-content">
+            <h4>Подготовка и подача заявки в ФСТЭК России</h4>
+            <p>Изготовитель выбирает аккредитованный орган по сертификации, согласовывает сроки, разрабатывает Руководство по РБПО и направляет заявку в ФСТЭК России. Заявка подписывается руководителем и заверяется печатью (при наличии); рекомендуемый образец — в Приложении №1 к Порядку.</p>
+            <div class="roadmap-meta">
+              <span class="roadmap-tag">Заявка по п. 4 Порядка</span>
+              <span class="roadmap-tag">Руководство по РБПО (п. 5.1)</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">2</div>
+          <div class="roadmap-content">
+            <h4>Решение ФСТЭК России о проведении сертификации</h4>
+            <p>ФСТЭК России рассматривает заявку и при отсутствии замечаний оформляет Решение в трёх экземплярах: изготовителю, органу по сертификации и в ФСТЭК. Если в заявке или Руководстве отсутствуют обязательные сведения — заявка возвращается на доработку.</p>
+            <div class="roadmap-meta">
+              <span class="roadmap-tag warn">15 рабочих дней</span>
+              <span class="roadmap-tag">пп. 7-9 Порядка</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">3</div>
+          <div class="roadmap-content">
+            <h4>Договор и проведение сертификации</h4>
+            <p>Изготовитель заключает договор с органом по сертификации и предоставляет ему Руководство по РБПО. Сертификация проводится на материально-технической базе изготовителя в РФ. В процессе выполняются шесть направлений оценки (см. раздел 04).</p>
+            <div class="roadmap-meta">
+              <span class="roadmap-tag">пп. 16-19 Порядка</span>
+              <span class="roadmap-tag">МТБ изготовителя</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">4</div>
+          <div class="roadmap-content">
+            <h4>Протокол и экспертное заключение</h4>
+            <p>Орган по сертификации оформляет протокол сертификации (подписывают эксперты) и экспертное заключение (подписывают эксперты, утверждает руководитель ОС). Если выявлены несоответствия — изготовитель устраняет их и проводится повторная сертификация в нужном объёме.</p>
+            <div class="roadmap-meta">
+              <span class="roadmap-tag">пп. 20-23 Порядка</span>
+              <span class="roadmap-tag warn">При несоответствии — повторная</span>
+            </div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">5</div>
+          <div class="roadmap-content">
+            <h4>Решение ФСТЭК и выдача сертификата</h4>
+            <p>Орган по сертификации передаёт материалы в ФСТЭК России (экспертное заключение, проект сертификата, протоколы, Руководство по РБПО, документация на электронном носителе). При отсутствии недостатков ФСТЭК принимает решение о выдаче сертификата.</p>
+            <div class="roadmap-meta">
+              <span class="roadmap-tag warn">≤ 30 календарных дней</span>
+              <span class="roadmap-tag success">До 5 лет действия</span>
+              <span class="roadmap-tag">пп. 24-30 Порядка</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Что важно понимать про сроки.</strong> 15 рабочих дней — это срок ФСТЭК на рассмотрение заявки, а не на сертификацию в целом. Сама сертификация проводится в сроки, установленные договором с органом по сертификации; на практике — несколько месяцев. После принятия материалов сертификации ФСТЭК даётся ещё до 30 календарных дней на проверку и решение о выдаче сертификата. Сертификат вручается изготовителю в течение 10 рабочих дней после подписания.</p>
+      </div>
+    </section>
+
+    <!-- 04. ASSESSMENTS -->
+    <section id="assessments" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> · Что проверяет ОС</div>
+      <h2>Шесть направлений оценки (п. 19 Порядка)</h2>
+      <p class="lead">Содержание сертификации задано пунктом 19 Порядка. Это шесть параллельных направлений, каждое из которых требует своих доказательств и подготовки.</p>
+
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <h4>1. Оценка Руководства и документации</h4>
+          <p>Соответствие Руководства п. 5.1 Порядка и документации по процессам 5.1-5.25 ГОСТ Р 56939-2024.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 11l3 3L22 4"/></svg>
+          </div>
+          <h4>2. Проверка артефактов реализации</h4>
+          <p>Наличие у изготовителя артефактов, подтверждающих фактическое выполнение требований процессов 5.1-5.25.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+          </div>
+          <h4>3. Наличие инструментария</h4>
+          <p>Средства разработки, тестирования, композиционного, статического и динамического анализа — пп. 5.8-5.12, 5.16, 5.18, 5.19.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h4>4. Фактическое соответствие процессов</h4>
+          <p>Соответствие реально выполняемых процессов Руководству и документации (модель «Ф» против модели «Д» — IDEF0).</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+          </div>
+          <h4>5. Инструментальный контроль</h4>
+          <p>Проверка реализации процессов представителями ОС на МТБ изготовителя — включая среду сборки и разработки.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          </div>
+          <h4>6. Обеспеченность сотрудниками</h4>
+          <p>Полнота и обеспеченность персоналом, обладающим знаниями и умениями для реализации процессов РБПО.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Логика шести направлений.</strong> Первые два — что написано и что есть в системах. Третье — какими инструментами сделано. Четвёртое — соответствие написанного и реально делаемого. Пятое — экспертная демонстрация в живой среде. Шестое — есть ли кому это всё делать. Если выпадает любая из шести — сертификат не выдаётся.</p>
+      </div>
+    </section>
+
+    <!-- 05. GUIDE -->
+    <section id="guide" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> · Документация</div>
+      <h2>Руководство по РБПО — основной документ заявителя</h2>
+      <p class="lead">Руководство по безопасной разработке программного обеспечения — единственный документ, прилагаемый к заявке в ФСТЭК России. Его соответствие пункту 5.1 Порядка проверяется в первую очередь; от его качества зависит, будет ли заявка принята к рассмотрению.</p>
+
+      <h3>Семь обязательных разделов (п. 5.1 Порядка)</h3>
+      <ul class="checklist">
+        <li><strong>Описание области действия</strong> — конкретные продукты, классы ПО, версии, исключения.</li>
+        <li><strong>Цели организации</strong> в области создания безопасного ПО.</li>
+        <li><strong>Перечень и описание процессов</strong> по РБПО — все 25 процессов 5.1-5.25 с описанием реализации.</li>
+        <li><strong>Распределение ролей и обязанностей</strong>, связанных с реализацией процессов.</li>
+        <li><strong>Перечень документации (регламентов)</strong> по РБПО в соответствии с подпунктами 5.1-5.25.</li>
+        <li><strong>Правила и требования к внутренним проверкам</strong> реализации мер РБПО, сообщения о результатах.</li>
+        <li><strong>Описание действий по улучшению процессов</strong>, связанных с РБПО.</li>
+      </ul>
+
+      <p>Руководство должно быть утверждено руководством организации, издано и доведено до сведения всех сотрудников, имеющих отношение к безопасной разработке.</p>
+
+      <h3>Контрольные вопросы к области действия (скоупу)</h3>
+      <p>Область действия — самая критичная часть Руководства. Размытая или непоследовательная формулировка скоупа делает сертификат бесполезным («сертифицировано всё и ничего»). Перед утверждением проверьте каждый блок:</p>
+
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Идентификация</span>
+              <span>Что именно входит в область действия</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Перечислены ли все продукты/модули/версии, входящие в область действия, в форме, позволяющей однозначно связать их с репозиториями, контурами CI, сборочными заданиями и релизными артефактами? Можно ли по тексту Руководства найти конкретный коммит, релизный артефакт, билд-номер?</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Границы</span>
+              <span>Что явно НЕ входит в область действия</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Явно ли указано, что не входит в область действия — экспериментальные ветки, legacy-линейки, внешние компоненты, не управляемые изготовителем, разовые проекты, форки? Описание исключений — это защита от ситуации «нашли в репозитории нечто, что под РБПО не подпадает, а ОС считает иначе».</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Применимость</span>
+              <span>Как процессы 5.1-5.25 применяются к разным продуктам</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Для каждого процесса 5.1-5.25 определено, как он применяется к продуктам области действия? Где применимость зависит от типа продукта (разные языки, платформы, режимы развёртывания) — это описано явно? Например: «Безопасный компилятор C/C++ применяется к продуктам A и B, в которых используется C/C++; для продукта C на Java/Kotlin применимы пп. 5.10, 5.11 в редакции для JVM-стека».</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Выборка</span>
+              <span>Готовое основание для выборки объектов проверки</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Внутри Руководства должно быть готовое основание для выборки: артефакты и реализации процессов ведутся в общих системах (VCS, CI, трекер) и применимы ко всей области действия. Орган по сертификации вправе попросить любой продукт из области действия — и для него артефакты должны быть. Это и есть принцип «один продукт — вся область».</p>
+          </div>
+        </details>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Принцип «один продукт — вся область».</strong> Подтверждения могут быть запрошены для любого программного продукта из области действия Руководства. Невыполнение требований РБПО хотя бы для одного программного продукта из области действия означает несоответствие процесса требованиям. Это положение логически обосновано принципами управления риском сертификации, но <em>не сформулировано буквально в Порядке</em>; имеет смысл закрепить его как внутреннее правило изготовителя.</p>
+      </div>
+    </section>
+
+    <!-- 06. REGULATIONS -->
+    <section id="regulations" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> · Документация</div>
+      <h2>25 регламентов и планов по процессам 5.1-5.25</h2>
+      <p class="lead">ГОСТ Р 56939-2024 устанавливает 25 процессов РБПО. По каждому требуется документация — план или регламент с приложениями. Минимально получается <strong>4 плана и 21 регламент (всего 25 базовых документов)</strong>; плюс прилагаемые перечни, схемы и описания (для процессов с несколькими артефактами 5.X.3.Y). Список построен из требований 5.1.3.X — 5.25.3.X стандарта.</p>
+
+      <p>Регламенты могут быть оформлены как самостоятельные документы или объединены в рамках общего документа (п. 4.12 ГОСТ Р 56939-2024). Требования к оформлению регламентов как таковых не предъявляются — но все они должны быть утверждены, изданы и доведены до работников.</p>
+
+      <h3>Полный список по процессам</h3>
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">5.1-5.5</span>
+              <span>Планирование, обучение, требования, конфигурация, недостатки</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <table class="data">
+              <thead><tr><th>Процесс</th><th>Документ</th><th>Пункт ГОСТ</th></tr></thead>
+              <tbody>
+                <tr><td><strong>5.1</strong> Планирование процессов</td><td>План реализации процессов разработки безопасного ПО</td><td>5.1.3.4</td></tr>
+                <tr><td><strong>5.1</strong> Планирование процессов</td><td>План развития процессов разработки безопасного ПО</td><td>5.1.3.3</td></tr>
+                <tr><td><strong>5.1</strong> Планирование процессов</td><td>Описание области применения процессов</td><td>5.1.3.5</td></tr>
+                <tr><td><strong>5.2</strong> Обучение сотрудников</td><td>План обучения сотрудников</td><td>5.2.3.2</td></tr>
+                <tr><td><strong>5.2</strong> Обучение сотрудников</td><td>Критерии пересмотра программ обучения</td><td>5.2.3.5</td></tr>
+                <tr><td><strong>5.3</strong> Требования безопасности к ПО</td><td>Регламент управления требованиями безопасности ПО</td><td>5.3.3.1</td></tr>
+                <tr><td><strong>5.3</strong> Требования безопасности к ПО</td><td>Набор требований безопасности ПО</td><td>5.3.3.2</td></tr>
+                <tr><td><strong>5.4</strong> Управление конфигурацией</td><td>Регламент управления конфигурацией ПО</td><td>5.4.3.1</td></tr>
+                <tr><td><strong>5.4</strong> Управление конфигурацией</td><td>Перечень элементов конфигурации</td><td>5.4.3.2</td></tr>
+                <tr><td><strong>5.5</strong> Управление недостатками</td><td>Регламент управления недостатками ПО</td><td>5.5.3.1</td></tr>
+                <tr><td><strong>5.5</strong> Управление недостатками</td><td>Регламент управления запросами на изменение ПО</td><td>5.5.3.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">5.6-5.11</span>
+              <span>Архитектура, моделирование угроз, кодирование, экспертиза, статический и динамический анализ</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <table class="data">
+              <thead><tr><th>Процесс</th><th>Документ</th><th>Пункт ГОСТ</th></tr></thead>
+              <tbody>
+                <tr><td><strong>5.6</strong> Разработка архитектуры</td><td>Требования к принципам проектирования архитектуры ПО</td><td>5.6.3.1</td></tr>
+                <tr><td><strong>5.6</strong> Разработка архитектуры</td><td>Описание архитектуры ПО</td><td>5.6.3.2</td></tr>
+                <tr><td><strong>5.6</strong> Разработка архитектуры</td><td>Критерии уточнения архитектуры ПО</td><td>5.6.3.3</td></tr>
+                <tr><td><strong>5.7</strong> Моделирование угроз</td><td>Модель угроз ПО</td><td>5.7.3.1</td></tr>
+                <tr><td><strong>5.7</strong> Моделирование угроз</td><td>Перечень мер по нейтрализации угроз</td><td>5.7.3.2</td></tr>
+                <tr><td><strong>5.7</strong> Моделирование угроз</td><td>Описание поверхности атаки</td><td>5.7.3.3</td></tr>
+                <tr><td><strong>5.7</strong> Моделирование угроз</td><td>Перечень целей для исследований безопасности</td><td>5.7.3.4</td></tr>
+                <tr><td><strong>5.8</strong> Правила кодирования</td><td>Регламент оформления исходного кода и безопасного кодирования</td><td>5.8.3.1</td></tr>
+                <tr><td><strong>5.9</strong> Экспертиза кода</td><td>Регламент проведения экспертизы исходного кода ПО</td><td>5.9.3.1</td></tr>
+                <tr><td><strong>5.10</strong> Статический анализ</td><td>Регламент проведения статического анализа</td><td>5.10.3.1</td></tr>
+                <tr><td><strong>5.10</strong> Статический анализ</td><td>Перечень инструментов статического анализа</td><td>5.10.3.2</td></tr>
+                <tr><td><strong>5.10</strong> Статический анализ</td><td>Конфигурации и параметры настройки инструментов</td><td>5.10.3.3</td></tr>
+                <tr><td><strong>5.11</strong> Динамический анализ</td><td>Регламент проведения динамического анализа</td><td>5.11.3.1</td></tr>
+                <tr><td><strong>5.11</strong> Динамический анализ</td><td>Перечень инструментов динамического анализа</td><td>5.11.3.2</td></tr>
+                <tr><td><strong>5.11</strong> Динамический анализ</td><td>Перечень модулей для динамического анализа</td><td>5.11.3.3</td></tr>
+                <tr><td><strong>5.11</strong> Динамический анализ</td><td>Сценарии проведения тестирования</td><td>5.11.3.4</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">5.12-5.17</span>
+              <span>Сборка, безопасность среды, целостность кода, секреты, композиционный анализ, цепочки поставок</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <table class="data">
+              <thead><tr><th>Процесс</th><th>Документ</th><th>Пункт ГОСТ</th></tr></thead>
+              <tbody>
+                <tr><td><strong>5.12</strong> Безопасная сборка</td><td>Регламент использования системы безопасной сборки ПО</td><td>5.12.3.1</td></tr>
+                <tr><td><strong>5.12</strong> Безопасная сборка</td><td>Информация о сборочной среде</td><td>5.12.3.2</td></tr>
+                <tr><td><strong>5.13</strong> Безопасность сборочной среды</td><td>Регламент обеспечения безопасности сборочной среды</td><td>5.13.3.1</td></tr>
+                <tr><td><strong>5.13</strong> Безопасность сборочной среды</td><td>Информация о безопасности сборочной среды</td><td>5.13.3.2</td></tr>
+                <tr><td><strong>5.13</strong> Безопасность сборочной среды</td><td>Схема сборочной среды</td><td>5.13.3.3</td></tr>
+                <tr><td><strong>5.14</strong> Целостность кода</td><td>Регламент доступа к исходному коду ПО и обеспечения его целостности</td><td>5.14.3.1</td></tr>
+                <tr><td><strong>5.14</strong> Целостность кода</td><td>Описание модели управления доступом</td><td>5.14.3.2</td></tr>
+                <tr><td><strong>5.15</strong> Безопасность секретов</td><td>Регламент использования секретов</td><td>5.15.3.1</td></tr>
+                <tr><td><strong>5.16</strong> Композиционный анализ</td><td>Регламент композиционного анализа</td><td>5.16.3.1</td></tr>
+                <tr><td><strong>5.16</strong> Композиционный анализ</td><td>Перечень зависимостей ПО</td><td>5.16.3.2</td></tr>
+                <tr><td><strong>5.17</strong> Проверка кода на предмет внедрения вредоносного ПО через цепочки поставок</td><td>Перечень процессов и компонентов, зависящих от сторонних поставщиков</td><td>5.17.3.1</td></tr>
+                <tr><td><strong>5.17</strong> Проверка кода на предмет внедрения вредоносного ПО через цепочки поставок</td><td>Сведения о договорных обязательствах со сторонними поставщиками</td><td>5.17.3.2</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">5.18-5.25</span>
+              <span>Тестирование, выпуск, поставка, поддержка, реагирование, вывод</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <table class="data">
+              <thead><tr><th>Процесс</th><th>Документ</th><th>Пункт ГОСТ</th></tr></thead>
+              <tbody>
+                <tr><td><strong>5.18</strong> Функциональное тестирование</td><td>План функционального тестирования</td><td>5.18.3.1</td></tr>
+                <tr><td><strong>5.19</strong> Нефункциональное тестирование</td><td>Регламент нефункционального тестирования</td><td>5.19.3.1</td></tr>
+                <tr><td><strong>5.20</strong> Обеспечение безопасности при выпуске готовой к эксплуатации версии ПО</td><td>Регламент приёмки ПО</td><td>5.20.3.1</td></tr>
+                <tr><td><strong>5.20</strong> Обеспечение безопасности при выпуске готовой к эксплуатации версии ПО</td><td>Регламент обеспечения целостности ПО, передаваемого пользователям</td><td>5.20.3.3</td></tr>
+                <tr><td><strong>5.21</strong> Безопасная поставка ПО пользователям</td><td>Документация безопасной поставки ПО пользователям</td><td>5.21.3.1</td></tr>
+                <tr><td><strong>5.22</strong> Обеспечение поддержки ПО при эксплуатации</td><td>Документация технической поддержки</td><td>5.22.3.1</td></tr>
+                <tr><td><strong>5.23</strong> Реагирование на информацию об уязвимостях</td><td>Регламент реагирования на информацию об уязвимостях</td><td>5.23.3.1</td></tr>
+                <tr><td><strong>5.24</strong> Поиск уязвимостей в ПО при эксплуатации</td><td>Регламент поиска ошибок и уязвимостей в эксплуатирующемся ПО</td><td>5.24.3.1</td></tr>
+                <tr><td><strong>5.25</strong> Обеспечение безопасности при выводе ПО из эксплуатации</td><td>Регламент вывода ПО из эксплуатации</td><td>5.25.3.1</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </details>
+      </div>
+
+      <h3>Рекомендации по приоритизации разработки</h3>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">1</div>
+          <h4>Первая очередь</h4>
+          <ul>
+            <li>Руководство по РБПО — основа подачи заявки</li>
+            <li>5.3 Требования безопасности</li>
+            <li>5.4 Управление конфигурацией</li>
+            <li>5.5 Управление недостатками</li>
+            <li>5.10 Статический анализ</li>
+            <li>5.12 Безопасная сборка</li>
+            <li>5.13 Безопасность сборочной среды</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">2</div>
+          <h4>Вторая очередь</h4>
+          <ul>
+            <li>5.6 Архитектура</li>
+            <li>5.7 Моделирование угроз</li>
+            <li>5.8 Правила кодирования</li>
+            <li>5.9 Экспертиза кода</li>
+            <li>5.11 Динамический анализ</li>
+            <li>5.14 Целостность кода</li>
+            <li>5.15 Секреты</li>
+            <li>5.16 Композиционный анализ</li>
+            <li>5.17 Цепочки поставок</li>
+            <li>5.18 Функциональное тестирование</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">3</div>
+          <h4>Третья очередь</h4>
+          <ul>
+            <li>5.19 Нефункциональное тестирование</li>
+            <li>5.20 Обеспечение безопасности при выпуске готовой к эксплуатации версии ПО</li>
+            <li>5.21 Безопасная поставка</li>
+            <li>5.22 Поддержка эксплуатации</li>
+            <li>5.23 Реагирование на информацию об уязвимостях</li>
+            <li>5.24 Поиск уязвимостей в эксплуатации</li>
+            <li>5.25 Вывод из эксплуатации</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Артефакт vs регламент.</strong> Артефакты реализации требований понимаются как любая информация в любом виде, подтверждающая выполнение требований (п. 4.11 ГОСТ Р 56939-2024). Регламент — это «правила игры», артефакт — «след игры». ОС проверяет и то, и другое; одно без другого не работает.</p>
+      </div>
+    </section>
+
+    <!-- 07. MATRIX -->
+    <section id="matrix" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> · Документация</div>
+      <h2>Матрица соответствия — ключевой внутренний документ</h2>
+      <p class="lead">Матрица соответствия — это связующее звено между нормой стандарта, регламентом, системой и конкретным артефактом. Без неё подготовка к сертификации превращается в бесконечный поиск «где у нас лежит подтверждение пункта 5.X.Y.Z». Матрица ведётся как живой документ изготовителя.</p>
+
+      <h3>Структура матрицы (4 обязательные колонки + 1)</h3>
+      <ul class="checklist">
+        <li><strong>Требование стандарта</strong> — конкретный подпункт ГОСТ Р 56939-2024 (например, 5.12.2.2).</li>
+        <li><strong>Регламент / процедура</strong>, устанавливающая выполнение этого требования.</li>
+        <li><strong>Система</strong>, где формируется подтверждение (CI, VCS, трекер, система хранения артефактов).</li>
+        <li><strong>Тип и местоположение артефакта</strong> — лог, отчёт, запись, журнал, документ, результат инструмента.</li>
+        <li><strong>Объекты области действия</strong>, для которых артефакт должен существовать, и правила выборки.</li>
+      </ul>
+
+      <h3>Пример строки матрицы</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Требование</th>
+              <th>Регламент</th>
+              <th>Система</th>
+              <th>Артефакт</th>
+              <th>Область / выборка</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>5.10.2.1</strong><br><small>Статанализ при каждой сборке</small></td>
+              <td>Регламент проведения статанализа, ред. 1.3</td>
+              <td>GitLab CI · SonarQube</td>
+              <td>Job <code>sast</code> в каждом merge-pipeline; SARIF-отчёт в <code>artifacts/sast/</code></td>
+              <td>Все продукты области; 100% pipeline-ов</td>
+            </tr>
+            <tr>
+              <td><strong>5.16.2.3</strong><br><small>Перечень зависимостей актуален</small></td>
+              <td>Регламент композиционного анализа</td>
+              <td>OSS-Trender · GitLab</td>
+              <td>SBOM в формате CycloneDX, обновляется при каждом релизе</td>
+              <td>Все релизные сборки; 1 SBOM на релиз</td>
+            </tr>
+            <tr>
+              <td><strong>5.13.2.4</strong><br><small>Журнал доступа к сборочной среде</small></td>
+              <td>Регламент безопасности сборочной среды</td>
+              <td>Active Directory · auditd · SIEM</td>
+              <td>Журнал входа и выполненных команд, retention 1 год</td>
+              <td>Все билд-агенты области</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Правило большого пальца.</strong> Если для пункта стандарта нельзя заполнить хотя бы одну строку матрицы — значит, у изготовителя для этого пункта нет ни регламента, ни доказательства, ни понимания, где это вообще должно быть. Это первый кандидат на «несоответствие» в экспертном заключении ОС.</p>
+      </div>
+    </section>
+
+    <!-- 08. TOOLING -->
+    <section id="tooling" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> · Инструментарий</div>
+      <h2>Анализ инструментария и информационных систем</h2>
+      <p class="lead">Орган по сертификации проверяет, что у изготовителя есть все типы средств, прямо названные в подпунктах 5.8, 5.9, 5.10, 5.11, 5.12, 5.16, 5.18 и 5.19 ГОСТ Р 56939-2024. Подготовка — это перечень этих инструментов с привязкой к процессам, источнику и месту в жизненном цикле.</p>
+
+      <h3>Перечень инструментов: что в нём должно быть</h3>
+      <ul>
+        <li><strong>Назначение</strong> — какой процесс ГОСТ обеспечивает (например, «5.10 — статический анализ исходного кода»).</li>
+        <li><strong>Тип</strong> — проприетарное, Open Source, собственная разработка.</li>
+        <li><strong>Версия и источник поставки</strong> — релиз, дистрибутив, репозиторий.</li>
+        <li><strong>Контур использования</strong> — рабочее место разработчика, CI, сборочная среда, тестовая среда.</li>
+        <li><strong>Ответственный</strong> — кто настраивает, кто администрирует, кто отвечает за результаты.</li>
+      </ul>
+
+      <h3>Карта «этап ЖЦ ПО → инструмент → артефакт»</h3>
+      <p>Дополняющий документ — карта связей, отражающая на каком этапе жизненного цикла какой инструмент работает и какой артефакт формирует. Помогает экспертам ОС быстро увидеть полноту покрытия, а изготовителю — найти пробелы.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Этап ЖЦ ПО</th>
+              <th>Типовой инструмент</th>
+              <th>Артефакт</th>
+              <th>Привязка к ГОСТ</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>Кодирование</td><td>IDE с linter / pre-commit hooks</td><td>Логи проверок, журналы git hooks</td><td>5.8</td></tr>
+            <tr><td>Ревью</td><td>GitLab MR / Gerrit / Bitbucket</td><td>Записи ревью, утверждённые MR</td><td>5.9</td></tr>
+            <tr><td>Статанализ</td><td>SAST-инструмент (PVS-Studio, SonarQube, Svace, AppChecker)</td><td>SARIF / отчёты, журнал прогонов</td><td>5.10</td></tr>
+            <tr><td>Динамический анализ</td><td>Фаззер, DAST, санитайзеры (ASan/UBSan/TSan)</td><td>Отчёты падений, корпус, минимизированные тест-кейсы</td><td>5.11</td></tr>
+            <tr><td>Сборка</td><td>CI-система + безопасный компилятор</td><td>Логи сборки, база данных компиляции (JSON)</td><td>5.12</td></tr>
+            <tr><td>Защита среды сборки</td><td>auditd / SIEM / IAM</td><td>Журналы аудита, политика доступа</td><td>5.13</td></tr>
+            <tr><td>Композиционный анализ</td><td>SCA-инструмент (Dependency-Track, OWASP DC, OSS-Trender)</td><td>SBOM (CycloneDX/SPDX), отчёты по уязвимостям</td><td>5.16</td></tr>
+            <tr><td>Функциональное тестирование</td><td>TestRail / Allure / xUnit-фреймворки</td><td>Тест-планы, логи, отчёты покрытия</td><td>5.18</td></tr>
+            <tr><td>Нефункциональное / pen-тестирование</td><td>BurpSuite, OWASP ZAP, MaxPatrol VM, ручная экспертиза</td><td>Отчёты пентеста, журнал найденных уязвимостей</td><td>5.19</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Самописное и Open Source — особое внимание.</strong> Если в перечне есть собственная разработка (свой fuzzer, свой SAST-плагин) — потребуется доказать качество и полноту. Для Open Source — указать версию, источник дистрибутива, процедуру обновления и реакцию на CVE в самом инструменте. Для проприетарного — лицензионный договор и сведения об актуальности версии.</p>
+      </div>
+    </section>
+
+    <!-- 09. IDEF0 -->
+    <section id="idef0" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> · Методология</div>
+      <h2>Проверка процессов: модели «Д», «Ф» и референтная (IDEF0)</h2>
+      <p class="lead">Орган по сертификации использует методологию процессного моделирования IDEF0. Логика реализации процессов у каждого изготовителя своя — поэтому проверяется не «как организовано внутри», а <em>выполнение функций</em>: что на входе, что на выходе, какие управления и какие механизмы.</p>
+
+      <h3>Три модели и их сравнение</h3>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">Д</div>
+          <h4>Модель из документации</h4>
+          <ul>
+            <li>Строится по Руководству по РБПО и регламентам</li>
+            <li>Отражает <em>заявленный</em> способ работы процесса</li>
+            <li>Источник — текст утверждённых документов изготовителя</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">Ф</div>
+          <h4>Модель из интервью</h4>
+          <ul>
+            <li>Строится по результатам интервью с сотрудниками</li>
+            <li>Отражает <em>фактический</em> способ работы процесса</li>
+            <li>Источник — устные показания исполнителей и владельцев процесса</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">R</div>
+          <h4>Референтная модель</h4>
+          <ul>
+            <li>Извлекается из ГОСТ Р 56939-2024</li>
+            <li>Эталон, к которому стремится приведение «Ф»</li>
+            <li>Источник — текст подпунктов 5.X.1 / 5.X.2 / 5.X.3 стандарта</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Что показывает сравнение моделей</h3>
+      <ul>
+        <li><strong>«Ф» ≠ «Д»</strong> — документация не соответствует реальной работе. Либо процессы выполняются «не по бумаге», либо сотрудники не знают регламентов. Признак низкой зрелости.</li>
+        <li><strong>«Ф» = «Д» ≠ «R»</strong> — внутренний процесс согласован, но не покрывает требования стандарта. Нужно либо доработать регламент, либо признать пробел и описать его как риск.</li>
+        <li><strong>«Ф» = «Д» = «R»</strong> — целевое состояние. Документация, реальность и эталон совпадают.</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Подготовка к интервью.</strong> Для каждого процесса 5.X должен существовать минимум один сотрудник, который: <strong>знает регламент</strong>, <strong>может показать артефакт «в системе»</strong>, <strong>может объяснить входы/выходы и контрольные точки</strong>, <strong>понимает, как процесс применяется ко всей области действия</strong>. Без такого «носителя» интервью провалится — даже при идеальной документации.</p>
+      </div>
+    </section>
+
+    <!-- 10. INSTR -->
+    <section id="instr" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> · Инструментальный контроль</div>
+      <h2>Инструментальный контроль среды разработки и сборки</h2>
+      <p class="lead">Инструментальный контроль реализуется представителями ОС <strong>на площадке изготовителя</strong>. Это «полевой» этап: эксперты подключаются к рабочим системам, запускают анализаторы, смотрят журналы, проверяют целостность среды сборки.</p>
+
+      <h3>Перечень контуров и окружений</h3>
+      <p>До начала проверки изготовителю нужно подготовить описание всех контуров — где, что и как происходит:</p>
+
+      <div class="props">
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+          </div>
+          <h4>Контур разработки</h4>
+          <p>Рабочие места разработчиков, IDE, локальные сборки, pre-commit hooks. Доступ к коду, локальные ключи, рабочие сертификаты.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h4>Контур CI</h4>
+          <p>GitLab/Jenkins/TeamCity-агенты, конфигурация pipeline-ов, секреты CI, кэши зависимостей. Проверка регламентов 5.10, 5.11, 5.16.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+          </div>
+          <h4>Контур сборки релизов</h4>
+          <p>Изолированные сборочные агенты, релизные подписи, фиксация версий компиляторов. Процессы 5.12, 5.13.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          </div>
+          <h4>Контур хранения результатов</h4>
+          <p>Артефакторий (Nexus, Artifactory), репозиторий релизов, хранилище SBOM-ов и SARIF-отчётов. Доступ — только для уполномоченных.</p>
+        </div>
+        <div class="prop">
+          <div class="prop-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+          </div>
+          <h4>Контур тестирования и анализа</h4>
+          <p>Стенды для функционального и нефункционального тестирования, фаззинг-фермы, DAST-сканеры, песочницы для динамики.</p>
+        </div>
+      </div>
+
+      <h3>Журналы аудита по сборочной среде (процесс 5.13)</h3>
+      <ul class="checklist">
+        <li><strong>Регистрация действий</strong> — кто и что делал на билд-агентах: вход, выход, выполненные команды, изменения конфигурации.</li>
+        <li><strong>Целостность журналов</strong> — журналы защищены от модификации, передаются в отдельный SIEM или WORM-хранилище.</li>
+        <li><strong>Сроки хранения</strong> — определены и соблюдаются (типично 1 год; больше — для продуктов длительного жизненного цикла).</li>
+        <li><strong>Регулярная проверка</strong> — есть процедура чтения журналов (минимум — выборочные просмотры) с фиксацией в задачах.</li>
+      </ul>
+    </section>
+
+    <!-- 11. COMPILER -->
+    <section id="compiler" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> · Специальная часть</div>
+      <h2>Безопасный компилятор C/C++ (ГОСТ Р 71206-2024)</h2>
+      <p class="lead">Если в составе разрабатываемого ПО есть код на C или C++, инструментальный контроль включает проверку соответствия используемых компиляторов требованиям ГОСТ Р 71206-2024. Это отдельный, технически самый сложный участок проверки.</p>
+
+      <h3>Определение и три класса</h3>
+      <p>Безопасный компилятор — компилятор, не вносящий в бинарный код программы ошибки, которых не было в исходном коде (п. 3.6 ГОСТ Р 71206-2024). Стандарт (пп. 4.7, 6) устанавливает три класса по объёму функций безопасности и допустимому замедлению. <strong>Самый низкий класс — третий, самый высокий — первый</strong>:</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Класс</th>
+              <th>Состав функций</th>
+              <th>Допустимое замедление</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>3 класс</strong></td><td>Базовые функции безопасности</td><td>не более <strong>20%</strong></td></tr>
+            <tr><td><strong>2 класс</strong></td><td>Расширенный набор функций</td><td>не более <strong>50%</strong></td></tr>
+            <tr><td><strong>1 класс</strong></td><td>Максимальная защита, в том числе динамический контроль</td><td>не более <strong>200%</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Пять функций безопасности (Таблица 1, раздел 5)</h3>
+      <ul class="checklist">
+        <li><strong>Безопасные преобразования кода</strong> — компилятор не «оптимизирует» проверки на null, не сворачивает обнуление памяти, не превращает определённое поведение в неопределённое.</li>
+        <li><strong>Оповещение о неопределённых конструкциях</strong> — диагностики на UB, переполнения, неинициализированные значения, gотовые к включению в сборку как ошибки.</li>
+        <li><strong>Динамический контроль неопределённых конструкций</strong> (только 1 класс) — санитайзеры и runtime-проверки, встраиваемые в бинарный код.</li>
+        <li><strong>Управление распределением памяти</strong> — корректные стратегии аллокации/освобождения, без UB при ошибках выделения.</li>
+        <li><strong>Журналирование процесса трансляции</strong> — база данных компиляции в формате JSON для последующего аудита.</li>
+        <li><strong>Управление механизмами защищённости</strong> — поддержка ASLR, stack protector, CFI, FORTIFY и др.</li>
+      </ul>
+
+      <h3>Проверка соответствия (раздел 7)</h3>
+      <ul>
+        <li><strong>Квалификационные тесты трёх типов:</strong> ассемблерные, времени выполнения, тесты санитайзеров.</li>
+        <li><strong>Производительность</strong> измеряется относительно эталонного компилятора.</li>
+        <li><strong>Соответствие классу</strong> подтверждается прохождением всех тестов данного и менее безопасных классов.</li>
+      </ul>
+
+      <h3>Пять шагов подготовки изготовителя к проверке компилятора</h3>
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">1</div>
+          <h4>Профиль сборки</h4>
+          <ul>
+            <li>Какие продукты/конфигурации из области действия будут собираться при инструментальном контроле</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">2</div>
+          <h4>Реестр уникальных использований</h4>
+          <ul>
+            <li>Для каждого pipeline — точный путь к утилитам, версии, конфигурационные файлы, наборы опций, переменные окружения</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">3</div>
+          <h4>Фиксация средствами контроля сборки</h4>
+          <ul>
+            <li>Результат фиксации позволяет однозначно восстановить, какие утилиты и с какими параметрами использовались</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">4</div>
+          <h4>Проверка соответствия классу</h4>
+          <ul>
+            <li>Квалификационные тесты (секция 7 ГОСТ Р 71206-2024) в сборочном окружении или идентичном ему</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">5</div>
+          <h4>Заключение по результату</h4>
+          <ul>
+            <li>Какому классу безопасного компилятора соответствуют все зафиксированные использования во всей проверенной сборке</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Требования к фиксации использования компиляторов (п. 5.2.5 ГОСТ Р 71206-2024)</h3>
+      <p>Безопасный компилятор должен фиксировать в базе данных компиляции для каждой единицы трансляции: рабочую директорию, имя файла, хэш-код файла, команду компиляции, имя выходного файла, хэш-код выходного файла, имена включаемых файлов и их хэш-коды. Формат — JSON, совместимый с базой данных компиляции clang. Хэширование — функция, определённая ГОСТ 34.11.</p>
+
+      <h3>Пример: формат базы данных компиляции (Buildography, ИСП РАН)</h3>
+      <p>Buildography — трассировщик Linux-процессов разработки ИСП РАН, собирающий сведения о выполнении сборки для последующего аудита. Один из вариантов реализации требований 71206 к фиксации сборки:</p>
+
+<pre class="code"><code>{
+  <span class="str">"directory"</span>: <span class="str">"/root"</span>,
+  <span class="str">"input"</span>: { <span class="str">"/root/main.c"</span>: <span class="str">"&lt;hash&gt;"</span> },
+  <span class="str">"commands"</span>: [ <span class="str">"gcc"</span>, <span class="str">"main.c"</span> ],
+  <span class="str">"component_commands"</span>: [
+    {
+      <span class="str">"command"</span>: [ <span class="str">"/usr/lib/gcc/x86_64-linux-gnu/11/cc1"</span>, <span class="str">"..."</span> ],
+      <span class="str">"dependencies"</span>: { <span class="str">"/etc/ld.so.cache"</span>: <span class="str">"&lt;hash&gt;"</span> },
+      <span class="str">"output"</span>: { <span class="str">"/tmp/ccUEQNfb.s"</span>: <span class="str">"&lt;hash&gt;"</span> }
+    },
+    ...
+  ],
+  <span class="str">"utilities"</span>: [ { <span class="str">"path"</span>: <span class="str">"/usr/bin/x86_64-linux-gnu-gcc-11"</span>, <span class="str">"hash"</span>: <span class="str">"&lt;hash&gt;"</span> }, ... ]
+}</code></pre>
+
+      <div class="callout warning">
+        <p><strong>Важная оговорка про Buildography.</strong> Это инструмент ИСП РАН, упомянутый в презентации Шаркова. На момент подготовки лекции дорожная карта релизов и условия лицензирования <em>не зафиксированы публично</em> в нормативных документах. При планировании работ — проверьте актуальность информации у разработчика и предусмотрите альтернативные варианты инструментального контроля сборки (ваш собственный JSON-логгер, доработка clang/gcc-wrapper-ов, сторонние решения).</p>
+      </div>
+    </section>
+
+    <!-- 12. PEOPLE -->
+    <section id="people" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> · Кадры</div>
+      <h2>Анализ обеспеченности людьми</h2>
+      <p class="lead">Шестое направление оценки — самое неочевидное и одновременно самое уязвимое. Идеальная документация и зрелый инструментарий не пройдут проверку, если у изготовителя нет сотрудников, способных это всё обслуживать. Подготовка строится вокруг штатного расписания, RACI-матрицы и доказательств компетентности.</p>
+
+      <h3>Что предоставляет изготовитель</h3>
+      <ul class="checklist">
+        <li><strong>Штатное расписание</strong> с должностями специалистов, задействованных в РБПО.</li>
+        <li><strong>Кадровая обеспеченность и количество вакантных позиций</strong> — особенно по ключевым ролям.</li>
+        <li><strong>Текучесть кадров</strong> — статистика за период; высокая текучесть ставит под вопрос воспроизводимость процессов.</li>
+        <li><strong>Полнота обеспеченности</strong> сотрудниками, обладающими нужными знаниями и умениями.</li>
+        <li><strong>RACI-матрица</strong> по процессам 5.1-5.25 — кто выполняет, утверждает, контролирует, обеспечивает инфраструктуру.</li>
+        <li><strong>Доказательства компетентности и обучения</strong> — план обучения, факты прохождения, участники, материалы.</li>
+      </ul>
+
+      <h3>Пример строки RACI-матрицы</h3>
+      <p style="font-size: 14.5px; color: var(--text-muted);"><em>Пример распределения для иллюстрации — конкретные роли и носители ответственности утверждаются Руководством по РБПО изготовителя.</em></p>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>Процесс</th>
+              <th>R (исполнитель)</th>
+              <th>A (утверждающий)</th>
+              <th>C (консультирует)</th>
+              <th>I (информируется)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>5.10</strong> Статанализ</td>
+              <td>AppSec-инженер</td>
+              <td>Руководитель отдела безопасности</td>
+              <td>Старший разработчик</td>
+              <td>Менеджер проекта, QA</td>
+            </tr>
+            <tr>
+              <td><strong>5.12</strong> Безопасная сборка</td>
+              <td>DevOps-инженер</td>
+              <td>Руководитель DevOps</td>
+              <td>AppSec, архитектор</td>
+              <td>Тимлид разработки, релиз-менеджер</td>
+            </tr>
+            <tr>
+              <td><strong>5.16</strong> Композиционный анализ</td>
+              <td>AppSec-инженер</td>
+              <td>Руководитель отдела безопасности</td>
+              <td>Архитектор, юрист (лицензии)</td>
+              <td>Менеджер проекта</td>
+            </tr>
+            <tr>
+              <td><strong>5.23</strong> Реагирование на информацию об уязвимостях</td>
+              <td>Дежурный AppSec</td>
+              <td>CISO</td>
+              <td>Разработчики затронутых модулей</td>
+              <td>Все продуктовые команды</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Практический критерий готовности по людям</h3>
+      <p>Самый простой и одновременно жёсткий тест: для каждого процесса должен существовать минимум один сотрудник, который умеет четыре вещи:</p>
+      <ul>
+        <li><strong>Знает регламент</strong> — может пересказать своими словами, без подсматривания в текст.</li>
+        <li><strong>Может показать артефакт «в системе»</strong> — открывает CI/трекер/репозиторий и демонстрирует пример.</li>
+        <li><strong>Может объяснить входы/выходы и контрольные точки</strong> процесса.</li>
+        <li><strong>Понимает, как процесс применяется ко всей области действия</strong> — а не только к «любимому» продукту.</li>
+      </ul>
+
+      <div class="callout warning">
+        <p><strong>Антипаттерн «один человек на всё».</strong> Если в RACI один и тот же сотрудник стоит как R по большинству процессов — это не сила, а риск. ОС обоснованно усомнится в воспроизводимости процесса при болезни или увольнении этого человека. Минимально — двойное покрытие критичных ролей. Идеально — описанная процедура передачи знаний.</p>
+      </div>
+    </section>
+
+    <!-- 13. READINESS -->
+    <section id="readiness" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> · Критерии</div>
+      <h2>Критерии готовности по каждому процессу 5.X</h2>
+      <p class="lead">Единый шаблон, по которому проверяется готовность каждого из 25 процессов. Применяется как самотест перед сертификацией и как чек-лист для эксперта.</p>
+
+      <ul class="checklist">
+        <li><strong>Полнота.</strong> Существует утверждённый регламент процесса, определены роли и ответственность, указаны применяемые системы и инструменты.</li>
+        <li><strong>Воспроизводимость.</strong> Процесс реально выполняется, и это подтверждается артефактами в системах — логами, задачами, отчётами инструментов, журналами.</li>
+        <li><strong>Охват области действия.</strong> Артефакты и выполнение процесса демонстрируются для любого продукта области действия (или по установленным правилам выборки внутри области действия).</li>
+        <li><strong>Управляемость.</strong> Определены события и периодичность пересмотра настроек, регламентов и результатов; есть журнал решений.</li>
+        <li><strong>Результативность.</strong> По результатам процесса принимаются решения, есть фиксация устранения выявленных недостатков и контроль закрытия.</li>
+      </ul>
+
+      <div class="callout success">
+        <p><strong>Как пользоваться чек-листом.</strong> Заполните по каждому из 25 процессов одну страницу: пять ответов «да/нет» с краткими доказательствами. Если хотя бы по одному критерию ответ «нет» — это пробел, который надо закрыть до сертификации. Это и есть тот самый «реалистичный термометр готовности», который трудно обмануть.</p>
+      </div>
+    </section>
+
+    <!-- 14. ADDITIONAL -->
+    <section id="additional" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> · Документация</div>
+      <h2>Дополнительные документы, требуемые для сертификации</h2>
+      <p class="lead">Помимо Руководства и 25 регламентов, на проверке потребуется набор связующих внутренних документов. Их часто упускают при подготовке — а без них экспертиза превращается в долгую сверку «вручную».</p>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">1</div>
+          <h4>Матрица соответствия</h4>
+          <ul>
+            <li>Связь «требование стандарта → регламент → артефакт»</li>
+            <li>Основание: п. 4.11, 4.12 ГОСТ Р 56939-2024</li>
+            <li>См. раздел 07 этого материала</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">2</div>
+          <h4>RACI-матрица ролей</h4>
+          <ul>
+            <li>Распределение ролей по процессам 5.1-5.25</li>
+            <li>Основание: п. 5.1 Порядка</li>
+            <li>См. раздел 12 этого материала</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">3</div>
+          <h4>Перечень информационных систем</h4>
+          <ul>
+            <li>и инструментальных средств РБПО</li>
+            <li>Основание: п. 19 Порядка</li>
+            <li>См. раздел 08 этого материала</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">4</div>
+          <h4>Карта «ЖЦ → инструменты → артефакты»</h4>
+          <ul>
+            <li>Основание: практика оценки соответствия процессов РБПО (ИСП РАН)</li>
+            <li>См. таблицу в разделе 08</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">5</div>
+          <h4>Реестр уникальных использований компиляторов</h4>
+          <ul>
+            <li>Для проверки по ГОСТ Р 71206-2024</li>
+            <li>Основание: п. 5.2.5, 5.2.6 ГОСТ Р 71206-2024</li>
+            <li>См. раздел 11 этого материала</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Дополнительно в комплекте материалов сертификации.</strong> Согласно п. 24 Порядка, в ФСТЭК России подаются: экспертное заключение, проект сертификата соответствия, протокол сертификации (и протокол повторной сертификации, если она проводилась), Руководство по РБПО, документация по РБПО. Всё, кроме документации, — на бумажном и электронном носителе; документация — только в электронном виде.</p>
+      </div>
+    </section>
+
+    <!-- 15. CAVEATS -->
+    <section id="caveats" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> · Подводные камни</div>
+      <h2>Спорные моменты и подводные камни методики</h2>
+      <p class="lead">Несколько мест, где формулировки методики или общепринятая практика расходятся с буквой нормативных документов. Знать эти расхождения — значит быть готовым ответить на каверзный вопрос аудитора и не повторить чужих ошибок.</p>
+
+      <div class="accordion">
+
+        <details class="acc-item" open>
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">п. 4.13</span>
+              <span>Ссылка на «п. 4.13» — на действующий ГОСТ или на проект?</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>В действующем ГОСТ Р 56939-2024 пункт 4.13 устанавливает требования к среде разработки (контроль версий, непрерывная интеграция, управление задачами), а <em>не</em> критерии оценки процессов. Критерии положительного заключения о реализации требований к процессу содержатся в проекте стандарта (п. 4.13 ПНС). В документах изготовителя следует разделять ссылки на проект и действующий стандарт; на ПНС — только как на ориентир, без нормативной апелляции.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">«Заочная»</span>
+              <span>Термина «заочная оценка» в Порядке нет</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Порядок сертификации не устанавливает «заочную» оценку как отдельный нормативный этап. Документарная проверка является частью процесса сертификации, но не выделяется. Формулировать «заочную» часть имеет смысл как внутренний этап подготовки изготовителя и как практику документарной проверки органом по сертификации до выезда — но без апелляции к Порядку как к источнику этого термина.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Принцип</span>
+              <span>«Один продукт — вся область»: не буквально в Порядке</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Принцип «невыполнение хотя бы для одного продукта = несоответствие процесса» логически обоснован принципами управления риском сертификации — но не сформулирован буквально в Порядке. Изготовителю рекомендуется закрепить этот принцип как внутреннее правило обеспечения однородности процессов по области действия. Это снимет вопрос «а правомерно ли ОС распространяет конкретное несоответствие на весь скоуп».</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Buildography</span>
+              <span>Статус инструмента не зафиксирован публично</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>В презентации ИСП РАН описаны возможности Buildography, но не дорожная карта релизов и не публичные условия лицензирования. При реальном планировании работ — проверьте актуальность у разработчика (ИСП РАН) и предусмотрите альтернативные варианты инструментального контроля сборки. Требования ГОСТ Р 71206-2024 к фиксации сборки можно реализовать и собственным wrapper-ом над компилятором с генерацией JSON-журнала.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Изменения</span>
+              <span>Управление изменениями в области действия</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Сертификат выдаётся на область действия, указанную в Руководстве по РБПО. Что делать, если в течение 5 лет действия сертификата появляются новые продукты или модули? В методике этот раздел отсутствует — рекомендуется добавить к Руководству порядок внесения изменений в область действия и процедуру согласования расширений с органом по сертификации. Без этого любой новый продукт окажется в «серой зоне» сертификата.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Повторная</span>
+              <span>Подготовка к повторной сертификации</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Сертификат действует не более 5 лет. К концу срока — повторная сертификация. Артефакты процессов должны вестись непрерывно, а не «оживляться» к моменту проверки. Имеет смысл встроить в внутренние регламенты периодический самоаудит (раз в 6 или 12 месяцев) с фиксацией результатов — это и есть готовность к инспекционному контролю.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <div class="acc-summary-left">
+              <span class="acc-tag">Цепочка</span>
+              <span>Заимствованные компоненты — слабое место</span>
+            </div>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <p>Процессы 5.16 (композиционный анализ) и 5.17 (цепочки поставок) исторически готовятся «по остаточному принципу». Для качественной подготовки — детализировать требования к документированию источников сторонних компонентов и процедур их верификации: каноничный SBOM (CycloneDX или SPDX) на каждый релиз, журнал обновления зависимостей, реакция на CVE в зависимостях, формализованные договорные обязательства с поставщиками.</p>
+          </div>
+        </details>
+
+      </div>
+    </section>
+
+    <!-- 16. APPSEC.TABLE.TOP -->
+    <section id="tabletop" class="section">
+      <div class="section-eyebrow"><span class="section-num">16</span> · Дополнительный фреймворк</div>
+      <h2>AppSec.Table.Top — комплементарный инструмент самооценки</h2>
+      <p class="lead">AppSec.Table.Top — методология оценки зрелости практик безопасной разработки от Positive Technologies. Распространяется свободно через <a href="https://cyberorda.com/methodology/" target="_blank" rel="noopener">cyberorda.com</a>. Не заменяет требования ГОСТ Р 56939-2024, но удобно дополняет их там, где стандарт оставляет свободу интерпретации.</p>
+
+      <h3>Чем полезен в контексте подготовки к сертификации</h3>
+      <p>ГОСТ Р 56939 формулирует требования к процессам как «должно быть»; AppSec.Table.Top формулирует то же самое как «как именно» — с разбиением каждой практики на инициативы и привязкой к уровням зрелости. Это даёт изготовителю понятный разговорный язык для:</p>
+      <ul>
+        <li><strong>самодиагностики</strong> — где вы сейчас по каждой практике, на шкале уровней зрелости;</li>
+        <li><strong>планирования развития процессов</strong> — какие практики поднимать в первую очередь и до какого уровня;</li>
+        <li><strong>обоснования инвестиций</strong> — почему именно эта роль/инструмент/процесс должен появиться в этом году.</li>
+      </ul>
+
+      <h3>Структура методологии</h3>
+      <p>По данным самой методологии (Таблица 1): <strong>3 стадии, 9 процессов, 26 практик и 98 инициатив</strong>. Стадии соответствуют моментам жизненного цикла безопасной разработки:</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div>
+              <h3>PreStageSDL</h3>
+              <span class="col-en">Подготовка к жизненному циклу</span>
+            </div>
+          </div>
+          <p>Организационно-административный фундамент: общие политики SSDL, оргдокументация (OAD), моделирование угроз и требования (TMR), риски и метрики (RM), технические проекты (TP), управление доступом (AC), конфигурации (CNFG).</p>
+          <div class="col-tags">
+            <span class="col-tag">SSDL</span>
+            <span class="col-tag">OAD</span>
+            <span class="col-tag">TMR</span>
+            <span class="col-tag">RM</span>
+            <span class="col-tag">TP</span>
+            <span class="col-tag">AC</span>
+            <span class="col-tag">CNFG</span>
+          </div>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            </div>
+            <div>
+              <h3>MainStageSDL</h3>
+              <span class="col-en">Основной жизненный цикл</span>
+            </div>
+          </div>
+          <p>Безопасное кодирование (SC), Open Source (OSS), статический анализ (SPA), GitFlow (GF), композиционный анализ (SCA), цепочки поставок (SCS), QA, динамический анализ (DPA), верификация соответствия (VC), автоматизация (PA), целостность (IA), мониторинг (MI).</p>
+          <div class="col-tags">
+            <span class="col-tag">SC · OSS · SPA</span>
+            <span class="col-tag">SCA · SCS · QA</span>
+            <span class="col-tag">DPA · VC · PA</span>
+            <span class="col-tag">IA · MI</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col" style="grid-template-columns: 1fr;">
+        <div class="col-card">
+          <div class="col-card-head">
+            <div class="col-card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <h3>PostStageSDL</h3>
+              <span class="col-en">Эксплуатация и развитие</span>
+            </div>
+          </div>
+          <p>Управление уязвимостями (VM), техподдержка (TS), внутренний (ISA) и внешний (ESA, в т. ч. Bug Bounty) анализ безопасности, обучение сотрудников (ET), специализированное обучение AppSec (TAS, включая Security Champions), security-портал (SP).</p>
+          <div class="col-tags">
+            <span class="col-tag">VM</span>
+            <span class="col-tag">TS</span>
+            <span class="col-tag">ISA</span>
+            <span class="col-tag">ESA</span>
+            <span class="col-tag">ET</span>
+            <span class="col-tag">TAS</span>
+            <span class="col-tag">SP</span>
+          </div>
+        </div>
+      </div>
+
+      <h3>Доступные артефакты на cyberorda.com</h3>
+      <ul class="checklist">
+        <li><strong>PDF с полной методологией</strong> — описание всех 98 инициатив, входов, выходов, уровней зрелости.</li>
+        <li><strong>Excel-шаблон с примерами заполнения</strong> — для понимания того, как должна выглядеть «зрелая» оценка.</li>
+        <li><strong>Чистый Excel-шаблон</strong> — для самостоятельного заполнения «как у вас».</li>
+        <li><strong>Word-памятка v0.2</strong> — короткое руководство по применению.</li>
+        <li><strong>Статья на Хабр</strong> — авторские пояснения к подходу и примеры из практики.</li>
+      </ul>
+
+      <h3>Связь с процессами ГОСТ Р 56939-2024 (приблизительная)</h3>
+      <div class="table-wrap">
+        <table class="data">
+          <thead>
+            <tr>
+              <th>ГОСТ 56939 — процесс</th>
+              <th>AppSec.Table.Top — практики</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>5.1 Планирование</td><td>SSDL · OAD</td></tr>
+            <tr><td>5.2 Обучение</td><td>ET · TAS</td></tr>
+            <tr><td>5.3 Требования безопасности</td><td>TMR · RM</td></tr>
+            <tr><td>5.6 Архитектура</td><td>TP</td></tr>
+            <tr><td>5.7 Моделирование угроз</td><td>TMR</td></tr>
+            <tr><td>5.8 Кодирование</td><td>SC</td></tr>
+            <tr><td>5.10 Статический анализ</td><td>SPA</td></tr>
+            <tr><td>5.11 Динамический анализ</td><td>DPA</td></tr>
+            <tr><td>5.12 Сборка</td><td>GF · IA · PA</td></tr>
+            <tr><td>5.16 Композиционный анализ</td><td>SCA · OSS</td></tr>
+            <tr><td>5.17 Цепочки поставок</td><td>SCS</td></tr>
+            <tr><td>5.18 Функциональное тестирование</td><td>QA</td></tr>
+            <tr><td>5.19 Нефункциональное тестирование</td><td>ISA · ESA</td></tr>
+            <tr><td>5.22 Поддержка</td><td>TS</td></tr>
+            <tr><td>5.23 Реагирование на информацию об уязвимостях</td><td>VM · MI</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout">
+        <p><strong>Как использовать вместе.</strong> ГОСТ Р 56939-2024 — это «что должно быть» (нормативное «да/нет» по 25 процессам). AppSec.Table.Top — «насколько зрело это сделано» (уровень зрелости по каждой из 26 практик и 98 инициатив). Сначала закрываете требования стандарта на сертификацию, затем по методологии Positive Technologies планируете рост зрелости от уровня «есть» к уровню «оптимизируется». Удобный комплект: <a href="https://cyberorda.com/methodology/" target="_blank" rel="noopener">cyberorda.com/methodology</a>.</p>
+      </div>
+    </section>
+
+    <!-- CONTACTS / FOOTER -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам лекции, проведения курсов и сопровождения подготовки к сертификации процессов РБПО по ГОСТ Р 56939-2024 / Приказам ФСТЭК России №240 (в ред. №230).</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:pikov@yandex.ru">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          pikov@yandex.ru
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Лекция · РБПО · Сертификация ФСТЭК</span>
+        </div>
+        <div>
+          В основу лекции положена <strong>Методика подготовки изготовителя к сертификации процессов РБПО</strong> (НОУ ДПО «Учебный центр безопасности информации МАСКОМ», v.002 от 24.03.2026).
+          В разделе «Проверка процессов» использованы материалы И. Шаркова (ИСП РАН) о практике оценки соответствия процессов РБПО.
+          AppSec.Table.Top — методология Positive Technologies, доступна на <a href="https://cyberorda.com/methodology/" target="_blank" rel="noopener">cyberorda.com</a>.
+        </div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
