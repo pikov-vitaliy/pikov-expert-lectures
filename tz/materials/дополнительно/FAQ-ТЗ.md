@@ -460,7 +460,7 @@
 ## 📞 Контакты
 
 По вопросам, связанным с FAQ:
-- **Email:** vitaliy@pikov.expert
+- **Email:** vitaly@pikov.expert
 - **Telegram:** [@UnderLineSecurity](https://t.me/UnderLineSecurity)
 - **Сайт:** [pikov.expert](https://pikov.expert)
 

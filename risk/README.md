@@ -33,13 +33,13 @@
   - методика критичности уязвимостей ФСТЭК (30.06.2025);
   - приказы ФСБ № 282, 213.
 - **Соответствие фирменному стилю** (логотип, цвет, шрифты — Claude по умолчанию возьмёт за основу `sast/` и `astra-hardening/`).
-- **Контакты:** `vitaliy@pikov.expert`, `@UnderLineSecurity`, ссылки на `pikov.expert` и `mascom-uc.ru` — корректны.
+- **Контакты:** `vitaly@pikov.expert`, `@UnderLineSecurity`, ссылки на `pikov.expert` и `mascom-uc.ru` — корректны.
 - **Регуляторы** упомянуты в кратких формах (ФСТЭК, ФСБ, Минцифры и т.п.), без слова «России» при повторных упоминаниях (это требование шаблона промптов автора).
 
 ## Контакты
 
 **Виталий Александрович Пиков**
 Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
-- Email: vitaliy@pikov.expert
+- Email: vitaly@pikov.expert
 - Telegram: @UnderLineSecurity
 - Сайт: https://pikov.expert/

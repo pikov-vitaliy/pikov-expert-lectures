@@ -1799,7 +1799,7 @@ PDCA лежит в основе СУИБ (ISO/IEC 27001) и подходов к 
 **Виталий Александрович Пиков**
 Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
 
-Email: vitaliy@pikov.expert
+Email: vitaly@pikov.expert
 Telegram: @UnderLineSecurity
 Сайт: https://pikov.expert/
 

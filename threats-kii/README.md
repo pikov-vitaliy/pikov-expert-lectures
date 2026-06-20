@@ -47,12 +47,12 @@
    - Проект изменений приказов 235/239 от 07.04.2026.
 2. **Дата** проведения лекции (в шаблоне указан четверг 28.05.2026).
 3. **Соответствие фирменному стилю** — копия дизайна risk.pikov.expert.
-4. **Контакты:** `vitaliy@pikov.expert`, `@UnderLineSecurity`.
+4. **Контакты:** `vitaly@pikov.expert`, `@UnderLineSecurity`.
 
 ## Контакты
 
 **Виталий Александрович Пиков**
 Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
-- Email: vitaliy@pikov.expert
+- Email: vitaly@pikov.expert
 - Telegram: @UnderLineSecurity
 - Сайт: https://pikov.expert/

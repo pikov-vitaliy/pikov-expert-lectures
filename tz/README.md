@@ -113,7 +113,7 @@ Select-String -LiteralPath .\index.html -Pattern 'src="https://|href="https://fo
 **Виталий Александрович Пиков**  
 Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
 
-- Email: `vitaliy@pikov.expert`
+- Email: `vitaly@pikov.expert`
 - Telegram: `@UnderLineSecurity`
 - Сайт: `https://pikov.expert/`
 

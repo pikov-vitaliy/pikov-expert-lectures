@@ -125,5 +125,5 @@ node .\_PROJECT\browser-qa-online.mjs
 
 Контакты:
 
-- Email: [vitaliy@pikov.expert](mailto:vitaliy@pikov.expert)
+- Email: [vitaly@pikov.expert](mailto:vitaly@pikov.expert)
 - Telegram: [@UnderLineSecurity](https://t.me/UnderLineSecurity)

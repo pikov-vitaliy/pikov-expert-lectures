@@ -1653,7 +1653,7 @@ V = f( B, T, X, Iat, Iimp )
 **Виталий Александрович Пиков**
 Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
 
-Email: vitaliy@pikov.expert
+Email: vitaly@pikov.expert
 Telegram: @UnderLineSecurity
 Сайт: https://pikov.expert/
 
