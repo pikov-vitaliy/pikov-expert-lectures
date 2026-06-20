@@ -75,6 +75,8 @@ function Should-ExcludeDirectory([string]$Name) {
 }
 
 function Should-ExcludeFile([string]$Name) {
+  $lower = $Name.ToLowerInvariant()
+  if ($lower -eq 'index1.html' -or $lower -like 'indexold*.html' -or $lower -like 'index-v*.html') { return $true }
   if ($Name.ToLowerInvariant().EndsWith('.md') -and $Name.ToLowerInvariant() -ne 'materials.md') { return $true }
   if ($Name -like '00_*.md') { return $true }
   if ($Name -in @('README.md', 'SOURCE.md')) { return $true }
