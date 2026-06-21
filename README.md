@@ -69,6 +69,8 @@
 
 ## Проверка
 
+Перед любыми изменениями, публикацией или повторным аудитом сначала открыть и выполнить порядок из [_PROJECT/OPERATIONS_RUNBOOK.md](_PROJECT/OPERATIONS_RUNBOOK.md). Это обязательная точка входа для синхронизации `git pull --ff-only`, локальных QA-gates, деплоя, `hosting-check`, commit/push и проверки CI.
+
 Минимальная локальная проверка:
 
 ```powershell
@@ -101,6 +103,8 @@ node .\_PROJECT\browser-qa-online.mjs
 ```
 
 ## Публикация
+
+Не публиковать сайт напрямую из рабочей папки. Канонический порядок зафиксирован в [_PROJECT/OPERATIONS_RUNBOOK.md](_PROJECT/OPERATIONS_RUNBOOK.md): синхронизация репозитория, актуализация контрольных файлов, smoke, release build, browser QA, deploy, hosting-check, commit, push, GitHub Actions.
 
 Релизная модель простая:
 
