@@ -8,12 +8,12 @@ function Fail([string]$Message) {
   throw "CONTROL FILES FAIL: $Message"
 }
 
-function Write-AsciiFile([string]$Path, [string[]]$Lines) {
+function Write-Utf8File([string]$Path, [string[]]$Lines) {
   $parent = Split-Path -Parent $Path
   if (-not (Test-Path -LiteralPath $parent)) {
     [void](New-Item -ItemType Directory -Path $parent -Force)
   }
-  $Lines | Set-Content -LiteralPath $Path -Encoding ASCII
+  [System.IO.File]::WriteAllLines($Path, $Lines, [System.Text.UTF8Encoding]::new($false))
 }
 
 function HtmlPathToUrl([string]$RelativePath, [string]$BaseUrl) {
@@ -42,7 +42,7 @@ function Get-RelativePathSafe([string]$BasePath, [string]$Path) {
 function Should-SkipSitemapPath([string]$RelativePath) {
   $normalized = $RelativePath.Replace('\', '/')
   if ($normalized -match '(^|/)(release|source|tools|output|notes|tests|test-results|node_modules)(/|$)') { return $true }
-  if ($normalized -match '(^|/)(_PROJECT|_НА_УДАЛЕНИЕ_2026-06-20|\.git|\.codegraph|\.codex|\.agents|\.gigacode)(/|$)') { return $true }
+  if ($normalized -match '(^|/)(_PROJECT|_[^/]*|\.git|\.codegraph|\.codex|\.claude|\.agents|\.gigacode|\.qwen|\.vscode|\.idea)(/|$)') { return $true }
   if ($normalized -match '(^|/)index-v[0-9].*\.html$') { return $true }
   if ($normalized -match '(^|/)indexOLD.*\.html$') { return $true }
   return $false
@@ -55,6 +55,24 @@ function New-HtaccessLines {
     '',
     'DirectoryIndex index.html',
     'AddDefaultCharset UTF-8',
+    '',
+    '# HTTPS redirect is handled by the hosting layer. Duplicating it here can',
+    '# create self-redirect loops when Apache runs behind a TLS terminator.',
+    '',
+    '<IfModule mod_headers.c>',
+    '  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"',
+    '  Header always set X-Content-Type-Options "nosniff"',
+    '  Header always set X-Frame-Options "DENY"',
+    '  Header always set Referrer-Policy "strict-origin-when-cross-origin"',
+    '  Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"',
+    '  Header always set Content-Security-Policy "default-src ''self''; base-uri ''self''; object-src ''none''; frame-ancestors ''none''; img-src ''self'' data: https://mc.yandex.ru https://*.mc.yandex.ru https://spdx.org; script-src ''self'' ''unsafe-inline'' https://mc.yandex.ru; style-src ''self'' ''unsafe-inline'' https://fonts.googleapis.com; font-src ''self'' data: https://fonts.gstatic.com; connect-src ''self'' https://mc.yandex.ru https://*.mc.yandex.ru; form-action ''self''; upgrade-insecure-requests"',
+    '</IfModule>',
+    '',
+    '<IfModule mod_headers.c>',
+    '<FilesMatch "\.(md|markdown|csv|txt|log|ttl|json|jsonld)$">',
+    '  Header set X-Robots-Tag "noindex, noarchive"',
+    '</FilesMatch>',
+    '</IfModule>',
     '',
     'AddCharset UTF-8 .html .htm .css .js .mjs .json .jsonld .xml .svg .txt .md .markdown .csv .log .ttl',
     'AddType "text/markdown; charset=UTF-8" .md .markdown',
@@ -79,6 +97,16 @@ function New-RobotsLines([string]$SitemapUrl) {
   @(
     'User-agent: *',
     'Allow: /',
+    'Disallow: /release/',
+    'Disallow: /source/',
+    'Disallow: /tools/',
+    'Disallow: /output/',
+    'Disallow: /notes/',
+    'Disallow: /tests/',
+    'Disallow: /test-results/',
+    'Disallow: /node_modules/',
+    'Disallow: /materials_from_4days/',
+    'Disallow: /_*/',
     '',
     "Sitemap: $SitemapUrl"
   )
@@ -114,9 +142,9 @@ foreach ($lecture in @($data.lectures | Sort-Object position)) {
   Add-UniqueUrl -List $rootUrls -Url ([string]$lecture.url)
 }
 
-Write-AsciiFile -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines)
-Write-AsciiFile -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
-Write-AsciiFile -Path (Join-Path $rootPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($rootUrls) -LastMod $lastMod)
+Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines)
+Write-Utf8File -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
+Write-Utf8File -Path (Join-Path $rootPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($rootUrls) -LastMod $lastMod)
 
 $uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
 foreach ($folder in $uniqueFolders) {
@@ -126,6 +154,13 @@ foreach ($folder in $uniqueFolders) {
   $domain = "$($lecture.domain).pikov.expert"
   $baseUrl = "https://$domain/"
 
+  if ($folder -eq 'spdx') {
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+    Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
+    Write-Output "controlExternalFolder=$folder"
+    continue
+  }
+
   $urls = New-Object System.Collections.Generic.List[string]
   foreach ($entry in @($data.lectures | Where-Object { $_.folder -eq $folder } | Sort-Object position)) {
     Add-UniqueUrl -List $urls -Url ([string]$entry.url)
@@ -133,6 +168,7 @@ foreach ($folder in $uniqueFolders) {
 
   Get-ChildItem -LiteralPath $folderPath -Recurse -File -Force |
     Where-Object { $_.Extension.ToLowerInvariant() -in @('.html', '.htm') } |
+    Sort-Object FullName |
     ForEach-Object {
       $relative = Get-RelativePathSafe -BasePath $folderPath -Path $_.FullName
       if (-not (Should-SkipSitemapPath $relative)) {
@@ -140,9 +176,9 @@ foreach ($folder in $uniqueFolders) {
       }
     }
 
-  Write-AsciiFile -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
-  Write-AsciiFile -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
-  Write-AsciiFile -Path (Join-Path $folderPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($urls) -LastMod $lastMod)
+  Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+  Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
+  Write-Utf8File -Path (Join-Path $folderPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($urls) -LastMod $lastMod)
 }
 
 Write-Output "CONTROL FILES OK"

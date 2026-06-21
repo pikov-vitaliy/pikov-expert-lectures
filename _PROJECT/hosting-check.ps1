@@ -1,6 +1,6 @@
 param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot),
-  [string]$ReleaseDate = '2026-06-20'
+  [string]$ReleaseDate = ''
 )
 
 $ErrorActionPreference = 'Stop'
@@ -52,8 +52,52 @@ function Add-Result([System.Collections.Generic.List[object]]$Results, [string]$
   }) | Out-Null
 }
 
+function Join-Url([string]$Base, [string]$RelativePath) {
+  $relative = $RelativePath.Replace('\', '/').TrimStart('/')
+  return ($Base.TrimEnd('/') + '/' + $relative)
+}
+
+function Get-ReleaseMarkdownUrls([object[]]$Targets) {
+  $urls = New-Object System.Collections.Generic.List[string]
+  foreach ($target in $Targets) {
+    if ([string]$target.kind -ne 'domain') { continue }
+    $releaseDir = [string]$target.releaseDir
+    if ([string]::IsNullOrWhiteSpace($releaseDir)) { continue }
+    $manifestPath = Join-Path $releaseDir 'MANIFEST.json'
+    if (-not (Test-Path -LiteralPath $manifestPath)) { continue }
+
+    $manifest = Get-Content -LiteralPath $manifestPath -Encoding UTF8 -Raw | ConvertFrom-Json
+    $base = Normalize-Base ([string]$target.url)
+    foreach ($file in @($manifest.files)) {
+      $relativePath = [string]$file.path
+      if ([string]::IsNullOrWhiteSpace($relativePath)) { continue }
+      $normalized = $relativePath.Replace('\', '/')
+      $lower = $normalized.ToLowerInvariant()
+      if (-not ($lower.EndsWith('.md') -or $lower.EndsWith('.markdown'))) { continue }
+      if ($normalized -match '(^|/)00_') { continue }
+      if ($normalized -match '(^|/)(README|SOURCE)\.md$') { continue }
+
+      $url = Join-Url -Base $base -RelativePath $normalized
+      if ($urls -notcontains $url) { $urls.Add($url) | Out-Null }
+    }
+  }
+  @($urls | Sort-Object)
+}
+
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
 $projectPath = Join-Path $rootPath '_PROJECT'
+$lecturesPath = Join-Path $projectPath 'lectures.json'
+if (-not (Test-Path -LiteralPath $lecturesPath)) {
+  throw "Missing _PROJECT\lectures.json"
+}
+$lectureData = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
+if ([string]::IsNullOrWhiteSpace($ReleaseDate)) {
+  $ReleaseDate = [string]$lectureData.updated
+}
+if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
+  throw "ReleaseDate must be YYYY-MM-DD, got $ReleaseDate"
+}
+
 $indexPath = Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json"
 $reportPath = Join-Path $projectPath "HOSTING_CHECK_$ReleaseDate.md"
 
@@ -103,14 +147,7 @@ foreach ($target in $targets) {
   }
 }
 
-$markdownUrls = @(
-  'https://astra-intro.pikov.expert/materials.md',
-  'https://astra-hardening.pikov.expert/labs/01-easy-password-policy.md',
-  'https://komrad.pikov.expert/docs/01-komrad-handout.md',
-  'https://risk.pikov.expert/materials.md',
-  'https://threats-kii.pikov.expert/materials.md',
-  'https://threats-kii.pikov.expert/threats-kii/materials.md'
-)
+$markdownUrls = @(Get-ReleaseMarkdownUrls -Targets $targets)
 
 foreach ($url in $markdownUrls) {
   $markdown = Get-Web $url
@@ -133,7 +170,7 @@ $lines.Add("# Hosting check $ReleaseDate") | Out-Null
 $lines.Add('') | Out-Null
 $lines.Add(("Checked at: {0:yyyy-MM-dd HH:mm:ss zzz}" -f (Get-Date))) | Out-Null
 $lines.Add('') | Out-Null
-$lines.Add(("Summary: OK={0}; WARN={1}; FAIL={2}; targets={3}" -f $okCount, $warnCount, $failCount, $targets.Count)) | Out-Null
+$lines.Add(("Summary: OK={0}; WARN={1}; FAIL={2}; targets={3}; markdown={4}" -f $okCount, $warnCount, $failCount, $targets.Count, $markdownUrls.Count)) | Out-Null
 $lines.Add('') | Out-Null
 $lines.Add('| Check | URL | Status | Details |') | Out-Null
 $lines.Add('|---|---|---:|---|') | Out-Null
@@ -145,7 +182,7 @@ foreach ($result in $results) {
 
 [System.IO.File]::WriteAllLines($reportPath, $lines, [System.Text.UTF8Encoding]::new($false))
 
-Write-Output "HOSTING CHECK report=$reportPath OK=$okCount WARN=$warnCount FAIL=$failCount targets=$($targets.Count)"
+Write-Output "HOSTING CHECK report=$reportPath OK=$okCount WARN=$warnCount FAIL=$failCount targets=$($targets.Count) markdown=$($markdownUrls.Count)"
 
 if ($failCount -gt 0) {
   $results | Where-Object Status -eq 'FAIL' | Format-Table -AutoSize | Out-String -Width 240 | Write-Output

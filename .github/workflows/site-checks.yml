@@ -33,3 +33,13 @@ jobs:
         shell: pwsh
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\smoke-check.ps1
+
+      - name: Build release archives
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+
+      - name: Prepare deploy script
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -PrepareOnly

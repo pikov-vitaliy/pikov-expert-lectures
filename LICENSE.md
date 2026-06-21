@@ -1,27 +1,35 @@
 # License
 
-This repository contains several different categories of material. A single blanket license would be misleading, because the site includes original educational content together with third-party documents, specifications, logos, product names, and generated reference material.
+This repository contains original educational material, static website code,
+automation scripts, and a limited amount of third-party reference material.
+Unless a file states otherwise, the licensing model is:
 
-## Proposed Public Licensing Model
+- original educational texts, HTML lecture pages, teaching examples, and
+  author-created diagrams: Creative Commons Attribution 4.0 International
+  (CC BY 4.0), see `LICENSE-CONTENT.md`;
+- project automation scripts in `_PROJECT/`: MIT License, see
+  `LICENSE-CODE.md`;
+- third-party materials, trademarks, standards text, product documentation,
+  screenshots, logos, and generated mirrors: original owners' terms apply and
+  are documented or excluded through `NOTICE.md` and `.gitignore`.
 
-Unless a file says otherwise:
+No license grant is made for material that is explicitly identified as
+third-party unless that material's own license permits redistribution.
 
-- original educational texts, HTML lecture pages, teaching examples, and author-created diagrams: Creative Commons Attribution 4.0 International (CC BY 4.0);
-- project automation scripts in `_PROJECT`: MIT License;
-- third-party materials: original owners' terms apply.
+## Attribution
 
-## Third-Party Material
+Recommended attribution for original educational content:
 
-Some folders may contain vendor documentation, standards-derived references, product screenshots, logos, SPDX-derived data, or other materials that are not authored by Vitaliy Pikov. Those materials are included only for educational/site continuity and must be reviewed before publishing the repository as public.
+> Vitaliy Pikov, pikov.expert, "Source repository for open web lectures on
+> information security, secure software development, SSDLC/RBPO, SCA/SBOM,
+> operating systems, and applied computer science education."
 
-If redistribution rights are unclear, keep the file out of the public repository and link to the authoritative source instead.
+## Redistribution Gate
 
-## Copyright
+Before adding new non-original materials to the public repository, verify:
 
-Copyright (c) Vitaliy Pikov and respective third-party rights holders.
-
-This file is a publication policy placeholder. Before the repository is made public, replace this file with the final selected license texts or split licenses, for example:
-
-- `LICENSE-CONTENT.md` for educational content;
-- `LICENSE-CODE.md` for scripts;
-- `NOTICE.md` for third-party attributions and exceptions.
+- source and rights holder are known;
+- redistribution terms are compatible with publication in this repository;
+- the material is listed in `NOTICE.md` when attribution or restrictions apply;
+- high-risk distributables (`.pdf`, `.pptx`, `.docx`, `.xlsx`, `.eps`, course
+  photos, vendor handouts) are kept out unless rights are explicit.

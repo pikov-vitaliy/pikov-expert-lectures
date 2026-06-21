@@ -4,6 +4,24 @@
 DirectoryIndex index.html
 AddDefaultCharset UTF-8
 
+# HTTPS redirect is handled by the hosting layer. Duplicating it here can
+# create self-redirect loops when Apache runs behind a TLS terminator.
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://mc.yandex.ru https://*.mc.yandex.ru https://spdx.org; script-src 'self' 'unsafe-inline' https://mc.yandex.ru; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; connect-src 'self' https://mc.yandex.ru https://*.mc.yandex.ru; form-action 'self'; upgrade-insecure-requests"
+</IfModule>
+
+<IfModule mod_headers.c>
+<FilesMatch "\.(md|markdown|csv|txt|log|ttl|json|jsonld)$">
+  Header set X-Robots-Tag "noindex, noarchive"
+</FilesMatch>
+</IfModule>
+
 AddCharset UTF-8 .html .htm .css .js .mjs .json .jsonld .xml .svg .txt .md .markdown .csv .log .ttl
 AddType "text/markdown; charset=UTF-8" .md .markdown
 AddType "text/plain; charset=UTF-8" .txt .log

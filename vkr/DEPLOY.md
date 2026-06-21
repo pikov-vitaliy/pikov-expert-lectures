@@ -6,8 +6,6 @@
 /                              ← корень сайта на хостинге
 ├── index.html                 ← слайдер
 ├── og-cover.jpg               ← превью для соцсетей (1200×630)
-├── VKR_Methodology_Pikov.pptx ← скачиваемый файл, на него ссылается кнопка
-├── VKR_Methodology_Pikov.pdf  ← опционально, для печати
 ├── slides/                    ← 61 JPG-слайд (FHD)
 │   ├── slide-01.jpg
 │   └── ... slide-61.jpg
@@ -16,9 +14,10 @@
     └── ... thumb-61.jpg
 ```
 
-**Проверьте, что `VKR_Methodology_Pikov.pptx` действительно лежит в корне** — иначе кнопка «Скачать PPTX» отдаст 404 (на это рецензент уже жаловался).
-
-После загрузки откройте `https://vkr.pikov.expert/VKR_Methodology_Pikov.pptx` в браузере: должна начаться загрузка файла.
+PPTX/PDF-версии методики не входят в публичный релиз по умолчанию. Если их
+нужно публиковать, сначала явно подтвердите права и добавьте файлы в
+лицензионный/публикационный gate; иначе кнопка на сайте должна оставаться в
+режиме «PPTX по запросу».
 
 ---
 
@@ -59,9 +58,9 @@
     AddOutputFilterByType DEFLATE text/html text/css application/javascript image/svg+xml
 </IfModule>
 
-# === Корректные MIME-типы для скачивания ===
-AddType application/vnd.openxmlformats-officedocument.presentationml.presentation .pptx
-AddType application/pdf .pdf
+# === Корректные MIME-типы для статических материалов ===
+AddType image/jpeg .jpg .jpeg
+AddType image/png .png
 ```
 
 ### Если хостинг на Nginx
@@ -93,10 +92,7 @@ gzip on;
 gzip_vary on;
 gzip_types text/html text/css application/javascript image/svg+xml application/json;
 
-# === MIME для PPTX ===
-types {
-    application/vnd.openxmlformats-officedocument.presentationml.presentation pptx;
-}
+# === MIME для изображений слайдов обычно задан веб-сервером по умолчанию ===
 ```
 
 После правки перезапустите nginx: `sudo nginx -t && sudo systemctl reload nginx`

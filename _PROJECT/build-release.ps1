@@ -66,17 +66,28 @@ function Should-ExcludeDirectory([string]$Name) {
     '.git',
     '.codegraph',
     '.codex',
+    '.claude',
     '.agents',
-    '.gigacode'
+    '.gigacode',
+    '.qwen',
+    '.vscode',
+    '.idea',
+    'materials_from_4days'
   )
   if ($excluded -contains $lower) { return $true }
   if ($Name.StartsWith('_')) { return $true }
   return $false
 }
 
+function Should-ExcludeDistributable([string]$Name) {
+  $extension = [System.IO.Path]::GetExtension($Name).ToLowerInvariant()
+  return $extension -in @('.pdf', '.pptx', '.docx', '.xlsx', '.eps', '.zip')
+}
+
 function Should-ExcludeFile([string]$Name) {
   $lower = $Name.ToLowerInvariant()
   if ($lower -eq 'index1.html' -or $lower -like 'indexold*.html' -or $lower -like 'index-v*.html') { return $true }
+  if (Should-ExcludeDistributable $Name) { return $true }
   if ($Name.ToLowerInvariant().EndsWith('.md') -and $Name.ToLowerInvariant() -ne 'materials.md') { return $true }
   if ($Name -like '00_*.md') { return $true }
   if ($Name -in @('README.md', 'SOURCE.md')) { return $true }
@@ -85,6 +96,10 @@ function Should-ExcludeFile([string]$Name) {
 }
 
 function Should-ExcludeNestedFile([string]$Name) {
+  $lower = $Name.ToLowerInvariant()
+  if ($Name.StartsWith('_')) { return $true }
+  if (Should-ExcludeDistributable $Name) { return $true }
+  if ($lower -like 'img_*.jpg' -or $lower -like 'img_*.jpeg') { return $true }
   if ($Name -like '00_*.md') { return $true }
   if ($Name -in @('README.md', 'SOURCE.md')) { return $true }
   if ($Name.EndsWith('.tmp') -or $Name.EndsWith('.bak')) { return $true }
@@ -169,7 +184,7 @@ function Test-StaticRelease([string]$StageRoot, [string]$SiteName) {
           continue
         }
 
-        if ($local -match '(^|/|\\)(_PROJECT|release|source|2026-06-20)($|/|\\)') {
+        if ($local -match '(^|/|\\)(_PROJECT|release|source|_[^/\\]*)($|/|\\)') {
           $issues += [pscustomobject]@{ severity = 'P0'; site = $SiteName; file = $relativeHtml; issue = "internal path reference: $raw" }
           continue
         }
@@ -374,7 +389,7 @@ $indexLines = New-Object System.Collections.Generic.List[string]
 $indexLines.Add("# Release index pikov.expert")
 $indexLines.Add('')
 $indexLines.Add("Build date: $ReleaseDate")
-$indexLines.Add("Archives: $($results.Count) (23 subdomains + root)")
+$indexLines.Add("Archives: $($results.Count) ($($uniqueFolders.Count) subdomains + root)")
 $indexLines.Add("Static issues: $totalIssues")
 $indexLines.Add("Browser QA: not-run")
 $indexLines.Add('')

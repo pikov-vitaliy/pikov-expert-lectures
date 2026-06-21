@@ -8,6 +8,40 @@ function Fail([string]$Message) {
   throw "SMOKE FAIL: $Message"
 }
 
+function Get-ExpectedIndexUrl($Lecture) {
+  $expectedIndexUrl = ([string]$Lecture.url).Split('#')[0]
+  if ($expectedIndexUrl.EndsWith('.html')) {
+    $expectedIndexUrl = "https://$($Lecture.domain).pikov.expert/"
+  }
+  return $expectedIndexUrl
+}
+
+function Assert-PublicHtmlMetadata([string]$Html, [string]$Label, [string]$ExpectedUrl, [bool]$RequireBrandBack) {
+  if ($Html -notmatch '(?s)<html\b[^>]*\blang="ru"') { Fail "$Label missing lang=`"ru`"" }
+  if ($Html -notmatch '<meta\s+name="viewport"\s+content="[^"]*width=device-width') { Fail "$Label missing responsive viewport" }
+  if ($Html -match '<meta\s+name="viewport"\s+content="width=1920"') { Fail "$Label has fixed 1920px viewport" }
+  if ($Html -notmatch '109116119|mc\.yandex\.ru/metrika') { Fail "$Label missing Yandex Metrika" }
+  if ($Html -notmatch 'webvisor:false') { Fail "$Label must keep Yandex Webvisor disabled" }
+  foreach ($property in @('og:title', 'og:description', 'og:type', 'og:url', 'og:image')) {
+    if ($Html -notmatch ('property="' + [regex]::Escape($property) + '"')) { Fail "$Label missing $property" }
+  }
+  if ($Html -notmatch 'property="og:url"\s+content="([^"]+)"') { Fail "$Label missing og:url" }
+  if ($Matches[1] -ne $ExpectedUrl) { Fail "$Label og:url $($Matches[1]) != $ExpectedUrl" }
+  if ($Html -notmatch 'application/ld\+json') { Fail "$Label missing JSON-LD" }
+  if ($RequireBrandBack) {
+    $brandBackLinks = @([regex]::Matches($Html, '<a\b[^>]*class="[^"]*\bbrand-back\b[^"]*"[^>]*>', 'IgnoreCase'))
+    if ($brandBackLinks.Count -eq 0) { Fail "$Label missing brand-back link" }
+    $hasCatalogLink = $false
+    foreach ($link in $brandBackLinks) {
+      if ($link.Value -match 'href="https://pikov\.expert/?"') {
+        $hasCatalogLink = $true
+        break
+      }
+    }
+    if (-not $hasCatalogLink) { Fail "$Label brand-back does not link to https://pikov.expert" }
+  }
+}
+
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
 $projectPath = Join-Path $rootPath '_PROJECT'
 $lecturesPath = Join-Path $projectPath 'lectures.json'
@@ -51,7 +85,7 @@ foreach ($folder in $domainFolders) {
 $actualRootDirObjects = @(Get-ChildItem -LiteralPath $rootPath -Directory -Force)
 $quarantineDirs = @(
   $actualRootDirObjects |
-    Where-Object { $_.Name -like '_*2026-06-20' } |
+    Where-Object { $_.Name.StartsWith('_') -and $_.Name -ne '_PROJECT' } |
     Select-Object -ExpandProperty Name
 )
 if ($quarantineDirs.Count -ne 1) {
@@ -59,7 +93,8 @@ if ($quarantineDirs.Count -ne 1) {
     Fail "Expected at most one quarantine directory, got $($quarantineDirs.Count)"
   }
 }
-$allowedRootDirs = @('.git', '.github', '_PROJECT', 'release', 'docs') + $quarantineDirs + $domainFolders
+$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.gigacode', '.qwen', '.vscode', '.idea')
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs') + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
@@ -138,22 +173,62 @@ if ($robots -match 'komrad-build|2026-06-20|_PROJECT') {
   Fail "robots.txt includes an internal or obsolete path"
 }
 
-$rbpoFolders = @('tz', 'fstec-sdlc', 'kapo', 'sast', 'p19', 'ppk')
-foreach ($folder in $rbpoFolders) {
+$trackedHtml = git -C $rootPath grep -n 'pikov@yandex\.ru' -- '*.html' 2>$null
+if ($LASTEXITCODE -eq 0 -and $trackedHtml) {
+  Fail "Public HTML still references pikov@yandex.ru"
+}
+
+$webvisorHtml = git -C $rootPath grep -n 'webvisor:true' -- '*.html' 2>$null
+if ($LASTEXITCODE -eq 0 -and $webvisorHtml) {
+  Fail "Yandex Webvisor/session replay must stay disabled unless explicitly approved"
+}
+
+foreach ($blockedPath in @(
+  'p19/materials',
+  'ppk/materials_from_4days',
+  'threats-kii/threats-kii',
+  'astralinux01/materials/astra-linux-se-1.8.3.7'
+)) {
+  $candidate = Join-Path $rootPath $blockedPath
+  if (Test-Path -LiteralPath $candidate) {
+    $trackedBlocked = git -C $rootPath ls-files -- $blockedPath
+    if ($LASTEXITCODE -eq 0 -and $trackedBlocked) {
+      Fail "High-risk or duplicate tracked path remains: $blockedPath"
+    }
+  }
+}
+
+foreach ($folder in $domainFolders) {
   $lecture = @($lectures | Where-Object { $_.folder -eq $folder })[0]
   if (-not $lecture) { Fail "Missing $folder in lectures.json" }
 
   $lectureHtmlPath = Join-Path (Join-Path $rootPath $folder) 'index.html'
   $lectureHtml = Get-Content -LiteralPath $lectureHtmlPath -Encoding UTF8 -Raw
+  if ($lectureHtml -notmatch '<link\s+rel="canonical"\s+href="([^"]+)"') { Fail "$folder missing canonical" }
+  $expectedIndexUrl = Get-ExpectedIndexUrl $lecture
+  if ($Matches[1] -ne $expectedIndexUrl) { Fail "$folder canonical $($Matches[1]) != $expectedIndexUrl" }
+  if ($lectureHtml -notmatch 'property="og:url"\s+content="([^"]+)"') { Fail "$folder missing og:url" }
+  if ($Matches[1] -ne $expectedIndexUrl) { Fail "$folder og:url $($Matches[1]) != $expectedIndexUrl" }
+  if ($lectureHtml -notmatch 'property="og:image"\s+content="https://[^"]+"') {
+    Fail "$folder missing og:image"
+  }
+  Assert-PublicHtmlMetadata -Html $lectureHtml -Label $folder -ExpectedUrl $expectedIndexUrl -RequireBrandBack $true
+}
+
+foreach ($lecture in @($lectures | Where-Object { ([string]$_.url).Split('#')[0].EndsWith('.html') })) {
+  $cleanUrl = ([string]$lecture.url).Split('#')[0]
+  $fileName = [System.IO.Path]::GetFileName(([Uri]$cleanUrl).AbsolutePath)
+  $pagePath = Join-Path (Join-Path $rootPath ([string]$lecture.folder)) $fileName
+  if (-not (Test-Path -LiteralPath $pagePath)) { Fail "Missing lecture detail page: $pagePath" }
+  $pageHtml = Get-Content -LiteralPath $pagePath -Encoding UTF8 -Raw
+  Assert-PublicHtmlMetadata -Html $pageHtml -Label "$($lecture.folder)/$fileName" -ExpectedUrl $cleanUrl -RequireBrandBack $true
+}
+
+foreach ($folder in @('tz', 'fstec-sdlc', 'kapo', 'sast', 'p19', 'ppk')) {
+  $lectureHtmlPath = Join-Path (Join-Path $rootPath $folder) 'index.html'
+  $lectureHtml = Get-Content -LiteralPath $lectureHtmlPath -Encoding UTF8 -Raw
   if ($lectureHtml -notmatch '<meta\s+name="description"') { Fail "$folder missing meta description" }
   if ($lectureHtml -notmatch '<meta\s+name="author"') { Fail "$folder missing meta author" }
-  if ($lectureHtml -notmatch '<link\s+rel="canonical"\s+href="([^"]+)"') { Fail "$folder missing canonical" }
-  if ($Matches[1] -ne $lecture.url) { Fail "$folder canonical $($Matches[1]) != $($lecture.url)" }
-  if ($lectureHtml -notmatch 'property="og:url"\s+content="([^"]+)"') { Fail "$folder missing og:url" }
-  if ($Matches[1] -ne $lecture.url) { Fail "$folder og:url $($Matches[1]) != $($lecture.url)" }
-  if ($lectureHtml -notmatch 'property="og:image"\s+content="https://pikov\.expert/photo\.jpg"') {
-    Fail "$folder missing canonical og:image"
-  }
 }
 
 Write-Output "SMOKE OK"

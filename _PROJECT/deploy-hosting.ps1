@@ -1,7 +1,9 @@
 param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot),
   [string]$SshAlias = 'pikov-hosting',
-  [string]$ReleaseDate = '2026-06-20'
+  [string]$ReleaseDate = '',
+  [int]$KeepLocalDeployDirs = 3,
+  [switch]$PrepareOnly
 )
 
 $ErrorActionPreference = 'Stop'
@@ -19,19 +21,56 @@ function Invoke-Checked([string]$FilePath, [string[]]$Arguments) {
   }
 }
 
+function Remove-OldLocalDeployDirs([string]$ProjectPath, [int]$Keep) {
+  if ($Keep -lt 1) { Fail "KeepLocalDeployDirs must be >= 1" }
+  $projectResolved = (Resolve-Path -LiteralPath $ProjectPath).Path.TrimEnd('\') + '\'
+  $dirs = @(
+    Get-ChildItem -LiteralPath $ProjectPath -Directory -Force |
+      Where-Object { $_.Name -like '.hosting-deploy-*' } |
+      Sort-Object LastWriteTime -Descending
+  )
+  $oldDirs = @($dirs | Select-Object -Skip $Keep)
+  foreach ($dir in $oldDirs) {
+    $resolved = (Resolve-Path -LiteralPath $dir.FullName).Path
+    if (-not (($resolved + '\').StartsWith($projectResolved, [System.StringComparison]::OrdinalIgnoreCase))) {
+      Fail "Refusing to remove deploy directory outside _PROJECT: $resolved"
+    }
+    if ($dir.Name -notlike '.hosting-deploy-*') {
+      Fail "Refusing to remove unexpected directory: $resolved"
+    }
+    Remove-Item -LiteralPath $resolved -Recurse -Force
+    Write-Output "removedOldLocalDeployDir=$resolved"
+  }
+}
+
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
 $projectPath = Join-Path $rootPath '_PROJECT'
+$lecturesPath = Join-Path $projectPath 'lectures.json'
+if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectures.json" }
+$lectureData = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
+if ([string]::IsNullOrWhiteSpace($ReleaseDate)) {
+  $ReleaseDate = [string]$lectureData.updated
+}
+if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
+  Fail "ReleaseDate must be YYYY-MM-DD, got $ReleaseDate"
+}
+
 $releaseIndexPath = Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json"
 if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release index: $releaseIndexPath" }
 
 $entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
-if ($entries.Count -ne 24) { Fail "Expected 24 release entries, got $($entries.Count)" }
+$expectedEntries = @($lectureData.lectures | Select-Object -ExpandProperty folder -Unique).Count + 1
+if ($entries.Count -ne $expectedEntries) { Fail "Expected $expectedEntries release entries, got $($entries.Count)" }
 
-$remoteHome = (& ssh $SshAlias 'printf %s "$HOME"')
-if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($remoteHome)) {
-  Fail "Could not resolve remote HOME through SSH alias $SshAlias"
+if ($PrepareOnly) {
+  $remoteHome = '/tmp/pikov-deploy-dry-run'
+} else {
+  $remoteHome = (& ssh $SshAlias 'printf %s "$HOME"')
+  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($remoteHome)) {
+    Fail "Could not resolve remote HOME through SSH alias $SshAlias"
+  }
+  $remoteHome = $remoteHome.Trim().TrimEnd('/')
 }
-$remoteHome = $remoteHome.Trim().TrimEnd('/')
 
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $deployRoot = "$remoteHome/_deploy_pikov_$stamp"
@@ -140,7 +179,7 @@ PY
   done
   chmod -R u+rwX "$unpack_dir"
 
-  if find "$unpack_dir" \( -path '*/_PROJECT/*' -o -path '*/_НА_УДАЛЕНИЕ_2026-06-20/*' -o -path '*/release/*' -o -path '*/source/*' -o -path '*/node_modules/*' -o -path '*/.git/*' -o -path '*/.codegraph/*' -o -path '*/.codex/*' -o -path '*/.agents/*' -o -path '*/.gigacode/*' \) -print -quit | grep -q .; then
+  if (cd "$unpack_dir" && find . \( -path './_PROJECT/*' -o -path './_*/*' -o -path './*/_PROJECT/*' -o -path './*/_*/*' -o -path './release/*' -o -path './*/release/*' -o -path './source/*' -o -path './*/source/*' -o -path './node_modules/*' -o -path './*/node_modules/*' -o -path './.git/*' -o -path './*/.git/*' -o -path './.codegraph/*' -o -path './*/.codegraph/*' -o -path './.codex/*' -o -path './*/.codex/*' -o -path './.claude/*' -o -path './*/.claude/*' -o -path './.agents/*' -o -path './*/.agents/*' -o -path './.gigacode/*' -o -path './*/.gigacode/*' -o -path './.qwen/*' -o -path './*/.qwen/*' -o -path './.vscode/*' -o -path './*/.vscode/*' -o -path './.idea/*' -o -path './*/.idea/*' \) -print -quit | grep -q .); then
     echo "Archive $domain contains internal paths" | tee -a "$LOG"
     exit 15
   fi
@@ -156,7 +195,17 @@ done < "$MANIFEST"
 
 echo "DEPLOY OK" | tee -a "$LOG"
 '@
-[System.IO.File]::WriteAllText($remoteScriptPath, ($remoteScript + "`n"), [System.Text.Encoding]::ASCII)
+$remoteScript = $remoteScript -replace "`r`n", "`n"
+[System.IO.File]::WriteAllText($remoteScriptPath, ($remoteScript.TrimEnd("`n") + "`n"), [System.Text.UTF8Encoding]::new($false))
+$remoteScriptBytes = [System.IO.File]::ReadAllBytes($remoteScriptPath)
+if ($remoteScriptBytes -contains 13) { Fail "Generated deploy-remote.sh contains CR bytes" }
+
+if ($PrepareOnly) {
+  Write-Output "DEPLOY PREPARE OK"
+  Write-Output "manifest=$manifestPath"
+  Write-Output "remoteScript=$remoteScriptPath"
+  return
+}
 
 Write-Output "Deploy root: $deployRoot"
 Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "mkdir -p '$deployRoot/zips'")
@@ -191,5 +240,6 @@ $lines = @(
   '```'
 )
 $lines | Set-Content -LiteralPath $summaryPath -Encoding UTF8
+Remove-OldLocalDeployDirs -ProjectPath $projectPath -Keep $KeepLocalDeployDirs
 Write-Output "DEPLOY SCRIPT OK"
 Write-Output "summary=$summaryPath"
