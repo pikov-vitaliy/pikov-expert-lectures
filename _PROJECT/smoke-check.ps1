@@ -9,6 +9,10 @@ function Fail([string]$Message) {
   throw "SMOKE FAIL: $Message"
 }
 
+function Decode-Utf8Base64([string]$Value) {
+  [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Value))
+}
+
 function Get-ExpectedIndexUrl($Lecture) {
   $expectedIndexUrl = ([string]$Lecture.url).Split('#')[0]
   if ($expectedIndexUrl.EndsWith('.html')) {
@@ -60,13 +64,92 @@ if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" 
 $p19Html = Get-Content -LiteralPath $p19HtmlPath -Encoding UTF8 -Raw
 if ($p19Html -match '\u2116\s*18') { Fail 'p19 contains obsolete process number 18' }
 if ($p19Html -notmatch '\u043F\u0440\u043E\u0446\u0435\u0441\u0441\s+\u2116\s*19') { Fail 'p19 does not identify the lecture as process 19' }
+
+$p19Title = Decode-Utf8Base64 '0J3QtdGE0YPQvdC60YbQuNC+0L3QsNC70YzQvdC+0LUg0YLQtdGB0YLQuNGA0L7QstCw0L3QuNC1INCx0LXQt9C+0L/QsNGB0L3QvtGB0YLQuCDQn9Ce'
+$obsoleteP19Title = Decode-Utf8Base64 '0J/RgNC+0LLQtdGA0LrQsCDQsdC10LfQvtC/0LDRgdC90L7RgdGC0Lgg0L/RgNC40LvQvtC20LXQvdC40Y8='
+$rootIndexHtml = Get-Content -LiteralPath $indexPath -Encoding UTF8 -Raw
+$lectureCatalogJson = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw
+foreach ($surface in @(
+  [pscustomobject]@{ Label = 'p19'; Text = $p19Html },
+  [pscustomobject]@{ Label = 'root index'; Text = $rootIndexHtml },
+  [pscustomobject]@{ Label = 'lecture catalog'; Text = $lectureCatalogJson }
+)) {
+  if ($surface.Text.IndexOf($p19Title, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) { Fail "$($surface.Label) missing corrected p19 title" }
+  if ($surface.Text.IndexOf($obsoleteP19Title, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) { Fail "$($surface.Label) contains obsolete p19 title" }
+}
+
+$requiredP19Text = @(
+  $p19Title,
+  '5.19.2.2',
+  '5.19.2.5',
+  '5.19.3.1',
+  '5.19.3.2',
+  '5.19.3.3',
+  'SELECT id, password_hash FROM users WHERE username = ?',
+  'passwordHasher.verify',
+  (Decode-Utf8Base64 '0LjQvdGC0YDQvtGB0L/QtdC60YbQuNGPINGB0LDQvNCwINC/0L4g0YHQtdCx0LUg0L3QtSDRj9Cy0LvRj9C10YLRgdGPINGD0Y/Qt9Cy0LjQvNC+0YHRgtGM0Y4='),
+  '-fstack-protector-strong',
+  '-D_FORTIFY_SOURCE=3',
+  (Decode-Utf8Base64 '0LjRgdGF0L7QtNC90YvQuSDRhNCw0LnQuyDQvdC1INCx0YvQuyDQv9C10YDQtdC30LDQv9C40YHQsNC9'),
+  'org.freedesktop.DBus.ListNames',
+  'org.freedesktop.DBus.ListActivatableNames',
+  'connection.createStatement().executeQuery(sql)',
+  'github.com/google/syzkaller',
+  'CWE-732',
+  'dbus-send --session'
+)
+foreach ($requiredText in $requiredP19Text) {
+  if ($p19Html.IndexOf($requiredText, [System.StringComparison]::OrdinalIgnoreCase) -lt 0) { Fail "p19 missing required corrected text: $requiredText" }
+}
+
+$forbiddenP19Text = @(
+  (Decode-Utf8Base64 '0J/RgNC+0YbQtdGB0YEg4oSWMTkg4oCUIMKr0J/RgNC+0LLQtdGA0LrQsCDQsdC10LfQvtC/0LDRgdC90L7RgdGC0Lgg0L/RgNC40LvQvtC20LXQvdC40Y/Cuw=='),
+  (Decode-Utf8Base64 '0JfQsNC/0YPRgdC60LDQtdGC0YHRjyDQv9C+0YHQu9C1INGE0YPQvdC60YbQuNC+0L3QsNC70YzQvdC+0LPQviDRgtC10YHRgtC40YDQvtCy0LDQvdC40Y8sINC+0LHRi9GH0L3QviDigJQg0L3QsCDRgdGC0LDQtNC40Lgg0LPQvtGC0L7QstC+0LPQviDQutCw0L3QtNC40LTQsNGC0LAg0LIg0YDQtdC70LjQty4='),
+  'SELECT * FROM users WHERE username = ? AND password = ?',
+  (Decode-Utf8Base64 '0JXQtNC40L3RgdGC0LLQtdC90L3Ri9C5INC/0YDQsNCy0LjQu9GM0L3Ri9C5INC/0L7QtNGF0L7QtCDigJQg0YbQtdC70LjQutC+0Lwg0LfQsNC40LzRgdGC0LLQvtCy0LDRgtGMINGH0YPQttC+0LUg0L/RgNC+0LPRgNCw0LzQvNC90L7QtSDRgNC10YjQtdC90LjQtQ=='),
+  (Decode-Utf8Base64 '0LrRgNCw0LbRgyDRgdC10YHRgdC40Lgg0LvRjtCx0L7Qs9C+INC/0L7Qu9GM0LfQvtCy0LDRgtC10LvRjw=='),
+  (Decode-Utf8Base64 '0L/QtdGA0LXQt9Cw0L/QuNGB0LDQuyDRgNC10YHRg9GA0YEg0L/RgNC40LvQvtC20LXQvdC40Y8gPGNvZGU+VHJhbnNsYXRpb24ueGFtbDwvY29kZT4='),
+  (Decode-Utf8Base64 '0JvRjtCx0L7QuSDRgdCw0LzQvtC/0LjRgdC90YvQuSDQtNGA0LDQudCy0LXRgCDigJQg0LPQsNGA0LDQvdGC0LjRgNC+0LLQsNC90L3Ri9C5INC40YHRgtC+0YfQvdC40Log0L/RgNC+0LHQu9C10Lw='),
+  'for (i = 0; i &lt; MAX_SYSCALL; i++)',
+  '%c0%ae%c0%ae',
+  (Decode-Utf8Base64 '0JIgV2F5bGFuZCDQuCBBbmRyb2lkINGBINCx0LXQt9C+0L/QsNGB0L3QvtGB0YLRjNGOINCy0YDQvtC00LUg0LLRgdGRINGF0L7RgNC+0YjQvi4='),
+  (Decode-Utf8Base64 '0J3QvtGA0LzQsNC70YzQvdGL0YUg0YDQtdCw0LvQuNC30LDRhtC40Lkg0JzQo9CULCDQv9GA0LjQs9C+0LTQvdGL0YUg0LTQu9GPINC/0L7QstGB0LXQtNC90LXQstC90L7Qs9C+INC40YHQv9C+0LvRjNC30L7QstCw0L3QuNGPLCDQstC40LTQuNC80L4sINC90LXRgi4='),
+  'set /p a=&lt;c:\secret\secret.doc',
+  (Decode-Utf8Base64 'TGlzdFtBY3RpdmF0YWJsZV1OYW1lcw=='),
+  (Decode-Utf8Base64 'U3FsQ29tbWFuZA=='),
+  (Decode-Utf8Base64 'PGNvZGU+Li4vPC9jb2RlPiwgPGNvZGU+Li88L2NvZGU+IOKAlCDQv9C10YDQtdGF0L7QtCDQvdCwINGD0YDQvtCy0LXQvdGMINCy0YvRiNC1'),
+  (Decode-Utf8Base64 '0L/RgNCw0LLQsCA8Y29kZT42NjY8L2NvZGU+IC8gPGNvZGU+RklMRV9BTllfQUNDRVNTPC9jb2RlPg=='),
+  (Decode-Utf8Base64 '0LIg0L7QtNC90L7QstGA0LXQvNC10L3QvdC+INCy0YvQv9C+0LvQvdGP0Y7RidC40YXRgdGPINC/0YDQvtGG0LXRgdGB0LDRhSDRgNCw0YHQv9GA0LXQtNC10LvQtdC90LjQtSDQtNC+0LvQttC90L4g0L7RgtC70LjRh9Cw0YLRjNGB0Y8='),
+  (Decode-Utf8Base64 '0L3QtdC+0LPRgNCw0L3QuNGH0LXQvdC90L4g0LTQvtC70LPQviDQvdC10LLQt9C40YDQsNGPINC90LAgQVNMUg=='),
+  'dbus-send [--system]'
+)
+foreach ($forbiddenText in $forbiddenP19Text) {
+  if ($p19Html.IndexOf($forbiddenText, [System.StringComparison]::OrdinalIgnoreCase) -ge 0) { Fail "p19 contains obsolete or unsafe text: $forbiddenText" }
+}
 if ($P19Only) {
-  Write-Output 'P19 PROCESS CHECK OK'
+  Write-Output 'P19 CONTENT CHECK OK'
   return
 }
 
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $lectures = @($data.lectures)
+
+foreach ($htaccessPath in @(
+  (Join-Path $rootPath '.htaccess'),
+  (Join-Path (Join-Path $rootPath 'p19') '.htaccess')
+)) {
+  if (-not (Test-Path -LiteralPath $htaccessPath)) { Fail "Missing CSP control file: $htaccessPath" }
+  $htaccess = Get-Content -LiteralPath $htaccessPath -Encoding UTF8 -Raw
+  if ($htaccess -notmatch 'img-src[^\r\n"]*https://mc\.yandex\.com[^\r\n"]*https://\*\.mc\.yandex\.com') {
+    Fail "$htaccessPath does not allow Yandex Metrika image endpoints on mc.yandex.com"
+  }
+  if ($htaccess -notmatch 'connect-src[^\r\n"]*https://mc\.yandex\.com[^\r\n"]*https://\*\.mc\.yandex\.com') {
+    Fail "$htaccessPath does not allow Yandex Metrika connection endpoints on mc.yandex.com"
+  }
+  if ($htaccess -notmatch 'connect-src[^\r\n"]*wss://mc\.yandex\.com[^\r\n"]*wss://\*\.mc\.yandex\.com') {
+    Fail "$htaccessPath does not allow Yandex Metrika WebSocket endpoints on mc.yandex.com"
+  }
+}
 
 if ($lectures.Count -ne [int]$data.summary.cards) {
   Fail "lectures.json count $($lectures.Count) != summary.cards $($data.summary.cards)"
@@ -104,8 +187,13 @@ if ($quarantineDirs.Count -ne 1) {
     Fail "Expected at most one quarantine directory, got $($quarantineDirs.Count)"
   }
 }
-$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.gigacode', '.qwen', '.vscode', '.idea')
-$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs') + $quarantineDirs + $domainFolders
+$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.serena', '.gigacode', '.qwen', '.vscode', '.idea')
+$localWorkspaceDirs = @(
+  $actualRootDirObjects |
+    Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.obsidian') } |
+    Select-Object -ExpandProperty Name
+)
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests') + $localWorkspaceDirs + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
