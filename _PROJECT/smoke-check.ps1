@@ -58,8 +58,8 @@ if (-not (Test-Path -LiteralPath $robotsPath)) { Fail "Missing root robots.txt" 
 if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" }
 
 $p19Html = Get-Content -LiteralPath $p19HtmlPath -Encoding UTF8 -Raw
-if ($p19Html -match '№\s*18') { Fail 'p19 contains obsolete process number 18' }
-if ($p19Html -notmatch 'процесс\s+№\s*19') { Fail 'p19 does not identify the lecture as process 19' }
+if ($p19Html -match '\u2116\s*18') { Fail 'p19 contains obsolete process number 18' }
+if ($p19Html -notmatch '\u043F\u0440\u043E\u0446\u0435\u0441\u0441\s+\u2116\s*19') { Fail 'p19 does not identify the lecture as process 19' }
 if ($P19Only) {
   Write-Output 'P19 PROCESS CHECK OK'
   return
