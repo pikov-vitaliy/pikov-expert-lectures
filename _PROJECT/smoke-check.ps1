@@ -1,5 +1,6 @@
 param(
-  [string]$Root = (Split-Path -Parent $PSScriptRoot)
+  [string]$Root = (Split-Path -Parent $PSScriptRoot),
+  [switch]$P19Only
 )
 
 $ErrorActionPreference = 'Stop'
@@ -48,11 +49,21 @@ $lecturesPath = Join-Path $projectPath 'lectures.json'
 $indexPath = Join-Path $rootPath 'index.html'
 $sitemapPath = Join-Path $rootPath 'sitemap.xml'
 $robotsPath = Join-Path $rootPath 'robots.txt'
+$p19HtmlPath = Join-Path (Join-Path $rootPath 'p19') 'index.html'
 
 if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectures.json" }
 if (-not (Test-Path -LiteralPath $indexPath)) { Fail "Missing root index.html" }
 if (-not (Test-Path -LiteralPath $sitemapPath)) { Fail "Missing root sitemap.xml" }
 if (-not (Test-Path -LiteralPath $robotsPath)) { Fail "Missing root robots.txt" }
+if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" }
+
+$p19Html = Get-Content -LiteralPath $p19HtmlPath -Encoding UTF8 -Raw
+if ($p19Html -match '№\s*18') { Fail 'p19 contains obsolete process number 18' }
+if ($p19Html -notmatch 'процесс\s+№\s*19') { Fail 'p19 does not identify the lecture as process 19' }
+if ($P19Only) {
+  Write-Output 'P19 PROCESS CHECK OK'
+  return
+}
 
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $lectures = @($data.lectures)
