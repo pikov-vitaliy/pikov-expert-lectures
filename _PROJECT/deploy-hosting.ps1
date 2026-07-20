@@ -3,6 +3,9 @@ param(
   [string]$SshAlias = 'pikov-hosting',
   [string]$ReleaseDate = '',
   [int]$KeepLocalDeployDirs = 3,
+  [string[]]$OnlyDomains = @(),
+  [switch]$KeepRemoteDeployRoot,
+  [switch]$SkipPostDeployCheck,
   [switch]$PrepareOnly
 )
 
@@ -54,6 +57,9 @@ if ([string]::IsNullOrWhiteSpace($ReleaseDate)) {
 if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
   Fail "ReleaseDate must be YYYY-MM-DD, got $ReleaseDate"
 }
+if ($SkipPostDeployCheck -and -not $KeepRemoteDeployRoot) {
+  Fail 'SkipPostDeployCheck requires KeepRemoteDeployRoot so rollback data is not removed without verification'
+}
 
 $releaseIndexPath = Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json"
 if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release index: $releaseIndexPath" }
@@ -61,6 +67,14 @@ if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release ind
 $entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
 $expectedEntries = @($lectureData.lectures | Select-Object -ExpandProperty folder -Unique).Count + 1
 if ($entries.Count -ne $expectedEntries) { Fail "Expected $expectedEntries release entries, got $($entries.Count)" }
+if ($OnlyDomains.Count -gt 0) {
+  $requestedDomains = @($OnlyDomains | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ } | Select-Object -Unique)
+  $knownDomains = @($entries | ForEach-Object { ([string]$_.domain).ToLowerInvariant() })
+  $unknownDomains = @($requestedDomains | Where-Object { $_ -notin $knownDomains })
+  if ($unknownDomains.Count -gt 0) { Fail "Unknown release domain(s): $($unknownDomains -join ', ')" }
+  $entries = @($entries | Where-Object { ([string]$_.domain).ToLowerInvariant() -in $requestedDomains })
+}
+if ($entries.Count -eq 0) { Fail 'No release entries selected' }
 
 if ($PrepareOnly) {
   $remoteHome = '/tmp/pikov-deploy-dry-run'
@@ -219,6 +233,21 @@ foreach ($entry in $entries) {
 
 Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "'$deployRoot/deploy-remote.sh' '$deployRoot' '$stamp'")
 
+if (-not $SkipPostDeployCheck) {
+  $hostingCheckPath = Join-Path $projectPath 'hosting-check.ps1'
+  if (-not (Test-Path -LiteralPath $hostingCheckPath)) { Fail "Missing hosting check: $hostingCheckPath" }
+  & $hostingCheckPath -Root $rootPath -ReleaseDate $ReleaseDate
+}
+
+if (-not $KeepRemoteDeployRoot) {
+  $expectedPrefix = "$remoteHome/_deploy_pikov_"
+  if (-not $deployRoot.StartsWith($expectedPrefix, [System.StringComparison]::Ordinal)) {
+    Fail "Refusing to remove unexpected remote deploy root: $deployRoot"
+  }
+  Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "rm -rf -- '$deployRoot'")
+  Write-Output "removedRemoteDeployRoot=$deployRoot"
+}
+
 $summaryPath = Join-Path $projectPath "HOSTING_DEPLOY_$ReleaseDate.md"
 $lines = @(
   "# Hosting deploy $ReleaseDate",
@@ -227,17 +256,7 @@ $lines = @(
   "Remote deploy root: $deployRoot",
   "Targets: $($entries.Count)",
   '',
-  "Backups are stored on the server under:",
-  '',
-  '```text',
-  "$deployRoot/backups",
-  '```',
-  '',
-  "Remote log:",
-  '',
-  '```text',
-  "$deployRoot/deploy.log",
-  '```'
+  $(if ($KeepRemoteDeployRoot) { "Remote deploy root retained (including temporary backups and log): $deployRoot" } else { "Remote deploy root removed after successful deployment and hosting check." })
 )
 $lines | Set-Content -LiteralPath $summaryPath -Encoding UTF8
 Remove-OldLocalDeployDirs -ProjectPath $projectPath -Keep $KeepLocalDeployDirs

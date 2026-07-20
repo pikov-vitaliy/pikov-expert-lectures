@@ -1,0 +1,22 @@
+# 27001.pikov.expert static lecture site rules
+
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+  # The self-contained lecture bundles unpack embedded scripts, fonts and images
+  # into blob URLs in the browser. Blob access is limited to those resource types.
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https://pikov.expert https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com; script-src 'self' 'unsafe-inline' blob: https://mc.yandex.ru; style-src 'self' 'unsafe-inline'; font-src 'self' data: blob:; connect-src 'self' https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com wss://mc.yandex.com wss://*.mc.yandex.com; form-action 'self'; upgrade-insecure-requests"
+</IfModule>
+
+AddCharset UTF-8 .html .htm .xml .txt
+AddType application/xml .xml
+
+<Files ".htaccess">
+  Require all denied
+</Files>

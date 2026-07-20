@@ -391,7 +391,7 @@ function rewriteReleaseIndex(indexEntries, results, smoke) {
   lines.push("# Release index pikov.expert");
   lines.push("");
   lines.push(`Build date: ${releaseDate}`);
-  lines.push(`Archives: ${updated.length} (23 subdomains + root)`);
+  lines.push(`Archives: ${updated.length} (${updated.length - 1} subdomains + root)`);
   lines.push(`Static issues: ${totalIssues}`);
   lines.push(`Browser QA: ${browserIssues === 0 ? "ok" : `issues-${browserIssues}`}`);
   lines.push(`Browser QA report: ${reportPath}`);

@@ -62,6 +62,19 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\hosting-check.ps1
 ```
 
+Для адресной публикации корня и одного поддомена без повторного развёртывания
+всей сети:
+
+```powershell
+& .\_PROJECT\deploy-hosting.ps1 -OnlyDomains @('pikov.expert', 'example.pikov.expert')
+```
+
+`deploy-hosting.ps1` делает временные резервные копии, запускает полный
+`hosting-check.ps1` и только после успешной проверки удаляет удалённый каталог
+`_deploy_pikov_<timestamp>`. Для диагностики неуспешной публикации каталог
+сохраняется автоматически; при осознанной ручной диагностике его можно оставить
+ключом `-KeepRemoteDeployRoot`.
+
 После публикации проверить минимум:
 
 ```powershell
@@ -114,4 +127,5 @@ gh run watch <run-id> --exit-status
 - Не считать локальный успех равным live-успеху.
 - Не добавлять HTTPS rewrite в `.htaccess`: редирект выполняется на уровне хостинга, дублирование может создать self-redirect loop за TLS-терминатором.
 - Не обновлять дополнительные домены, не входящие в текущий release index, без отдельного решения.
+- Не хранить успешные `_deploy_pikov_*` в домашней папке хостинга: это временные ZIP, распакованные копии и резервные архивы, а не контент сайтов.
 - Не оставлять опубликованное состояние незакоммиченным.
