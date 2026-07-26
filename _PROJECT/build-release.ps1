@@ -80,6 +80,11 @@ function Should-ExcludeDirectory([string]$Name) {
 }
 
 function Should-ExcludeDistributable([string]$Name) {
+  # Reviewed exception: 'materials.zip' is the lecture handout bundle that a
+  # lecture folder publishes on purpose. It is assembled from files that already
+  # live in that lecture folder, so it introduces no third-party redistribution
+  # risk. Every other archive stays excluded.
+  if ($Name.ToLowerInvariant() -eq 'materials.zip') { return $false }
   $extension = [System.IO.Path]::GetExtension($Name).ToLowerInvariant()
   return $extension -in @('.pdf', '.pptx', '.docx', '.xlsx', '.eps', '.zip')
 }
