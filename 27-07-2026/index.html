@@ -1,0 +1,1886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+<title>Жизненный цикл безопасного ПО: языки, стеки, дефекты — лекция В.А. Пикова</title>
+<meta name="description" content="Учебная лекция курса «Специалист по процессам РБПО»: жизненный цикл безопасного ПО, экстремальное программирование, современные стеки технологий, четыре языка в сравнении и четыре дефекта безопасности на разборе учебного приложения.">
+<meta name="author" content="Пиков Виталий Александрович">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://27-07-2026.pikov.expert/">
+<link rel="home" href="https://pikov.expert/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="pikov.expert">
+<meta property="og:title" content="Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта">
+<meta property="og:description" content="От требований до релиза за один учебный день: SDL, экстремальное программирование, десять слоёв современного стека, четыре языка в сравнении и четыре уязвимости в разборе.">
+<meta property="og:url" content="https://27-07-2026.pikov.expert/">
+<meta property="og:image" content="https://27-07-2026.pikov.expert/og-image.png">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:alt" content="Титульный экран занятия о жизненном цикле безопасного программного обеспечения">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта">
+<meta name="twitter:description" content="Учебное занятие курса «Специалист по процессам РБПО»: от требований до релиза за один день.">
+<meta name="twitter:image" content="https://27-07-2026.pikov.expert/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2264%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2244%22 font-weight=%22700%22 fill=%22white%22>&lt;/&gt;</text></svg>">
+<style>
+  :root {
+    /* Объявляем схему явно: иначе браузер при системной тёмной теме
+       применяет к странице автозатемнение и переключатель темы
+       перестаёт работать. */
+    color-scheme: light;
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --surface-2: #f1f5f9;
+    --surface-3: #e2e8f0;
+    --border: #e2e8f0;
+    --border-strong: #cbd5e1;
+    --text: #0f172a;
+    --text-muted: #475569;
+    --text-subtle: #64748b;
+    --accent: #2563eb;
+    --accent-strong: #1d4ed8;
+    --accent-soft: rgba(37, 99, 235, 0.08);
+    --accent-softer: rgba(37, 99, 235, 0.04);
+    --warning: #d97706;
+    --warning-soft: rgba(217, 119, 6, 0.1);
+    --success: #059669;
+    --success-soft: rgba(5, 150, 105, 0.1);
+    --danger: #dc2626;
+    --danger-soft: rgba(220, 38, 38, 0.1);
+    --code-bg: #f8fafc;
+    --code-border: #e2e8f0;
+    --code-keyword: #7c3aed;
+    --code-string: #059669;
+    --code-comment: #64748b;
+    --code-number: #ea580c;
+    --code-fn: #2563eb;
+    --code-type: #0891b2;
+    --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+    --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  }
+
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0b1120;
+    --surface: #111827;
+    --surface-2: #1f2937;
+    --surface-3: #374151;
+    --border: #1f2937;
+    --border-strong: #374151;
+    --text: #f9fafb;
+    --text-muted: #cbd5e1;
+    --text-subtle: #94a3b8;
+    --accent: #60a5fa;
+    --accent-strong: #93c5fd;
+    --accent-soft: rgba(96, 165, 250, 0.12);
+    --accent-softer: rgba(96, 165, 250, 0.06);
+    --warning: #fbbf24;
+    --warning-soft: rgba(251, 191, 36, 0.12);
+    --success: #34d399;
+    --success-soft: rgba(52, 211, 153, 0.12);
+    --danger: #f87171;
+    --danger-soft: rgba(248, 113, 113, 0.12);
+    --code-bg: #0f172a;
+    --code-border: #1f2937;
+    --code-keyword: #c084fc;
+    --code-string: #34d399;
+    --code-comment: #64748b;
+    --code-number: #fb923c;
+    --code-fn: #60a5fa;
+    --code-type: #22d3ee;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
+  }
+  ::selection { background: var(--accent-soft); color: var(--text); }
+  a { color: var(--accent); text-decoration: none; transition: color 0.2s; }
+  a:hover { color: var(--accent-strong); }
+  .container { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+
+  .reading-progress {
+    position: fixed; top: 0; left: 0; right: 0; height: 3px;
+    background: transparent; z-index: 110; pointer-events: none;
+  }
+  .reading-progress-bar {
+    height: 100%; background: var(--accent); width: 0%;
+    transition: width 0.1s ease-out;
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 100;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: saturate(180%) blur(12px);
+    -webkit-backdrop-filter: saturate(180%) blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .site-header .container {
+    display: flex; align-items: center; justify-content: space-between; height: 60px;
+  }
+  .brand-back {
+    display: inline-flex; align-items: center; gap: 10px;
+    color: var(--text-muted); font-size: 14px; font-weight: 500;
+    padding: 8px 14px; border-radius: 8px; transition: all 0.2s;
+  }
+  .brand-back:hover { color: var(--text); background: var(--surface); }
+  .brand-back svg { width: 16px; height: 16px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; }
+  .icon-btn {
+    background: transparent; border: 1px solid var(--border-strong); border-radius: 10px;
+    padding: 8px; cursor: pointer; color: var(--text-muted);
+    display: inline-flex; align-items: center; transition: all 0.2s;
+  }
+  .icon-btn:hover { color: var(--text); border-color: var(--accent); }
+  .icon-btn svg { width: 18px; height: 18px; }
+  .theme-toggle .moon { display: none; }
+  [data-theme="dark"] .theme-toggle .sun { display: none; }
+  [data-theme="dark"] .theme-toggle .moon { display: block; }
+  .toc-toggle { display: none; }
+
+  .layout {
+    max-width: 1280px; margin: 0 auto; padding: 0 24px;
+    display: grid; grid-template-columns: 300px 1fr; gap: 56px; align-items: start;
+  }
+
+  .toc {
+    position: sticky; top: 84px; max-height: calc(100vh - 100px);
+    overflow-y: auto; padding: 24px 0 24px 4px;
+    border-right: 1px solid var(--border); padding-right: 20px;
+  }
+  .toc::-webkit-scrollbar { width: 6px; }
+  .toc::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+  .toc-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--text-subtle); margin-bottom: 14px; padding-left: 14px;
+  }
+  .toc-pair {
+    font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--accent); margin: 16px 0 6px; padding-left: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toc-pair::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .toc-pair:first-of-type { margin-top: 4px; }
+  .toc-list { list-style: none; }
+  .toc-list li { position: relative; }
+  .toc-list a {
+    display: flex; align-items: baseline; gap: 10px; padding: 7px 14px;
+    border-radius: 6px; color: var(--text-muted); font-size: 13.5px; line-height: 1.4;
+    transition: all 0.15s; border-left: 2px solid transparent; margin-bottom: 1px;
+  }
+  .toc-list a:hover { color: var(--text); background: var(--surface); }
+  .toc-list .toc-num {
+    font-variant-numeric: tabular-nums; font-size: 11px;
+    color: var(--text-subtle); font-weight: 600; flex-shrink: 0;
+  }
+  .toc-list a.active {
+    color: var(--accent); background: var(--accent-soft);
+    border-left-color: var(--accent); font-weight: 500;
+  }
+  .toc-list a.active .toc-num { color: var(--accent); }
+
+  .content { max-width: 780px; padding: 32px 0 80px; }
+
+  .hero { padding: 32px 0 56px; border-bottom: 1px solid var(--border); margin-bottom: 56px; }
+  .hero-eyebrow {
+    display: inline-block; font-size: 12px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); background: var(--accent-soft);
+    padding: 6px 12px; border-radius: 6px; margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(34px, 5vw, 52px); font-weight: 700; letter-spacing: -0.025em;
+    line-height: 1.1; margin-bottom: 20px;
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent-strong) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  [data-theme="dark"] .hero h1 {
+    background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  }
+  .hero-lead {
+    font-size: clamp(17px, 1.6vw, 20px); line-height: 1.55;
+    color: var(--text-muted); margin-bottom: 36px; max-width: 700px;
+  }
+  .hero-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; padding: 20px 24px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+  }
+  .hero-meta-item { display: flex; flex-direction: column; gap: 4px; }
+  .hero-meta-label {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.08em; color: var(--text-subtle);
+  }
+  .hero-meta-value { font-size: 14.5px; color: var(--text); font-weight: 500; }
+
+  .section { padding: 56px 0 16px; scroll-margin-top: 80px; }
+  .section-eyebrow {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); margin-bottom: 16px;
+  }
+  .section-eyebrow::before { content: ''; width: 24px; height: 1.5px; background: var(--accent); }
+  .section-num { font-variant-numeric: tabular-nums; }
+  .section h2 {
+    font-size: clamp(28px, 3.4vw, 38px); font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.15; margin-bottom: 20px; color: var(--text);
+  }
+  .section h3 {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.015em;
+    line-height: 1.25; margin: 36px 0 14px; color: var(--text);
+  }
+  .section h4 {
+    font-size: 16px; font-weight: 600; letter-spacing: -0.005em;
+    margin: 24px 0 10px; color: var(--text);
+  }
+  .section p { font-size: 17px; line-height: 1.7; margin-bottom: 18px; color: var(--text); }
+  .section p.lead {
+    font-size: 19px; line-height: 1.6; color: var(--text-muted); margin-bottom: 28px;
+  }
+  .section ul, .section ol { margin: 16px 0 24px 0; padding-left: 24px; }
+  .section ul li, .section ol li {
+    font-size: 17px; line-height: 1.65; margin-bottom: 10px; color: var(--text);
+  }
+  .section strong { color: var(--text); font-weight: 600; }
+  .section em { color: var(--text); font-style: italic; }
+
+  .section :not(pre) > code, .ic {
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.88em; padding: 2px 6px;
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 5px; color: var(--text);
+  }
+
+  .callout {
+    border-left: 3px solid var(--accent); background: var(--accent-softer);
+    padding: 18px 22px; margin: 24px 0; border-radius: 0 10px 10px 0;
+  }
+  .callout p { font-size: 16.5px; margin-bottom: 0; color: var(--text); }
+  .callout p + p { margin-top: 10px; }
+  .callout strong { color: var(--accent); }
+  .callout.warning { border-left-color: var(--warning); background: var(--warning-soft); }
+  .callout.warning strong { color: var(--warning); }
+  .callout.danger { border-left-color: var(--danger); background: var(--danger-soft); }
+  .callout.danger strong { color: var(--danger); }
+  .callout.success { border-left-color: var(--success); background: var(--success-soft); }
+  .callout.success strong { color: var(--success); }
+
+  .table-wrap { overflow-x: auto; margin: 24px 0; }
+  table.data {
+    width: 100%; border-collapse: collapse; font-size: 15px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 10px; overflow: hidden;
+  }
+  table.data th, table.data td {
+    text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  table.data th {
+    font-weight: 600; color: var(--text-subtle); text-transform: uppercase;
+    letter-spacing: 0.04em; font-size: 12px; background: var(--surface-2);
+  }
+  table.data tr:last-child td { border-bottom: none; }
+  table.data td:first-child { font-weight: 500; }
+  table.data .num { font-variant-numeric: tabular-nums; color: var(--accent); font-weight: 600; }
+  table.data .tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 2px 8px; border-radius: 4px; background: var(--accent-soft);
+    color: var(--accent); text-transform: uppercase; letter-spacing: 0.04em;
+  }
+  table.data .tag.bad { background: var(--danger-soft); color: var(--danger); }
+  table.data .tag.good { background: var(--success-soft); color: var(--success); }
+  table.data .tag.warn { background: var(--warning-soft); color: var(--warning); }
+
+  pre.code {
+    margin: 20px 0; padding: 18px 20px;
+    background: var(--code-bg); border: 1px solid var(--code-border);
+    border-radius: 10px; overflow-x: auto;
+    font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 13.5px; line-height: 1.55; color: var(--text);
+  }
+  pre.code code { font-family: inherit; font-size: inherit; }
+  pre.code .kw { color: var(--code-keyword); font-weight: 500; }
+  pre.code .str { color: var(--code-string); }
+  pre.code .cm { color: var(--code-comment); font-style: italic; }
+  pre.code .num { color: var(--code-number); }
+  pre.code .fn { color: var(--code-fn); }
+  pre.code .ty { color: var(--code-type); }
+  pre.code .hl { background: var(--warning-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+  pre.code .hl-bad { background: var(--danger-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+  pre.code .hl-good { background: var(--success-soft); border-radius: 3px; padding: 1px 3px; margin: 0 -3px; }
+  .code-label {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    color: var(--text-subtle); margin: 24px 0 -12px;
+  }
+  .code-label .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text-subtle); }
+  .code-label.bad { color: var(--danger); }
+  .code-label.bad .dot { background: var(--danger); }
+  .code-label.good { color: var(--success); }
+  .code-label.good .dot { background: var(--success); }
+
+  .two-col {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 28px 0;
+  }
+  .col-card {
+    padding: 24px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 14px;
+  }
+  .col-card-head { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+  .col-card h3 { margin: 0; font-size: 18px; }
+  .col-card p { font-size: 15px; line-height: 1.6; margin-bottom: 14px; }
+  .col-card ul { margin: 10px 0 0; padding-left: 20px; }
+  .col-card li { font-size: 14.5px; line-height: 1.55; margin-bottom: 7px; color: var(--text-muted); }
+  .col-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .col-tag {
+    font-size: 12px; font-weight: 500; padding: 4px 10px;
+    background: var(--bg); border: 1px solid var(--border-strong);
+    border-radius: 6px; color: var(--text-muted);
+  }
+
+  .phases {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px; margin: 28px 0;
+  }
+  .phase {
+    padding: 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .phase-num {
+    font-size: 36px; font-weight: 700; color: var(--accent);
+    opacity: 0.3; line-height: 1; margin-bottom: 8px; font-variant-numeric: tabular-nums;
+  }
+  .phase h4 { font-size: 17px; margin: 0 0 10px; }
+  .phase ul { padding-left: 18px; margin: 0; }
+  .phase li { font-size: 14.5px; line-height: 1.5; margin-bottom: 6px; color: var(--text-muted); }
+
+  .accordion { margin: 28px 0; display: flex; flex-direction: column; gap: 10px; }
+  .acc-item {
+    border: 1px solid var(--border); border-radius: 12px;
+    background: var(--surface); overflow: hidden;
+  }
+  .acc-summary {
+    list-style: none; cursor: pointer; padding: 18px 22px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    font-size: 16px; font-weight: 600; color: var(--text);
+    transition: background 0.2s; user-select: none;
+  }
+  .acc-summary::-webkit-details-marker { display: none; }
+  .acc-summary:hover { background: var(--surface-2); }
+  .acc-summary-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .acc-summary-left > span:last-child { min-width: 0; }
+  .acc-tag {
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    padding: 4px 8px; background: var(--accent-soft); color: var(--accent);
+    border-radius: 5px; flex-shrink: 0;
+  }
+  .acc-tag.bad { background: var(--danger-soft); color: var(--danger); }
+  .acc-icon { width: 18px; height: 18px; color: var(--text-subtle); transition: transform 0.2s; flex-shrink: 0; }
+  .acc-item[open] .acc-icon { transform: rotate(180deg); }
+  .acc-body {
+    padding: 4px 22px 22px; border-top: 1px solid var(--border); margin-top: -1px;
+  }
+  .acc-body ol, .acc-body ul { margin: 14px 0 0; padding-left: 20px; }
+  .acc-body li {
+    font-size: 15.5px; margin-bottom: 8px; line-height: 1.55; color: var(--text);
+  }
+  .acc-body p {
+    font-size: 15.5px; line-height: 1.6; color: var(--text-muted); margin: 14px 0 0;
+  }
+  .acc-body p:first-child { margin-top: 14px; }
+  .acc-body strong { color: var(--text); }
+  .acc-body table.data { font-size: 14px; margin: 14px 0; }
+  .acc-body table.data th, .acc-body table.data td { padding: 8px 12px; }
+  .acc-body pre.code { font-size: 12.5px; }
+
+  .checklist {
+    list-style: none !important; padding-left: 0 !important; margin: 16px 0 24px !important;
+  }
+  .checklist li {
+    position: relative; padding: 10px 0 10px 32px;
+    font-size: 15.5px !important; line-height: 1.55 !important;
+    border-bottom: 1px solid var(--border); margin-bottom: 0 !important;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: ''; position: absolute; left: 0; top: 14px;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: var(--success-soft); border: 1.5px solid var(--success);
+  }
+  .checklist li::after {
+    content: ''; position: absolute; left: 5px; top: 19px;
+    width: 8px; height: 4px;
+    border-left: 2px solid var(--success); border-bottom: 2px solid var(--success);
+    transform: rotate(-45deg);
+  }
+  .checklist li strong { color: var(--text); }
+  .checklist li code { font-size: 13px !important; }
+
+  .key-stats {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin: 24px 0;
+  }
+  .key-stat {
+    padding: 16px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+  }
+  .key-stat-value {
+    font-size: 22px; font-weight: 700; color: var(--accent);
+    letter-spacing: -0.02em; line-height: 1.1;
+    margin-bottom: 4px; font-variant-numeric: tabular-nums;
+  }
+  .key-stat-label { font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+
+  .roadmap { margin: 28px 0; display: flex; flex-direction: column; gap: 12px; }
+  .roadmap-step {
+    display: grid; grid-template-columns: 56px 1fr; gap: 18px;
+    padding: 18px 22px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 12px;
+    align-items: start;
+  }
+  .roadmap-num {
+    width: 40px; height: 40px; border-radius: 10px;
+    background: var(--accent); color: #ffffff;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .roadmap-content h4 { font-size: 16px; margin: 0 0 6px; }
+  .roadmap-content p { font-size: 14.5px; margin: 0; color: var(--text-muted); line-height: 1.55; }
+  .roadmap-content .roadmap-meta { margin-top: 8px; display: flex; gap: 8px; flex-wrap: wrap; }
+  .roadmap-tag {
+    font-size: 11px; font-weight: 600; padding: 3px 8px;
+    background: var(--surface-2); border: 1px solid var(--border-strong);
+    border-radius: 4px; color: var(--text-muted); letter-spacing: 0.04em;
+  }
+  .roadmap-tag.warn { background: var(--warning-soft); border-color: var(--warning); color: var(--warning); }
+  .roadmap-tag.success { background: var(--success-soft); border-color: var(--success); color: var(--success); }
+
+  .stack-layers { margin: 28px 0; display: flex; flex-direction: column; gap: 6px; }
+  .stack-layer {
+    display: grid; grid-template-columns: 40px 1fr; gap: 16px;
+    padding: 14px 18px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 10px;
+    align-items: center; transition: all 0.2s;
+  }
+  .stack-layer:hover { border-color: var(--accent); }
+  .stack-layer.highlight { background: var(--accent-soft); border-color: var(--accent); }
+  .stack-layer-num {
+    font-size: 15px; font-weight: 700; color: var(--accent);
+    font-variant-numeric: tabular-nums; text-align: center;
+  }
+  .stack-layer-body h4 { font-size: 15.5px; margin: 0 0 3px; }
+  .stack-layer-body p { font-size: 13.5px; margin: 0; color: var(--text-muted); line-height: 1.5; }
+
+  .timeline { position: relative; margin: 36px 0; padding: 24px 0; }
+  .timeline::before {
+    content: ''; position: absolute; left: 0; right: 0; top: 50%;
+    height: 2px; background: linear-gradient(90deg, transparent, var(--border-strong) 10%, var(--border-strong) 90%, transparent);
+    z-index: 0;
+  }
+  .timeline-track {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 24px; position: relative; z-index: 1;
+  }
+  .timeline-item {
+    text-align: center; padding: 18px;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px; position: relative;
+  }
+  .timeline-item::before {
+    content: ''; width: 12px; height: 12px;
+    background: var(--accent); border-radius: 50%;
+    position: absolute; top: -6px; left: 50%; transform: translateX(-50%);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .timeline-date { font-size: 13px; font-weight: 700; color: var(--accent); letter-spacing: 0.04em; margin-bottom: 6px; }
+  .timeline-title { font-size: 14px; font-weight: 600; line-height: 1.4; margin-bottom: 4px; color: var(--text); }
+  .timeline-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.45; }
+
+  .integration-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px; margin: 20px 0;
+  }
+  .int-item {
+    padding: 12px 14px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 9px; font-size: 13.5px; font-weight: 500; color: var(--text);
+    text-align: center; transition: all 0.2s;
+  }
+  .int-item:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  .pair-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-size: 11.5px; font-weight: 600; letter-spacing: 0.05em;
+    padding: 5px 11px; border-radius: 999px;
+    background: var(--surface-2); border: 1px solid var(--border-strong);
+    color: var(--text-muted); margin-bottom: 16px;
+  }
+  .pair-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); }
+
+  .content-footer { margin-top: 80px; padding: 56px 0 0; border-top: 1px solid var(--border); }
+  .content-footer h2 {
+    font-size: clamp(26px, 3vw, 34px); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .content-footer p.lead { color: var(--text-muted); font-size: 17px; margin-bottom: 28px; }
+  .contact-buttons { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 40px; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 12px 20px; border-radius: 10px;
+    font-size: 15px; font-weight: 500;
+    transition: all 0.2s; border: 1px solid transparent;
+  }
+  .btn svg { width: 18px; height: 18px; }
+  .btn-primary { background: var(--accent); color: #ffffff; box-shadow: var(--shadow-md); }
+  .btn-primary:hover { background: var(--accent-strong); color: #ffffff; transform: translateY(-1px); }
+  .btn-secondary { background: var(--surface); color: var(--text); border-color: var(--border-strong); }
+  .btn-secondary:hover { background: var(--surface-2); color: var(--text); border-color: var(--accent); }
+  .attribution {
+    margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border);
+    font-size: 13px; color: var(--text-subtle); line-height: 1.6;
+  }
+  .attribution-row {
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px; margin-bottom: 10px;
+  }
+  .attribution-row .copy { color: var(--text-muted); }
+
+  .back-to-top {
+    position: fixed; bottom: 24px; right: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    background: var(--accent); color: #ffffff; border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-lg);
+    opacity: 0; visibility: hidden; transform: translateY(8px);
+    transition: all 0.25s; z-index: 90;
+  }
+  .back-to-top.visible { opacity: 1; visibility: visible; transform: translateY(0); }
+  .back-to-top:hover { background: var(--accent-strong); }
+  .back-to-top svg { width: 20px; height: 20px; }
+
+  @media (max-width: 1100px) {
+    .layout { grid-template-columns: 250px 1fr; gap: 36px; }
+  }
+  @media (max-width: 900px) {
+    .layout { grid-template-columns: 1fr; gap: 0; }
+    .toc {
+      position: fixed; top: 60px; left: 0; right: 0; bottom: 0;
+      background: var(--bg); border-right: none; border-bottom: 1px solid var(--border);
+      padding: 20px 24px; transform: translateY(-100%);
+      transition: transform 0.25s ease-out; z-index: 99;
+      max-height: 100vh; overflow-y: auto;
+    }
+    .toc.open { transform: translateY(0); }
+    .toc-toggle { display: inline-flex; }
+    .content { max-width: 100%; padding: 16px 0 60px; }
+    .two-col { grid-template-columns: 1fr; }
+    .roadmap-step { grid-template-columns: 48px 1fr; gap: 12px; padding: 14px 16px; }
+  }
+  @media (max-width: 600px) {
+    .container { padding: 0 18px; }
+    .layout { padding: 0 18px; }
+    .hero { padding: 24px 0 36px; margin-bottom: 36px; }
+    .section { padding: 36px 0 8px; }
+    .key-stats { grid-template-columns: repeat(2, 1fr); }
+    .integration-grid { grid-template-columns: repeat(2, 1fr); }
+    pre.code { font-size: 12.5px; padding: 14px 16px; }
+    .stack-layer { grid-template-columns: 30px 1fr; gap: 10px; padding: 12px 14px; }
+  }
+
+  .content, .section, .hero, .hero-meta, .hero-meta-item, .acc-item,
+  .table-wrap, pre, code { min-width: 0; }
+  .hero h1, .hero-lead, .hero-meta-value, .section h2, .content-footer h2,
+  .acc-summary-left span, .btn { overflow-wrap: anywhere; }
+  img, svg { max-width: 100%; }
+  @media (max-width: 600px) {
+    .hero h1 { font-size: clamp(30px, 10vw, 40px); }
+    .hero-meta, .key-stats, .integration-grid { grid-template-columns: 1fr; }
+    .hero-eyebrow { white-space: normal; }
+  }
+
+  @media print {
+    .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
+    .layout { grid-template-columns: 1fr; }
+    .content { max-width: 100%; }
+    body { font-size: 11pt; }
+    .section { page-break-inside: avoid; }
+    .acc-item { page-break-inside: avoid; }
+    .acc-body { display: block !important; }
+    details { display: block !important; }
+    details > summary { list-style: none; }
+    details > *:not(summary) { display: block !important; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+    html { scroll-behavior: auto; }
+  }
+</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Жизненный цикл безопасного ПО: языки, стеки технологий и дефекты",
+  "description": "Учебное занятие курса повышения квалификации «Специалист по процессам разработки безопасного программного обеспечения»: жизненный цикл безопасного ПО, экстремальное программирование, современные стеки технологий, сравнение четырёх языков программирования и разбор четырёх дефектов безопасности на учебном приложении.",
+  "inLanguage": "ru",
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "НОУ ДПО «УЦБИ \"МАСКОМ\"»"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Виталий Александрович Пиков"
+  }
+}
+</script>
+</head>
+<body>
+
+<div class="reading-progress"><div class="reading-progress-bar" id="progressBar"></div></div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" aria-label="Содержание">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout">
+
+  <aside class="toc" id="toc">
+    <div class="toc-title">Содержание занятия</div>
+
+    <div class="toc-pair">Пара 1 · Лекция</div>
+    <ol class="toc-list">
+      <li><a href="#question" data-section="question"><span class="toc-num">01</span><span>Вопрос дня</span></a></li>
+      <li><a href="#lifecycle" data-section="lifecycle"><span class="toc-num">02</span><span>Жизненный цикл ПО</span></a></li>
+      <li><a href="#shiftleft" data-section="shiftleft"><span class="toc-num">03</span><span>Сдвиг влево и ГОСТ Р 56939</span></a></li>
+      <li><a href="#xp" data-section="xp"><span class="toc-num">04</span><span>Экстремальное программирование</span></a></li>
+    </ol>
+
+    <div class="toc-pair">Пара 2 · Стек</div>
+    <ol class="toc-list">
+      <li><a href="#layers" data-section="layers"><span class="toc-num">05</span><span>Десять слоёв разработки</span></a></li>
+      <li><a href="#languages" data-section="languages"><span class="toc-num">06</span><span>Где какой язык живёт</span></a></li>
+      <li><a href="#frameworks" data-section="frameworks"><span class="toc-num">07</span><span>Библиотека, фреймворк, платформа</span></a></li>
+    </ol>
+
+    <div class="toc-pair">Пара 3 · Архитектура</div>
+    <ol class="toc-list">
+      <li><a href="#task" data-section="task"><span class="toc-num">08</span><span>Задача дня и требования</span></a></li>
+      <li><a href="#class" data-section="class"><span class="toc-num">09</span><span>От словаря к классу</span></a></li>
+      <li><a href="#four-langs" data-section="four-langs"><span class="toc-num">10</span><span>Четыре языка, одна задача</span></a></li>
+    </ol>
+
+    <div class="toc-pair">Пара 4 · Дефекты</div>
+    <ol class="toc-list">
+      <li><a href="#defects" data-section="defects"><span class="toc-num">11</span><span>Четыре дефекта безопасности</span></a></li>
+      <li><a href="#owasp" data-section="owasp"><span class="toc-num">12</span><span>Чего не лечит выбор языка</span></a></li>
+    </ol>
+
+    <div class="toc-pair">Пара 5 · Проверки</div>
+    <ol class="toc-list">
+      <li><a href="#tests" data-section="tests"><span class="toc-num">13</span><span>Тесты и регрессии безопасности</span></a></li>
+      <li><a href="#tools" data-section="tools"><span class="toc-num">14</span><span>Линтер, SAST, SCA</span></a></li>
+      <li><a href="#pipeline" data-section="pipeline"><span class="toc-num">15</span><span>Конвейер и релиз</span></a></li>
+      <li><a href="#answer" data-section="answer"><span class="toc-num">16</span><span>Ответ на вопрос дня</span></a></li>
+    </ol>
+
+    <div class="toc-pair">Итог</div>
+    <ol class="toc-list">
+      <li><a href="#contacts" data-section="contacts"><span class="toc-num">17</span><span>Связь с преподавателем</span></a></li>
+    </ol>
+  </aside>
+
+  <article class="content">
+
+    <!-- HERO -->
+    <header class="hero">
+      <span class="hero-eyebrow">Курс «Специалист по процессам РБПО» · Занятие 27.07.2026</span>
+      <h1>Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта</h1>
+      <p class="hero-lead">Один учебный день, одно приложение, полный путь: от требований и модели угроз до релиза с тестами и автоматическими проверками. Между ними — как устроена разработка сегодня, чем стек отличается от фреймворка, что даёт и чего не даёт выбор языка программирования, и как выглядит уязвимость, когда её видишь своими глазами.</p>
+
+      <div class="key-stats">
+        <div class="key-stat"><div class="key-stat-value">5</div><div class="key-stat-label">пар, 10 академических часов</div></div>
+        <div class="key-stat"><div class="key-stat-value">4</div><div class="key-stat-label">языка в сравнении</div></div>
+        <div class="key-stat"><div class="key-stat-value">4</div><div class="key-stat-label">дефекта найти и исправить</div></div>
+        <div class="key-stat"><div class="key-stat-value">18</div><div class="key-stat-label">тестов к концу дня</div></div>
+      </div>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item"><span class="hero-meta-label">Тема программы</span><span class="hero-meta-value">Тема № 4 — хроника языков, ЖЦ безопасного ПО</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Нормативная опора</span><span class="hero-meta-value">ГОСТ Р 56939-2024, процессы 5.8–5.18</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Рабочий язык практики</span><span class="hero-meta-value">Python, стандартная библиотека</span></div>
+        <div class="hero-meta-item"><span class="hero-meta-label">Преподаватель</span><span class="hero-meta-value">Пиков Виталий Александрович</span></div>
+      </div>
+
+      <h3 style="font-size:18px;font-weight:600;margin:36px 0 14px;">Материалы занятия</h3>
+      <div class="integration-grid">
+        <a class="int-item" href="materials/konspekt.md">Конспект</a>
+        <a class="int-item" href="materials/praktikum.md">Практические задания</a>
+        <a class="int-item" href="code/spravka.md">Навигация по коду</a>
+        <a class="int-item" href="code/step1_list.py">step1_list.py</a>
+        <a class="int-item" href="code/step2_class.py">step2_class.py</a>
+        <a class="int-item" href="code/step3_defect.py">step3_defect.py</a>
+        <a class="int-item" href="code/step3_fixed.py">step3_fixed.py</a>
+        <a class="int-item" href="code/test_journal.py">test_journal.py</a>
+        <a class="int-item" href="code/languages/copy_name.py">copy_name.py</a>
+        <a class="int-item" href="code/languages/copy_name.asm">copy_name.asm</a>
+        <a class="int-item" href="code/languages/CopyName.pas">CopyName.pas</a>
+        <a class="int-item" href="code/languages/CopyName.cs">CopyName.cs</a>
+        <a class="int-item" href="code/.gitlab-ci.yml">.gitlab-ci.yml</a>
+        <a class="int-item" href="code/requirements-dev.txt">requirements-dev.txt</a>
+      </div>
+      <p style="font-size:14.5px;color:var(--text-muted);margin-top:12px;">Файлы открываются в браузере. Чтобы сохранить на диск — правая кнопка мыши, «Сохранить ссылку как…». Всё учебное приложение работает на стандартной библиотеке Python: ставить ничего не нужно.</p>
+    </header>
+
+    <!-- 01 -->
+    <section id="question" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> Вопрос дня</div>
+      <h2>Чем «программа работает» отличается от «программу можно выпускать»?</h2>
+
+      <p class="lead">Это единственный вопрос, ради которого собран весь день. Ответ на него мы дадим в разделе 16 — а пока стоит записать свою версию на бумаге и не подглядывать.</p>
+
+      <p>Представьте: вы написали программу. Она запускается, считает правильно, вы проверили её на нескольких примерах. Всё сходится.</p>
+
+      <p><strong>Готова ли она к тому, чтобы её выпустить?</strong></p>
+
+      <p>Типичные ответы: «надо ещё потестировать», «надо написать документацию», «надо чтобы интерфейс был поприличнее». Всё это верно — и всё это описывает меньше половины того, что на самом деле отделяет работающий код от продукта, который можно отдать людям.</p>
+
+      <div class="callout">
+        <p><strong>Забегая вперёд.</strong> Разница измеряется не количеством написанного кода, а количеством <em>проверяемых свидетельств</em>. Работающая программа — это одно свидетельство из примерно одиннадцати. Хорошая новость в том, что почти все остальные производятся автоматически, если настроить это один раз.</p>
+      </div>
+
+      <h3>Что мы сделаем за день</h3>
+
+      <div class="roadmap">
+        <div class="roadmap-step">
+          <div class="roadmap-num">1</div>
+          <div class="roadmap-content">
+            <h4>Требования</h4>
+            <p>Сформулируем, что приложение должно делать — и, главное, чего оно не должно делать никогда. Пять требований через «никогда» вечером превратятся в пять тестов.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Пара 1</span><span class="roadmap-tag">Лекция</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">2</div>
+          <div class="roadmap-content">
+            <h4>Среда и первый код</h4>
+            <p>Разберём, как устроена разработка сегодня. Соберём рабочее место, возьмём код под контроль версий, получим первую работающую версию.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Пара 2</span><span class="roadmap-tag">Практика</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">3</div>
+          <div class="roadmap-content">
+            <h4>Архитектура</h4>
+            <p>Перейдём от словарей к классам с встроенной проверкой. Посмотрим одну и ту же задачу на четырёх языках и увидим, что каждое поколение языков забирало у программиста.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Пара 3</span><span class="roadmap-tag">Практика</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">4</div>
+          <div class="roadmap-content">
+            <h4>Дефекты</h4>
+            <p>Запустим приложение с четырьмя намеренно оставленными уязвимостями. Увидим, как каждая срабатывает. Назовём класс по CWE. Исправим и проверим, что исправление работает.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Пара 4</span><span class="roadmap-tag warn">Ключевая</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">5</div>
+          <div class="roadmap-content">
+            <h4>Проверки и релиз</h4>
+            <p>Напишем тесты, которые не дадут уязвимости вернуться. Сравним линтер, SAST и SCA. Соберём конвейер и выпустим версию 1.0.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Пара 5</span><span class="roadmap-tag success">Релиз</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p>Приложение одно и то же на протяжении всего дня — <strong>журнал учёта машинных носителей информации</strong>. Предметная область знакомая: инвентарный номер, тип носителя, гриф, ответственный. Задачи простые: добавить, найти, выгрузить отчёт. Именно поэтому на нём хорошо видно всё остальное.</p>
+    </section>
+
+    <!-- 02 -->
+    <section id="lifecycle" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> Пара 1 · Лекция</div>
+      <h2>Жизненный цикл программного обеспечения</h2>
+
+      <p class="lead">Любая программа проходит одни и те же этапы — независимо от того, называете вы их вслух или нет.</p>
+
+      <pre class="code"><code>требования → проектирование → реализация → тестирование → выпуск → сопровождение → вывод из эксплуатации</code></pre>
+
+      <p>Разница между методологиями разработки — <strong>не в наборе этапов</strong>. Этапы всегда одни и те же. Разница в том, сколько раз вы по ним проходите и насколько крупными кусками.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Подход</th><th>Как проходит цикл</th><th>Где применяется сегодня</th></tr></thead>
+          <tbody>
+            <tr><td>Водопад</td><td>Один раз, целиком, последовательно</td><td>Госконтракты, сертифицируемые системы — там, где требования зафиксированы заранее и не меняются</td></tr>
+            <tr><td>Итеративный</td><td>Много раз, каждый раз целиком, но по кусочку функционала</td><td>Крупные корпоративные системы</td></tr>
+            <tr><td>Agile / Scrum</td><td>Циклами по 1–4 недели, приоритеты пересматриваются каждый цикл</td><td>Большая часть коммерческой разработки</td></tr>
+            <tr><td>DevOps</td><td>То же плюс автоматизация выкладки: цикл замыкается на эксплуатацию</td><td>Сервисы, которые обновляются часто</td></tr>
+            <tr><td>DevSecOps</td><td>То же, но проверки безопасности встроены в автоматику, а не пристроены сбоку</td><td>То, к чему идёт отрасль и на что ориентирован ГОСТ Р 56939</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-track">
+          <div class="timeline-item">
+            <div class="timeline-date">1970-е</div>
+            <div class="timeline-title">Водопад</div>
+            <div class="timeline-desc">Один проход. Ошибка в требованиях доживает до сдачи</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">1990-е</div>
+            <div class="timeline-title">Итерации, XP</div>
+            <div class="timeline-desc">Короткие циклы. Обратная связь появляется раньше</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2000-е</div>
+            <div class="timeline-title">Agile, SDL</div>
+            <div class="timeline-desc">Безопасность становится отдельным процессом</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">2010-е+</div>
+            <div class="timeline-title">DevSecOps</div>
+            <div class="timeline-desc">Проверки безопасности внутри автоматики</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Частое заблуждение.</strong> «Водопад устарел, все работают по Agile». В отрасли — да, во многом. Но в сертифицируемых системах и в госзаказе водопад никуда не делся и не денется: там требования фиксируются документом, который согласован с заказчиком и регулятором, и «пересмотреть приоритеты каждые две недели» просто не предусмотрено процедурой. Умение работать в обоих режимах — часть профессии.</p>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section id="shiftleft" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> Пара 1 · Лекция</div>
+      <h2>Сдвиг влево и ГОСТ Р 56939-2024</h2>
+
+      <p class="lead">Если нарисовать жизненный цикл слева направо, «сдвиг влево» — это перенос работ по безопасности из правой части в левую.</p>
+
+      <p>Из тестирования и выпуска — в требования, проектирование и написание кода. Причина простая и считается в деньгах: <strong>чем позже найден дефект, тем больше вокруг него успело нарасти.</strong></p>
+
+      <div class="roadmap">
+        <div class="roadmap-step">
+          <div class="roadmap-num">1</div>
+          <div class="roadmap-content">
+            <h4>Ошибка найдена в требованиях</h4>
+            <p>Правится одним предложением в документе. Стоимость — минуты.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag success">Дёшево</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">2</div>
+          <div class="roadmap-content">
+            <h4>Та же ошибка в проектировании</h4>
+            <p>Переделка схемы, пересогласование интерфейсов между компонентами.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag">Дни</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">3</div>
+          <div class="roadmap-content">
+            <h4>Та же ошибка в коде</h4>
+            <p>Переписывание модуля и всех тестов к нему. Плюс всё, что успело на него опереться.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag warn">Недели</span></div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="roadmap-num">4</div>
+          <div class="roadmap-content">
+            <h4>Та же ошибка в выпущенном продукте</h4>
+            <p>Плюс оповещение заказчиков, внеплановое обновление, разбор инцидента, объяснения регулятору, репутационные последствия.</p>
+            <div class="roadmap-meta"><span class="roadmap-tag warn">Месяцы и деньги</span></div>
+          </div>
+        </div>
+      </div>
+
+      <p>Обратите внимание: <strong>сама работа по исправлению во всех четырёх случаях примерно одинаковая.</strong> Разница — в слое обвязки, который нарастает вокруг неё со временем. Сдвиг влево не про «делать больше работы», а про «делать ту же работу тогда, когда вокруг неё ещё ничего не наросло».</p>
+
+      <h3>Что говорит стандарт</h3>
+
+      <p>ГОСТ Р 56939-2024 «Защита информации. Разработка безопасного программного обеспечения. Общие требования» описывает <strong>25 процессов</strong> с нумерацией 5.1–5.25 — от планирования и обучения сотрудников до реагирования на уязвимости и вывода ПО из эксплуатации.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head"><h3>SDL</h3></div>
+          <p>Отвечает на вопрос <strong>как делать</strong>. Это инженерная практика: последовательность фаз от обучения до реагирования на инциденты.</p>
+          <ul>
+            <li>Обучение</li>
+            <li>Требования</li>
+            <li>Проектирование</li>
+            <li>Реализация</li>
+            <li>Верификация</li>
+            <li>Выпуск</li>
+            <li>Реагирование</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>ГОСТ Р 56939-2024</h3></div>
+          <p>Отвечает на вопрос <strong>что должно быть сделано и чем это подтверждается</strong>. Это предмет проверки при сертификации.</p>
+          <ul>
+            <li>25 процессов, 5.1–5.25</li>
+            <li>К каждому — регламент</li>
+            <li>К каждому — назначенный исполнитель</li>
+            <li>К каждому — запись о выполнении</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Ключевое различие.</strong> Один и тот же статический анализ кода в SDL называется практикой, а в ГОСТ — процессом 5.10, к которому нужен регламент, исполнитель и запись о выполнении. Запустить анализатор — это практика. Показать проверяющему, кто, когда, по какому регламенту его запускал и что сделал с результатами — это процесс.</p>
+      </div>
+
+      <h3>Процессы, которых касается сегодняшний день</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Процесс</th><th>Название</th><th>Где сегодня</th></tr></thead>
+          <tbody>
+            <tr><td><span class="tag">5.8</span></td><td>Кодирование — правила и безопасные конструкции</td><td>Пары 3 и 4 целиком</td></tr>
+            <tr><td><span class="tag">5.9</span></td><td>Экспертиза исходного кода</td><td>Разбор дефектов, парная работа</td></tr>
+            <tr><td><span class="tag">5.10</span></td><td>Статический анализ исходного кода</td><td>Пара 5, ruff и bandit</td></tr>
+            <tr><td><span class="tag">5.12</span></td><td>Использование безопасной системы сборки</td><td>Пара 3, флаги компилятора в Object Pascal</td></tr>
+            <tr><td><span class="tag">5.16</span></td><td>Композиционный анализ</td><td>Пара 5, pip-audit и SBOM</td></tr>
+            <tr><td><span class="tag">5.18</span></td><td>Функциональное тестирование</td><td>Пара 5, регрессионные тесты</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section id="xp" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> Пара 1 · Лекция</div>
+      <h2>Экстремальное программирование</h2>
+
+      <p class="lead">Вторая половина 1990-х. Кент Бек, книга «Extreme Programming Explained» — 1999 год.</p>
+
+      <p>Идея заложена в названии. Возьмём практики, которые все считают полезными, и доведём их до предела:</p>
+
+      <ul>
+        <li>Ревью кода полезно? Тогда пусть код пишут двое за одним экраном — ревью станет непрерывным.</li>
+        <li>Тесты полезны? Тогда будем писать тест <strong>до</strong> кода.</li>
+        <li>Интеграция полезна? Тогда будем интегрировать несколько раз в день, а не раз в квартал.</li>
+      </ul>
+
+      <h3>Двенадцать практик</h3>
+
+      <div class="integration-grid">
+        <div class="int-item">Планирование</div>
+        <div class="int-item">Малые релизы</div>
+        <div class="int-item">Метафора системы</div>
+        <div class="int-item">Простой дизайн</div>
+        <div class="int-item">Тестирование</div>
+        <div class="int-item">Рефакторинг</div>
+        <div class="int-item">Парное программирование</div>
+        <div class="int-item">Коллективный код</div>
+        <div class="int-item">Непрерывная интеграция</div>
+        <div class="int-item">40-часовая неделя</div>
+        <div class="int-item">Заказчик рядом</div>
+        <div class="int-item">Стандарт кодирования</div>
+      </div>
+
+      <h3>Четыре практики XP, которые являются мерами безопасности</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Практика XP</th><th>Что это в терминах РБПО</th></tr></thead>
+          <tbody>
+            <tr><td>Парное программирование</td><td>Экспертиза исходного кода (процесс 5.9), выполняемая непрерывно, а не отдельной процедурой раз в спринт</td></tr>
+            <tr><td>Тестирование до кода (TDD)</td><td>Каждый исправленный дефект получает тест. Регрессия закрыта навсегда, а не до следующего рефакторинга</td></tr>
+            <tr><td>Непрерывная интеграция</td><td>Основа конвейера РБПО: проверки запускаются автоматически, а не когда о них вспомнили</td></tr>
+            <tr><td>Стандарт кодирования</td><td>Правила кодирования — прямое требование процесса 5.8</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Честная оговорка.</strong> XP в чистом виде сегодня применяют редко. Но непрерывная интеграция, разработка через тестирование и парное программирование ушли из него в общую практику и живут там отдельно от методологии. Это тот случай, когда подход растворился в отрасли — и это лучшее, что может случиться с методологией.</p>
+      </div>
+
+      <p>Отдельно стоит сказать про <strong>40-часовую неделю</strong>. В списке практик она выглядит неуместно — при чём тут инженерия? При том, что усталый разработчик даёт больше дефектов, а дефект, найденный на проде, стоит в сотни раз дороже переработки, которая его породила. Устойчивый темп — это тоже мера безопасности, просто она измеряется не в коде.</p>
+    </section>
+
+    <!-- 05 -->
+    <section id="layers" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> Пара 2 · Стек</div>
+      <h2>Десять слоёв современной разработки</h2>
+
+      <p class="lead">Когда говорят «стек технологий», имеют в виду набор выборов — по одному на каждом слое. Слоёв примерно десять.</p>
+
+      <div class="stack-layers">
+        <div class="stack-layer">
+          <div class="stack-layer-num">1</div>
+          <div class="stack-layer-body"><h4>Язык и среда выполнения</h4><p>Python, TypeScript, Java, C#, Go, Rust, Kotlin, Swift</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">2</div>
+          <div class="stack-layer-body"><h4>Пакеты и изолированное окружение</h4><p>pip / uv, npm / pnpm, NuGet, Maven, Cargo, Go modules</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">3</div>
+          <div class="stack-layer-body"><h4>Фреймворк</h4><p>Django, FastAPI, React, Vue, Spring Boot, ASP.NET Core</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">4</div>
+          <div class="stack-layer-body"><h4>Хранилище данных</h4><p>PostgreSQL, SQLite, Redis, ClickHouse, MongoDB</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">5</div>
+          <div class="stack-layer-body"><h4>Упаковка и перенос</h4><p>Docker, Docker Compose, Kubernetes</p></div>
+        </div>
+        <div class="stack-layer highlight">
+          <div class="stack-layer-num">6</div>
+          <div class="stack-layer-body"><h4>Контроль версий</h4><p>Git + GitLab, GitVerse, GitFlic, Gitea. Предмет процесса 5.4</p></div>
+        </div>
+        <div class="stack-layer highlight">
+          <div class="stack-layer-num">7</div>
+          <div class="stack-layer-body"><h4>CI/CD</h4><p>GitLab CI, GitHub Actions, Jenkins, TeamCity. Здесь живёт конвейер РБПО</p></div>
+        </div>
+        <div class="stack-layer highlight">
+          <div class="stack-layer-num">8</div>
+          <div class="stack-layer-body"><h4>Качество и безопасность</h4><p>Линтер, тесты, SAST, SCA, DAST, фаззинг. Процессы 5.10, 5.11, 5.16, 5.18</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">9</div>
+          <div class="stack-layer-body"><h4>Наблюдаемость</h4><p>Логи, метрики, трассировки. Как понять, что происходит в работе</p></div>
+        </div>
+        <div class="stack-layer">
+          <div class="stack-layer-num">10</div>
+          <div class="stack-layer-body"><h4>Помощь разработчику</h4><p>IDE, отладчик, ИИ-ассистенты</p></div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Главное наблюдение раздела.</strong> В учебных курсах программирования обычно проходят слои 1–4 и на этом останавливаются. В РБПО предметом проверки при сертификации являются в первую очередь слои 6–8 — выделенные выше. «Умею писать код» и «умею выпускать продукт» — разные навыки, и второй состоит в основном из того, чему не учат.</p>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section id="languages" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> Пара 2 · Стек</div>
+      <h2>Где какой язык живёт</h2>
+
+      <p class="lead">Вопрос «какой язык лучше» не имеет ответа. Вопрос «какой язык для какой задачи» — имеет.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Язык</th><th>Основные ниши</th><th>Типичные фреймворки</th></tr></thead>
+          <tbody>
+            <tr><td>Python</td><td>Веб-бэкенд, анализ данных и ML, автоматизация, скрипты ИБ</td><td>Django, FastAPI, Flask</td></tr>
+            <tr><td>JavaScript / TypeScript</td><td>Веб-интерфейсы, серверная часть</td><td>React, Vue, Svelte, Node.js</td></tr>
+            <tr><td>Java</td><td>Крупные корпоративные системы, Android</td><td>Spring Boot</td></tr>
+            <tr><td>C#</td><td>Корпоративные и настольные приложения, игры</td><td>ASP.NET Core, .NET MAUI, Unity</td></tr>
+            <tr><td>C / C++</td><td>Операционные системы, драйверы, встраиваемые системы</td><td>Qt, Boost</td></tr>
+            <tr><td>Rust</td><td>То же, что C/C++, но с гарантиями безопасности памяти</td><td>Tokio, Axum</td></tr>
+            <tr><td>Go</td><td>Сетевые сервисы, инфраструктурное ПО</td><td>стандартная библиотека, Gin</td></tr>
+            <tr><td>Kotlin / Swift</td><td>Мобильные приложения</td><td>Jetpack Compose, SwiftUI</td></tr>
+            <tr><td>SQL</td><td>Работа с данными. Декларативный язык — тема среды</td><td>—</td></tr>
+            <tr><td>1С</td><td>Учётные системы, в России очень широко</td><td>платформа 1С:Предприятие</td></tr>
+            <tr><td>Object Pascal (Delphi)</td><td>Сопровождение унаследованных систем, быстрая разработка интерфейсов</td><td>VCL, Lazarus</td></tr>
+            <tr><td>Ассемблер</td><td>Обратная разработка, загрузчики, оптимизация узких мест</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Расписание сегодняшнего дня называет четыре языка: <strong>Assembler, Python, Delphi, C#</strong>. Выбор не случайный — это четыре разных уровня отношений с памятью, и в разделе 10 мы посмотрим на них на одной и той же задаче.</p>
+    </section>
+
+    <!-- 07 -->
+    <section id="frameworks" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> Пара 2 · Стек</div>
+      <h2>Библиотека, фреймворк, платформа</h2>
+
+      <p class="lead">Различие определяется одним признаком — кто кого вызывает.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head"><h3>Библиотеку вызываете вы</h3></div>
+          <p>Вы решаете, когда обратиться к <code>requests</code>, чтобы отправить запрос. Управление остаётся у вас.</p>
+          <div class="col-tags">
+            <span class="col-tag">requests</span><span class="col-tag">sqlite3</span><span class="col-tag">pandas</span>
+          </div>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>Фреймворк вызывает вас</h3></div>
+          <p>Django сам решает, когда вызвать вашу функцию обработки страницы. Это называется инверсией управления.</p>
+          <div class="col-tags">
+            <span class="col-tag">Django</span><span class="col-tag">React</span><span class="col-tag">ASP.NET Core</span>
+          </div>
+        </div>
+      </div>
+
+      <p><strong>Платформа</strong> — .NET, JVM, Docker — определяет, где и как вы вообще можете быть вызваны. Она задаёт правила игры до того, как в неё вступит и ваш код, и фреймворк.</p>
+
+      <div class="callout danger">
+        <p><strong>Почему это важно для безопасности.</strong> Когда чужой код управляет вашим, уязвимость в нём становится вашей уязвимостью — и вы о ней не узнаете, пока специально не начнёте следить. Отсюда композиционный анализ (процесс 5.16) и SBOM: перечень всех компонентов, входящих в продукт. Без него на вопрос «а у вас есть эта уязвимая библиотека?» приходится отвечать «сейчас поищем», и поиск занимает недели.</p>
+      </div>
+
+      <h3>Кто ещё пишет код в 2026 году</h3>
+
+      <p>Часть кода сегодня создаётся с помощью ИИ-ассистентов, и это уже обычная практика, а не экзотика. Для РБПО важны три вещи.</p>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">01</div>
+          <h4>Ответственность не делится</h4>
+          <ul>
+            <li>Отвечает тот, кто отправил код в репозиторий</li>
+            <li>Сгенерированный код проходит те же процессы 5.8–5.11</li>
+            <li>«Так сгенерировал ассистент» — не объяснение для проверяющего</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">02</div>
+          <h4>Объём растёт быстрее внимания</h4>
+          <ul>
+            <li>Кода становится больше, а глаз — столько же</li>
+            <li>Это усиливает роль автоматических проверок</li>
+            <li>Ручное ревью перестаёт масштабироваться первым</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">03</div>
+          <h4>Новый риск цепочки поставок</h4>
+          <ul>
+            <li>Ассистент может предложить несуществующий пакет</li>
+            <li>Злоумышленник может заранее занять это имя</li>
+            <li>Проверка имён зависимостей стала обязательной</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Практическое правило.</strong> Пользоваться ассистентами можно, и в этом нет ничего плохого. Но не отправляйте в коммит строку, которую не можете объяснить. Как только вы нажали «закоммитить» — это ваш код и ваша ответственность.</p>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section id="task" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> Пара 3 · Архитектура</div>
+      <h2>Задача дня: журнал учёта носителей</h2>
+
+      <p class="lead">Приложение намеренно маленькое. Всё интересное сегодня — не в нём, а вокруг него.</p>
+
+      <p><strong>Учётная запись:</strong> инвентарный номер, тип носителя, гриф, ответственный.<br>
+      <strong>Функции:</strong> добавить носитель, найти по номеру или ФИО, выгрузить отчёт в файл.</p>
+
+      <h3>Требования безопасности через «никогда»</h3>
+
+      <p>Формулировка через «никогда» — не стилистический приём. Такое требование почти механически превращается в тест, и мы это увидим в разделе 13.</p>
+
+      <ol>
+        <li>Поиск для обычного пользователя <strong>никогда</strong> не возвращает записи с грифом «Конфиденциально».</li>
+        <li>Отчёт <strong>никогда</strong> не записывается за пределы каталога выгрузки.</li>
+        <li>Служебный токен <strong>никогда</strong> не хранится в исходном коде.</li>
+        <li>Служебный токен <strong>никогда</strong> не попадает в журнал приложения.</li>
+        <li>Запись с невалидными данными <strong>никогда</strong> не попадает в журнал.</li>
+      </ol>
+
+      <h3>Мини-модель угроз</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Актив</th><th>Угроза</th><th>Кто</th><th>Мера</th></tr></thead>
+          <tbody>
+            <tr><td>Перечень конфиденциальных носителей</td><td>Раскрытие через функцию поиска</td><td>Внутренний пользователь без прав</td><td>Фильтр по грифу + регрессионный тест</td></tr>
+            <tr><td>Файлы за пределами каталога</td><td>Перезапись произвольного файла</td><td>Внутренний пользователь</td><td>Нормализация пути и проверка границы</td></tr>
+            <tr><td>Служебный токен</td><td>Компрометация через репозиторий</td><td>Любой с доступом к git</td><td>Секрет вне кода, <code>.gitignore</code></td></tr>
+            <tr><td>Служебный токен</td><td>Компрометация через журналы</td><td>Оператор, служба поддержки</td><td>Маскирование при записи в журнал</td></tr>
+            <tr><td>Целостность журнала учёта</td><td>Внесение мусорных записей</td><td>Пользователь, ошибка интеграции</td><td>Валидация в конструкторе объекта</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Запомните это место.</strong> Пять строк «никогда» и пять строк модели угроз, написанные за 15 минут в начале дня, к вечеру превратятся в пять тестов, которые будут проверяться автоматически при каждом изменении кода. Это и есть сдвиг влево в самом дешёвом исполнении.</p>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section id="class" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> Пара 3 · Архитектура</div>
+      <h2>От словаря к классу</h2>
+
+      <p class="lead">Первая версия журнала хранит записи в словарях. Она работает. И в ней уже три дефекта.</p>
+
+      <div class="code-label bad"><span class="dot"></span>Версия 1 — работает, но беззащитна</div>
+      <pre class="code"><code>record = {<span class="str">"inv"</span>: <span class="str">"МНИ-001"</span>, <span class="str">"kind"</span>: <span class="str">"USB-флеш"</span>,
+          <span class="str">"label"</span>: <span class="str">"ДСП"</span>, <span class="str">"owner"</span>: <span class="str">"Иванова А. П."</span>}</code></pre>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Проблема</th><th>Что произойдёт</th></tr></thead>
+          <tbody>
+            <tr><td>У словаря нет схемы</td><td>Опечатка <code>record["Owner"]</code> вместо <code>record["owner"]</code> не вызовет ошибки — просто создастся новый ключ, и данные молча разойдутся</td></tr>
+            <tr><td>Нет проверки значений</td><td>Тип «Дискета», гриф «Совершенно секретно», ФИО «asdf» — всё пройдёт без единого возражения</td></tr>
+            <tr><td>Нет защиты от дублей</td><td>Один инвентарный номер можно добавить дважды</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="code-label good"><span class="dot"></span>Версия 2 — невалидное состояние невозможно</div>
+      <pre class="code"><code><span class="fn">@dataclass</span>(frozen=<span class="kw">True</span>)
+<span class="kw">class</span> <span class="ty">Medium</span>:
+    inv: <span class="ty">str</span>
+    kind: <span class="ty">str</span>
+    label: <span class="ty">str</span>
+    owner: <span class="ty">str</span>
+
+    <span class="kw">def</span> <span class="fn">__post_init__</span>(self) -> <span class="kw">None</span>:
+        <span class="kw">if not</span> INV_PATTERN.match(self.inv):
+            <span class="kw">raise</span> ValidationError(...)
+        <span class="kw">if</span> self.kind <span class="kw">not in</span> ALLOWED_KINDS:
+            <span class="kw">raise</span> ValidationError(...)</code></pre>
+
+      <p>Три изменения, и каждое — мера безопасности:</p>
+
+      <ul class="checklist">
+        <li><strong>Набор полей фиксирован.</strong> Опечатка в имени поля теперь ошибка, а не тихое расхождение данных.</li>
+        <li><strong><code>frozen=True</code> — запись неизменяема.</strong> Учётную запись нельзя тихо поменять в обход журнала. Значит, все изменения проходят через журнал. Значит, все изменения можно записать.</li>
+        <li><strong>Проверка в конструкторе.</strong> Невалидный объект нельзя создать вообще — ни из формы, ни из импорта CSV, ни из теста, ни из кода, который ещё не написан.</li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>Ключевая мысль раздела.</strong> Проверять данные при вводе — это охранять одну дверь. Проверять в конструкторе — сделать так, чтобы неправильное состояние было невозможно в принципе. Первое — контроль. Второе — свойство системы. Контроль можно обойти, свойство — нет.</p>
+      </div>
+
+      <h3>Белый список против чёрного</h3>
+
+      <p>В справочниках мы перечисляем <strong>разрешённые</strong> типы носителей и грифы, а не запрещённые.</p>
+
+      <pre class="code"><code>ALLOWED_KINDS = (<span class="str">"USB-флеш"</span>, <span class="str">"HDD"</span>, <span class="str">"SSD"</span>, <span class="str">"CD/DVD"</span>, <span class="str">"Карта памяти"</span>)
+ALLOWED_LABELS = (<span class="str">"Открыто"</span>, <span class="str">"ДСП"</span>, <span class="str">"Конфиденциально"</span>)</code></pre>
+
+      <p>Причина простая: перечислить всё разрешённое реально. Перечислить всё запрещённое — нет. Всегда найдётся способ записать то же самое иначе, и этот способ обнаружит не тот, кто пишет фильтр.</p>
+    </section>
+
+    <!-- 10 -->
+    <section id="four-langs" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> Пара 3 · Архитектура</div>
+      <h2>Четыре языка, одна задача</h2>
+
+      <p class="lead">Задача: скопировать строку в буфер размером ровно 16 символов. Строка длиннее буфера. Четыре языка — четыре разных ответа на вопрос «а кто за этим следит».</p>
+
+      <div class="accordion">
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <span class="acc-summary-left"><span class="acc-tag bad">1 / 4</span><span>Ассемблер — не следит никто</span></span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <pre class="code"><code><span class="fn">copy_name:</span>
+    lea     rdi, [rel buffer]   <span class="cm">; куда копируем</span>
+<span class="fn">.loop:</span>
+    mov     al, [rsi]           <span class="cm">; взять байт источника</span>
+    mov     [rdi], al           <span class="cm">; положить в приёмник</span>
+    inc     rsi
+    inc     rdi
+    test    al, al              <span class="cm">; дошли до нуля?</span>
+    jnz     .loop               <span class="cm">; нет — продолжаем</span>
+    ret</code></pre>
+            <p>Цикл копирует до нулевого байта — сколько бы их ни было. Проверки размера нет нигде. Строка в 40 байт положит 24 лишних байта в соседнюю память.</p>
+            <p><strong>Процессор не считает это ошибкой.</strong> Для него нет никакого «буфера» — есть адрес и инструкция записи. Понятие границы существует только в голове программиста и в исходном тексте.</p>
+            <p>Это <strong>CWE-787, запись за границей буфера</strong> — корневая причина классического переполнения буфера.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <span class="acc-summary-left"><span class="acc-tag">2 / 4</span><span>Object Pascal — следит компилятор, если его попросить</span></span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <pre class="code"><code>{$RANGECHECKS ON}
+<span class="kw">type</span> TBuffer = <span class="kw">array</span>[0..15] <span class="kw">of</span> Char;</code></pre>
+            <p>При включённой директиве программа аварийно остановится на 17-м символе: <code>Runtime error 201</code>. При выключенной — молча продолжит писать за границу, ровно как ассемблер.</p>
+            <p><strong>То есть безопасность памяти здесь является настройкой сборки.</strong> Её можно включить, а можно случайно отключить ради быстродействия.</p>
+            <p>Именно поэтому в РБПО проверяется не только исходный код, но и параметры компиляции — это процесс 5.12 «Использование безопасной системы сборки». Флаги компилятора являются таким же объектом контроля, как и текст программы.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <span class="acc-summary-left"><span class="acc-tag">3 / 4</span><span>C# — следит среда выполнения, отключить нельзя</span></span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <pre class="code"><code><span class="ty">char</span>[] buffer = <span class="kw">new</span> <span class="ty">char</span>[<span class="num">16</span>];
+buffer[i] = source[i];   <span class="cm">// IndexOutOfRangeException при i >= 16</span></code></pre>
+            <p>Проверку границ нельзя отключить настройкой сборки — она встроена в среду выполнения CLR.</p>
+            <p>Обойти её можно только явным блоком <code>unsafe</code> с указателями, а такой блок требует отдельного разрешения при компиляции. <strong>Небезопасный код в C# невозможно написать случайно — только намеренно и заметно.</strong></p>
+            <p>Поэтому в правилах кодирования для C#-проектов обычно прямо записывают: блоки <code>unsafe</code> запрещены, исключения согласуются с архитектором.</p>
+          </div>
+        </details>
+
+        <details class="acc-item">
+          <summary class="acc-summary">
+            <span class="acc-summary-left"><span class="acc-tag">4 / 4</span><span>Python — вопрос исчезает вместе с ручной памятью</span></span>
+            <svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="acc-body">
+            <pre class="code"><code>buffer = [<span class="str">""</span>] * <span class="num">16</span>
+buffer[i] = source[i]   <span class="cm"># IndexError</span>
+
+<span class="cm"># а так эту задачу пишут в реальной жизни:</span>
+result = source[:<span class="num">16</span>]   <span class="cm"># срез никогда не выходит за границы</span></code></pre>
+            <p>Проверка всегда, отключить нельзя. Более того, у строк в Python вообще нет фиксированного размера — задача в таком виде обычно просто не возникает.</p>
+            <p>Плата за это — производительность и потеря контроля над тем, где и как размещаются данные. Поэтому загрузчики, драйверы и ядра операционных систем на Python не пишут.</p>
+          </div>
+        </details>
+      </div>
+
+      <h3>Итоговая таблица</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Язык</th><th>Кто отвечает за границы памяти</th><th>Можно ли отключить проверку</th></tr></thead>
+          <tbody>
+            <tr><td>Ассемблер</td><td>Программист</td><td><span class="tag bad">Проверки нет вообще</span></td></tr>
+            <tr><td>Object Pascal</td><td>Программист + компилятор</td><td><span class="tag warn">Да, директивой</span></td></tr>
+            <tr><td>C#</td><td>Среда выполнения (CLR)</td><td><span class="tag good">Только явным <code>unsafe</code></span></td></tr>
+            <tr><td>Python</td><td>Интерпретатор</td><td><span class="tag good">Нет</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Языки, где безопасность памяти обеспечивается средой или компилятором, называют <strong>memory-safe</strong>: C#, Java, Python, Go, Rust. Языки, где она лежит на программисте: C, C++, ассемблер.</p>
+
+      <div class="callout">
+        <p><strong>Насколько это существенно.</strong> По данным Microsoft Security Response Center, около 70 % уязвимостей в продуктах Microsoft за 2006–2018 годы относились к классу нарушений безопасности памяти — то есть к тому, чего в C# и Python просто не бывает. Это не аргумент «переписать всё на Python»: у C и C++ есть задачи, которые больше решать не на чем. Это аргумент за осознанный выбор.</p>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Главный вывод пары.</strong> Выбор языка — это архитектурное решение по безопасности, принятое до написания первой строки кода. Оно определяет, какие классы уязвимостей вообще возможны в вашей программе.</p>
+        <p>Но ни один язык не защищает от SQL-инъекции, от ошибки в логике доступа и от секрета, попавшего в репозиторий. Именно их мы сейчас и пойдём ловить.</p>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section id="defects" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> Пара 4 · Дефекты</div>
+      <h2>Четыре дефекта безопасности</h2>
+
+      <p class="lead">Все четыре живут в файле <code>step3_defect.py</code>. Их нужно найти, назвать по CWE и исправить. Порядок разбора — от самого наглядного.</p>
+
+      <div class="callout danger">
+        <p><strong>Про учебный файл.</strong> <code>step3_defect.py</code> содержит намеренно оставленные уязвимости и предназначен только для разбора на занятии. В рабочие проекты этот код не переносится. Исправленный вариант — <code>step3_fixed.py</code>.</p>
+      </div>
+
+      <h3>Д3 · Внедрение SQL-кода · CWE-89</h3>
+
+      <p>Функция <code>find_public</code> по замыслу обязана возвращать <strong>только</strong> записи с грифом «Открыто».</p>
+
+      <div class="code-label bad"><span class="dot"></span>Как написано</div>
+      <pre class="code"><code>sql = (<span class="str">"SELECT inv, kind, label, owner FROM media "</span>
+       <span class="str">"WHERE label = 'Открыто' AND owner LIKE '%"</span> <span class="hl-bad">+ query +</span> <span class="str">"%'"</span>)</code></pre>
+
+      <p>Введём строку <code>%' OR label LIKE '%</code> — и получится вот такой запрос:</p>
+
+      <pre class="code"><code><span class="kw">SELECT</span> ... <span class="kw">WHERE</span> label = <span class="str">'Открыто'</span> <span class="kw">AND</span> owner <span class="kw">LIKE</span> <span class="str">'%%'</span> <span class="hl-bad kw">OR</span> <span class="hl-bad">label LIKE '%%'</span></code></pre>
+
+      <p>В SQL операция <code>AND</code> связывает сильнее, чем <code>OR</code>. Значит, условие читается так:</p>
+
+      <pre class="code"><code>(label = <span class="str">'Открыто'</span> <span class="kw">AND</span> owner <span class="kw">LIKE</span> <span class="str">'%%'</span>)   <span class="kw">ИЛИ</span>   (label <span class="kw">LIKE</span> <span class="str">'%%'</span>)</code></pre>
+
+      <p>Второе слагаемое истинно для любой строки: <code>%</code> в LIKE означает «любая последовательность символов». Дизъюнкция с истиной даёт истину — и фильтр по грифу перестаёт что-либо значить.</p>
+
+      <div class="code-label"><span class="dot"></span>Что печатает программа — проверено 26.07.2026</div>
+      <pre class="code"><code>  Тот же поиск, но пользователь ввёл специальную строку:
+      (<span class="str">'МНИ-001'</span>, <span class="str">'USB-флеш'</span>, <span class="str">'Открыто'</span>, <span class="str">'Иванова А. П.'</span>)
+      (<span class="str">'МНИ-002'</span>, <span class="str">'HDD'</span>, <span class="str">'Открыто'</span>, <span class="str">'Петров С. И.'</span>)
+      (<span class="str">'МНИ-003'</span>, <span class="str">'SSD'</span>, <span class="str">'Конфиденциально'</span>, <span class="str">'Сидорова М. К.'</span>)
+      (<span class="str">'МНИ-004'</span>, <span class="str">'USB-флеш'</span>, <span class="str">'Конфиденциально'</span>, <span class="str">'Кузнецов Д. А.'</span>)
+
+  Утекло записей с грифом «Конфиденциально»: <span class="num">2</span>
+  Функция обязана была вернуть <span class="num">0</span> таких записей.</code></pre>
+
+      <div class="code-label good"><span class="dot"></span>Как надо — параметризованный запрос</div>
+      <pre class="code"><code>sql = (<span class="str">"SELECT inv, kind, label, owner FROM media "</span>
+       <span class="str">"WHERE label = 'Открыто' AND owner LIKE </span><span class="hl-good str">?</span><span class="str">"</span>)
+<span class="kw">return</span> connection.execute(sql, <span class="hl-good">(<span class="str">f"%{query}%"</span>,)</span>).fetchall()</code></pre>
+
+      <p>Текст запроса — константа, известная на этапе написания кода. Значения передаются отдельно. <strong>База разбирает запрос до того, как увидит данные</strong> — поэтому данные уже не могут стать командой.</p>
+
+      <div class="callout warning">
+        <p><strong>Почему нельзя «просто запретить кавычки».</strong> Это фильтрация по чёрному списку: способов записать то же самое всегда больше, чем вы предусмотрели, а фамилии с апострофом при этом перестанут искаться.</p>
+        <p>И главное: <strong>инъекция — это не про SQL.</strong> Это про склейку команды из данных. То же самое бывает с командами оболочки, путями к файлам, шаблонами, LDAP-запросами, заголовками HTTP. Как только вы строите строку-команду конкатенацией — вы в зоне риска.</p>
+      </div>
+
+      <h3>Д4 · Выход за пределы каталога · CWE-22</h3>
+
+      <div class="code-label bad"><span class="dot"></span>Как написано</div>
+      <pre class="code"><code>path = Path(os.path.join(EXPORT_DIR, <span class="hl-bad">filename</span>))</code></pre>
+
+      <p>Имя файла приходит снаружи. Передайте <code>../../отчёт.txt</code> — и файл уйдёт за пределы каталога выгрузки, туда, куда программе писать не положено.</p>
+
+      <div class="code-label good"><span class="dot"></span>Как надо — нормализация и проверка границы</div>
+      <pre class="code"><code>base = EXPORT_DIR.resolve()
+candidate = (base / filename).<span class="hl-good">resolve()</span>
+<span class="kw">if not</span> candidate.<span class="hl-good">is_relative_to(base)</span>:
+    <span class="kw">raise</span> ValueError(<span class="str">"Имя файла выводит за пределы каталога выгрузки"</span>)</code></pre>
+
+      <p><code>resolve()</code> приводит путь к каноническому виду и убирает <code>..</code>. Затем проверяем, что результат действительно лежит внутри разрешённого каталога.</p>
+
+      <div class="callout">
+        <p><strong>Правило.</strong> Проверять исходную строку на наличие <code>..</code> ненадёжно: есть обратные слэши, процентное кодирование, символические ссылки, подкаталоги вида <code>a/../../b</code>. <strong>Проверяйте результат, а не текст.</strong></p>
+      </div>
+
+      <h3>Д1 · Секрет в исходном коде · CWE-798</h3>
+
+      <div class="code-label bad"><span class="dot"></span>Как написано</div>
+      <pre class="code"><code>ADMIN_TOKEN = <span class="hl-bad str">"s3cr3t-admin-token-2026"</span></code></pre>
+
+      <p>Такой токен уезжает в систему контроля версий и остаётся в её истории <strong>навсегда</strong>. Удаление строки следующим коммитом ничего не меняет: старые коммиты никуда не делись, и <code>git log -p</code> их покажет. Сменить токен можно только пересборкой и перевыпуском программы.</p>
+
+      <div class="code-label good"><span class="dot"></span>Как надо</div>
+      <pre class="code"><code><span class="kw">def</span> <span class="fn">get_admin_token</span>() -> <span class="ty">str</span>:
+    token = os.environ.get(<span class="str">"MEDIA_JOURNAL_ADMIN_TOKEN"</span>)
+    <span class="kw">if not</span> token:
+        <span class="kw">raise</span> RuntimeError(<span class="str">"Не задана переменная окружения..."</span>)
+    <span class="kw">return</span> token</code></pre>
+
+      <p>В коде остаётся только <em>имя</em> переменной. Сам секрет живёт в окружении процесса, в файле <code>.env</code> (добавленном в <code>.gitignore</code>) или в менеджере секретов.</p>
+
+      <div class="callout warning">
+        <p><strong>Обратите внимание на деталь.</strong> При отсутствующем секрете программа <em>падает</em>, а не подставляет значение по умолчанию. Значение по умолчанию для секрета — это тот же захардкоженный секрет, только незаметный.</p>
+      </div>
+
+      <h3>Д2 · Секрет в журнале приложения · CWE-532</h3>
+
+      <div class="code-label bad"><span class="dot"></span>Как написано</div>
+      <pre class="code"><code>logging.info(<span class="str">"Попытка входа: пользователь=%s токен=%s"</span>, user, <span class="hl-bad">token</span>)</code></pre>
+
+      <p>Журналы читает больше людей, чем исходный код: их собирают в SIEM, выгружают в тикеты, прикладывают к обращениям в поддержку. Секрет в журнале — это секрет, розданный всем этим людям.</p>
+
+      <div class="code-label good"><span class="dot"></span>Как надо — маскирование</div>
+      <pre class="code"><code><span class="kw">def</span> <span class="fn">mask</span>(secret: <span class="ty">str</span>) -> <span class="ty">str</span>:
+    <span class="kw">if</span> len(secret) &lt;= <span class="num">4</span>:
+        <span class="kw">return</span> <span class="str">"***"</span>
+    <span class="kw">return</span> <span class="str">f"{secret[:2]}***{secret[-2:]} (длина {len(secret)})"</span>
+
+logging.info(<span class="str">"Попытка входа: пользователь=%s токен=%s"</span>, user, <span class="hl-good">mask(token)</span>)</code></pre>
+
+      <p>Заодно в эталоне сравнение токенов сделано через <code>hmac.compare_digest</code>: обычное <code>==</code> завершается на первом несовпавшем символе, поэтому по времени ответа секрет можно подобрать посимвольно.</p>
+
+      <div class="callout">
+        <p><strong>Живая деталь из подготовки материалов.</strong> <code>hmac.compare_digest</code> со строками принимает только ASCII и падает на кириллице — поэтому в эталоне стоит <code>.encode("utf-8")</code> и сравниваются байты. Хорошая иллюстрация того, что «правильная» функция тоже требует чтения документации.</p>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section id="owasp" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> Пара 4 · Дефекты</div>
+      <h2>Чего не лечит выбор языка</h2>
+
+      <p class="lead">Все четыре дефекта из предыдущего раздела воспроизводятся на любом языке — на C#, на Java, на Go. Memory safety тут не помогает вообще.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Дефект</th><th>CWE</th><th>Категория OWASP Top 10 (ред. 2021)</th></tr></thead>
+          <tbody>
+            <tr><td>Д3 · Внедрение SQL-кода</td><td><span class="tag">CWE-89</span></td><td>A03 · Injection</td></tr>
+            <tr><td>Д4 · Выход за пределы каталога</td><td><span class="tag">CWE-22</span></td><td>A01 · Broken Access Control</td></tr>
+            <tr><td>Д1 · Секрет в исходном коде</td><td><span class="tag">CWE-798</span></td><td>A02 · Cryptographic Failures</td></tr>
+            <tr><td>Д2 · Секрет в журнале</td><td><span class="tag">CWE-532</span></td><td>A09 · Security Logging and Monitoring Failures</td></tr>
+            <tr><td>Переполнение буфера (раздел 10)</td><td><span class="tag">CWE-787</span></td><td>вне веб-контекста OWASP</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Три класса дефектов, от которых язык не спасает</h3>
+
+      <div class="phases">
+        <div class="phase">
+          <div class="phase-num">01</div>
+          <h4>Внедрение кода</h4>
+          <ul>
+            <li>SQL, команды оболочки, пути, шаблоны, LDAP</li>
+            <li>Ошибка построения команды из данных</li>
+            <li>Возможна на любом языке без исключений</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">02</div>
+          <h4>Дефекты логики доступа</h4>
+          <ul>
+            <li>Программа корректно выполняет неправильное правило</li>
+            <li>Компилятор здесь бессилен по определению</li>
+            <li>Ловится только тестами на требования</li>
+          </ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">03</div>
+          <h4>Секреты и цепочка поставок</h4>
+          <ul>
+            <li>Организационно-процессная проблема</li>
+            <li>К языку отношения не имеет вообще</li>
+            <li>Лечится дисциплиной и автоматикой</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Что из этого следует для РБПО.</strong> Именно поэтому ГОСТ Р 56939-2024 описывает 25 процессов, а не один пункт «пишите на безопасном языке». Безопасный язык закрывает один класс дефектов — важный, но один. Остальные закрываются требованиями, архитектурой, правилами кодирования, экспертизой кода, тестами, статическим и динамическим анализом, управлением конфигурацией и работой с уязвимостями.</p>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section id="tests" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> Пара 5 · Проверки</div>
+      <h2>Тесты и регрессии безопасности</h2>
+
+      <p class="lead">Два вида тестов, и разница между ними — главная мысль последней пары.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head"><h3>Функциональные</h3></div>
+          <p>Проверяют, что программа <strong>делает то, что должна</strong>. Добавляет запись, находит по фамилии, считает количество.</p>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>Регрессии безопасности</h3></div>
+          <p>Проверяют, что программа <strong>не делает того, чего не должна</strong>. Это память об уже найденной уязвимости.</p>
+        </div>
+      </div>
+
+      <p>Пока регрессионный тест зелёный, дефект не может вернуться в код незамеченным. Это процесс 5.18 ГОСТ Р 56939-2024 в самом дешёвом исполнении: одна функция вместо целого регламента.</p>
+
+      <div class="code-label good"><span class="dot"></span>Требование «никогда» № 1 из раздела 08, дословно превращённое в тест</div>
+      <pre class="code"><code><span class="kw">def</span> <span class="fn">test_d3_sql_injection_does_not_leak_confidential</span>(self):
+    payload = <span class="str">"%' OR label LIKE '%"</span>
+    rows = step3_fixed.find_public(self.connection, payload)
+    leaked = [row <span class="kw">for</span> row <span class="kw">in</span> rows <span class="kw">if</span> row[<span class="num">2</span>] == <span class="str">"Конфиденциально"</span>]
+    self.assertEqual(leaked, [])</code></pre>
+
+      <div class="callout success">
+        <p><strong>Замкните круг вслух.</strong> Утром на доске было написано: «поиск никогда не возвращает записи с грифом Конфиденциально». Вечером это ровно тот же текст, только исполняемый. Требование безопасности, сформулированное через «никогда», превращается в тест почти механически — поэтому и формулировать их стоит именно так.</p>
+      </div>
+
+      <h3>Красное перед зелёным</h3>
+
+      <p><strong>Тест, который никогда не падал, ничего не доказывает.</strong> Прежде чем поверить тесту, убедитесь, что он умеет краснеть.</p>
+
+      <pre class="code"><code><span class="cm"># подставляем дефектную версию вместо исправленной</span>
+<span class="kw">import</span> step3_defect <span class="kw">as</span> step3_fixed</code></pre>
+
+      <div class="code-label"><span class="dot"></span>Результат — проверено 26.07.2026</div>
+      <pre class="code"><code><span class="cm"># на исправленной версии</span>
+Ran <span class="num">18</span> tests in <span class="num">0.018</span>s
+OK
+
+<span class="cm"># на дефектной версии</span>
+Ran <span class="num">8</span> tests in <span class="num">0.012</span>s
+FAILED (failures=<span class="num">6</span>, errors=<span class="num">9</span>)</code></pre>
+
+      <p>Тесты падают — значит, они действительно проверяют то, что заявлено. Только теперь им можно верить.</p>
+    </section>
+
+    <!-- 14 -->
+    <section id="tools" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> Пара 5 · Проверки</div>
+      <h2>Линтер, SAST, SCA — разные инструменты</h2>
+
+      <p class="lead">Их часто валят в одну кучу под словом «анализаторы». Это разные инструменты для разных задач, и подмена одного другим — типичная ошибка при внедрении.</p>
+
+      <div class="code-label"><span class="dot"></span>Реальный вывод ruff на дефектном файле — проверено 26.07.2026</div>
+      <pre class="code"><code>$ py -m ruff check step3_defect.py
+
+F841 Local variable `lines` is assigned to but never used
+   --> step3_defect.py:105:5
+Found <span class="num">1</span> error.</code></pre>
+
+      <div class="callout danger">
+        <p><strong>Остановитесь здесь на минуту.</strong> Линтер нашёл неиспользуемую переменную — и <em>не нашёл</em> SQL-инъекцию, которая живёт в том же файле и через которую утекают конфиденциальные записи.</p>
+        <p>Это не недостаток ruff. Это разница в назначении. Линтер отвечает за стиль, мёртвый код и очевидные ошибки. Поиск опасных конструкций — задача анализатора безопасности.</p>
+      </div>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Инструмент</th><th>Что ищет</th><th>Нашёл ли Д3</th></tr></thead>
+          <tbody>
+            <tr><td>Тесты</td><td>Нарушение заданного поведения</td><td><span class="tag good">Да, если тест написан</span></td></tr>
+            <tr><td>ruff · линтер</td><td>Стиль, мёртвый код, опечатки</td><td><span class="tag bad">Нет</span></td></tr>
+            <tr><td>bandit · SAST</td><td>Опасные конструкции языка</td><td><span class="tag good">Да</span></td></tr>
+            <tr><td>pip-audit · SCA</td><td>Уязвимости в чужих зависимостях</td><td><span class="tag bad">Нет — другой класс</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>На дефектном файле bandit должен сработать по двум правилам: <strong>B105</strong> <code>hardcoded_password_string</code> — на константе <code>ADMIN_TOKEN</code>, и <strong>B608</strong> <code>hardcoded_sql_expressions</code> — на склейке SQL.</p>
+
+      <div class="callout">
+        <p><strong>Вывод раздела.</strong> Ни один инструмент не закрывает задачу в одиночку. Отсюда конвейер, в котором они стоят последовательно — и отсюда же то, что в ГОСТ Р 56939-2024 статический анализ (5.10), динамический анализ (5.11), композиционный анализ (5.16) и функциональное тестирование (5.18) записаны как <strong>четыре разных процесса</strong>, а не один.</p>
+      </div>
+    </section>
+
+    <!-- 15 -->
+    <section id="pipeline" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> Пара 5 · Проверки</div>
+      <h2>Конвейер и релиз</h2>
+
+      <p class="lead">Конвейер РБПО — это те же самые команды, которые вы вводили руками, только запускаемые автоматически при каждом изменении кода.</p>
+
+      <pre class="code"><code><span class="ty">stages</span>: [lint, test, security]
+
+<span class="ty">lint</span>:
+  <span class="ty">script</span>:
+    - ruff check .
+
+<span class="ty">test</span>:
+  <span class="ty">script</span>:
+    - python -m unittest -v test_journal.py
+
+<span class="ty">sast</span>:
+  <span class="ty">script</span>:
+    - bandit -r .
+
+<span class="ty">sca</span>:
+  <span class="ty">script</span>:
+    - pip-audit --requirement requirements-dev.txt
+  <span class="ty">allow_failure</span>: <span class="kw">true</span></code></pre>
+
+      <p>В этом и состоит вся идея непрерывной интеграции: проверки выполняются не тогда, когда о них вспомнили, а <strong>всегда</strong>.</p>
+
+      <h3>Quality gate</h3>
+
+      <p>Шаг, отрицательный результат которого <em>останавливает</em> сборку, называется quality gate.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Шаг</th><th>Блокирует?</th><th>Почему</th></tr></thead>
+          <tbody>
+            <tr><td>test</td><td><span class="tag good">Всегда</span></td><td>Красный тест означает, что программа делает не то, что заявлено. Выпускать такое нельзя</td></tr>
+            <tr><td>sast</td><td><span class="tag good">По высокой критичности</span></td><td>Находка высокого уровня — это потенциальная уязвимость в продукте</td></tr>
+            <tr><td>lint</td><td><span class="tag warn">Сначала нет, потом да</span></td><td>На старте внедрения предупреждает, иначе замечания копятся и обесцениваются</td></tr>
+            <tr><td>sca</td><td><span class="tag warn">Часто предупреждает</span></td><td>Уязвимость в чужой библиотеке не всегда можно закрыть сегодня</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Конвейер без единого блокирующего шага — это не конвейер, а генератор отчётов.</strong> Отчёты, которые ничего не останавливают, перестают читать примерно через месяц. Это самый частый способ внедрить РБПО формально и не получить от него ничего.</p>
+      </div>
+
+      <h3>Мини-паспорт РБПО учебного приложения</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Поле</th><th>Значение</th></tr></thead>
+          <tbody>
+            <tr><td>Наименование и версия</td><td>Журнал учёта МНИ, v1.0</td></tr>
+            <tr><td>Язык и среда</td><td>Python 3.x, стандартная библиотека</td></tr>
+            <tr><td>Правила кодирования</td><td>Стандарт PEP 8, контроль ruff</td></tr>
+            <tr><td>Контроль ввода</td><td>Валидация в конструкторе, справочники по белому списку</td></tr>
+            <tr><td>Работа с секретами</td><td>Переменные окружения, <code>.gitignore</code>, маскирование в журналах</td></tr>
+            <tr><td>Тестирование</td><td>unittest, 18 тестов, из них 8 регрессионных по безопасности</td></tr>
+            <tr><td>Статический анализ</td><td>ruff, bandit</td></tr>
+            <tr><td>Управление конфигурацией</td><td>git, тег v1.0</td></tr>
+            <tr><td>Известные ограничения</td><td>Нет аутентификации пользователей, нет разграничения доступа, нет шифрования хранилища</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <p><strong>Последняя строка обязательна.</strong> Честный перечень того, чего в продукте нет, — признак зрелого процесса, а не слабости. Продукт без списка ограничений означает одно из двух: либо его не анализировали, либо список есть, но его прячут. Оба варианта хуже, чем честная строка.</p>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section id="answer" class="section">
+      <div class="section-eyebrow"><span class="section-num">16</span> Итог</div>
+      <h2>Ответ на вопрос дня</h2>
+
+      <p class="lead">Чем «программа работает» отличается от «программу можно выпускать»?</p>
+
+      <p>Разницей в <strong>проверяемых свидетельствах</strong>. Работающий код — это одно свидетельство. Вот полный список:</p>
+
+      <ul class="checklist">
+        <li><strong>Сформулированные требования</strong>, в том числе требования безопасности через «никогда»</li>
+        <li><strong>Модель угроз</strong> — пусть на пять строк, но написанная</li>
+        <li><strong>Контроль ввода</strong>, встроенный в структуру данных, а не приделанный сбоку</li>
+        <li><strong>Работающий код</strong> — то самое единственное свидетельство, с которого все начинают</li>
+        <li><strong>Функциональные тесты</strong></li>
+        <li><strong>Регрессионные тесты безопасности</strong>, проверенные на дефектной версии</li>
+        <li><strong>Отчёт линтера</strong></li>
+        <li><strong>Отчёт анализатора безопасности</strong></li>
+        <li><strong>Отчёт композиционного анализа</strong> зависимостей</li>
+        <li><strong>История изменений</strong> в системе контроля версий</li>
+        <li><strong>Отсутствие секретов</strong> в коде и в истории репозитория</li>
+        <li><strong>Воспроизводимая сборка</strong> с зафиксированными параметрами компиляции</li>
+        <li><strong>Зафиксированная версия</strong> выпуска</li>
+        <li><strong>Честный перечень того, чего в продукте нет</strong></li>
+      </ul>
+
+      <div class="callout">
+        <p><strong>И главное.</strong> Почти всё в этом списке производится автоматически, если конвейер настроен один раз. В этом и состоит смысл сдвига влево: не «делать больше работы», а сделать так, чтобы работа делалась сама и раньше.</p>
+      </div>
+
+      <h3>Что дальше на неделе</h3>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>День</th><th>Тема</th><th>Связь с сегодняшним</th></tr></thead>
+          <tbody>
+            <tr><td>Вт 28.07</td><td>Тестирование ПО, автоматизация, CI/CD, GitLab CE</td><td>Продолжение разделов 13 и 15</td></tr>
+            <tr><td>Ср 29.07</td><td>Хроника языков, декларативные языки (Prolog, SQL), сдвиг влево, фреймворки, архитектура</td><td>Продолжение разделов 5, 6 и 10. SQL сегодня встретился как источник уязвимости — в среду разбирается как язык</td></tr>
+            <tr><td>Чт 30.07</td><td>Конвейер РБПО: статический, композиционный, динамический анализ, фаззинг</td><td>Продолжение раздела 14 вглубь</td></tr>
+            <tr><td>Пт 31.07</td><td>Подведение итогов, итоговое тестирование</td><td>—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Что почитать</h3>
+
+      <ul>
+        <li><strong>ГОСТ Р 56939-2024</strong> — выборочно по процессам сегодняшнего дня: 5.8, 5.9, 5.10, 5.12, 5.18</li>
+        <li><strong>Банк данных угроз ФСТЭК России</strong> — <a href="https://bdu.fstec.ru" target="_blank" rel="noopener">bdu.fstec.ru</a></li>
+        <li><strong>CWE</strong> — <a href="https://cwe.mitre.org" target="_blank" rel="noopener">cwe.mitre.org</a>, поиск по номерам занятия: CWE-89, CWE-22, CWE-798, CWE-532, CWE-787</li>
+        <li><strong>OWASP Top 10</strong> — перечень наиболее критичных рисков веб-приложений</li>
+        <li><strong>Kent Beck. Extreme Programming Explained</strong> — первоисточник по XP</li>
+      </ul>
+    </section>
+
+    <!-- CONTACTS -->
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам занятия, программы курса «Специалист по процессам разработки безопасного программного обеспечения» и сопровождения внедрения процессов РБПО.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="mailto:vitaly@pikov.expert">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          vitaly@pikov.expert
+        </a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+          Telegram @UnderLineSecurity
+        </a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year"></span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Занятие 27.07.2026 · Курс «М БРПО»</span>
+        </div>
+        <div>
+          Материал подготовлен для программы повышения квалификации <strong>«Специалист по процессам разработки безопасного программного обеспечения»</strong> (код «М БРПО»), НОУ ДПО «Учебный центр безопасности информации МАСКОМ». Тема № 4 учебного плана.
+          Нормативная опора — ГОСТ Р 56939-2024. Идентификаторы дефектов приведены по перечню CWE (MITRE), категории рисков — по OWASP Top 10 редакции 2021 года.
+          Все приведённые в лекции результаты запуска учебного кода проверены 26.07.2026 на Python 3.14.5.
+        </div>
+      </div>
+    </footer>
+
+  </article>
+
+</div>
+
+<button class="back-to-top" id="backToTop" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+<script>
+(function() {
+  const root = document.documentElement;
+  const themeToggle = document.getElementById('themeToggle');
+  const stored = localStorage.getItem('theme');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  root.setAttribute('data-theme', stored || (prefersDark ? 'dark' : 'light'));
+  themeToggle.addEventListener('click', function() {
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+  });
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const progressBar = document.getElementById('progressBar');
+  const backToTop = document.getElementById('backToTop');
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const pct = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = pct + '%';
+    if (scrollTop > 600) backToTop.classList.add('visible');
+    else backToTop.classList.remove('visible');
+  }
+  window.addEventListener('scroll', updateProgress, { passive: true });
+  updateProgress();
+
+  backToTop.addEventListener('click', function() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
+  const tocLinks = document.querySelectorAll('.toc-list a');
+  const sections = document.querySelectorAll('.section, .hero');
+  const linkBySection = {};
+  tocLinks.forEach(a => {
+    const id = a.getAttribute('data-section');
+    if (id) linkBySection[id] = a;
+  });
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+        tocLinks.forEach(a => a.classList.remove('active'));
+        if (linkBySection[id]) linkBySection[id].classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -65% 0px', threshold: 0 });
+
+  sections.forEach(s => { if (s.id) observer.observe(s); });
+
+  const tocToggle = document.getElementById('tocToggle');
+  const toc = document.getElementById('toc');
+  tocToggle.addEventListener('click', function() {
+    toc.classList.toggle('open');
+  });
+  tocLinks.forEach(a => {
+    a.addEventListener('click', function() {
+      if (window.innerWidth <= 900) toc.classList.remove('open');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
