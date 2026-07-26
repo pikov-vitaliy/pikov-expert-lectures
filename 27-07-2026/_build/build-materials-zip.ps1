@@ -28,6 +28,9 @@ $manifest = [ordered]@{
     'index.html'                  = 'index.html'
     'materials\konspekt.md'       = 'materials\konspekt.md'
     'materials\praktikum.md'      = 'materials\praktikum.md'
+    # Слайды лекции. Разрешены к распространению автором; см. пояснение
+    # в .gitignore рядом с правилом **/*.pdf.
+    'materials\From_Working_Code_to_Shippable_Product.pdf' = 'materials\From_Working_Code_to_Shippable_Product.pdf'
     'code\spravka.md'             = 'code\spravka.md'
     'code\step1_list.py'          = 'code\step1_list.py'
     'code\step2_class.py'         = 'code\step2_class.py'
