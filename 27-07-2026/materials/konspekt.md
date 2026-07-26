@@ -258,7 +258,12 @@ buffer[i] = source[i]   # IndexError
 
 ## 6. Четыре дефекта, которые не лечатся выбором языка
 
-Все четыре живут в файле `step3_defect.py`. Их нужно найти, назвать и исправить.
+Все четыре живут в образце `step3_defect.py`, а править вы будете его копию — **`step3_student.py`**. Образец остаётся нетронутым: к нему возвращаются, чтобы сравнить «было / стало» и чтобы проверки в пятой паре было с чем сопоставлять.
+
+> [!important] В каком порядке читать этот раздел
+> Ниже разобран каждый дефект и показано, как он устраняется. **Сначала попробуйте сами** — по заданию 3, глядя только на подсказки. Разбор здесь нужен, когда вы застряли или когда уже сделали и хотите свериться.
+>
+> Скопировать отсюда готовые строки можно за минуту, но тогда занятие пройдёт мимо. Проверка `py -m unittest test_student.py` покажет зелёный результат в обоих случаях — она не отличает понимание от копирования. Отличаете только вы.
 
 ### Д3. Внедрение SQL-кода — CWE-89
 
@@ -301,7 +306,7 @@ path = Path(os.path.join(EXPORT_DIR, filename))
 
 ```python
 base = EXPORT_DIR.resolve()
-candidate = (base / filename).resolve()
+candidate = (base / filename.replace("\\", "/")).resolve()
 if not candidate.is_relative_to(base):
     raise ValueError(...)
 ```
@@ -358,12 +363,14 @@ logging.info("Попытка входа: пользователь=%s токен=
 Второй вид — это память об уже найденной уязвимости. Пока тест зелёный, дефект не может вернуться в код незамеченным.
 
 ```python
-def test_d3_sql_injection_does_not_leak_confidential(self):
-    payload = "%' OR label LIKE '%"
-    rows = step3_fixed.find_public(self.connection, payload)
-    leaked = [row for row in rows if row[2] == "Конфиденциально"]
-    self.assertEqual(leaked, [])
+    def test_d3_sql_injection_does_not_leak_confidential(self):
+        payload = "%' OR label LIKE '%"
+        rows = self.module.find_public(self.connection, payload)
+        leaked = [row for row in rows if row[2] == "Конфиденциально"]
+        self.assertEqual(leaked, [])
 ```
+
+`self.module` — это проверяемый файл. В `test_journal.py` он равен эталону, в `test_student.py` — вашему `step3_student.py`. Благодаря этому один и тот же текст теста работает и там, и там: свои тесты пишите точно так же, через `self.module`.
 
 > **Обратите внимание.** Этот тест дословно повторяет требование, которое мы сформулировали утром на доске: «поиск никогда не возвращает записи с грифом Конфиденциально». Требование безопасности, записанное через «никогда», превращается в тест почти механически. Поэтому и формулировать их стоит именно так.
 

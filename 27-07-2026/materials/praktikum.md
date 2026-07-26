@@ -336,7 +336,7 @@ py step3_student.py
 
 ```python
     base = EXPORT_DIR.resolve()
-    candidate = (base / filename).resolve()
+    candidate = (base / filename.replace("\\", "/")).resolve()
     if not candidate.is_relative_to(base):
         raise ValueError(f"Имя файла {filename!r} выводит за пределы каталога выгрузки")
 ```

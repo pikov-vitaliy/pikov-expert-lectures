@@ -101,6 +101,14 @@ function Should-ExcludeDistributable([string]$Name) {
 # reaches it that was not reviewed.
 $script:MaterialsZipFolders = @('27-07-2026')
 
+# Lecture folders cleared to publish PDF handouts. PDFs are excluded globally
+# as "high-risk distributables pending explicit redistribution review"; naming
+# a folder here IS that review, recorded by the rights holder for that lecture.
+# Note the trade-off: PDFs stay untracked in git per repository policy, so a
+# published PDF cannot be rebuilt from a clean checkout - it has to be present
+# in the working tree at release time.
+$script:PublishPdfFolders = @('27-07-2026')
+
 function Should-ExcludeFile([string]$Name) {
   $lower = $Name.ToLowerInvariant()
   if ($lower -eq 'index1.html' -or $lower -like 'indexold*.html' -or $lower -like 'index-v*.html') { return $true }
@@ -150,6 +158,12 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       $segments = (Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName).Split('\')
       $parentSegments = @($segments | Select-Object -First ([Math]::Max($segments.Count - 1, 0)))
       if (@($parentSegments | Where-Object { Should-ExcludeDirectory $_ }).Count -gt 0) { return }
+
+      if ($script:PublishPdfFolders -contains $folderName -and
+          $_.Extension.ToLowerInvariant() -eq '.pdf') {
+        $files.Add((Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName))
+        return
+      }
 
       if (-not (Should-ExcludeNestedFile $_.Name)) {
         $relative = Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName
@@ -328,6 +342,18 @@ foreach ($target in $targets) {
     }
     $releaseDir = Join-Path $sourceRoot 'release'
     $archiveName = "$($target.domain)-release-$ReleaseDate.zip"
+
+    # A lecture may ship a handout bundle for its learners. The bundle is a
+    # build artifact, so it is NOT tracked in git (the repository policy keeps
+    # ZIP archives out) - it is regenerated here from files that are tracked.
+    # That also guarantees the bundle can never drift out of sync with the
+    # published page: both come from the same run.
+    $bundleScript = Join-Path $sourceRoot '_build\build-materials-zip.ps1'
+    if (Test-Path -LiteralPath $bundleScript -PathType Leaf) {
+      Write-Output "RUN bundle $($target.folder)"
+      & $bundleScript | Out-Null
+    }
+
     $relativeFiles = Get-DomainReleaseFiles $sourceRoot
     $stageName = $target.folder
   }
