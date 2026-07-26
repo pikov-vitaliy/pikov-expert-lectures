@@ -28,9 +28,6 @@ $manifest = [ordered]@{
     'index.html'                  = 'index.html'
     'materials\konspekt.md'       = 'materials\konspekt.md'
     'materials\praktikum.md'      = 'materials\praktikum.md'
-    # Слайды лекции. Разрешены к распространению автором; см. пояснение
-    # в .gitignore рядом с правилом **/*.pdf.
-    'materials\From_Working_Code_to_Shippable_Product.pdf' = 'materials\From_Working_Code_to_Shippable_Product.pdf'
     'code\spravka.md'             = 'code\spravka.md'
     'code\step1_list.py'          = 'code\step1_list.py'
     'code\step2_class.py'         = 'code\step2_class.py'
@@ -46,6 +43,25 @@ $manifest = [ordered]@{
     'code\languages\CopyName.pas'   = 'code\languages\CopyName.pas'
     'code\languages\CopyName.cs'    = 'code\languages\CopyName.cs'
     'code\languages\copy_name.py'   = 'code\languages\copy_name.py'
+}
+
+# --- Необязательная часть комплекта ----------------------------------------
+# Файлы, разрешённые к распространению, но НЕ хранящиеся в репозитории
+# (политика держит .pdf и подобное вне git - см. комментарий в .gitignore).
+# Если файл лежит в рабочем дереве - он попадает в архив; если нет, например
+# на чистом клоне в CI, сборка идёт дальше и просто сообщает об этом.
+# Обязательными их делать нельзя: тогда сборка станет невоспроизводимой.
+$optional = [ordered]@{
+    'materials\From_Working_Code_to_Shippable_Product.pdf' = 'materials\From_Working_Code_to_Shippable_Product.pdf'
+}
+
+$missingOptional = New-Object System.Collections.Generic.List[string]
+foreach ($entry in $optional.GetEnumerator()) {
+    if (Test-Path -LiteralPath (Join-Path $lectureRoot $entry.Value) -PathType Leaf) {
+        $manifest[$entry.Key] = $entry.Value
+    } else {
+        $missingOptional.Add($entry.Value)
+    }
 }
 
 # --- Проверка 1: каждый файл списка существует и это обычный файл ----------
@@ -94,6 +110,9 @@ foreach ($scanDir in @('code', 'materials')) {
 
 foreach ($name in $skipped) {
     Write-Warning "В каталоге лекции лежит нераспространяемый файл, в архив он НЕ включён: $name"
+}
+foreach ($name in $missingOptional) {
+    Write-Warning "Необязательный файл отсутствует в рабочем дереве, архив собран без него: $name"
 }
 
 # --- Проверка 3: явный запрет на секреты и служебные файлы -----------------
