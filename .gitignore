@@ -63,7 +63,17 @@ _PROJECT/Счётчик.md
 **/tests/
 **/test-results/
 
-# High-risk distributables pending explicit redistribution review
+# High-risk distributables pending explicit redistribution review.
+# These never enter the repository, and this rule has no exceptions.
+#
+# Publishing one is a separate, per-folder decision recorded in
+# _PROJECT/build-release.ps1 ($script:PublishPdfFolders). Consequence to keep
+# in mind: a file published that way lives only in the working tree, so a
+# clean checkout cannot rebuild the site with it. Reference such a file by
+# absolute URL, never by a relative link, or the static link check fails in CI.
+#
+# Currently approved: 27-07-2026 - lecture slide deck, published on the
+# author's instruction 26.07.2026.
 **/*.pdf
 **/*.pptx
 **/*.docx
