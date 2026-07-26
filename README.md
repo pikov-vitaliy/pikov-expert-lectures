@@ -7,8 +7,8 @@
 ## Что внутри
 
 - корневая страница-каталог `pikov.expert`;
-- 23 папки под домены третьего уровня;
-- 26 карточек лекций и справочных материалов;
+- 25 папок под домены третьего уровня;
+- 28 карточек лекций и справочных материалов;
 - служебные файлы для сайта: `.htaccess`, `robots.txt`, `sitemap.xml`;
 - скрипты сборки, проверки, релиза и деплоя в `_PROJECT`;
 - локальные QA-сценарии для статической проверки, HTTP-проверки и браузерной проверки.
@@ -31,18 +31,20 @@
 | 12 | День II. Объекты КИИ: угрозы, меры, уязвимости | [threats-kii.pikov.expert](https://threats-kii.pikov.expert/) | Регулирование и право | published-snapshot |
 | 13 | Техническое задание: проверяемые требования и РБПО | [tz.pikov.expert](https://tz.pikov.expert/) | РБПО | ready-local |
 | 14 | Подготовка к сертификации процессов РБПО | [fstec-sdlc.pikov.expert](https://fstec-sdlc.pikov.expert/) | РБПО | published-snapshot |
-| 15 | Композиционный анализ ПО | [kapo.pikov.expert](https://kapo.pikov.expert/) | РБПО | ready-local |
-| 16 | Статический анализ безопасности приложений | [sast.pikov.expert](https://sast.pikov.expert/) | РБПО | published-snapshot |
-| 17 | Проверка безопасности приложения | [p19.pikov.expert](https://p19.pikov.expert/) | РБПО | ready-local |
-| 18 | Архитектурный анализ / ППК ФСТЭК | [ppk.pikov.expert](https://ppk.pikov.expert/) | РБПО | published-snapshot |
-| 19 | Технологии хакеров и оценка защищенности | [pentest.pikov.expert](https://pentest.pikov.expert/) | Новые курсы МАСКОМ | published-snapshot |
-| 20 | Статический анализ ПО + PVS-Studio | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Новые курсы МАСКОМ | ready-local |
-| 21 | Пентест базовый | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Новые курсы МАСКОМ | ready-local |
-| 22 | Пентест углубленный | [new-courses.pikov.expert](https://new-courses.pikov.expert/pentest-02.html) | Новые курсы МАСКОМ | published-snapshot |
-| 23 | Фаззинг-тестирование | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Новые курсы МАСКОМ | ready-local |
-| 24 | Проектирование информационных систем | [is.pikov.expert](https://is.pikov.expert/) | Студенческие курсы | ready-local |
-| 25 | Методика формулирования тем ВКР | [vkr.pikov.expert](https://vkr.pikov.expert/) | Студенческие курсы | ready-local |
-| 26 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | ready-local |
+| 15 | РБПО — разработка безопасного программного обеспечения | [gost56939.pikov.expert](https://gost56939.pikov.expert/) | РБПО | ready-local |
+| 16 | Композиционный анализ ПО | [kapo.pikov.expert](https://kapo.pikov.expert/) | РБПО | ready-local |
+| 17 | Статический анализ безопасности приложений | [sast.pikov.expert](https://sast.pikov.expert/) | РБПО | published-snapshot |
+| 18 | Нефункциональное тестирование безопасности ПО | [p19.pikov.expert](https://p19.pikov.expert/) | РБПО | ready-local |
+| 19 | Архитектурный анализ / ППК ФСТЭК | [ppk.pikov.expert](https://ppk.pikov.expert/) | РБПО | published-snapshot |
+| 20 | Информационная безопасность и системы менеджмента ИБ | [27001.pikov.expert](https://27001.pikov.expert/) | РБПО | ready-local |
+| 21 | Технологии хакеров и оценка защищенности | [pentest.pikov.expert](https://pentest.pikov.expert/) | Новые курсы МАСКОМ | published-snapshot |
+| 22 | Статический анализ ПО + PVS-Studio | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Новые курсы МАСКОМ | ready-local |
+| 23 | Пентест базовый | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Новые курсы МАСКОМ | ready-local |
+| 24 | Пентест углубленный | [new-courses.pikov.expert](https://new-courses.pikov.expert/pentest-02.html) | Новые курсы МАСКОМ | published-snapshot |
+| 25 | Фаззинг-тестирование | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Новые курсы МАСКОМ | ready-local |
+| 26 | Проектирование информационных систем | [is.pikov.expert](https://is.pikov.expert/) | Студенческие курсы | ready-local |
+| 27 | Методика формулирования тем ВКР | [vkr.pikov.expert](https://vkr.pikov.expert/) | Студенческие курсы | ready-local |
+| 28 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | ready-local |
 
 ## Структура
 
@@ -61,6 +63,7 @@
 │   └── deploy-hosting.ps1
 ├── astra-intro/
 ├── astralinux01/
+├── gost56939/
 ├── ...
 └── spdx/
 ```

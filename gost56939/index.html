@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ГОСТ Р 56939-2024: разработка безопасного ПО — лекция В. А. Пикова</title>
+<meta name="description" content="Авторская лекция В. А. Пикова по ГОСТ Р 56939-2024: уязвимости, 25 процессов разработки безопасного ПО, требования стандарта и сертификация процессов РБПО.">
+<meta name="author" content="Пиков Виталий Александрович">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#1abe67">
+<link rel="canonical" href="https://gost56939.pikov.expert/">
+<link rel="home" href="https://pikov.expert/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="pikov.expert">
+<meta property="og:title" content="ГОСТ Р 56939-2024: разработка безопасного программного обеспечения">
+<meta property="og:description" content="Шесть учебных плакатов: уязвимости, понятие РБПО, 25 процессов, сертификация и требования ГОСТ Р 56939-2024.">
+<meta property="og:url" content="https://gost56939.pikov.expert/">
+<meta property="og:image" content="https://gost56939.pikov.expert/og-image.png">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:alt" content="Титульный экран лекции о разработке безопасного программного обеспечения">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="ГОСТ Р 56939-2024: разработка безопасного ПО">
+<meta name="twitter:description" content="Авторская лекция В. А. Пикова по процессам РБПО и требованиям ГОСТ Р 56939-2024.">
+<meta name="twitter:image" content="https://gost56939.pikov.expert/og-image.png">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%231abe67%22/><text x=%2250%22 y=%2262%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2223%22 font-weight=%22700%22 fill=%22white%22>56939</text></svg>">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "РБПО — разработка безопасного программного обеспечения",
+  "description": "Авторская лекция по ГОСТ Р 56939-2024: уязвимости, понятие РБПО, 25 процессов разработки безопасного ПО, требования стандарта и сертификация процессов.",
+  "url": "https://gost56939.pikov.expert/",
+  "image": "https://gost56939.pikov.expert/og-image.png",
+  "inLanguage": "ru",
+  "dateModified": "2026-07-26",
+  "author": {
+    "@type": "Person",
+    "name": "Пиков Виталий Александрович",
+    "url": "https://pikov.expert/"
+  },
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "НОУ ДПО «УЦБИ \"МАСКОМ\"»",
+    "url": "https://mascom-uc.ru/"
+  },
+  "isBasedOn": "https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64",
+  "about": [
+    "ГОСТ Р 56939-2024",
+    "разработка безопасного программного обеспечения",
+    "РБПО",
+    "SSDLC",
+    "управление уязвимостями"
+  ]
+}
+</script>
+<!-- Yandex.Metrika: воспроизведение сессий отключено. -->
+<script>
+  (function(m,e,t,r,i,k,a){
+    m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();
+    for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a);
+  })(window,document,"script","https://mc.yandex.ru/metrika/tag.js?id=109116119","ym");
+  ym(109116119,"init",{ssr:true,webvisor:false,clickmap:false,ecommerce:"dataLayer",referrer:document.referrer,url:location.href,accurateTrackBounce:true,trackLinks:true});
+</script>
+<!-- ============================================================
+     УЦ МАСКОМ · Серия «РБПО» · Лэндинг (этап 3)
+     Один самодостаточный файл: без внешних библиотек; счётчик загружается только при публикации.
+     Каждый экран = проект одного плаката серии; текст живой (выделяется/копируется).
+     Киоск-режим: ?autoplay=1 (экран ~11 с, цикл). Служебное: ?screen=N (для скриншотов).
+     ============================================================ -->
+<style>
+  :root{
+    --green:#1ABE67; --green-mid:#4DB380; --green-pale:#E9F1EB; --green-tint:#F3F9F5;
+    --orange:#F07E26; --petrol:#0B3C5A; --petrol-soft:#365E79;
+    --ink:#1A1A1A; --graphite:#3F4245; --muted:#5F7367; --line:#D7E4DB;
+    --f-head:'Montserrat','Segoe UI',Arial,sans-serif;
+    --f-body:'PT Sans','Segoe UI',Tahoma,Arial,sans-serif;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-snap-type:y mandatory;scroll-behavior:smooth;overflow-x:hidden}
+  body{font-family:var(--f-body);color:var(--ink);background:#fff;overflow-x:hidden}
+  ::selection{background:var(--green);color:#fff}
+  :focus-visible{outline:3px solid var(--orange);outline-offset:4px}
+  .skip-link{position:fixed;left:1.2vw;top:-80px;z-index:100;background:var(--petrol);
+    color:#fff;padding:10px 14px;border-radius:8px;font:700 13px var(--f-head);text-decoration:none}
+  .skip-link:focus{top:1.2vh}
+  .brand-back{position:fixed;left:1.2vw;top:1.8vh;z-index:60;display:inline-flex;
+    align-items:center;gap:.45em;padding:8px 12px;border:1px solid var(--line);border-radius:999px;
+    background:rgba(255,255,255,.94);color:var(--petrol);font:700 12px var(--f-head);
+    text-decoration:none;box-shadow:0 4px 18px rgba(11,60,90,.08);backdrop-filter:blur(8px)}
+  .brand-back:hover{border-color:var(--green);color:var(--green)}
+  .metric-pixel{position:absolute;left:-9999px;width:1px;height:1px}
+
+  section.screen{min-height:100vh;height:100vh;scroll-snap-align:start;scroll-snap-stop:always;
+    position:relative;overflow:hidden;display:flex;flex-direction:column;
+    padding:4.5vh 6vw 5vh}
+  section.screen:nth-child(even){background:var(--green-tint)}
+
+  /* Фоновые шевроны-водяные знаки */
+  .wm{position:absolute;pointer-events:none;border-style:solid;border-color:var(--green-pale);
+      border-width:0 0 2.6vw 2.6vw;width:9vw;height:9vw;transform:rotate(-45deg);opacity:.8}
+  .wm.tr{right:-3vw;top:8vh;transform:rotate(135deg)}
+  .wm.bl{left:-3vw;bottom:6vh}
+  .wm.br{right:-2vw;bottom:-4vh;transform:rotate(135deg)}
+
+  /* Типографика */
+  h1,h2,h3,.chip,.knum{font-family:var(--f-head)}
+  h2.title{font-size:clamp(26px,3.4vw,52px);font-weight:800;color:var(--graphite);
+    letter-spacing:.01em;margin-bottom:.6vh}
+  h2.title .acc{color:var(--green)}
+  .kicker{font-family:var(--f-head);font-weight:600;letter-spacing:.28em;font-size:clamp(10px,.85vw,14px);
+    color:var(--muted);text-transform:uppercase;margin-bottom:1.2vh}
+  .lead{font-size:clamp(13px,1.15vw,19px);color:var(--graphite)}
+
+  /* Шеврон-буллет */
+  .chv{display:inline-block;width:.62em;height:.62em;margin-right:.45em;flex:none;
+    background:var(--green);clip-path:polygon(0 0,55% 0,100% 50%,55% 100%,0 100%,45% 50%);
+    transform:translateY(.04em)}
+  .chv.or{background:var(--orange)}
+  .chv.pt{background:var(--petrol)}
+  ul.chvl{list-style:none}
+  ul.chvl li{display:flex;align-items:baseline;margin-bottom:.9vh;line-height:1.32}
+
+  /* Карточки */
+  .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:1.6vh 1.2vw;
+    box-shadow:0 1px 0 rgba(11,60,90,.04)}
+  .chip{display:inline-block;font-weight:700;font-size:clamp(10px,.8vw,13px);letter-spacing:.06em;
+    padding:.35em .9em;border-radius:999px}
+  .grid{display:grid;gap:1.6vh 1.2vw}
+  .flex{display:flex}
+
+  /* Точки-навигация */
+  #dots{position:fixed;right:1.2vw;top:50%;transform:translateY(-50%);z-index:50;
+    display:flex;flex-direction:column;gap:10px}
+  #dots a{width:12px;height:12px;border-radius:50%;background:var(--line);display:block;
+    transition:.25s;position:relative}
+  #dots a.on{background:var(--green);transform:scale(1.35)}
+  #dots a:hover::after{content:attr(data-t);position:absolute;right:20px;top:50%;
+    transform:translateY(-50%);background:var(--petrol);color:#fff;font:600 11px/1 var(--f-head);
+    padding:6px 10px;border-radius:6px;white-space:nowrap}
+
+  /* Кнопка автопоказа */
+  #play{position:fixed;right:1.2vw;bottom:2.4vh;z-index:50;border:1.5px solid var(--line);
+    background:#fff;color:var(--muted);font:600 12px var(--f-head);border-radius:999px;
+    padding:8px 14px;cursor:pointer}
+  #play.on{background:var(--green);border-color:var(--green);color:#fff}
+
+  /* Entrance-анимации */
+  .rv{opacity:0;transform:translateY(18px);transition:opacity .7s ease,transform .7s ease}
+  .rv.d1{transition-delay:.12s}.rv.d2{transition-delay:.24s}.rv.d3{transition-delay:.36s}
+  .in .rv{opacity:1;transform:none}
+  .no-anim .rv{opacity:1 !important;transform:none !important;transition:none !important}
+  @media (prefers-reduced-motion: reduce){.rv{opacity:1;transform:none;transition:none}}
+
+  /* ===== Титул ===== */
+  #s0{align-items:center;justify-content:center;text-align:center;background:
+      linear-gradient(180deg,#fff 0%,var(--green-tint) 100%)}
+  #s0 .logo{display:flex;align-items:center;gap:1.1vw;margin-bottom:4vh}
+  #s0 h1{font-size:clamp(34px,4.6vw,74px);font-weight:800;color:var(--graphite);line-height:1.06}
+  #s0 h1 .acc{color:var(--green)}
+  #s0 .sub{font-size:clamp(15px,1.5vw,24px);color:var(--muted);margin:2.2vh 0 1vh}
+  #s0 .byline{font:600 clamp(11px,.9vw,15px) var(--f-head);color:var(--petrol);
+    margin-bottom:3.5vh;letter-spacing:.025em}
+  .minis{display:grid;grid-template-columns:repeat(6,1fr);gap:.9vw;width:min(84vw,1500px)}
+  .mini{background:#fff;border:1.5px solid var(--line);border-radius:14px;padding:1.8vh .8vw;
+    cursor:pointer;transition:.25s;text-align:left;font:inherit;color:inherit}
+  .mini:hover{border-color:var(--green);transform:translateY(-4px)}
+  .mini .n{font:800 clamp(18px,1.7vw,28px) var(--f-head);color:var(--green)}
+  .mini .t{font:700 clamp(11px,.85vw,14px) var(--f-head);color:var(--graphite);line-height:1.25;margin-top:.6vh}
+
+  /* ===== Экран 1: Уязвимости ===== */
+  #s1 .cols{display:grid;grid-template-columns:1.05fr 1.15fr .95fr;gap:1.2vw;flex:1;min-height:0}
+  .defcard{border-left:4px solid var(--petrol);padding:.9vh .9vw;background:#fff;
+    border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .defcard.z{border-left-color:var(--orange)}
+  .defcard h3{font-size:clamp(10px,.8vw,13px);color:var(--petrol);letter-spacing:.04em;margin-bottom:.4vh}
+  .defcard.z h3{color:var(--orange)}
+  .defcard p{font-size:clamp(10.5px,.86vw,14px);line-height:1.34}
+  .defcard .src{font-size:clamp(9px,.68vw,11px);color:var(--muted);margin-top:.4vh;display:block}
+  .klabel{font:700 clamp(10px,.8vw,13px) var(--f-head);color:var(--petrol);letter-spacing:.05em;margin:.9vh 0 .5vh}
+  .kbody{font-size:clamp(10px,.82vw,13.5px);line-height:1.38}
+  .types{columns:2;column-gap:1vw;font-size:clamp(10px,.78vw,13px);line-height:1.32;
+    padding-left:1.1em}
+  .types li{margin-bottom:.45em}
+  .scale{height:14px;border-radius:7px;overflow:hidden;display:flex;margin:.5vh 0 .3vh}
+  .scale i{display:block;height:100%}
+  .slbl{font-size:clamp(9px,.7vw,11.5px);color:var(--muted)}
+  .tl{display:flex;align-items:flex-start;gap:0;margin-top:1.2vh;position:relative;z-index:0}
+  .tlzones{display:flex;margin-top:.8vh}
+  .tlzones span{flex:1;text-align:center;font:700 clamp(9px,.78vw,12.5px) var(--f-head);letter-spacing:.08em}
+  .tlzones .z0{color:var(--orange)}
+  .tlzones .z1{color:var(--petrol)}
+  .tl .st{flex:1;text-align:center;position:relative;font:700 clamp(9px,.72vw,12px) var(--f-body);line-height:1.2}
+  .tl .st::before{content:"";display:block;width:12px;height:12px;border-radius:50%;
+    margin:0 auto .5vh;background:var(--green)}
+  .tl .st.z::before{background:var(--orange)}
+  .tl .st.b::before{background:var(--petrol)}
+  .tlaxis{position:absolute;left:4%;right:4%;top:5px;height:2px;background:var(--ink);z-index:-1}
+  .bases{font-size:clamp(9.5px,.78vw,13px);line-height:1.55;color:var(--graphite)}
+  .bases b{color:var(--petrol)}
+
+  /* ===== Экран 2 ===== */
+  #s2 .hero{font:800 clamp(64px,9vw,150px)/1 var(--f-head);color:var(--green);letter-spacing:.02em}
+  #s2 .dec{font:700 clamp(13px,1.25vw,21px) var(--f-head);letter-spacing:.14em;color:var(--graphite);
+    margin:.8vh 0 2.6vh}
+  #s2 .duo{display:grid;grid-template-columns:1fr auto 1fr;gap:1vw;align-items:stretch}
+  .gost{border-radius:16px;padding:1.8vh 1.4vw}
+  .gost.old{background:var(--green-pale)}
+  .gost.new{background:#fff;border:2.5px solid var(--green)}
+  .gost .y{font:800 clamp(30px,3vw,48px) var(--f-head)}
+  .gost.old .y{color:var(--petrol)} .gost.new .y{color:var(--green)}
+  .gost .yl{font:700 clamp(12px,1vw,16px) var(--f-head);color:var(--ink)}
+  .gost .ys{font-size:clamp(10px,.8vw,13px);color:var(--muted);margin-bottom:1vh}
+  .gost blockquote{font-size:clamp(11.5px,.95vw,15.5px);line-height:1.45}
+  .gost .hl{color:var(--orange);font-weight:700}
+  .arrow{align-self:center;font:800 clamp(26px,2.6vw,44px) var(--f-head);color:var(--orange)}
+  .def38{background:var(--green-pale);border-radius:14px;padding:1.4vh 1.4vw;margin-top:2vh}
+  .def38 h3{font-size:clamp(12px,1vw,16px);color:var(--ink);margin-bottom:.5vh}
+  .def38 h3 span{color:var(--muted);font-weight:600;font-size:.85em}
+  .def38 p{font-size:clamp(11px,.9vw,14.5px);line-height:1.45}
+  .concl{margin-top:2vh;font:700 clamp(13px,1.15vw,19px) var(--f-body)}
+  .concl .hl{color:var(--orange)}
+
+  /* ===== Экран 3 ===== */
+  #s3 .top{display:flex;align-items:baseline;gap:1.4vw;margin-bottom:1.2vh}
+  #s3 .n25{font:800 clamp(56px,6vw,104px)/1 var(--f-head);color:var(--green)}
+  #s3 .facts .f1{font:800 clamp(16px,1.5vw,26px) var(--f-head);color:var(--ink)}
+  #s3 .facts .f2{font:700 clamp(11px,1vw,16px) var(--f-body);color:var(--green)}
+  .plist{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(13,auto);grid-auto-flow:column;gap:.4vh 1vw;align-content:start}
+  .prow{display:flex;align-items:center;gap:.5vw;border-radius:8px;padding:.5vh .7vw;
+    font-size:clamp(10px,.84vw,14px);line-height:1.25;background:#fff;border:1px solid var(--line)}
+  .prow.hl{background:var(--petrol);border-color:var(--petrol);color:#fff;font-weight:700}
+  .prow .no{font:700 .92em var(--f-head);color:var(--petrol);min-width:1.9em}
+  .prow.hl .no{color:#fff}
+  .prow .new{margin-left:auto;background:var(--orange);color:#fff;font:800 .68em var(--f-head);
+    letter-spacing:.06em;padding:.25em .7em;border-radius:999px}
+  #s3 .legend{display:flex;gap:2vw;align-items:center;margin-top:1vh;font-size:clamp(9.5px,.75vw,12.5px);color:var(--graphite);flex-wrap:wrap}
+  #s3 .legend .sq{display:inline-block;width:.9em;height:.9em;background:var(--petrol);border-radius:3px;margin-right:.4em;vertical-align:-.1em}
+  #s3 .legend .nn{background:var(--orange);color:#fff;font:800 .68em var(--f-head);padding:.25em .7em;border-radius:999px;margin-right:.4em}
+
+  /* ===== Экран 4 ===== */
+  #s4 .wrap{display:grid;grid-template-columns:1fr 1.4fr;gap:2vw}
+  .doc{background:#fff;border:3px solid var(--petrol);border-radius:6px;position:relative;
+    padding:3vh 1.6vw;max-width:24vw;align-self:start}
+  .doc::after{content:"";position:absolute;top:-3px;right:-3px;width:2.6vw;height:2.6vw;
+    background:var(--petrol);clip-path:polygon(0 0,100% 100%,100% 0)}
+  .doc .t1{font:800 clamp(12px,1vw,16px) var(--f-head);text-align:center}
+  .doc .num{font:800 clamp(24px,2.4vw,40px) var(--f-head);color:var(--petrol);text-align:center;margin:1vh 0 .3vh}
+  .doc .dt{text-align:center;color:var(--muted);font-size:clamp(10px,.8vw,13px)}
+  .doc .ribbon{background:var(--orange);color:#fff;text-align:center;border-radius:6px;
+    padding:.7vh .5vw;margin-top:1.6vh;font:700 clamp(10px,.82vw,13.5px) var(--f-body)}
+  .doc .ribbon b{font-family:var(--f-head)}
+  #s4 .name{font:700 clamp(14px,1.3vw,22px) var(--f-body);line-height:1.35}
+  #s4 .reg{color:var(--muted);font-size:clamp(10px,.85vw,14px);margin:.8vh 0 1.6vh}
+  #s4 .facts{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:1vw;margin-bottom:1.6vh}
+  #s4 .fact{background:var(--green-pale);border-radius:12px;padding:1.2vh 1vw;text-align:center}
+  #s4 .fact .b{font:800 clamp(15px,1.4vw,24px) var(--f-head)}
+  #s4 .fact .b.g{color:var(--green)} #s4 .fact .b.p{color:var(--petrol)}
+  #s4 .fact .s{font-size:clamp(9.5px,.75vw,12px);color:var(--muted)}
+  #s4 ul.chvl li{font-size:clamp(10.5px,.88vw,14px)}
+  .benefit{background:var(--green);border-radius:16px;color:#fff;text-align:center;
+    padding:1.8vh 2vw;margin-top:2.2vh}
+  #s2,#s3,#s4,#s5,#s6{justify-content:center}
+  .benefit h3{font-size:clamp(13px,1.2vw,20px);letter-spacing:.03em;margin-bottom:.6vh}
+  .benefit p{font-size:clamp(11px,.95vw,15px);font-weight:700;line-height:1.4}
+  .benefit .pill{display:inline-block;background:#fff;color:var(--green);border-radius:999px;
+    font:800 clamp(12px,1.05vw,17px) var(--f-head);padding:.55em 1.4em;margin-top:1vh}
+
+  /* ===== Экран 5 ===== */
+  #s5 .head{display:flex;gap:1.6vw;align-items:stretch;margin-bottom:1.4vh}
+  .magnet{background:var(--green);color:#fff;border-radius:16px;padding:1.6vh 1.6vw;
+    display:flex;flex-direction:column;justify-content:center;flex:none}
+  .magnet .a{font:800 clamp(22px,2.2vw,38px) var(--f-head)}
+  .magnet .b{font:700 clamp(11px,1vw,16px) var(--f-head);letter-spacing:.04em}
+  #s5 .feats{flex:1}
+  #s5 .feats li{font-size:clamp(10.5px,.9vw,14px);margin-bottom:.55vh}
+  .plist5{display:grid;grid-template-columns:1fr 1fr;gap:.3vh 1vw;flex:1;min-height:0;align-content:start}
+  .plist5 .prow .no{color:var(--green)}
+
+  /* ===== Экран 6 ===== */
+  #s6 .ax{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2vw;margin-bottom:1.2vh}
+  .axc{background:#fff;border:1.5px solid var(--line);border-radius:16px;text-align:center;
+    padding:2vh 1.2vw}
+  .axc .n{width:2.6em;height:2.6em;border-radius:50%;background:var(--green);color:#fff;
+    font:800 clamp(14px,1.2vw,20px) var(--f-head);display:flex;align-items:center;justify-content:center;margin:0 auto 1.2vh}
+  .axc p{font:700 clamp(11.5px,1vw,16px) var(--f-body);line-height:1.35}
+  #s6 .podv{text-align:center;font:700 clamp(11.5px,1vw,16px) var(--f-body);margin-bottom:1.6vh}
+  #s6 .podv .hl{color:var(--orange)}
+  #s6 .fact li{font-size:clamp(10.5px,.88vw,14px)}
+  .dirs{display:grid;grid-template-columns:repeat(3,1fr);gap:1vw;margin-top:1.4vh}
+  .dir{border-radius:14px;padding:1.4vh 1.1vw;color:#fff;display:flex;flex-direction:column}
+  .dir.g{background:var(--green)} .dir.p{background:var(--petrol)} .dir.m{background:var(--green-mid)}
+  .dir h3{font-size:clamp(13px,1.15vw,19px);letter-spacing:.03em}
+  .dir .w{font-size:clamp(10px,.82vw,13px);opacity:.9;margin:.3vh 0 .8vh}
+  .dir .m2{font-size:clamp(10px,.85vw,13.5px);line-height:1.4;background:rgba(255,255,255,.12);
+    border-radius:8px;padding:.8vh .7vw}
+  .dir .m2 .hl{color:#FFD9B3;font-weight:700}
+
+  /* ===== Финал ===== */
+  #s7{align-items:center;justify-content:center;text-align:center;background:
+      linear-gradient(180deg,var(--green-tint) 0%,#fff 100%)}
+  #s7 h2{font-size:clamp(24px,2.8vw,44px);font-weight:800;color:var(--graphite)}
+  #s7 h2 .acc{color:var(--green)}
+  #s7 p.inv{font-size:clamp(13px,1.2vw,19px);color:var(--graphite);max-width:62vw;margin:2vh auto 3vh;line-height:1.5}
+  #s7 .contacts{display:flex;align-items:center;justify-content:center;gap:1.5vw;flex-wrap:wrap}
+  #s7 .contact{font:800 clamp(16px,1.6vw,26px) var(--f-head);color:var(--petrol);display:flex;
+    align-items:center;gap:.6vw;justify-content:center;text-decoration:none}
+  #s7 .contact:hover{color:var(--green)}
+  #s7 .desc{letter-spacing:.3em;color:var(--muted);font:600 clamp(10px,.85vw,14px) var(--f-head);margin-top:1vh}
+  #s7 .sources{max-width:min(90vw,1100px);margin:1.3vh auto 0;display:flex;justify-content:center;
+    gap:.45em 1em;flex-wrap:wrap;font-size:clamp(10px,.78vw,13px);color:var(--muted)}
+  #s7 .sources a{color:var(--petrol);text-underline-offset:3px}
+  #s7 .sources a:hover{color:var(--green)}
+
+  /* На узких и низких экранах плакаты становятся читаемым длинным документом. */
+  @media (max-width:1180px), (max-height:760px){
+    html{scroll-snap-type:none}
+    section.screen{height:auto;min-height:100svh;overflow:visible;scroll-snap-align:none;
+      padding:76px max(28px,5vw) 64px;justify-content:flex-start !important}
+    .rv{opacity:1;transform:none;transition:none}
+    #dots,#play{display:none}
+    #s0{min-height:100svh}
+    .minis{grid-template-columns:repeat(3,1fr);width:100%}
+    #s1 .cols{grid-template-columns:1fr 1fr}
+    #s2 .duo{grid-template-columns:1fr}
+    #s2 .arrow{transform:rotate(90deg);justify-self:center}
+    .plist,.plist5{grid-template-columns:1fr;grid-template-rows:none;grid-auto-flow:row}
+    #s4 .wrap{grid-template-columns:1fr}
+    .doc{max-width:none;width:100%}
+    #s5 .head{flex-direction:column}
+    #s6 .ax,.dirs{grid-template-columns:1fr}
+    #s7 p.inv{max-width:82vw}
+  }
+  @media (max-width:700px){
+    .brand-back{left:14px;top:12px}
+    section.screen{padding:72px 18px 52px}
+    h2.title{font-size:clamp(28px,9vw,40px);line-height:1.08;margin-bottom:12px}
+    .kicker{font-size:11px;letter-spacing:.18em}
+    .lead{font-size:16px;line-height:1.45}
+    #s0 .logo{margin-bottom:26px}
+    #s0 h1{max-width:100%;font-size:clamp(32px,9vw,42px);overflow-wrap:break-word}
+    #s0 .sub{font-size:17px;line-height:1.45}
+    #s0 .byline{font-size:13px;line-height:1.4}
+    .minis{grid-template-columns:1fr 1fr;gap:10px}
+    .mini{padding:14px}
+    .mini .n{font-size:22px}
+    .mini .t{font-size:13px}
+    #s1 .cols{grid-template-columns:1fr;gap:18px}
+    .grid{gap:10px}
+    .defcard{padding:12px 14px}
+    .defcard h3,.klabel{font-size:12px;line-height:1.35}
+    .defcard p,.kbody,.types,.bases,.gost blockquote,.def38 p,
+    #s4 .reg,#s4 ul.chvl li,#s5 .feats li,#s6 .fact li,.dir .m2{font-size:14px;line-height:1.5}
+    .defcard .src,.slbl,#s4 .fact .s{font-size:11px;line-height:1.45}
+    .types{columns:1;padding-left:1.35em}
+    .tlzones,.tl{min-width:620px}
+    #s1 .rv.d2{overflow-x:auto;padding-bottom:8px}
+    #s2 .hero{font-size:clamp(64px,24vw,100px)}
+    #s2 .dec{font-size:14px;line-height:1.4}
+    .gost{padding:18px}
+    .def38{padding:16px}
+    .concl{font-size:15px;line-height:1.5}
+    #s3 .top{align-items:center}
+    #s3 .n25{font-size:64px}
+    #s3 .facts .f1{font-size:17px;line-height:1.2}
+    #s3 .facts .f2{font-size:13px;margin-top:4px}
+    .prow{font-size:13px;padding:9px 10px;gap:8px}
+    #s3 .legend{font-size:12px;line-height:1.5;gap:10px}
+    #s4 .name{font-size:18px}
+    #s4 .facts{grid-template-columns:1fr}
+    .benefit{padding:18px}
+    .benefit h3{font-size:15px}
+    .benefit p{font-size:13px}
+    .benefit .pill{font-size:12px}
+    .magnet{padding:18px}
+    .magnet .a{font-size:27px}
+    .axc{padding:18px}
+    .axc p,#s6 .podv{font-size:15px}
+    .dir{padding:18px}
+    .dir h3{font-size:17px}
+    .dir .w{font-size:13px}
+    #s7 p.inv{max-width:100%;font-size:16px}
+    #s7 .contacts{gap:12px}
+    #s7 .contact{font-size:18px}
+    #s7 .desc{letter-spacing:.16em;font-size:11px;line-height:1.5}
+    #s7 .sources{max-width:100%;line-height:1.45}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#s0">К содержанию</a>
+<a class="brand-back" href="https://pikov.expert/" aria-label="Вернуться в каталог лекций pikov.expert">← pikov.expert</a>
+<noscript><div><img class="metric-pixel" src="https://mc.yandex.ru/watch/109116119" alt=""></div></noscript>
+<nav id="dots" aria-label="Навигация по экранам"></nav>
+<button id="play" type="button" title="Автопоказ" aria-pressed="false">▶ автопоказ</button>
+
+<!-- ================== ТИТУЛ ================== -->
+<section class="screen" id="s0" data-t="Титул">
+  <div class="wm tr"></div><div class="wm bl"></div>
+  <div class="logo rv">
+    <!-- Знак УЦ (вектор из logo_УЦ.svg) -->
+    <svg width="84" height="42" viewBox="26 2 117 59" xmlns="http://www.w3.org/2000/svg" aria-label="Логотип УЦ МАСКОМ">
+      <polygon fill="#FCBC00" points="66.8,5.1 45.6,5.1 56.2,15.4"/>
+      <polygon fill="#000000" points="85.7,31.5 85.7,2.1 56.2,30.7 26.7,2.1 26.7,31.5 56.2,60.1"/>
+      <polygon fill="#1ABE67" points="113.8,2.1 85.7,31.5 113.8,60.1 142.6,60.1 114.5,31.5 142.6,2.1"/>
+    </svg>
+    <div style="text-align:left">
+      <div style="font:600 12px var(--f-head);letter-spacing:.3em;color:var(--graphite)">УЧЕБНЫЙ ЦЕНТР</div>
+      <div style="font:800 26px var(--f-head);color:var(--ink)">МАСКОМ</div>
+    </div>
+  </div>
+  <h1 class="rv d1"><span class="acc">РБПО</span> — разработка безопасного<br>программного обеспечения</h1>
+  <p class="sub rv d2">Учебная серия Учебного центра МАСКОМ: нормативная база, процессы
+    и практика безопасной разработки — на шести плакатах.</p>
+  <p class="byline rv d2">Автор и преподаватель — Виталий Александрович Пиков · ГОСТ Р 56939-2024</p>
+  <div class="minis rv d3">
+    <button class="mini" type="button" data-go="1"><div class="n">01</div><div class="t">Уязвимости</div></button>
+    <button class="mini" type="button" data-go="2"><div class="n">02</div><div class="t">Что такое РБПО?</div></button>
+    <button class="mini" type="button" data-go="3"><div class="n">03</div><div class="t">25 процессов РБПО</div></button>
+    <button class="mini" type="button" data-go="4"><div class="n">04</div><div class="t">Сертификация процессов</div></button>
+    <button class="mini" type="button" data-go="5"><div class="n">05</div><div class="t">Требования ГОСТ Р 56939-2024</div></button>
+    <button class="mini" type="button" data-go="6"><div class="n">06</div><div class="t">Система без уязвимостей?</div></button>
+  </div>
+</section>
+
+<!-- ================== 01 · УЯЗВИМОСТИ ================== -->
+<section class="screen" id="s1" data-t="01 · Уязвимости">
+  <div class="wm br"></div>
+  <div class="kicker rv">Плакат 01 · Серия РБПО</div>
+  <h2 class="title rv"><span class="acc">Уязвимости</span></h2>
+  <div class="cols rv d1">
+    <div><!-- Колонка 1: определения -->
+      <div class="klabel">ЧТО ТАКОЕ УЯЗВИМОСТЬ</div>
+      <div class="grid" style="gap:.8vh">
+        <div class="defcard"><h3>ГОСТ Р ИСО/МЭК 27000-2021</h3>
+          <p>«уязвимость (vulnerability): Слабое место актива или меры обеспечения информационной
+          безопасности (3.14), которое может быть использовано одной или несколькими угрозами (3.74)».</p>
+          <span class="src">[ГОСТ Р ИСО/МЭК 27000-2021 «Информационные технологии. Методы и средства обеспечения безопасности. Системы менеджмента информационной безопасности. Общие сведения и словарь», п.&nbsp;3.77].</span></div>
+        <div class="defcard"><h3>ГОСТ Р 56545-2015</h3>
+          <p>Уязвимость — недостаток (слабость) программного (программно-технического) средства
+          или информационной системы в целом, который (которая) может быть использована
+          для реализации угроз безопасности информации</p>
+          <span class="src">[ГОСТ Р 56545-2015 «Защита информации. Уязвимости информационных систем. Правила описания уязвимостей»].</span></div>
+        <div class="defcard z"><h3>УЯЗВИМОСТЬ НУЛЕВОГО ДНЯ (0-DAY)</h3>
+          <p>«уязвимость нулевого дня: Уязвимость, которая становится известной до момента
+          выпуска разработчиком компонента информационной системы соответствующих мер защиты
+          информации, исправлений недостатков или соответствующих обновлений».</p>
+          <span class="src">[ГОСТ Р 56545-2015 «Защита информации. Уязвимости информационных систем. Правила описания уязвимостей», п.&nbsp;3.8].</span></div>
+        <div class="defcard"><h3>CWE (COMMON WEAKNESS ENUMERATION)</h3>
+          <p>Поддерживаемый сообществом перечень типов недостатков программного и аппаратного
+          обеспечения, которые при определённых условиях могут привести к уязвимостям.
+          CWE описывает типы недостатков, а не конкретные уязвимости.</p>
+          <span class="src">[Источник: https://cwe.mitre.org/].</span></div>
+      </div>
+    </div>
+    <div><!-- Колонка 2: классификация -->
+      <div class="klabel">КЛАССИФИКАЦИЯ УЯЗВИМОСТЕЙ ИНФОРМАЦИОННЫХ СИСТЕМ ПО ГОСТ Р 56546-2015</div>
+      <div class="kbody"><b>Область происхождения · 5 классов:</b> уязвимости кода · уязвимости
+        конфигурации · уязвимости архитектуры · организационные уязвимости · многофакторные уязвимости</div>
+      <div class="klabel">ТИПЫ НЕДОСТАТКОВ · 20 ТИПОВ</div>
+      <ol class="types">
+        <li>недостатки, связанные с неправильной настройкой параметров программного обеспечения;</li>
+        <li>недостатки, связанные с неполнотой проверки вводимых (входных) данных;</li>
+        <li>недостатки, связанные с возможностью прослеживания пути доступа к каталогам;</li>
+        <li>недостатки, связанные с возможностью перехода по ссылкам;</li>
+        <li>недостатки, связанные с возможностью внедрения команд ОС;</li>
+        <li>недостатки, связанные с межсайтовым скриптингом (выполнением сценариев);</li>
+        <li>недостатки, связанные с внедрением интерпретируемых операторов языков программирования или разметки;</li>
+        <li>недостатки, связанные с внедрением произвольного кода;</li>
+        <li>недостатки, связанные с переполнением буфера памяти;</li>
+        <li>недостатки, связанные с неконтролируемой форматной строкой;</li>
+        <li>недостатки, связанные с вычислениями;</li>
+        <li>недостатки, приводящие к утечке/раскрытию информации ограниченного доступа;</li>
+        <li>недостатки, связанные с управлением полномочиями (учетными данными);</li>
+        <li>недостатки, связанные с управлением разрешениями, привилегиями и доступом;</li>
+        <li>недостатки, связанные с аутентификацией;</li>
+        <li>недостатки, связанные с криптографическими преобразованиями (недостатки шифрования);</li>
+        <li>недостатки, связанные с подменой межсайтовых запросов;</li>
+        <li>недостатки, приводящие к «состоянию гонки»;</li>
+        <li>недостатки, связанные с управлением ресурсами;</li>
+        <li>иные типы недостатков.</li>
+      </ol>
+      <div class="klabel">МЕСТО ВОЗНИКНОВЕНИЯ · 7 МЕСТ</div>
+      <div class="kbody">уязвимости в общесистемном (общем) программном обеспечении · в прикладном
+        программном обеспечении · в специальном программном обеспечении · в технических средствах ·
+        в портативных технических средствах · в сетевом (коммуникационном, телекоммуникационном)
+        оборудовании · в средствах защиты информации</div>
+      <div class="slbl" style="margin-top:.6vh">Примечание: стандарт не распространяется на уязвимости,
+        связанные с утечкой информации по техническим каналам, включая уязвимости электронных
+        компонентов технических средств.</div>
+    </div>
+    <div><!-- Колонка 3: оценка и базы -->
+      <div class="klabel">ОЦЕНКА ОПАСНОСТИ: CVSS</div>
+      <div class="kbody"><b>CVSS 4.0</b> — открытая методика FIRST для описания характеристик
+        и количественной оценки технической серьёзности уязвимости. В CVSS 4.0 используются группы
+        метрик Base, Threat, Environmental и Supplemental. CVSS не является полной оценкой риска
+        и не предсказывает вероятность эксплуатации. Спецификация и калькулятор: first.org/cvss</div>
+      <div class="slbl" style="margin-top:.7vh"><b>CVSS v2.0</b> (устаревшая версия)</div>
+      <div class="scale"><i style="flex:39;background:var(--green)"></i><i style="flex:30;background:var(--orange)"></i><i style="flex:31;background:var(--petrol)"></i></div>
+      <div class="slbl">Низкая (Low) 0.0–3.9 · Средняя (Medium) 4.0–6.9 · Высокая (High) 7.0–10.0</div>
+      <div class="slbl" style="margin-top:.7vh"><b>CVSS v3.x / v4.0</b></div>
+      <div class="scale"><i style="flex:5;background:#9DB4A6"></i><i style="flex:37;background:var(--green)"></i><i style="flex:29;background:var(--orange)"></i><i style="flex:19;background:var(--petrol-soft)"></i><i style="flex:10;background:var(--petrol)"></i></div>
+      <div class="slbl">None 0.0 · Low 0.1–3.9 · Medium 4.0–6.9 · High 7.0–8.9 · Critical 9.0–10.0</div>
+      <div class="slbl" style="margin-top:.4vh">Категории обозначают диапазоны итогового балла CVSS
+        и не означают фиксированный вид доступа, последствий или техники эксплуатации.</div>
+      <div class="klabel" style="margin-top:1vh">EPSS</div>
+      <div class="kbody"><b>EPSS</b> — ежедневно обновляемая модель FIRST, оценивающая вероятность
+        того, что для опубликованной CVE в следующие 30 дней будет наблюдаться активность
+        эксплуатации в реальных условиях (in the wild). EPSS не учитывает последствия
+        для конкретной организации и не является полной оценкой риска. Наблюдаемая активность
+        означает попытку эксплуатации, а не обязательно успешную атаку. Источник:
+        first.org/epss/model. Модель: сбор информации об уязвимостях; сбор данных об активности
+        эксплуатации; обучение модели; оптимизация; ежедневные оценки на следующие 30 дней
+        для каждого CVE.</div>
+      <div class="klabel" style="margin-top:1vh">ИЗВЕСТНАЯ / ВПЕРВЫЕ ВЫЯВЛЕННАЯ</div>
+      <div class="kbody"><b>Известная уязвимость</b> — уязвимость, опубликованная в общедоступных
+        источниках с описанием соответствующих мер защиты информации, исправлений недостатков
+        или соответствующих обновлений. <b>Впервые выявленная уязвимость</b> — уязвимость,
+        неопубликованная в общедоступных источниках <span style="color:var(--muted)">[ГОСТ Р 56545-2015,
+        пп.&nbsp;3.7, 3.9]</span>.</div>
+      <div class="klabel" style="margin-top:1vh">ГДЕ ИСКАТЬ</div>
+      <div class="bases"><b>БДУ ФСТЭК России</b> bdu.fstec.ru · <b>NIST NVD</b> nvd.nist.gov ·
+        <b>CNVD</b> cnvd.org.cn · <b>Debian</b> security-tracker.debian.org · <b>Ubuntu CVE</b>
+        ubuntu.com/security/cves · <b>Red Hat CVE Database</b> access.redhat.com/security/security-updates/cve ·
+        <b>CISA KEV</b> cisa.gov/known-exploited-vulnerabilities-catalog · <b>Exploit-DB</b>
+        exploit-db.com · <b>Каталог Сканер-ВС</b> vulnerabilities.etecs.ru</div>
+    </div>
+  </div>
+  <!-- Таймлайн -->
+  <div class="rv d2" style="margin-top:1.4vh">
+    <div class="klabel">ПУТЬ УЯЗВИМОСТИ <span style="color:var(--muted);font-weight:600">— данные за 2023 год, медианные значения; интервалы — от вехи «Назначен идентификатор»: внесена в базу — 34 дня · эксплойт — 47/48 дней (Exploit-DB / GitHub PoC) · стала популярной — 62 дня</span></div>
+    <div class="tlzones"><span class="z0">УЯЗВИМОСТЬ НУЛЕВОГО ДНЯ</span><span class="z1">ИЗВЕСТНАЯ УЯЗВИМОСТЬ</span></div>
+    <div class="tl"><div class="tlaxis"></div>
+      <div class="st z">Уязвимость<br>обнаружена</div>
+      <div class="st z">Назначен<br>идентификатор</div>
+      <div class="st z">Эксплойт<br>нулевого дня</div>
+      <div class="st b">Исправлена</div>
+      <div class="st">Опубликован бюллетень /<br>Внесена в базу</div>
+      <div class="st">Эксплойт</div>
+      <div class="st">Стала<br>популярной</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================== 02 · ЧТО ТАКОЕ РБПО ================== -->
+<section class="screen" id="s2" data-t="02 · Что такое РБПО?">
+  <div class="wm tr"></div><div class="wm bl"></div>
+  <div class="kicker rv">Плакат 02 · Серия РБПО</div>
+  <div style="text-align:center">
+    <div class="hero rv">РБПО</div>
+    <div class="dec rv d1">РАЗРАБОТКА БЕЗОПАСНОГО ПРОГРАММНОГО ОБЕСПЕЧЕНИЯ</div>
+  </div>
+  <div class="duo rv d2">
+    <div class="gost old">
+      <div class="yl">ГОСТ Р 56939-</div><div class="y">2016</div>
+      <div class="ys">заменён ГОСТ Р 56939-2024</div>
+      <blockquote>«3.2 безопасное программное обеспечение: Программное обеспечение, разработанное
+        с использованием совокупности мер, направленных на предотвращение появления
+        и устранение <span class="hl">уязвимостей</span> программы».</blockquote>
+    </div>
+    <div class="arrow">❯</div>
+    <div class="gost new">
+      <div class="yl">ГОСТ Р 56939-</div><div class="y">2024</div>
+      <div class="ys">действующая редакция</div>
+      <blockquote>«3.1 безопасное программное обеспечение: Программное обеспечение, разработанное
+        в ходе реализации совокупности процессов (мер), направленных на предотвращение появления
+        и устранение <span class="hl">недостатков</span> программы».</blockquote>
+    </div>
+  </div>
+  <div class="def38 rv d3">
+    <h3>НЕДОСТАТОК ПРОГРАММЫ <span>· ГОСТ Р 56939-2024, п.&nbsp;3.8</span></h3>
+    <p>«3.8 недостаток программы: Любое несоответствие программы заданным требованиям или любая
+      ошибка, допущенная в ходе проектирования или реализации программы, которая в случае ее
+      неисправления может являться причиной невозможности выполнения требуемых функциональных
+      возможностей или уязвимости программы».</p>
+  </div>
+  <p class="concl rv d3" style="text-align:center">Понятие <span class="hl">расширено</span>:
+    процессы РБПО направлены на предотвращение появления и устранение недостатков программы;<br>
+    уязвимость программы является одним из видов таких недостатков.</p>
+</section>
+
+<!-- ================== 03 · 25 ПРОЦЕССОВ ================== -->
+<section class="screen" id="s3" data-t="03 · 25 процессов">
+  <div class="kicker rv">Плакат 03 · Серия РБПО</div>
+  <div class="top rv">
+    <div class="n25">25</div>
+    <div class="facts">
+      <div class="f1">ПРОЦЕССОВ РБПО — С 20 ДЕКАБРЯ 2024 ГОДА</div>
+      <div class="f2">ГОСТ Р 56939-2024 — действующая редакция стандарта</div>
+    </div>
+  </div>
+  <div class="plist rv d1" id="plist3"></div>
+  <div class="legend rv d2" style="margin-top:.8vh">
+    <span><b>АВТОРСКАЯ УЧЕБНАЯ СХЕМА.</b> ГОСТ Р 56939-2024 не классифицирует процессы как «сквозные» и «проектные» и не устанавливает показанные стрелками связи с анализом и трансформацией программ. Названия процессов сокращены для плаката: ПО — программное обеспечение, РБПО — разработка безопасного программного обеспечения.</span>
+  </div>
+  <div class="legend rv d2">
+    <span><span class="sq"></span>выделенные процессы — 13</span>
+    <span><span class="nn">NEW</span>процессы, не имевшие отдельного прямого соответствия в редакции 2016 года по авторскому сопоставлению (№&nbsp;5.1, 5.15, 5.16, 5.17, 5.25); обозначение не является классификацией ГОСТ Р 56939-2024</span>
+    <span><span class="chv or"></span>«Анализ и трансформация программ: технологические требования» — стрелки ровно к 12 процессам: ко всем выделенным, КРОМЕ №&nbsp;5.2</span>
+  </div>
+</section>
+
+<!-- ================== 04 · СЕРТИФИКАЦИЯ ================== -->
+<section class="screen" id="s4" data-t="04 · Сертификация">
+  <div class="wm br"></div>
+  <div class="kicker rv">Плакат 04 · Серия РБПО</div>
+  <h2 class="title rv">Сертификация процессов безопасной разработки <span class="acc">ПО средств защиты информации</span></h2>
+  <div class="wrap rv d1">
+    <div class="doc">
+      <div class="t1">ПРИКАЗ<br>ФСТЭК РОССИИ</div>
+      <div class="num">№ 240</div>
+      <div class="dt">от 1 декабря 2023 г.</div>
+      <div class="ribbon">в редакции приказа ФСТЭК России<br><b>от 30.06.2025 № 230</b><br>
+        <span style="font-size:.82em">зарегистрирован Минюстом России 18.09.2025, рег.&nbsp;№&nbsp;83573;
+        официально опубликован 19.09.2025</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;min-height:0">
+      <p class="name"><span class="chv"></span>Порядок проведения сертификации процессов
+        безопасной разработки программного обеспечения средств защиты информации</p>
+      <p class="reg">утверждён приказом ФСТЭК России от 1 декабря 2023 г. № 240
+        (зарегистрирован Минюстом России 16.04.2024, рег. № 77896)<br>
+        <b>Область Порядка № 240:</b> процессы проектирования и производства ПО СЗИ,
+        предназначенных для защиты сведений, составляющих государственную тайну, или иной
+        охраняемой законом информации ограниченного доступа (п.&nbsp;1 Порядка)</p>
+      <div class="facts">
+        <div class="fact"><div class="b p">ГОСТ Р 56939-2024</div>
+          <div class="s">процессы оцениваются на соответствие требованиям; ссылки актуализированы приказом от 30.06.2025 № 230 (ранее — ГОСТ Р 56939-2016)</div></div>
+        <div class="fact"><div class="b g">01.06.2024</div>
+          <div class="s">приказ № 240 вступил в силу</div></div>
+        <div class="fact"><div class="b p">30.09.2025</div>
+          <div class="s">изменения по приказу № 230 вступили в силу</div></div>
+      </div>
+      <div class="klabel" style="margin:0 0 .6vh">ЧТО ИЗМЕНИЛ ПРИКАЗ ФСТЭК РОССИИ ОТ 30.06.2025 № 230</div>
+      <ul class="chvl">
+        <li><span class="chv or"></span><span>актуализирована версия стандарта: оценка процессов — по <b>ГОСТ Р 56939-2024</b> (приказ Росстандарта от 24.10.2024 № 1504-ст);</span></li>
+        <li><span class="chv or"></span><span>введён п. 5.1 — требования к содержанию <b>руководства по безопасной разработке ПО</b> (область действия, цели, процессы, роли, регламенты по пп. 5.1–5.25, внутренние проверки, улучшение процессов);</span></li>
+        <li><span class="chv or"></span><span>сертификация — на материально-технической базе изготовителя <b>на территории Российской Федерации</b>, с доступом органа по сертификации к среде сборки и разработки ПО (п. 18);</span></li>
+        <li><span class="chv or"></span><span>проверяется наличие средств композиционного, статического и динамического анализа ПО (пп. 5.8–5.12, 5.16, 5.18, 5.19 требований) (п. 19);</span></li>
+        <li><span class="chv or"></span><span>сертификат соответствия выдаётся на область действия, указанную в руководстве по безопасной разработке ПО, и на срок, указанный в заявке, но <b>не более чем на 5 лет</b> (п. 30).</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="benefit rv d2">
+    <h3>ПРАКТИЧЕСКОЕ СЛЕДСТВИЕ СЕРТИФИКАЦИИ</h3>
+    <p>Согласно п. 71.1 Положения о системе сертификации СЗИ, утверждённого приказом ФСТЭК России
+      от 03.04.2018 № 55, заявитель — разработчик СЗИ, имеющий сертификат соответствия процедур
+      безопасной разработки ПО требованиям национальных стандартов в области защиты информации,
+      при внесении изменений в сертифицированное СЗИ проводит испытания</p>
+    <div class="pill">САМОСТОЯТЕЛЬНО ИЛИ С ПРИВЛЕЧЕНИЕМ ИСПЫТАТЕЛЬНОЙ ЛАБОРАТОРИИ</div>
+  </div>
+</section>
+
+<!-- ================== 05 · ТРЕБОВАНИЯ ГОСТ ================== -->
+<section class="screen" id="s5" data-t="05 · Требования ГОСТ">
+  <div class="kicker rv">Плакат 05 · Серия РБПО</div>
+  <h2 class="title rv">Требования <span class="acc">ГОСТ Р 56939-2024</span></h2>
+  <p class="lead rv" style="margin-bottom:1vh">Национальный стандарт «Защита информации.
+    Разработка безопасного программного обеспечения. Общие требования»</p>
+  <div class="head rv d1">
+    <div class="magnet"><div class="a">25 ПРОЦЕССОВ,</div><div class="b">ОХВАТЫВАЮЩИХ ЖИЗНЕННЫЙ ЦИКЛ ПО</div></div>
+    <div class="feats">
+      <div class="klabel" style="margin-top:0">ОСОБЕННОСТИ СТАНДАРТА</div>
+      <ul class="chvl">
+        <li><span class="chv or"></span><span>содержит описание 25 процессов разработки безопасного ПО;</span></li>
+        <li><span class="chv or"></span><span>не привязывает процессы к одной модели жизненного цикла;</span></li>
+        <li><span class="chv or"></span><span>адресован разработчикам и производителям ПО, а также организациям, оценивающим соответствие процессов;</span></li>
+        <li><span class="chv or"></span><span>позволяет определить применимый набор процессов с учётом НПА, стандартов, ТЗ и иных документов;</span></li>
+        <li><span class="chv or"></span><span>учитывает специфику, масштаб и сложность ПО.</span></li>
+      </ul>
+    </div>
+  </div>
+  <div class="rv d1" style="font-size:clamp(9.5px,.78vw,13px);color:var(--graphite);line-height:1.4;margin-bottom:1vh">
+    <p><span class="chv or"></span>устанавливает требования к разработке ПО, включая ПО в составе
+      программно-аппаратных комплексов (ПАК) и автоматизированных систем (АС); требований
+      к разработке аппаратной части конечного изделия напрямую не устанавливает, но учитывает
+      аппаратные и программно-аппаратные средства среды сборки и разработки.</p>
+    <p style="margin-top:.4vh"><span class="chv or"></span>Конкретная совокупность процессов
+      определяется применимыми нормативными правовыми актами, стандартами, техническим заданием
+      и иными документами. Если установлено требование соответствия ГОСТ Р 56939-2024, обязательны
+      все требования стандарта, кроме сформулированных с использованием слов «рекомендуется»
+      и «может» (пп.&nbsp;4.7, 4.14–4.15).</p>
+    <p style="margin-top:.4vh;color:var(--muted)">Стандарт устанавливает общие требования к работам
+      по созданию безопасного ПО и устранению выявленных недостатков, в том числе уязвимостей,
+      и описывает 25 процессов (пп.&nbsp;5.1–5.25); процессы соотносятся с этапами принятой модели
+      жизненного цикла с учётом специфики, масштаба и сложности ПО. Названия процессов сокращены:
+      ПО — программное обеспечение, РБПО — разработка безопасного программного обеспечения.</p>
+  </div>
+  <div class="plist5 plist rv d2" id="plist5"></div>
+</section>
+
+<!-- ================== 06 · СИСТЕМА БЕЗ УЯЗВИМОСТЕЙ ================== -->
+<section class="screen" id="s6" data-t="06 · Без уязвимостей?">
+  <div class="wm tr"></div>
+  <div class="kicker rv">Плакат 06 · Серия РБПО</div>
+  <h2 class="title rv">Можно ли сделать систему <span class="acc">без уязвимостей?</span></h2>
+  <div class="klabel rv">ТРИ АКСИОМЫ, ПРИПИСЫВАЕМЫЕ М.&nbsp;Р.&nbsp;ШУРЕ-БУРЕ</div>
+  <div class="ax rv d1">
+    <div class="axc"><div class="n">1</div><p>В каждой программе есть ошибка.</p></div>
+    <div class="axc"><div class="n">2</div><p>Если в программе нет ошибок, значит, в исходном алгоритме есть ошибка.</p></div>
+    <div class="axc"><div class="n">3</div><p>Если ни в программе, ни в алгоритме ошибок нет, то такая программа никому не нужна.</p></div>
+  </div>
+  <p class="podv rv d2">Аксиомы — не пессимизм, а отправная точка: раз ошибки неизбежны,
+    их нужно <span class="hl" style="color:var(--orange)">предотвращать, находить и устранять</span>
+    системно — на всех этапах жизненного цикла ПО.</p>
+  <div class="klabel rv d2">ФАКТОРЫ, ВЛИЯЮЩИЕ НА НАЛИЧИЕ УЯЗВИМОСТЕЙ</div>
+  <ul class="chvl fact rv d2">
+    <li><span class="chv or"></span><span>в сложном ПО могут оставаться невыявленные уязвимости; поэтому необходимы систематический поиск, актуализация сведений и реагирование на протяжении срока технической поддержки;</span></li>
+    <li><span class="chv or"></span><span>в ходе эксплуатации могут выявляться ранее неизвестные уязвимости; сведения о них необходимо регулярно актуализировать в течение срока технической поддержки;</span></li>
+    <li><span class="chv or"></span><span>в конфигурации системы могут появляться уязвимости при вводе системы в эксплуатацию и в ходе её эксплуатации;</span></li>
+    <li><span class="chv or"></span><span>человеческий фактор.</span></li>
+  </ul>
+  <div class="klabel rv d3">ПРО СУТЬ, ПРО СМЫСЛЫ ИБ, ЗИ — все наши действия направлены на:
+    <span style="display:block;font:400 clamp(9px,.72vw,12px) var(--f-body);letter-spacing:normal;text-transform:none;color:var(--muted);margin-top:.3vh">Учебное обобщение; ср. цели разработки безопасного ПО — ГОСТ Р 56939-2024, п.&nbsp;4.1</span></div>
+  <div class="dirs rv d3">
+    <div class="dir g"><h3>ИСКЛЮЧИТЬ</h3><div class="w">появление уязвимостей при создании систем, ПО</div>
+      <div class="m2">Меры: <span class="hl">внедрение РБПО</span></div></div>
+    <div class="dir p"><h3>УСТРАНИТЬ</h3><div class="w">уже имеющиеся уязвимости</div>
+      <div class="m2">Меры: <span class="hl">внедрение РБПО</span> у разработчиков; у эксплуатантов — организационные и технические меры управления уязвимостями (Vulnerability Management, VM) — см. справа</div></div>
+    <div class="dir m"><h3>НЕ ДОПУСТИТЬ</h3><div class="w">появления новых уязвимостей</div>
+      <div class="m2">Меры — организационные и технические: назначение ответственных и распределение ролей; утверждение регламентов; учёт, анализ применимости и оценка критичности уязвимостей; регулярный поиск; устранение; выпуск и доставка обновлений; контроль исполнения.</div></div>
+  </div>
+</section>
+
+<!-- ================== ФИНАЛ ================== -->
+<section class="screen" id="s7" data-t="Контакты">
+  <div class="wm bl"></div><div class="wm tr"></div>
+  <div class="logo rv" style="display:flex;align-items:center;gap:1.1vw;margin-bottom:3vh">
+    <svg width="84" height="42" viewBox="26 2 117 59" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <polygon fill="#FCBC00" points="66.8,5.1 45.6,5.1 56.2,15.4"/>
+      <polygon fill="#000000" points="85.7,31.5 85.7,2.1 56.2,30.7 26.7,2.1 26.7,31.5 56.2,60.1"/>
+      <polygon fill="#1ABE67" points="113.8,2.1 85.7,31.5 113.8,60.1 142.6,60.1 114.5,31.5 142.6,2.1"/>
+    </svg>
+    <div style="text-align:left">
+      <div style="font:600 12px var(--f-head);letter-spacing:.3em;color:var(--graphite)">УЧЕБНЫЙ ЦЕНТР</div>
+      <div style="font:800 26px var(--f-head);color:var(--ink)">МАСКОМ</div>
+    </div>
+  </div>
+  <h2 class="rv d1">Разработка безопасного ПО — <span class="acc">это навык.</span></h2>
+  <p class="inv rv d2">Учебный центр МАСКОМ проводит обучение по направлению «Разработка
+    безопасного программного обеспечения»: нормативная база ФСТЭК России, требования
+    ГОСТ Р 56939-2024 и практика внедрения 25 процессов РБПО. Приглашаем разработчиков,
+    специалистов по ИБ и руководителей команд.</p>
+  <div class="contacts rv d3">
+    <a class="contact" href="https://mascom-uc.ru/" target="_blank" rel="noopener"><span class="chv"></span>MASCOM-UC.RU</a>
+    <a class="contact" href="https://pikov.expert/"><span class="chv pt"></span>PIKOV.EXPERT</a>
+  </div>
+  <div class="desc rv d3">УЧЕБНЫЙ ЦЕНТР МАСКОМ · СЕРИЯ «РБПО»</div>
+  <div class="rv d3" style="margin-top:2vh;font-size:clamp(10px,.8vw,13px);color:var(--muted)">Нормативные сведения проверены по состоянию на 26.07.2026.</div>
+  <div class="sources rv d3" aria-label="Официальные нормативные источники">
+    <span>Официальные источники:</span>
+    <a href="https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64" target="_blank" rel="noopener">ГОСТ Р 56939-2024</a>
+    <a href="https://publication.pravo.gov.ru/document/0001202404170002" target="_blank" rel="noopener">приказ № 240</a>
+    <a href="https://publication.pravo.gov.ru/document/0001202509190005" target="_blank" rel="noopener">изменения № 230</a>
+    <a href="https://publication.pravo.gov.ru/document/0001202210190024" target="_blank" rel="noopener">п. 71.1 — приказ № 172</a>
+  </div>
+</section>
+
+<script>
+(function(){
+  "use strict";
+  var qs = new URLSearchParams(location.search);
+
+  /* ---------- данные перечней ---------- */
+  var HL = {2:1,3:1,6:1,8:1,9:1,10:1,11:1,12:1,16:1,17:1,18:1,19:1,24:1};
+  var NEW = {1:1,15:1,16:1,17:1,25:1};
+  var P03 = [
+    "Планирование процессов РБПО","Обучение сотрудников",
+    "Формирование и предъявление требований безопасности к ПО","Управление конфигурацией ПО",
+    "Управление недостатками и запросами на изменение ПО","Разработка, уточнение и анализ архитектуры ПО",
+    "Моделирование угроз и разработка описания поверхности атаки",
+    "Формирование и поддержание в актуальном состоянии правил кодирования",
+    "Экспертиза исходного кода","Статический анализ исходного кода","Динамический анализ кода программы",
+    "Использование безопасной системы сборки ПО","Обеспечение безопасности сборочной среды ПО",
+    "Управление доступом и контроль целостности кода при разработке ПО",
+    "Обеспечение безопасности используемых секретов","Использование инструментов композиционного анализа",
+    "Проверка кода на предмет внедрения вредоносного ПО через цепочки поставок",
+    "Функциональное тестирование","Нефункциональное тестирование",
+    "Обеспечение безопасности при выпуске готовой к эксплуатации версии ПО",
+    "Безопасная поставка ПО пользователям","Обеспечение поддержки ПО при эксплуатации пользователями",
+    "Реагирование на информацию об уязвимостях","Поиск уязвимостей в ПО при эксплуатации",
+    "Обеспечение безопасности при выводе ПО из эксплуатации"];
+  /* Перечни плакатов 03 и 05 унифицированы (раздел 8 заключения экспертизы):
+     одинаковые сокращения «ПО» на обоих экранах, нумерация 5.1-5.25. */
+  var P05 = P03;
+
+  function fill(id, arr, mode){
+    var host = document.getElementById(id);
+    if(!host) return;
+    var html = "";
+    for(var i=0;i<arr.length;i++){
+      var n = i+1, cls = "prow", no, badge = "";
+      if(mode==="p03"){
+        if(HL[n]) cls += " hl";
+        no = "5."+n;
+        if(NEW[n]) badge = '<span class="new">NEW</span>';
+      } else { no = "5."+n; }
+      html += '<div class="'+cls+'"><span class="no">'+no+'</span><span>'+arr[i]+'</span>'+badge+'</div>';
+    }
+    host.innerHTML = html;
+  }
+  fill("plist3", P03, "p03");
+  fill("plist5", P05, "p05");
+
+  /* ---------- секции, точки ---------- */
+  var secs = Array.prototype.slice.call(document.querySelectorAll("section.screen"));
+  var dots = document.getElementById("dots");
+  secs.forEach(function(s,i){
+    var a = document.createElement("a");
+    a.href = "#"+s.id; a.dataset.t = s.dataset.t || ("Экран "+i);
+    a.setAttribute("aria-label", a.dataset.t);
+    a.addEventListener("click", function(e){ e.preventDefault(); go(i); });
+    dots.appendChild(a);
+  });
+  var dotEls = Array.prototype.slice.call(dots.children);
+  var cur = 0;
+  function go(i, instant){
+    i = (i+secs.length) % secs.length;
+    cur = i;
+    secs[i].scrollIntoView({behavior: instant ? "auto" : "smooth"});
+    /* fail-safe: раскрыть контент, даже если IntersectionObserver не сработал */
+    setTimeout(function(){ secs[i].classList.add("in"); }, instant ? 0 : 700);
+  }
+  secs[0].classList.add("in");
+  document.querySelectorAll(".mini").forEach(function(m){
+    m.addEventListener("click", function(){ go(+m.dataset.go); });
+  });
+
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      var i = secs.indexOf(e.target);
+      if(e.isIntersecting && e.intersectionRatio > .55){
+        e.target.classList.add("in");
+        dotEls.forEach(function(d,k){ d.classList.toggle("on", k===i); });
+        cur = i;
+      }
+    });
+  }, {threshold:[.55]});
+  secs.forEach(function(s){ io.observe(s); });
+
+  /* ---------- клавиатура ---------- */
+  document.addEventListener("keydown", function(e){
+    if(e.defaultPrevented || /^(INPUT|TEXTAREA|SELECT|BUTTON|A)$/.test(e.target.tagName)){ return; }
+    if(e.key==="ArrowDown"||e.key==="PageDown"||e.key===" "){ e.preventDefault(); go(cur+1); }
+    else if(e.key==="ArrowUp"||e.key==="PageUp"){ e.preventDefault(); go(cur-1); }
+    else if(e.key==="Home"){ e.preventDefault(); go(0); }
+    else if(e.key==="End"){ e.preventDefault(); go(secs.length-1); }
+  });
+
+  /* ---------- киоск-режим ---------- */
+  var playBtn = document.getElementById("play");
+  var timer = null, PERIOD = 11000;
+  function setPlay(on){
+    if(on && !timer){
+      timer = setInterval(function(){ go(cur+1); }, PERIOD);
+      playBtn.classList.add("on"); playBtn.textContent = "⏸ автопоказ";
+      playBtn.setAttribute("aria-pressed", "true");
+    } else if(!on && timer){
+      clearInterval(timer); timer = null;
+      playBtn.classList.remove("on"); playBtn.textContent = "▶ автопоказ";
+      playBtn.setAttribute("aria-pressed", "false");
+    }
+  }
+  playBtn.addEventListener("click", function(){ setPlay(!timer); });
+  if(qs.get("autoplay")==="1"){ setPlay(true); }
+
+  /* ---------- служебный режим скриншотов ---------- */
+  var scr = qs.get("screen");
+  if(scr!==null){
+    var n = parseInt(scr,10)||0;
+    document.documentElement.classList.add("no-anim");
+    document.body.classList.add("no-anim");
+    document.documentElement.style.scrollSnapType = "none";
+    secs.forEach(function(s,k){
+      s.classList.add("in");
+      if(k!==n){ s.style.display = "none"; }
+    });
+    window.scrollTo(0,0);
+  }
+})();
+</script>
+</body>
+</html>
