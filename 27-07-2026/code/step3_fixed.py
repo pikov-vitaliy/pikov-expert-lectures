@@ -18,6 +18,7 @@ from __future__ import annotations
 import hmac
 import logging
 import os
+import secrets
 import sqlite3
 import sys
 from pathlib import Path
@@ -41,10 +42,18 @@ def get_admin_token() -> str:
 
 
 def mask(secret: str) -> str:
-    """Превратить секрет в безопасное для журнала представление."""
-    if len(secret) <= 4:
-        return "***"
-    return f"{secret[:2]}***{secret[-2:]} (длина {len(secret)})"
+    """Вернуть безопасную для журнала заглушку вместо секрета.
+
+    Здесь намеренно НЕ печатается ничего, что вычисляется из самого секрета:
+    ни первых символов, ни последних, ни длины. Каждая такая «мелочь» сужает
+    перебор: длина отсекает большую часть вариантов, а известные два символа
+    с каждого конца — почти всё остальное. Маска вида «ab***yz (длина 21)»
+    выглядит аккуратно и при этом раздаёт ровно то, что защищали.
+
+    Аргумент принимается только ради единообразия вызова: значение не
+    используется, и это правильно.
+    """
+    return "***"
 
 
 def connect() -> sqlite3.Connection:
@@ -128,7 +137,15 @@ def export_report(connection: sqlite3.Connection, filename: str) -> Path:
 def demo() -> None:
     """Показать, что все четыре дефекта устранены."""
     logging.basicConfig(level=logging.INFO, format="    [ЖУРНАЛ] %(message)s")
-    os.environ.setdefault("MEDIA_JOURNAL_ADMIN_TOKEN", "demo-token-27-07-2026")
+
+    # Токен для демонстрации создаётся здесь же, случайным, на один запуск.
+    # Записать сюда строковую константу «для удобства» нельзя: это ровно тот
+    # самый Д1, который мы только что чинили, — просто под видом значения
+    # по умолчанию. Значение по умолчанию для секрета — это захардкоженный
+    # секрет, который никто не замечает.
+    if not os.environ.get("MEDIA_JOURNAL_ADMIN_TOKEN"):
+        os.environ["MEDIA_JOURNAL_ADMIN_TOKEN"] = secrets.token_urlsafe(16)
+
     connection = connect()
 
     print("=" * 70)
@@ -136,7 +153,9 @@ def demo() -> None:
     print("=" * 70)
     ok = login("ivanova", os.environ["MEDIA_JOURNAL_ADMIN_TOKEN"])
     print(f"    Вход выполнен: {ok}")
-    print("    В журнале выше — маска, а не сам токен. В коде токена нет вовсе.")
+    print("    В журнале выше — заглушка. Ни самого токена, ни его длины,")
+    print("    ни первых или последних символов там нет. В коде токена тоже нет:")
+    print("    он берётся из окружения, а для этого запуска сгенерирован случайно.")
 
     print()
     print("=" * 70)

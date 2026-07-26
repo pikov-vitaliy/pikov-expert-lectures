@@ -25,7 +25,14 @@ import unittest
 import step3_fixed
 from step2_class import Journal, Medium, ValidationError
 
-TEST_TOKEN = "test-token-do-not-use-in-production"
+# Тестовое значение, а не секрет: оно не даёт доступа ни к чему и существует
+# только внутри этого файла. Анализатор безопасности об этом знать не может,
+# поэтому исключение оформляется явно — с указанием конкретного правила.
+#
+# Так и выглядит правильная работа с находками SAST: не «отключить проверку»,
+# а точечно обосновать каждый случай прямо в коде. Исключение без указания
+# правила (просто `# nosec`) глушит вообще всё в строке — так делать нельзя.
+TEST_TOKEN = "test-token-do-not-use-in-production"  # nosec B105
 
 
 # ---------------------------------------------------------------------------
@@ -92,11 +99,19 @@ class TestJournal(unittest.TestCase):
 # Регрессионные тесты безопасности: программа НЕ делает того, чего не должна
 # ---------------------------------------------------------------------------
 class TestSecurityRegressions(unittest.TestCase):
-    """Каждый тест закрывает конкретный дефект из step3_defect.py."""
+    """Каждый тест закрывает конкретный дефект из step3_defect.py.
+
+    Проверяемый модуль вынесен в атрибут `module`. Здесь он равен эталону
+    step3_fixed — эти тесты показывают, как выглядит зелёный результат.
+    Файл test_student.py наследует этот же класс и подменяет `module`
+    на ваш step3_student.py, ничего не переписывая.
+    """
+
+    module = step3_fixed
 
     def setUp(self) -> None:
         os.environ["MEDIA_JOURNAL_ADMIN_TOKEN"] = TEST_TOKEN
-        self.connection = step3_fixed.connect()
+        self.connection = self.module.connect()
 
     def tearDown(self) -> None:
         self.connection.close()
@@ -104,7 +119,7 @@ class TestSecurityRegressions(unittest.TestCase):
     def test_d3_sql_injection_does_not_leak_confidential(self) -> None:
         """Д3 / CWE-89: строка атаки должна искаться как обычный текст."""
         payload = "%' OR label LIKE '%"
-        rows = step3_fixed.find_public(self.connection, payload)
+        rows = self.module.find_public(self.connection, payload)
         leaked = [row for row in rows if row[2] == "Конфиденциально"]
         self.assertEqual(leaked, [], "Утекли записи с грифом «Конфиденциально»")
 
@@ -112,7 +127,7 @@ class TestSecurityRegressions(unittest.TestCase):
         """Д3: инвариант функции — при ЛЮБОМ вводе только гриф «Открыто»."""
         for payload in ("", "'", "' OR 1=1 --", "%", "_", "Сидорова", "МНИ-003"):
             with self.subTest(payload=payload):
-                rows = step3_fixed.find_public(self.connection, payload)
+                rows = self.module.find_public(self.connection, payload)
                 labels = {row[2] for row in rows}
                 self.assertTrue(labels <= {"Открыто"}, f"Вернулись грифы: {labels}")
 
@@ -126,32 +141,54 @@ class TestSecurityRegressions(unittest.TestCase):
         ):
             with self.subTest(payload=payload):
                 with self.assertRaises(ValueError):
-                    step3_fixed.export_report(self.connection, payload)
+                    self.module.export_report(self.connection, payload)
 
     def test_d4_normal_filename_stays_inside_export_dir(self) -> None:
         """Д4: обычное имя файла по-прежнему работает."""
-        path = step3_fixed.export_report(self.connection, "report.txt")
-        self.assertTrue(path.is_relative_to(step3_fixed.EXPORT_DIR.resolve()))
+        path = self.module.export_report(self.connection, "report.txt")
+        self.assertTrue(path.is_relative_to(self.module.EXPORT_DIR.resolve()))
 
     def test_d1_token_is_not_hardcoded(self) -> None:
         """Д1 / CWE-798: значение токена берётся из окружения."""
-        os.environ["MEDIA_JOURNAL_ADMIN_TOKEN"] = "another-token"
-        self.assertEqual(step3_fixed.get_admin_token(), "another-token")
+        os.environ["MEDIA_JOURNAL_ADMIN_TOKEN"] = "another-token"  # nosec B105
+        self.assertEqual(self.module.get_admin_token(), "another-token")
 
     def test_d2_token_is_not_written_to_log(self) -> None:
-        """Д2 / CWE-532: в журнале приложения не должно быть самого токена."""
+        """Д2 / CWE-532: в журнале нет ни токена, ни чего-либо от него производного.
+
+        Проверять только полное совпадение недостаточно. Утечка длины отсекает
+        большую часть пространства перебора, а два известных символа с каждого
+        конца — почти всё остальное. Поэтому тест запрещает и префикс,
+        и суффикс, и длину.
+        """
         with self.assertLogs(level=logging.INFO) as captured:
-            step3_fixed.login("ivanova", TEST_TOKEN)
+            self.module.login("ivanova", TEST_TOKEN)
         log_text = "\n".join(captured.output)
+
         self.assertNotIn(TEST_TOKEN, log_text, "Токен целиком попал в журнал")
-        self.assertIn("***", log_text, "Ожидалась маска вместо токена")
+        self.assertIn("***", log_text, "Ожидалась заглушка вместо токена")
+
+        for size in (2, 3, 4, 6):
+            with self.subTest(fragment=f"префикс {size}"):
+                self.assertNotIn(TEST_TOKEN[:size], log_text)
+            with self.subTest(fragment=f"суффикс {size}"):
+                self.assertNotIn(TEST_TOKEN[-size:], log_text)
+
+        self.assertNotIn(str(len(TEST_TOKEN)), log_text, "В журнал утекла длина токена")
+
+    def test_d2_mask_reveals_nothing_about_the_secret(self) -> None:
+        """Д2: маска обязана быть одинаковой для любых разных секретов."""
+        first = self.module.mask("short")
+        second = self.module.mask("a-much-longer-secret-value-here")
+        self.assertEqual(first, second, "Маска зависит от секрета — это утечка")
+        self.assertNotIn("5", first, "В маске видна длина")
 
     def test_login_rejects_wrong_token(self) -> None:
         """Проверка входа: чужой токен не подходит."""
-        self.assertFalse(step3_fixed.login("ivanova", "wrong-token"))
+        self.assertFalse(self.module.login("ivanova", "wrong-token"))
 
     def test_login_accepts_correct_token(self) -> None:
-        self.assertTrue(step3_fixed.login("ivanova", TEST_TOKEN))
+        self.assertTrue(self.module.login("ivanova", TEST_TOKEN))
 
 
 if __name__ == "__main__":

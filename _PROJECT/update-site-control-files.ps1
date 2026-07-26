@@ -146,6 +146,12 @@ Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines
 Write-Utf8File -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
 Write-Utf8File -Path (Join-Path $rootPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($rootUrls) -LastMod $lastMod)
 
+# Folders whose .htaccess is domain-specific and must NOT be overwritten by the
+# common template. The 27001 deck unpacks its runtime into blob: URLs and needs
+# 'unsafe-eval' plus blob: in script-src; the shared policy drops both and the
+# slide navigation stops working. robots.txt and sitemap.xml are still generated.
+$customHtaccessFolders = @('27001')
+
 $uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
 foreach ($folder in $uniqueFolders) {
   $folderPath = Join-Path $rootPath $folder
@@ -176,7 +182,14 @@ foreach ($folder in $uniqueFolders) {
       }
     }
 
-  Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+  if ($customHtaccessFolders -contains $folder) {
+    if (-not (Test-Path -LiteralPath (Join-Path $folderPath '.htaccess'))) {
+      Fail "Folder $folder is marked as having a custom .htaccess, but the file is missing"
+    }
+    Write-Output "controlCustomHtaccess=$folder"
+  } else {
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+  }
   Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
   Write-Utf8File -Path (Join-Path $folderPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($urls) -LastMod $lastMod)
 }

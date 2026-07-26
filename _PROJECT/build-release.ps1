@@ -72,7 +72,17 @@ function Should-ExcludeDirectory([string]$Name) {
     '.qwen',
     '.vscode',
     '.idea',
-    'materials_from_4days'
+    'materials_from_4days',
+    # Build artifacts of local tooling. A lecture folder that ships runnable
+    # code collects these as soon as anyone runs the linter, the tests or the
+    # sample app in it, and without this they end up published.
+    '__pycache__',
+    '.pytest_cache',
+    '.ruff_cache',
+    '.mypy_cache',
+    '.venv',
+    'venv',
+    'export'
   )
   if ($excluded -contains $lower) { return $true }
   if ($Name.StartsWith('_')) { return $true }
@@ -80,14 +90,16 @@ function Should-ExcludeDirectory([string]$Name) {
 }
 
 function Should-ExcludeDistributable([string]$Name) {
-  # Reviewed exception: 'materials.zip' is the lecture handout bundle that a
-  # lecture folder publishes on purpose. It is assembled from files that already
-  # live in that lecture folder, so it introduces no third-party redistribution
-  # risk. Every other archive stays excluded.
-  if ($Name.ToLowerInvariant() -eq 'materials.zip') { return $false }
   $extension = [System.IO.Path]::GetExtension($Name).ToLowerInvariant()
   return $extension -in @('.pdf', '.pptx', '.docx', '.xlsx', '.eps', '.zip')
 }
+
+# Lecture folders explicitly cleared to publish a 'materials.zip' handout bundle.
+# The exception is per folder, not per file name: a stray archive dropped into
+# any other lecture still gets excluded. Each bundle is assembled by that
+# lecture's own build-materials-zip.ps1 from a literal file list, so nothing
+# reaches it that was not reviewed.
+$script:MaterialsZipFolders = @('27-07-2026')
 
 function Should-ExcludeFile([string]$Name) {
   $lower = $Name.ToLowerInvariant()
@@ -120,9 +132,25 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
     }
   }
 
+  $folderName = Split-Path -Leaf $FolderPath
+  if ($script:MaterialsZipFolders -contains $folderName) {
+    $bundlePath = Join-Path $FolderPath 'materials.zip'
+    if (Test-Path -LiteralPath $bundlePath -PathType Leaf) {
+      $files.Add('materials.zip')
+    }
+  }
+
   Get-ChildItem -LiteralPath $FolderPath -Directory -Force | ForEach-Object {
     if (Should-ExcludeDirectory $_.Name) { return }
     Get-ChildItem -LiteralPath $_.FullName -File -Recurse -Force | ForEach-Object {
+      # Excluded directories must be honoured at EVERY depth, not just at the
+      # top level. A lecture folder that ships runnable code grows nested
+      # '__pycache__' and '.ruff_cache' the moment anyone runs it, and their
+      # files carry ordinary names that no per-file rule would catch.
+      $segments = (Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName).Split('\')
+      $parentSegments = @($segments | Select-Object -First ([Math]::Max($segments.Count - 1, 0)))
+      if (@($parentSegments | Where-Object { Should-ExcludeDirectory $_ }).Count -gt 0) { return }
+
       if (-not (Should-ExcludeNestedFile $_.Name)) {
         $relative = Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName
         $files.Add($relative)

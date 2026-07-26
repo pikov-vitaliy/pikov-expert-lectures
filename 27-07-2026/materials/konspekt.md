@@ -344,7 +344,7 @@ logging.info("Попытка входа: пользователь=%s токен=
 
 ### Связь с общепринятыми перечнями
 
-Все четыре дефекта попадают в категории OWASP Top 10 (редакция 2021 года): Д3 — в A03 «Injection», Д1 и Д2 — в A02 «Cryptographic Failures» и A09 «Security Logging and Monitoring Failures», Д4 — в A01 «Broken Access Control».
+Все четыре дефекта попадают в категории OWASP Top 10 (редакция 2021 года): Д3 — в A03 «Injection», Д1 — в A07 «Identification and Authentication Failures», Д2 — в A09 «Security Logging and Monitoring Failures», Д4 — в A01 «Broken Access Control».
 
 ---
 
