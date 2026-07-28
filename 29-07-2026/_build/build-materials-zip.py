@@ -17,11 +17,13 @@ FIXED_TIME = (2026, 7, 29, 0, 0, 0)
 # (source path relative to ROOT, archive path)
 # og-image.png намеренно не входит: это превью для соцсетей размером ~1.1 МБ
 # (96% веса архива), офлайн-странице оно не нужно.
+# assets/metrika.js тоже не входит: офлайн-копия не должна обращаться к
+# Яндекс Метрике (url страницы file:/// содержит локальный путь студента);
+# ссылки на счётчик вырезаются из index.html функцией strip_metrika().
 FILES = (
     ("index.html", "index.html"),
     ("assets/site.css", "assets/site.css"),
     ("assets/site.js", "assets/site.js"),
-    ("assets/metrika.js", "assets/metrika.js"),
     ("materials/ЧИТАТЬ-ПЕРВЫМ.md", "ЧИТАТЬ-ПЕРВЫМ.md"),
     ("materials/konspekt.md", "materials/konspekt.md"),
     ("materials/praktikum.md", "materials/praktikum.md"),
@@ -46,6 +48,38 @@ def sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
 
 
+# Фрагменты счётчика, которые обязаны исчезнуть из офлайн-копии index.html.
+_METRIKA_FRAGMENTS = (
+    '<!-- Yandex Metrika counter 109116119; privacy: webvisor:false -->\n',
+    '<script src="assets/metrika.js" defer></script>\n',
+    '<noscript><div><img class="metrika-pixel" '
+    'src="https://mc.yandex.ru/watch/109116119" alt=""></div></noscript>\n',
+)
+
+
+def strip_metrika(data: bytes) -> bytes:
+    """Убирает Яндекс Метрику из офлайн-копии страницы.
+
+    Падает с ошибкой, если ожидаемый фрагмент не найден: молчаливый
+    пропуск означал бы, что офлайн-архив снова отправляет телеметрию.
+    """
+    text = data.decode("utf-8")
+    for fragment in _METRIKA_FRAGMENTS:
+        if fragment not in text:
+            raise RuntimeError(
+                f"Не найден фрагмент Метрики для вырезания: {fragment!r}"
+            )
+        text = text.replace(fragment, "")
+    if "metrika" in text.lower() or "mc.yandex" in text.lower():
+        raise RuntimeError("В офлайн-копии index.html остались следы Метрики")
+    return text.encode("utf-8")
+
+
+def normalize_newlines(data: bytes) -> bytes:
+    """CRLF -> LF, чтобы архив был воспроизводим из любого checkout."""
+    return data.replace(b"\r\n", b"\n")
+
+
 def validated_inputs() -> list[tuple[Path, str, bytes]]:
     result: list[tuple[Path, str, bytes]] = []
     seen: set[str] = set()
@@ -65,7 +99,10 @@ def validated_inputs() -> list[tuple[Path, str, bytes]]:
         if normalized in seen:
             raise RuntimeError(f"Дублирующий путь в архиве: {archive_name}")
         seen.add(normalized)
-        result.append((source, archive_path.as_posix(), source.read_bytes()))
+        data = normalize_newlines(source.read_bytes())
+        if archive_path.as_posix() == "index.html":
+            data = strip_metrika(data)
+        result.append((source, archive_path.as_posix(), data))
     return result
 
 

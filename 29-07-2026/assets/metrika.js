@@ -1,6 +1,12 @@
 "use strict";
 
 (function initializeMetrika(windowObject, documentObject) {
+  // Счётчик нужен только опубликованной странице. Офлайн-копия (file:)
+  // или локальный предпросмотр (http) не должны отправлять Метрике
+  // локальный путь пользователя в поле url.
+  if (windowObject.location.protocol !== "https:") {
+    return;
+  }
   const counterId = 109116119;
   const source = `https://mc.yandex.ru/metrika/tag.js?id=${counterId}`;
 

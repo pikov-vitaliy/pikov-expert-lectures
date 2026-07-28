@@ -144,9 +144,25 @@ class SearchTests(RegistryTestCase):
         rows = registry.search_components(self.conn, "100%")
         self.assertEqual([row["name"] for row in rows], ["codec100%"])
 
+        # Подчёркивание — второй метасимвол LIKE: терм "b_c" не должен
+        # работать как «b, любой символ, c» и находить "abXc"; находится
+        # только буквальное "ab_c".
+        self.insert_fixture(name="ab_c", version="3.0")
+        self.insert_fixture(name="abXc", version="3.0")
+        rows = registry.search_components(self.conn, "b_c")
+        self.assertEqual([row["name"] for row in rows], ["ab_c"])
+
     def test_search_rejects_unbounded_limit(self) -> None:
         with self.assertRaises(ValueError):
             registry.search_components(self.conn, "lib", limit=1000)
+        # Границы контракта: крайние значения диапазона 1..100 допустимы
+        # и не должны бросать исключение.
+        registry.search_components(self.conn, "lib", limit=1)
+        registry.search_components(self.conn, "lib", limit=100)
+        # Значения сразу за границами диапазона отклоняются.
+        for bad_limit in (0, -1, 101):
+            with self.assertRaises(ValueError):
+                registry.search_components(self.conn, "lib", limit=bad_limit)
 
 
 class OrderingTests(RegistryTestCase):
@@ -167,6 +183,14 @@ class OrderingTests(RegistryTestCase):
             self.conn.execute("SELECT count(*) FROM components").fetchone()[0],
             1,
         )
+        # Полный обход allowlist: каждый разрешённый ключ сортировки
+        # обязан работать без исключения.
+        for allowed in ("criticality", "license_spdx", "name", "version"):
+            registry.list_components(self.conn, sort_by=allowed)
+        # Реальный столбец, отсутствующий в allowlist («безопасно
+        # выглядит», но не разрешён явно), тоже отклоняется.
+        with self.assertRaises(ValueError):
+            registry.list_components(self.conn, sort_by="supplier")
 
 
 class TransactionTests(RegistryTestCase):
@@ -217,6 +241,39 @@ class TransactionTests(RegistryTestCase):
                 "SELECT count(*) FROM audit_events"
             ).fetchone()[0]
         self.assertEqual(persisted_events, 0)
+
+        # Сценарий 2: атомарность при сбое журнала аудита. UPDATE успешен,
+        # но INSERT в audit_events падает (учебный триггер имитирует отказ
+        # журнала) — изменение лицензии обязано откатиться вместе с ним.
+        # Реализация с двумя отдельными commit здесь провалится: лицензия
+        # останется изменённой без записи в аудите.
+        component_id = self.insert_fixture(license_spdx="Apache-2.0")
+        self.conn.execute(
+            """
+            CREATE TRIGGER block_audit BEFORE INSERT ON audit_events
+            BEGIN
+                SELECT RAISE(ABORT, 'учебный сбой журнала аудита');
+            END
+            """
+        )
+        try:
+            # RAISE(ABORT) приходит как подкласс IntegrityError; ловим
+            # DatabaseError для устойчивости к деталям драйвера.
+            with self.assertRaises(sqlite3.DatabaseError):
+                registry.change_license(self.conn, component_id, "MIT")
+            with closing(sqlite3.connect(self.db_path)) as checker:
+                persisted_license = checker.execute(
+                    "SELECT license_spdx FROM components WHERE id = ?",
+                    (component_id,),
+                ).fetchone()[0]
+                persisted_events = checker.execute(
+                    "SELECT count(*) FROM audit_events WHERE component_id = ?",
+                    (component_id,),
+                ).fetchone()[0]
+            self.assertEqual(persisted_license, "Apache-2.0")
+            self.assertEqual(persisted_events, 0)
+        finally:
+            self.conn.execute("DROP TRIGGER block_audit")
 
 
 class LeastPrivilegeTests(RegistryTestCase):

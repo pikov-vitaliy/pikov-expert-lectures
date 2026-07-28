@@ -308,7 +308,7 @@
       <p class="lead">Требования безопасности, моделирование угроз, анализ архитектуры и автоматические проверки включаются раньше в существующий SDLC. Это не означает перенос всей безопасности только в начало проекта.</p>
 
       <figure class="figure">
-        <div class="figure-scroll">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 340" role="img" aria-label="График: стоимость исправления одного и того же дефекта растёт от фазы требований к эксплуатации; Shift Left переносит меры в дешёвую левую часть оси">
           <defs>
             <marker id="m2i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -398,7 +398,7 @@
       <p>Фраза «библиотеку вызываете вы, фреймворк вызывает вас» полезна как эвристика, но реальные продукты бывают гибридными. Для безопасности название не меняет обязательных действий.</p>
 
       <figure class="figure">
-        <div class="figure-scroll">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 200" role="img" aria-label="Схема направления вызова: приложение вызывает библиотеку; фреймворк сам вызывает код приложения в точках расширения">
           <defs>
             <marker id="m5i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -474,7 +474,7 @@
       <p>Учебное приложение хранит наименование компонента, версию, SPDX-идентификатор лицензии, поставщика и критичность. Данные вымышлены, но угрозы типовые.</p>
 
       <figure class="figure">
-        <div class="figure-scroll">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 320" role="img" aria-label="Схема границ доверия: пользователь, Python-приложение, движок SQLite и файл базы данных разделены тремя границами; между приложением и движком SQL-текст и значения параметров передаются раздельными каналами">
           <defs>
             <marker id="m3i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -608,7 +608,7 @@ rows = conn.execute(sql).fetchall()</code></pre>
       <p>В первом примере значение попадает внутрь грамматики SQL. Во втором драйвер передаёт текст запроса и значение раздельно; payload остаётся строкой. Ручное «экранирование кавычек» не заменяет параметризацию.</p>
 
       <figure class="figure">
-        <div class="figure-scroll">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 400" role="img" aria-label="Схема: один и тот же ввод пользователя при склейке строк становится частью SQL-команды, а при параметризации остаётся данными">
           <defs>
             <marker id="m1d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -707,7 +707,7 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
   )</code></pre>
 
       <figure class="figure">
-        <div class="figure-scroll">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 290" role="img" aria-label="Схема транзакции: UPDATE и INSERT выполняются в одной транзакции; при выходе без исключения происходит COMMIT и видны обе записи, при исключении — ROLLBACK и не видна ни одна">
           <defs>
             <marker id="m4i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -716,8 +716,9 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
           </defs>
 
           <rect x="20" y="120" width="120" height="64" rx="10" class="d-box"/>
-          <text x="80" y="147" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">with conn:</text>
-          <text x="80" y="168" text-anchor="middle" font-size="11.5" class="d-subtle">открыта транзакция</text>
+          <text x="80" y="141" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">with conn:</text>
+          <text x="80" y="159" text-anchor="middle" font-size="10.5" class="d-subtle">транзакцию начнёт</text>
+          <text x="80" y="174" text-anchor="middle" font-size="10.5" class="d-subtle">первая запись</text>
 
           <text x="354" y="86" text-anchor="middle" font-size="12.5" font-weight="700" class="d-accent">одна транзакция — одно целое</text>
           <rect x="176" y="96" width="356" height="112" rx="12" stroke-width="1.5" class="d-frame"/>
@@ -744,7 +745,7 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
           <text x="679" y="254" text-anchor="middle" font-size="11.5" class="d-subtle">не видна ни одна</text>
         </svg>
         </div>
-        <figcaption>Два исхода блока <code>with conn:</code> — и третьего не дано: «половина результата», когда лицензия изменена, а событие аудита потеряно, невозможна по построению. Именно это проверяет тест <code>test_change_license_rolls_back_when_component_is_missing</code>.</figcaption>
+        <figcaption>Два исхода блока <code>with conn:</code> — и третьего не дано: «половина результата», когда лицензия изменена, а событие аудита потеряно, невозможна по построению. Сам оператор <code>with</code> транзакцию не открывает — её начинает первая изменяющая команда, а блок на выходе выполняет <code>COMMIT</code> или <code>ROLLBACK</code>. Атомарность проверяет тест <code>test_change_license_rolls_back_when_component_is_missing</code>.</figcaption>
       </figure>
 
       <p>Для читающего процесса используется отдельное подключение <code>file:...?...mode=ro</code>. В рабочей клиент-серверной СУБД принцип продолжается отдельной учётной записью с минимальными правами. Только приложение не должно решать, может ли оно писать: запрет должен обеспечивать и нижний слой.</p>
@@ -781,56 +782,62 @@ py -m unittest -v test_student.py</code></pre>
       <h2>CI проверяет именно студенческий результат</h2>
 
       <figure class="figure">
-        <div class="figure-scroll">
-        <svg class="diagram" viewBox="0 0 760 240" role="img" aria-label="Схема конвейера CI: пять последовательных шагов проверки; провал любого шага останавливает конвейер, прохождение всех подтверждает результат">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <svg class="diagram" viewBox="0 0 760 268" role="img" aria-label="Схема конвейера CI: три стадии — lint, test и security; ruff и два набора тестов идут последовательно, bandit и pip-audit выполняются параллельно; провал любого job останавливает конвейер, прохождение всех подтверждает результат">
           <defs>
             <marker id="m6i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
             <marker id="m6d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
           </defs>
 
-          <rect x="20" y="56" width="106" height="68" rx="10" class="d-box"/>
-          <text x="73" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">ruff</text>
-          <text x="73" y="104" text-anchor="middle" font-size="11" class="d-subtle">стиль и ошибки</text>
-          <path d="M126 90 L144 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <text x="73" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия lint</text>
+          <text x="262" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия test</text>
+          <text x="473" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия security · параллельно</text>
 
-          <rect x="146" y="56" width="106" height="68" rx="10" class="d-box"/>
-          <text x="199" y="80" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_examples</text>
-          <text x="199" y="98" text-anchor="middle" font-size="11" class="d-subtle">примеры</text>
-          <text x="199" y="113" text-anchor="middle" font-size="11" class="d-subtle">6 тестов</text>
-          <path d="M252 90 L270 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <rect x="20" y="40" width="106" height="68" rx="10" class="d-box"/>
+          <text x="73" y="68" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">ruff</text>
+          <text x="73" y="88" text-anchor="middle" font-size="11" class="d-subtle">стиль и ошибки</text>
+          <path d="M126 74 L144 74" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
-          <rect x="272" y="56" width="106" height="68" rx="10" class="d-box-accent"/>
-          <text x="325" y="80" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_student</text>
-          <text x="325" y="98" text-anchor="middle" font-size="11" class="d-subtle">ваш результат</text>
-          <text x="325" y="113" text-anchor="middle" font-size="11" class="d-subtle">13 тестов</text>
-          <path d="M378 90 L396 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <rect x="146" y="40" width="106" height="68" rx="10" class="d-box"/>
+          <text x="199" y="64" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_examples</text>
+          <text x="199" y="82" text-anchor="middle" font-size="11" class="d-subtle">примеры</text>
+          <text x="199" y="97" text-anchor="middle" font-size="11" class="d-subtle">6 тестов</text>
+          <path d="M252 74 L270 74" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
-          <rect x="398" y="56" width="106" height="68" rx="10" class="d-box"/>
-          <text x="451" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">bandit</text>
-          <text x="451" y="104" text-anchor="middle" font-size="11" class="d-subtle">SAST</text>
-          <path d="M504 90 L522 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <rect x="272" y="40" width="106" height="68" rx="10" class="d-box-accent"/>
+          <text x="325" y="64" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_student</text>
+          <text x="325" y="82" text-anchor="middle" font-size="11" class="d-subtle">ваш результат</text>
+          <text x="325" y="97" text-anchor="middle" font-size="11" class="d-subtle">13 тестов</text>
 
-          <rect x="524" y="56" width="106" height="68" rx="10" class="d-box"/>
-          <text x="577" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">pip-audit</text>
-          <text x="577" y="104" text-anchor="middle" font-size="11" class="d-subtle">зависимости</text>
-          <path d="M630 90 L648 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M378 74 C398 74 402 56 418 56" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M378 74 C398 74 402 132 418 132" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
-          <circle cx="676" cy="90" r="22" stroke-width="1.5" class="d-box-ok"/>
-          <path d="M666 90 L673 98 L687 81" stroke-width="3" fill="none" class="d-arrow-ok"/>
-          <text x="676" y="136" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">результат</text>
-          <text x="676" y="152" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">подтверждён</text>
+          <rect x="420" y="28" width="106" height="56" rx="10" class="d-box"/>
+          <text x="473" y="52" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">bandit</text>
+          <text x="473" y="70" text-anchor="middle" font-size="11" class="d-subtle">SAST</text>
 
-          <path d="M73 124 L73 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <path d="M199 124 L199 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <path d="M325 124 L325 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <path d="M451 124 L451 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <path d="M577 124 L577 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <rect x="20" y="170" width="610" height="52" rx="10" class="d-box-danger"/>
-          <text x="325" y="192" text-anchor="middle" font-size="12.5" font-weight="700" class="d-danger">любой красный шаг останавливает конвейер</text>
-          <text x="325" y="211" text-anchor="middle" font-size="11.5" class="d-danger">до исправления результат не считается готовым</text>
+          <rect x="420" y="104" width="106" height="56" rx="10" class="d-box"/>
+          <text x="473" y="128" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">pip-audit</text>
+          <text x="473" y="146" text-anchor="middle" font-size="11" class="d-subtle">зависимости</text>
+
+          <path d="M526 56 C556 56 562 94 582 94" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M526 132 C556 132 562 94 582 94" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <circle cx="608" cy="94" r="22" stroke-width="1.5" class="d-box-ok"/>
+          <path d="M598 94 L605 102 L619 85" stroke-width="3" fill="none" class="d-arrow-ok"/>
+          <text x="608" y="136" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">результат</text>
+          <text x="608" y="152" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">подтверждён</text>
+
+          <path d="M73 108 L73 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M199 108 L199 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M325 108 L325 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M473 160 L473 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <rect x="20" y="196" width="612" height="52" rx="10" class="d-box-danger"/>
+          <text x="326" y="218" text-anchor="middle" font-size="12.5" font-weight="700" class="d-danger">любой красный job останавливает конвейер</text>
+          <text x="326" y="237" text-anchor="middle" font-size="11.5" class="d-danger">до исправления результат не считается готовым</text>
         </svg>
         </div>
-        <figcaption>Порядок шагов учебного quality gate из <code>.gitlab-ci.yml</code>. До выполнения задания шаг <code>test_student</code> красный — это ожидаемое стартовое состояние; соответствие шагов и локальных команд — в таблице ниже.</figcaption>
+        <figcaption>Конвейер учебного quality gate из <code>.gitlab-ci.yml</code>: три стадии, внутри стадии security job <code>bandit</code> и <code>pip-audit</code> выполняются параллельно. До выполнения задания шаг <code>test_student</code> красный — это ожидаемое стартовое состояние; соответствие job и локальных команд — в таблице ниже.</figcaption>
       </figure>
 
       <div class="table-wrap">
