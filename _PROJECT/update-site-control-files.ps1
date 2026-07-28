@@ -150,7 +150,7 @@ Write-Utf8File -Path (Join-Path $rootPath 'sitemap.xml') -Lines (New-SitemapLine
 # common template. The 27001 deck unpacks its runtime into blob: URLs and needs
 # 'unsafe-eval' plus blob: in script-src; the shared policy drops both and the
 # slide navigation stops working. robots.txt and sitemap.xml are still generated.
-$customHtaccessFolders = @('27001')
+$customHtaccessFolders = @('27001', '29-07-2026')
 
 $uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
 foreach ($folder in $uniqueFolders) {

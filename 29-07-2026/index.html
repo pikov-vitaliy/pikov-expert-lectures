@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex Metrika counter 109116119; privacy: webvisor:false -->
+<script src="assets/metrika.js" defer></script>
+<title>Языки, архитектура и безопасный SQL — занятие В.А. Пикова 29.07.2026</title>
+<meta name="description" content="Две лекции и три практических занятия курса М БРПО: история и классификация языков программирования, влияние выбора языка на безопасность, shift left, библиотеки и фреймворки, архитектурные решения и безопасная работа с SQL.">
+<meta name="author" content="Пиков Виталий Александрович">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+<meta name="theme-color" content="#2563eb">
+<link rel="canonical" href="https://29-07-2026.pikov.expert/">
+<link rel="home" href="https://pikov.expert/">
+<meta property="og:type" content="article">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="pikov.expert">
+<meta property="og:title" content="Языки, архитектура и безопасный SQL">
+<meta property="og:description" content="Как выбор языка меняет поверхность атаки и как встроить безопасность в архитектуру и SQL-код до первой сборки.">
+<meta property="og:url" content="https://29-07-2026.pikov.expert/">
+<meta property="og:image" content="https://29-07-2026.pikov.expert/og-image.png">
+<meta property="og:image:width" content="1672">
+<meta property="og:image:height" content="941">
+<meta property="og:image:alt" content="Титульный экран занятия о языках программирования, архитектуре и безопасном SQL">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Языки, архитектура и безопасный SQL">
+<meta name="twitter:description" content="Учебный день курса М БРПО: от выбора языка до параметризованных запросов и проверяемого quality gate.">
+<meta name="twitter:image" content="https://29-07-2026.pikov.expert/og-image.png">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Языки, архитектура и безопасный SQL",
+  "description": "Две лекции и три практических занятия о классификации языков программирования, Shift Left, архитектуре безопасного ПО и защите SQL-запросов.",
+  "url": "https://29-07-2026.pikov.expert/",
+  "image": "https://29-07-2026.pikov.expert/og-image.png",
+  "inLanguage": "ru",
+  "provider": {
+    "@type": "EducationalOrganization",
+    "name": "НОУ ДПО «УЦБИ \"МАСКОМ\"»"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Пиков Виталий Александрович",
+    "url": "https://pikov.expert/"
+  }
+}
+</script>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2220%22 fill=%22%232563eb%22/><text x=%2250%22 y=%2264%22 text-anchor=%22middle%22 font-family=%22Arial%22 font-size=%2238%22 font-weight=%22700%22 fill=%22white%22>SQL</text></svg>">
+<link rel="stylesheet" href="assets/site.css">
+<script src="assets/site.js" defer></script>
+</head>
+<body>
+<noscript><div><img class="metrika-pixel" src="https://mc.yandex.ru/watch/109116119" alt=""></div></noscript>
+
+<div class="reading-progress" aria-hidden="true">
+  <div class="reading-progress-bar" id="progressBar"></div>
+</div>
+
+<header class="site-header">
+  <div class="container">
+    <a class="brand-back" href="https://pikov.expert/" aria-label="Вернуться в каталог лекций">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      pikov.expert
+    </a>
+    <div class="header-actions">
+      <button class="icon-btn toc-toggle" id="tocToggle" type="button" aria-label="Открыть содержание" aria-controls="toc" aria-expanded="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>
+      </button>
+      <button class="icon-btn theme-toggle" id="themeToggle" type="button" aria-label="Переключить тему">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="layout container">
+  <aside class="toc" id="toc" aria-label="Содержание занятия">
+    <div class="toc-title">Содержание</div>
+
+    <div class="toc-pair">Лекция 1 · 09:30</div>
+    <ul class="toc-list">
+      <li><a href="#question" data-section="question"><span class="toc-num">01</span><span>Вопрос дня</span></a></li>
+      <li><a href="#history" data-section="history"><span class="toc-num">02</span><span>Хроника языков</span></a></li>
+      <li><a href="#classification" data-section="classification"><span class="toc-num">03</span><span>Как классифицировать</span></a></li>
+      <li><a href="#language-security" data-section="language-security"><span class="toc-num">04</span><span>Язык и безопасность</span></a></li>
+      <li><a href="#dsl" data-section="dsl"><span class="toc-num">05</span><span>DSL и SQL</span></a></li>
+    </ul>
+
+    <div class="toc-pair">Лекция 2 · 11:10</div>
+    <ul class="toc-list">
+      <li><a href="#shift-left" data-section="shift-left"><span class="toc-num">06</span><span>Shift Left</span></a></li>
+      <li><a href="#standards" data-section="standards"><span class="toc-num">07</span><span>Нормативная карта</span></a></li>
+      <li><a href="#components" data-section="components"><span class="toc-num">08</span><span>Библиотека и фреймворк</span></a></li>
+      <li><a href="#architecture" data-section="architecture"><span class="toc-num">09</span><span>Архитектурное решение</span></a></li>
+      <li><a href="#threat-model" data-section="threat-model"><span class="toc-num">10</span><span>Модель угроз</span></a></li>
+    </ul>
+
+    <div class="toc-pair">Практикум · 13:30–18:20</div>
+    <ul class="toc-list">
+      <li><a href="#relational" data-section="relational"><span class="toc-num">11</span><span>Схема и ограничения</span></a></li>
+      <li><a href="#injection" data-section="injection"><span class="toc-num">12</span><span>SQL-инъекция</span></a></li>
+      <li><a href="#parameters" data-section="parameters"><span class="toc-num">13</span><span>Параметры и allowlist</span></a></li>
+      <li><a href="#transactions" data-section="transactions"><span class="toc-num">14</span><span>Транзакции и права</span></a></li>
+      <li><a href="#route" data-section="route"><span class="toc-num">15</span><span>Маршрут практикума</span></a></li>
+      <li><a href="#pipeline" data-section="pipeline"><span class="toc-num">16</span><span>Проверки и CI</span></a></li>
+      <li><a href="#answer" data-section="answer"><span class="toc-num">17</span><span>Ответ и материалы</span></a></li>
+    </ul>
+  </aside>
+
+  <main class="content" id="main-content">
+    <section id="hero" class="hero">
+      <div class="hero-eyebrow">М БРПО · Тема № 4 · 29 июля 2026</div>
+      <h1>Языки, архитектура и безопасный SQL</h1>
+      <p class="hero-lead">Как выбор языка изменяет классы возможных ошибок, почему безопасность должна появляться в требованиях и архитектуре, и как отделить данные от SQL-кода.</p>
+
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Формат</span>
+          <span class="hero-meta-value">2 лекции + 3 практических занятия</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Сквозная задача</span>
+          <span class="hero-meta-value">Реестр сторонних компонентов ПО</span>
+        </div>
+        <div class="hero-meta-item">
+          <span class="hero-meta-label">Среда</span>
+          <span class="hero-meta-value">Python 3.11+ · SQLite · без runtime-зависимостей</span>
+        </div>
+      </div>
+
+      <h3>Материалы занятия</h3>
+      <div class="contact-buttons material-buttons">
+        <a class="btn btn-secondary" href="materials/konspekt.md">Конспект</a>
+        <a class="btn btn-secondary" href="materials/praktikum.md">Практические задания</a>
+        <a class="btn btn-secondary" href="code/spravka.md">Навигация по коду</a>
+      </div>
+    </section>
+
+    <section id="question" class="section">
+      <div class="section-eyebrow"><span class="section-num">01</span> Вопрос дня</div>
+      <h2>Где именно выбор языка становится решением по безопасности?</h2>
+      <p class="lead">Не в рейтинге популярности и не в споре «компилируемый против интерпретируемого», а в архитектурном решении: какие ошибки возможны, где проходят границы доверия и какими средствами команда докажет выполнение требований.</p>
+
+      <div class="key-stats">
+        <div class="key-stat"><div class="key-stat-value">2</div><div class="key-stat-label">лекционных блока: язык и архитектура</div></div>
+        <div class="key-stat"><div class="key-stat-value">3</div><div class="key-stat-label">SQL-практикума по 90 минут</div></div>
+        <div class="key-stat"><div class="key-stat-value">19</div><div class="key-stat-label">автоматических проверок готовых примеров и результата</div></div>
+        <div class="key-stat"><div class="key-stat-value">1</div><div class="key-stat-label">изолированная демонстрация CWE-89</div></div>
+      </div>
+
+      <h3>К вечеру слушатель должен уметь</h3>
+      <ul class="checklist">
+        <li>сравнивать языки по нескольким признакам, а не по одному ярлыку;</li>
+        <li>фиксировать выбор языка и стека как проверяемое архитектурное решение;</li>
+        <li>различать библиотеку, фреймворк, платформу и предметно-ориентированный язык;</li>
+        <li>проектировать SQL-схему с ограничениями целостности;</li>
+        <li>разделять SQL-код и данные с помощью placeholders;</li>
+        <li>применять allowlist там, где идентификаторы нельзя параметризовать;</li>
+        <li>подтверждать результат тестами, SAST и CI, а не только ручным запуском.</li>
+      </ul>
+    </section>
+
+    <section id="history" class="section">
+      <div class="section-eyebrow"><span class="section-num">02</span> Лекция 1</div>
+      <h2>Хроника языков: менялась не только запись программ</h2>
+      <p class="lead">Каждое поколение языков переносило часть ответственности от разработчика к транслятору, среде выполнения, системе типов или библиотекам. Вместе с удобством перемещалась и поверхность атаки.</p>
+
+      <div class="timeline">
+        <div class="timeline-track">
+          <div class="timeline-item">
+            <div class="timeline-date">1940–1950-е</div>
+            <div class="timeline-title">Машинный код и ассемблер</div>
+            <div class="timeline-desc">Полный контроль над памятью и устройством; почти вся корректность — ответственность программиста.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">1957–1960</div>
+            <div class="timeline-title">Fortran, Lisp, COBOL, ALGOL</div>
+            <div class="timeline-desc">Высокоуровневые конструкции, новые парадигмы, переносимость и формализация алгоритмов.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">1969–1973</div>
+            <div class="timeline-title">C и Unix</div>
+            <div class="timeline-desc">Системное программирование с переносимостью и прямой работой с памятью.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">1979–1985</div>
+            <div class="timeline-title">C with Classes → C++</div>
+            <div class="timeline-desc">Абстракции и объектная модель поверх возможностей C.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">1989–1991</div>
+            <div class="timeline-title">Python</div>
+            <div class="timeline-desc">Высокоуровневая динамическая среда, несколько парадигм и автоматическое управление памятью.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-date">Сегодня</div>
+            <div class="timeline-title">Многоязычные системы</div>
+            <div class="timeline-desc">Один продукт сочетает DSL, SQL, C/C++, Python, JavaScript, конфигурации и код инфраструктуры.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Историческая ось не является рейтингом безопасности.</strong> Новый язык может исключить часть старых ошибок, но добавить сложную среду выполнения, цепочку зависимостей, FFI и новые способы неправильного использования API.</p>
+      </div>
+    </section>
+
+    <section id="classification" class="section">
+      <div class="section-eyebrow"><span class="section-num">03</span> Несколько осей</div>
+      <h2>«Компилируемый» и «интерпретируемый» — недостаточно</h2>
+      <p>Современный язык нужно рассматривать вместе с его реализацией и экосистемой. CPython, например, получает байткод и исполняет его виртуальной машиной; поэтому граница между компиляцией и интерпретацией размыта.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Ось сравнения</th><th>Вопрос</th><th>Связь с безопасностью</th></tr></thead>
+          <tbody>
+            <tr><td>Уровень абстракции</td><td>Насколько явно код управляет памятью и устройством?</td><td>Классы ошибок памяти, контроль ресурсов, детерминизм.</td></tr>
+            <tr><td>Парадигмы</td><td>Императивная, объектная, функциональная, декларативная?</td><td>Способы выражения инвариантов и разделения ответственности.</td></tr>
+            <tr><td>Типизация</td><td>Статическая или динамическая; строгая или допускающая неявные преобразования?</td><td>Какие ошибки ловятся до запуска, а какие только во время выполнения.</td></tr>
+            <tr><td>Память</td><td>Ручная, автоматическая, владение и заимствование?</td><td>Use-after-free, переполнения, утечки, паузы сборщика мусора.</td></tr>
+            <tr><td>Модель исполнения</td><td>Нативный код, виртуальная машина, JIT, интерпретатор?</td><td>Hardening, sandbox, поверхность среды выполнения.</td></tr>
+            <tr><td>FFI и unsafe</td><td>Где высокоуровневый код пересекается с нативным?</td><td>Возврат рисков памяти на границе доверия.</td></tr>
+            <tr><td>Toolchain</td><td>Есть ли SAST, sanitizers, fuzzing, lock-файлы, SBOM?</td><td>Способность обнаруживать и воспроизводимо устранять дефекты.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head"><h3>Императивный подход</h3></div>
+          <p>Программа задаёт последовательность изменения состояния: «как получить результат».</p>
+          <div class="col-tags"><span class="col-tag">C</span><span class="col-tag">Python</span><span class="col-tag">Pascal</span></div>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>Декларативный подход</h3></div>
+          <p>Программа описывает требуемый результат или ограничения: «что должно быть истинно».</p>
+          <div class="col-tags"><span class="col-tag">SQL</span><span class="col-tag">Prolog</span><span class="col-tag">регулярные выражения</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="language-security" class="section">
+      <div class="section-eyebrow"><span class="section-num">04</span> Поверхность атаки</div>
+      <h2>Язык исключает одни дефекты, но не отменяет требования</h2>
+      <p class="lead">Выбор memory-safe языка способен устранить или сильно затруднить часть ошибок ручного управления памятью. Он не устраняет ошибки авторизации, SQL-инъекции, небезопасную десериализацию, секреты в коде и уязвимые зависимости.</p>
+
+      <div class="two-col">
+        <div class="col-card">
+          <div class="col-card-head"><h3>C/C++</h3></div>
+          <ul>
+            <li>прямой контроль памяти и аппаратуры;</li>
+            <li>подходит для систем с жёсткими ограничениями;</li>
+            <li>требует compiler hardening, sanitizers, SAST, fuzzing и строгих правил;</li>
+            <li>CWE-119 описывает широкий класс ошибок границ буфера.</li>
+          </ul>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>Управляемая среда</h3></div>
+          <ul>
+            <li>часть ошибок памяти предотвращает runtime;</li>
+            <li>сохраняются логические и инъекционные дефекты;</li>
+            <li>нативные расширения возвращают риски FFI;</li>
+            <li>компрометация платформы или зависимости влияет на всё приложение.</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3>Минимум для C/C++ в архитектурном решении</h3>
+      <ul class="checklist">
+        <li>обосновать, почему требования нельзя закрыть memory-safe альтернативой;</li>
+        <li>минимизировать объём небезопасного кода и изолировать его интерфейс;</li>
+        <li>включить <code>-fstack-protector-strong</code>, <code>-D_FORTIFY_SOURCE=3</code>, PIE/RELRO там, где поддерживается;</li>
+        <li>на тестовых сборках применять ASan/UBSan, а при многопоточности — TSan отдельным прогоном;</li>
+        <li>зафиксировать правила CERT C/C++ или применимый профиль MISRA и процесс управления отклонениями;</li>
+        <li>добавить fuzzing и регрессионный тест на каждый подтверждённый дефект.</li>
+      </ul>
+
+      <div class="callout warning">
+        <p><strong>Соответствие правилам не равно отсутствию уязвимостей.</strong> CERT и MISRA требуют процесса применения и управления отклонениями; один запуск анализатора не превращает код в безопасный.</p>
+      </div>
+    </section>
+
+    <section id="dsl" class="section">
+      <div class="section-eyebrow"><span class="section-num">05</span> Предметная область</div>
+      <h2>DSL: меньше свободы, больше смысла</h2>
+      <p>Предметно-ориентированный язык выражает задачи конкретной области. SQL описывает выборку и изменение отношений; регулярные выражения — шаблоны строк; конфигурационный DSL — состояние инфраструктуры. Ограниченный словарь может сделать намерение проверяемым, но интерпретатор DSL остаётся границей доверия.</p>
+
+      <div class="stack-layers">
+        <div class="stack-layer"><div class="stack-layer-num">1</div><div class="stack-layer-body"><h4>Python вызывает драйвер</h4><p>Императивный код управляет соединением, ошибками и транзакцией.</p></div></div>
+        <div class="stack-layer highlight"><div class="stack-layer-num">2</div><div class="stack-layer-body"><h4>SQL описывает результат</h4><p>Декларативный запрос передаётся отдельно от значений.</p></div></div>
+        <div class="stack-layer"><div class="stack-layer-num">3</div><div class="stack-layer-body"><h4>SQLite строит план</h4><p>Движок анализирует SQL, применяет ограничения и изменяет файл БД.</p></div></div>
+        <div class="stack-layer"><div class="stack-layer-num">4</div><div class="stack-layer-body"><h4>ОС защищает файл</h4><p>Права файловой системы остаются частью модели доступа.</p></div></div>
+      </div>
+
+      <div class="callout danger">
+        <p><strong>Ошибка на границе языков.</strong> Если приложение склеивает пользовательскую строку с SQL, данные превращаются в программу. Именно это и есть корень CWE-89.</p>
+      </div>
+    </section>
+
+    <section id="shift-left" class="section">
+      <div class="section-eyebrow"><span class="section-num">06</span> Лекция 2</div>
+      <h2>Shift Left: раньше, но не один раз</h2>
+      <p class="lead">Требования безопасности, моделирование угроз, анализ архитектуры и автоматические проверки включаются раньше в существующий SDLC. Это не означает перенос всей безопасности только в начало проекта.</p>
+
+      <div class="roadmap">
+        <div class="roadmap-step"><div class="roadmap-num">01</div><div class="roadmap-content"><h4>Требования</h4><p>Определить активы, недопустимые события и критерии приёмки.</p><div class="roadmap-meta"><span class="roadmap-tag">до кода</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">02</div><div class="roadmap-content"><h4>Архитектура</h4><p>Провести threat modeling, определить границы доверия, язык, компоненты и компенсирующие меры.</p><div class="roadmap-meta"><span class="roadmap-tag">до зависимости</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">03</div><div class="roadmap-content"><h4>Реализация</h4><p>Применить правила языка, безопасные API и ограничения данных.</p><div class="roadmap-meta"><span class="roadmap-tag">при изменении</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">04</div><div class="roadmap-content"><h4>Верификация</h4><p>Тесты, review, SAST, SCA, DAST и fuzzing выполняются автоматически и повторяемо.</p><div class="roadmap-meta"><span class="roadmap-tag success">каждая сборка</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">05</div><div class="roadmap-content"><h4>Эксплуатация</h4><p>Следить за уязвимостями, обновлять решения и предотвращать повторение первопричин.</p><div class="roadmap-meta"><span class="roadmap-tag warn">весь срок жизни</span></div></div></div>
+      </div>
+
+      <div class="callout">
+        <p><strong>Практический признак Shift Left сегодня:</strong> ограничение <code>CHECK</code> в схеме, placeholder в API и тест на инъекционный payload появляются до того, как код назван готовым.</p>
+      </div>
+    </section>
+
+    <section id="standards" class="section">
+      <div class="section-eyebrow"><span class="section-num">07</span> Прослеживаемость</div>
+      <h2>От инженерной практики к проверяемому процессу</h2>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Решение занятия</th><th>ГОСТ Р 56939-2024</th><th>NIST SSDF v1.1</th><th>Свидетельство</th></tr></thead>
+          <tbody>
+            <tr><td>Выбор языка и структура решения</td><td>5.6 Архитектура</td><td>PW.1, PW.1.2</td><td>ADR и схема границ доверия</td></tr>
+            <tr><td>Инъекция как сценарий угрозы</td><td>5.7 Моделирование угроз</td><td>PW.1.1</td><td>Сценарий, актив, мера и тест</td></tr>
+            <tr><td>Placeholder и allowlist</td><td>5.8 Правила кодирования</td><td>PW.5.1</td><td>Правило + проверяемый пример</td></tr>
+            <tr><td>Автоматический анализ</td><td>5.10 Статический анализ</td><td>PW.7 / PW.8</td><td>Лог CI и разбор находок</td></tr>
+            <tr><td>Регрессионные тесты</td><td>5.18 Функциональное тестирование</td><td>PW.8</td><td>19 повторяемых тестов комплекта</td></tr>
+            <tr><td>Проверка компонентов</td><td>5.16 Композиционный анализ</td><td>PW.4.1, PS.3.2</td><td>Перечень зависимостей, SBOM, отчёт SCA</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>Граница утверждения.</strong> Карточка Росстандарта подтверждает статус и область применения стандарта. Для формального решения по конкретному подпункту используют легальный экземпляр полного текста и внутреннюю матрицу «требование → регламент → артефакт».</p>
+      </div>
+    </section>
+
+    <section id="components" class="section">
+      <div class="section-eyebrow"><span class="section-num">08</span> Чужой код</div>
+      <h2>Библиотека, фреймворк и платформа</h2>
+
+      <div class="phases">
+        <div class="phase"><div class="phase-num">A</div><h4>Библиотека</h4><p>Приложение подключает функциональность и обычно само определяет момент вызова.</p></div>
+        <div class="phase"><div class="phase-num">B</div><h4>Фреймворк</h4><p>Задаёт жизненный цикл и вызывает прикладной код в предусмотренных точках расширения.</p></div>
+        <div class="phase"><div class="phase-num">C</div><h4>Платформа</h4><p>Может включать runtime, библиотеки, SDK, компилятор, инструменты и стеки приложений.</p></div>
+        <div class="phase"><div class="phase-num">D</div><h4>Движок</h4><p>Готовая среда исполнения предметной области; часто сочетает признаки платформы и фреймворка.</p></div>
+      </div>
+
+      <p>Фраза «библиотеку вызываете вы, фреймворк вызывает вас» полезна как эвристика, но реальные продукты бывают гибридными. Для безопасности название не меняет обязательных действий.</p>
+
+      <ul class="checklist">
+        <li>идентифицировать компонент, версию, поставщика и источник;</li>
+        <li>проверить происхождение, целостность и лицензию;</li>
+        <li>найти известные уязвимости и оценить достижимость;</li>
+        <li>зафиксировать компонент в SBOM и политике допуска;</li>
+        <li>назначить владельца обновления и срок поддержки;</li>
+        <li>учесть расширения, плагины и транзитивные зависимости.</li>
+      </ul>
+    </section>
+
+    <section id="architecture" class="section">
+      <div class="section-eyebrow"><span class="section-num">09</span> Security by Design</div>
+      <h2>ADR выбора языка и стека</h2>
+      <p class="lead">Архитектурное решение должно объяснять не только «что выбрали», но и какие угрозы учтены, какие альтернативы отклонены и чем контролируется остаточный риск.</p>
+
+      <div class="accordion">
+        <details class="acc-item" open>
+          <summary class="acc-summary"><span class="acc-summary-left"><span class="acc-tag">1</span><span>Контекст и активы</span></span><svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="acc-body"><p>Какие данные и функции защищаются? Где проходят доверительные границы? Каковы последствия отказа, раскрытия или подмены?</p></div>
+        </details>
+        <details class="acc-item">
+          <summary class="acc-summary"><span class="acc-summary-left"><span class="acc-tag">2</span><span>Ограничения</span></span><svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="acc-body"><p>Нужны ли жёсткое реальное время, детерминизм, сертифицированный компилятор, ограниченная память или прямой доступ к оборудованию?</p></div>
+        </details>
+        <details class="acc-item">
+          <summary class="acc-summary"><span class="acc-summary-left"><span class="acc-tag">3</span><span>Риски реализации</span></span><svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="acc-body"><p>Какие классы CWE возможны? Каков объём unsafe/FFI? Поддерживает ли toolchain hardening, SAST, sanitizers, fuzzing и воспроизводимую сборку?</p></div>
+        </details>
+        <details class="acc-item">
+          <summary class="acc-summary"><span class="acc-summary-left"><span class="acc-tag">4</span><span>Цепочка поставок</span></span><svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="acc-body"><p>Как фиксируются зависимости, provenance, лицензии, SBOM, обновления и срок поддержки выбранной реализации?</p></div>
+        </details>
+        <details class="acc-item">
+          <summary class="acc-summary"><span class="acc-summary-left"><span class="acc-tag">5</span><span>Решение и доказательства</span></span><svg class="acc-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><polyline points="6 9 12 15 18 9"/></svg></summary>
+          <div class="acc-body"><p>Какие альтернативы рассмотрены? Какие меры обязательны? Кто независимо проверил решение и когда его пересмотреть?</p></div>
+        </details>
+      </div>
+    </section>
+
+    <section id="threat-model" class="section">
+      <div class="section-eyebrow"><span class="section-num">10</span> Сквозная задача</div>
+      <h2>Модель угроз реестра компонентов</h2>
+      <p>Учебное приложение хранит наименование компонента, версию, SPDX-идентификатор лицензии, поставщика и критичность. Данные вымышлены, но угрозы типовые.</p>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Актив / граница</th><th>Недопустимое событие</th><th>Ранняя мера</th><th>Проверка</th></tr></thead>
+          <tbody>
+            <tr><td>SQL-запрос</td><td>Ввод изменяет структуру команды</td><td>Placeholder для каждого значения</td><td>Payload хранится как строка</td></tr>
+            <tr><td>ORDER BY</td><td>Имя столбца становится произвольным SQL</td><td>Закрытый allowlist идентификаторов</td><td>Неизвестный ключ отклоняется</td></tr>
+            <tr><td>Связи данных</td><td>Появляются осиротевшие записи</td><td>Foreign key на каждом соединении</td><td>Нарушение связи блокируется</td></tr>
+            <tr><td>Изменение лицензии</td><td>Обновление и аудит расходятся</td><td>Одна транзакция</td><td>Ошибка откатывает обе операции</td></tr>
+            <tr><td>Файл БД</td><td>Читающий процесс меняет данные</td><td>Соединение <code>mode=ro</code> и права ОС</td><td>INSERT завершается ошибкой</td></tr>
+            <tr><td>Компонент</td><td>Данные вне допустимого домена</td><td><code>NOT NULL</code>, <code>CHECK</code>, <code>UNIQUE</code></td><td>Невалидная строка не сохраняется</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="relational" class="section">
+      <div class="section-eyebrow"><span class="section-num">11</span> ПЗ-1 · 13:30</div>
+      <h2>Безопасность начинается со схемы</h2>
+      <p class="lead">Валидация только в интерфейсе обходится другим клиентом. Ограничения базы данных действуют для каждого пути записи и становятся исполняемой частью требований.</p>
+
+      <div class="two-col">
+        <div>
+          <div class="code-label good"><span class="dot"></span>schema.sql</div>
+          <pre class="code"><code><span class="kw">CREATE TABLE</span> components (
+  id <span class="type">INTEGER PRIMARY KEY</span>,
+  name <span class="type">TEXT NOT NULL</span>
+    <span class="kw">CHECK</span> (length(trim(name)) <span class="kw">BETWEEN</span> 1 <span class="kw">AND</span> 100),
+  criticality <span class="type">TEXT NOT NULL</span>
+    <span class="kw">CHECK</span> (criticality <span class="kw">IN</span> (
+      <span class="str">'low'</span>, <span class="str">'medium'</span>, <span class="str">'high'</span>
+    ))
+) <span class="kw">STRICT</span>;</code></pre>
+        </div>
+        <div class="col-card">
+          <div class="col-card-head"><h3>Что гарантирует движок</h3></div>
+          <ul>
+            <li>пустое имя не пройдёт;</li>
+            <li>критичность ограничена доменом;</li>
+            <li>дубли блокирует <code>UNIQUE</code>;</li>
+            <li>ссылочную целостность задаёт <code>FOREIGN KEY</code>;</li>
+            <li>режим <code>STRICT</code> сужает допустимые типы.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="callout warning">
+        <p><strong>SQLite-особенность:</strong> <code>PRAGMA foreign_keys = ON</code> нужно включать для каждого соединения. Наличие внешнего ключа в DDL само по себе не доказывает, что он проверяется в конкретном подключении.</p>
+      </div>
+    </section>
+
+    <section id="injection" class="section">
+      <div class="section-eyebrow"><span class="section-num">12</span> ПЗ-2 · 15:10</div>
+      <h2>SQL-инъекция: данные стали кодом</h2>
+
+      <div class="two-col">
+        <div>
+          <div class="code-label bad"><span class="dot"></span>Намеренно уязвимо</div>
+          <pre class="code"><code>sql = (
+  <span class="str">"SELECT id, name FROM components "</span>
+  <span class="str">f"WHERE name = '{term}'"</span>
+)
+rows = conn.execute(sql).fetchall()</code></pre>
+        </div>
+        <div>
+          <div class="code-label good"><span class="dot"></span>Параметризовано</div>
+          <pre class="code"><code>rows = conn.execute(
+  <span class="str">"""
+  SELECT id, name
+  FROM components
+  WHERE name = ?
+  """</span>,
+  (term,),
+).fetchall()</code></pre>
+        </div>
+      </div>
+
+      <p>В первом примере значение попадает внутрь грамматики SQL. Во втором драйвер передаёт текст запроса и значение раздельно; payload остаётся строкой. Ручное «экранирование кавычек» не заменяет параметризацию.</p>
+
+      <div class="callout danger">
+        <p><strong>Демонстрация изолирована.</strong> <code>demo_unsafe_query.py</code> работает только с тремя вымышленными строками в памяти и использует фиксированный учебный payload. Уязвимая функция не является заготовкой для проекта.</p>
+      </div>
+    </section>
+
+    <section id="parameters" class="section">
+      <div class="section-eyebrow"><span class="section-num">13</span> Значения и идентификаторы</div>
+      <h2>Placeholder не подставляет имя столбца</h2>
+      <p>Параметры предназначены для значений. Если пользователь выбирает сортировку, имя столбца нельзя передавать как <code>?</code>. Его отображают на константу, принадлежащую коду.</p>
+
+      <pre class="code"><code>SORT_COLUMNS = {
+  <span class="str">"name"</span>: <span class="str">"name"</span>,
+  <span class="str">"version"</span>: <span class="str">"version"</span>,
+  <span class="str">"license_spdx"</span>: <span class="str">"license_spdx"</span>,
+}
+
+column = SORT_COLUMNS[user_choice]  <span class="cm"># иначе ValueError</span>
+sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Элемент запроса</th><th>Правильная мера</th><th>Ошибка</th></tr></thead>
+          <tbody>
+            <tr><td>Строковое или числовое значение</td><td>Placeholder и отдельный параметр</td><td>f-string, <code>%</code>, <code>.format()</code></td></tr>
+            <tr><td>Имя столбца / таблицы</td><td>Закрытое отображение из бизнес-ключа</td><td>Прямая вставка ввода</td></tr>
+            <tr><td>ASC / DESC</td><td>Булево значение → две константы</td><td>Произвольная строка направления</td></tr>
+            <tr><td>LIKE</td><td>Placeholder + определённая политика для <code>%</code> и <code>_</code></td><td>Неясно, считаются ли wildcard данными</td></tr>
+            <tr><td>LIMIT</td><td>Параметр и верхняя граница</td><td>Неограниченная выгрузка</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="transactions" class="section">
+      <div class="section-eyebrow"><span class="section-num">14</span> ПЗ-3 · 16:50</div>
+      <h2>Транзакция, аудит и минимальные полномочия</h2>
+
+      <div class="phases">
+        <div class="phase"><div class="phase-num">1</div><h4>Проверить</h4><p>Тип, длина, допустимый домен и существование объекта.</p></div>
+        <div class="phase"><div class="phase-num">2</div><h4>Изменить</h4><p>Выполнить UPDATE с placeholders.</p></div>
+        <div class="phase"><div class="phase-num">3</div><h4>Зафиксировать</h4><p>Добавить событие аудита в той же транзакции.</p></div>
+        <div class="phase"><div class="phase-num">4</div><h4>Откатить</h4><p>При ошибке не оставлять половину результата.</p></div>
+      </div>
+
+      <pre class="code"><code><span class="kw">with</span> conn:
+  cursor = conn.execute(
+    <span class="str">"UPDATE components SET license_spdx = ? WHERE id = ?"</span>,
+    (new_license, component_id),
+  )
+  <span class="kw">if</span> cursor.rowcount != 1:
+    <span class="kw">raise</span> LookupError(<span class="str">"Компонент не найден"</span>)
+  conn.execute(
+    <span class="str">"INSERT INTO audit_events (...) VALUES (?, ?)"</span>,
+    (<span class="str">"license_changed"</span>, component_id),
+  )</code></pre>
+
+      <p>Для читающего процесса используется отдельное подключение <code>file:...?...mode=ro</code>. В рабочей клиент-серверной СУБД принцип продолжается отдельной учётной записью с минимальными правами. Только приложение не должно решать, может ли оно писать: запрет должен обеспечивать и нижний слой.</p>
+
+      <div class="callout warning">
+        <p><strong>Аудит в той же БД — учебное упрощение.</strong> Пользователь с правом менять файл способен изменить и журнал. Для независимого аудита нужны отдельный контур хранения, защита целостности, синхронизация времени и контроль доступа.</p>
+      </div>
+    </section>
+
+    <section id="route" class="section">
+      <div class="section-eyebrow"><span class="section-num">15</span> Работа слушателя</div>
+      <h2>Маршрут трёх практических занятий</h2>
+
+      <div class="roadmap">
+        <div class="roadmap-step"><div class="roadmap-num">ПЗ-1</div><div class="roadmap-content"><h4>Схема и данные</h4><p>Прочитать <code>schema.sql</code>, создать <code>components.db</code>, проверить ограничения и сформулировать инварианты.</p><div class="roadmap-meta"><span class="roadmap-tag">13:30–15:00</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">ПЗ-2</div><div class="roadmap-content"><h4>CWE-89 и безопасные запросы</h4><p>Сравнить фиксированную демонстрацию с параметризацией, разобрать <code>LIKE</code>, <code>ORDER BY</code> и верхнюю границу <code>LIMIT</code>.</p><div class="roadmap-meta"><span class="roadmap-tag">15:10–16:40</span></div></div></div>
+        <div class="roadmap-step"><div class="roadmap-num">ПЗ-3</div><div class="roadmap-content"><h4>RED → GREEN → quality gate</h4><p>Реализовать пять функций в <code>step3_student.py</code>, получить 13 зелёных тестов и разобрать CI.</p><div class="roadmap-meta"><span class="roadmap-tag success">16:50–18:20</span></div></div></div>
+      </div>
+
+      <h3>Команды</h3>
+      <pre class="code"><code>py step1_schema.py
+py -m unittest -v test_examples.py
+py demo_unsafe_query.py
+py step2_secure_queries.py
+py -m unittest -v test_student.py</code></pre>
+
+      <div class="callout">
+        <p><strong>Подробный порядок без ответов</strong> находится в <a href="materials/praktikum.md">практикуме</a>. Эталон реализации и ключи не входят в студенческий архив.</p>
+      </div>
+    </section>
+
+    <section id="pipeline" class="section">
+      <div class="section-eyebrow"><span class="section-num">16</span> Доказательства</div>
+      <h2>CI проверяет именно студенческий результат</h2>
+
+      <div class="table-wrap">
+        <table class="data">
+          <thead><tr><th>Шаг</th><th>Что проверяет</th><th>Результат, который останавливает работу</th></tr></thead>
+          <tbody>
+            <tr><td><code>ruff check .</code></td><td>Ошибки Python, стиль, опасные конструкции выбранных правил</td><td>Любая неисправленная находка</td></tr>
+            <tr><td><code>test_examples.py</code></td><td>Готовые примеры ПЗ-1/ПЗ-2</td><td>Не 6/6</td></tr>
+            <tr><td><code>test_student.py</code></td><td>Параметры, allowlist, транзакция, read-only</td><td>Не 13/13</td></tr>
+            <tr><td><code>bandit -r .</code></td><td>Высокосигнальные опасные конструкции Python</td><td>Необоснованная находка</td></tr>
+            <tr><td><code>pip-audit</code></td><td>Известные уязвимости runtime-зависимостей</td><td>Для приложения список пуст; факт фиксируется явно</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout success">
+        <p><strong>В отличие от раннего учебного конвейера,</strong> здесь CI по умолчанию запускает именно <code>test_student.py</code> и не исключает рабочий файл слушателя из lint/SAST. До выполнения задания красный pipeline — ожидаемое и честное состояние.</p>
+      </div>
+    </section>
+
+    <section id="answer" class="section">
+      <div class="section-eyebrow"><span class="section-num">17</span> Итог</div>
+      <h2>Ответ на вопрос дня</h2>
+      <p class="lead">Выбор языка становится решением по безопасности тогда, когда он связан с активами и угрозами, зафиксирован в архитектуре, ограничивает конкретные классы дефектов и сопровождается проверяемым набором мер для оставшихся рисков.</p>
+
+      <ul class="checklist">
+        <li>язык влияет на возможные ошибки памяти, типизации и границ FFI;</li>
+        <li>архитектура определяет доверительные границы и полномочия компонентов;</li>
+        <li>фреймворк и платформа расширяют цепочку поставок и поверхность обновления;</li>
+        <li>схема SQL превращает часть требований в исполняемые ограничения;</li>
+        <li>placeholder отделяет данные от кода, но не заменяет allowlist идентификаторов;</li>
+        <li>тесты и CI превращают правила в повторяемые свидетельства;</li>
+        <li>Shift Left означает раннюю и постоянную интеграцию безопасности во весь SDLC.</li>
+      </ul>
+
+      <h3 id="download">Скачать комплект</h3>
+      <p>Архив содержит офлайн-лекцию, конспект, задания и учебный код. Для основных упражнений достаточно Python 3.11 или новее; SQLite и <code>unittest</code> входят в стандартную библиотеку.</p>
+      <div class="contact-buttons material-buttons">
+        <a class="btn btn-primary" href="materials.zip" download>Скачать материалы занятия (ZIP)</a>
+        <span class="button-note">Откройте внутри <code>ЧИТАТЬ-ПЕРВЫМ.md</code></span>
+      </div>
+
+      <h3>Первичные источники</h3>
+      <ul>
+        <li><a href="https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64" target="_blank" rel="noopener noreferrer">ГОСТ Р 56939-2024 — официальная карточка Росстандарта</a></li>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener noreferrer">NIST SP 800-218 v1.1 Secure Software Development Framework</a></li>
+        <li><a href="https://www.iso.org/standard/44378.html" target="_blank" rel="noopener noreferrer">ISO/IEC 27034-1:2011 Application security</a></li>
+        <li><a href="https://www.iso.org/standard/83629.html" target="_blank" rel="noopener noreferrer">ISO/IEC 24772-1:2024 Language vulnerabilities</a></li>
+        <li><a href="https://www.bell-labs.com/usr/dmr/www/chist.pdf" target="_blank" rel="noopener noreferrer">Dennis Ritchie, The Development of the C Language</a></li>
+        <li><a href="https://isocpp.org/wiki/faq/big-picture" target="_blank" rel="noopener noreferrer">ISO C++ FAQ: история C++</a></li>
+        <li><a href="https://docs.python.org/3/faq/general.html" target="_blank" rel="noopener noreferrer">Python General FAQ</a></li>
+        <li><a href="https://cwe.mitre.org/data/definitions/119.html" target="_blank" rel="noopener noreferrer">MITRE CWE-119: Memory Buffer Bounds</a></li>
+        <li><a href="https://cwe.mitre.org/data/definitions/89.html" target="_blank" rel="noopener noreferrer">MITRE CWE-89: SQL Injection</a></li>
+        <li><a href="https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html" target="_blank" rel="noopener noreferrer">OWASP SQL Injection Prevention Cheat Sheet</a></li>
+        <li><a href="https://docs.python.org/3/library/sqlite3.html" target="_blank" rel="noopener noreferrer">Python <code>sqlite3</code>: placeholders и транзакции</a></li>
+        <li><a href="https://www.sqlite.org/security.html" target="_blank" rel="noopener noreferrer">SQLite Security</a> и <a href="https://www.sqlite.org/foreignkeys.html" target="_blank" rel="noopener noreferrer">Foreign Keys</a></li>
+      </ul>
+    </section>
+
+    <footer class="content-footer" id="contacts">
+      <h2>Связь с преподавателем</h2>
+      <p class="lead">По вопросам занятия, программы курса «Специалист по процессам разработки безопасного программного обеспечения» и внедрения процессов РБПО.</p>
+
+      <div class="contact-buttons">
+        <a class="btn btn-primary" href="materials.zip" download>Материалы занятия (ZIP)</a>
+        <a class="btn btn-secondary" href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
+        <a class="btn btn-secondary" href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener noreferrer">Telegram @UnderLineSecurity</a>
+      </div>
+
+      <div class="attribution">
+        <div class="attribution-row">
+          <span class="copy">© <span id="year">2026</span> Пиков Виталий Александрович · <a href="https://pikov.expert">pikov.expert</a></span>
+          <span>Занятие 29.07.2026 · Курс «М БРПО»</span>
+        </div>
+        <div>Материал подготовлен для программы повышения квалификации «Специалист по процессам разработки безопасного программного обеспечения» (код «М БРПО»), НОУ ДПО «Учебный центр безопасности информации МАСКОМ». Нормативная опора: ГОСТ Р 56939-2024, NIST SSDF v1.1, CWE и официальная документация Python/SQLite. Учебные данные вымышлены.</div>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<button class="back-to-top" id="backToTop" type="button" aria-label="Наверх">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="18 15 12 9 6 15"/></svg>
+</button>
+
+</body>
+</html>

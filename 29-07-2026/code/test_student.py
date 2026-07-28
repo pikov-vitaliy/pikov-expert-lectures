@@ -1,0 +1,212 @@
+"""Регрессионные проверки практикума 29.07.2026.
+
+По умолчанию проверяется ``step3_student``. Преподаватель может проверить
+эталон, задав переменную окружения REGISTRY_MODULE=step3_fixed и добавив
+каталог с эталоном в PYTHONPATH.
+"""
+
+from __future__ import annotations
+
+import importlib
+import os
+import sqlite3
+import tempfile
+import unittest
+from pathlib import Path
+
+MODULE_NAME = os.environ.get("REGISTRY_MODULE", "step3_student")
+registry = importlib.import_module(MODULE_NAME)
+CODE_DIR = Path(__file__).resolve().parent
+SCHEMA_PATH = CODE_DIR / "schema.sql"
+
+
+class RegistryTestCase(unittest.TestCase):
+    def setUp(self) -> None:
+        self.tmp = tempfile.TemporaryDirectory()
+        self.db_path = Path(self.tmp.name) / "components.db"
+        self.conn = sqlite3.connect(self.db_path)
+        self.conn.row_factory = sqlite3.Row
+        self.conn.execute("PRAGMA foreign_keys = ON")
+        self.conn.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+    def tearDown(self) -> None:
+        self.conn.close()
+        self.tmp.cleanup()
+
+    def insert_fixture(
+        self,
+        name: str = "libalpha",
+        version: str = "1.0.0",
+        license_spdx: str = "MIT",
+        supplier: str = "Example",
+        criticality: str = "medium",
+    ) -> int:
+        cursor = self.conn.execute(
+            """
+            INSERT INTO components
+                (name, version, license_spdx, supplier, criticality)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (name, version, license_spdx, supplier, criticality),
+        )
+        self.conn.commit()
+        return int(cursor.lastrowid)
+
+
+class AddComponentTests(RegistryTestCase):
+    def test_add_component_persists_all_fields(self) -> None:
+        component_id = registry.add_component(
+            self.conn,
+            name="libsafe",
+            version="2.4.1",
+            license_spdx="Apache-2.0",
+            supplier="Example Org",
+            criticality="high",
+        )
+
+        row = self.conn.execute(
+            "SELECT * FROM components WHERE id = ?", (component_id,)
+        ).fetchone()
+        self.assertIsNotNone(row)
+        assert row is not None
+        self.assertEqual(row["name"], "libsafe")
+        self.assertEqual(row["version"], "2.4.1")
+        self.assertEqual(row["license_spdx"], "Apache-2.0")
+        self.assertEqual(row["supplier"], "Example Org")
+        self.assertEqual(row["criticality"], "high")
+
+    def test_add_component_treats_sql_payload_as_plain_data(self) -> None:
+        payload = "x'); DROP TABLE components; --"
+        registry.add_component(
+            self.conn,
+            name=payload,
+            version="1.0",
+            license_spdx="MIT",
+            supplier="Training",
+        )
+
+        stored = self.conn.execute("SELECT name FROM components").fetchone()
+        self.assertEqual(stored["name"], payload)
+        self.assertEqual(
+            self.conn.execute("SELECT count(*) FROM components").fetchone()[0],
+            1,
+        )
+
+    def test_add_component_rejects_blank_name_before_sql(self) -> None:
+        with self.assertRaises(ValueError):
+            registry.add_component(
+                self.conn,
+                name="   ",
+                version="1.0",
+                license_spdx="MIT",
+                supplier="Training",
+            )
+
+    def test_add_component_rejects_unknown_criticality(self) -> None:
+        with self.assertRaises(ValueError):
+            registry.add_component(
+                self.conn,
+                name="libsafe",
+                version="1.0",
+                license_spdx="MIT",
+                supplier="Training",
+                criticality="urgent",
+            )
+
+
+class SearchTests(RegistryTestCase):
+    def test_search_finds_case_insensitive_substring(self) -> None:
+        self.insert_fixture(name="CryptoLibrary")
+        rows = registry.search_components(self.conn, "crypto")
+        self.assertEqual([row["name"] for row in rows], ["CryptoLibrary"])
+
+    def test_search_does_not_turn_injection_text_into_sql(self) -> None:
+        self.insert_fixture(name="libalpha")
+        self.insert_fixture(name="libbeta", version="2.0")
+        rows = registry.search_components(self.conn, "' OR 1=1 --")
+        self.assertEqual(rows, [])
+
+    def test_search_treats_percent_as_literal_character(self) -> None:
+        self.insert_fixture(name="codec100%")
+        self.insert_fixture(name="codec1000", version="2.0")
+        rows = registry.search_components(self.conn, "100%")
+        self.assertEqual([row["name"] for row in rows], ["codec100%"])
+
+    def test_search_rejects_unbounded_limit(self) -> None:
+        with self.assertRaises(ValueError):
+            registry.search_components(self.conn, "lib", limit=1000)
+
+
+class OrderingTests(RegistryTestCase):
+    def test_list_components_accepts_only_allowlisted_sort_columns(self) -> None:
+        self.insert_fixture(name="Zulu")
+        self.insert_fixture(name="Alpha", version="2.0")
+        rows = registry.list_components(self.conn, sort_by="name")
+        self.assertEqual([row["name"] for row in rows], ["Alpha", "Zulu"])
+
+    def test_list_components_rejects_sql_in_sort_column(self) -> None:
+        self.insert_fixture()
+        with self.assertRaises(ValueError):
+            registry.list_components(
+                self.conn,
+                sort_by="name; DROP TABLE components; --",
+            )
+        self.assertEqual(
+            self.conn.execute("SELECT count(*) FROM components").fetchone()[0],
+            1,
+        )
+
+
+class TransactionTests(RegistryTestCase):
+    def test_change_license_updates_component_and_adds_audit_event(self) -> None:
+        component_id = self.insert_fixture()
+        registry.change_license(self.conn, component_id, "BSD-3-Clause")
+
+        component = self.conn.execute(
+            "SELECT license_spdx FROM components WHERE id = ?",
+            (component_id,),
+        ).fetchone()
+        audit = self.conn.execute(
+            """
+            SELECT event_type, component_id
+            FROM audit_events
+            WHERE component_id = ?
+            """,
+            (component_id,),
+        ).fetchone()
+        self.assertEqual(component["license_spdx"], "BSD-3-Clause")
+        self.assertEqual(audit["event_type"], "license_changed")
+
+    def test_change_license_rolls_back_when_component_is_missing(self) -> None:
+        with self.assertRaises(LookupError):
+            registry.change_license(self.conn, 999, "MIT")
+        self.assertEqual(
+            self.conn.execute("SELECT count(*) FROM audit_events").fetchone()[0],
+            0,
+        )
+
+
+class LeastPrivilegeTests(RegistryTestCase):
+    def test_read_only_connection_can_read_but_cannot_write(self) -> None:
+        self.insert_fixture()
+        read_only = registry.open_read_only(self.db_path)
+        try:
+            self.assertEqual(
+                read_only.execute("SELECT count(*) FROM components").fetchone()[0],
+                1,
+            )
+            with self.assertRaises(sqlite3.OperationalError):
+                read_only.execute(
+                    """
+                    INSERT INTO components
+                        (name, version, license_spdx, supplier, criticality)
+                    VALUES (?, ?, ?, ?, ?)
+                    """,
+                    ("forbidden", "1.0", "MIT", "Training", "low"),
+                )
+        finally:
+            read_only.close()
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)

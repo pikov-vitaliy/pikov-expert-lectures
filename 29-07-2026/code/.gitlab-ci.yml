@@ -1,0 +1,34 @@
+# Учебный quality gate для результата ПЗ-3.
+# Стартовый step3_student.py намеренно не проходит тесты. После выполнения
+# задания все четыре job должны стать зелёными.
+
+stages:
+  - lint
+  - test
+  - security
+
+default:
+  image: python:3.12
+  before_script:
+    - python -m pip install --disable-pip-version-check -r requirements-dev.txt
+
+lint:
+  stage: lint
+  script:
+    - ruff check .
+
+test:
+  stage: test
+  script:
+    - python -m unittest -v test_examples.py
+    - python -m unittest -v test_student.py
+
+sast:
+  stage: security
+  script:
+    - bandit -r . -x ./demo_unsafe_query.py,./test_examples.py,./test_student.py
+
+sca:
+  stage: security
+  script:
+    - pip-audit --requirement requirements.txt

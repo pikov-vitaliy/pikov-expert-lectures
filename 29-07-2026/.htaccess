@@ -1,0 +1,33 @@
+# Static lecture site: UTF-8, least privilege and defense in depth.
+
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Cross-Origin-Resource-Policy "same-origin"
+  Header always set X-Permitted-Cross-Domain-Policies "none"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com; script-src 'self' https://mc.yandex.ru; style-src 'self'; font-src 'self'; connect-src 'self' https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com wss://mc.yandex.com wss://*.mc.yandex.com; form-action 'self'; upgrade-insecure-requests"
+</IfModule>
+
+<IfModule mod_headers.c>
+<FilesMatch "\.(md|markdown|csv|txt|log|json|jsonld)$">
+  Header set X-Robots-Tag "noindex, noarchive"
+</FilesMatch>
+</IfModule>
+
+AddCharset UTF-8 .html .htm .css .js .mjs .json .jsonld .xml .svg .txt .md .markdown .csv .log
+AddType "text/markdown; charset=UTF-8" .md .markdown
+AddType "text/plain; charset=UTF-8" .txt .log
+AddType application/json .json
+AddType application/ld+json .jsonld
+AddType image/svg+xml .svg
+
+<Files ".htaccess">
+  Require all denied
+</Files>

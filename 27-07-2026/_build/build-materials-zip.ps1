@@ -88,6 +88,8 @@ $ignorableDirs = @('__pycache__', '.pytest_cache', '.ruff_cache', '.mypy_cache',
 # сборку из-за них не роняем — но и молчать нельзя: о каждом таком файле
 # сообщаем, чтобы он не остался незамеченным в каталоге лекции.
 $policyExcludedExtensions = @('.pdf', '.pptx', '.docx', '.xlsx', '.eps', '.zip')
+$generatedReadFirstHtml = ((1095, 1080, 1090, 1072, 1090, 1100, 45, 1087, 1077, 1088, 1074, 1099, 1084 | ForEach-Object { [char]$_ }) -join '') + '.html'
+$ignoredGeneratedFiles = @("materials\$generatedReadFirstHtml")
 
 $declared = @($manifest.Values | ForEach-Object { $_.ToLowerInvariant() })
 $skipped = New-Object System.Collections.Generic.List[string]
@@ -100,6 +102,10 @@ foreach ($scanDir in @('code', 'materials')) {
         $parts = $relative.Split('\')
         if ($parts | Where-Object { $ignorableDirs -contains $_ }) { return }
         if ($declared -contains $relative.ToLowerInvariant()) { return }
+        if ($ignoredGeneratedFiles -contains $relative.ToLowerInvariant()) {
+            $skipped.Add($relative)
+            return
+        }
         if ($policyExcludedExtensions -contains $_.Extension.ToLowerInvariant()) {
             $skipped.Add($relative)
             return
@@ -150,13 +156,14 @@ try {
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $zip = [System.IO.Compression.ZipFile]::OpenRead($archive)
 try {
-    $names = @($zip.Entries | ForEach-Object { $_.FullName })
+    $names = @($zip.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
+    $expectedNames = @($manifest.Keys | ForEach-Object { $_.Replace('\', '/') })
     if ($names.Count -ne $manifest.Count) { Fail "В архиве $($names.Count) записей вместо $($manifest.Count)" }
-    foreach ($expected in $manifest.Keys) {
+    foreach ($expected in $expectedNames) {
         if ($names -notcontains $expected) { Fail "В архиве нет файла: $expected" }
     }
     foreach ($actual in $names) {
-        if (-not $manifest.Contains($actual)) { Fail "В архиве лишний файл: $actual" }
+        if ($expectedNames -notcontains $actual) { Fail "В архиве лишний файл: $actual" }
     }
 } finally {
     $zip.Dispose()

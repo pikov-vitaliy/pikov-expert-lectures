@@ -99,7 +99,7 @@ function Should-ExcludeDistributable([string]$Name) {
 # any other lecture still gets excluded. Each bundle is assembled by that
 # lecture's own build-materials-zip.ps1 from a literal file list, so nothing
 # reaches it that was not reviewed.
-$script:MaterialsZipFolders = @('27-07-2026')
+$script:MaterialsZipFolders = @('27-07-2026', '29-07-2026')
 
 # Lecture folders cleared to publish PDF handouts. PDFs are excluded globally
 # as "high-risk distributables pending explicit redistribution review"; naming
@@ -122,7 +122,9 @@ function Should-ExcludeFile([string]$Name) {
 
 function Should-ExcludeNestedFile([string]$Name) {
   $lower = $Name.ToLowerInvariant()
+  $generatedReadFirstHtml = ((1095, 1080, 1090, 1072, 1090, 1100, 45, 1087, 1077, 1088, 1074, 1099, 1084 | ForEach-Object { [char]$_ }) -join '') + '.html'
   if ($Name.StartsWith('_')) { return $true }
+  if ($lower -eq $generatedReadFirstHtml) { return $true }
   if (Should-ExcludeDistributable $Name) { return $true }
   if ($lower -like 'img_*.jpg' -or $lower -like 'img_*.jpeg') { return $true }
   if ($Name -like '00_*.md') { return $true }
