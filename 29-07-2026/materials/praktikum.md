@@ -310,6 +310,8 @@ Get-Content .\test_student.py
 
 Конструкция `with self.assertRaises(ValueError):` в тесте означает: проверка засчитывается, только если код внутри блока `with` выбросил именно `ValueError` или его подкласс. Если исключение не возникло или его тип другой, тест остаётся красным.
 
+Ошибки самого драйвера `sqlite3` (например, если база отклонила запись) не перехватывайте и не заменяйте собственными типами: тесты ожидают, что такое исключение дойдёт до вызывающего кода как есть. Оборачивать нужно только проверки аргументов, перечисленные в контрактах.
+
 ### `add_component`
 
 Контракт:
@@ -483,7 +485,7 @@ sqlite3.IntegrityError: CHECK constraint failed: ...
 ### `NotImplementedError` при первом прогоне `test_student.py`
 
 ```text
-ERROR: test_add_component_persists_all_fields (test_student.AddComponentTests)
+ERROR: test_add_component_persists_all_fields (test_student.AddComponentTests.test_add_component_persists_all_fields)
 ...
 NotImplementedError: Реализуйте add_component
 ...
@@ -502,10 +504,10 @@ FAILED (errors=13)
 Мини-пример вывода:
 
 ```text
-FAIL: test_search_treats_percent_as_literal_character (test_student.SearchTests)
+FAIL: test_search_treats_percent_as_literal_character (test_student.SearchTests.test_search_treats_percent_as_literal_character)
 AssertionError: Lists differ: ['codec100%', 'codec1000'] != ['codec100%']
 
-ERROR: test_change_license_updates_component_and_adds_audit_event (test_student.TransactionTests)
+ERROR: test_change_license_updates_component_and_adds_audit_event (test_student.TransactionTests.test_change_license_updates_component_and_adds_audit_event)
 NotImplementedError: Реализуйте change_license
 ```
 

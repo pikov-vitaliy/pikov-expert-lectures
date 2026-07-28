@@ -308,7 +308,7 @@
       <p class="lead">Требования безопасности, моделирование угроз, анализ архитектуры и автоматические проверки включаются раньше в существующий SDLC. Это не означает перенос всей безопасности только в начало проекта.</p>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="График роста стоимости исправления дефекта, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 340" role="img" aria-label="График: стоимость исправления одного и того же дефекта растёт от фазы требований к эксплуатации; Shift Left переносит меры в дешёвую левую часть оси">
           <defs>
             <marker id="m2i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -398,7 +398,7 @@
       <p>Фраза «библиотеку вызываете вы, фреймворк вызывает вас» полезна как эвристика, но реальные продукты бывают гибридными. Для безопасности название не меняет обязательных действий.</p>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема направления вызова: библиотека и фреймворк, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 200" role="img" aria-label="Схема направления вызова: приложение вызывает библиотеку; фреймворк сам вызывает код приложения в точках расширения">
           <defs>
             <marker id="m5i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -474,7 +474,7 @@
       <p>Учебное приложение хранит наименование компонента, версию, SPDX-идентификатор лицензии, поставщика и критичность. Данные вымышлены, но угрозы типовые.</p>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема границ доверия учебного реестра, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 320" role="img" aria-label="Схема границ доверия: пользователь, Python-приложение, движок SQLite и файл базы данных разделены тремя границами; между приложением и движком SQL-текст и значения параметров передаются раздельными каналами">
           <defs>
             <marker id="m3i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -608,7 +608,7 @@ rows = conn.execute(sql).fetchall()</code></pre>
       <p>В первом примере значение попадает внутрь грамматики SQL. Во втором драйвер передаёт текст запроса и значение раздельно; payload остаётся строкой. Ручное «экранирование кавычек» не заменяет параметризацию.</p>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема «данные и код»: два пути строки пользователя, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 400" role="img" aria-label="Схема: один и тот же ввод пользователя при склейке строк становится частью SQL-команды, а при параметризации остаётся данными">
           <defs>
             <marker id="m1d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -664,9 +664,13 @@ rows = conn.execute(sql).fetchall()</code></pre>
   <span class="str">"name"</span>: <span class="str">"name"</span>,
   <span class="str">"version"</span>: <span class="str">"version"</span>,
   <span class="str">"license_spdx"</span>: <span class="str">"license_spdx"</span>,
+  <span class="str">"criticality"</span>: <span class="str">"criticality"</span>,
 }
 
-column = SORT_COLUMNS[user_choice]  <span class="cm"># иначе ValueError</span>
+<span class="kw">try</span>:
+    column = SORT_COLUMNS[user_choice]
+<span class="kw">except</span> KeyError:
+    <span class="kw">raise</span> ValueError(<span class="str">"Недопустимый ключ сортировки"</span>)  <span class="cm"># контракт: ValueError</span>
 sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
 
       <div class="table-wrap">
@@ -707,7 +711,7 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
   )</code></pre>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема двух исходов транзакции, прокручивается по горизонтали">
         <svg class="diagram" viewBox="0 0 760 290" role="img" aria-label="Схема транзакции: UPDATE и INSERT выполняются в одной транзакции; при выходе без исключения происходит COMMIT и видны обе записи, при исключении — ROLLBACK и не видна ни одна">
           <defs>
             <marker id="m4i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
@@ -782,20 +786,21 @@ py -m unittest -v test_student.py</code></pre>
       <h2>CI проверяет именно студенческий результат</h2>
 
       <figure class="figure">
-        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема, прокручивается по горизонтали">
-        <svg class="diagram" viewBox="0 0 760 268" role="img" aria-label="Схема конвейера CI: три стадии — lint, test и security; ruff и два набора тестов идут последовательно, bandit и pip-audit выполняются параллельно; провал любого job останавливает конвейер, прохождение всех подтверждает результат">
+        <div class="figure-scroll" tabindex="0" role="group" aria-label="Схема конвейера CI, прокручивается по горизонтали">
+        <svg class="diagram" viewBox="0 0 660 268" role="img" aria-label="Схема конвейера CI: четыре job в трёх стадиях — lint с ruff, единый job test с двумя наборами тестов, затем параллельные job sast с bandit и sca с pip-audit; провал любой проверки останавливает конвейер, прохождение всех подтверждает результат">
           <defs>
             <marker id="m6i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
             <marker id="m6d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
           </defs>
 
           <text x="73" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия lint</text>
-          <text x="262" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия test</text>
-          <text x="473" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия security · параллельно</text>
+          <text x="262" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия test · один job</text>
+          <text x="467" y="18" text-anchor="middle" font-size="11" font-weight="600" class="d-subtle">стадия security · параллельные job</text>
 
           <rect x="20" y="40" width="106" height="68" rx="10" class="d-box"/>
-          <text x="73" y="68" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">ruff</text>
-          <text x="73" y="88" text-anchor="middle" font-size="11" class="d-subtle">стиль и ошибки</text>
+          <text x="73" y="64" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">ruff</text>
+          <text x="73" y="82" text-anchor="middle" font-size="11" class="d-subtle">стиль и ошибки</text>
+          <text x="73" y="97" text-anchor="middle" font-size="11" class="d-subtle">job lint</text>
           <path d="M126 74 L144 74" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
           <rect x="146" y="40" width="106" height="68" rx="10" class="d-box"/>
@@ -809,35 +814,36 @@ py -m unittest -v test_student.py</code></pre>
           <text x="325" y="82" text-anchor="middle" font-size="11" class="d-subtle">ваш результат</text>
           <text x="325" y="97" text-anchor="middle" font-size="11" class="d-subtle">13 тестов</text>
 
-          <path d="M378 74 C398 74 402 56 418 56" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
-          <path d="M378 74 C398 74 402 132 418 132" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M378 74 C388 74 390 54 394 54" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M378 74 C402 74 406 138 432 138" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
-          <rect x="420" y="28" width="106" height="56" rx="10" class="d-box"/>
-          <text x="473" y="52" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">bandit</text>
-          <text x="473" y="70" text-anchor="middle" font-size="11" class="d-subtle">SAST</text>
+          <rect x="398" y="26" width="100" height="56" rx="10" class="d-box"/>
+          <text x="448" y="50" text-anchor="middle" font-size="12" font-weight="600" class="d-mono d-ink">bandit</text>
+          <text x="448" y="68" text-anchor="middle" font-size="11" class="d-subtle">job sast · SAST</text>
 
-          <rect x="420" y="104" width="106" height="56" rx="10" class="d-box"/>
-          <text x="473" y="128" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">pip-audit</text>
-          <text x="473" y="146" text-anchor="middle" font-size="11" class="d-subtle">зависимости</text>
+          <rect x="436" y="110" width="100" height="56" rx="10" class="d-box"/>
+          <text x="486" y="134" text-anchor="middle" font-size="12" font-weight="600" class="d-mono d-ink">pip-audit</text>
+          <text x="486" y="152" text-anchor="middle" font-size="11" class="d-subtle">job sca · SCA</text>
 
-          <path d="M526 56 C556 56 562 94 582 94" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
-          <path d="M526 132 C556 132 562 94 582 94" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M498 54 C534 54 542 96 564 96" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+          <path d="M536 138 C552 138 556 96 564 96" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
 
-          <circle cx="608" cy="94" r="22" stroke-width="1.5" class="d-box-ok"/>
-          <path d="M598 94 L605 102 L619 85" stroke-width="3" fill="none" class="d-arrow-ok"/>
-          <text x="608" y="136" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">результат</text>
-          <text x="608" y="152" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">подтверждён</text>
+          <circle cx="590" cy="96" r="22" stroke-width="1.5" class="d-box-ok"/>
+          <path d="M580 96 L587 104 L601 87" stroke-width="3" fill="none" class="d-arrow-ok"/>
+          <text x="590" y="138" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">результат</text>
+          <text x="590" y="154" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">подтверждён</text>
 
           <path d="M73 108 L73 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
           <path d="M199 108 L199 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
           <path d="M325 108 L325 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <path d="M473 160 L473 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
-          <rect x="20" y="196" width="612" height="52" rx="10" class="d-box-danger"/>
-          <text x="326" y="218" text-anchor="middle" font-size="12.5" font-weight="700" class="d-danger">любой красный job останавливает конвейер</text>
-          <text x="326" y="237" text-anchor="middle" font-size="11.5" class="d-danger">до исправления результат не считается готовым</text>
+          <path d="M416 82 L416 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M486 166 L486 192" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <rect x="20" y="196" width="600" height="52" rx="10" class="d-box-danger"/>
+          <text x="320" y="218" text-anchor="middle" font-size="12.5" font-weight="700" class="d-danger">любая красная проверка останавливает конвейер</text>
+          <text x="320" y="237" text-anchor="middle" font-size="11.5" class="d-danger">до исправления результат не считается готовым</text>
         </svg>
         </div>
-        <figcaption>Конвейер учебного quality gate из <code>.gitlab-ci.yml</code>: три стадии, внутри стадии security job <code>bandit</code> и <code>pip-audit</code> выполняются параллельно. До выполнения задания шаг <code>test_student</code> красный — это ожидаемое стартовое состояние; соответствие job и локальных команд — в таблице ниже.</figcaption>
+        <figcaption>Конвейер учебного quality gate из <code>.gitlab-ci.yml</code>: четыре job в трёх стадиях — <code>lint</code> (ruff), единый <code>test</code> (оба набора тестов последовательно), затем параллельные <code>sast</code> (bandit) и <code>sca</code> (pip-audit). До выполнения задания job <code>test</code> красный — это ожидаемое стартовое состояние; соответствие проверок и локальных команд — в таблице ниже.</figcaption>
       </figure>
 
       <div class="table-wrap">

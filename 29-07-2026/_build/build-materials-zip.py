@@ -62,6 +62,8 @@ def strip_metrika(data: bytes) -> bytes:
 
     Падает с ошибкой, если ожидаемый фрагмент не найден: молчаливый
     пропуск означал бы, что офлайн-архив снова отправляет телеметрию.
+    Заодно перенаправляет ссылку «скачать архив» на опубликованный адрес:
+    внутри распакованного архива файла materials.zip рядом нет.
     """
     text = data.decode("utf-8")
     for fragment in _METRIKA_FRAGMENTS:
@@ -72,11 +74,20 @@ def strip_metrika(data: bytes) -> bytes:
         text = text.replace(fragment, "")
     if "metrika" in text.lower() or "mc.yandex" in text.lower():
         raise RuntimeError("В офлайн-копии index.html остались следы Метрики")
+    text = text.replace(
+        'href="materials.zip"',
+        'href="https://29-07-2026.pikov.expert/materials.zip"',
+    )
     return text.encode("utf-8")
 
 
 def normalize_newlines(data: bytes) -> bytes:
-    """CRLF -> LF, чтобы архив был воспроизводим из любого checkout."""
+    """CRLF -> LF в текстовых файлах, чтобы архив был воспроизводим
+    из любого checkout. Бинарные данные (не UTF-8) возвращаются как есть."""
+    try:
+        data.decode("utf-8")
+    except UnicodeDecodeError:
+        return data
     return data.replace(b"\r\n", b"\n")
 
 
@@ -102,6 +113,10 @@ def validated_inputs() -> list[tuple[Path, str, bytes]]:
         data = normalize_newlines(source.read_bytes())
         if archive_path.as_posix() == "index.html":
             data = strip_metrika(data)
+        if b"mc.yandex" in data:
+            raise RuntimeError(
+                f"Файл {archive_name} тянет Яндекс Метрику в офлайн-архив"
+            )
         result.append((source, archive_path.as_posix(), data))
     return result
 
@@ -131,7 +146,9 @@ def build() -> None:
             archive.writestr(info, data, compresslevel=9)
 
     with zipfile.ZipFile(temporary, mode="r") as archive:
-        archive.testzip()
+        corrupted = archive.testzip()
+        if corrupted is not None:
+            raise RuntimeError(f"Повреждённый файл в архиве: {corrupted}")
         actual = sorted(name.casefold() for name in archive.namelist())
         expected = sorted(name.casefold() for _, name in FILES)
         if actual != expected:
@@ -150,8 +167,11 @@ def build() -> None:
         inputs,
         key=lambda item: item[1].casefold(),
     ):
-        lines.append(f"{sha256(data)}  {archive_name}  <-  {source.relative_to(ROOT)}")
-    MANIFEST.write_text("\n".join(lines) + "\n", encoding="utf-8")
+        lines.append(
+            f"{sha256(data)}  {archive_name}"
+            f"  <-  {source.relative_to(ROOT).as_posix()}"
+        )
+    MANIFEST.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
     print(f"Создан: {OUTPUT}")
     print(f"Файлов: {len(inputs)}")
