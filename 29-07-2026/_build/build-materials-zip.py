@@ -15,9 +15,10 @@ MANIFEST = ROOT / "_build" / "materials-zip-manifest.txt"
 FIXED_TIME = (2026, 7, 29, 0, 0, 0)
 
 # (source path relative to ROOT, archive path)
+# og-image.png намеренно не входит: это превью для соцсетей размером ~1.1 МБ
+# (96% веса архива), офлайн-странице оно не нужно.
 FILES = (
     ("index.html", "index.html"),
-    ("og-image.png", "og-image.png"),
     ("assets/site.css", "assets/site.css"),
     ("assets/site.js", "assets/site.js"),
     ("assets/metrika.js", "assets/metrika.js"),

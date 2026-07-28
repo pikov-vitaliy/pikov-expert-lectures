@@ -212,6 +212,8 @@
       <h2>«Компилируемый» и «интерпретируемый» — недостаточно</h2>
       <p>Современный язык нужно рассматривать вместе с его реализацией и экосистемой. CPython, например, получает байткод и исполняет его виртуальной машиной; поэтому граница между компиляцией и интерпретацией размыта.</p>
 
+      <p>В конспекте зафиксированы четыре независимые оси классификации — уровень абстракции, парадигма, модель выполнения и область применения. Таблица ниже повторяет их и добавляет инженерные срезы (типизация, память, FFI, toolchain), которые понадобятся при выборе стека.</p>
+
       <div class="table-wrap">
         <table class="data">
           <thead><tr><th>Ось сравнения</th><th>Вопрос</th><th>Связь с безопасностью</th></tr></thead>
@@ -222,6 +224,7 @@
             <tr><td>Память</td><td>Ручная, автоматическая, владение и заимствование?</td><td>Use-after-free, переполнения, утечки, паузы сборщика мусора.</td></tr>
             <tr><td>Модель исполнения</td><td>Нативный код, виртуальная машина, JIT, интерпретатор?</td><td>Hardening, sandbox, поверхность среды выполнения.</td></tr>
             <tr><td>FFI и unsafe</td><td>Где высокоуровневый код пересекается с нативным?</td><td>Возврат рисков памяти на границе доверия.</td></tr>
+            <tr><td>Область применения</td><td>Универсальный язык или предметно-ориентированный (DSL)?</td><td>Широта поверхности атаки и специализация проверок.</td></tr>
             <tr><td>Toolchain</td><td>Есть ли SAST, sanitizers, fuzzing, lock-файлы, SBOM?</td><td>Способность обнаруживать и воспроизводимо устранять дефекты.</td></tr>
           </tbody>
         </table>
@@ -304,6 +307,47 @@
       <h2>Shift Left: раньше, но не один раз</h2>
       <p class="lead">Требования безопасности, моделирование угроз, анализ архитектуры и автоматические проверки включаются раньше в существующий SDLC. Это не означает перенос всей безопасности только в начало проекта.</p>
 
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 340" role="img" aria-label="График: стоимость исправления одного и того же дефекта растёт от фазы требований к эксплуатации; Shift Left переносит меры в дешёвую левую часть оси">
+          <defs>
+            <marker id="m2i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m2a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-accent" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <rect x="66" y="44" width="274" height="239" class="d-area-ok"/>
+          <text x="90" y="68" font-size="12.5" font-weight="700" class="d-ok">зона Shift Left</text>
+          <text x="90" y="86" font-size="11.5" class="d-ok">дефект дёшево предотвратить</text>
+
+          <path d="M64 284 L738 284" stroke-width="1.5" class="d-axis" marker-end="url(#m2i)"/>
+          <path d="M64 284 L64 42" stroke-width="1.5" class="d-axis" marker-end="url(#m2i)"/>
+          <text transform="rotate(-90 30 170)" x="30" y="170" text-anchor="middle" font-size="12.5" class="d-subtle">стоимость исправления</text>
+
+          <path d="M130 266 C200 262 230 258 270 252 C330 244 360 236 410 220 C470 200 500 186 550 158 C610 124 650 96 690 64" stroke-width="2.5" class="d-curve"/>
+          <circle cx="130" cy="266" r="5" stroke-width="2" class="d-dot"/>
+          <circle cx="270" cy="252" r="5" stroke-width="2" class="d-dot"/>
+          <circle cx="410" cy="220" r="5" stroke-width="2" class="d-dot"/>
+          <circle cx="550" cy="158" r="5" stroke-width="2" class="d-dot"/>
+          <circle cx="690" cy="64" r="5" stroke-width="2" class="d-dot"/>
+          <text x="130" y="246" text-anchor="middle" font-size="13" font-weight="700" class="d-ink">×1</text>
+          <text x="270" y="232" text-anchor="middle" font-size="13" font-weight="700" class="d-ink">×5</text>
+          <text x="410" y="200" text-anchor="middle" font-size="13" font-weight="700" class="d-ink">×10</text>
+          <text x="550" y="138" text-anchor="middle" font-size="13" font-weight="700" class="d-ink">×15</text>
+          <text x="678" y="48" text-anchor="middle" font-size="13" font-weight="700" class="d-ink">×30+</text>
+
+          <text x="315" y="96" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Shift Left: меры принимаются раньше</text>
+          <path d="M470 112 L160 112" stroke-width="2" class="d-arrow-accent" marker-end="url(#m2a)"/>
+
+          <text x="130" y="308" text-anchor="middle" font-size="12.5" class="d-muted">Требования</text>
+          <text x="270" y="308" text-anchor="middle" font-size="12.5" class="d-muted">Архитектура</text>
+          <text x="410" y="308" text-anchor="middle" font-size="12.5" class="d-muted">Реализация</text>
+          <text x="550" y="308" text-anchor="middle" font-size="12.5" class="d-muted">Верификация</text>
+          <text x="690" y="308" text-anchor="middle" font-size="12.5" class="d-muted">Эксплуатация</text>
+        </svg>
+        </div>
+        <figcaption>Соотношения условны (по мотивам классических оценок Барри Боэма и IBM Systems Sciences Institute), но порядок устойчив: чем позже обнаружен дефект, тем дороже исправление. Пять шагов ниже переносят решения безопасности в левую часть оси — не отменяя проверок справа.</figcaption>
+      </figure>
+
       <div class="roadmap">
         <div class="roadmap-step"><div class="roadmap-num">01</div><div class="roadmap-content"><h4>Требования</h4><p>Определить активы, недопустимые события и критерии приёмки.</p><div class="roadmap-meta"><span class="roadmap-tag">до кода</span></div></div></div>
         <div class="roadmap-step"><div class="roadmap-num">02</div><div class="roadmap-content"><h4>Архитектура</h4><p>Провести threat modeling, определить границы доверия, язык, компоненты и компенсирующие меры.</p><div class="roadmap-meta"><span class="roadmap-tag">до зависимости</span></div></div></div>
@@ -353,6 +397,38 @@
 
       <p>Фраза «библиотеку вызываете вы, фреймворк вызывает вас» полезна как эвристика, но реальные продукты бывают гибридными. Для безопасности название не меняет обязательных действий.</p>
 
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 200" role="img" aria-label="Схема направления вызова: приложение вызывает библиотеку; фреймворк сам вызывает код приложения в точках расширения">
+          <defs>
+            <marker id="m5i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m5a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-accent" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <text x="206" y="42" text-anchor="middle" font-size="14" font-weight="700" class="d-ink">Библиотека</text>
+          <rect x="36" y="66" width="110" height="60" rx="10" class="d-box-accent"/>
+          <text x="91" y="101" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Ваш код</text>
+          <path d="M146 96 L264 96" stroke-width="2" class="d-arrow-accent" marker-end="url(#m5a)"/>
+          <text x="205" y="82" text-anchor="middle" font-size="12" class="d-muted">вызываете вы</text>
+          <rect x="266" y="66" width="110" height="60" rx="10" class="d-box"/>
+          <text x="321" y="101" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Библиотека</text>
+          <text x="206" y="156" text-anchor="middle" font-size="11.5" class="d-subtle">момент вызова выбирает приложение</text>
+
+          <line x1="391" y1="30" x2="391" y2="170" stroke-width="1.5" class="d-line"/>
+
+          <text x="576" y="42" text-anchor="middle" font-size="14" font-weight="700" class="d-ink">Фреймворк</text>
+          <rect x="406" y="66" width="110" height="60" rx="10" class="d-box"/>
+          <text x="461" y="101" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Фреймворк</text>
+          <path d="M516 96 L634 96" stroke-width="2" class="d-arrow" marker-end="url(#m5i)"/>
+          <text x="575" y="82" text-anchor="middle" font-size="12" class="d-muted">вызывает вас</text>
+          <rect x="636" y="66" width="110" height="60" rx="10" class="d-box-accent"/>
+          <text x="691" y="101" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Ваш код</text>
+          <text x="576" y="156" text-anchor="middle" font-size="11.5" class="d-subtle">точки расширения задаёт каркас</text>
+        </svg>
+        </div>
+        <figcaption>Главное различие — направление вызова и, вместе с ним, контроль над жизненным циклом: у библиотеки его сохраняет ваш код, во фреймворке — каркас. Обязательные действия безопасности из списка ниже одинаковы для обоих случаев.</figcaption>
+      </figure>
+
       <ul class="checklist">
         <li>идентифицировать компонент, версию, поставщика и источник;</li>
         <li>проверить происхождение, целостность и лицензию;</li>
@@ -397,6 +473,62 @@
       <h2>Модель угроз реестра компонентов</h2>
       <p>Учебное приложение хранит наименование компонента, версию, SPDX-идентификатор лицензии, поставщика и критичность. Данные вымышлены, но угрозы типовые.</p>
 
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 320" role="img" aria-label="Схема границ доверия: пользователь, Python-приложение, движок SQLite и файл базы данных разделены тремя границами; между приложением и движком SQL-текст и значения параметров передаются раздельными каналами">
+          <defs>
+            <marker id="m3i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m3a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-accent" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <line x1="183" y1="72" x2="183" y2="230" stroke-width="2" class="d-boundary"/>
+          <line x1="370" y1="72" x2="370" y2="230" stroke-width="2" class="d-boundary"/>
+          <line x1="557" y1="72" x2="557" y2="230" stroke-width="2" class="d-boundary"/>
+          <text x="183" y="58" text-anchor="middle" font-size="11.5" font-weight="600" class="d-danger">граница доверия 1</text>
+          <text x="370" y="58" text-anchor="middle" font-size="11.5" font-weight="600" class="d-danger">граница доверия 2</text>
+          <text x="557" y="58" text-anchor="middle" font-size="11.5" font-weight="600" class="d-danger">граница доверия 3</text>
+
+          <rect x="20" y="110" width="140" height="104" rx="10" class="d-box"/>
+          <text x="90" y="136" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Пользователь,</text>
+          <text x="90" y="153" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">другой клиент</text>
+          <text x="90" y="180" text-anchor="middle" font-size="11.5" class="d-subtle">возможен любой ввод,</text>
+          <text x="90" y="196" text-anchor="middle" font-size="11.5" class="d-subtle">включая payload</text>
+
+          <rect x="207" y="110" width="140" height="104" rx="10" class="d-box-accent"/>
+          <text x="277" y="136" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Python-</text>
+          <text x="277" y="153" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">приложение</text>
+          <text x="277" y="177" text-anchor="middle" font-size="11.5" class="d-subtle">валидация значений</text>
+          <text x="277" y="192" text-anchor="middle" font-size="11.5" class="d-subtle">allowlist идентификаторов</text>
+          <text x="277" y="207" text-anchor="middle" font-size="11.5" class="d-subtle">транзакции</text>
+
+          <rect x="394" y="110" width="140" height="104" rx="10" class="d-box-accent"/>
+          <text x="464" y="136" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Движок SQLite</text>
+          <text x="464" y="163" text-anchor="middle" font-size="11.5" class="d-subtle">план запроса</text>
+          <text x="464" y="178" text-anchor="middle" font-size="11.5" class="d-subtle">CHECK · UNIQUE · FK</text>
+          <text x="464" y="193" text-anchor="middle" font-size="11.5" class="d-subtle">STRICT-типизация</text>
+
+          <rect x="601" y="110" width="140" height="104" rx="10" class="d-box"/>
+          <text x="671" y="136" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Файл</text>
+          <text x="671" y="153" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">components.db</text>
+          <text x="671" y="180" text-anchor="middle" font-size="11.5" class="d-subtle">права ОС</text>
+          <text x="671" y="196" text-anchor="middle" font-size="11.5" class="d-subtle">mode=ro для читателя</text>
+
+          <path d="M160 162 L205 162" stroke-width="2" class="d-arrow" marker-end="url(#m3i)"/>
+          <text x="183" y="98" text-anchor="middle" font-size="11.5" class="d-subtle">строка ввода</text>
+
+          <path d="M347 148 L392 148" stroke-width="2" class="d-arrow-accent" marker-end="url(#m3a)"/>
+          <path d="M347 184 L392 184" stroke-width="2" class="d-arrow-accent" marker-end="url(#m3a)"/>
+          <text x="370" y="98" text-anchor="middle" font-size="11.5" font-weight="600" class="d-accent">два раздельных канала:</text>
+          <text x="370" y="252" text-anchor="middle" font-size="11.5" class="d-mono d-accent">SQL-текст с ?</text>
+          <text x="370" y="269" text-anchor="middle" font-size="11.5" class="d-mono d-accent">значения параметров</text>
+
+          <path d="M534 162 L599 162" stroke-width="2" class="d-arrow" marker-end="url(#m3i)"/>
+          <text x="557" y="98" text-anchor="middle" font-size="11.5" class="d-subtle">запись в файл</text>
+        </svg>
+        </div>
+        <figcaption>Схема границ доверия учебного реестра. Каждую границу пересекает только узкий проверяемый канал; ключевая деталь — граница 2, где текст запроса с placeholder и значения параметров идут раздельно, поэтому данные не могут изменить команду.</figcaption>
+      </figure>
+
       <div class="table-wrap">
         <table class="data">
           <thead><tr><th>Актив / граница</th><th>Недопустимое событие</th><th>Ранняя мера</th><th>Проверка</th></tr></thead>
@@ -419,7 +551,7 @@
 
       <div class="two-col">
         <div>
-          <div class="code-label good"><span class="dot"></span>schema.sql</div>
+          <div class="code-label good"><span class="dot"></span>schema.sql (фрагмент)</div>
           <pre class="code"><code><span class="kw">CREATE TABLE</span> components (
   id <span class="type">INTEGER PRIMARY KEY</span>,
   name <span class="type">TEXT NOT NULL</span>
@@ -474,6 +606,49 @@ rows = conn.execute(sql).fetchall()</code></pre>
       </div>
 
       <p>В первом примере значение попадает внутрь грамматики SQL. Во втором драйвер передаёт текст запроса и значение раздельно; payload остаётся строкой. Ручное «экранирование кавычек» не заменяет параметризацию.</p>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 400" role="img" aria-label="Схема: один и тот же ввод пользователя при склейке строк становится частью SQL-команды, а при параметризации остаётся данными">
+          <defs>
+            <marker id="m1d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m1o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ok" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <rect x="16" y="170" width="168" height="92" rx="10" class="d-box"/>
+          <text x="100" y="198" text-anchor="middle" font-size="13" class="d-muted">Ввод пользователя</text>
+          <text x="100" y="222" text-anchor="middle" font-size="13.5" font-weight="600" class="d-mono d-danger">' OR 1=1 --</text>
+          <text x="100" y="246" text-anchor="middle" font-size="11.5" class="d-subtle">одна и та же строка</text>
+
+          <text x="248" y="34" font-size="13.5" font-weight="700" class="d-danger">Путь 1 · склейка строк</text>
+          <path d="M184 198 C216 198 216 94 248 94" stroke-width="2" class="d-arrow-danger" marker-end="url(#m1d)"/>
+          <rect x="248" y="48" width="224" height="92" rx="10" class="d-box-danger"/>
+          <text x="360" y="74" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Склейка f-строкой</text>
+          <text x="360" y="98" text-anchor="middle" font-size="11.5" class="d-mono d-muted">f"WHERE name = '{term}'"</text>
+          <text x="360" y="122" text-anchor="middle" font-size="11.5" class="d-mono d-danger">WHERE name = '' OR 1=1 --'</text>
+          <path d="M472 94 L520 94" stroke-width="2" class="d-arrow-danger" marker-end="url(#m1d)"/>
+          <rect x="524" y="48" width="220" height="92" rx="10" class="d-box-danger"/>
+          <text x="634" y="74" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">SQLite разбирает команду</text>
+          <text x="634" y="97" text-anchor="middle" font-size="11.5" class="d-muted">ввод стал частью кода:</text>
+          <text x="634" y="115" text-anchor="middle" font-size="11.5" class="d-muted">условие 1=1 всегда истинно</text>
+          <text x="634" y="133" text-anchor="middle" font-size="12" font-weight="700" class="d-danger">вернулись все 3 строки</text>
+
+          <text x="248" y="282" font-size="13.5" font-weight="700" class="d-ok">Путь 2 · параметризация</text>
+          <path d="M184 234 C216 234 216 338 248 338" stroke-width="2" class="d-arrow-ok" marker-end="url(#m1o)"/>
+          <rect x="248" y="292" width="224" height="92" rx="10" class="d-box-ok"/>
+          <text x="360" y="318" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">Placeholder и кортеж</text>
+          <text x="360" y="342" text-anchor="middle" font-size="11.5" class="d-mono d-muted">"WHERE name = ?"</text>
+          <text x="360" y="366" text-anchor="middle" font-size="11.5" class="d-mono d-muted">("' OR 1=1 --",)</text>
+          <path d="M472 338 L520 338" stroke-width="2" class="d-arrow-ok" marker-end="url(#m1o)"/>
+          <rect x="524" y="292" width="220" height="92" rx="10" class="d-box-ok"/>
+          <text x="634" y="318" text-anchor="middle" font-size="13" font-weight="600" class="d-ink">SQLite разбирает команду</text>
+          <text x="634" y="341" text-anchor="middle" font-size="11.5" class="d-muted">код и значение пришли раздельно:</text>
+          <text x="634" y="359" text-anchor="middle" font-size="11.5" class="d-muted">payload — просто текст для поиска</text>
+          <text x="634" y="377" text-anchor="middle" font-size="12" font-weight="700" class="d-ok">вернулось 0 строк</text>
+        </svg>
+        </div>
+        <figcaption>Судьба одной и той же строки на двух путях. Именно это показывает <code>demo_unsafe_query.py</code>: небезопасный запрос возвращает все 3 учебные записи, параметризованный — ни одной, потому что компонента с таким именем не существует.</figcaption>
+      </figure>
 
       <div class="callout danger">
         <p><strong>Демонстрация изолирована.</strong> <code>demo_unsafe_query.py</code> работает только с тремя вымышленными строками в памяти и использует фиксированный учебный payload. Уязвимая функция не является заготовкой для проекта.</p>
@@ -531,6 +706,47 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
     (<span class="str">"license_changed"</span>, component_id),
   )</code></pre>
 
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 290" role="img" aria-label="Схема транзакции: UPDATE и INSERT выполняются в одной транзакции; при выходе без исключения происходит COMMIT и видны обе записи, при исключении — ROLLBACK и не видна ни одна">
+          <defs>
+            <marker id="m4i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m4o" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ok" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m4d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <rect x="20" y="120" width="120" height="64" rx="10" class="d-box"/>
+          <text x="80" y="147" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">with conn:</text>
+          <text x="80" y="168" text-anchor="middle" font-size="11.5" class="d-subtle">открыта транзакция</text>
+
+          <text x="354" y="86" text-anchor="middle" font-size="12.5" font-weight="700" class="d-accent">одна транзакция — одно целое</text>
+          <rect x="176" y="96" width="356" height="112" rx="12" stroke-width="1.5" class="d-frame"/>
+
+          <path d="M140 152 L194 152" stroke-width="2" class="d-arrow" marker-end="url(#m4i)"/>
+          <rect x="196" y="120" width="150" height="64" rx="10" class="d-box-accent"/>
+          <text x="271" y="147" text-anchor="middle" font-size="12" font-weight="600" class="d-mono d-ink">UPDATE</text>
+          <text x="271" y="167" text-anchor="middle" font-size="11.5" class="d-mono d-subtle">components</text>
+          <path d="M346 152 L364 152" stroke-width="2" class="d-arrow" marker-end="url(#m4i)"/>
+          <rect x="366" y="120" width="146" height="64" rx="10" class="d-box-accent"/>
+          <text x="439" y="147" text-anchor="middle" font-size="12" font-weight="600" class="d-mono d-ink">INSERT</text>
+          <text x="439" y="167" text-anchor="middle" font-size="11.5" class="d-mono d-subtle">audit_events</text>
+
+          <path d="M532 152 C572 152 578 66 614 66" stroke-width="2" class="d-arrow-ok" marker-end="url(#m4o)"/>
+          <text x="561" y="102" text-anchor="middle" font-size="12" font-weight="600" class="d-ok">без исключений</text>
+          <rect x="616" y="34" width="126" height="64" rx="10" class="d-box-ok"/>
+          <text x="679" y="61" text-anchor="middle" font-size="13" font-weight="700" class="d-mono d-ok">COMMIT</text>
+          <text x="679" y="82" text-anchor="middle" font-size="11.5" class="d-subtle">видны обе записи</text>
+
+          <path d="M532 152 C572 152 578 238 614 238" stroke-width="2" class="d-arrow-danger" marker-end="url(#m4d)"/>
+          <text x="561" y="216" text-anchor="middle" font-size="12" font-weight="600" class="d-danger">исключение</text>
+          <rect x="616" y="206" width="126" height="64" rx="10" class="d-box-danger"/>
+          <text x="679" y="233" text-anchor="middle" font-size="13" font-weight="700" class="d-mono d-danger">ROLLBACK</text>
+          <text x="679" y="254" text-anchor="middle" font-size="11.5" class="d-subtle">не видна ни одна</text>
+        </svg>
+        </div>
+        <figcaption>Два исхода блока <code>with conn:</code> — и третьего не дано: «половина результата», когда лицензия изменена, а событие аудита потеряно, невозможна по построению. Именно это проверяет тест <code>test_change_license_rolls_back_when_component_is_missing</code>.</figcaption>
+      </figure>
+
       <p>Для читающего процесса используется отдельное подключение <code>file:...?...mode=ro</code>. В рабочей клиент-серверной СУБД принцип продолжается отдельной учётной записью с минимальными правами. Только приложение не должно решать, может ли оно писать: запрет должен обеспечивать и нижний слой.</p>
 
       <div class="callout warning">
@@ -550,19 +766,72 @@ sql = <span class="str">f"SELECT ... ORDER BY {column} ASC"</span></code></pre>
 
       <h3>Команды</h3>
       <pre class="code"><code>py step1_schema.py
-py -m unittest -v test_examples.py
+py -m unittest -v test_examples.py   <span class="cm"># служебная проверка примеров, по желанию</span>
 py demo_unsafe_query.py
 py step2_secure_queries.py
 py -m unittest -v test_student.py</code></pre>
 
       <div class="callout">
-        <p><strong>Подробный порядок без ответов</strong> находится в <a href="materials/praktikum.md">практикуме</a>. Эталон реализации и ключи не входят в студенческий архив.</p>
+        <p><strong>Подробный порядок без ответов</strong> находится в <a href="materials/praktikum.md">практикуме</a>; там же есть раздел «Если что-то пошло не так» с разбором типичных ошибок. Эталон реализации и ключи не входят в студенческий архив.</p>
       </div>
     </section>
 
     <section id="pipeline" class="section">
       <div class="section-eyebrow"><span class="section-num">16</span> Доказательства</div>
       <h2>CI проверяет именно студенческий результат</h2>
+
+      <figure class="figure">
+        <div class="figure-scroll">
+        <svg class="diagram" viewBox="0 0 760 240" role="img" aria-label="Схема конвейера CI: пять последовательных шагов проверки; провал любого шага останавливает конвейер, прохождение всех подтверждает результат">
+          <defs>
+            <marker id="m6i" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-ink" d="M0 0 L10 5 L0 10 z"/></marker>
+            <marker id="m6d" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path class="mk-danger" d="M0 0 L10 5 L0 10 z"/></marker>
+          </defs>
+
+          <rect x="20" y="56" width="106" height="68" rx="10" class="d-box"/>
+          <text x="73" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">ruff</text>
+          <text x="73" y="104" text-anchor="middle" font-size="11" class="d-subtle">стиль и ошибки</text>
+          <path d="M126 90 L144 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <rect x="146" y="56" width="106" height="68" rx="10" class="d-box"/>
+          <text x="199" y="80" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_examples</text>
+          <text x="199" y="98" text-anchor="middle" font-size="11" class="d-subtle">примеры</text>
+          <text x="199" y="113" text-anchor="middle" font-size="11" class="d-subtle">6 тестов</text>
+          <path d="M252 90 L270 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <rect x="272" y="56" width="106" height="68" rx="10" class="d-box-accent"/>
+          <text x="325" y="80" text-anchor="middle" font-size="11" font-weight="600" class="d-mono d-ink">test_student</text>
+          <text x="325" y="98" text-anchor="middle" font-size="11" class="d-subtle">ваш результат</text>
+          <text x="325" y="113" text-anchor="middle" font-size="11" class="d-subtle">13 тестов</text>
+          <path d="M378 90 L396 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <rect x="398" y="56" width="106" height="68" rx="10" class="d-box"/>
+          <text x="451" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">bandit</text>
+          <text x="451" y="104" text-anchor="middle" font-size="11" class="d-subtle">SAST</text>
+          <path d="M504 90 L522 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <rect x="524" y="56" width="106" height="68" rx="10" class="d-box"/>
+          <text x="577" y="84" text-anchor="middle" font-size="12.5" font-weight="600" class="d-mono d-ink">pip-audit</text>
+          <text x="577" y="104" text-anchor="middle" font-size="11" class="d-subtle">зависимости</text>
+          <path d="M630 90 L648 90" stroke-width="2" class="d-arrow" marker-end="url(#m6i)"/>
+
+          <circle cx="676" cy="90" r="22" stroke-width="1.5" class="d-box-ok"/>
+          <path d="M666 90 L673 98 L687 81" stroke-width="3" fill="none" class="d-arrow-ok"/>
+          <text x="676" y="136" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">результат</text>
+          <text x="676" y="152" text-anchor="middle" font-size="11.5" font-weight="600" class="d-ok">подтверждён</text>
+
+          <path d="M73 124 L73 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M199 124 L199 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M325 124 L325 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M451 124 L451 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <path d="M577 124 L577 166" stroke-width="1.5" class="d-arrow-danger" marker-end="url(#m6d)"/>
+          <rect x="20" y="170" width="610" height="52" rx="10" class="d-box-danger"/>
+          <text x="325" y="192" text-anchor="middle" font-size="12.5" font-weight="700" class="d-danger">любой красный шаг останавливает конвейер</text>
+          <text x="325" y="211" text-anchor="middle" font-size="11.5" class="d-danger">до исправления результат не считается готовым</text>
+        </svg>
+        </div>
+        <figcaption>Порядок шагов учебного quality gate из <code>.gitlab-ci.yml</code>. До выполнения задания шаг <code>test_student</code> красный — это ожидаемое стартовое состояние; соответствие шагов и локальных команд — в таблице ниже.</figcaption>
+      </figure>
 
       <div class="table-wrap">
         <table class="data">
@@ -571,7 +840,7 @@ py -m unittest -v test_student.py</code></pre>
             <tr><td><code>ruff check .</code></td><td>Ошибки Python, стиль, опасные конструкции выбранных правил</td><td>Любая неисправленная находка</td></tr>
             <tr><td><code>test_examples.py</code></td><td>Готовые примеры ПЗ-1/ПЗ-2</td><td>Не 6/6</td></tr>
             <tr><td><code>test_student.py</code></td><td>Параметры, allowlist, транзакция, read-only</td><td>Не 13/13</td></tr>
-            <tr><td><code>bandit -r .</code></td><td>Высокосигнальные опасные конструкции Python</td><td>Необоснованная находка</td></tr>
+            <tr><td><code>bandit -r . -x ./demo_unsafe_query.py,./test_examples.py,./test_student.py</code></td><td>Высокосигнальные опасные конструкции Python; демонстрация и тесты исключены осознанно, рабочий файл слушателя — нет</td><td>Необоснованная находка</td></tr>
             <tr><td><code>pip-audit</code></td><td>Известные уязвимости runtime-зависимостей</td><td>Для приложения список пуст; факт фиксируется явно</td></tr>
           </tbody>
         </table>

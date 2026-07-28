@@ -41,6 +41,13 @@ def build_database(path: str | Path) -> Path:
 def main() -> int:
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    if sys.version_info < (3, 11) or sqlite3.sqlite_version_info < (3, 37):
+        python_found = ".".join(str(part) for part in sys.version_info[:3])
+        print("Не получится создать учебную БД: среда устарела.")
+        print(f"Найдено: Python {python_found}, SQLite {sqlite3.sqlite_version}.")
+        print("Нужно: Python 3.11+ и SQLite 3.37+ (таблицы STRICT требуют 3.37+).")
+        print("Поставьте Python 3.11+ с python.org — свежий SQLite идёт в комплекте.")
+        return 1
     parser = argparse.ArgumentParser(
         description="Создать учебную SQLite-БД реестра компонентов."
     )

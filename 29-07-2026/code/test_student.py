@@ -12,6 +12,7 @@ import os
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 MODULE_NAME = os.environ.get("REGISTRY_MODULE", "step3_student")
@@ -74,6 +75,17 @@ class AddComponentTests(RegistryTestCase):
         self.assertEqual(row["license_spdx"], "Apache-2.0")
         self.assertEqual(row["supplier"], "Example Org")
         self.assertEqual(row["criticality"], "high")
+
+        # Второе соединение: незакоммиченная транзакция не видна
+        # другим соединениям, поэтому данные обязаны быть зафиксированы.
+        with closing(sqlite3.connect(self.db_path)) as checker:
+            persisted = checker.execute(
+                "SELECT name FROM components WHERE id = ?",
+                (component_id,),
+            ).fetchone()
+        self.assertIsNotNone(persisted)
+        assert persisted is not None
+        self.assertEqual(persisted[0], "libsafe")
 
     def test_add_component_treats_sql_payload_as_plain_data(self) -> None:
         payload = "x'); DROP TABLE components; --"
@@ -177,6 +189,20 @@ class TransactionTests(RegistryTestCase):
         self.assertEqual(component["license_spdx"], "BSD-3-Clause")
         self.assertEqual(audit["event_type"], "license_changed")
 
+        # Второе соединение: незакоммиченная транзакция не видна
+        # другим соединениям — проверяем, что фиксация действительно была.
+        with closing(sqlite3.connect(self.db_path)) as checker:
+            persisted_license = checker.execute(
+                "SELECT license_spdx FROM components WHERE id = ?",
+                (component_id,),
+            ).fetchone()[0]
+            persisted_events = checker.execute(
+                "SELECT count(*) FROM audit_events WHERE component_id = ?",
+                (component_id,),
+            ).fetchone()[0]
+        self.assertEqual(persisted_license, "BSD-3-Clause")
+        self.assertEqual(persisted_events, 1)
+
     def test_change_license_rolls_back_when_component_is_missing(self) -> None:
         with self.assertRaises(LookupError):
             registry.change_license(self.conn, 999, "MIT")
@@ -184,6 +210,13 @@ class TransactionTests(RegistryTestCase):
             self.conn.execute("SELECT count(*) FROM audit_events").fetchone()[0],
             0,
         )
+        # Второе соединение: незакоммиченная транзакция не видна другим
+        # соединениям — в файле БД события аудита тоже быть не должно.
+        with closing(sqlite3.connect(self.db_path)) as checker:
+            persisted_events = checker.execute(
+                "SELECT count(*) FROM audit_events"
+            ).fetchone()[0]
+        self.assertEqual(persisted_events, 0)
 
 
 class LeastPrivilegeTests(RegistryTestCase):

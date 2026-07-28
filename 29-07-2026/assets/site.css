@@ -593,6 +593,47 @@
     .hero-eyebrow { white-space: normal; }
   }
 
+  /* ---- Содержательные иллюстрации (inline SVG). Цвета только через
+     классы: CSP style-src 'self' запрещает инлайновые style-атрибуты,
+     а классы наследуют переменные светлой и тёмной темы. ---- */
+  .figure { margin: 26px 0 30px; }
+  .figure-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .figure-scroll svg { min-width: 640px; width: 100%; height: auto; display: block; }
+  .figure figcaption {
+    margin-top: 10px; font-size: 13.5px; color: var(--text-subtle);
+    line-height: 1.55; max-width: 70ch;
+  }
+  .diagram { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", "Inter", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  .diagram .d-mono { font-family: "SF Mono", Monaco, Consolas, "Liberation Mono", "Courier New", monospace; }
+  .diagram .d-ink { fill: var(--text); }
+  .diagram .d-muted { fill: var(--text-muted); }
+  .diagram .d-subtle { fill: var(--text-subtle); }
+  .diagram .d-accent { fill: var(--accent); }
+  .diagram .d-danger { fill: var(--danger); }
+  .diagram .d-ok { fill: var(--success); }
+  .diagram .d-warn { fill: var(--warning); }
+  .diagram .d-box { fill: var(--surface); stroke: var(--border-strong); }
+  .diagram .d-box-plain { fill: var(--bg); stroke: var(--border-strong); }
+  .diagram .d-box-accent { fill: var(--accent-soft); stroke: var(--accent); }
+  .diagram .d-box-danger { fill: var(--danger-soft); stroke: var(--danger); }
+  .diagram .d-box-ok { fill: var(--success-soft); stroke: var(--success); }
+  .diagram .d-box-warn { fill: var(--warning-soft); stroke: var(--warning); }
+  .diagram .d-frame { fill: none; stroke: var(--accent); stroke-dasharray: 7 5; }
+  .diagram .d-line { stroke: var(--border-strong); fill: none; }
+  .diagram .d-axis { stroke: var(--border-strong); fill: none; }
+  .diagram .d-area-ok { fill: var(--success-soft); }
+  .diagram .d-arrow { stroke: var(--text-muted); fill: none; }
+  .diagram .d-arrow-accent { stroke: var(--accent); fill: none; }
+  .diagram .d-arrow-danger { stroke: var(--danger); fill: none; }
+  .diagram .d-arrow-ok { stroke: var(--success); fill: none; }
+  .diagram .d-curve { stroke: var(--accent); fill: none; }
+  .diagram .d-dot { fill: var(--accent); stroke: var(--bg); }
+  .diagram .d-boundary { stroke: var(--danger); stroke-dasharray: 6 5; fill: none; }
+  .diagram .mk-ink { fill: var(--text-muted); }
+  .diagram .mk-accent { fill: var(--accent); }
+  .diagram .mk-danger { fill: var(--danger); }
+  .diagram .mk-ok { fill: var(--success); }
+
   @media print {
     .site-header, .toc, .back-to-top, .reading-progress, .toc-toggle { display: none !important; }
     .layout { grid-template-columns: 1fr; }

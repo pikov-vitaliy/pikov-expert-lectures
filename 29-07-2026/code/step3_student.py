@@ -22,7 +22,11 @@ def add_component(
     supplier: str,
     criticality: str = "medium",
 ) -> int:
-    """Проверить поля и атомарно добавить компонент."""
+    """Проверить поля и атомарно добавить компонент.
+
+    Пустое или пробельное ``name`` и неизвестная ``criticality`` —
+    ``raise ValueError`` (ещё до обращения к SQL).
+    """
     raise NotImplementedError("Реализуйте add_component")
 
 
@@ -32,7 +36,10 @@ def search_components(
     *,
     limit: int = 20,
 ) -> list[sqlite3.Row]:
-    """Найти буквальный фрагмент имени, не интерпретируя его как SQL."""
+    """Найти буквальный фрагмент имени, не интерпретируя его как SQL.
+
+    Недопустимый ``limit`` (разрешено от 1 до 100) — ``raise ValueError``.
+    """
     raise NotImplementedError("Реализуйте search_components")
 
 
@@ -42,7 +49,10 @@ def list_components(
     sort_by: str = "name",
     descending: bool = False,
 ) -> list[sqlite3.Row]:
-    """Отсортировать только по явно разрешённым столбцам."""
+    """Отсортировать только по явно разрешённым столбцам.
+
+    Неизвестный ``sort_by`` — ``raise ValueError``.
+    """
     raise NotImplementedError("Реализуйте list_components")
 
 
@@ -51,7 +61,11 @@ def change_license(
     component_id: int,
     new_license: str,
 ) -> None:
-    """В одной транзакции изменить лицензию и добавить событие аудита."""
+    """В одной транзакции изменить лицензию и добавить событие аудита.
+
+    Если компонент не найден — ``raise LookupError``; событие аудита
+    при этом не добавляется.
+    """
     raise NotImplementedError("Реализуйте change_license")
 
 

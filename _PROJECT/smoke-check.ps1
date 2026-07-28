@@ -187,7 +187,7 @@ if ($quarantineDirs.Count -ne 1) {
     Fail "Expected at most one quarantine directory, got $($quarantineDirs.Count)"
   }
 }
-$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.serena', '.gigacode', '.qwen', '.vscode', '.idea')
+$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.serena', '.gigacode', '.qwen', '.vscode', '.idea', '.sbom-tool', '.ruff_cache')
 $localWorkspaceDirs = @(
   $actualRootDirObjects |
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.obsidian') } |

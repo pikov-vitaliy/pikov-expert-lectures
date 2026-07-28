@@ -23,6 +23,9 @@ class SchemaExampleTests(unittest.TestCase):
                 count = conn.execute("SELECT count(*) FROM components").fetchone()[0]
                 foreign_keys = conn.execute("PRAGMA foreign_keys").fetchone()[0]
             self.assertEqual(count, 4)
+            # PRAGMA foreign_keys действует на КАЖДОЕ соединение отдельно:
+            # свежее соединение всегда стартует со значения 0. Именно поэтому
+            # step1_schema.py включает его явно. Тест фиксирует эту ловушку.
             self.assertEqual(foreign_keys, 0)
 
     def test_build_database_refuses_to_overwrite_existing_file(self) -> None:
