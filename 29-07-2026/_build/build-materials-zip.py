@@ -25,6 +25,7 @@ FILES = (
     ("assets/site.css", "assets/site.css"),
     ("assets/site.js", "assets/site.js"),
     ("materials/ЧИТАТЬ-ПЕРВЫМ.md", "ЧИТАТЬ-ПЕРВЫМ.md"),
+    ("materials/ЧИТАТЬ-ПЕРВЫМ-Mac.md", "ЧИТАТЬ-ПЕРВЫМ-Mac.md"),
     ("materials/konspekt.md", "materials/konspekt.md"),
     ("materials/praktikum.md", "materials/praktikum.md"),
     ("code/.gitignore", "code/.gitignore"),
@@ -39,6 +40,7 @@ FILES = (
     ("code/demo_unsafe_query.py", "code/demo_unsafe_query.py"),
     ("code/step2_secure_queries.py", "code/step2_secure_queries.py"),
     ("code/step3_student.py", "code/step3_student.py"),
+    ("code/step3_student_template.py", "code/step3_student_template.py"),
     ("code/test_examples.py", "code/test_examples.py"),
     ("code/test_student.py", "code/test_student.py"),
 )

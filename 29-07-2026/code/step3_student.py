@@ -13,6 +13,9 @@ import sqlite3
 from pathlib import Path
 
 
+_VALID_CRITICALITY = frozenset({"low", "medium", "high"})
+
+
 def add_component(
     conn: sqlite3.Connection,
     *,
@@ -27,7 +30,25 @@ def add_component(
     Пустое или пробельное ``name`` и неизвестная ``criticality`` —
     ``raise ValueError`` (ещё до обращения к SQL).
     """
-    raise NotImplementedError("Реализуйте add_component")
+    if not name or not name.strip():
+        raise ValueError("name: обязательно для заполнения")
+    if criticality not in _VALID_CRITICALITY:
+        raise ValueError("criticality: допустимы low, medium, high")
+
+    with conn:
+        cursor = conn.execute(
+            """
+            INSERT INTO components
+                (name, version, license_spdx, supplier, criticality)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (name, version, license_spdx, supplier, criticality),
+        )
+        return int(cursor.lastrowid)
+
+
+def _escape_like(value: str) -> str:
+    return value.replace("!", "!!").replace("%", "!%").replace("_", "!_")
 
 
 def search_components(
@@ -40,7 +61,30 @@ def search_components(
 
     Недопустимый ``limit`` (разрешено от 1 до 100) — ``raise ValueError``.
     """
-    raise NotImplementedError("Реализуйте search_components")
+    if not 1 <= limit <= 100:
+        raise ValueError("limit: допустим диапазон от 1 до 100")
+
+    pattern = f"%{_escape_like(term)}%"
+    return list(
+        conn.execute(
+            """
+            SELECT id, name, version, license_spdx, supplier, criticality
+            FROM components
+            WHERE name LIKE ? ESCAPE '!'
+            ORDER BY name COLLATE NOCASE, version
+            LIMIT ?
+            """,
+            (pattern, limit),
+        ).fetchall()
+    )
+
+
+_SORT_COLUMNS = {
+    "name": "name",
+    "version": "version",
+    "license_spdx": "license_spdx",
+    "criticality": "criticality",
+}
 
 
 def list_components(
@@ -53,7 +97,19 @@ def list_components(
 
     Неизвестный ``sort_by`` — ``raise ValueError``.
     """
-    raise NotImplementedError("Реализуйте list_components")
+    try:
+        column = _SORT_COLUMNS[sort_by]
+    except KeyError as exc:
+        raise ValueError(
+            "sort_by: допустимы " + ", ".join(sorted(_SORT_COLUMNS))
+        ) from exc
+
+    direction = "DESC" if descending else "ASC"
+    sql = (
+        "SELECT id, name, version, license_spdx, supplier, criticality "
+        f"FROM components ORDER BY {column} {direction}, id ASC"
+    )
+    return list(conn.execute(sql).fetchall())
 
 
 def change_license(
@@ -66,9 +122,25 @@ def change_license(
     Если компонент не найден — ``raise LookupError``; событие аудита
     при этом не добавляется.
     """
-    raise NotImplementedError("Реализуйте change_license")
+    with conn:
+        row = conn.execute(
+            "SELECT id FROM components WHERE id = ?", (component_id,)
+        ).fetchone()
+        if row is None:
+            raise LookupError(f"Компонент {component_id} не найден")
+
+        conn.execute(
+            "UPDATE components SET license_spdx = ? WHERE id = ?",
+            (new_license, component_id),
+        )
+        conn.execute(
+            "INSERT INTO audit_events (event_type, component_id) VALUES (?, ?)",
+            ("license_changed", component_id),
+        )
 
 
 def open_read_only(path: str | Path) -> sqlite3.Connection:
     """Открыть SQLite-файл так, чтобы запись была запрещена движком."""
-    raise NotImplementedError("Реализуйте open_read_only")
+    p = Path(path).resolve()
+    uri = f"file:{p.as_posix()}?mode=ro"
+    return sqlite3.connect(uri, uri=True)
