@@ -40,6 +40,7 @@ FILES = (
     ("code/demo_unsafe_query.py", "code/demo_unsafe_query.py"),
     ("code/step2_secure_queries.py", "code/step2_secure_queries.py"),
     ("code/step3_student.py", "code/step3_student.py"),
+    ("code/step3_student_solution.py", "code/step3_student_solution.py"),
     ("code/step3_student_template.py", "code/step3_student_template.py"),
     ("code/test_examples.py", "code/test_examples.py"),
     ("code/test_student.py", "code/test_student.py"),
