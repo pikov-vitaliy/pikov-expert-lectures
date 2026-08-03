@@ -3,24 +3,89 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Лабораторные работы Astra Linux SE</title>
-  <style>
-    body{font-family:Arial,sans-serif;margin:40px;line-height:1.55;color:#172033;background:#f8fafc}
-    main{max-width:860px;margin:auto;background:#fff;border:1px solid #dbe3ef;border-radius:10px;padding:28px}
-    h1{margin-top:0}
-    a{color:#1d4ed8;font-weight:700}
-    li{margin:12px 0}
-  </style>
+  <meta name="description" content="Три проверяемые лабораторные работы по безопасной настройке Astra Linux SE: парольная политика, SSH и Apache.">
+  <link rel="canonical" href="https://astra-hardening.pikov.expert/labs/">
+  <meta property="og:title" content="Лабораторные работы · Astra Linux SE">
+  <meta property="og:description" content="Парольная политика, безопасный SSH и Apache с проверяемым TLS: предусловия, доказательства результата и восстановление.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://astra-hardening.pikov.expert/labs/">
+  <meta property="og:image" content="https://pikov.expert/photo.jpg">
+  <title>Лабораторные работы · Astra Linux SE</title>
+  <link rel="stylesheet" href="labs.css">
 </head>
 <body>
-<main>
-  <h1>Лабораторные работы Astra Linux SE</h1>
-  <p>Комплект практических заданий к лекции по безопасной настройке Astra Linux SE.</p>
-  <ol>
-    <li><a href="01-easy-password-policy.md">Лабораторная 1: парольная политика</a></li>
-    <li><a href="02-medium-secure-ssh.md">Лабораторная 2: безопасная настройка SSH</a></li>
-    <li><a href="03-hard-apache-hardening.md">Лабораторная 3: hardening Apache</a></li>
-  </ol>
-</main>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="back-link" href="../index.html">← К лекции</a>
+      <span class="header-label">Astra Linux Hardening</span>
+    </div>
+  </header>
+
+  <main class="shell landing">
+    <section class="hero">
+      <p class="eyebrow">Практикум</p>
+      <h1>Лабораторные работы Astra Linux SE</h1>
+      <p class="lead">Три самостоятельных сценария с предусловиями, безопасным порядком применения, функциональной проверкой и восстановлением стенда.</p>
+    </section>
+
+    <section class="notice" aria-labelledby="before-title">
+      <h2 id="before-title">Перед началом</h2>
+      <ul>
+        <li>Работайте только на учебных ВМ без рабочих или защищаемых данных.</li>
+        <li>Зафиксируйте точную версию, номер обновления и текущий уровень; создайте снимок и проверьте доступ к консоли.</li>
+        <li>Не копируйте команды между 1.7 и 1.8 без предварительной проверки доступных модулей и эффективной конфигурации.</li>
+        <li>Markdown оставлен для скачивания; основная студенческая версия каждой работы — оформленная HTML-страница.</li>
+      </ul>
+    </section>
+
+    <section class="lab-grid" aria-label="Список лабораторных работ">
+      <article class="lab-card">
+        <div class="lab-number">01</div>
+        <p class="lab-meta">Базовая · 45–60 минут · одна ВМ</p>
+        <h2>Парольная политика</h2>
+        <p>Определение фактического PAM-стека, штатные интерфейсы 1.7/1.8, <code>chage</code>, проверка сложности и истории без риска удалить чужую учётную запись.</p>
+        <div class="actions">
+          <a class="primary" href="01-easy-password-policy.html">Открыть работу</a>
+          <a href="01-easy-password-policy.md" download>Скачать Markdown</a>
+        </div>
+      </article>
+
+      <article class="lab-card">
+        <div class="lab-number">02</div>
+        <p class="lab-meta">Средняя · 60–75 минут · две ВМ</p>
+        <h2>Безопасный SSH</h2>
+        <p>Доверенная проверка fingerprint, отдельный ключ с парольной фразой, запрет парольных методов, <code>sshd -T</code> и применение через вторую сессию.</p>
+        <div class="actions">
+          <a class="primary" href="02-medium-secure-ssh.html">Открыть работу</a>
+          <a href="02-medium-secure-ssh.md" download>Скачать Markdown</a>
+        </div>
+      </article>
+
+      <article class="lab-card">
+        <div class="lab-number">03</div>
+        <p class="lab-meta">Повышенная · 120–150 минут · сервер и клиент</p>
+        <h2>Apache и проверяемый TLS</h2>
+        <p>Изолированный virtual host, ограниченное решение по <code>AstraMode</code>, заголовки, запрет листинга, сертификат с SAN и проверка без <code>curl -k</code>.</p>
+        <div class="actions">
+          <a class="primary" href="03-hard-apache-hardening.html">Открыть работу</a>
+          <a href="03-hard-apache-hardening.md" download>Скачать Markdown</a>
+        </div>
+      </article>
+    </section>
+
+    <section class="route" aria-labelledby="route-title">
+      <h2 id="route-title">Рекомендуемый маршрут</h2>
+      <ol>
+        <li><strong>Лабораторная 1</strong> формирует привычку сначала определять фактическую конфигурацию.</li>
+        <li><strong>Лабораторная 2</strong> добавляет безопасное изменение удалённого сервиса без потери управления.</li>
+        <li><strong>Лабораторная 3</strong> объединяет сервис, КСЗ, TLS, позитивные и негативные проверки и контролируемый откат.</li>
+      </ol>
+      <p>Работы можно выполнять независимо, но лабораторные 2 и 3 используют одну топологию: <code>infra</code> — клиент, <code>server1</code> — сервер.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">Материалы обновлены 03.08.2026 · <a href="../index.html">Вернуться к лекции</a></div>
+  </footer>
 </body>
 </html>

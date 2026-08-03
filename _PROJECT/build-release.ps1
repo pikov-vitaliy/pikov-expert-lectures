@@ -294,6 +294,12 @@ $projectPath = Join-Path $rootPath '_PROJECT'
 $lecturesPath = Join-Path $projectPath 'lectures.json'
 if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectures.json" }
 
+$astraLabsBuilder = Join-Path $projectPath 'build-astra-hardening-labs.ps1'
+if (-not (Test-Path -LiteralPath $astraLabsBuilder -PathType Leaf)) {
+  Fail "Missing _PROJECT\build-astra-hardening-labs.ps1"
+}
+& $astraLabsBuilder -Check
+
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 if ([string]::IsNullOrWhiteSpace($ReleaseDate)) {
   $ReleaseDate = [string]$data.updated

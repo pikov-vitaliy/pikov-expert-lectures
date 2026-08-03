@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Настройка SSH по ключам с проверкой эффективной конфигурации и сохранением доступа.">
+  <link rel="canonical" href="https://astra-hardening.pikov.expert/labs/02-medium-secure-ssh.html">
+  <meta property="og:title" content="Лабораторная 2 · Безопасный SSH · Astra Linux SE">
+  <meta property="og:description" content="Настройка SSH по ключам с проверкой эффективной конфигурации и сохранением доступа.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://astra-hardening.pikov.expert/labs/02-medium-secure-ssh.html">
+  <meta property="og:image" content="https://pikov.expert/photo.jpg">
+  <title>Лабораторная 2 · Безопасный SSH · Astra Linux SE</title>
+  <link rel="stylesheet" href="labs.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="back-link" href="index.html">← Ко всем работам</a>
+      <span class="header-label">Лабораторная 2 · Безопасный SSH</span>
+    </div>
+  </header>
+
+  <main class="shell document-page">
+    <p class="document-meta">Практикум к лекции «Astra Linux Hardening» · редакция 03.08.2026</p>
+    <article class="document">
+<h1 id="ssh">Лабораторная работа 2. Безопасный доступ по SSH без потери управления</h1>
+<p><strong>Сложность:</strong> средняя<br>
+<strong>Время:</strong> 60–75 минут<br>
+<strong>Целевая ОС:</strong> учебные Astra Linux Special Edition 1.7 или 1.8<br>
+<strong>Формат:</strong> две виртуальные машины</p>
+<h2 id="section">Результат работы</h2>
+<p>Вы настроите отдельный ключ SSH с парольной фразой, сверите ключ хоста по доверенному каналу, запретите парольные методы и прямой вход <code>root</code>, проверите <strong>эффективную</strong>, а не только записанную конфигурацию и примените её без разрыва контрольной сессии.</p>
+<h2 id="section-1">Схема стенда</h2>
+<table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Имя</th>
+<th>Учебный адрес</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Клиент администратора</td>
+<td><code>infra</code></td>
+<td><code>10.0.1.254</code></td>
+</tr>
+<tr>
+<td>SSH-сервер</td>
+<td><code>server1</code></td>
+<td><code>10.0.1.1</code></td>
+</tr>
+</tbody>
+</table>
+<p>Во всех командах замените адреса на фактические. Учётная запись <code>sa</code> должна существовать на обеих ВМ, иметь домашний каталог и командную оболочку. На <code>server1</code> до копирования ключа временно разрешён парольный вход <code>sa</code>.</p>
+<h2 id="section-2">Границы и меры безопасности</h2>
+<ol>
+<li>Используйте только учебные ВМ без рабочих данных и создайте снимки обеих машин.</li>
+<li>Убедитесь, что доступна консоль <code>server1</code> в гипервизоре.</li>
+<li>Не закрывайте текущую консольную или SSH-сессию до успешного входа во втором терминале.</li>
+<li>Если сетевой экран включён, TCP/22 разрешают только от учебного клиента; отсутствие ответа ICMP не доказывает недоступность SSH.</li>
+<li>Для максимального уровня назначьте <code>sa</code> необходимые атрибуты и метки штатными средствами Astra Linux до начала работы.</li>
+</ol>
+<h2 id="section-3">Шаг 1. Предварительная проверка обеих ВМ</h2>
+<p>На обеих машинах зафиксируйте версию и текущий уровень:</p>
+<pre><code class="language-bash">cat /etc/os-release
+test -r /etc/astra_version &amp;&amp; cat /etc/astra_version
+command -v astra-modeswitch &gt;/dev/null &amp;&amp; sudo astra-modeswitch getname
+id sa
+getent passwd sa
+</code></pre>
+<p>На <code>server1</code> проверьте пакет сервера. Устанавливайте его только из настроенного учебного репозитория:</p>
+<pre><code class="language-bash">if ! dpkg-query -W -f='${Status}\n' openssh-server 2&gt;/dev/null | grep -q 'install ok installed'; then
+    sudo apt update
+    sudo apt install openssh-server
+fi
+sudo systemctl enable --now ssh
+sudo systemctl --no-pager --full status ssh
+sudo ss -H -ltnp 'sport = :22'
+</code></pre>
+<p>На <code>infra</code> проверьте маршрут. Интерактивное SSH-подключение до сверки ключа хоста не выполняйте:</p>
+<pre><code class="language-bash">ip route get 10.0.1.1
+ping -c 4 10.0.1.1 || echo &quot;ICMP недоступен; доступность SSH проверим безопасно на следующем шаге&quot;
+</code></pre>
+<p>Не принимайте неизвестный host key и не вводите временный пароль до независимого сравнения fingerprint.</p>
+<h2 id="section-4">Шаг 2. Сверить ключ хоста по доверенному каналу</h2>
+<p>На консоли <code>server1</code> получите fingerprint ключа хоста:</p>
+<pre><code class="language-bash">HOST_KEY_FILE=/etc/ssh/ssh_host_ed25519_key.pub
+if ! sudo test -f &quot;$HOST_KEY_FILE&quot;; then
+    sudo ls -1 /etc/ssh/ssh_host_*_key.pub
+    echo &quot;Выберите существующий публичный ключ хоста и повторите шаг&quot;
+    exit 1
+fi
+sudo ssh-keygen -lf &quot;$HOST_KEY_FILE&quot;
+</code></pre>
+<p>Если Ed25519-ключ отсутствует, задайте <code>HOST_KEY_FILE</code> как путь к существующему публичному ключу из выведенного списка. Запишите его тип, например <code>rsa</code>.</p>
+<p>На <code>infra</code> посмотрите fingerprint, получаемый по сети:</p>
+<pre><code class="language-bash">HOST_KEY_TYPE=ed25519  # замените на фактический тип с консоли server1
+ssh-keyscan -T 5 -t &quot;$HOST_KEY_TYPE&quot; 10.0.1.1 2&gt;/dev/null | ssh-keygen -lf -
+</code></pre>
+<p>Сравните SHA256 fingerprint символ в символ с результатом на консоли. <code>ssh-keyscan</code> сам по себе не устанавливает доверие: продолжать можно только после независимого сравнения. После совпадения выполните первое интерактивное подключение, подтвердите именно проверенный ключ и введите временный пароль <code>sa</code>:</p>
+<pre><code class="language-bash">ssh -o ConnectTimeout=5 -o StrictHostKeyChecking=ask sa@10.0.1.1 exit
+</code></pre>
+<h2 id="section-5">Шаг 3. Создать отдельный лабораторный ключ</h2>
+<p>На <code>infra</code> под <code>sa</code> выберите <strong>один</strong> поддерживаемый тип ключа. Предпочтительный вариант Ed25519:</p>
+<pre><code class="language-bash">LAB_KEY=&quot;$HOME/.ssh/id_ed25519_astra_lab&quot;
+if test -e &quot;$LAB_KEY&quot; || test -e &quot;$LAB_KEY.pub&quot;; then
+    echo &quot;STOP: лабораторный ключ уже существует&quot;
+    exit 1
+fi
+ssh-keygen -t ed25519 -a 64 -f &quot;$LAB_KEY&quot; \
+  -C &quot;sa@infra astra ssh lab&quot;
+chmod 700 &quot;$HOME/.ssh&quot;
+chmod 600 &quot;$LAB_KEY&quot;
+chmod 644 &quot;$LAB_KEY.pub&quot;
+umask 077
+printf '%s\n' &quot;$LAB_KEY&quot; &gt; &quot;$HOME/astra-lab2-key-path.txt&quot;
+</code></pre>
+<p>Если криптографическая политика целевой сборки запрещает Ed25519, согласованный запасной вариант:</p>
+<pre><code class="language-bash">LAB_KEY=&quot;$HOME/.ssh/id_rsa_astra_lab&quot;
+if test -e &quot;$LAB_KEY&quot; || test -e &quot;$LAB_KEY.pub&quot;; then
+    echo &quot;STOP: лабораторный ключ уже существует&quot;
+    exit 1
+fi
+ssh-keygen -t rsa -b 3072 -o -a 64 -f &quot;$LAB_KEY&quot; \
+  -C &quot;sa@infra astra ssh lab&quot;
+chmod 700 &quot;$HOME/.ssh&quot;
+chmod 600 &quot;$LAB_KEY&quot;
+chmod 644 &quot;$LAB_KEY.pub&quot;
+umask 077
+printf '%s\n' &quot;$LAB_KEY&quot; &gt; &quot;$HOME/astra-lab2-key-path.txt&quot;
+</code></pre>
+<p>Оба варианта требуют парольную фразу. Дальнейшие команды читают выбранный путь из <code>astra-lab2-key-path.txt</code>, поэтому fallback не оставляет скрытых Ed25519-зависимостей.</p>
+<h2 id="section-6">Шаг 4. Установить открытый ключ и доказать метод входа</h2>
+<p>На <code>infra</code>:</p>
+<pre><code class="language-bash">LAB_KEY=&quot;$(cat &quot;$HOME/astra-lab2-key-path.txt&quot;)&quot;
+ssh-copy-id -i &quot;$LAB_KEY.pub&quot; sa@10.0.1.1
+ssh -vv -i &quot;$LAB_KEY&quot; -o IdentitiesOnly=yes \
+  sa@10.0.1.1 true
+</code></pre>
+<p>В диагностическом выводе найдите подтверждение аутентификации методом <code>publickey</code>. Запрос парольной фразы локального закрытого ключа допустим; запрос пароля учётной записи на сервере — нет.</p>
+<h2 id="section-7">Шаг 5. Подготовить безопасное изменение сервера</h2>
+<p>На <code>server1</code> создайте отдельную резервную копию:</p>
+<pre><code class="language-bash">LAB2_BACKUP=&quot;/root/astra-lab2-$(date +%Y%m%d-%H%M%S)&quot;
+sudo install -d -m 700 &quot;$LAB2_BACKUP&quot; || {
+    echo &quot;STOP: не удалось создать резервную директорию&quot;
+    exit 1
+}
+sudo cp -a /etc/ssh &quot;$LAB2_BACKUP/ssh&quot; || {
+    echo &quot;STOP: не удалось скопировать /etc/ssh&quot;
+    exit 1
+}
+sudo test -f &quot;$LAB2_BACKUP/ssh/sshd_config&quot; || {
+    echo &quot;STOP: резервная копия sshd_config отсутствует&quot;
+    exit 1
+}
+umask 077
+printf '%s\n' &quot;$LAB2_BACKUP&quot; &gt; &quot;$HOME/astra-lab2-backup-path.txt&quot; || exit 1
+sudo grep -RnsE '^[[:space:]]*(Include|Match|PermitRootLogin|PubkeyAuthentication|PasswordAuthentication|KbdInteractiveAuthentication|ChallengeResponseAuthentication|AuthenticationMethods|AllowUsers|AllowGroups|MaxAuthTries|X11Forwarding|ClientAlive)' \
+  /etc/ssh/sshd_config /etc/ssh/sshd_config.d 2&gt;/dev/null
+</code></pre>
+<p>OpenSSH обычно использует первое полученное глобальное значение. Поэтому нельзя бездумно дописывать второй набор директив в конец файла. Если главный файл рано подключает каталог <code>sshd_config.d</code>, создайте отдельный первый лабораторный drop-in; иначе редактируйте первые действующие глобальные значения до блока <code>Match</code> в основном файле:</p>
+<pre><code class="language-bash">if sudo grep -Eq '^[[:space:]]*Include[[:space:]]+/etc/ssh/sshd_config\.d/\*\.conf' \
+  /etc/ssh/sshd_config; then
+    LAB2_POLICY=/etc/ssh/sshd_config.d/00-astra-lab-hardening.conf
+    sudo test ! -e &quot;$LAB2_POLICY&quot; || {
+        echo &quot;STOP: $LAB2_POLICY уже существует&quot;
+        exit 1
+    }
+else
+    LAB2_POLICY=/etc/ssh/sshd_config
+fi
+printf '%s\n' &quot;$LAB2_POLICY&quot; &gt; &quot;$HOME/astra-lab2-policy-path.txt&quot;
+sudoedit &quot;$LAB2_POLICY&quot;
+</code></pre>
+<p>При работе с новым drop-in поместите в него целевой профиль целиком. При работе с основным файлом изменяйте первые активные определения, не создавая поздние дубли. Если <code>sshd -T</code> ниже показывает другое значение, найдите более ранний <code>Include</code>, drop-in или глобальное определение; резервная копия всего <code>/etc/ssh</code> уже создана.</p>
+<p>Целевая эффективная конфигурация учебного стенда:</p>
+<pre><code class="language-text">PermitRootLogin no
+PubkeyAuthentication yes
+PasswordAuthentication no
+KbdInteractiveAuthentication no
+ChallengeResponseAuthentication no
+AuthenticationMethods publickey
+X11Forwarding no
+MaxAuthTries 3
+ClientAliveInterval 300
+ClientAliveCountMax 2
+AllowUsers sa
+</code></pre>
+<p><code>ChallengeResponseAuthentication</code> оставлен для совместимости с обновлениями, где это историческое имя параметра ещё используется. Если SSH нужен другим администраторам, добавьте только заранее проверенные учётные записи в одну строку <code>AllowUsers</code>; не лишайте аварийную учётную запись доступа.</p>
+<h2 id="section-8">Шаг 6. Проверить синтаксис и эффективные значения</h2>
+<p>На <code>server1</code>:</p>
+<pre><code class="language-bash">sudo /usr/sbin/sshd -t
+sudo /usr/sbin/sshd -T -C user=sa,host=infra,addr=10.0.1.254 | \
+  grep -E '^(permitrootlogin|pubkeyauthentication|passwordauthentication|kbdinteractiveauthentication|challengeresponseauthentication|authenticationmethods|maxauthtries|x11forwarding|clientaliveinterval|clientalivecountmax|allowusers)\b'
+sudo /usr/sbin/sshd -T -C user=root,host=infra,addr=10.0.1.254 | \
+  grep -x 'permitrootlogin no'
+</code></pre>
+<p>Проверка не пройдена, если среди эффективных значений нет как минимум:</p>
+<pre><code class="language-text">permitrootlogin no
+pubkeyauthentication yes
+passwordauthentication no
+kbdinteractiveauthentication no
+authenticationmethods publickey
+x11forwarding no
+maxauthtries 3
+allowusers sa
+</code></pre>
+<p>Не применяйте конфигурацию, пока фактический вывод отличается от целевого. Ищите ранний дубль, <code>Include</code> или подходящий блок <code>Match</code>.</p>
+<h2 id="section-9">Шаг 7. Применить без потери доступа</h2>
+<p>Оставьте текущую консоль или SSH-сессию открытой. На <code>server1</code>:</p>
+<pre><code class="language-bash">sudo /usr/sbin/sshd -t || {
+    echo &quot;Синтаксис SSH повреждён; конфигурацию не применяем&quot;
+    exit 1
+}
+sudo systemctl reload ssh
+sudo systemctl is-active ssh
+sudo journalctl -u ssh -n 30 --no-pager
+</code></pre>
+<p>Во <strong>втором</strong> терминале на <code>infra</code>:</p>
+<pre><code class="language-bash">LAB_KEY=&quot;$(cat &quot;$HOME/astra-lab2-key-path.txt&quot;)&quot;
+ssh -vv -i &quot;$LAB_KEY&quot; -o IdentitiesOnly=yes \
+  sa@10.0.1.1 id
+</code></pre>
+<p>Только после успешного нового подключения можно закрыть контрольную сессию.</p>
+<h2 id="section-10">Шаг 8. Отрицательные проверки</h2>
+<p>Убедитесь, что сервер не предлагает пароль или keyboard-interactive:</p>
+<pre><code class="language-bash">ssh -vv \
+  -o PubkeyAuthentication=no \
+  -o PreferredAuthentications=password,keyboard-interactive \
+  -o NumberOfPasswordPrompts=1 \
+  sa@10.0.1.1
+</code></pre>
+<p>Ожидается отказ; среди доступных методов сервер должен оставлять только <code>publickey</code> либо не предлагать совместимого метода.</p>
+<p>Проверьте запрет прямого входа <code>root</code> без интерактивных запросов:</p>
+<pre><code class="language-bash">LAB_KEY=&quot;$(cat &quot;$HOME/astra-lab2-key-path.txt&quot;)&quot;
+ssh -o BatchMode=yes -i &quot;$LAB_KEY&quot; \
+  -o IdentitiesOnly=yes root@10.0.1.1 true
+</code></pre>
+<p>Ожидается отказ, но это только дополнительная функциональная проверка: у <code>root</code> обычно нет лабораторного ключа <code>sa</code>, поэтому один такой отказ ещё не доказывает действие <code>PermitRootLogin no</code>. Основное доказательство — строка <code>permitrootlogin no</code> в эффективной конфигурации для контекста <code>user=root</code>. Не устанавливайте отдельный ключ <code>root</code> ради теста. Успешный TCP handshake сам по себе не означает успешную аутентификацию.</p>
+<h2 id="section-11">Аварийное восстановление</h2>
+<p>Если второе подключение не работает, не закрывайте контрольную сессию. На консоли <code>server1</code>:</p>
+<pre><code class="language-bash">test -r &quot;$HOME/astra-lab2-backup-path.txt&quot; || {
+    echo &quot;STOP: файл с путём к резервной копии отсутствует&quot;
+    exit 1
+}
+LAB2_BACKUP=&quot;$(cat &quot;$HOME/astra-lab2-backup-path.txt&quot;)&quot;
+[[ &quot;$LAB2_BACKUP&quot; =~ ^/root/astra-lab2-[0-9]{8}-[0-9]{6}$ ]] || {
+    echo &quot;STOP: недопустимый путь резервной копии&quot;
+    exit 1
+}
+sudo test -d &quot;$LAB2_BACKUP/ssh&quot; &amp;&amp;
+sudo test -f &quot;$LAB2_BACKUP/ssh/sshd_config&quot; || {
+    echo &quot;STOP: резервная копия /etc/ssh неполна; откат не начинаем&quot;
+    exit 1
+}
+if sudo test -f /etc/ssh/sshd_config.d/00-astra-lab-hardening.conf; then
+    sudo install -d -m 700 &quot;$LAB2_BACKUP/created-artifacts&quot; || exit 1
+    sudo mv /etc/ssh/sshd_config.d/00-astra-lab-hardening.conf \
+      &quot;$LAB2_BACKUP/created-artifacts/&quot; || exit 1
+fi
+sudo cp -a &quot;$LAB2_BACKUP/ssh/sshd_config&quot; /etc/ssh/sshd_config || exit 1
+if sudo test -d &quot;$LAB2_BACKUP/ssh/sshd_config.d&quot;; then
+    sudo install -d -m 755 /etc/ssh/sshd_config.d || exit 1
+    sudo cp -a &quot;$LAB2_BACKUP/ssh/sshd_config.d/.&quot; /etc/ssh/sshd_config.d/ || exit 1
+fi
+sudo /usr/sbin/sshd -t || {
+    echo &quot;Откат не прошёл проверку; службу не перезагружаем&quot;
+    exit 1
+}
+sudo systemctl reload ssh
+sudo systemctl is-active ssh
+</code></pre>
+<p>Для полного возврата удалите из <code>~sa/.ssh/authorized_keys</code> только строку с комментарием <code>sa@infra astra ssh lab</code>, удалите только отдельный лабораторный ключ на <code>infra</code> и восстановите снимки обеих ВМ. Не удаляйте весь <code>authorized_keys</code> и не отключайте модули КСЗ.</p>
+<h2 id="section-12">Что сдать</h2>
+<ol>
+<li>Версии, текущие уровни и адреса обеих ВМ.</li>
+<li>Сверенные SHA256 fingerprints ключа хоста.</li>
+<li>Фрагмент <code>ssh -vv</code>, подтверждающий метод <code>publickey</code>.</li>
+<li>Полный отфильтрованный вывод <code>sshd -T -C</code>.</li>
+<li>Результаты двух отрицательных проверок.</li>
+<li>Путь к резервной копии и описание успешного входа во втором терминале.</li>
+</ol>
+<h2 id="section-13">Контрольные вопросы</h2>
+<ol>
+<li>Почему <code>ssh-keyscan</code> нельзя считать доверенным источником без сравнения fingerprint?</li>
+<li>Чем парольная фраза закрытого ключа отличается от пароля удалённой учётной записи?</li>
+<li>Почему <code>sshd -t</code> недостаточно и нужна команда <code>sshd -T</code>?</li>
+<li>Как <code>AuthenticationMethods publickey</code> страхует ошибку в настройке других методов?</li>
+<li>Почему конфигурацию применяют через <code>reload</code> и проверяют во второй сессии?</li>
+</ol>
+<h2 id="section-14">Критерии зачёта</h2>
+<p>Работа зачтена, если ключ хоста сверён по доверенному каналу, вход <code>sa</code> доказан методом <code>publickey</code>, эффективные значения соответствуют профилю, парольные методы и прямой вход <code>root</code> отвергаются, а откат выполняется через доступную консоль без удаления чужих ключей.</p>
+<h2 id="section-15">Официальные материалы</h2>
+<ul>
+<li><a href="https://man.openbsd.org/sshd_config">OpenSSH: sshd_config(5)</a></li>
+<li><a href="https://manpages.debian.org/bookworm/openssh-server/sshd.8.en.html">Debian manpages: sshd(8)</a></li>
+<li><a href="https://manpages.debian.org/bookworm/openssh-client/ssh-keygen.1.en.html">Debian manpages: ssh-keygen(1)</a></li>
+<li><a href="https://wiki.astralinux.ru/pages/viewpage.action?pageId=137563555">Рекомендации по безопасной настройке Astra Linux</a></li>
+</ul>
+
+    </article>
+    <nav class="document-nav" aria-label="Навигация по материалам">
+      <a href="index.html">← Список лабораторных</a>
+      <a href="02-medium-secure-ssh.md" download>Скачать исходный Markdown</a>
+      <a href="../index.html">К лекции</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">Учебный стенд · перед изменениями создайте снимок ВМ</div>
+  </footer>
+</body>
+</html>

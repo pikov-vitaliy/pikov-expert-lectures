@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Усиление Apache, ограниченное решение по AstraMode и проверяемый TLS.">
+  <link rel="canonical" href="https://astra-hardening.pikov.expert/labs/03-hard-apache-hardening.html">
+  <meta property="og:title" content="Лабораторная 3 · Apache и TLS · Astra Linux SE">
+  <meta property="og:description" content="Усиление Apache, ограниченное решение по AstraMode и проверяемый TLS.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://astra-hardening.pikov.expert/labs/03-hard-apache-hardening.html">
+  <meta property="og:image" content="https://pikov.expert/photo.jpg">
+  <title>Лабораторная 3 · Apache и TLS · Astra Linux SE</title>
+  <link rel="stylesheet" href="labs.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="shell header-inner">
+      <a class="back-link" href="index.html">← Ко всем работам</a>
+      <span class="header-label">Лабораторная 3 · Apache и TLS</span>
+    </div>
+  </header>
+
+  <main class="shell document-page">
+    <p class="document-meta">Практикум к лекции «Astra Linux Hardening» · редакция 03.08.2026</p>
+    <article class="document">
+<h1 id="apache-tls">Лабораторная работа 3. Усиление Apache с проверяемым TLS</h1>
+<p><strong>Сложность:</strong> повышенная<br>
+<strong>Время:</strong> 120–150 минут<br>
+<strong>Целевая ОС:</strong> учебная Astra Linux Special Edition 1.7.4+ или 1.8<br>
+<strong>Формат:</strong> серверная ВМ и, при наличии, отдельный клиент</p>
+<h2 id="section">Результат работы</h2>
+<p>Вы развернёте отдельный виртуальный хост Apache, минимизируете раскрытие информации и возможности каталога, настроите защитные заголовки, выпустите учебный сертификат с SAN, проверите TLS <strong>с проверкой доверия</strong> и подготовите откат только созданных объектов.</p>
+<h2 id="section-1">Схема стенда</h2>
+<table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Имя</th>
+<th>Учебный адрес</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Клиент администратора</td>
+<td><code>infra</code></td>
+<td><code>10.0.1.254</code></td>
+</tr>
+<tr>
+<td>Веб-сервер</td>
+<td><code>server1</code></td>
+<td><code>10.0.1.1</code></td>
+</tr>
+</tbody>
+</table>
+<p>Имя сайта: <code>server1.astra.test</code>. Замените пример адреса во всех командах и сертификате, если стенд использует другую сеть. Работа не зависит от лабораторной 2, но использует ту же топологию.</p>
+<h2 id="astramode">Границы и решение по AstraMode</h2>
+<p>Работа выполняется только на снимке ВМ без защищаемых данных.</p>
+<p><code>AstraMode</code> управляет обязательной авторизацией Apache. По умолчанию режим включён, даже если директива закомментирована. Глобальное <code>AstraMode off</code> снижает защищённость всех виртуальных хостов и <strong>не является hardening</strong>.</p>
+<p>В этой лабораторной создаётся анонимный демонстрационный сайт. Поэтому, если обязательная авторизация препятствует учебному сценарию, <code>AstraMode off</code> задаётся как документированное исключение <strong>только внутри двух лабораторных <code>&lt;VirtualHost&gt;</code></strong>. Остальные сайты сохраняют безопасное значение по умолчанию. Для рабочего контура это решение не переносится автоматически: приложение либо интегрируют со штатной авторизацией Astra Linux, либо исключение обосновывают и ограничивают проектом защиты.</p>
+<h2 id="section-2">Шаг 1. Предварительная проверка</h2>
+<p>На <code>server1</code>:</p>
+<pre><code class="language-bash">cat /etc/os-release
+test -r /etc/astra_version &amp;&amp; cat /etc/astra_version
+command -v astra-modeswitch &gt;/dev/null &amp;&amp; sudo astra-modeswitch getname
+ip -4 addr
+sudo -v
+
+{
+  if dpkg-query -W -f='${Status}\n' apache2 2&gt;/dev/null | grep -q 'install ok installed'; then
+      echo 'package=installed'
+  else
+      echo 'package=absent'
+  fi
+  if systemctl is-active --quiet apache2 2&gt;/dev/null; then echo 'service=active'; else echo 'service=inactive'; fi
+  if systemctl is-enabled --quiet apache2 2&gt;/dev/null; then echo 'autostart=enabled'; else echo 'autostart=disabled'; fi
+  if sudo test -d /etc/apache2/ssl; then echo 'ssl-dir=present'; else echo 'ssl-dir=absent'; fi
+} &gt; &quot;$HOME/astra-lab3-pre-state.txt&quot;
+cat &quot;$HOME/astra-lab3-pre-state.txt&quot;
+grep -Eq '^package=(installed|absent)$' &quot;$HOME/astra-lab3-pre-state.txt&quot; &amp;&amp;
+grep -Eq '^service=(active|inactive)$' &quot;$HOME/astra-lab3-pre-state.txt&quot; &amp;&amp;
+grep -Eq '^autostart=(enabled|disabled)$' &quot;$HOME/astra-lab3-pre-state.txt&quot; &amp;&amp;
+grep -Eq '^ssl-dir=(present|absent)$' &quot;$HOME/astra-lab3-pre-state.txt&quot; || {
+    echo &quot;STOP: не удалось зафиксировать исходное состояние Apache&quot;
+    exit 1
+}
+</code></pre>
+<p>Проверьте, что имена лабораторных объектов свободны:</p>
+<pre><code class="language-bash">for path in \
+  /var/www/server1 \
+  /etc/apache2/sites-available/server1.conf \
+  /etc/apache2/sites-available/server1-ssl.conf \
+  /etc/apache2/conf-available/zz-security-hardening.conf \
+  /etc/apache2/ssl/server1.key \
+  /etc/apache2/ssl/server1.crt \
+  /etc/apache2/ssl/server1-openssl.cnf; do
+    if sudo test -e &quot;$path&quot;; then
+        echo &quot;STOP: уже существует $path&quot;
+        exit 1
+    fi
+done
+</code></pre>
+<p>Если Apache ещё не установлен, последние пути могут находиться внутри отсутствующих каталогов — это нормально. Любое найденное совпадение означает, что нужен чистый снимок или другие согласованные имена.</p>
+<h2 id="apache">Шаг 2. Установить Apache и сохранить базовое состояние</h2>
+<p>Устанавливайте пакеты только из настроенного учебного репозитория:</p>
+<pre><code class="language-bash">sudo apt update
+sudo apt install apache2 openssl curl || {
+    echo &quot;Установка пакетов не завершена; работу останавливаем&quot;
+    exit 1
+}
+sudo systemctl stop apache2
+</code></pre>
+<p>После установки сохраните конфигурацию и состояние компонентов:</p>
+<pre><code class="language-bash">LAB3_BACKUP=&quot;/root/astra-lab3-$(date +%Y%m%d-%H%M%S)&quot;
+sudo install -d -m 700 &quot;$LAB3_BACKUP&quot; || {
+    echo &quot;STOP: не удалось создать резервную директорию&quot;
+    exit 1
+}
+sudo cp -a /etc/apache2 &quot;$LAB3_BACKUP/apache2&quot; || {
+    echo &quot;STOP: не удалось скопировать /etc/apache2&quot;
+    exit 1
+}
+sudo test -f &quot;$LAB3_BACKUP/apache2/apache2.conf&quot; || {
+    echo &quot;STOP: резервная копия Apache неполна&quot;
+    exit 1
+}
+sudo cp -a &quot;$HOME/astra-lab3-pre-state.txt&quot; &quot;$LAB3_BACKUP/pre-state.txt&quot; || exit 1
+umask 077
+
+{
+  if a2query -m headers &gt;/dev/null 2&gt;&amp;1; then echo 'headers=enabled'; else echo 'headers=disabled'; fi
+  if a2query -m ssl &gt;/dev/null 2&gt;&amp;1; then echo 'ssl=enabled'; else echo 'ssl=disabled'; fi
+  if a2query -m socache_shmcb &gt;/dev/null 2&gt;&amp;1; then echo 'socache_shmcb=enabled'; else echo 'socache_shmcb=disabled'; fi
+  if a2query -s 000-default &gt;/dev/null 2&gt;&amp;1; then echo '000-default=enabled'; else echo '000-default=disabled'; fi
+} | sudo tee &quot;$LAB3_BACKUP/initial-state.txt&quot; &gt;/dev/null || exit 1
+
+sudo grep -Eq '^headers=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^ssl=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^socache_shmcb=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^000-default=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; || {
+    echo &quot;STOP: не удалось зафиксировать состояние модулей Apache&quot;
+    exit 1
+}
+printf '%s\n' &quot;$LAB3_BACKUP&quot; &gt; &quot;$HOME/astra-lab3-backup-path.txt&quot; || exit 1
+sudo cat &quot;$LAB3_BACKUP/initial-state.txt&quot;
+sudo apache2ctl configtest || {
+    echo &quot;Базовая конфигурация Apache уже содержит ошибку; работу останавливаем&quot;
+    exit 1
+}
+</code></pre>
+<h2 id="section-3">Шаг 3. Создать содержимое сайта</h2>
+<pre><code class="language-bash">sudo install -d -o root -g www-data -m 750 /var/www/server1
+sudoedit /var/www/server1/index.html
+</code></pre>
+<p>Содержимое:</p>
+<pre><code class="language-html">&lt;!doctype html&gt;
+&lt;html lang=&quot;ru&quot;&gt;
+&lt;head&gt;
+  &lt;meta charset=&quot;utf-8&quot;&gt;
+  &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1&quot;&gt;
+  &lt;title&gt;server1.astra.test&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;server1.astra.test&lt;/h1&gt;
+  &lt;p&gt;Учебный веб-сервер Astra Linux SE.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<p>Ограничьте права:</p>
+<pre><code class="language-bash">sudo chown root:www-data /var/www/server1/index.html
+sudo chmod 640 /var/www/server1/index.html
+namei -l /var/www/server1/index.html
+</code></pre>
+<h2 id="http-virtual-host">Шаг 4. Создать HTTP virtual host</h2>
+<pre><code class="language-bash">sudoedit /etc/apache2/sites-available/server1.conf
+</code></pre>
+<p>Содержимое:</p>
+<pre><code class="language-apache">&lt;VirtualHost *:80&gt;
+    ServerName server1.astra.test
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/server1
+
+    &lt;Directory /var/www/server1&gt;
+        Options -Indexes -FollowSymLinks
+        AllowOverride None
+        Require all granted
+    &lt;/Directory&gt;
+
+    ErrorLog ${APACHE_LOG_DIR}/server1_error.log
+    CustomLog ${APACHE_LOG_DIR}/server1_access.log combined
+&lt;/VirtualHost&gt;
+</code></pre>
+<p>В исходном варианте директива <code>AstraMode</code> отсутствует, поэтому действует безопасное значение по умолчанию. Условное исключение для анонимного стенда рассматривается только после первой проверки HTTP в шаге 6.</p>
+<h2 id="section-4">Шаг 5. Добавить базовые ограничения и заголовки</h2>
+<pre><code class="language-bash">sudoedit /etc/apache2/conf-available/zz-security-hardening.conf
+</code></pre>
+<p>Содержимое:</p>
+<pre><code class="language-apache">ServerTokens Prod
+ServerSignature Off
+TraceEnable Off
+Timeout 45
+KeepAlive On
+KeepAliveTimeout 5
+MaxKeepAliveRequests 100
+LimitRequestBody 1048576
+LimitXMLRequestBody 1048576
+
+Header always set X-Content-Type-Options &quot;nosniff&quot;
+Header always set X-Frame-Options &quot;SAMEORIGIN&quot;
+Header always set Referrer-Policy &quot;no-referrer&quot;
+Header always set Permissions-Policy &quot;geolocation=(), microphone=(), camera=()&quot;
+Header always set Content-Security-Policy &quot;default-src 'self'; object-src 'none'; frame-ancestors 'self'; base-uri 'self'&quot;
+</code></pre>
+<p>Это <strong>риск-ориентированная адаптация для статического учебного сайта</strong>, а не буквальное воспроизведение консервативного профиля рекомендаций Astra. В официальном профиле для Apache указаны <code>KeepAlive Off</code> и <code>LimitXMLRequestBody 10485760</code>; здесь keep-alive оставлен включённым с коротким тайм-аутом, а общий и XML-лимиты уменьшены до 1 MiB. Для рабочего приложения выбор подтверждают нагрузочным и функциональным тестированием. Если сервис загружает файлы или принимает крупный XML, лимит рассчитывают по функции сервиса и задают в минимальной необходимой области.</p>
+<p>Префикс <code>zz-</code> нужен не для красоты: на Debian-подобной схеме включаемых конфигураций штатный <code>security.conf</code> может загружаться позже и переопределить ранний <code>ServerTokens</code>. Итог всё равно проверяется по реальному HTTP-заголовку.</p>
+<p>Активируйте только подготовленные компоненты и поставьте явный guard перед запуском:</p>
+<pre><code class="language-bash">sudo a2enmod headers &amp;&amp;
+sudo a2enconf zz-security-hardening &amp;&amp;
+sudo a2ensite server1 &amp;&amp;
+sudo a2dissite 000-default.conf || {
+    echo &quot;Не удалось включить подготовленные компоненты&quot;
+    exit 1
+}
+sudo apache2ctl configtest || {
+    echo &quot;Конфигурация Apache ошибочна; службу не запускаем&quot;
+    exit 1
+}
+sudo apache2ctl -S
+sudo systemctl enable --now apache2
+sudo systemctl --no-pager --full status apache2
+sudo ss -H -ltnp 'sport = :80'
+</code></pre>
+<p>Если <code>configtest</code> не выводит <code>Syntax OK</code>, не запускайте и не перезагружайте службу.</p>
+<h2 id="http">Шаг 6. Проверить HTTP и запрет листинга</h2>
+<p>На <code>server1</code> можно проверить имя без изменения <code>/etc/hosts</code>. Сначала зафиксируйте ответ при безопасном значении <code>AstraMode</code> по умолчанию:</p>
+<pre><code class="language-bash">HTTP_CODE=&quot;$(curl --silent --output /dev/null --write-out '%{http_code}' \
+  --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/)&quot;
+printf 'HTTP status with default AstraMode: %s\n' &quot;$HTTP_CODE&quot;
+curl --show-error --head --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/
+</code></pre>
+<p>Если код <code>200</code>, оставьте <code>AstraMode</code> по умолчанию и запишите выбранный профиль:</p>
+<pre><code class="language-bash">printf '%s\n' 'astramode=default-on' &gt; &quot;$HOME/astra-lab3-astramode-state.txt&quot;
+</code></pre>
+<p>Если обязательная авторизация не позволяет выполнить именно анонимный учебный сценарий, преподаватель может разрешить контролируемое исключение. Только тогда добавьте <code>AstraMode off</code> <strong>внутрь</strong> созданного <code>&lt;VirtualHost *:80&gt;</code>, проверьте и примените:</p>
+<pre><code class="language-bash">sudoedit /etc/apache2/sites-available/server1.conf
+sudo apache2ctl configtest || {
+    echo &quot;Исключение AstraMode содержит ошибку; конфигурацию не применяем&quot;
+    exit 1
+}
+sudo systemctl reload apache2
+printf '%s\n' 'astramode=scoped-off' &gt; &quot;$HOME/astra-lab3-astramode-state.txt&quot;
+curl --fail --show-error --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/
+</code></pre>
+<p>Не добавляйте исключение «на всякий случай» и не переносите его в глобальный файл. В заголовках должны присутствовать настроенные значения; <code>ServerTokens Prod</code> должен убрать точную версию Apache и ОС. Эффективное значение проверьте явно:</p>
+<pre><code class="language-bash">curl --silent --head --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/ | tr -d '\r' | grep -E '^Server: Apache$'
+</code></pre>
+<p>Если вывод содержит версию или имя ОС, не продолжайте: проверьте порядок файлов в <code>conf-enabled</code> и наличие более позднего переопределения.</p>
+<p>Создайте каталог без <code>index.html</code>:</p>
+<pre><code class="language-bash">sudo install -d -o root -g www-data -m 750 /var/www/server1/test-no-index
+curl --silent --output /dev/null --write-out '%{http_code}\n' \
+  --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/test-no-index/
+</code></pre>
+<p>Ожидается HTTP <code>403</code>. Ответ <code>200</code> с перечнем файлов означает, что <code>Options -Indexes</code> не действует.</p>
+<h2 id="san">Шаг 7. Выпустить учебный сертификат с SAN</h2>
+<p>Создайте каталог и конфигурацию запроса:</p>
+<pre><code class="language-bash">sudo install -d -o root -g root -m 700 /etc/apache2/ssl
+sudoedit /etc/apache2/ssl/server1-openssl.cnf
+</code></pre>
+<p>Содержимое для адреса <code>10.0.1.1</code>:</p>
+<pre><code class="language-ini">[req]
+prompt = no
+distinguished_name = dn
+x509_extensions = server_ext
+
+[dn]
+CN = server1.astra.test
+
+[server_ext]
+subjectAltName = @alt_names
+keyUsage = critical, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth
+
+[alt_names]
+DNS.1 = server1.astra.test
+IP.1 = 10.0.1.1
+</code></pre>
+<p>Выпустите краткоживущий сертификат только для лаборатории:</p>
+<pre><code class="language-bash">sudo openssl req -x509 -newkey rsa:3072 -sha256 -nodes -days 30 \
+  -keyout /etc/apache2/ssl/server1.key \
+  -out /etc/apache2/ssl/server1.crt \
+  -config /etc/apache2/ssl/server1-openssl.cnf
+sudo chown root:root /etc/apache2/ssl/server1.key /etc/apache2/ssl/server1.crt
+sudo chmod 600 /etc/apache2/ssl/server1.key
+sudo chmod 644 /etc/apache2/ssl/server1.crt
+sudo openssl x509 -in /etc/apache2/ssl/server1.crt -noout \
+  -subject -issuer -dates -ext subjectAltName
+</code></pre>
+<p><code>-nodes</code> оставляет серверный ключ без парольной фразы, чтобы Apache мог запускаться без оператора; риск компенсируется правами <code>600</code>, владельцем <code>root</code> и защитой ВМ. В рабочей PKI сертификат выпускает доверенный УЦ, а ключ защищают по принятой модели.</p>
+<h2 id="https-virtual-host">Шаг 8. Создать HTTPS virtual host</h2>
+<pre><code class="language-bash">sudoedit /etc/apache2/sites-available/server1-ssl.conf
+</code></pre>
+<p>Содержимое:</p>
+<pre><code class="language-apache">&lt;VirtualHost *:443&gt;
+    ServerName server1.astra.test
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/server1
+
+    SSLEngine on
+    SSLProtocol all -SSLv3 -TLSv1 -TLSv1.1
+    SSLCipherSuite HIGH:!aNULL:!MD5:!3DES
+    SSLHonorCipherOrder on
+    SSLCertificateFile /etc/apache2/ssl/server1.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/server1.key
+
+    Header always set Strict-Transport-Security &quot;max-age=300&quot;
+
+    &lt;Directory /var/www/server1&gt;
+        Options -Indexes -FollowSymLinks
+        AllowOverride None
+        Require all granted
+    &lt;/Directory&gt;
+
+    ErrorLog ${APACHE_LOG_DIR}/server1_ssl_error.log
+    CustomLog ${APACHE_LOG_DIR}/server1_ssl_access.log combined
+&lt;/VirtualHost&gt;
+</code></pre>
+<p><code>SSLProtocol</code> исключает SSLv3, TLS 1.0 и TLS 1.1. Приведённый <code>SSLCipherSuite</code> управляет наборами до TLS 1.2; наборы TLS 1.3 настраиваются средствами, поддерживаемыми конкретными версиями Apache и OpenSSL. Значение HSTS намеренно короткое для учебного домена; рабочую политику проектируют отдельно.</p>
+<p>Если в шаге 6 преподаватель разрешил профиль <code>astramode=scoped-off</code>, добавьте <code>AstraMode off</code> также внутрь <strong>только этого</strong> лабораторного HTTPS virtual host. При профиле <code>astramode=default-on</code> директиву не добавляйте.</p>
+<p>Активируйте TLS и снова выполните проверку <strong>до</strong> reload:</p>
+<pre><code class="language-bash">sudo a2enmod ssl &amp;&amp; sudo a2ensite server1-ssl || {
+    echo &quot;Не удалось включить SSL или HTTPS virtual host&quot;
+    exit 1
+}
+sudo apache2ctl configtest || {
+    echo &quot;Конфигурация TLS ошибочна; Apache не перезагружаем&quot;
+    exit 1
+}
+sudo apache2ctl -S
+sudo systemctl reload apache2
+sudo systemctl is-active apache2
+sudo ss -H -ltnp 'sport = :443'
+</code></pre>
+<h2 id="tls">Шаг 9. Проверить TLS с проверкой имени и доверия</h2>
+<p>На <code>server1</code>:</p>
+<pre><code class="language-bash">curl --fail --show-error \
+  --cacert /etc/apache2/ssl/server1.crt \
+  --resolve server1.astra.test:443:127.0.0.1 \
+  https://server1.astra.test/
+
+curl --show-error --head \
+  --cacert /etc/apache2/ssl/server1.crt \
+  --resolve server1.astra.test:443:127.0.0.1 \
+  https://server1.astra.test/
+
+openssl s_client -connect 127.0.0.1:443 \
+  -servername server1.astra.test \
+  -verify_hostname server1.astra.test \
+  -CAfile /etc/apache2/ssl/server1.crt -verify_return_error &lt;/dev/null
+</code></pre>
+<p>Ожидается успешная проверка сертификата, SAN и TLS handshake. <code>curl -k</code> отключает проверку доверия и имени; его вывод не принимается как доказательство корректного TLS.</p>
+<p>Для проверки с <code>infra</code> передайте <strong>только публичный</strong> <code>server1.crt</code> по доверенному учебному каналу и используйте тот же <code>--cacert</code>. Закрытый <code>server1.key</code> никогда не покидает сервер.</p>
+<h2 id="http-https">Шаг 10. Перенаправить HTTP на HTTPS</h2>
+<p>После успешной проверки TLS добавьте в HTTP virtual host сразу после <code>ServerName</code>:</p>
+<pre><code class="language-apache">Redirect permanent / https://server1.astra.test/
+</code></pre>
+<p>Примените и проверьте:</p>
+<pre><code class="language-bash">sudo apache2ctl configtest || {
+    echo &quot;Конфигурация редиректа ошибочна; Apache не перезагружаем&quot;
+    exit 1
+}
+sudo systemctl reload apache2
+curl --head --resolve server1.astra.test:80:127.0.0.1 \
+  http://server1.astra.test/
+</code></pre>
+<p>Ожидается <code>301</code> или <code>308</code> и <code>Location: https://server1.astra.test/</code>.</p>
+<h2 id="loopback">Дополнительное задание: слушать только loopback</h2>
+<p>Выполняйте только по указанию преподавателя. Сначала сохраните файл:</p>
+<pre><code class="language-bash">LAB3_BACKUP=&quot;$(cat &quot;$HOME/astra-lab3-backup-path.txt&quot;)&quot;
+sudo cp -a /etc/apache2/ports.conf &quot;$LAB3_BACKUP/ports.conf.before-loopback&quot; || {
+    echo &quot;STOP: не удалось сохранить ports.conf&quot;
+    exit 1
+}
+sudoedit /etc/apache2/ports.conf
+</code></pre>
+<p><strong>Замените</strong>, а не дополните, существующие активные <code>Listen 80</code> и <code>Listen 443</code>:</p>
+<pre><code class="language-apache">Listen 127.0.0.1:80
+Listen 127.0.0.1:443
+</code></pre>
+<p>Затем:</p>
+<pre><code class="language-bash">sudo apache2ctl configtest || {
+    echo &quot;Конфигурация Listen ошибочна; Apache не перезагружаем&quot;
+    exit 1
+}
+sudo systemctl reload apache2
+sudo ss -H -ltnp 'sport = :80'
+sudo ss -H -ltnp 'sport = :443'
+</code></pre>
+<p>Оба сокета должны быть привязаны к <code>127.0.0.1</code>, а не к <code>0.0.0.0</code>, <code>[::]</code> или сетевому адресу. Для сетевого ограничения рабочего сервера обычно используют также узловой межсетевой экран; смена <code>Listen</code> не заменяет сетевую политику.</p>
+<h2 id="section-5">Восстановление</h2>
+<p>Предпочтительный полный откат — возврат снимка ВМ. Для контролируемого ручного отката на чистом учебном стенде:</p>
+<pre><code class="language-bash">test -r &quot;$HOME/astra-lab3-backup-path.txt&quot; || {
+    echo &quot;STOP: файл с путём к резервной копии отсутствует&quot;
+    exit 1
+}
+LAB3_BACKUP=&quot;$(cat &quot;$HOME/astra-lab3-backup-path.txt&quot;)&quot;
+[[ &quot;$LAB3_BACKUP&quot; =~ ^/root/astra-lab3-[0-9]{8}-[0-9]{6}$ ]] || {
+    echo &quot;STOP: недопустимый путь резервной копии&quot;
+    exit 1
+}
+sudo test -f &quot;$LAB3_BACKUP/apache2/apache2.conf&quot; &amp;&amp;
+sudo test -f &quot;$LAB3_BACKUP/pre-state.txt&quot; &amp;&amp;
+sudo test -f &quot;$LAB3_BACKUP/initial-state.txt&quot; || {
+    echo &quot;STOP: обязательные файлы резервной копии отсутствуют&quot;
+    exit 1
+}
+sudo grep -Eq '^package=(installed|absent)$' &quot;$LAB3_BACKUP/pre-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^service=(active|inactive)$' &quot;$LAB3_BACKUP/pre-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^autostart=(enabled|disabled)$' &quot;$LAB3_BACKUP/pre-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^ssl-dir=(present|absent)$' &quot;$LAB3_BACKUP/pre-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^headers=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^ssl=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^socache_shmcb=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; &amp;&amp;
+sudo grep -Eq '^000-default=(enabled|disabled)$' &quot;$LAB3_BACKUP/initial-state.txt&quot; || {
+    echo &quot;STOP: файлы состояния неполны или повреждены; откат не начинаем&quot;
+    exit 1
+}
+sudo install -d -m 700 &quot;$LAB3_BACKUP/created-artifacts&quot; || exit 1
+sudo systemctl stop apache2
+
+sudo a2dissite server1-ssl server1
+sudo a2disconf zz-security-hardening
+
+if test -f &quot;$LAB3_BACKUP/ports.conf.before-loopback&quot;; then
+    sudo cp -a &quot;$LAB3_BACKUP/ports.conf.before-loopback&quot; /etc/apache2/ports.conf
+fi
+
+if sudo grep -q '^000-default=enabled$' &quot;$LAB3_BACKUP/initial-state.txt&quot;; then
+    sudo a2ensite 000-default
+fi
+
+sudo mv /etc/apache2/sites-available/server1.conf \
+  &quot;$LAB3_BACKUP/created-artifacts/server1.conf&quot;
+sudo mv /etc/apache2/sites-available/server1-ssl.conf \
+  &quot;$LAB3_BACKUP/created-artifacts/server1-ssl.conf&quot;
+sudo mv /etc/apache2/conf-available/zz-security-hardening.conf \
+  &quot;$LAB3_BACKUP/created-artifacts/zz-security-hardening.conf&quot;
+sudo mv /etc/apache2/ssl/server1.key \
+  &quot;$LAB3_BACKUP/created-artifacts/server1.key&quot;
+sudo mv /etc/apache2/ssl/server1.crt \
+  &quot;$LAB3_BACKUP/created-artifacts/server1.crt&quot;
+sudo mv /etc/apache2/ssl/server1-openssl.cnf \
+  &quot;$LAB3_BACKUP/created-artifacts/server1-openssl.cnf&quot;
+sudo mv /var/www/server1 &quot;$LAB3_BACKUP/created-artifacts/webroot-server1&quot;
+
+for log in \
+  /var/log/apache2/server1_error.log \
+  /var/log/apache2/server1_access.log \
+  /var/log/apache2/server1_ssl_error.log \
+  /var/log/apache2/server1_ssl_access.log; do
+    if sudo test -e &quot;$log&quot;; then
+        sudo mv &quot;$log&quot; &quot;$LAB3_BACKUP/created-artifacts/&quot;
+    fi
+done
+
+if sudo grep -q '^ssl=disabled$' &quot;$LAB3_BACKUP/initial-state.txt&quot;; then
+    sudo a2dismod ssl || exit 1
+fi
+if sudo grep -q '^socache_shmcb=disabled$' &quot;$LAB3_BACKUP/initial-state.txt&quot;; then
+    sudo a2dismod socache_shmcb || exit 1
+fi
+if sudo grep -q '^headers=disabled$' &quot;$LAB3_BACKUP/initial-state.txt&quot;; then
+    sudo a2dismod headers || exit 1
+fi
+
+if sudo grep -q '^ssl-dir=absent$' &quot;$LAB3_BACKUP/pre-state.txt&quot;; then
+    sudo rmdir /etc/apache2/ssl || {
+        echo &quot;Каталог /etc/apache2/ssl не пуст; используйте снимок для полного отката&quot;
+        exit 1
+    }
+fi
+
+sudo apache2ctl configtest || {
+    echo &quot;Восстановленная конфигурация ошибочна; Apache не запускаем&quot;
+    exit 1
+}
+
+if sudo grep -q '^autostart=enabled$' &quot;$LAB3_BACKUP/pre-state.txt&quot;; then
+    sudo systemctl enable apache2
+else
+    sudo systemctl disable apache2
+fi
+
+if sudo grep -q '^service=active$' &quot;$LAB3_BACKUP/pre-state.txt&quot;; then
+    sudo systemctl start apache2
+    sudo systemctl is-active apache2
+else
+    sudo systemctl stop apache2
+fi
+</code></pre>
+<p>Команды перемещают созданные объекты и журналы в защищённую резервную директорию, возвращают состояния модулей, сайта по умолчанию и службы. Если до работы пакет Apache отсутствовал, ручной откат намеренно не удаляет установленный пакет и его зависимости; полный возврат обеспечивает снимок ВМ. Если начальное состояние было сложнее чистой установки или появились параллельные изменения, не выполняйте ручной откат — восстановите снимок.</p>
+<h2 id="section-6">Что сдать</h2>
+<ol>
+<li>Версию, текущий уровень и фактический IP сервера.</li>
+<li>Вывод <code>apache2ctl configtest</code>, <code>apache2ctl -S</code> и точные сокеты 80/443.</li>
+<li>Оба virtual host и обоснование выбранного значения <code>AstraMode</code>.</li>
+<li>HTTP-код <code>403</code> для каталога без index и финальный редирект HTTP → HTTPS.</li>
+<li>Заголовки HTTPS без раскрытия точной версии Apache.</li>
+<li>Сведения сертификата с SAN и успешные результаты <code>curl --cacert</code> и <code>openssl s_client -verify_return_error</code>.</li>
+<li>Путь к резервной копии и выбранный способ восстановления.</li>
+</ol>
+<h2 id="section-7">Контрольные вопросы</h2>
+<ol>
+<li>Почему глобальное <code>AstraMode off</code> противоречит hardening и чем ограниченное исключение отличается от него?</li>
+<li>Почему <code>configtest</code> выполняется перед каждым применением конфигурации?</li>
+<li>Почему <code>curl -k</code> не доказывает корректность TLS?</li>
+<li>Какие версии протокола исключает <code>SSLProtocol</code>, и почему строка <code>SSLCipherSuite</code> не описывает TLS 1.3 полностью?</li>
+<li>Почему директивы <code>Listen</code> при loopback-ограничении заменяют, а не добавляют рядом?</li>
+<li>Какие данные нельзя переносить с сервера на клиент при проверке сертификата?</li>
+</ol>
+<h2 id="section-8">Критерии зачёта</h2>
+<p>Работа зачтена, если конфигурация проходит <code>configtest</code>, active vhosts и сокеты соответствуют заданию, листинг возвращает <code>403</code>, HTTP перенаправляет на HTTPS, защитные заголовки присутствуют, TLS проходит проверку имени и доверия без <code>-k</code>, а откат затрагивает только созданные лабораторией объекты.</p>
+<h2 id="section-9">Официальные материалы</h2>
+<ul>
+<li><a href="https://wiki.astralinux.ru/pages/viewpage.action?pageId=238749508">Astra Linux: директива AstraMode</a></li>
+<li><a href="https://httpd.apache.org/docs/2.4/misc/security_tips.html">Apache HTTP Server: Security Tips</a></li>
+<li><a href="https://httpd.apache.org/docs/2.4/mod/mod_ssl.html">Apache HTTP Server: mod_ssl</a></li>
+<li><a href="https://httpd.apache.org/docs/2.4/mod/core.html">Apache HTTP Server: core directives</a></li>
+<li><a href="https://curl.se/docs/httpscripting.html">curl: HTTPS scripting</a></li>
+</ul>
+
+    </article>
+    <nav class="document-nav" aria-label="Навигация по материалам">
+      <a href="index.html">← Список лабораторных</a>
+      <a href="03-hard-apache-hardening.md" download>Скачать исходный Markdown</a>
+      <a href="../index.html">К лекции</a>
+    </nav>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">Учебный стенд · перед изменениями создайте снимок ВМ</div>
+  </footer>
+</body>
+</html>

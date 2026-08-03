@@ -61,6 +61,14 @@ if (-not (Test-Path -LiteralPath $sitemapPath)) { Fail "Missing root sitemap.xml
 if (-not (Test-Path -LiteralPath $robotsPath)) { Fail "Missing root robots.txt" }
 if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" }
 
+if (-not $P19Only) {
+  $astraLabsBuilder = Join-Path $projectPath 'build-astra-hardening-labs.ps1'
+  if (-not (Test-Path -LiteralPath $astraLabsBuilder -PathType Leaf)) {
+    Fail "Missing _PROJECT\build-astra-hardening-labs.ps1"
+  }
+  & $astraLabsBuilder -Check
+}
+
 $p19Html = Get-Content -LiteralPath $p19HtmlPath -Encoding UTF8 -Raw
 if ($p19Html -match '\u2116\s*18') { Fail 'p19 contains obsolete process number 18' }
 if ($p19Html -notmatch '\u043F\u0440\u043E\u0446\u0435\u0441\u0441\s+\u2116\s*19') { Fail 'p19 does not identify the lecture as process 19' }
