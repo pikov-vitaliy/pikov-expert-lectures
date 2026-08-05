@@ -8,7 +8,7 @@
 
 - [Общий рабочий процесс](scanner/01-common-workflow.md)
 - [Локальная практика с ScanOVAL](scanner/02-scanoval-local.md)
-- [Индивидуальный стенд WSL 2](scanner/03-wsl-individual.md)
+- [Подробная установка и индивидуальный стенд WSL 2](scanner/03-wsl-individual.md) - включает команды из предоставленной инструкции `Установка Сканер-ВС 7 для УЦ Маском.pdf`, страницы 3-5.
 - [Полный стенд VirtualBox](scanner/04-virtualbox-full-lab.md)
 - [Сценарий Live USB](scanner/05-live-usb.md)
 - [Шаблон отчета](scanner/REPORT-TEMPLATE.md)

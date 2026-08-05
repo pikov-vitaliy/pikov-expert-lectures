@@ -40,6 +40,52 @@
       </div>
     </section>
 
+    <section class="section" aria-labelledby="offline-install-title">
+      <div class="section-heading">
+        <p class="section-kicker">Копируемая шпаргалка</p>
+        <h2 id="offline-install-title">Установка Сканер-ВС 7 в WSL</h2>
+        <p>Команды перенесены из предоставленного файла <code>Установка Сканер-ВС 7 для УЦ Маском.pdf</code>, страницы 3-5. Полное объяснение, безопасная настройка сети и откат находятся в <a href="materials/scanner/03-wsl-individual.md">пошаговой Markdown-инструкции</a>.</p>
+      </div>
+
+      <div class="source-grid">
+        <article class="source-card">
+          <span class="topic-code">1 · PowerShell от администратора</span>
+          <h3>Подготовить WSL</h3>
+          <pre class="command" tabindex="0" aria-label="Команды подготовки WSL">wsl --install
+wsl --install Ubuntu
+wsl -d Ubuntu
+wsl --list --verbose</pre>
+          <p>Если имя установленного дистрибутива отличается, используйте имя из списка. После включения WSL может потребоваться перезагрузка.</p>
+        </article>
+
+        <article class="source-card">
+          <span class="topic-code">2 · Ubuntu</span>
+          <h3>Установить продукт</h3>
+          <pre class="command" tabindex="0" aria-label="Команды установки Сканер-ВС">sh scanner-signed-deb.run
+cp license.lic pkg/
+cd pkg/
+./installer install</pre>
+          <p>Подставьте фактическое имя свежего <code>.run</code>-файла. Лицензия должна находиться в <code>pkg</code> до запуска installer.</p>
+        </article>
+
+        <article class="source-card">
+          <span class="topic-code">3 · Только при сетевом доступе</span>
+          <h3>Перенаправить HTTPS</h3>
+          <pre class="command" tabindex="0" aria-label="Команда portproxy">netsh interface portproxy add v4tov4 listenport=443 listenaddress=&lt;IP_Хоста&gt; connectport=443 connectaddress=&lt;IP_WSL&gt;</pre>
+          <pre class="command" tabindex="0" aria-label="Команда правила Windows Firewall">New-NetFirewallRule -DisplayName "Allow Scanner UI" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow</pre>
+          <p>Замените оба заполнителя реальными адресами. Для занятия ограничьте удалённые адреса разрешённой лабораторной подсетью; не отключайте брандмауэры целиком.</p>
+        </article>
+
+        <article class="source-card">
+          <span class="topic-code">4 · Проверка</span>
+          <h3>Подтвердить результат</h3>
+          <pre class="command" tabindex="0" aria-label="Проверка Сканер-ВС и правил">systemctl status scanner
+netsh interface portproxy show all</pre>
+          <p>Откройте <code>https://localhost</code>, смените первоначальный пароль и после занятия удалите только созданные временные правила. Не используйте общий <code>portproxy reset</code>.</p>
+        </article>
+      </div>
+    </section>
+
     <section class="section section--alternate" aria-labelledby="scanner-route-visual-title">
       <div class="section-heading">
         <p class="section-kicker">Схема практики</p>

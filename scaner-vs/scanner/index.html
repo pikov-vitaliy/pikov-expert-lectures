@@ -65,6 +65,7 @@
         <a href="#vocabulary">Уязвимости</a>
         <a href="#landscape">Рынок</a>
         <a href="#workflow">Сканер-ВС</a>
+        <a href="#installation">Установка</a>
         <a href="#practice">Практика</a>
         <a href="../inspector/">День 2</a>
       </nav>
@@ -99,7 +100,7 @@
     <section class="section section--soft" id="lecture">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">01 / 08</div>
+          <div class="section-index">01 / 09</div>
           <div>
             <h2>Карта большой лекции</h2>
             <p class="section-intro">Лекция строится от понятия слабости до управляемого процесса: что найдено, насколько серьёзно, эксплуатируется ли сейчас, где находится актив и что делать первым.</p>
@@ -119,7 +120,7 @@
     <section class="section" id="vocabulary">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">02 / 08</div>
+          <div class="section-index">02 / 09</div>
           <div>
             <h2>Слабость, уязвимость, продукт</h2>
             <p class="section-intro">Одна таблица не заменяет модель угроз. Идентификаторы помогают связать данные, но отвечают на разные вопросы.</p>
@@ -159,7 +160,7 @@
     <section class="section section--blue" id="priority">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">03 / 08</div>
+          <div class="section-index">03 / 09</div>
           <div>
             <h2>CVSS v4.0 + KEV + EPSS</h2>
             <p class="section-intro">Правильный приоритет появляется только при совместном рассмотрении технической серьёзности, фактов эксплуатации, прогноза, экспозиции и бизнес-контекста.</p>
@@ -210,7 +211,7 @@
     <section class="section" id="landscape">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">04 / 08</div>
+          <div class="section-index">04 / 09</div>
           <div>
             <h2>Не все решения — просто сканеры</h2>
             <p class="section-intro">Локальный обзор от 14.11.2024 используется только как исторический снимок методики и набора продуктов. Текущие функции и статусы проверяются по официальным страницам на дату занятия.</p>
@@ -245,7 +246,7 @@
     <section class="section section--soft" id="workflow">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">05 / 08</div>
+          <div class="section-index">05 / 09</div>
           <div>
             <h2>Рабочий цикл Сканер-ВС 7</h2>
             <p class="section-intro">Рекомендуемая последовательность документации: исследование сети → инвентаризация → поиск уязвимостей и аудит конфигурации. Проверка паролей проводится отдельно и только на учебных реквизитах.</p>
@@ -278,7 +279,7 @@
     <section class="section" id="connections">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">06 / 08</div>
+          <div class="section-index">06 / 09</div>
           <div>
             <h2>Windows через WinRM, Linux через SSH</h2>
             <p class="section-intro">Удобство лаборатории не должно превращаться в постоянное ослабление. Реквизиты — отдельные, права — минимально достаточные, доступ — только от адреса сканера и только на время занятия.</p>
@@ -316,10 +317,77 @@
       </div>
     </section>
 
+    <section class="section section--soft" id="installation">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">07 / 09</div>
+          <div>
+            <h2>Установка по инструкции для УЦ МАСКОМ</h2>
+            <p class="section-intro">Обязательные команды перенесены из файла <code>Установка Сканер-ВС 7 для УЦ Маском.pdf</code>, страницы 3-5, и сверены с текущей официальной документацией Сканер-ВС 7.x. Переносы строк из PDF нормализованы в исполнимые однострочные команды.</p>
+          </div>
+        </div>
+
+        <div class="callout callout--blue">
+          <div class="callout-icon" aria-hidden="true">1</div>
+          <div>
+            <h3>Сначала получите свежий дистрибутив и лицензию</h3>
+            <p>Имена файлов в конкретной выдаче могут отличаться. В предоставленной инструкции используется <code>scanner-signed-deb.run</code>, а в текущей документации - условное <code>scanner.run</code>. Подставляйте точное имя файла из письма производителя; лицензию не передавайте другим слушателям.</p>
+          </div>
+        </div>
+
+        <div class="source-grid">
+          <article class="source-card">
+            <span class="topic-code">PDF · стр. 3</span>
+            <h3>Подготовить WSL и Ubuntu</h3>
+            <p>Запустите PowerShell от имени администратора. Приглашение <code>PS C:\&gt;</code> вводить не нужно. После включения WSL может потребоваться перезагрузка.</p>
+            <pre class="command" tabindex="0" aria-label="Команды установки WSL и Ubuntu">wsl --install
+wsl --install Ubuntu
+wsl -d Ubuntu
+wsl --list --verbose</pre>
+            <p>Если имя дистрибутива отличается от <code>Ubuntu</code>, используйте имя из списка. Текущая документация также рекомендует выполнить <code>wsl --version</code> и убедиться, что дистрибутив работает как WSL 2.</p>
+          </article>
+
+          <article class="source-card">
+            <span class="topic-code">PDF · стр. 5</span>
+            <h3>Распаковать, положить лицензию, установить</h3>
+            <p>Скопируйте выданные файлы в Ubuntu через <code>\\wsl$\</code>. Лицензия должна попасть в созданный каталог <code>pkg</code> до запуска installer.</p>
+            <pre class="command" tabindex="0" aria-label="Команды установки Сканер-ВС 7">sh scanner-signed-deb.run
+cp license.lic pkg/
+cd pkg/
+./installer install</pre>
+            <p>Для нативной Astra Linux/Debian в PDF строка сокращена до <code>sudo bash scanner...</code>. Многоточие не является частью команды: подставьте полное имя свежего <code>.run</code>-файла. Каждый запрос установщика нужно читать, а не подтверждать вслепую.</p>
+          </article>
+
+          <article class="source-card">
+            <span class="topic-code">PDF · стр. 4 · опционально</span>
+            <h3>Открыть 443 только при необходимости</h3>
+            <p>Для работы только на самом Windows-компьютере используйте <code>https://localhost</code> и не создавайте сетевые правила. Для доступа из разрешённой лабораторной сети замените заполнители фактическими адресами.</p>
+            <pre class="command" tabindex="0" aria-label="Команда перенаправления HTTPS в WSL">netsh interface portproxy add v4tov4 listenport=443 listenaddress=&lt;IP_Хоста&gt; connectport=443 connectaddress=&lt;IP_WSL&gt;</pre>
+            <pre class="command" tabindex="0" aria-label="Правило брандмауэра из инструкции">New-NetFirewallRule -DisplayName "Allow Scanner UI" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow</pre>
+            <p>Правило из PDF не ограничивает удалённые адреса. В учебной сети добавьте <code>-RemoteAddress &lt;ЛАБОРАТОРНАЯ_ПОДСЕТЬ_CIDR&gt; -Profile Private</code>. Не отключайте брандмауэры целиком и не публикуйте HTTP-порт 80.</p>
+          </article>
+
+          <article class="source-card">
+            <span class="topic-code">Контрольная точка</span>
+            <h3>Проверить и затем убрать временный доступ</h3>
+            <p>Текущая документация добавляет проверку службы <code>systemctl status scanner</code>; ожидается <code>active (running)</code>. После первого входа немедленно смените первоначальный пароль.</p>
+            <pre class="command" tabindex="0" aria-label="Проверка сетевых правил">netsh interface portproxy show all
+Get-NetFirewallRule -DisplayName "Allow Scanner UI"</pre>
+            <p>После занятия удаляйте только созданное правило и конкретное перенаправление. Общий <code>netsh interface portproxy reset</code> не используют: он затронет чужие правила.</p>
+          </article>
+        </div>
+
+        <div class="button-row" style="margin-top:24px">
+          <a class="button button--blue" href="../materials/scanner/03-wsl-individual.md">Открыть полную пошаговую инструкцию</a>
+          <a class="button" href="https://docs.etecs.ru/scanner/docs/getting-started/installation/windows-wsl-install/" target="_blank" rel="noopener">Сверить с документацией Эшелона</a>
+        </div>
+      </div>
+    </section>
+
     <section class="section section--blue" id="practice">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">07 / 08</div>
+          <div class="section-index">08 / 09</div>
           <div>
             <h2>Четыре практических блока</h2>
             <p class="section-intro">Каждый блок длится 90 минут и заканчивается артефактом, который нужен для следующего шага. После первого блока — обед; между остальными — короткие перерывы.</p>
@@ -390,7 +458,7 @@
     <section class="section section--soft" id="sources">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">08 / 08</div>
+          <div class="section-index">09 / 09</div>
           <div>
             <h2>Первоисточники к занятию</h2>
             <p class="section-intro">Проверено по официальным материалам 05.08.2026. Перед проведением курса преподаватель повторно сверяет версии, условия демолицензии и доступность образов.</p>

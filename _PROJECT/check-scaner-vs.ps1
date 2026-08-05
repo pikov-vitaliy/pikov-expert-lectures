@@ -127,7 +127,10 @@ Assert-Contains 'scaner-vs/assets/site.css' @(
     '(?s)\.lecture-visual img\s*\{[^}]*object-fit:\s*contain',
     '(?s)\.offline-page \.hero\s*\{[^}]*display:\s*grid',
     '(?s)\.offline-page \.hero__media img\s*\{[^}]*object-fit:\s*contain',
-    '(?s)\.offline-page \.document-card\s*\{[^}]*display:\s*grid'
+    '(?s)\.offline-page \.document-card\s*\{[^}]*display:\s*grid',
+    '(?s)\.lane\s*\{[^}]*min-width:\s*0',
+    '(?s)\.source-card\s*\{[^}]*min-width:\s*0',
+    '(?s)\.command\s*\{[^}]*max-width:\s*100%'
 )
 Assert-NotContains 'scaner-vs/assets/site.css' @(
     '\.hero-copy\s*\{\s*padding-top:\s*34px',
@@ -184,9 +187,52 @@ Assert-Contains 'scaner-vs/scanner/index.html' @(
     'историческ[^<]{0,80}снимок',
     'practical-trajectories\.png',
     'priority-pipeline',
+    'href="#installation"',
+    'Установка[^<]{0,100}инструкц[^<]{0,100}УЦ МАСКОМ',
+    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'wsl\s+--install',
+    'wsl\s+--install\s+Ubuntu',
+    'wsl\s+-d\s+Ubuntu',
+    'wsl\s+--list\s+--verbose',
+    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+    'New-NetFirewallRule',
+    'sh\s+scanner-signed-deb\.run',
+    'cp\s+license\.lic\s+pkg/',
+    '\./installer\s+install',
+    '<pre\s+class="command"\s+tabindex="0"',
     'docs\.etecs\.ru/scanner/docs/',
     'scaner-vs\.ru',
     'bdu\.fstec\.ru/scanoval'
+)
+
+Assert-Contains 'scaner-vs/materials/scanner/03-wsl-individual.md' @(
+    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'страниц(?:ы|ах)\s+3.{0,3}5',
+    'wsl\s+--install',
+    'wsl\s+--install\s+Ubuntu',
+    'wsl\s+-d\s+Ubuntu',
+    'wsl\s+--list\s+--verbose',
+    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+    'New-NetFirewallRule',
+    'sh\s+scanner-signed-deb\.run',
+    'cp\s+license\.lic\s+pkg/',
+    'cd\s+pkg/',
+    '\./installer\s+install',
+    'systemctl\s+status\s+scanner',
+    'только[^\r\n]{0,80}(лабораторн|разреш[её]нн)',
+    'не[^\r\n]{0,80}portproxy reset',
+    'многоточие[^\r\n]{0,80}вводить нельзя',
+    'не отключайте[^\r\n]{0,80}брандмауэр'
+)
+
+Assert-Contains '_PROJECT/scaner-vs-offline/scanner/index.html' @(
+    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'wsl\s+--install',
+    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+    'sh\s+scanner-signed-deb\.run',
+    '\./installer\s+install',
+    '<pre\s+class="command"\s+tabindex="0"',
+    'materials/scanner/03-wsl-individual\.md'
 )
 
 Assert-NotContains 'scaner-vs/scanner/index.html' @(
@@ -267,6 +313,7 @@ if (Test-Path -LiteralPath $siteRoot) {
     }
     $allowedArchiveExtensions = @('.md', '.html', '.css', '.js', '.png')
     $publishedCssHash = (Get-FileHash -LiteralPath (Join-Path $siteRoot 'assets\site.css') -Algorithm SHA256).Hash
+    $publishedWslHash = (Get-FileHash -LiteralPath (Join-Path $siteRoot 'materials\scanner\03-wsl-individual.md') -Algorithm SHA256).Hash
     $archives = Get-ChildItem -LiteralPath (Join-Path $siteRoot 'materials\downloads') -Filter '*.zip' -File -ErrorAction SilentlyContinue
     foreach ($archive in $archives) {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($archive.FullName)
@@ -317,6 +364,44 @@ if (Test-Path -LiteralPath $siteRoot) {
                     $resolvedTarget = [Uri]::UnescapeDataString(([Uri]::new($baseUri, $target)).AbsolutePath.TrimStart('/'))
                     if ($entryNames -notcontains $resolvedTarget) {
                         Add-Failure "Неразрешимая Markdown-ссылка в $($archive.Name): $($entry.FullName) -> $target"
+                    }
+                }
+            }
+            if ($archive.Name -in @('scanner-labs-markdown.zip', 'all-labs-markdown.zip')) {
+                $wslEntry = $zip.GetEntry('materials/scanner/03-wsl-individual.md')
+                if ($null -eq $wslEntry) {
+                    Add-Failure "В архиве $($archive.Name) нет WSL-инструкции"
+                }
+                else {
+                    $wslHashStream = $wslEntry.Open()
+                    $wslHasher = [Security.Cryptography.SHA256]::Create()
+                    try {
+                        $archiveWslHash = [Convert]::ToHexString($wslHasher.ComputeHash($wslHashStream))
+                    }
+                    finally {
+                        $wslHasher.Dispose()
+                        $wslHashStream.Dispose()
+                    }
+                    if ($archiveWslHash -ne $publishedWslHash) {
+                        Add-Failure "WSL-инструкция в $($archive.Name) побайтно не совпадает с актуальным Markdown"
+                    }
+                    $reader = [IO.StreamReader]::new($wslEntry.Open(), [Text.Encoding]::UTF8)
+                    try {
+                        $wslText = $reader.ReadToEnd()
+                    }
+                    finally {
+                        $reader.Dispose()
+                    }
+                    foreach ($pattern in @(
+                        'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+                        'wsl\s+--install',
+                        'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+                        'sh\s+scanner-signed-deb\.run',
+                        '\./installer\s+install'
+                    )) {
+                        if ($wslText -notmatch $pattern) {
+                            Add-Failure "WSL-инструкция в $($archive.Name) не содержит: $pattern"
+                        }
                     }
                 }
             }
