@@ -303,8 +303,9 @@ if ($LASTEXITCODE -eq 0 -and $spdxExternalFontAwesome) {
 
 $spdxHtaccessPath = Join-Path (Join-Path $rootPath 'spdx') '.htaccess'
 $spdxHtaccess = Get-Content -LiteralPath $spdxHtaccessPath -Encoding UTF8 -Raw
-$spdxHtmlFilesMatch = '<FilesMatch "^(?!\.)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$).+$">'
-if (-not $spdxHtaccess.Contains($spdxHtmlFilesMatch) -or $spdxHtaccess -notmatch '(?im)^\s*ForceType\s+text/html\s*$') {
+$spdxHtmlFilesMatch = '<FilesMatch "(?i)^(?!\.)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$).+$">'
+$spdxHtmlFilesMatchBlock = '(?is)' + [regex]::Escape($spdxHtmlFilesMatch) + '\s*ForceType\s+text/html\s*</FilesMatch>'
+if ($spdxHtaccess -notmatch $spdxHtmlFilesMatchBlock) {
   Fail "SPDX .htaccess does not assign text/html to paired extensionless pages"
 }
 
