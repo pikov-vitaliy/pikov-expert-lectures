@@ -301,6 +301,11 @@ if ($LASTEXITCODE -eq 0 -and $spdxExternalFontAwesome) {
   Fail "SPDX content loads external Font Awesome that is blocked by the site CSP"
 }
 
+$spdxLegacyGoogleAnalytics = git -C $rootPath grep -n -E 'google-analytics\.com/ga\.js|_gaq|UA-3676394-2' -- 'spdx' 2>$null
+if ($LASTEXITCODE -eq 0 -and $spdxLegacyGoogleAnalytics) {
+  Fail "SPDX content still contains the obsolete Google Analytics loader blocked by CSP"
+}
+
 $spdxHtaccessPath = Join-Path (Join-Path $rootPath 'spdx') '.htaccess'
 $spdxHtaccess = Get-Content -LiteralPath $spdxHtaccessPath -Encoding UTF8 -Raw
 $spdxHtmlFilesMatch = '<FilesMatch "(?i)^(?!\.)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$).+$">'
