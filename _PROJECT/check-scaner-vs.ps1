@@ -116,6 +116,23 @@ foreach ($html in $htmlFiles) {
     }
 }
 
+Assert-Contains 'scaner-vs/assets/site.css' @(
+    '(?s)\.hero-grid\s*\{[^}]*align-items:\s*center',
+    '(?s)\.hero-copy\s*\{[^}]*padding-top:\s*0',
+    '(?s)\.hero-figure img\s*\{[^}]*height:\s*auto'
+)
+Assert-NotContains 'scaner-vs/assets/site.css' @('\.hero-copy\s*\{\s*padding-top:\s*34px')
+
+$heroHtmlFiles = $htmlFiles + @(
+    '_PROJECT/scaner-vs-offline/scanner/index.html',
+    '_PROJECT/scaner-vs-offline/inspector/index.html',
+    '_PROJECT/scaner-vs-offline/all/index.html'
+)
+foreach ($html in $heroHtmlFiles) {
+    Assert-Contains $html @('scanner-inspector-hero\.png"[^>]*width="1672"\s+height="941"')
+    Assert-NotContains $html @('scanner-inspector-hero\.png"[^>]*height="(?:720|1024)"')
+}
+
 Assert-Contains 'scaner-vs/index.html' @(
     'два учебных дня',
     '90 минут',
