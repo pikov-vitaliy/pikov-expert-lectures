@@ -109,6 +109,24 @@ $script:MaterialsZipFolders = @('27-07-2026', '29-07-2026')
 # in the working tree at release time.
 $script:PublishPdfFolders = @('27-07-2026')
 
+# Narrow allowlist for reviewed nested handouts that must remain downloadable
+# from the published HTML. The global distributable rules still exclude every
+# other ZIP and README file from lecture releases.
+$script:ReviewedNestedDistributables = @{
+  'scaner-vs' = @(
+    'materials\README.md',
+    'materials\downloads\all-labs-markdown.zip',
+    'materials\downloads\inspector-labs-markdown.zip',
+    'materials\downloads\scanner-labs-markdown.zip'
+  )
+}
+
+function Should-IncludeReviewedNestedDistributable([string]$FolderName, [string]$RelativePath) {
+  if (-not $script:ReviewedNestedDistributables.ContainsKey($FolderName)) { return $false }
+  $normalized = $RelativePath.Replace('/', '\')
+  return $script:ReviewedNestedDistributables[$FolderName] -contains $normalized
+}
+
 function Should-ExcludeFile([string]$Name) {
   $lower = $Name.ToLowerInvariant()
   if ($lower -eq 'index1.html' -or $lower -like 'indexold*.html' -or $lower -like 'index-v*.html') { return $true }
@@ -157,18 +175,23 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       # top level. A lecture folder that ships runnable code grows nested
       # '__pycache__' and '.ruff_cache' the moment anyone runs it, and their
       # files carry ordinary names that no per-file rule would catch.
-      $segments = (Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName).Split('\')
+      $relative = Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName
+      $segments = $relative.Split('\')
       $parentSegments = @($segments | Select-Object -First ([Math]::Max($segments.Count - 1, 0)))
       if (@($parentSegments | Where-Object { Should-ExcludeDirectory $_ }).Count -gt 0) { return }
 
+      if (Should-IncludeReviewedNestedDistributable -FolderName $folderName -RelativePath $relative) {
+        $files.Add($relative)
+        return
+      }
+
       if ($script:PublishPdfFolders -contains $folderName -and
           $_.Extension.ToLowerInvariant() -eq '.pdf') {
-        $files.Add((Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName))
+        $files.Add($relative)
         return
       }
 
       if (-not (Should-ExcludeNestedFile $_.Name)) {
-        $relative = Get-RelativePathSafe -BasePath $FolderPath -Path $_.FullName
         $files.Add($relative)
       }
     }
@@ -350,6 +373,15 @@ foreach ($target in $targets) {
     }
     $releaseDir = Join-Path $sourceRoot 'release'
     $archiveName = "$($target.domain)-release-$ReleaseDate.zip"
+
+    if ($target.folder -eq 'scaner-vs') {
+      $scanerBundleScript = Join-Path $projectPath 'build-scaner-vs-archives.ps1'
+      if (-not (Test-Path -LiteralPath $scanerBundleScript -PathType Leaf)) {
+        Fail "Missing Scanner-VS bundle builder: $scanerBundleScript"
+      }
+      Write-Output 'RUN bundle scaner-vs'
+      & $scanerBundleScript -Root $rootPath | Out-Null
+    }
 
     # A lecture may ship a handout bundle for its learners. The bundle is a
     # build artifact, so it is NOT tracked in git (the repository policy keeps
