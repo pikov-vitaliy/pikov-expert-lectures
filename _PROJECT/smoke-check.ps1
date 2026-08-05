@@ -301,6 +301,25 @@ if ($LASTEXITCODE -eq 0 -and $spdxExternalFontAwesome) {
   Fail "SPDX content loads external Font Awesome that is blocked by the site CSP"
 }
 
+$spdxHtaccessPath = Join-Path (Join-Path $rootPath 'spdx') '.htaccess'
+$spdxHtaccess = Get-Content -LiteralPath $spdxHtaccessPath -Encoding UTF8 -Raw
+$spdxHtmlFilesMatch = '<FilesMatch "(?i)^(?!\.)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$).+$">'
+$spdxHtmlFilesMatchBlock = '(?is)' + [regex]::Escape($spdxHtmlFilesMatch) + '\s*ForceType\s+text/html\s*</FilesMatch>'
+if ($spdxHtaccess -notmatch $spdxHtmlFilesMatchBlock) {
+  Fail "SPDX .htaccess does not assign text/html to paired extensionless pages"
+}
+
+$spdxKnownAssetExtension = '\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$'
+$spdxHtmlCandidates = @(Get-ChildItem -LiteralPath (Join-Path $rootPath 'spdx') -Recurse -File | Where-Object {
+  -not $_.Name.StartsWith('.') -and $_.Name -notmatch $spdxKnownAssetExtension
+})
+$spdxUnsafeForcedHtml = @($spdxHtmlCandidates | Where-Object {
+  -not (Test-Path -LiteralPath ($_.FullName + '.html') -PathType Leaf)
+})
+if ($spdxUnsafeForcedHtml.Count -gt 0) {
+  Fail "SPDX ForceType rule would cover a non-HTML asset: $($spdxUnsafeForcedHtml[0].FullName)"
+}
+
 foreach ($blockedPath in @(
   'p19/materials',
   'ppk/materials_from_4days',

@@ -111,6 +111,10 @@ foreach ($relativePath in $modernImageFiles) {
     }
 }
 
+Assert-Contains 'scaner-vs/.htaccess' @(
+    '(?im)^\s*AddType\s+image/webp\s+\.webp\s*$'
+)
+
 $htmlFiles = @(
     'scaner-vs/index.html',
     'scaner-vs/scanner/index.html',
