@@ -63,6 +63,9 @@ $requiredFiles = @(
     'scaner-vs/assets/site.css',
     'scaner-vs/assets/site.js',
     'scaner-vs/assets/scanner-inspector-hero.png',
+    'scaner-vs/assets/course-map-two-days.png',
+    'scaner-vs/assets/two-level-analysis.png',
+    'scaner-vs/assets/practical-trajectories.png',
     'scaner-vs/materials/README.md',
     'scaner-vs/materials/CHECKSUMS.md',
     'scaner-vs/materials/scanner/01-common-workflow.md',
@@ -119,9 +122,18 @@ foreach ($html in $htmlFiles) {
 Assert-Contains 'scaner-vs/assets/site.css' @(
     '(?s)\.hero-grid\s*\{[^}]*align-items:\s*center',
     '(?s)\.hero-copy\s*\{[^}]*padding-top:\s*0',
-    '(?s)\.hero-figure img\s*\{[^}]*height:\s*auto'
+    '(?s)\.hero-figure img\s*\{[^}]*height:\s*auto',
+    '(?s)\.hero-figure img\s*\{[^}]*object-fit:\s*contain',
+    '(?s)\.lecture-visual img\s*\{[^}]*object-fit:\s*contain',
+    '(?s)\.offline-page \.hero\s*\{[^}]*display:\s*grid',
+    '(?s)\.offline-page \.hero__media img\s*\{[^}]*object-fit:\s*contain',
+    '(?s)\.offline-page \.document-card\s*\{[^}]*display:\s*grid'
 )
-Assert-NotContains 'scaner-vs/assets/site.css' @('\.hero-copy\s*\{\s*padding-top:\s*34px')
+Assert-NotContains 'scaner-vs/assets/site.css' @(
+    '\.hero-copy\s*\{\s*padding-top:\s*34px',
+    '(?s)\.hero-figure img\s*\{[^}]*object-fit:\s*cover',
+    '(?s)\.hero-figure img\s*\{[^}]*aspect-ratio:\s*16\s*/\s*10'
+)
 
 $heroHtmlFiles = $htmlFiles + @(
     '_PROJECT/scaner-vs-offline/scanner/index.html',
@@ -131,6 +143,14 @@ $heroHtmlFiles = $htmlFiles + @(
 foreach ($html in $heroHtmlFiles) {
     Assert-Contains $html @('scanner-inspector-hero\.png"[^>]*width="1672"\s+height="941"')
     Assert-NotContains $html @('scanner-inspector-hero\.png"[^>]*height="(?:720|1024)"')
+}
+
+foreach ($html in @(
+    '_PROJECT/scaner-vs-offline/scanner/index.html',
+    '_PROJECT/scaner-vs-offline/inspector/index.html',
+    '_PROJECT/scaner-vs-offline/all/index.html'
+)) {
+    Assert-Contains $html @('<body class="offline-page">', 'class="skip-link"[^>]*href="#content"')
 }
 
 Assert-Contains 'scaner-vs/index.html' @(
@@ -144,6 +164,8 @@ Assert-Contains 'scaner-vs/index.html' @(
     'materials/README\.md',
     'materials/downloads/all-labs-markdown\.zip',
     'офлайн[^<]{0,40}лендинг',
+    'course-map-two-days\.png',
+    'two-level-analysis\.png',
     'scanner/',
     'inspector/'
 )
@@ -160,6 +182,8 @@ Assert-Contains 'scaner-vs/scanner/index.html' @(
     '../materials/scanner/01-common-workflow\.md',
     '../materials/downloads/scanner-labs-markdown\.zip',
     'историческ[^<]{0,80}снимок',
+    'practical-trajectories\.png',
+    'priority-pipeline',
     'docs\.etecs\.ru/scanner/docs/',
     'scaner-vs\.ru',
     'bdu\.fstec\.ru/scanoval'
@@ -177,6 +201,17 @@ Assert-Contains 'scaner-vs/inspector/index.html' @(
     'синтетическ[^<]{0,40}данн',
     'не[^<]{0,60}аттестац',
     'верси[ия][^<]{0,80}(операцион|ядр|файлов)',
+    'two-level-analysis\.png',
+    'АНЗ\.4', 'АНЗ\.5', 'ОЦЛ\.1', 'ЗНИ\.8',
+    'приказ[^<]{0,80}(?:№|N)\s*117',
+    '1\s+марта\s+2026',
+    'приказ[^<]{0,80}(?:№|N)\s*17[^<]{0,120}утратил',
+    'ФСТЭК\s+России[^<]{0,40}2204',
+    '4[^<]{0,30}уровн[^<]{0,20}довери',
+    '13\.11\.2029',
+    'publication\.pravo\.gov\.ru/document/0001202506170011',
+    'docs\.etecs\.ru/scanner/docs/intro',
+    'fstec-map',
     '../materials/inspector/01-practicum\.md',
     '../materials/downloads/inspector-labs-markdown\.zip'
 )
@@ -201,6 +236,7 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/practical-trajectories.png',
             'materials/scanner/01-common-workflow.md',
             'materials/scanner/02-scanoval-local.md',
             'materials/scanner/03-wsl-individual.md',
@@ -213,6 +249,7 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/two-level-analysis.png',
             'materials/inspector/01-practicum.md',
             'materials/inspector/REPORT-TEMPLATE.md'
         )
@@ -221,12 +258,15 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/course-map-two-days.png',
+            'assets/two-level-analysis.png',
             'materials/README.md',
             'materials/scanner/01-common-workflow.md',
             'materials/inspector/01-practicum.md'
         )
     }
     $allowedArchiveExtensions = @('.md', '.html', '.css', '.js', '.png')
+    $publishedCssHash = (Get-FileHash -LiteralPath (Join-Path $siteRoot 'assets\site.css') -Algorithm SHA256).Hash
     $archives = Get-ChildItem -LiteralPath (Join-Path $siteRoot 'materials\downloads') -Filter '*.zip' -File -ErrorAction SilentlyContinue
     foreach ($archive in $archives) {
         $zip = [System.IO.Compression.ZipFile]::OpenRead($archive.FullName)
@@ -243,6 +283,21 @@ if (Test-Path -LiteralPath $siteRoot) {
                 }
                 if ($entry.Name -and $allowedArchiveExtensions -notcontains ([IO.Path]::GetExtension($entry.Name).ToLowerInvariant())) {
                     Add-Failure "В архиве $($archive.Name) найден файл недопустимого типа: $($entry.FullName)"
+                }
+            }
+            $archiveCss = $zip.GetEntry('assets/site.css')
+            if ($null -ne $archiveCss) {
+                $cssStream = $archiveCss.Open()
+                $hasher = [Security.Cryptography.SHA256]::Create()
+                try {
+                    $archiveCssHash = [Convert]::ToHexString($hasher.ComputeHash($cssStream))
+                }
+                finally {
+                    $hasher.Dispose()
+                    $cssStream.Dispose()
+                }
+                if ($archiveCssHash -ne $publishedCssHash) {
+                    Add-Failure "CSS в архиве $($archive.Name) не совпадает с актуальным scaner-vs/assets/site.css"
                 }
             }
             foreach ($entry in $zip.Entries | Where-Object { [IO.Path]::GetExtension($_.Name) -eq '.md' }) {
@@ -274,7 +329,7 @@ if (Test-Path -LiteralPath $siteRoot) {
                 finally {
                     $reader.Dispose()
                 }
-                foreach ($pattern in @('Офлайн-комплект', 'href="assets/site\.css"', 'src="assets/site\.js"', 'src="assets/scanner-inspector-hero\.png"')) {
+                foreach ($pattern in @('Офлайн-комплект', 'class="offline-page"', 'class="skip-link"', 'href="assets/site\.css"', 'src="assets/site\.js"', 'src="assets/scanner-inspector-hero\.png"', 'src="assets/(?:course-map-two-days|two-level-analysis|practical-trajectories)\.png"')) {
                     if ($offlineHtml -notmatch $pattern) {
                         Add-Failure "Офлайн-лендинг в $($archive.Name) не содержит: $pattern"
                     }

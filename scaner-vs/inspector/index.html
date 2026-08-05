@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>День 2 · Компонент «Инспектор» — лекция и практикум</title>
-  <meta name="description" content="Учебный день по компоненту «Инспектор»: остаточная информация, контрольные суммы, системный аудит, права доступа, сравнение отчётов и защита вывода.">
+  <meta name="description" content="Учебный день по компоненту «Инспектор»: нормативная карта АНЗ.4, АНЗ.5, ОЦЛ.1 и ЗНИ.8, остаточная информация, контрольные суммы, системный аудит, права доступа и доказательный отчёт.">
   <meta name="author" content="Виталий Александрович Пиков">
   <meta name="theme-color" content="#ffffff">
   <link rel="canonical" href="https://scaner-vs.pikov.expert/inspector/">
@@ -58,11 +58,12 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
         <span>Сканер-ВС · два учебных дня</span>
       </a>
-      <button class="menu-button" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-button>
+      <button class="menu-button" type="button" aria-label="Открыть меню" aria-controls="primary-navigation" aria-expanded="false" data-menu-button>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
-      <nav class="top-nav" aria-label="Разделы" data-navigation>
+      <nav class="top-nav" id="primary-navigation" aria-label="Разделы" data-navigation>
         <a href="#lecture">Лекция</a>
+        <a href="#regulation">Нормативная карта</a>
         <a href="#tools">Проверки</a>
         <a href="#practice">Практика</a>
         <a href="#evidence">Отчёт</a>
@@ -99,7 +100,7 @@
     <section class="section section--green" id="lecture">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">01 / 07</div>
+          <div class="section-index">01 / 08</div>
           <div>
             <h2>Карта большой лекции</h2>
             <p class="section-intro">Цель — научиться получать и интерпретировать свидетельства конкретной проверки, не превращая отчёт инструмента в необоснованное заключение о защищённости всей системы.</p>
@@ -119,7 +120,7 @@
     <section class="section" id="versions">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">02 / 07</div>
+          <div class="section-index">02 / 08</div>
           <div>
             <h2>Сначала определить версию и среду</h2>
             <p class="section-intro">Доступность функции зависит от версии «Инспектора», операционной системы, версии ядра и файловой системы. Демолицензия Сканер-ВС не гарантирует включение компонента — это проверяется до занятия.</p>
@@ -136,6 +137,13 @@
           </table>
         </div>
 
+        <div class="topic-grid" style="margin-top:24px">
+          <article class="topic"><span class="topic-code">ОЗУ</span><h3>Ограничение по ядрам</h3><p>В руководстве 2025 года для проверки очистки оперативной памяти перечислены ядра 4.2.0-23-generic, 4.2.0-23-pax, 3.16.0-16-generic и 3.16.0-16-pax.</p></article>
+          <article class="topic"><span class="topic-code">НОСИТЕЛИ</span><h3>Поддерживаемые ФС</h3><p>Для проверки механизмов очистки устройств под Astra Linux документированы ext2, ext3, ext4 и vfat.</p></article>
+          <article class="topic"><span class="topic-code">ПОИСК</span><h3>Границы поиска</h3><p>Документ до 10 Мбайт и непрерывное размещение; не более 100 слов по 100 символов и 1000 находок одного слова.</p></article>
+          <article class="topic"><span class="topic-code">СРАВНЕНИЕ</span><h3>Не для всех вкладок</h3><p>Автоматическое сравнение документировано для отчётов контрольного суммирования и системного аудита.</p></article>
+        </div>
+
         <div class="callout">
           <div class="callout-icon" aria-hidden="true">✓</div>
           <div>
@@ -146,10 +154,82 @@
       </div>
     </section>
 
+    <section class="section section--green" id="regulation">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">03 / 08</div>
+          <div>
+            <h2>Нормативная карта: четыре проверяемые области</h2>
+            <p class="section-intro">Руководство пользователя НПЕШ.00606-01 90-2 связывает функции «Инспектора» с мерами АНЗ.4, АНЗ.5, ОЦЛ.1 и ЗНИ.8. Это карта отдельных проверок и доказательств, а не заявление о выполнении всех требований конкретного приказа.</p>
+          </div>
+        </div>
+
+        <div class="lane-grid">
+          <article class="lane lane--green">
+            <div class="lane-kicker">Актуально для ГИС с 01.03.2026</div>
+            <h3>Приказ № 117 вместо приказа № 17</h3>
+            <p>Приказ ФСТЭК России от 11.04.2025 № 117 вступил в силу 1 марта 2026 года; приказ № 17 утратил силу с этой даты. Поэтому ссылка на № 17 в руководстве 2025 года — историческая, а актуальные требования к ГИС и иным системам государственных органов сверяются с приказом № 117.</p>
+            <a class="button button--green" href="https://publication.pravo.gov.ru/document/0001202506170011" target="_blank" rel="noopener">Официальное опубликование № 117</a>
+          </article>
+          <article class="lane">
+            <div class="lane-kicker">Сертификация средства</div>
+            <h3>ФСТЭК России № 2204</h3>
+            <p>В официальной документации Сканер-ВС указан сертификат ФСТЭК России № 2204: соответствие требованиям по 4 уровню доверия, срок действия — до 13.11.2029. Сертификат относится к средству и не является аттестатом проверяемого объекта.</p>
+            <a class="button" href="https://docs.etecs.ru/scanner/docs/intro/" target="_blank" rel="noopener">Официальная страница и сертификаты</a>
+          </article>
+        </div>
+
+        <div class="fstec-map" aria-label="Соответствие мер ФСТЭК инструментам компонента Инспектор">
+          <article class="measure-card">
+            <span class="measure-code">АНЗ.4</span>
+            <h3>Состав ПО и техники</h3>
+            <p>«Системный аудит» инвентаризирует ОС, программы и пакеты, лицензионные номера, процессор, диски, сетевые адаптеры, периферию и USB-устройства.</p>
+          </article>
+          <article class="measure-card">
+            <span class="measure-code">АНЗ.5</span>
+            <h3>Только в части правил и полномочий</h3>
+            <p>«Проверка прав доступа» сопоставляет заданную модель с фактическими дискреционными и мандатными полномочиями пользователей для выбранных объектов.</p>
+          </article>
+          <article class="measure-card">
+            <span class="measure-code">ОЦЛ.1</span>
+            <h3>Контроль целостности ПО</h3>
+            <p>«Контрольное суммирование» фиксирует значения для выбранных файлов, папок, подпапок, съёмных носителей и накопителей.</p>
+          </article>
+          <article class="measure-card">
+            <span class="measure-code">ЗНИ.8</span>
+            <h3>Уничтожение и остаточная информация</h3>
+            <p>Проверяются механизмы очистки и выполняется поиск остаточной информации на выбранных машинных носителях с фиксацией места находки.</p>
+          </article>
+        </div>
+
+        <figure class="lecture-visual">
+          <img src="../assets/two-level-analysis.png" width="1586" height="992" loading="lazy" alt="Два уровня анализа: сетевые проверки Сканер-ВС 7 и локальные доказательные проверки компонента Инспектор">
+          <figcaption>Два уровня учебного анализа: Сканер-ВС исследует сеть и активы, «Инспектор» — локальную рабочую станцию, файлы, носители и права. Автоматический обмен результатами между уровнями в курсе не предполагается.</figcaption>
+        </figure>
+
+        <h3>Цепочка доказательств</h3>
+        <div class="evidence-chain" aria-label="Пять шагов от области проверки к экспертному выводу">
+          <div class="evidence-step"><strong>1. Область</strong><span>Версия, ОС, объект, права и непроверенные зоны.</span></div>
+          <div class="evidence-step"><strong>2. Критерий</strong><span>Мера, программа испытаний и ожидаемое состояние.</span></div>
+          <div class="evidence-step"><strong>3. Наблюдение</strong><span>Хеш, право, маркер, состав системы или статус очистки.</span></div>
+          <div class="evidence-step"><strong>4. Свидетельство</strong><span>HTML-отчёт, журнал, ручная сверка и воспроизводимые параметры.</span></div>
+          <div class="evidence-step"><strong>5. Вывод</strong><span>Экспертная оценка только в заданных границах и с ограничениями.</span></div>
+        </div>
+
+        <div class="callout callout--red">
+          <div class="callout-icon" aria-hidden="true">!</div>
+          <div>
+            <h3>Сертификат средства ≠ аттестация объекта</h3>
+            <p>Отчёт «Инспектора» подтверждает результат конкретной операции при зафиксированных условиях. Он не создаёт автоматического заключения о соответствии приказу № 117, № 21, № 31 или № 239 и не заменяет модель угроз, программу испытаний, организационные документы и решение аттестационной комиссии.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <section class="section section--soft" id="tools">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">03 / 07</div>
+          <div class="section-index">04 / 08</div>
           <div>
             <h2>Что именно проверяем</h2>
             <p class="section-intro">Каждая операция связывает объект, исходное условие, действие, наблюдение и ограниченный вывод. Практика использует только синтетические данные.</p>
@@ -170,7 +250,7 @@
     <section class="section section--green" id="practice">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">04 / 07</div>
+          <div class="section-index">05 / 08</div>
           <div>
             <h2>Четыре практических блока</h2>
             <p class="section-intro">Практика не затрагивает системные каталоги и реальные данные. Все изменения ограничены новым каталогом внутри профиля пользователя.</p>
@@ -198,7 +278,7 @@
     <section class="section" id="lab-kit">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">05 / 07</div>
+          <div class="section-index">06 / 08</div>
           <div>
             <h2>Практикум в Markdown и офлайн-комплекте</h2>
             <p class="section-intro">В инструкции находятся четыре блока, безопасная подготовка синтетических файлов для Windows и Astra Linux и правила интерпретации. В ZIP добавлен автономный офлайн-лендинг; скрипты настройки продукта, лицензии и дистрибутивы на сайт не загружаются.</p>
@@ -234,7 +314,7 @@
     <section class="section section--soft" id="evidence">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">06 / 07</div>
+          <div class="section-index">07 / 08</div>
           <div>
             <h2>От наблюдения к корректному выводу</h2>
             <p class="section-intro">Отчёт «Инспектора» — доказательный материал конкретной проверки, но не готовое аттестационное заключение и не замена модели угроз, программы испытаний и организационно-технических мер.</p>
@@ -267,7 +347,7 @@
     <section class="section section--green" id="sources">
       <div class="wrap">
         <div class="section-head">
-          <div class="section-index">07 / 07</div>
+          <div class="section-index">08 / 08</div>
           <div>
             <h2>Официальные источники</h2>
             <p class="section-intro">Текущие функции сверяются с документацией 7.x и фактической сборкой. Локальные методички используются как сценарий занятия, но не подменяют документацию производителя.</p>
@@ -286,9 +366,18 @@
           <article class="source-card">
             <h3>Комплекс Сканер-ВС 7</h3>
             <ul class="source-list">
+              <li><a href="https://docs.etecs.ru/scanner/docs/intro/" target="_blank" rel="noopener">Функции безопасности и сертификат № 2204</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/introduction/product-overview/" target="_blank" rel="noopener">Обзор продукта</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/introduction/editions-comparison/" target="_blank" rel="noopener">Сравнение редакций</a></li>
               <li><a href="https://scaner-vs.ru/" target="_blank" rel="noopener">Официальная страница продукта</a></li>
+            </ul>
+          </article>
+          <article class="source-card">
+            <h3>Актуальный нормативный контекст</h3>
+            <ul class="source-list">
+              <li><a href="https://publication.pravo.gov.ru/document/0001202506170011" target="_blank" rel="noopener">Приказ ФСТЭК России от 11.04.2025 № 117</a></li>
+              <li>С 01.03.2026 ссылка на приказ № 17 рассматривается как историческая.</li>
+              <li>Выбор требований и критериев выполняется для конкретного объекта и программы испытаний.</li>
             </ul>
           </article>
         </div>

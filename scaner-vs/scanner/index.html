@@ -58,10 +58,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
         <span>Сканер-ВС · два учебных дня</span>
       </a>
-      <button class="menu-button" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-button>
+      <button class="menu-button" type="button" aria-label="Открыть меню" aria-controls="primary-navigation" aria-expanded="false" data-menu-button>
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
-      <nav class="top-nav" aria-label="Разделы" data-navigation>
+      <nav class="top-nav" id="primary-navigation" aria-label="Разделы" data-navigation>
         <a href="#vocabulary">Уязвимости</a>
         <a href="#landscape">Рынок</a>
         <a href="#workflow">Сканер-ВС</a>
@@ -137,11 +137,20 @@
           </table>
         </div>
 
+        <div class="topic-grid" aria-label="Многомерная классификация уязвимостей">
+          <article class="topic"><span class="topic-code">ПРИЧИНА</span><h3>Откуда возникла</h3><p>Ошибка архитектуры или проектирования, дефект реализации, небезопасная конфигурация, уязвимая зависимость, слабые либо скомпрометированные учётные данные.</p></article>
+          <article class="topic"><span class="topic-code">КОМПОНЕНТ</span><h3>Где находится</h3><p>ОС, сетевой сервис, веб-приложение, СУБД, встроенное ПО, контейнер, библиотека или средство администрирования.</p></article>
+          <article class="topic"><span class="topic-code">УСЛОВИЯ</span><h3>Как эксплуатируется</h3><p>Локально, из смежной сети или удалённо; с участием пользователя или без него; до либо после получения привилегий.</p></article>
+          <article class="topic"><span class="topic-code">ПОСЛЕДСТВИЯ</span><h3>Что нарушается</h3><p>Конфиденциальность, целостность и доступность, а также подлинность, подотчётность и возможность дальнейшего перемещения по инфраструктуре.</p></article>
+          <article class="topic"><span class="topic-code">СТАТУС</span><h3>Что известно сейчас</h3><p>Теоретическая применимость, наличие публичного PoC, наблюдаемая эксплуатация, исправление производителя и фактическое состояние целевого актива.</p></article>
+          <article class="topic"><span class="topic-code">КОНТЕКСТ</span><h3>Почему это важно здесь</h3><p>Экспозиция, ценность данных и сервиса, защитные меры, связность с другими системами, допустимый простой и требования к устранению.</p></article>
+        </div>
+
         <div class="callout callout--blue">
           <div class="callout-icon" aria-hidden="true">i</div>
           <div>
             <h3>Классификация уязвимостей многомерна</h3>
-            <p>Их различают по происхождению, компоненту, вектору атаки, требуемым правам, влиянию на конфиденциальность, целостность и доступность, наличию эксплуатации и критичности затронутого актива. Один CVE или балл не описывает весь риск.</p>
+            <p>Их различают по происхождению, компоненту, вектору атаки, требуемым правам, влиянию на конфиденциальность, целостность и доступность, наличию эксплуатации и критичности затронутого актива. CVE и записи БДУ ФСТЭК России помогают связать сведения о конкретной уязвимости, а CWE — понять класс первопричины. Один идентификатор или балл не описывает весь риск.</p>
           </div>
         </div>
       </div>
@@ -187,6 +196,14 @@
             <p><strong>Приоритет =</strong> факт/вероятность эксплуатации + техническая серьёзность + внешняя доступность + критичность актива + компенсирующие меры + последствия + стоимость и срочность исправления. Складывать CVSS и EPSS арифметически нельзя.</p>
           </div>
         </div>
+
+        <div class="priority-pipeline" aria-label="Конвейер приоритизации уязвимостей">
+          <div class="priority-node"><strong>1. Актив</strong><span>Критичность, владелец, данные, внешний или внутренний контур.</span></div>
+          <div class="priority-node"><strong>2. Эксплуатация</strong><span>Запись в KEV, подтверждённые атаки и другие проверенные сведения.</span></div>
+          <div class="priority-node"><strong>3. Прогноз</strong><span>EPSS как вероятность наблюдаемой эксплуатации CVE в ближайшие 30 дней.</span></div>
+          <div class="priority-node"><strong>4. Серьёзность</strong><span>CVSS и контекст среды: достижимость, права, последствия и защитные меры.</span></div>
+          <div class="priority-node"><strong>5. Действие</strong><span>Исправить, компенсировать или принять риск; назначить срок и повторную проверку.</span></div>
+        </div>
       </div>
     </section>
 
@@ -214,6 +231,14 @@
         </div>
 
         <p class="footnote">Таблица — учебная классификация пересекающихся функций, а не рейтинг и не закупочная рекомендация. Доступность лицензий, сертификация и поддержка конкретных платформ проверяются отдельно.</p>
+
+        <div class="callout callout--blue">
+          <div class="callout-icon" aria-hidden="true">✓</div>
+          <div>
+            <h3>Как сравнивать продукты без рекламного рейтинга</h3>
+            <p>Для конкретной организации сопоставляют охват обнаружения и инвентаризации, глубину авторизованного анализа, источники уязвимостей и конфигурационных проверок, приоритизацию, жизненный цикл устранения, работу в изолированном контуре, API и интеграции, поддерживаемые платформы, сертификацию и сопровождение. Название класса само по себе не гарантирует наличие этих функций.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -227,11 +252,22 @@
           </div>
         </div>
 
+        <h3>Какие группы мер поддерживает средство</h3>
+        <p class="section-intro">Официальное введение связывает функции Сканер-ВС с отдельными мерами защиты. Это карта функциональных возможностей, а не автоматическое подтверждение соответствия всей информационной системы.</p>
+        <div class="topic-grid" aria-label="Группы мер защиты, поддерживаемые Сканер-ВС">
+          <article class="topic"><span class="topic-code">ИАФ</span><h3>Идентификация</h3><p>ИАФ.1, ИАФ.3, ИАФ.4 и ИАФ.5: проверки, связанные с идентификацией и аутентификацией.</p></article>
+          <article class="topic"><span class="topic-code">УПД</span><h3>Управление доступом</h3><p>УПД.1, УПД.2, УПД.10 и УПД.11: отдельные проверки управления доступом и сетевого взаимодействия.</p></article>
+          <article class="topic"><span class="topic-code">РСБ</span><h3>События безопасности</h3><p>РСБ.3 и РСБ.6: функции, используемые при анализе регистрации и событий безопасности.</p></article>
+          <article class="topic"><span class="topic-code">ОЦЛ</span><h3>Целостность</h3><p>ОЦЛ.6 и ОЦЛ.7: контроль отдельных параметров целостности и конфигурации.</p></article>
+          <article class="topic"><span class="topic-code">АНЗ</span><h3>Анализ защищённости</h3><p>АНЗ.1, АНЗ.3 и АНЗ.4: выявление, анализ уязвимостей и контроль состава технических средств и ПО.</p></article>
+          <article class="topic"><span class="topic-code">ГРАНИЦА</span><h3>Не аттестационное заключение</h3><p>Отчёт фиксирует выбранные задачи в заданной области; полноту мер и соответствие системы обосновывает эксперт по совокупности доказательств.</p></article>
+        </div>
+
         <div class="timeline">
-          <article class="timeline-step"><div class="timeline-number">01</div><div class="timeline-content"><h3>Исследование сети</h3><p>Задать разрешённые диапазоны, найти доступные узлы, порты и признаки операционных систем. Перед запуском зафиксировать область работ и исключения.</p></div></article>
-          <article class="timeline-step"><div class="timeline-number">02</div><div class="timeline-content"><h3>Подключение найденных активов</h3><p>Для Windows основной маршрут занятия — WinRM с vendor-скриптом <code>winrm.ps1</code>; для Linux — SSH с отдельным секретом и контролируемым <code>sudo</code>. У одного актива должно быть одно корректное подключение.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">01</div><div class="timeline-content"><h3>Исследование сети</h3><p>Задать разрешённые цели и исключения, интенсивность и лимиты; определить доступные узлы, TCP/UDP-порты, версии сервисов, признаки ОС и топологию. Перед запуском зафиксировать область работ.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">02</div><div class="timeline-content"><h3>Подключение найденных активов</h3><p>Для Windows основной маршрут занятия — WinRM с vendor-скриптом <code>winrm.ps1</code>; для Linux — SSH. Для полноты вендор указывает административные права и <code>root</code>, поэтому в лаборатории привилегированные реквизиты делают отдельными и временными. У одного актива должно быть одно корректное подключение.</p></div></article>
           <article class="timeline-step"><div class="timeline-number">03</div><div class="timeline-content"><h3>Инвентаризация</h3><p>Собрать программное обеспечение и версии, обновления, аппаратный состав и пользователей. Привилегии нужны для полноты результата; экспорт SPDX/CycloneDX затем отдельно валидируется.</p></div></article>
-          <article class="timeline-step"><div class="timeline-number">04</div><div class="timeline-content"><h3>Поиск уязвимостей</h3><p>Сопоставить инвентаризацию с CVE/БДУ и источниками ОС, затем проверить версию, применимость и возможные ложные срабатывания. Для Windows особенно важна предварительная инвентаризация.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">04</div><div class="timeline-content"><h3>Поиск уязвимостей</h3><p>Сопоставить инвентаризацию с выбранным источником, проверить версию, применимость и возможные ложные срабатывания. Режим БДУ рассматривается как отдельный эксперимент: документация содержит оговорку об игнорировании других штатных источников, поэтому поведение проверяют на фактической сборке.</p></div></article>
           <article class="timeline-step"><div class="timeline-number">05</div><div class="timeline-content"><h3>Подбор паролей</h3><p>Использовать малый словарь, синтетические учётные записи, фиксированные цели и остановку после первого результата. Отчёт может содержать пароль открытым текстом — удалить его и сменить реквизиты после занятия.</p></div></article>
           <article class="timeline-step"><div class="timeline-number">06</div><div class="timeline-content"><h3>Аудит конфигурации</h3><p>Выбрать подходящий шаблон Best Practice, сравнить фактические настройки с требованиями и отделить небезопасную конфигурацию от уязвимости версии ПО.</p></div></article>
           <article class="timeline-step"><div class="timeline-number">07</div><div class="timeline-content"><h3>Отчёт и повторная проверка</h3><p>Зафиксировать параметры задачи, версию базы, время и область проверки; проверить критичные результаты вручную, назначить действия и повторить проверку после исправления.</p></div></article>
@@ -253,14 +289,14 @@
           <article class="lane">
             <div class="lane-kicker">Windows · базовый маршрут</div>
             <h3>Подготовить WinRM</h3>
-            <p>Официальная документация предлагает поставляемый <code>winrm.ps1</code>. До запуска преподаватель проверяет исходный текст и хеш полученного файла. В лаборатории используется HTTPS-прослушиватель WinRM на 5986 и правило брандмауэра только для IP сканера.</p>
+            <p>Официальная документация предлагает <code>winrm.ps1</code> из <code>/var/lib/echelon/0/scanner/scripts</code> либо со страницы <code>https://&lt;IP-сканера&gt;/winrm/</code>. До запуска преподаватель проверяет исходный текст и хеш. Для полной проверки вендор указывает административные права; в лаборатории это отдельная временная запись, HTTPS WinRM на 5986 и правило брандмауэра только для IP сканера.</p>
             <div class="command">Powershell.exe -ExecutionPolicy Bypass -File winrm.ps1</div>
-            <p class="footnote">Это vendor-команда, а не универсальная рекомендация менять политику PowerShell. Запуск допустим только после проверки скрипта и только на лабораторной Windows. Basic-аутентификация не передаётся по HTTP.</p>
+            <p class="footnote">Это vendor-команда, а не универсальная рекомендация менять политику PowerShell. Для удаления созданной конфигурации в поставке предусмотрен <code>remove.ps1</code>; <code>Disable-PSRemoting</code> не является точечной отменой и отключает PowerShell Remoting целиком.</p>
           </article>
           <article class="lane lane--green">
             <div class="lane-kicker">Linux · контролируемый доступ</div>
             <h3>Создать SSH-подключение</h3>
-            <p>Используется отдельная учебная учётная запись, ключ RSA/ECDSA/ED25519 или временный пароль и разрешённый <code>sudo</code> для нужных операций. Без привилегий инвентаризация и аудит могут быть неполными.</p>
+            <p>Документация для полной инвентаризации и аудита указывает привилегии <code>root</code>. В учебном стенде создаётся отдельная временная запись с ключом RSA/ECDSA/ED25519 либо временным паролем и строго ограниченным сроком жизни; объём привилегий и отклонения от требований вендора фиксируются в отчёте.</p>
             <ul class="clean-list">
               <li>Ограничить вход адресом сканера</li>
               <li>Сохранить строгие права на ключи и <code>authorized_keys</code></li>
@@ -294,8 +330,24 @@
           <div class="callout-icon" aria-hidden="true">↓</div>
           <div>
             <h3>До занятия получите свежий учебный дистрибутив у производителя</h3>
-            <p>Заполните <a href="https://scaner-vs.ru/#form" target="_blank" rel="noopener"><strong>официальную форму демоверсии</strong></a>. Производитель вышлет на указанную почту ссылку на актуальную на момент запроса демоверсию Сканер-ВС 7 Base и файл лицензии. Преподавателю заранее сообщается только факт получения; сам дистрибутив и лицензия в общий учебный архив не загружаются.</p>
+            <p>Заполните <a href="https://scaner-vs.ru/#form" target="_blank" rel="noopener"><strong>официальную форму демоверсии</strong></a>. Производитель вышлет на указанную почту ссылку на актуальную демоверсию Сканер-ВС 7 Base и файл лицензии. На 05.08.2026 форма сообщает о лицензии на 4 IP до 30.09.2026 и сборках для Astra Linux, Windows 10/11 через WSL, Альт СП и РЕД ОС; это изменяемые условия, поэтому их проверяют перед каждым потоком. Включение «Инспектора» не предполагается без отдельного подтверждения производителя.</p>
             <div class="button-row"><a class="button button--blue" href="https://scaner-vs.ru/#form" target="_blank" rel="noopener">Получить демоверсию Сканер-ВС 7 Base</a></div>
+          </div>
+        </div>
+
+        <div class="callout">
+          <div class="callout-icon" aria-hidden="true">i</div>
+          <div>
+            <h3>Base и Enterprise нельзя смешивать в одном задании</h3>
+            <p>На дату проверки продукта Base содержит штатные шаблоны аудита, но создание, редактирование и импорт собственных шаблонов относится к Enterprise. Практика на демоверсии строится только на реально доступном шаблоне; число шаблонов и состав редакций сверяются перед занятием.</p>
+          </div>
+        </div>
+
+        <div class="callout callout--green">
+          <div class="callout-icon" aria-hidden="true">✓</div>
+          <div>
+            <h3>Контрольная точка установки</h3>
+            <p>Официальная базовая конфигурация указывает 4 процессорных ядра, 8 Гбайт ОЗУ и SSD 100 Гбайт. Документированы варианты для поддерживаемых Linux-дистрибутивов, WSL 2 и контейнерного развёртывания; перед установкой сверяются именно актуальная инструкция для выбранной ОС, первый вход, смена первоначального пароля и загрузка выданной лицензии.</p>
           </div>
         </div>
 
@@ -319,6 +371,11 @@
           <div class="day-block"><div class="duration">Блок 3</div><div><h3>Инвентаризация и поиск уязвимостей</h3><p>Собрать ПО и аппаратный состав, запустить задачу поиска, выбрать несколько результатов и проверить версии, CVE/БДУ, CVSS, KEV/EPSS и применимость. <strong>Артефакт:</strong> реестр проверенных находок.</p></div></div>
           <div class="day-block"><div class="duration">Блок 4</div><div><h3>Пароли, конфигурации и отчёт</h3><p>Провести контролируемую проверку синтетической учётной записи, запустить аудит конфигурации по подходящему шаблону, сформировать отчёт и план повторной проверки. <strong>Артефакт:</strong> защищаемый вывод.</p></div></div>
         </div>
+
+        <figure class="lecture-visual">
+          <img src="../assets/practical-trajectories.png" width="1505" height="1045" loading="lazy" decoding="async" alt="Четыре безопасные траектории практики: ScanOVAL, Сканер-ВС в WSL, изолированный стенд VirtualBox и предварительно проверенный Live USB">
+          <figcaption>Учебные траектории различаются глубиной и требованиями к стенду; дистрибутив и лицензию слушатель получает напрямую у разработчика.</figcaption>
+        </figure>
 
         <h3 style="margin-top:42px">Четыре варианта развертывания</h3>
         <div class="stand-grid" style="margin-top:18px">
@@ -345,6 +402,8 @@
             <h3>Сканер-ВС 7</h3>
             <ul class="source-list">
               <li><a href="https://docs.etecs.ru/scanner/docs/intro/" target="_blank" rel="noopener">Введение и документация</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/getting-started/prerequisites/" target="_blank" rel="noopener">Системные требования</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/getting-started/installation/overview/" target="_blank" rel="noopener">Варианты установки</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/" target="_blank" rel="noopener">Управление задачами</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/inventory/" target="_blank" rel="noopener">Инвентаризация</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/vulnerability-scan/" target="_blank" rel="noopener">Поиск уязвимостей</a></li>
@@ -352,6 +411,7 @@
               <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/audit-configuration/" target="_blank" rel="noopener">Аудит конфигурации</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/administration/secrets-and-connections/winrm-setup/" target="_blank" rel="noopener">Настройка WinRM</a></li>
               <li><a href="https://docs.etecs.ru/scanner/docs/administration/secrets-and-connections/" target="_blank" rel="noopener">Секреты и SSH-подключения</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/working-with-results/reports" target="_blank" rel="noopener">Формирование отчётов 7.x</a></li>
               <li><a href="https://scaner-vs.ru/" target="_blank" rel="noopener">Страница продукта</a></li>
             </ul>
           </article>
@@ -374,7 +434,7 @@
           <div class="callout-icon" aria-hidden="true">↻</div>
           <div>
             <h3>Контроль актуальности</h3>
-            <p>Нельзя обещать обнаружение всех уязвимостей, отсутствие ложных срабатываний, одновременное объединение всех баз, наличие CVSS v4-вектора в конкретной сборке или включение «Инспектора» в демолицензию без проверки фактического стенда.</p>
+            <p>Нельзя обещать обнаружение всех уязвимостей, отсутствие ложных срабатываний, одновременное объединение всех баз, наличие CVSS v4-вектора в конкретной сборке или включение «Инспектора» в демолицензию без проверки фактического стенда. Введение указывает сертификат ФСТЭК России № 2204, 4-й уровень доверия, срок действия до 13.11.2029; сертификат продукта не доказывает соответствие проверяемой системы.</p>
           </div>
         </div>
       </div>

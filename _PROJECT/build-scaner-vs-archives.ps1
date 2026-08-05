@@ -186,7 +186,13 @@ function New-OfflinePackage {
     [void](New-Item -ItemType Directory -Path $packageRoot -Force)
 
     Copy-FileChecked -Source (Join-Path (Join-Path $offlineRoot $Package) 'index.html') -Destination (Join-Path $packageRoot 'index.html')
-    foreach ($assetName in @('site.css', 'site.js', 'scanner-inspector-hero.png')) {
+    $assetNames = @('site.css', 'site.js', 'scanner-inspector-hero.png')
+    switch ($Package) {
+        'scanner' { $assetNames += 'practical-trajectories.png' }
+        'inspector' { $assetNames += 'two-level-analysis.png' }
+        'all' { $assetNames += @('course-map-two-days.png', 'two-level-analysis.png') }
+    }
+    foreach ($assetName in $assetNames) {
         Copy-FileChecked -Source (Join-Path (Join-Path $siteRoot 'assets') $assetName) -Destination (Join-Path (Join-Path $packageRoot 'assets') $assetName)
     }
 
