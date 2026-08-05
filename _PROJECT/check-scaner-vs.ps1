@@ -130,7 +130,9 @@ Assert-Contains 'scaner-vs/assets/site.css' @(
     '(?s)\.offline-page \.document-card\s*\{[^}]*display:\s*grid',
     '(?s)\.lane\s*\{[^}]*min-width:\s*0',
     '(?s)\.source-card\s*\{[^}]*min-width:\s*0',
-    '(?s)\.command\s*\{[^}]*max-width:\s*100%'
+    '(?s)\.command\s*\{[^}]*max-width:\s*100%',
+    '(?s)\.version-label\s*\{[^}]*display:\s*inline-block',
+    '(?s)\.version-label\s*\{[^}]*white-space:\s*nowrap'
 )
 Assert-NotContains 'scaner-vs/assets/site.css' @(
     '\.hero-copy\s*\{\s*padding-top:\s*34px',
@@ -258,6 +260,8 @@ Assert-Contains 'scaner-vs/inspector/index.html' @(
     'publication\.pravo\.gov\.ru/document/0001202506170011',
     'docs\.etecs\.ru/scanner/docs/intro',
     'fstec-map',
+    '<strong\s+class="version-label">«Инспектор»\s*3</strong>',
+    '<strong\s+class="version-label">«Инспектор»\s*4</strong>',
     '../materials/inspector/01-practicum\.md',
     '../materials/downloads/inspector-labs-markdown\.zip'
 )
