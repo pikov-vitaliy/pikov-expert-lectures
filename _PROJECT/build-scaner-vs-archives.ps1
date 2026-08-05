@@ -1,9 +1,36 @@
 [CmdletBinding()]
 param(
-    [string]$Root = (Split-Path -Parent $PSScriptRoot)
+    [string]$Root
 )
 
 $ErrorActionPreference = 'Stop'
+
+if (-not ('ScanerVsZipCrc32' -as [type])) {
+    Add-Type -TypeDefinition @'
+public static class ScanerVsZipCrc32
+{
+    public static uint Compute(byte[] data)
+    {
+        uint crc = 0xFFFFFFFFu;
+        foreach (byte value in data)
+        {
+            crc ^= value;
+            for (int bit = 0; bit < 8; bit++)
+            {
+                crc = (crc & 1u) != 0u
+                    ? (crc >> 1) ^ 0xEDB88320u
+                    : crc >> 1;
+            }
+        }
+        return ~crc;
+    }
+}
+'@
+}
+
+if ([string]::IsNullOrWhiteSpace($Root)) {
+    $Root = Split-Path -Parent $PSScriptRoot
+}
 
 $repoRoot = (Resolve-Path -LiteralPath $Root).Path
 $siteRoot = Join-Path $repoRoot 'scaner-vs'
@@ -20,7 +47,7 @@ function Copy-FileChecked {
     )
 
     if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
-        throw "Не найден исходный файл: $Source"
+        throw "Missing source file: $Source"
     }
     $destinationDirectory = Split-Path -Parent $Destination
     if (-not (Test-Path -LiteralPath $destinationDirectory -PathType Container)) {
@@ -43,6 +70,110 @@ function Copy-MarkdownDirectory {
         ForEach-Object {
             Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $destinationDirectory $_.Name) -Force
         }
+}
+
+function New-DeterministicZip {
+    param(
+        [Parameter(Mandatory)][string]$SourceRoot,
+        [Parameter(Mandatory)][string]$DestinationPath
+    )
+
+    if (-not [BitConverter]::IsLittleEndian) {
+        throw 'This ZIP writer requires a little-endian runtime.'
+    }
+
+    $utf8 = [Text.UTF8Encoding]::new($false)
+    $relativePaths = [Collections.Generic.List[string]]::new()
+    Get-ChildItem -LiteralPath $SourceRoot -Recurse -File | ForEach-Object {
+        $relativePaths.Add($_.FullName.Substring($SourceRoot.Length).TrimStart([char[]]@('\', '/')).Replace('\', '/'))
+    }
+    $relativePaths.Sort([StringComparer]::Ordinal)
+
+    $archiveStream = $null
+    $writer = $null
+    try {
+        $archiveStream = [IO.File]::Open(
+            $DestinationPath,
+            [IO.FileMode]::Create,
+            [IO.FileAccess]::ReadWrite,
+            [IO.FileShare]::None
+        )
+        $writer = [IO.BinaryWriter]::new($archiveStream, $utf8, $true)
+        $entries = [Collections.Generic.List[object]]::new()
+
+        foreach ($relativePath in $relativePaths) {
+            $sourcePath = Join-Path $SourceRoot ($relativePath.Replace('/', '\'))
+            $data = [IO.File]::ReadAllBytes($sourcePath)
+            if ($data.LongLength -gt [uint32]::MaxValue) {
+                throw "File is too large for this ZIP writer: $relativePath"
+            }
+            $nameBytes = $utf8.GetBytes($relativePath)
+            if ($nameBytes.Length -gt [uint16]::MaxValue) {
+                throw "ZIP entry name is too long: $relativePath"
+            }
+            $crc32 = [ScanerVsZipCrc32]::Compute($data)
+            $size = [uint32]$data.Length
+            $offset = [uint32]$archiveStream.Position
+
+            $writer.Write([uint32]0x04034b50)
+            $writer.Write([uint16]20)
+            $writer.Write([uint16]2048)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]10273)
+            $writer.Write([uint32]$crc32)
+            $writer.Write($size)
+            $writer.Write($size)
+            $writer.Write([uint16]$nameBytes.Length)
+            $writer.Write([uint16]0)
+            $writer.Write($nameBytes)
+            $writer.Write($data)
+
+            $entries.Add([pscustomobject]@{
+                NameBytes = $nameBytes
+                Crc32 = [uint32]$crc32
+                Size = $size
+                Offset = $offset
+            })
+        }
+
+        $centralOffset = [uint32]$archiveStream.Position
+        foreach ($entry in $entries) {
+            $writer.Write([uint32]0x02014b50)
+            $writer.Write([uint16]20)
+            $writer.Write([uint16]20)
+            $writer.Write([uint16]2048)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]10273)
+            $writer.Write([uint32]$entry.Crc32)
+            $writer.Write([uint32]$entry.Size)
+            $writer.Write([uint32]$entry.Size)
+            $writer.Write([uint16]$entry.NameBytes.Length)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]0)
+            $writer.Write([uint16]0)
+            $writer.Write([uint32]0)
+            $writer.Write([uint32]$entry.Offset)
+            $writer.Write([byte[]]$entry.NameBytes)
+        }
+        $centralSize = [uint32]($archiveStream.Position - $centralOffset)
+
+        $writer.Write([uint32]0x06054b50)
+        $writer.Write([uint16]0)
+        $writer.Write([uint16]0)
+        $writer.Write([uint16]$entries.Count)
+        $writer.Write([uint16]$entries.Count)
+        $writer.Write($centralSize)
+        $writer.Write($centralOffset)
+        $writer.Write([uint16]0)
+        $writer.Flush()
+    }
+    finally {
+        if ($null -ne $writer) { $writer.Dispose() }
+        if ($null -ne $archiveStream) { $archiveStream.Dispose() }
+    }
 }
 
 function New-OfflinePackage {
@@ -70,7 +201,7 @@ function New-OfflinePackage {
     }
 
     $archivePath = Join-Path $downloadsRoot $ArchiveName
-    Compress-Archive -Path (Join-Path $packageRoot '*') -DestinationPath $archivePath -CompressionLevel Optimal -Force
+    New-DeterministicZip -SourceRoot $packageRoot -DestinationPath $archivePath
 }
 
 try {
