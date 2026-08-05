@@ -1,4 +1,4 @@
-[CmdletBinding()]
+﻿[CmdletBinding()]
 param()
 
 $ErrorActionPreference = 'Stop'
@@ -63,9 +63,13 @@ $requiredFiles = @(
     'scaner-vs/assets/site.css',
     'scaner-vs/assets/site.js',
     'scaner-vs/assets/scanner-inspector-hero.png',
+    'scaner-vs/assets/scanner-inspector-hero.webp',
     'scaner-vs/assets/course-map-two-days.png',
+    'scaner-vs/assets/course-map-two-days.webp',
     'scaner-vs/assets/two-level-analysis.png',
+    'scaner-vs/assets/two-level-analysis.webp',
     'scaner-vs/assets/practical-trajectories.png',
+    'scaner-vs/assets/practical-trajectories.webp',
     'scaner-vs/materials/README.md',
     'scaner-vs/materials/CHECKSUMS.md',
     'scaner-vs/materials/scanner/01-common-workflow.md',
@@ -91,6 +95,20 @@ $requiredFiles = @(
 
 foreach ($file in $requiredFiles) {
     [void](Assert-File $file)
+}
+
+$maxModernImageBytes = 250KB
+$modernImageFiles = @(
+    'scaner-vs/assets/scanner-inspector-hero.webp',
+    'scaner-vs/assets/course-map-two-days.webp',
+    'scaner-vs/assets/two-level-analysis.webp',
+    'scaner-vs/assets/practical-trajectories.webp'
+)
+foreach ($relativePath in $modernImageFiles) {
+    $fullPath = Join-Path $repoRoot $relativePath
+    if ((Test-Path -LiteralPath $fullPath -PathType Leaf) -and (Get-Item -LiteralPath $fullPath).Length -gt $maxModernImageBytes) {
+        Add-Failure "$relativePath превышает лимит оптимизированного изображения $maxModernImageBytes байт"
+    }
 }
 
 $htmlFiles = @(
@@ -119,7 +137,57 @@ foreach ($html in $htmlFiles) {
     }
 }
 
+$pageModernAssets = @{
+    'scaner-vs/index.html' = @(
+        'assets/scanner-inspector-hero',
+        'assets/two-level-analysis',
+        'assets/course-map-two-days'
+    )
+    'scaner-vs/scanner/index.html' = @(
+        '../assets/scanner-inspector-hero',
+        '../assets/practical-trajectories'
+    )
+    'scaner-vs/inspector/index.html' = @(
+        '../assets/scanner-inspector-hero',
+        '../assets/two-level-analysis'
+    )
+}
+foreach ($page in $pageModernAssets.Keys) {
+    $html = Get-Utf8Text $page
+    $expectedAssets = $pageModernAssets[$page]
+    $pictureCount = ([regex]::Matches($html, '<picture(?:\s|>)', 'IgnoreCase')).Count
+    if ($pictureCount -ne $expectedAssets.Count) {
+        Add-Failure "${page}: ожидается $($expectedAssets.Count) picture-контейнеров, найдено $pictureCount"
+    }
+    foreach ($asset in $expectedAssets) {
+        if ($html -notmatch ('<source\s+[^>]*srcset="' + [regex]::Escape($asset + '.webp') + '"[^>]*type="image/webp"[^>]*>')) {
+            Add-Failure "${page}: нет WebP source для $asset"
+        }
+        if ($html -notmatch ('<img\s+[^>]*src="' + [regex]::Escape($asset + '.png') + '"[^>]*>')) {
+            Add-Failure "${page}: нет PNG fallback для $asset"
+        }
+    }
+}
+
+$offlineModernAssets = @{
+    '_PROJECT/scaner-vs-offline/scanner/index.html' = @('scanner-inspector-hero', 'practical-trajectories')
+    '_PROJECT/scaner-vs-offline/inspector/index.html' = @('scanner-inspector-hero', 'two-level-analysis')
+    '_PROJECT/scaner-vs-offline/all/index.html' = @('scanner-inspector-hero', 'course-map-two-days', 'two-level-analysis')
+}
+foreach ($page in $offlineModernAssets.Keys) {
+    $html = Get-Utf8Text $page
+    foreach ($assetName in $offlineModernAssets[$page]) {
+        if ($html -notmatch ('<source\s+[^>]*srcset="assets/' + [regex]::Escape($assetName + '.webp') + '"[^>]*type="image/webp"[^>]*>')) {
+            Add-Failure "${page}: нет WebP source для assets/$assetName"
+        }
+        if ($html -notmatch ('<img\s+[^>]*src="assets/' + [regex]::Escape($assetName + '.png') + '"[^>]*>')) {
+            Add-Failure "${page}: нет PNG fallback для assets/$assetName"
+        }
+    }
+}
+
 Assert-Contains 'scaner-vs/assets/site.css' @(
+    '(?s)\.hero-figure picture,\s*\.lecture-visual picture,\s*\.offline-page \.hero__media picture',
     '(?s)\.hero-grid\s*\{[^}]*align-items:\s*center',
     '(?s)\.hero-copy\s*\{[^}]*padding-top:\s*0',
     '(?s)\.hero-figure img\s*\{[^}]*height:\s*auto',
@@ -286,7 +354,9 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/scanner-inspector-hero.webp',
             'assets/practical-trajectories.png',
+            'assets/practical-trajectories.webp',
             'materials/scanner/01-common-workflow.md',
             'materials/scanner/02-scanoval-local.md',
             'materials/scanner/03-wsl-individual.md',
@@ -299,7 +369,9 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/scanner-inspector-hero.webp',
             'assets/two-level-analysis.png',
+            'assets/two-level-analysis.webp',
             'materials/inspector/01-practicum.md',
             'materials/inspector/REPORT-TEMPLATE.md'
         )
@@ -308,14 +380,17 @@ if (Test-Path -LiteralPath $siteRoot) {
             'assets/site.css',
             'assets/site.js',
             'assets/scanner-inspector-hero.png',
+            'assets/scanner-inspector-hero.webp',
             'assets/course-map-two-days.png',
+            'assets/course-map-two-days.webp',
             'assets/two-level-analysis.png',
+            'assets/two-level-analysis.webp',
             'materials/README.md',
             'materials/scanner/01-common-workflow.md',
             'materials/inspector/01-practicum.md'
         )
     }
-    $allowedArchiveExtensions = @('.md', '.html', '.css', '.js', '.png')
+    $allowedArchiveExtensions = @('.md', '.html', '.css', '.js', '.png', '.webp')
     $publishedCssHash = (Get-FileHash -LiteralPath (Join-Path $siteRoot 'assets\site.css') -Algorithm SHA256).Hash
     $publishedWslHash = (Get-FileHash -LiteralPath (Join-Path $siteRoot 'materials\scanner\03-wsl-individual.md') -Algorithm SHA256).Hash
     $archives = Get-ChildItem -LiteralPath (Join-Path $siteRoot 'materials\downloads') -Filter '*.zip' -File -ErrorAction SilentlyContinue
@@ -335,13 +410,16 @@ if (Test-Path -LiteralPath $siteRoot) {
                 if ($entry.Name -and $allowedArchiveExtensions -notcontains ([IO.Path]::GetExtension($entry.Name).ToLowerInvariant())) {
                     Add-Failure "В архиве $($archive.Name) найден файл недопустимого типа: $($entry.FullName)"
                 }
+                if ([IO.Path]::GetExtension($entry.Name).ToLowerInvariant() -eq '.webp' -and $entry.Length -gt $maxModernImageBytes) {
+                    Add-Failure "В архиве $($archive.Name) WebP превышает лимит $maxModernImageBytes байт: $($entry.FullName)"
+                }
             }
             $archiveCss = $zip.GetEntry('assets/site.css')
             if ($null -ne $archiveCss) {
                 $cssStream = $archiveCss.Open()
                 $hasher = [Security.Cryptography.SHA256]::Create()
                 try {
-                    $archiveCssHash = [Convert]::ToHexString($hasher.ComputeHash($cssStream))
+                    $archiveCssHash = ([BitConverter]::ToString($hasher.ComputeHash($cssStream))).Replace('-', '')
                 }
                 finally {
                     $hasher.Dispose()
@@ -380,7 +458,7 @@ if (Test-Path -LiteralPath $siteRoot) {
                     $wslHashStream = $wslEntry.Open()
                     $wslHasher = [Security.Cryptography.SHA256]::Create()
                     try {
-                        $archiveWslHash = [Convert]::ToHexString($wslHasher.ComputeHash($wslHashStream))
+                        $archiveWslHash = ([BitConverter]::ToString($wslHasher.ComputeHash($wslHashStream))).Replace('-', '')
                     }
                     finally {
                         $wslHasher.Dispose()
@@ -421,6 +499,12 @@ if (Test-Path -LiteralPath $siteRoot) {
                 foreach ($pattern in @('Офлайн-комплект', 'class="offline-page"', 'class="skip-link"', 'href="assets/site\.css"', 'src="assets/site\.js"', 'src="assets/scanner-inspector-hero\.png"', 'src="assets/(?:course-map-two-days|two-level-analysis|practical-trajectories)\.png"')) {
                     if ($offlineHtml -notmatch $pattern) {
                         Add-Failure "Офлайн-лендинг в $($archive.Name) не содержит: $pattern"
+                    }
+                }
+                $requiredWebpEntries = @($requiredArchiveEntries[$archive.Name] | Where-Object { $_ -like '*.webp' })
+                foreach ($webpEntry in $requiredWebpEntries) {
+                    if ($offlineHtml -notmatch ('srcset="' + [regex]::Escape($webpEntry) + '"')) {
+                        Add-Failure "Офлайн-лендинг в $($archive.Name) не использует $webpEntry"
                     }
                 }
                 if ($offlineHtml -match '(?:href|src)="/') {

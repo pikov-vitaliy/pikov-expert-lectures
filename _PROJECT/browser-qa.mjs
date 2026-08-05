@@ -202,7 +202,10 @@ async function checkViewport(browser, target, documentRoot, viewport) {
   const issues = [];
   let metrics = null;
   try {
-    await page.goto(server.url, { waitUntil: "domcontentloaded", timeout: 12000 });
+    // The suite opens 87 isolated Chromium contexts and can briefly contend
+    // with archive extraction or endpoint scanning on Windows. Keep a strict
+    // timeout, but avoid reporting a random local startup delay as a site bug.
+    await page.goto(server.url, { waitUntil: "domcontentloaded", timeout: 30000 });
     await page.waitForTimeout(700);
     metrics = await page.evaluate(() => {
       const body = document.body;

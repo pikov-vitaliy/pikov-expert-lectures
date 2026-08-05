@@ -13,7 +13,18 @@ function Write-Utf8File([string]$Path, [string[]]$Lines) {
   if (-not (Test-Path -LiteralPath $parent)) {
     [void](New-Item -ItemType Directory -Path $parent -Force)
   }
-  [System.IO.File]::WriteAllLines($Path, $Lines, [System.Text.UTF8Encoding]::new($false))
+
+  $content = [string]::Join([Environment]::NewLine, $Lines)
+  if ($Lines.Count -gt 0) { $content += [Environment]::NewLine }
+
+  if (Test-Path -LiteralPath $Path) {
+    $existing = [System.IO.File]::ReadAllText($Path, [System.Text.Encoding]::UTF8)
+    $existingNormalized = (($existing -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd([char[]]"`n")
+    $contentNormalized = (($content -replace "`r`n", "`n") -replace "`r", "`n").TrimEnd([char[]]"`n")
+    if ($existingNormalized -ceq $contentNormalized) { return }
+  }
+
+  [System.IO.File]::WriteAllText($Path, $content, [System.Text.UTF8Encoding]::new($false))
 }
 
 function HtmlPathToUrl([string]$RelativePath, [string]$BaseUrl) {
@@ -112,19 +123,93 @@ function New-RobotsLines([string]$SitemapUrl) {
   )
 }
 
-function New-SitemapLines([string[]]$Urls, [string]$LastMod) {
+function Get-SitemapEntries([string]$Path) {
+  if (-not (Test-Path -LiteralPath $Path)) { return @() }
+
+  $document = [System.Xml.XmlDocument]::new()
+  $document.XmlResolver = $null
+  try {
+    $document.Load($Path)
+  } catch {
+    Fail "Invalid sitemap XML at $Path`: $($_.Exception.Message)"
+  }
+
+  $entries = New-Object System.Collections.Generic.List[object]
+  foreach ($node in @($document.SelectNodes('/*[local-name()="urlset"]/*[local-name()="url"]'))) {
+    $locNode = $node.SelectSingleNode('./*[local-name()="loc"]')
+    $lastModNode = $node.SelectSingleNode('./*[local-name()="lastmod"]')
+    $url = if ($null -eq $locNode) { '' } else { $locNode.InnerText.Trim() }
+    $entryLastMod = if ($null -eq $lastModNode) { '' } else { $lastModNode.InnerText.Trim() }
+    if ([string]::IsNullOrWhiteSpace($url)) { Fail "Missing sitemap loc in $Path" }
+    if ($entryLastMod -notmatch '^\d{4}-\d{2}-\d{2}$') { Fail "Invalid sitemap lastmod for $url in $Path" }
+    $entries.Add([pscustomobject]@{ Url = $url; LastMod = $entryLastMod })
+  }
+  foreach ($entry in $entries) { $entry }
+}
+
+function New-SitemapLines([string[]]$Urls, [string]$DefaultLastMod, [object]$LastModsByUrl) {
   $lines = New-Object System.Collections.Generic.List[string]
   $lines.Add('<?xml version="1.0" encoding="UTF-8"?>')
   $lines.Add('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
   foreach ($url in $Urls) {
     $escaped = [System.Security.SecurityElement]::Escape($url)
+    $entryLastMod = if ($null -ne $LastModsByUrl -and $LastModsByUrl.ContainsKey($url)) { $LastModsByUrl[$url] } else { $DefaultLastMod }
     $lines.Add('  <url>')
     $lines.Add("    <loc>$escaped</loc>")
-    $lines.Add("    <lastmod>$LastMod</lastmod>")
+    $lines.Add("    <lastmod>$entryLastMod</lastmod>")
     $lines.Add('  </url>')
   }
   $lines.Add('</urlset>')
   @($lines)
+}
+
+function Write-SitemapFile([string]$Path, [string[]]$Urls, [string]$DefaultLastMod) {
+  $desiredByUrl = [System.Collections.Generic.Dictionary[string,string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+  foreach ($url in $Urls) {
+    if (-not $desiredByUrl.ContainsKey($url)) { $desiredByUrl.Add($url, $url) }
+  }
+
+  $existingEntries = @(Get-SitemapEntries -Path $Path)
+  $existingByUrl = [System.Collections.Generic.Dictionary[string,object]]::new([System.StringComparer]::OrdinalIgnoreCase)
+  foreach ($entry in $existingEntries) {
+    if (-not $existingByUrl.ContainsKey($entry.Url)) { $existingByUrl.Add($entry.Url, $entry) }
+  }
+
+  $sameUrlSet = $existingEntries.Count -eq $desiredByUrl.Count
+  if ($sameUrlSet) {
+    foreach ($url in $desiredByUrl.Keys) {
+      if (-not $existingByUrl.ContainsKey($url)) {
+        $sameUrlSet = $false
+        break
+      }
+    }
+  }
+  $sameLastMod = $existingEntries.Count -gt 0
+  foreach ($entry in $existingEntries) {
+    if ($entry.LastMod -ne $DefaultLastMod) {
+      $sameLastMod = $false
+      break
+    }
+  }
+  if ($sameUrlSet -and $sameLastMod) { return }
+
+  $orderedUrls = New-Object System.Collections.Generic.List[string]
+  $lastModsByUrl = [System.Collections.Generic.Dictionary[string,string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+  foreach ($entry in $existingEntries) {
+    if ($desiredByUrl.ContainsKey($entry.Url) -and -not $lastModsByUrl.ContainsKey($entry.Url)) {
+      $canonicalUrl = $desiredByUrl[$entry.Url]
+      $orderedUrls.Add($canonicalUrl)
+      $lastModsByUrl.Add($canonicalUrl, $DefaultLastMod)
+    }
+  }
+  foreach ($url in $Urls) {
+    if (-not $lastModsByUrl.ContainsKey($url)) {
+      $orderedUrls.Add($url)
+      $lastModsByUrl.Add($url, $DefaultLastMod)
+    }
+  }
+
+  Write-Utf8File -Path $Path -Lines (New-SitemapLines -Urls @($orderedUrls) -DefaultLastMod $DefaultLastMod -LastModsByUrl $lastModsByUrl)
 }
 
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
@@ -144,13 +229,18 @@ foreach ($lecture in @($data.lectures | Sort-Object position)) {
 
 Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines)
 Write-Utf8File -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
-Write-Utf8File -Path (Join-Path $rootPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($rootUrls) -LastMod $lastMod)
+Write-SitemapFile -Path (Join-Path $rootPath 'sitemap.xml') -Urls @($rootUrls) -DefaultLastMod $lastMod
 
 # Folders whose .htaccess is domain-specific and must NOT be overwritten by the
 # common template. The 27001 deck unpacks its runtime into blob: URLs and needs
 # 'unsafe-eval' plus blob: in script-src; the shared policy drops both and the
 # slide navigation stops working. robots.txt and sitemap.xml are still generated.
 $customHtaccessFolders = @('27001', '29-07-2026')
+
+# Some sites intentionally curate all three controls. Scanner-VS publishes
+# selected Markdown materials in its sitemap, serves offline ZIP archives,
+# blocks those downloads in robots.txt, and adds ZIP-specific response headers.
+$customControlFolders = @('scaner-vs')
 
 $uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
 foreach ($folder in $uniqueFolders) {
@@ -164,6 +254,16 @@ foreach ($folder in $uniqueFolders) {
     Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
     Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
     Write-Output "controlExternalFolder=$folder"
+    continue
+  }
+
+  if ($customControlFolders -contains $folder) {
+    foreach ($controlName in @('.htaccess', 'robots.txt', 'sitemap.xml')) {
+      if (-not (Test-Path -LiteralPath (Join-Path $folderPath $controlName))) {
+        Fail "Folder $folder is marked as having custom controls, but $controlName is missing"
+      }
+    }
+    Write-Output "controlCustomFiles=$folder"
     continue
   }
 
@@ -191,7 +291,7 @@ foreach ($folder in $uniqueFolders) {
     Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
   }
   Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
-  Write-Utf8File -Path (Join-Path $folderPath 'sitemap.xml') -Lines (New-SitemapLines -Urls @($urls) -LastMod $lastMod)
+  Write-SitemapFile -Path (Join-Path $folderPath 'sitemap.xml') -Urls @($urls) -DefaultLastMod $lastMod
 }
 
 Write-Output "CONTROL FILES OK"
