@@ -62,6 +62,12 @@ if (-not (Test-Path -LiteralPath $robotsPath)) { Fail "Missing root robots.txt" 
 if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" }
 
 if (-not $P19Only) {
+  $controlFilesTest = Join-Path $projectPath 'test-update-site-control-files.ps1'
+  if (-not (Test-Path -LiteralPath $controlFilesTest -PathType Leaf)) {
+    Fail "Missing _PROJECT\test-update-site-control-files.ps1"
+  }
+  & $controlFilesTest
+
   $astraLabsBuilder = Join-Path $projectPath 'build-astra-hardening-labs.ps1'
   if (-not (Test-Path -LiteralPath $astraLabsBuilder -PathType Leaf)) {
     Fail "Missing _PROJECT\build-astra-hardening-labs.ps1"
@@ -288,6 +294,11 @@ if ($LASTEXITCODE -eq 0 -and $trackedHtml) {
 $webvisorHtml = git -C $rootPath grep -n 'webvisor:true' -- '*.html' 2>$null
 if ($LASTEXITCODE -eq 0 -and $webvisorHtml) {
   Fail "Yandex Webvisor/session replay must stay disabled unless explicitly approved"
+}
+
+$spdxExternalFontAwesome = git -C $rootPath grep -n -F 'netdna.bootstrapcdn.com/font-awesome' -- 'spdx' 2>$null
+if ($LASTEXITCODE -eq 0 -and $spdxExternalFontAwesome) {
+  Fail "SPDX content loads external Font Awesome that is blocked by the site CSP"
 }
 
 foreach ($blockedPath in @(
