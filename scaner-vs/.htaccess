@@ -1,0 +1,30 @@
+# Static course portal: scaner-vs.pikov.expert
+DirectoryIndex index.html
+AddDefaultCharset UTF-8
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "DENY"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
+  Header always set Content-Security-Policy "default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com; script-src 'self' 'unsafe-inline' https://mc.yandex.ru; style-src 'self' 'unsafe-inline'; connect-src 'self' https://mc.yandex.ru https://*.mc.yandex.ru https://mc.yandex.com https://*.mc.yandex.com wss://mc.yandex.com wss://*.mc.yandex.com; form-action 'self'; upgrade-insecure-requests"
+</IfModule>
+
+AddCharset UTF-8 .html .htm .css .js .json .xml .svg .txt .md
+AddType application/json .json
+AddType image/svg+xml .svg
+AddType "text/markdown; charset=UTF-8" .md
+AddType "text/plain; charset=UTF-8" .txt
+AddType application/zip .zip
+
+<Files ".htaccess">
+  Require all denied
+</Files>
+
+<IfModule mod_headers.c>
+  <FilesMatch "\.(zip)$">
+    Header set X-Robots-Tag "noindex, noarchive"
+    Header set Content-Disposition "attachment"
+  </FilesMatch>
+</IfModule>

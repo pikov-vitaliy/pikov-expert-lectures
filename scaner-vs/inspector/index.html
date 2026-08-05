@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>День 2 · Компонент «Инспектор» — лекция и практикум</title>
+  <meta name="description" content="Учебный день по компоненту «Инспектор»: остаточная информация, контрольные суммы, системный аудит, права доступа, сравнение отчётов и защита вывода.">
+  <meta name="author" content="Виталий Александрович Пиков">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://scaner-vs.pikov.expert/inspector/">
+  <link rel="stylesheet" href="../assets/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%2308783f'/%3E%3Cpath d='M28 19h31l14 14v48H28z' fill='none' stroke='white' stroke-width='7' stroke-linejoin='round'/%3E%3Cpath d='M59 19v16h14M39 50h23M39 63h17' stroke='white' stroke-width='6' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta property="og:title" content="День 2 · Компонент «Инспектор»">
+  <meta property="og:description" content="90 минут лекции и четыре практических блока: от учебного проекта до защищаемого вывода.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://scaner-vs.pikov.expert/inspector/">
+  <meta property="og:image" content="https://scaner-vs.pikov.expert/assets/scanner-inspector-hero.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "День 2. Компонент «Инспектор»",
+    "description": "Лекция и четыре практических блока по комплексным проверкам, контрольным суммам, системному аудиту и правам доступа.",
+    "url": "https://scaner-vs.pikov.expert/inspector/",
+    "inLanguage": "ru",
+    "timeRequired": "PT7H30M",
+    "learningResourceType": ["Лекция", "Практическая работа"],
+    "isPartOf": {
+      "@type": "Course",
+      "name": "Сканер-ВС 7 и компонент «Инспектор»: двухдневный практикум",
+      "url": "https://scaner-vs.pikov.expert/"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Виталий Александрович Пиков",
+      "url": "https://pikov.expert/"
+    }
+  }
+  </script>
+  <!-- Yandex.Metrika counter -->
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119','ym');
+    ym(109116119,'init',{ssr:true,webvisor:false,clickmap:false,accurateTrackBounce:true,trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute;left:-9999px" alt=""></div></noscript>
+  <!-- /Yandex.Metrika counter -->
+</head>
+<body>
+  <a class="skip-link" href="#content">К содержанию</a>
+  <div class="progress" aria-hidden="true"><div class="progress__bar" data-progress style="background:#08783f"></div></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-back" href="../" aria-label="К программе двухдневного курса">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
+        <span>Сканер-ВС · два учебных дня</span>
+      </a>
+      <button class="menu-button" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="top-nav" aria-label="Разделы" data-navigation>
+        <a href="#lecture">Лекция</a>
+        <a href="#tools">Проверки</a>
+        <a href="#practice">Практика</a>
+        <a href="#evidence">Отчёт</a>
+        <a href="../scanner/">День 1</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1><span class="inspector-word">День 2.</span><br>Компонент «Инспектор»</h1>
+            <p class="hero-lead">Утром — обзор назначения, установки, функций и границ результата. Затем четыре практических блока на синтетическом наборе: остаточная информация, целостность, системный аудит, права доступа и сравнение отчётов.</p>
+            <div class="hero-actions">
+              <a class="button button--green" href="#lecture">Начать лекцию</a>
+              <a class="button" href="#practice">Перейти к практике</a>
+            </div>
+          </div>
+          <figure class="hero-figure">
+            <img src="../assets/scanner-inspector-hero.png" width="1536" height="1024" alt="Схема перехода от исследования системы к документированным доказательствам">
+            <figcaption>Авторская схема курса</figcaption>
+          </figure>
+        </div>
+        <div class="metrics" aria-label="Формат второго дня">
+          <div class="metric"><strong>90 мин</strong><span>лекция: назначение, функции, версии и границы</span></div>
+          <div class="metric"><strong>4 × 90</strong><span>практика на отдельном учебном каталоге</span></div>
+          <div class="metric"><strong>2 состояния</strong><span>исходное и изменённое для сравнения отчётов</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--green" id="lecture">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">01 / 07</div>
+          <div>
+            <h2>Карта большой лекции</h2>
+            <p class="section-intro">Цель — научиться получать и интерпретировать свидетельства конкретной проверки, не превращая отчёт инструмента в необоснованное заключение о защищённости всей системы.</p>
+          </div>
+        </div>
+        <div class="topic-grid">
+          <article class="topic"><span class="topic-code">00–15′</span><h3>Место компонента</h3><p>«Инспектор» — компонент комплекса Сканер-ВС в предусмотренных редакциях, а не автоматически отдельный продукт.</p></article>
+          <article class="topic"><span class="topic-code">15–30′</span><h3>Установка и проект</h3><p>Поддерживаемая ОС, лицензия, запуск, создание проекта и фиксация исходного состояния.</p></article>
+          <article class="topic"><span class="topic-code">30–50′</span><h3>Остаточная информация</h3><p>Поиск синтетических маркеров, очистка, повторная проверка и ограничения вывода.</p></article>
+          <article class="topic"><span class="topic-code">50–68′</span><h3>Целостность и аудит</h3><p>Контрольные суммы SHA-256, состав программного и аппаратного обеспечения.</p></article>
+          <article class="topic"><span class="topic-code">68–82′</span><h3>Права доступа</h3><p>Модель доступа, фактические разрешения, наследование и проверяемый учебный каталог.</p></article>
+          <article class="topic"><span class="topic-code">82–90′</span><h3>Отчёты и пределы</h3><p>Сравнение состояний, достаточность доказательств и корректная формулировка вывода.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="versions">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">02 / 07</div>
+          <div>
+            <h2>Сначала определить версию и среду</h2>
+            <p class="section-intro">Доступность функции зависит от версии «Инспектора», операционной системы, версии ядра и файловой системы. Демолицензия Сканер-ВС не гарантирует включение компонента — это проверяется до занятия.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Вариант</th><th>Документированная среда</th><th>Учебный акцент</th><th>Ограничение формулировки</th></tr></thead>
+            <tbody>
+              <tr><td><strong>«Инспектор» 3</strong></td><td>Windows 7/8.1/10; Astra Linux 1.4–1.6 в локальном руководстве</td><td>Включая документированную проверку тестовым EICAR-файлом</td><td>Не переносить интерфейс и функции версии 3 на версию 4</td></tr>
+              <tr><td><strong>«Инспектор» 4</strong></td><td>Astra Linux SE 1.7 в текущей документации 7.x</td><td>Доступ, остаточная информация, очистка, контрольные суммы и состав системы</td><td>EICAR не заявлять, если функции нет в фактической сборке</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout">
+          <div class="callout-icon" aria-hidden="true">✓</div>
+          <div>
+            <h3>Предстендовая проверка преподавателя</h3>
+            <p>Зафиксировать версию комплекса и компонента, ОС/ядро/файловую систему, редакцию лицензии, доступные инструменты, каталог для отчётов и возможность восстановления снимка. Лекция показывает только подтверждённые на этом стенде функции.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="tools">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">03 / 07</div>
+          <div>
+            <h2>Что именно проверяем</h2>
+            <p class="section-intro">Каждая операция связывает объект, исходное условие, действие, наблюдение и ограниченный вывод. Практика использует только синтетические данные.</p>
+          </div>
+        </div>
+
+        <div class="timeline timeline--green">
+          <article class="timeline-step"><div class="timeline-number">01</div><div class="timeline-content"><h3>Проект и исходное состояние</h3><p>Указать цель, объект, версию среды и каталог отчётов. Сохранить исходное состояние до любых изменений.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">02</div><div class="timeline-content"><h3>Остаточная информация</h3><p>Найти тестовые маркеры, удалить выбранный объект штатным способом, повторить поиск и объяснить, что результат относится только к проверенному пространству.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">03</div><div class="timeline-content"><h3>Контрольные суммы</h3><p>Зафиксировать SHA-256 эталонного файла, внести контролируемое изменение и подтвердить несовпадение. MD5 не используется как рекомендуемый алгоритм целостности.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">04</div><div class="timeline-content"><h3>Системный аудит</h3><p>Собрать доступные сведения о программном и аппаратном составе и сопоставить их с паспортом стенда. Неполнота данных фиксируется, а не скрывается.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">05</div><div class="timeline-content"><h3>Права доступа</h3><p>Сравнить ожидаемую модель с фактическими разрешениями отдельного учебного каталога, включая наследование и хорошо известные SID.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">06</div><div class="timeline-content"><h3>Отчёт и сравнение</h3><p>Сформировать отчёт до и после изменения, выделить разницу и отделить наблюдаемый факт от экспертной интерпретации.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--green" id="practice">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">04 / 07</div>
+          <div>
+            <h2>Четыре практических блока</h2>
+            <p class="section-intro">Практика не затрагивает системные каталоги и реальные данные. Все изменения ограничены новым каталогом внутри профиля пользователя.</p>
+          </div>
+        </div>
+
+        <div class="day day--inspector">
+          <div class="day-head"><strong>Практика дня 2</strong><span>4 × 90 минут</span></div>
+          <div class="day-block"><div class="duration">Блок 1</div><div><h3>Запуск и создание проекта</h3><p>Проверить версию, лицензию и доступные инструменты; создать проект, описать стенд, сформировать безопасный набор файлов и сохранить исходное состояние. <strong>Артефакт:</strong> карточка проекта и дерево учебного каталога.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 2</div><div><h3>Поиск остаточной информации</h3><p>Запустить поиск синтетических маркеров, удалить выбранный файл, повторить операцию и оценить, что именно подтверждает результат. <strong>Артефакт:</strong> таблица «до / действие / после / ограничение».</p></div></div>
+          <div class="day-block"><div class="duration">Блок 3</div><div><h3>Контрольные суммы и системный аудит</h3><p>Проверить SHA-256, изменить учебный конфигурационный файл, зафиксировать расхождение и сопоставить системную информацию с паспортом ВМ. <strong>Артефакт:</strong> журнал контроля целостности.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 4</div><div><h3>Права, отчёты и защита результата</h3><p>Проверить разрешения каталога, сформировать два отчёта, сравнить состояния и защитить вывод с указанием допущений и непроверенных областей. <strong>Артефакт:</strong> итоговый отчёт слушателя.</p></div></div>
+        </div>
+
+        <div class="callout callout--red">
+          <div class="callout-icon" aria-hidden="true">!</div>
+          <div>
+            <h3>Только одноразовая лабораторная среда</h3>
+            <p>Практика выполняется только на собственной или явно разрешённой учебной ВМ. Не отключаются Secure Boot, антивирус и брандмауэр ради прохождения задания; не используются реальные персональные данные, рабочие документы, ключи и пароли.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="lab-kit">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">05 / 07</div>
+          <div>
+            <h2>Практикум в Markdown и офлайн-комплекте</h2>
+            <p class="section-intro">В инструкции находятся четыре блока, безопасная подготовка синтетических файлов для Windows и Astra Linux и правила интерпретации. В ZIP добавлен автономный офлайн-лендинг; скрипты настройки продукта, лицензии и дистрибутивы на сайт не загружаются.</p>
+          </div>
+        </div>
+
+        <div class="lane-grid">
+          <article class="lane lane--green">
+            <div class="lane-kicker">Читать в браузере</div>
+            <h3>Полная инструкция слушателя</h3>
+            <p>Откройте Markdown, прочитайте код подготовки данных и только затем скопируйте нужный вариант на одноразовую учебную ВМ.</p>
+            <div class="button-row"><a class="button button--green" href="../materials/inspector/01-practicum.md">Открыть 01-practicum.md</a><a class="button" href="../materials/inspector/REPORT-TEMPLATE.md">Шаблон отчета</a></div>
+          </article>
+          <article class="lane">
+            <div class="lane-kicker">Скачать архив</div>
+            <h3>Офлайн-лендинг и два `.md`-файла</h3>
+            <p>Архив содержит автономную стартовую страницу, инструкцию и шаблон отчета. Полностью распакуйте ZIP и откройте `index.html`; SHA-256 опубликован в индексе материалов.</p>
+            <div class="button-row"><a class="button" href="../materials/downloads/inspector-labs-markdown.zip" download>Скачать inspector-labs-markdown.zip</a><a class="button" href="../materials/CHECKSUMS.md">SHA-256</a></div>
+          </article>
+        </div>
+
+        <div class="topic-grid" style="margin-top:24px">
+          <article class="topic"><span class="topic-code">01_Public</span><h3>Открытый учебный файл</h3><p>Контрольный пример без чувствительных сведений.</p></article>
+          <article class="topic"><span class="topic-code">02_Confidential</span><h3>Синтетические маркеры</h3><p>Только тестовые строки PASSPORT-TEST и SNILS-TEST.</p></article>
+          <article class="topic"><span class="topic-code">03_ControlSum</span><h3>SHA-256 и конфигурация</h3><p>Файл и отдельный эталон для проверки целостности.</p></article>
+          <article class="topic"><span class="topic-code">04_Residual</span><h3>Маркеры для поиска</h3><p>Однозначно учебные строки без рабочих секретов.</p></article>
+          <article class="topic"><span class="topic-code">05_Reports</span><h3>Выходные материалы</h3><p>Отдельное место для отчетов и их сравнения.</p></article>
+          <article class="topic"><span class="topic-code">ГРАНИЦА</span><h3>Не аттестация</h3><p>Отчет фиксирует конкретную проверку, а не защищенность всей системы.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="evidence">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">06 / 07</div>
+          <div>
+            <h2>От наблюдения к корректному выводу</h2>
+            <p class="section-intro">Отчёт «Инспектора» — доказательный материал конкретной проверки, но не готовое аттестационное заключение и не замена модели угроз, программы испытаний и организационно-технических мер.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Уровень</th><th>Что фиксируем</th><th>Корректная формулировка</th><th>Некорректное завышение</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Условие</strong></td><td>Версия, ОС, объект, права, время и параметры</td><td>«При указанных условиях проверено…»</td><td>«Средство проверило всю систему»</td></tr>
+              <tr><td><strong>Наблюдение</strong></td><td>Найденный маркер, хеш, право или запись отчёта</td><td>«Получено следующее значение…»</td><td>«Это доказывает отсутствие иных проблем»</td></tr>
+              <tr><td><strong>Интерпретация</strong></td><td>Сопоставление с ожидаемым состоянием</td><td>«Результат соответствует/не соответствует критерию…»</td><td>«Объект полностью защищён»</td></tr>
+              <tr><td><strong>Ограничение</strong></td><td>Непроверенная область и неопределённость</td><td>«Не оценивались физические носители и иные профили…»</td><td>Умолчать о неполноте</td></tr>
+              <tr><td><strong>Действие</strong></td><td>Исправление и повторная проверка</td><td>«После изменения повторить тест…»</td><td>Считать отчёт конечной точкой</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout--green">
+          <div class="callout-icon" aria-hidden="true">✓</div>
+          <div>
+            <h3>Критерий защиты работы</h3>
+            <p>Слушатель показывает исходное состояние, действие, повторное наблюдение, отчёт, ручную сверку и границы вывода. Если функция недоступна в фактической версии, это фиксируется как ограничение стенда, а не маскируется.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--green" id="sources">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">07 / 07</div>
+          <div>
+            <h2>Официальные источники</h2>
+            <p class="section-intro">Текущие функции сверяются с документацией 7.x и фактической сборкой. Локальные методички используются как сценарий занятия, но не подменяют документацию производителя.</p>
+          </div>
+        </div>
+
+        <div class="source-grid">
+          <article class="source-card">
+            <h3>«Инспектор» 4</h3>
+            <ul class="source-list">
+              <li><a href="https://docs.etecs.ru/scanner/docs/tools/inspector/v4/launch/" target="_blank" rel="noopener">Запуск и активация</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/tools/inspector/v4/tools/" target="_blank" rel="noopener">Перечень инструментов</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/tools/inspector/v4/reports/" target="_blank" rel="noopener">Работа с отчётами</a></li>
+            </ul>
+          </article>
+          <article class="source-card">
+            <h3>Комплекс Сканер-ВС 7</h3>
+            <ul class="source-list">
+              <li><a href="https://docs.etecs.ru/scanner/docs/introduction/product-overview/" target="_blank" rel="noopener">Обзор продукта</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/introduction/editions-comparison/" target="_blank" rel="noopener">Сравнение редакций</a></li>
+              <li><a href="https://scaner-vs.ru/" target="_blank" rel="noopener">Официальная страница продукта</a></li>
+            </ul>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div><h2>День 2 завершён, когда вывод можно защитить</h2><p>Ценность работы — в воспроизводимости: что проверяли, чем, при каких условиях, что увидели, чего не проверили и какое следующее действие требуется.</p></div>
+        <nav class="footer-links" aria-label="Навигация курса"><a href="../">Программа двух дней</a><a href="../scanner/">День 1 · Сканер-ВС 7</a><a href="https://pikov.expert/">Все лекции на pikov.expert</a></nav>
+      </div>
+      <div class="footer-meta"><span>© <span data-year></span> Виталий Александрович Пиков</span><span>Проверено: 05.08.2026</span></div>
+    </div>
+  </footer>
+
+  <script src="../assets/site.js" defer></script>
+</body>
+</html>

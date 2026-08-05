@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>День 1 · Сканер-ВС 7 — лекция и четыре практических блока</title>
+  <meta name="description" content="Учебный день по уязвимостям и Сканер-ВС 7: CVSS v4.0, KEV, EPSS, рынок решений, подключение Windows по WinRM и Linux по SSH, инвентаризация и проверки.">
+  <meta name="author" content="Виталий Александрович Пиков">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="canonical" href="https://scaner-vs.pikov.expert/scanner/">
+  <link rel="stylesheet" href="../assets/site.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%231557d6'/%3E%3Ccircle cx='43' cy='43' r='22' fill='none' stroke='white' stroke-width='8'/%3E%3Cpath d='m60 60 19 19' stroke='white' stroke-width='9' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta property="og:title" content="День 1 · Сканер-ВС 7">
+  <meta property="og:description" content="90 минут лекции и четыре практических блока: от языка уязвимостей до отчёта Сканер-ВС.">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://scaner-vs.pikov.expert/scanner/">
+  <meta property="og:image" content="https://scaner-vs.pikov.expert/assets/scanner-inspector-hero.png">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "День 1. Уязвимости и Сканер-ВС 7",
+    "description": "Лекция и четыре практических блока по управлению уязвимостями и работе со Сканер-ВС 7.",
+    "url": "https://scaner-vs.pikov.expert/scanner/",
+    "inLanguage": "ru",
+    "timeRequired": "PT7H30M",
+    "learningResourceType": ["Лекция", "Практическая работа"],
+    "isPartOf": {
+      "@type": "Course",
+      "name": "Сканер-ВС 7 и компонент «Инспектор»: двухдневный практикум",
+      "url": "https://scaner-vs.pikov.expert/"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "Виталий Александрович Пиков",
+      "url": "https://pikov.expert/"
+    }
+  }
+  </script>
+  <!-- Yandex.Metrika counter -->
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+    m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}
+    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+    (window,document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119','ym');
+    ym(109116119,'init',{ssr:true,webvisor:false,clickmap:false,accurateTrackBounce:true,trackLinks:true});
+  </script>
+  <noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute;left:-9999px" alt=""></div></noscript>
+  <!-- /Yandex.Metrika counter -->
+</head>
+<body>
+  <a class="skip-link" href="#content">К содержанию</a>
+  <div class="progress" aria-hidden="true"><div class="progress__bar" data-progress></div></div>
+
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-back" href="../" aria-label="К программе двухдневного курса">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M19 12H5m7 7-7-7 7-7"/></svg>
+        <span>Сканер-ВС · два учебных дня</span>
+      </a>
+      <button class="menu-button" type="button" aria-label="Открыть меню" aria-expanded="false" data-menu-button>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+      <nav class="top-nav" aria-label="Разделы" data-navigation>
+        <a href="#vocabulary">Уязвимости</a>
+        <a href="#landscape">Рынок</a>
+        <a href="#workflow">Сканер-ВС</a>
+        <a href="#practice">Практика</a>
+        <a href="../inspector/">День 2</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="content">
+    <section class="hero">
+      <div class="wrap">
+        <div class="hero-grid">
+          <div class="hero-copy">
+            <h1><span class="scanner-word">День 1.</span><br>Уязвимости и Сканер-ВС 7</h1>
+            <p class="hero-lead">Утром — большая лекция о языке уязвимостей, приоритизации и классах решений. Затем четыре практических блока: установить, обнаружить, подключить, проанализировать и защитить вывод.</p>
+            <div class="hero-actions">
+              <a class="button button--blue" href="#lecture">Начать лекцию</a>
+              <a class="button" href="#practice">Перейти к практике</a>
+            </div>
+          </div>
+          <figure class="hero-figure">
+            <img src="../assets/scanner-inspector-hero.png" width="1536" height="1024" alt="Схема исследования сети и перехода к доказательствам">
+            <figcaption>Авторская схема курса</figcaption>
+          </figure>
+        </div>
+        <div class="metrics" aria-label="Формат первого дня">
+          <div class="metric"><strong>90 мин</strong><span>лекция: уязвимости, приоритеты, рынок и метод</span></div>
+          <div class="metric"><strong>4 × 90</strong><span>последовательные практические блоки</span></div>
+          <div class="metric"><strong>1 отчёт</strong><span>воспроизводимый результат и план действий</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="lecture">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">01 / 08</div>
+          <div>
+            <h2>Карта большой лекции</h2>
+            <p class="section-intro">Лекция строится от понятия слабости до управляемого процесса: что найдено, насколько серьёзно, эксплуатируется ли сейчас, где находится актив и что делать первым.</p>
+          </div>
+        </div>
+        <div class="topic-grid">
+          <article class="topic"><span class="topic-code">00–20′</span><h3>Язык уязвимостей</h3><p>CWE, CVE и CPE; причины, проявления и идентификаторы.</p></article>
+          <article class="topic"><span class="topic-code">20–40′</span><h3>Приоритизация</h3><p>CVSS v4.0, CISA KEV и EPSS как разные, не взаимозаменяемые сигналы.</p></article>
+          <article class="topic"><span class="topic-code">40–60′</span><h3>Классы решений</h3><p>Локальная проверка, VA/Compliance, VM, Exposure Management и endpoint-native VM.</p></article>
+          <article class="topic"><span class="topic-code">60–75′</span><h3>Метод проверки</h3><p>Авторизация, область работ, обнаружение, подтверждение и фиксация результата.</p></article>
+          <article class="topic"><span class="topic-code">75–90′</span><h3>Сканер-ВС 7</h3><p>Пять типов задач и рекомендуемая последовательность их запуска.</p></article>
+          <article class="topic"><span class="topic-code">РЕЗУЛЬТАТ</span><h3>Общая модель</h3><p>Актив → экспозиция → свидетельство → приоритет → действие → повторная проверка.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="vocabulary">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">02 / 08</div>
+          <div>
+            <h2>Слабость, уязвимость, продукт</h2>
+            <p class="section-intro">Одна таблица не заменяет модель угроз. Идентификаторы помогают связать данные, но отвечают на разные вопросы.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Система</th><th>Что идентифицирует</th><th>Учебный вопрос</th><th>Пример применения</th></tr></thead>
+            <tbody>
+              <tr><td><strong>CWE</strong></td><td>Класс слабости проектирования или реализации</td><td>Какой тип ошибки допустили?</td><td>CWE-787: запись за границами буфера</td></tr>
+              <tr><td><strong>CVE</strong></td><td>Публично известную уязвимость в конкретном контексте</td><td>Какая запись описывает проблему?</td><td>Связать бюллетень, оценки и исправление</td></tr>
+              <tr><td><strong>CPE</strong></td><td>Нормализованное наименование продукта и версии</td><td>К какому продукту относится запись?</td><td>Сопоставить инвентаризацию с источником уязвимостей</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="callout callout--blue">
+          <div class="callout-icon" aria-hidden="true">i</div>
+          <div>
+            <h3>Классификация уязвимостей многомерна</h3>
+            <p>Их различают по происхождению, компоненту, вектору атаки, требуемым правам, влиянию на конфиденциальность, целостность и доступность, наличию эксплуатации и критичности затронутого актива. Один CVE или балл не описывает весь риск.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--blue" id="priority">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">03 / 08</div>
+          <div>
+            <h2>CVSS v4.0 + KEV + EPSS</h2>
+            <p class="section-intro">Правильный приоритет появляется только при совместном рассмотрении технической серьёзности, фактов эксплуатации, прогноза, экспозиции и бизнес-контекста.</p>
+          </div>
+        </div>
+
+        <div class="lane-grid">
+          <article class="lane">
+            <div class="lane-kicker">Технические свойства</div>
+            <h3>CVSS v4.0</h3>
+            <p>Характеризует серьёзность уязвимости через группы Base, Threat, Environmental и Supplemental. Оценка 0–10 не является вероятностью атаки и не равна полному риску организации.</p>
+            <ul class="clean-list">
+              <li><strong>CVSS-B:</strong> только базовые метрики</li>
+              <li><strong>CVSS-BT:</strong> Base + Threat</li>
+              <li><strong>CVSS-BE / BTE:</strong> добавлен контекст среды</li>
+            </ul>
+          </article>
+          <article class="lane lane--green">
+            <div class="lane-kicker">Динамика эксплуатации</div>
+            <h3>KEV и EPSS</h3>
+            <p><strong>KEV</strong> означает подтверждённую эксплуатацию в реальных атаках. <strong>EPSS</strong> оценивает вероятность наблюдаемой эксплуатации CVE в ближайшие 30 дней и обновляется ежедневно.</p>
+            <ul class="clean-list">
+              <li>Нет записи в KEV ≠ нет эксплуатации</li>
+              <li>Низкий EPSS ≠ исправление не требуется</li>
+              <li>Факт эксплуатации имеет приоритет над прогнозом</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          <div class="callout-icon" aria-hidden="true">→</div>
+          <div>
+            <h3>Формула принятия решения</h3>
+            <p><strong>Приоритет =</strong> факт/вероятность эксплуатации + техническая серьёзность + внешняя доступность + критичность актива + компенсирующие меры + последствия + стоимость и срочность исправления. Складывать CVSS и EPSS арифметически нельзя.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="landscape">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">04 / 08</div>
+          <div>
+            <h2>Не все решения — просто сканеры</h2>
+            <p class="section-intro">Локальный обзор от 14.11.2024 используется только как исторический снимок методики и набора продуктов. Текущие функции и статусы проверяются по официальным страницам на дату занятия.</p>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Класс</th><th>Главный результат</th><th>Российские примеры для обзора</th><th>Международные ориентиры</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Локальный точечный анализ</strong></td><td>Проверка установленного ПО одного хоста</td><td><a href="https://bdu.fstec.ru/scanoval" target="_blank" rel="noopener">ScanOVAL</a></td><td>—</td></tr>
+              <tr><td><strong>VA / Compliance</strong></td><td>Сетевое и системное сканирование, конфигурационный аудит</td><td><a href="https://scaner-vs.ru/" target="_blank" rel="noopener">Сканер-ВС 7</a>, <a href="https://ptsecurity.com/products/mp8/" target="_blank" rel="noopener">MaxPatrol 8</a>, <a href="https://www.redcheck.ru/" target="_blank" rel="noopener">RedCheck</a></td><td><a href="https://www.tenable.com/products/nessus" target="_blank" rel="noopener">Nessus</a>, <a href="https://greenbone.github.io/docs/latest/" target="_blank" rel="noopener">Greenbone/OpenVAS</a></td></tr>
+              <tr><td><strong>Полный VM-цикл</strong></td><td>Активы → приоритет → задача → контроль устранения</td><td><a href="https://ptsecurity.com/products/mp-vm/" target="_blank" rel="noopener">MaxPatrol VM</a>, <a href="https://rvision.ru/products/vm" target="_blank" rel="noopener">R-Vision VM</a></td><td><a href="https://www.qualys.com/apps/vulnerability-management-detection-response" target="_blank" rel="noopener">Qualys VMDR</a>, <a href="https://www.rapid7.com/products/insightvm/" target="_blank" rel="noopener">Rapid7 InsightVM</a></td></tr>
+              <tr><td><strong>Exposure / оркестрация</strong></td><td>Объединение источников, бизнес-контекст, SLA и автоматизация</td><td><a href="https://www.securityvision.ru/products/vm/" target="_blank" rel="noopener">Security Vision VM</a>, <a href="https://scan-factory.ru/" target="_blank" rel="noopener">ScanFactory VM</a></td><td><a href="https://www.tenable.com/products/vulnerability-management" target="_blank" rel="noopener">Tenable One VM</a></td></tr>
+              <tr><td><strong>Endpoint-native VM</strong></td><td>Непрерывная оценка через endpoint-платформу</td><td>Рассматривается как отдельная архитектурная модель</td><td><a href="https://learn.microsoft.com/en-us/defender-vulnerability-management/defender-vulnerability-management" target="_blank" rel="noopener">Microsoft Defender VM</a></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p class="footnote">Таблица — учебная классификация пересекающихся функций, а не рейтинг и не закупочная рекомендация. Доступность лицензий, сертификация и поддержка конкретных платформ проверяются отдельно.</p>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="workflow">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">05 / 08</div>
+          <div>
+            <h2>Рабочий цикл Сканер-ВС 7</h2>
+            <p class="section-intro">Рекомендуемая последовательность документации: исследование сети → инвентаризация → поиск уязвимостей и аудит конфигурации. Проверка паролей проводится отдельно и только на учебных реквизитах.</p>
+          </div>
+        </div>
+
+        <div class="timeline">
+          <article class="timeline-step"><div class="timeline-number">01</div><div class="timeline-content"><h3>Исследование сети</h3><p>Задать разрешённые диапазоны, найти доступные узлы, порты и признаки операционных систем. Перед запуском зафиксировать область работ и исключения.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">02</div><div class="timeline-content"><h3>Подключение найденных активов</h3><p>Для Windows основной маршрут занятия — WinRM с vendor-скриптом <code>winrm.ps1</code>; для Linux — SSH с отдельным секретом и контролируемым <code>sudo</code>. У одного актива должно быть одно корректное подключение.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">03</div><div class="timeline-content"><h3>Инвентаризация</h3><p>Собрать программное обеспечение и версии, обновления, аппаратный состав и пользователей. Привилегии нужны для полноты результата; экспорт SPDX/CycloneDX затем отдельно валидируется.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">04</div><div class="timeline-content"><h3>Поиск уязвимостей</h3><p>Сопоставить инвентаризацию с CVE/БДУ и источниками ОС, затем проверить версию, применимость и возможные ложные срабатывания. Для Windows особенно важна предварительная инвентаризация.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">05</div><div class="timeline-content"><h3>Подбор паролей</h3><p>Использовать малый словарь, синтетические учётные записи, фиксированные цели и остановку после первого результата. Отчёт может содержать пароль открытым текстом — удалить его и сменить реквизиты после занятия.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">06</div><div class="timeline-content"><h3>Аудит конфигурации</h3><p>Выбрать подходящий шаблон Best Practice, сравнить фактические настройки с требованиями и отделить небезопасную конфигурацию от уязвимости версии ПО.</p></div></article>
+          <article class="timeline-step"><div class="timeline-number">07</div><div class="timeline-content"><h3>Отчёт и повторная проверка</h3><p>Зафиксировать параметры задачи, версию базы, время и область проверки; проверить критичные результаты вручную, назначить действия и повторить проверку после исправления.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="connections">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">06 / 08</div>
+          <div>
+            <h2>Windows через WinRM, Linux через SSH</h2>
+            <p class="section-intro">Удобство лаборатории не должно превращаться в постоянное ослабление. Реквизиты — отдельные, права — минимально достаточные, доступ — только от адреса сканера и только на время занятия.</p>
+          </div>
+        </div>
+
+        <div class="lane-grid">
+          <article class="lane">
+            <div class="lane-kicker">Windows · базовый маршрут</div>
+            <h3>Подготовить WinRM</h3>
+            <p>Официальная документация предлагает поставляемый <code>winrm.ps1</code>. До запуска преподаватель проверяет исходный текст и хеш полученного файла. В лаборатории используется HTTPS-прослушиватель WinRM на 5986 и правило брандмауэра только для IP сканера.</p>
+            <div class="command">Powershell.exe -ExecutionPolicy Bypass -File winrm.ps1</div>
+            <p class="footnote">Это vendor-команда, а не универсальная рекомендация менять политику PowerShell. Запуск допустим только после проверки скрипта и только на лабораторной Windows. Basic-аутентификация не передаётся по HTTP.</p>
+          </article>
+          <article class="lane lane--green">
+            <div class="lane-kicker">Linux · контролируемый доступ</div>
+            <h3>Создать SSH-подключение</h3>
+            <p>Используется отдельная учебная учётная запись, ключ RSA/ECDSA/ED25519 или временный пароль и разрешённый <code>sudo</code> для нужных операций. Без привилегий инвентаризация и аудит могут быть неполными.</p>
+            <ul class="clean-list">
+              <li>Ограничить вход адресом сканера</li>
+              <li>Сохранить строгие права на ключи и <code>authorized_keys</code></li>
+              <li>Не переносить <code>StrictModes no</code> в Linux и production</li>
+              <li>Отозвать ключ и удалить временную запись после работы</li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout callout--red">
+          <div class="callout-icon" aria-hidden="true">!</div>
+          <div>
+            <h3>Только разрешённая инфраструктура</h3>
+            <p>Все действия выполняются только на собственных или письменно разрешённых учебных системах. Диапазоны, время, методы, учётные записи, пороги блокировки и ответственный за остановку фиксируются до начала работы.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--blue" id="practice">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">07 / 08</div>
+          <div>
+            <h2>Четыре практических блока</h2>
+            <p class="section-intro">Каждый блок длится 90 минут и заканчивается артефактом, который нужен для следующего шага. После первого блока — обед; между остальными — короткие перерывы.</p>
+          </div>
+        </div>
+
+        <div class="callout callout--blue">
+          <div class="callout-icon" aria-hidden="true">↓</div>
+          <div>
+            <h3>До занятия получите свежий учебный дистрибутив у производителя</h3>
+            <p>Заполните <a href="https://scaner-vs.ru/#form" target="_blank" rel="noopener"><strong>официальную форму демоверсии</strong></a>. Производитель вышлет на указанную почту ссылку на актуальную на момент запроса демоверсию Сканер-ВС 7 Base и файл лицензии. Преподавателю заранее сообщается только факт получения; сам дистрибутив и лицензия в общий учебный архив не загружаются.</p>
+            <div class="button-row"><a class="button button--blue" href="https://scaner-vs.ru/#form" target="_blank" rel="noopener">Получить демоверсию Сканер-ВС 7 Base</a></div>
+          </div>
+        </div>
+
+        <div class="source-grid" style="margin-bottom:28px">
+          <article class="source-card">
+            <h3>Основная лабораторная инструкция</h3>
+            <p>Четыре практических блока, адаптированные с полезной последовательности методички версии 6 к задачам Сканер-ВС 7.x.</p>
+            <div class="button-row"><a class="button button--blue" href="../materials/scanner/01-common-workflow.md">Открыть Markdown</a><a class="button" href="../materials/scanner/REPORT-TEMPLATE.md">Шаблон отчета</a></div>
+          </article>
+          <article class="source-card">
+            <h3>Все варианты одним архивом</h3>
+            <p>Внутри находятся офлайн-лендинг и материалы `.md`: общий сценарий, ScanOVAL, WSL 2, VirtualBox, Live USB и отчет. Полностью распакуйте ZIP и откройте `index.html`.</p>
+            <div class="button-row"><a class="button" href="../materials/downloads/scanner-labs-markdown.zip" download>Скачать scanner-labs-markdown.zip</a></div>
+          </article>
+        </div>
+
+        <div class="day day--scanner">
+          <div class="day-head"><strong>Практика дня 1</strong><span>4 × 90 минут</span></div>
+          <div class="day-block"><div class="duration">Блок 1</div><div><h3>Подготовка и установка</h3><p>Убедиться, что слушатель получил демоверсию Сканер-ВС 7 Base и файл лицензии через официальную форму; затем выбрать вариант: ScanOVAL, WSL 2, VirtualBox или Live USB. Проверить источник, контрольные суммы (если опубликованы), условия лицензии, снимок ВМ и отсутствие мостового подключения. <strong>Артефакт:</strong> паспорт стенда.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 2</div><div><h3>Исследование сети и подключения</h3><p>Создать проект и задачу исследования сети, сверить найденные активы, подготовить Windows через WinRM и Linux через SSH. <strong>Артефакт:</strong> карта активов и журнал подключений.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 3</div><div><h3>Инвентаризация и поиск уязвимостей</h3><p>Собрать ПО и аппаратный состав, запустить задачу поиска, выбрать несколько результатов и проверить версии, CVE/БДУ, CVSS, KEV/EPSS и применимость. <strong>Артефакт:</strong> реестр проверенных находок.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 4</div><div><h3>Пароли, конфигурации и отчёт</h3><p>Провести контролируемую проверку синтетической учётной записи, запустить аудит конфигурации по подходящему шаблону, сформировать отчёт и план повторной проверки. <strong>Артефакт:</strong> защищаемый вывод.</p></div></div>
+        </div>
+
+        <h3 style="margin-top:42px">Четыре варианта развертывания</h3>
+        <div class="stand-grid" style="margin-top:18px">
+          <article class="stand"><div class="stand-number">01</div><h3>ScanOVAL</h3><p>Локальная проверка поддерживаемой Windows. Это не сетевой сканер и не VM-система. Windows 11 официальная страница сейчас не перечисляет — совместимость проверяется заранее. Дистрибутив не включается в курс.</p><div class="button-row"><a class="button" href="https://bdu.fstec.ru/scanoval" target="_blank" rel="noopener">Скачать из БДУ</a></div></article>
+          <article class="stand"><div class="stand-number">02</div><h3>Сканер-ВС в WSL 2</h3><p>Поддержаны Windows 10/11 и WSL 2. Сразу сменить стандартный пароль, не публиковать HTTP и ограничить 443 лабораторной подсетью.</p><div class="button-row"><a class="button" href="https://docs.etecs.ru/scanner/docs/getting-started/installation/windows-wsl-install/" target="_blank" rel="noopener">Инструкция WSL</a></div></article>
+          <article class="stand"><div class="stand-number">03</div><h3>VirtualBox</h3><p>Astra Linux со сканером, Metasploitable 2 и учебная Windows размещаются в Host-only/Internal Network. Снимок создаётся до изменения конфигурации.</p></article>
+          <article class="stand"><div class="stand-number">04</div><h3>Live USB</h3><p>Вендор документирует носитель от 32 ГБ. Без Persistence результаты исчезают после перезагрузки; с Persistence носитель содержит чувствительные данные и требует защиты.</p><div class="button-row"><a class="button" href="https://docs.etecs.ru/scanner/docs/getting-started/bootable-media/create-boot-drive/" target="_blank" rel="noopener">Инструкция Live USB</a></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--soft" id="sources">
+      <div class="wrap">
+        <div class="section-head">
+          <div class="section-index">08 / 08</div>
+          <div>
+            <h2>Первоисточники к занятию</h2>
+            <p class="section-intro">Проверено по официальным материалам 05.08.2026. Перед проведением курса преподаватель повторно сверяет версии, условия демолицензии и доступность образов.</p>
+          </div>
+        </div>
+
+        <div class="source-grid">
+          <article class="source-card">
+            <h3>Сканер-ВС 7</h3>
+            <ul class="source-list">
+              <li><a href="https://docs.etecs.ru/scanner/docs/intro/" target="_blank" rel="noopener">Введение и документация</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/" target="_blank" rel="noopener">Управление задачами</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/inventory/" target="_blank" rel="noopener">Инвентаризация</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/vulnerability-scan/" target="_blank" rel="noopener">Поиск уязвимостей</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/password-cracking/" target="_blank" rel="noopener">Подбор паролей</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/user-guide/running-tasks/audit-configuration/" target="_blank" rel="noopener">Аудит конфигурации</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/administration/secrets-and-connections/winrm-setup/" target="_blank" rel="noopener">Настройка WinRM</a></li>
+              <li><a href="https://docs.etecs.ru/scanner/docs/administration/secrets-and-connections/" target="_blank" rel="noopener">Секреты и SSH-подключения</a></li>
+              <li><a href="https://scaner-vs.ru/" target="_blank" rel="noopener">Страница продукта</a></li>
+            </ul>
+          </article>
+          <article class="source-card">
+            <h3>Таксономии и приоритизация</h3>
+            <ul class="source-list">
+              <li><a href="https://cwe.mitre.org/" target="_blank" rel="noopener">MITRE CWE</a></li>
+              <li><a href="https://www.cve.org/" target="_blank" rel="noopener">CVE Program</a></li>
+              <li><a href="https://nvd.nist.gov/products/cpe" target="_blank" rel="noopener">NIST CPE</a></li>
+              <li><a href="https://www.first.org/cvss/v4.0/specification-document" target="_blank" rel="noopener">FIRST CVSS v4.0</a></li>
+              <li><a href="https://www.first.org/epss/" target="_blank" rel="noopener">FIRST EPSS</a></li>
+              <li><a href="https://www.cisa.gov/known-exploited-vulnerabilities-catalog" target="_blank" rel="noopener">CISA KEV Catalog</a></li>
+              <li><a href="https://bdu.fstec.ru/scanoval" target="_blank" rel="noopener">БДУ ФСТЭК России · ScanOVAL</a></li>
+              <li><a href="https://bdu.fstec.ru/scanovalforlinux" target="_blank" rel="noopener">ScanOVAL для Linux</a></li>
+            </ul>
+          </article>
+        </div>
+
+        <div class="callout">
+          <div class="callout-icon" aria-hidden="true">↻</div>
+          <div>
+            <h3>Контроль актуальности</h3>
+            <p>Нельзя обещать обнаружение всех уязвимостей, отсутствие ложных срабатываний, одновременное объединение всех баз, наличие CVSS v4-вектора в конкретной сборке или включение «Инспектора» в демолицензию без проверки фактического стенда.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <div class="footer-grid">
+        <div><h2>День 1 завершён, когда вывод воспроизводим</h2><p>Слушатель должен показать не только отчёт, но и область проверки, параметры задачи, источник данных, ручную верификацию и безопасный план повторного контроля.</p></div>
+        <nav class="footer-links" aria-label="Навигация курса"><a href="../">Программа двух дней</a><a href="../inspector/">День 2 · Компонент «Инспектор»</a><a href="https://pikov.expert/">Все лекции на pikov.expert</a></nav>
+      </div>
+      <div class="footer-meta"><span>© <span data-year></span> Виталий Александрович Пиков</span><span>Проверено: 05.08.2026</span></div>
+    </div>
+  </footer>
+
+  <script src="../assets/site.js" defer></script>
+</body>
+</html>
