@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Методическое руководство преподавателя по материалам первого дня программы «Образовательная лаборатория Kaspersky Academy | Безопасность приложений»: тайминг, три уровня сложности лабораторных, критерии оценивания и типичные ошибки группы.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Преподавателю: как провести этот материал в своём курсе">
+  <meta property="og:description" content="Тайминг занятия, три уровня сложности заданий, критерии оценивания, типичные ошибки группы и требования к учебной среде.">
+  <meta property="og:url" content="https://appsec-lections.pikov.expert/for-teachers.html">
+  <meta property="og:image" content="https://appsec-lections.pikov.expert/assets/appsec-practice-hero.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://appsec-lections.pikov.expert/for-teachers.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111f'/%3E%3Cpath d='M17 32h30M32 17v30' stroke='%2365e5ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Преподавателю: как провести этот материал в своём курсе</title>
+  <link rel="stylesheet" href="assets/site.css?v=20260811-theme">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Методическое руководство преподавателя по безопасности приложений",
+    "inLanguage": "ru",
+    "url": "https://appsec-lections.pikov.expert/for-teachers.html",
+    "learningResourceType": "Методическое руководство",
+    "audience": {"@type": "EducationalAudience", "educationalRole": "teacher"},
+    "educationalLevel": "Высшее образование и дополнительное профессиональное образование",
+    "author": {"@type": "Person", "name": "Виталий Александрович Пиков", "url": "https://pikov.expert/"},
+    "isBasedOn": {"@type": "CreativeWork", "name": "Образовательная лаборатория Kaspersky Academy | Безопасность приложений", "provider": {"@type": "Organization", "name": "АО «Лаборатория Касперского»"}},
+    "dateCreated": "2026-08-11",
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <div class="reading-line" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand brand-back" href="https://pikov.expert/" aria-label="На главный сайт pikov.expert">
+        <span class="brand-mark" aria-hidden="true">↗</span>
+        <span>appsec / lectures<br><small>pikov.expert</small></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Основная навигация"><a href="index.html">Программа</a><a href="day-01.html">День 1</a><a href="day-02.html">День 2</a><a href="slides-day-01.html">Слайды</a><a href="practice.html">Практикум</a><a href="glossary.html">Глоссарий</a><a href="for-teachers.html" aria-current="page">Преподавателю</a><a href="rights.html">Права</a></nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true"><img src="assets/appsec-practice-hero.png" width="2184" height="1229" alt=""></div>
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Методическое руководство · для ведущего занятие</p>
+          <h1 id="hero-title">Материал <span class="accent">для тех</span>, кто будет вести занятие.</h1>
+          <p class="hero-lead">Двухдневный тренинг Kaspersky Academy проводился для преподавателей, доцентов и специалистов вузов — с явной целью, чтобы материал был перенесён в собственные курсы. Здесь собрано то, что нужно именно ведущему: тайминг, три уровня сложности заданий, критерии оценивания, требования к среде и места, где группа предсказуемо спотыкается.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#plan">Открыть план занятия <span aria-hidden="true">↓</span></a>
+            <a class="button ghost" href="day-01.html">Содержание дня 1 <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="hero-meta">
+            <span><b>03</b> уровня сложности заданий</span>
+            <span><b>04</b> критерия оценивания</span>
+            <span><b>RU</b> авторская методика</span>
+          </div>
+          <aside class="notice">
+            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em> (11–12 августа 2026 года). Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="plan" aria-labelledby="plan-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">01 · Структура занятия</p><h2 id="plan-title">Ритм, при котором теория не съедает практику.</h2></div>
+          <p>Ниже — расписание первого дня, как оно было заявлено программой, с методическим комментарием к каждому блоку. Пропорция важнее точных минут: на каждый лекционный блок приходится сопоставимый по времени практический.</p>
+        </div>
+        <div class="timeline reveal">
+          <div class="timeline-item"><div class="timeline-time">10:20</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>Основы AppSec · мини-лекция и работа в группе</h3><p>Самый недооценённый блок. Здесь закладывается словарь: актив, угроза, уязвимость, риск, CIA, три вопроса доступа. Не экономьте на нём — сэкономленные 15 минут придётся потратить дважды при разборе OWASP.</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">11:00</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>OWASP Top 10:2025 — A01–A03 · мини-лекция</h3><p>Контроль доступа, конфигурация, цепочка поставки. Держите темп: каждая категория — одна причина, один пример, одна проверяемая мера. Углубление оставьте на разбор после практики.</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">12:30</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>Лабораторный блок 1</h3><p>Первый выход в среду. Заложите время на технические сбои: запуск учебного приложения у части группы не получится с первого раза, и это нормальная часть занятия.</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">14:30</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>OWASP Top 10:2025 — A04–A06 · мини-лекция</h3><p>Криптографические сбои, инъекции, небезопасное проектирование. Здесь полезнее всего разбирать «до и после»: один и тот же код в уязвимом и исправленном виде.</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">15:10</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>Лабораторный блок 2 · индивидуально, затем разбор в группе</h3><p>Разбор в группе — обязательная часть, а не остаток времени. Именно на нём результат превращается в понимание причины.</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">16:10</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>Безопасность ИИ и организация учебного процесса</h3><p>Ставится в конец намеренно: блок работает как сборка всего дня. Он же снимает вопрос «как теперь оценивать работы, написанные с помощью модели».</p></div></div>
+          <div class="timeline-item"><div class="timeline-time">16:55</div><div class="timeline-rail"><span class="timeline-dot"></span></div><div class="timeline-body"><h3>Подведение итогов дня</h3><p>Соберите не впечатления, а вопросы: три вещи, которые остались непонятны. Они задают план следующего занятия лучше любой анкеты.</p></div></div>
+        </div>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Пропорция занятия: почему разбор нельзя сокращать</h3><p class="figure-index">Схема 12</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 250" role="img" aria-labelledby="f12t f12d">
+              <title id="f12t">Соотношение лекции, практики и разбора в учебном цикле</title>
+              <desc id="f12d">Цикл из четырёх шагов: короткая лекция даёт язык, практика даёт наблюдение, разбор превращает наблюдение в причину, оформление закрепляет результат как проверяемый артефакт.</desc>
+              <defs><marker id="f12a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <rect x="16" y="34" width="196" height="96" rx="12" class="dg-box is-accent"/>
+              <text x="34" y="58" class="dg-k">ШАГ 1 · ЯЗЫК</text>
+              <text x="34" y="82" class="dg-h">Короткая лекция</text>
+              <text x="34" y="102" class="dg-s">даёт слова, которыми</text>
+              <text x="34" y="117" class="dg-s">потом описывают наблюдение</text>
+              <rect x="238" y="34" width="196" height="96" rx="12" class="dg-box is-warn"/>
+              <text x="256" y="58" class="dg-k">ШАГ 2 · ОПЫТ</text>
+              <text x="256" y="82" class="dg-h">Практика</text>
+              <text x="256" y="102" class="dg-s">слушатель сам видит,</text>
+              <text x="256" y="117" class="dg-s">что система ведёт себя не так</text>
+              <rect x="460" y="34" width="196" height="96" rx="12" class="dg-box is-good"/>
+              <text x="478" y="58" class="dg-k">ШАГ 3 · СМЫСЛ</text>
+              <text x="478" y="82" class="dg-h">Разбор в группе</text>
+              <text x="478" y="102" class="dg-s">наблюдение превращается</text>
+              <text x="478" y="117" class="dg-s">в первопричину</text>
+              <rect x="682" y="34" width="202" height="96" rx="12" class="dg-box"/>
+              <text x="700" y="58" class="dg-k">ШАГ 4 · СЛЕД</text>
+              <text x="700" y="82" class="dg-h">Оформление</text>
+              <text x="700" y="102" class="dg-s">причина и исправление</text>
+              <text x="700" y="117" class="dg-s">записаны и проверяемы</text>
+              <path d="M216 82 L234 82" class="dg-flow" marker-end="url(#f12a)"/>
+              <path d="M438 82 L456 82" class="dg-flow" marker-end="url(#f12a)"/>
+              <path d="M660 82 L678 82" class="dg-flow" marker-end="url(#f12a)"/>
+              <path d="M16 168 L884 168" class="dg-rule"/>
+              <text x="16" y="194" class="dg-h">Если из цикла выпадает шаг 3, занятие превращается в набор эффектных трюков.</text>
+              <text x="16" y="216" class="dg-s">Слушатель уходит с ощущением «я взломал», но без ответа на вопрос, почему это сработало и что нужно изменить в коде. Шаг 4 закрепляет</text>
+              <text x="16" y="232" class="dg-s">результат: без письменного следа причина забывается за несколько дней.</text>
+            </svg>
+          </div>
+          <figcaption><b>Практическое следствие.</b> Планируя занятие, отводите разбору не остаток времени, а фиксированный слот — и защищайте его так же, как защищаете лекцию.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="levels-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">02 · Три уровня сложности</p><h2 id="levels-title">Одно задание, три группы — и никто не скучает.</h2></div>
+          <p>Программа прямо предусматривает адаптацию заданий под подготовку студентов: от новичков до продвинутых. Удобнее всего менять не саму цель, а объём подсказки и требования к результату — тогда группа работает с одним и тем же учебным приложением и обсуждает общий предмет.</p>
+        </div>
+        <div class="split">
+          <article class="panel reveal">
+            <span class="tag good">Уровень 1 · знакомство</span>
+            <h3>Даём маршрут, спрашиваем наблюдение</h3>
+            <p>Слушатель получает пошаговую инструкцию и заранее известную цель. От него требуется точно описать, что он увидел, и назвать нарушенное свойство из триады.</p>
+            <p><b>Критерий:</b> шаги выполнены, наблюдение описано без домыслов.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag amber">Уровень 2 · самостоятельность</span>
+            <h3>Даём область, спрашиваем причину</h3>
+            <p>Указывается только раздел приложения и класс риска. Слушатель сам находит проблему и обязан объяснить первопричину: где именно отсутствует проверка и почему она должна быть на сервере.</p>
+            <p><b>Критерий:</b> причина названа верно и подтверждена наблюдением.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag">Уровень 3 · инженерный</span>
+            <h3>Даём систему, спрашиваем исправление и тест</h3>
+            <p>Задание формулируется как инженерная задача: предложить исправление, оценить его влияние на функциональность и написать отрицательный тест, который не пройдёт на уязвимой версии.</p>
+            <p><b>Критерий:</b> исправление обосновано, тест действительно различает две версии.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag amber">Общая рамка</span>
+            <h3>Что остаётся одинаковым на всех уровнях</h3>
+            <p>Учебная среда, форма отчёта и запрет на действия за её пределами. Различается глубина требований, а не правила безопасности и не структура результата.</p>
+          </article>
+        </div>
+        <div class="callout teacher reveal">
+          <p class="callout-label">Заметка преподавателя</p>
+          <p>Не объявляйте уровни вслух как «слабый / средний / сильный». Практичнее выдать всем один и тот же текст задания, а уровни оформить как необязательные разделы: «минимум», «если получилось быстро», «для тех, кто хочет довести до конца». Так сильные студенты не простаивают, а слабые не получают ярлык.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="grade-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">03 · Оценивание</p><h2 id="grade-title">Оценивается понимание причины, а не зрелищность результата.</h2></div>
+          <p>Шкала ниже одинаково работает и для отчёта по лабораторной, и для устной защиты. Она специально построена так, чтобы найденный «флаг» сам по себе не приносил баллов.</p>
+        </div>
+        <div class="table-wrap reveal">
+          <table>
+            <thead><tr><th>Критерий</th><th>Что смотрим</th><th>Признак слабой работы</th></tr></thead>
+            <tbody>
+              <tr><td>Полнота выполнения</td><td>Пройдены обязательные шаги, среда и её версия зафиксированы</td><td>Не указано, что именно и где проверялось</td></tr>
+              <tr><td>Объяснение первопричины</td><td>Названо конкретное место отсутствующей или неверной проверки</td><td>«Приложение уязвимо к XSS» без указания источника и приёмника</td></tr>
+              <tr><td>Конкретность исправления</td><td>Предложена серверная мера и способ проверить регрессию</td><td>«Нужно фильтровать ввод» без указания контекста и механизма</td></tr>
+              <tr><td>Качество и безопасность оформления</td><td>Доказательства обезличены, секретов и чужих данных нет</td><td>Скриншоты с реальными токенами, ключами или персональными данными</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="callout-duo reveal">
+          <div class="callout student">
+            <p class="callout-label">Слушателю</p>
+            <p>Работа считается сделанной не тогда, когда что-то получилось, а тогда, когда вы можете объяснить, почему это получилось, и назвать изменение, после которого перестанет получаться.</p>
+          </div>
+          <div class="callout warn">
+            <p class="callout-label">Что не принимается</p>
+            <p>Отчёт, содержащий чужие персональные данные, реальные ключи и токены, а также любые действия за пределами разрешённой учебной среды. Это условие не смягчается уровнем задания.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="mistakes-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">04 · Где группа спотыкается</p><h2 id="mistakes-title">Шесть мест, которые стоит предусмотреть заранее.</h2></div>
+          <p>Перечень собран по ходу занятия и по разбору выполненных работ. Каждый пункт дешевле предупредить одной фразой, чем разбирать потом.</p>
+        </div>
+        <div class="topic-grid">
+          <article class="topic reveal"><p class="topic-number">01 / СЛОВАРЬ</p><h3>Аутентификация и авторизация как синонимы</h3><p>Самая частая путаница. Разведите их до разбора A01, иначе категория останется непонятой. Помогает <a href="glossary.html">глоссарий</a> и схема трёх вопросов.</p></article>
+          <article class="topic reveal"><p class="topic-number">02 / ЛОГИКА</p><h3>Начинают с уязвимости, а не с актива</h3><p>Группа сразу называет технический дефект и не может объяснить, почему он важен. Разворачивайте обсуждение назад — к активу и последствию.</p></article>
+          <article class="topic reveal"><p class="topic-number">03 / КАРТА</p><h3>Не называют цепочку поставки</h3><p>При составлении карты поверхности атаки зависимости и сборку не вспоминают почти никогда. Это стоит зафиксировать вслух: именно поэтому категория A03 существует.</p></article>
+          <article class="topic reveal"><p class="topic-number">04 / СРЕДА</p><h3>Технические сбои на старте практики</h3><p>Часть группы не запустит учебное приложение с первого раза. Заложите время, подготовьте запасной вариант и попросите заранее проверить среду.</p></article>
+          <article class="topic reveal"><p class="topic-number">05 / ОТЧЁТ</p><h3>Флаг вместо объяснения</h3><p>В отчёт попадает результат, но не причина. Помогает жёсткая форма отчёта, где поле «первопричина» нельзя оставить пустым.</p></article>
+          <article class="topic reveal"><p class="topic-number">06 / ГРАНИЦЫ</p><h3>Желание проверить «на чём-нибудь настоящем»</h3><p>Проговорите правило до начала практики, а не после. Формулировка простая: за пределами выданной локальной среды — ничего и никогда.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="env-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">05 · Подготовка среды</p><h2 id="env-title">Что проверить до того, как в аудиторию войдут студенты.</h2></div>
+          <p>Практика проводится только в намеренно уязвимой локальной среде, развёрнутой для обучения. Подробный порядок запуска и правила работы — в <a href="practice.html">практикуме</a>.</p>
+        </div>
+        <div class="split">
+          <article class="panel reveal">
+            <p class="caption">Чек-лист ведущего</p>
+            <ol class="checklist">
+              <li>Образ учебного приложения скачан заранее и запускается офлайн.</li>
+              <li>Версия образа зафиксирована и одинакова у всех — иначе разбор рассыпается на частные случаи.</li>
+              <li>Сервис слушает только локальный интерфейс и не доступен из сети аудитории.</li>
+              <li>Правило «только эта среда» объявлено до начала практики и записано в задании.</li>
+              <li>Форма отчёта роздана вместе с заданием, а не после него.</li>
+              <li>Запасной сценарий на случай, если среда не поднимется у части группы.</li>
+            </ol>
+          </article>
+          <article class="panel reveal">
+            <p class="caption">Что взять с собой в курс</p>
+            <h3>Готовые материалы для переиспользования</h3>
+            <p>Все документы распространяются по CC BY 4.0: их можно адаптировать под свой курс с указанием происхождения.</p>
+            <p class="button-row">
+              <a class="button primary" href="materials/методика-преподавателя-день-1.md" download>Методика преподавателя ↓</a>
+              <a class="button" href="materials/шаблон-отчёта-лабораторной-работы.md" download>Шаблон отчёта ↓</a>
+              <a class="button" href="materials/чек-лист-слушателя.md" download>Чек-лист слушателя ↓</a>
+              <a class="button" href="materials/практикум-безопасность-приложений-методичка.md" download>Методичка практикума ↓</a>
+            </p>
+          </article>
+        </div>
+        <div class="callout teacher reveal">
+          <p class="callout-label">О переносе материала в свой курс</p>
+          <p>Программа Kaspersky Academy проводилась именно для того, чтобы преподаватели транслировали материал студентам. При переиспользовании указывайте название программы, дату и происхождение файла — это требование корректной атрибуции, а не формальность. Полный перечень источников и их статус — на странице <a href="rights.html">прав и атрибуции</a>.</p>
+          <p>Основной AppSec-блок первого дня вёл Дмитрий Павлухин, архитектор по информационной безопасности.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-title">appsec / lectures</p>
+        <p>Авторский образовательный материал Виталия Александровича Пикова для преподавателей и слушателей по безопасной разработке.</p>
+      </div>
+      <div>
+        <p class="footer-title">Разделы</p>
+        <ul><li><a href="index.html">Программа на два дня</a></li><li><a href="day-01.html">День 1</a></li><li><a href="practice.html">Практикум</a></li><li><a href="glossary.html">Глоссарий</a></li></ul>
+      </div>
+      <div>
+        <p class="footer-title">Условие использования</p>
+        <p>Лабораторные действия допустимы только в локальной разрешённой среде. При переиспользовании материалов указывайте программу, дату и происхождение файла.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© <span data-year>2026</span> Виталий Александрович Пиков · <a href="https://pikov.expert/">pikov.expert</a> · <a href="rights.html">права и атрибуция</a></div>
+  </footer>
+  <script src="assets/site.js?v=20260811-theme" defer></script>
+</body>
+</html>

@@ -46,15 +46,7 @@
         <span>appsec / lectures<br><small>pikov.expert</small></span>
       </a>
       <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button>
-      <nav class="nav" id="site-nav" aria-label="Основная навигация">
-        <a href="index.html">Программа</a>
-        <a href="day-01.html" aria-current="page">День 1</a>
-        <a href="day-02.html">День 2</a>
-        <a href="slides-day-01.html">Слайды</a>
-        <a href="practice.html">Практикум</a>
-        <a href="#downloads">Загрузки</a>
-        <a href="rights.html">Права и источники</a>
-      </nav>
+      <nav class="nav" id="site-nav" aria-label="Основная навигация"><a href="index.html">Программа</a><a href="day-01.html" aria-current="page">День 1</a><a href="day-02.html">День 2</a><a href="slides-day-01.html">Слайды</a><a href="practice.html">Практикум</a><a href="glossary.html">Глоссарий</a><a href="for-teachers.html">Преподавателю</a><a href="rights.html">Права</a></nav>
     </div>
   </header>
 
@@ -76,7 +68,7 @@
             <span><b>RU</b> авторский конспект</span>
           </div>
           <aside class="notice" aria-label="Атрибуция">
-            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em> (11–12 августа 2026 года). Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.
+            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em> (11–12 августа 2026 года). Основной блок первого дня вёл Дмитрий Павлухин, архитектор по информационной безопасности. Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.
           </aside>
         </div>
       </div>
@@ -87,15 +79,175 @@
         <div class="stat"><b>06</b><span>разобранных категорий OWASP Top 10:2025</span></div>
         <div class="stat"><b>02</b><span>лабораторных блока в разрешённой локальной среде</span></div>
         <div class="stat"><b>01</b><span>карта поверхности атаки как отправная точка</span></div>
-        <div class="stat"><b>34</b><span>реконструированных HTML‑слайда и 4 Markdown-документа в открытом архиве</span></div>
+        <div class="stat"><b>34</b><span>HTML‑слайда и 4 Markdown-документа в открытом архиве</span></div>
+      </div>
+    </section>
+
+    <section class="section" id="basics" aria-labelledby="basics-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Шаг ноль · для тех, кто начинает</p>
+            <h2 id="basics-title">Сначала — где вообще живёт то, что мы защищаем.</h2>
+          </div>
+          <p>Разговор про уязвимости бесполезен, пока в голове нет картинки устройства системы. Три схемы ниже — минимум, который стоит нарисовать на доске до первого термина. Все схемы на сайте нарисованы заново и остаются текстом: их можно искать, копировать и читать со вспомогательными технологиями.</p>
+        </div>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Где живёт прикладное ПО</h3><p class="figure-index">Схема 01</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 300" role="img" aria-labelledby="f01t f01d">
+              <title id="f01t">Четыре уровня: пользователь, прикладное ПО, системное ПО, аппаратное обеспечение</title>
+              <desc id="f01d">Пользователь работает с прикладным ПО; прикладное ПО опирается на системное, системное — на аппаратное обеспечение. Безопасность приложений отвечает за уровень прикладного ПО.</desc>
+              <defs><marker id="f01a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <rect x="20" y="16" width="560" height="52" rx="10" class="dg-box"/>
+              <text x="44" y="40" class="dg-h">Пользователь</text>
+              <text x="44" y="58" class="dg-s">человек или другая система, которая ставит задачу</text>
+              <rect x="20" y="82" width="560" height="66" rx="10" class="dg-box is-accent"/>
+              <text x="44" y="106" class="dg-h">Прикладное ПО</text>
+              <text x="44" y="125" class="dg-s">браузеры, офисные программы, мобильные и веб-приложения,</text>
+              <text x="44" y="140" class="dg-s">почтовые клиенты, облачные и SaaS-сервисы</text>
+              <rect x="20" y="162" width="560" height="60" rx="10" class="dg-box"/>
+              <text x="44" y="186" class="dg-h">Системное ПО</text>
+              <text x="44" y="205" class="dg-s">операционная система, драйверы, компиляторы, средства управления файлами</text>
+              <rect x="20" y="236" width="560" height="52" rx="10" class="dg-box is-quiet"/>
+              <text x="44" y="260" class="dg-h">Аппаратное обеспечение</text>
+              <text x="44" y="278" class="dg-s">процессор, оперативная память, средства ввода-вывода</text>
+              <path d="M300 68 L300 80" class="dg-flow is-quiet" marker-end="url(#f01a)"/>
+              <path d="M300 148 L300 160" class="dg-flow is-quiet" marker-end="url(#f01a)"/>
+              <path d="M300 222 L300 234" class="dg-flow is-quiet" marker-end="url(#f01a)"/>
+              <path d="M700 115 L598 115" class="dg-flow" marker-end="url(#f01a)"/>
+              <rect x="700" y="82" width="182" height="66" rx="10" class="dg-box is-accent"/>
+              <text x="716" y="106" class="dg-k">ЗОНА APPSEC</text>
+              <text x="716" y="126" class="dg-s">здесь появляются данные</text>
+              <text x="716" y="141" class="dg-s">пользователя и его права</text>
+            </svg>
+          </div>
+          <figcaption><b>Как читать.</b> Каждый уровень доверяет тому, что ниже, и обслуживает то, что выше. Безопасность приложений отвечает за уровень прикладного ПО — но ошибка на нём открывает данные пользователя, а иногда и путь к системному уровню.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Клиент, сервер и то, что между ними</h3><p class="figure-index">Схема 02</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 330" role="img" aria-labelledby="f02t f02d">
+              <title id="f02t">Клиент-серверная архитектура с балансировщиком нагрузки и границей доверия</title>
+              <desc id="f02d">Браузер, мобильное приложение и внешний сервис обращаются к балансировщику; он распределяет запросы между серверами приложения, которые работают с базой данных и хранилищем. Граница доверия проходит между клиентами и серверной зоной.</desc>
+              <defs><marker id="f02a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <text x="16" y="22" class="dg-k">НЕДОВЕРЕННАЯ СТОРОНА</text>
+              <rect x="16" y="36" width="168" height="52" rx="10" class="dg-box"/>
+              <text x="32" y="60" class="dg-h">Браузер</text>
+              <text x="32" y="78" class="dg-s">HTML, JavaScript, cookie</text>
+              <rect x="16" y="100" width="168" height="52" rx="10" class="dg-box"/>
+              <text x="32" y="124" class="dg-h">Мобильное</text>
+              <text x="32" y="142" class="dg-s">свой код, кэш и токены</text>
+              <rect x="16" y="164" width="168" height="52" rx="10" class="dg-box"/>
+              <text x="32" y="188" class="dg-h">Внешний сервис</text>
+              <text x="32" y="206" class="dg-s">интеграция по API</text>
+              <rect x="196" y="24" width="688" height="212" rx="14" class="dg-zone"/>
+              <text x="212" y="46" class="dg-k">ДОВЕРЕННАЯ ЗОНА · ЗДЕСЬ ПРИНИМАЮТСЯ РЕШЕНИЯ</text>
+              <rect x="212" y="62" width="150" height="70" rx="10" class="dg-box is-accent"/>
+              <text x="228" y="88" class="dg-h">Балансировщик</text>
+              <text x="228" y="107" class="dg-s">распределяет трафик,</text>
+              <text x="228" y="122" class="dg-s">терминирует TLS</text>
+              <rect x="212" y="150" width="150" height="70" rx="10" class="dg-box is-quiet"/>
+              <text x="228" y="176" class="dg-h">Журналы</text>
+              <text x="228" y="195" class="dg-s">кто, что и когда</text>
+              <text x="228" y="210" class="dg-s">сделал — без секретов</text>
+              <rect x="390" y="56" width="200" height="52" rx="10" class="dg-box is-accent"/>
+              <text x="406" y="80" class="dg-h">Сервер приложения 1</text>
+              <text x="406" y="98" class="dg-s">бизнес-логика и авторизация</text>
+              <rect x="390" y="120" width="200" height="52" rx="10" class="dg-box is-accent"/>
+              <text x="406" y="144" class="dg-h">Сервер приложения 2</text>
+              <text x="406" y="162" class="dg-s">та же логика, другой экземпляр</text>
+              <rect x="618" y="56" width="248" height="52" rx="10" class="dg-box"/>
+              <text x="634" y="80" class="dg-h">База данных</text>
+              <text x="634" y="98" class="dg-s">заказы, пользователи, роли</text>
+              <rect x="618" y="120" width="248" height="52" rx="10" class="dg-box"/>
+              <text x="634" y="144" class="dg-h">Файловое хранилище</text>
+              <text x="634" y="162" class="dg-s">документы, выгрузки, резервные копии</text>
+              <path d="M188 62 L200 62 L200 97 L206 97" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M188 126 L200 126 L200 97 L206 97" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M188 190 L200 190 L200 97 L206 97" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M362 97 L376 97 L376 82 L384 82" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M362 97 L376 97 L376 146 L384 146" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M590 82 L612 82" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M590 146 L612 146" class="dg-flow" marker-end="url(#f02a)"/>
+              <path d="M16 262 L884 262" class="dg-rule"/>
+              <text x="16" y="288" class="dg-h">Всё, что приходит слева, — это данные. Даже если выглядит как команда.</text>
+              <text x="16" y="310" class="dg-s">Клиент принадлежит пользователю: его можно переписать, отладить и подделать. Решение о том, что разрешено,</text>
+              <text x="16" y="325" class="dg-s">принимается только справа от пунктира.</text>
+            </svg>
+          </div>
+          <figcaption><b>Зачем это на первом же занятии.</b> Почти каждая тема дня — это вопрос «на какой стороне пунктира выполняется проверка». Скрытая кнопка, отключённое поле формы и «внутренний» адрес находятся слева и защитой не являются.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Две стороны атаки — и разный масштаб последствий</h3><p class="figure-index">Схема 03</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 360" role="img" aria-labelledby="f03t f03d">
+              <title id="f03t">Сравнение атаки на клиентскую и серверную часть</title>
+              <desc id="f03d">При атаке на клиента жертва сама открывает вредоносный файл или ресурс, и страдает одно устройство. При атаке на сервер злоумышленник обращается к открытому сервису напрямую, и под угрозой оказываются данные всех пользователей.</desc>
+              <defs><marker id="f03a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker></defs>
+              <rect x="16" y="16" width="424" height="272" rx="14" class="dg-zone is-danger"/>
+              <text x="36" y="42" class="dg-k">АТАКА НА КЛИЕНТСКУЮ ЧАСТЬ</text>
+              <rect x="36" y="52" width="384" height="44" rx="9" class="dg-box is-danger"/>
+              <text x="54" y="72" class="dg-h">Злоумышленник готовит приманку</text>
+              <text x="54" y="89" class="dg-s">вредоносный документ, архив, установщик или свой сайт</text>
+              <rect x="36" y="108" width="384" height="44" rx="9" class="dg-box is-warn"/>
+              <text x="54" y="128" class="dg-h">Жертва сама открывает файл или ссылку</text>
+              <text x="54" y="145" class="dg-s">нужен клик — и доверие к отправителю или к сайту</text>
+              <rect x="36" y="164" width="384" height="44" rx="9" class="dg-box"/>
+              <text x="54" y="184" class="dg-h">Срабатывает уязвимость в программе</text>
+              <text x="54" y="201" class="dg-s">браузер, офисный пакет, просмотрщик PDF, мессенджер, медиаплеер</text>
+              <rect x="36" y="220" width="384" height="52" rx="9" class="dg-box"/>
+              <text x="54" y="240" class="dg-h">Масштаб: одно устройство</text>
+              <text x="54" y="257" class="dg-s">и всё, что на нём есть, — включая доступы этого пользователя</text>
+              <path d="M228 96 L228 106" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <path d="M228 152 L228 162" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <path d="M228 208 L228 218" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <rect x="460" y="16" width="424" height="272" rx="14" class="dg-zone is-danger"/>
+              <text x="480" y="42" class="dg-k">АТАКА НА СЕРВЕРНУЮ ЧАСТЬ</text>
+              <rect x="480" y="52" width="384" height="44" rx="9" class="dg-box is-danger"/>
+              <text x="498" y="72" class="dg-h">Злоумышленник сканирует сеть</text>
+              <text x="498" y="89" class="dg-s">ищет открытые порты, API, панели управления, забытые сервисы</text>
+              <rect x="480" y="108" width="384" height="44" rx="9" class="dg-box is-warn"/>
+              <text x="498" y="128" class="dg-h">Жертва не участвует</text>
+              <text x="498" y="145" class="dg-s">ни клика, ни доверия — достаточно того, что сервис доступен</text>
+              <rect x="480" y="164" width="384" height="44" rx="9" class="dg-box"/>
+              <text x="498" y="184" class="dg-h">Уязвимость или слабая настройка сервиса</text>
+              <text x="498" y="201" class="dg-s">код сервиса, его настройки, права учётной записи процесса</text>
+              <rect x="480" y="220" width="384" height="52" rx="9" class="dg-box"/>
+              <text x="498" y="240" class="dg-h">Масштаб: данные всех пользователей сразу</text>
+              <text x="498" y="257" class="dg-s">одна ошибка — и утечка касается всей базы, а не одного клиента</text>
+              <path d="M672 96 L672 106" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <path d="M672 152 L672 162" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <path d="M672 208 L672 218" class="dg-flow is-danger" marker-end="url(#f03a)"/>
+              <path d="M16 312 L884 312" class="dg-rule"/>
+              <text x="16" y="336" class="dg-s">Удалённая атака часто опаснее физического доступа: она масштабируется. Права учётной записи умножают ущерб на обеих сторонах,</text>
+              <text x="16" y="352" class="dg-s">поэтому вопрос «под кем это выполняется» задают раньше, чем «какой это класс уязвимости».</text>
+            </svg>
+          </div>
+          <figcaption><b>Учебный вывод.</b> Один и тот же класс уязвимости на клиенте и на сервере имеет разную цену. Это первая причина, по которой оценка риска не сводится к названию уязвимости.</figcaption>
+        </figure>
+
+        <div class="callout-duo reveal">
+          <div class="callout student">
+            <p class="callout-label">Слушателю</p>
+            <p>Если какой-то из терминов на схемах незнаком — не пропускайте его. Откройте <a href="glossary.html">глоссарий</a>: там каждое понятие разобрано одним предложением и примером, без предварительных знаний.</p>
+          </div>
+          <div class="callout teacher">
+            <p class="callout-label">Заметка преподавателя</p>
+            <p>Схемы 01–03 закрывают типовой разрыв: студент знает слово «уязвимость», но не представляет, где физически исполняется код и кому принадлежит клиент. Пока этот разрыв не закрыт, разбор OWASP превращается в заучивание списка.</p>
+          </div>
+        </div>
       </div>
     </section>
 
     <section class="section section-band" aria-labelledby="slides-preview-title">
       <div class="content">
         <div class="section-top reveal">
-          <div><p class="caption">Визуальный конспект</p><h2 id="slides-preview-title">Слайды первого дня — заново свёрстаны для занятия.</h2></div>
-          <p>Это чистая колода по структуре занятия: тезисы, термины, инженерные меры и связь с практикой. Рабочие фотоматериалы использованы только для внутренней сверки содержания.</p>
+          <div><p class="caption">Визуальный конспект</p><h2 id="slides-preview-title">Слайды, которые раскрывают тему первого дня.</h2></div>
+          <p>Полная учебная колода последовательно раскрывает тезисы, термины, инженерные меры и связь теории с практикой: от активов и рисков к OWASP, лабораторным заданиям и безопасности ИИ.</p>
         </div>
         <div class="topic-grid reveal">
           <article class="topic"><p class="topic-number">01 / ОСНОВЫ</p><h3>Активы, риск и CIA</h3><p>От ценности актива и сценария угрозы к понятным последствиям для конфиденциальности, целостности и доступности.</p></article>
@@ -114,13 +266,13 @@
             <p class="caption">Навигация по первому дню</p>
             <h2 id="route-title">План занятия и подтверждённая последовательность — это разные сущности.</h2>
           </div>
-          <p>Расписание ниже воспроизводит программу. Фактическая последовательность сверена с локальной ASR-записью и тематической структурой занятия, но не подменяется выдуманными точными интервалами.</p>
+          <p>Расписание ниже воспроизводит программу. Подробная стенограмма сохраняет тематическую последовательность занятия без неподтверждённых точных интервалов.</p>
         </div>
         <div class="split">
           <article class="panel reveal">
             <p class="caption">Как читать этот материал</p>
-            <h3>Не дословная расшифровка, а редакторская реконструкция</h3>
-            <p>Рабочая автоматическая расшифровка содержит ошибки терминов и технические метки говорящих, поэтому она используется только внутри редакционной подготовки. В открытом архиве доступны Markdown-протокол и стенограмма, автоматические пересказы и реконструированная колода. Метки ASR не являются подтверждённой атрибуцией реплик.</p>
+            <h3>Стенограмма и протокол для самостоятельной работы</h3>
+            <p>В открытом архиве доступны подробная редактированная стенограмма, протокол дня и автоматические пересказы в Markdown. Они помогают повторить логику занятия, найти нужный термин и подготовиться к практике.</p>
           </article>
           <article class="panel reveal">
             <p class="caption">Учебный результат</p>
@@ -162,6 +314,196 @@
           </div>
           <p>Скрытая кнопка, доверенный JavaScript или «внутренний» URL не являются механизмами защиты. Контроль должен выполняться на доверенной стороне и оставлять проверяемый след.</p>
         </div>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Как из актива получается риск</h3><p class="figure-index">Схема 04</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 250" role="img" aria-labelledby="f04t f04d">
+              <title id="f04t">Цепочка: актив, угроза, уязвимость, риск</title>
+              <desc id="f04d">Риск возникает там, где у ценного актива есть угроза и есть уязвимость, через которую угроза реализуется. Мера защиты уменьшает вероятность или последствия.</desc>
+              <defs><marker id="f04a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <rect x="16" y="34" width="190" height="100" rx="12" class="dg-box is-good"/>
+              <text x="34" y="60" class="dg-k">01 · АКТИВ</text>
+              <text x="34" y="84" class="dg-h">Что ценно</text>
+              <text x="34" y="104" class="dg-s">данные, деньги, репутация,</text>
+              <text x="34" y="119" class="dg-s">непрерывность процесса</text>
+              <rect x="238" y="34" width="190" height="100" rx="12" class="dg-box is-danger"/>
+              <text x="256" y="60" class="dg-k">02 · УГРОЗА</text>
+              <text x="256" y="84" class="dg-h">Кто и зачем</text>
+              <text x="256" y="104" class="dg-s">нежелательное событие</text>
+              <text x="256" y="119" class="dg-s">и путь его реализации</text>
+              <rect x="460" y="34" width="190" height="100" rx="12" class="dg-box is-warn"/>
+              <text x="478" y="60" class="dg-k">03 · УЯЗВИМОСТЬ</text>
+              <text x="478" y="84" class="dg-h">Через что</text>
+              <text x="478" y="104" class="dg-s">недостаток дизайна, кода,</text>
+              <text x="478" y="119" class="dg-s">конфигурации или процесса</text>
+              <rect x="682" y="34" width="202" height="100" rx="12" class="dg-box is-accent"/>
+              <text x="700" y="60" class="dg-k">04 · РИСК</text>
+              <text x="700" y="84" class="dg-h">Насколько это дорого</text>
+              <text x="700" y="104" class="dg-s">вероятность × последствия</text>
+              <text x="700" y="119" class="dg-s">для конкретной организации</text>
+              <path d="M210 84 L234 84" class="dg-flow" marker-end="url(#f04a)"/>
+              <path d="M432 84 L456 84" class="dg-flow" marker-end="url(#f04a)"/>
+              <path d="M654 84 L678 84" class="dg-flow" marker-end="url(#f04a)"/>
+              <path d="M16 172 L884 172" class="dg-rule"/>
+              <text x="16" y="200" class="dg-h">Мера защиты обязана уменьшать вероятность, последствия — или и то и другое.</text>
+              <text x="16" y="224" class="dg-s">Если после внедрения контроля нельзя назвать, какой из двух множителей уменьшился, — это не мера защиты, а строчка в отчёте.</text>
+            </svg>
+          </div>
+          <figcaption><b>Практический смысл.</b> Фраза «у нас SQL-инъекция» не помогает принять решение. Фраза «через параметр <code>id</code> посторонний прочитает заказы чужих клиентов» содержит и актив, и угрозу, и уязвимость — из неё сразу следуют и мера, и тест, который эту меру проверит.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Что именно мы защищаем: конфиденциальность, целостность, доступность</h3><p class="figure-index">Схема 05</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 268" role="img" aria-labelledby="f05t f05d">
+              <title id="f05t">Триада CIA: конфиденциальность, целостность, доступность</title>
+              <desc id="f05d">Для каждого свойства указан вопрос, пример нарушения и типичная мера защиты.</desc>
+              <rect x="16" y="24" width="282" height="182" rx="12" class="dg-box is-accent"/>
+              <text x="34" y="50" class="dg-k">C · КОНФИДЕНЦИАЛЬНОСТЬ</text>
+              <text x="34" y="74" class="dg-h">Кто может узнать?</text>
+              <text x="34" y="102" class="dg-s">Нарушение: посторонний читает</text>
+              <text x="34" y="117" class="dg-s">чужой документ, заказ или секрет.</text>
+              <text x="34" y="145" class="dg-s">Мера: серверная авторизация</text>
+              <text x="34" y="160" class="dg-s">по владельцу объекта, шифрование</text>
+              <text x="34" y="175" class="dg-s">хранения и передачи.</text>
+              <text x="34" y="196" class="dg-s">Вопрос слушателю: чьи это данные?</text>
+              <rect x="309" y="24" width="282" height="182" rx="12" class="dg-box is-warn"/>
+              <text x="327" y="50" class="dg-k">I · ЦЕЛОСТНОСТЬ</text>
+              <text x="327" y="74" class="dg-h">Кто может изменить?</text>
+              <text x="327" y="102" class="dg-s">Нарушение: меняются цена, роль,</text>
+              <text x="327" y="117" class="dg-s">статус заказа или сумма перевода.</text>
+              <text x="327" y="145" class="dg-s">Мера: расчёт и проверка на сервере,</text>
+              <text x="327" y="160" class="dg-s">ограничения в базе данных,</text>
+              <text x="327" y="175" class="dg-s">подписи и контроль версий.</text>
+              <text x="327" y="196" class="dg-s">Вопрос: что здесь нельзя нарушить?</text>
+              <rect x="602" y="24" width="282" height="182" rx="12" class="dg-box is-good"/>
+              <text x="620" y="50" class="dg-k">A · ДОСТУПНОСТЬ</text>
+              <text x="620" y="74" class="dg-h">Дождётся ли свой?</text>
+              <text x="620" y="102" class="dg-s">Нарушение: законный пользователь</text>
+              <text x="620" y="117" class="dg-s">не получает услугу вовремя.</text>
+              <text x="620" y="145" class="dg-s">Мера: лимиты запросов, тайм-ауты,</text>
+              <text x="620" y="160" class="dg-s">резервирование, защита от</text>
+              <text x="620" y="175" class="dg-s">дорогих операций без ограничений.</text>
+              <text x="620" y="196" class="dg-s">Вопрос: что будет при отказе?</text>
+              <path d="M16 232 L884 232" class="dg-rule"/>
+              <text x="16" y="252" class="dg-s">В сценарии угрозы всегда называйте три вещи: актив, нарушаемое свойство и контроль, который это свойство удерживает.</text>
+              <text x="16" y="266" class="dg-s">Без названного свойства обсуждение остаётся общим — и из него не следует ни приоритет, ни проверка.</text>
+            </svg>
+          </div>
+          <figcaption><b>Зачем нужна триада.</b> Она превращает разговор о «взломе» в разговор о конкретном последствии. Одна и та же уязвимость может нарушать одно свойство и не затрагивать два других — и это напрямую меняет приоритет исправления.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Три разных вопроса: идентификация, аутентификация, авторизация</h3><p class="figure-index">Схема 06</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 264" role="img" aria-labelledby="f06t f06d">
+              <title id="f06t">Идентификация, аутентификация и авторизация как три последовательные проверки</title>
+              <desc id="f06d">Идентификация — субъект называет себя. Аутентификация — система проверяет доказательство. Авторизация — сервер решает, разрешено ли конкретное действие над конкретным объектом.</desc>
+              <defs><marker id="f06a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <rect x="16" y="24" width="266" height="106" rx="12" class="dg-box"/>
+              <text x="34" y="50" class="dg-k">ИДЕНТИФИКАЦИЯ</text>
+              <text x="34" y="74" class="dg-h">«Я — Иванов»</text>
+              <text x="34" y="97" class="dg-s">Субъект сообщает, кем он</text>
+              <text x="34" y="112" class="dg-s">представляется. Проверки ещё нет.</text>
+              <rect x="317" y="24" width="266" height="106" rx="12" class="dg-box is-accent"/>
+              <text x="335" y="50" class="dg-k">АУТЕНТИФИКАЦИЯ</text>
+              <text x="335" y="74" class="dg-h">«Докажи»</text>
+              <text x="335" y="97" class="dg-s">Система проверяет пароль, ключ,</text>
+              <text x="335" y="112" class="dg-s">второй фактор или подпись токена.</text>
+              <rect x="618" y="24" width="266" height="106" rx="12" class="dg-box is-good"/>
+              <text x="636" y="50" class="dg-k">АВТОРИЗАЦИЯ</text>
+              <text x="636" y="74" class="dg-h">«А это тебе можно?»</text>
+              <text x="636" y="97" class="dg-s">Сервер решает по каждому запросу,</text>
+              <text x="636" y="112" class="dg-s">разрешено ли действие над объектом.</text>
+              <path d="M286 77 L313 77" class="dg-flow" marker-end="url(#f06a)"/>
+              <path d="M587 77 L614 77" class="dg-flow" marker-end="url(#f06a)"/>
+              <rect x="16" y="152" width="868" height="58" rx="12" class="dg-box is-warn"/>
+              <text x="34" y="176" class="dg-h">Успешный вход не означает право выполнить любое действие.</text>
+              <text x="34" y="196" class="dg-s">Формула проверки: субъект → действие → объект → контекст. Все четыре элемента проверяются на сервере, для каждого запроса, заново.</text>
+              <path d="M16 234 L884 234" class="dg-rule"/>
+              <text x="16" y="250" class="dg-s">Большинство ошибок контроля доступа возникает не из-за слабой аутентификации, а из-за пропущенного третьего шага:</text>
+              <text x="16" y="264" class="dg-s">пользователь вошёл — и дальше система уже не спрашивает, чей именно объект он запросил.</text>
+            </svg>
+          </div>
+          <figcaption><b>Ошибка, которую делают почти все.</b> Три слова часто используют как синонимы. Разведите их на первом же занятии: без этого категория A01 (нарушение контроля доступа) не будет понятна, потому что она про третий шаг, а не про первые два.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Карта атакуемой поверхности: что перечислять и где ставить контроль</h3><p class="figure-index">Схема 07</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 430" role="img" aria-labelledby="f07t f07d">
+              <title id="f07t">Карта атакуемой поверхности с тремя зонами доверия и цепочкой поставки</title>
+              <desc id="f07d">Внешние субъекты обращаются к точкам входа приложения, точки входа — к доверенному ядру с бизнес-логикой, базой данных, файлами и журналами. Отдельный вход в систему даёт цепочка поставки: зависимости, сборка и реестр образов.</desc>
+              <defs><marker id="f07a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker>
+              <marker id="f07b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker></defs>
+              <text x="16" y="20" class="dg-k">ВНЕШНИЙ МИР</text>
+              <rect x="16" y="28" width="196" height="232" rx="14" class="dg-zone is-danger"/>
+              <rect x="32" y="44" width="164" height="44" rx="9" class="dg-box"/>
+              <text x="48" y="64" class="dg-h">Пользователь</text>
+              <text x="48" y="81" class="dg-s">обычный сценарий</text>
+              <rect x="32" y="96" width="164" height="44" rx="9" class="dg-box is-danger"/>
+              <text x="48" y="116" class="dg-h">Злоумышленник</text>
+              <text x="48" y="133" class="dg-s">тот же вход, другая цель</text>
+              <rect x="32" y="148" width="164" height="44" rx="9" class="dg-box"/>
+              <text x="48" y="168" class="dg-h">Партнёрский сервис</text>
+              <text x="48" y="185" class="dg-s">интеграция и вебхуки</text>
+              <rect x="32" y="200" width="164" height="44" rx="9" class="dg-box is-quiet"/>
+              <text x="48" y="220" class="dg-h">Свой сотрудник</text>
+              <text x="48" y="237" class="dg-s">доступ шире обычного</text>
+              <text x="244" y="20" class="dg-k">ТОЧКИ ВХОДА · НЕДОВЕРЕННЫЙ ВВОД</text>
+              <rect x="244" y="28" width="286" height="232" rx="14" class="dg-zone"/>
+              <rect x="260" y="44" width="254" height="44" rx="9" class="dg-box is-accent"/>
+              <text x="276" y="64" class="dg-h">Формы и веб-интерфейс</text>
+              <text x="276" y="81" class="dg-s">поля, параметры, скрытые значения</text>
+              <rect x="260" y="96" width="254" height="44" rx="9" class="dg-box is-accent"/>
+              <text x="276" y="116" class="dg-h">Публичный API</text>
+              <text x="276" y="133" class="dg-s">маршруты, версии, старые эндпоинты</text>
+              <rect x="260" y="148" width="254" height="44" rx="9" class="dg-box is-accent"/>
+              <text x="276" y="168" class="dg-h">Загрузка файлов</text>
+              <text x="276" y="185" class="dg-s">имя, тип, размер, место хранения</text>
+              <rect x="260" y="200" width="254" height="44" rx="9" class="dg-box is-warn"/>
+              <text x="276" y="220" class="dg-h">Админ-интерфейсы</text>
+              <text x="276" y="237" class="dg-s">«о них никто не знает» — не контроль</text>
+              <text x="562" y="20" class="dg-k">ДОВЕРЕННОЕ ЯДРО · РЕШЕНИЯ</text>
+              <rect x="562" y="28" width="322" height="232" rx="14" class="dg-zone is-good"/>
+              <rect x="578" y="44" width="290" height="44" rx="9" class="dg-box is-good"/>
+              <text x="594" y="64" class="dg-h">Бизнес-логика и авторизация</text>
+              <text x="594" y="81" class="dg-s">субъект, действие, объект, контекст</text>
+              <rect x="578" y="96" width="290" height="44" rx="9" class="dg-box"/>
+              <text x="594" y="116" class="dg-h">База данных</text>
+              <text x="594" y="133" class="dg-s">ограничения, типы, права учётной записи</text>
+              <rect x="578" y="148" width="290" height="44" rx="9" class="dg-box"/>
+              <text x="594" y="168" class="dg-h">Файлы, выгрузки, резервные копии</text>
+              <text x="594" y="185" class="dg-s">часто самая забытая часть карты</text>
+              <rect x="578" y="200" width="290" height="44" rx="9" class="dg-box is-quiet"/>
+              <text x="594" y="220" class="dg-h">Журналы и мониторинг</text>
+              <text x="594" y="237" class="dg-s">виден ли отказ контроля — и без секретов</text>
+              <path d="M216 66 L254 66" class="dg-flow" marker-end="url(#f07a)"/>
+              <path d="M216 118 L254 118" class="dg-flow is-danger" marker-end="url(#f07b)"/>
+              <path d="M216 170 L254 170" class="dg-flow" marker-end="url(#f07a)"/>
+              <path d="M216 222 L254 222" class="dg-flow is-quiet" marker-end="url(#f07a)"/>
+              <path d="M534 66 L572 66" class="dg-flow" marker-end="url(#f07a)"/>
+              <path d="M534 118 L572 118" class="dg-flow" marker-end="url(#f07a)"/>
+              <path d="M534 170 L572 170" class="dg-flow" marker-end="url(#f07a)"/>
+              <path d="M534 222 L572 222" class="dg-flow" marker-end="url(#f07a)"/>
+              <rect x="16" y="284" width="868" height="60" rx="12" class="dg-box is-warn"/>
+              <text x="34" y="308" class="dg-h">И ещё один вход, который забывают перечислить: цепочка поставки.</text>
+              <text x="34" y="329" class="dg-s">Зависимости и пакеты → сборка и CI/CD → реестр образов → развёртывание. Этот путь ведёт прямо в доверенное ядро, минуя все точки входа слева.</text>
+              <path d="M16 368 L884 368" class="dg-rule"/>
+              <text x="16" y="392" class="dg-h">Каждая стрелка, пересекающая пунктир, — это место для четырёх вещей.</text>
+              <text x="16" y="414" class="dg-s">Проверка входа (формат, смысл, происхождение) · авторизация действия · минимально необходимые права · запись в журнал без секретов.</text>
+            </svg>
+          </div>
+          <figcaption><b>Это и есть групповое упражнение первого дня.</b> Карта превращает абстрактный разговор об угрозах в перечень: субъекты, входы, переходы, полномочия, хранилища, журналы и зависимости. Заполненный пример карточки входит в <a href="#downloads">публичный пакет материалов</a>.</figcaption>
+        </figure>
+
+        <div class="callout teacher reveal">
+          <p class="callout-label">Заметка преподавателя</p>
+          <p>Схему 07 полезно не показывать, а строить вместе с группой на доске — по одному столбцу за раз. Практика показывает, что первые два столбца группа заполняет уверенно, третий — хуже, а строку про цепочку поставки почти никогда не называет сама. Именно этот пробел и стоит зафиксировать вслух: он объясняет, почему категория A03 попала в OWASP Top 10.</p>
+          <p>Ограничение по времени: 10–12 минут на заполнение и 8–10 минут на разбор. Если дать больше, группа уходит в детали одного компонента и теряет картину целиком.</p>
+        </div>
+
         <div class="split">
           <article class="panel reveal">
             <span class="tag">1 · Актив и последствия</span>
@@ -204,6 +546,284 @@
           <article class="topic reveal"><span class="topic-number">A05:2025</span><h3>A05:2025 — Инъекции</h3><p>Разделяем код и данные, используем параметризацию и контекстное экранирование. XSS, SQLi, CSRF и command injection требуют разных рубежей.</p><span class="tag">parameterize · encode</span></article>
           <article class="topic reveal"><span class="topic-number">A06:2025</span><h3>A06:2025 — Небезопасное проектирование</h3><p>Бизнес-инварианты формулируются до UI: серверный расчёт, точные типы, лимиты, атомарность и ограничения базы данных.</p><span class="tag">abuse cases · invariants</span></article>
         </div>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>A01 · IDOR: почему «пользователь вошёл» — это ещё не разрешение</h3><p class="figure-index">Схема 08</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 338" role="img" aria-labelledby="f08t f08d">
+              <title id="f08t">Сравнение уязвимого и корректного контроля доступа к объекту по идентификатору</title>
+              <desc id="f08d">В уязвимом варианте сервер проверяет только факт входа и отдаёт чужой заказ по номеру. В корректном варианте сервер дополнительно сверяет владельца объекта с тем, кто прислал запрос, и отвечает отказом.</desc>
+              <defs>
+                <marker id="f08a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker>
+                <marker id="f08b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-good"/></marker>
+              </defs>
+              <text x="16" y="20" class="dg-k">КАК ЛОМАЕТСЯ</text>
+              <rect x="16" y="28" width="868" height="118" rx="14" class="dg-zone is-danger"/>
+              <rect x="34" y="48" width="212" height="56" rx="9" class="dg-box"/>
+              <text x="50" y="70" class="dg-h">Пользователь A</text>
+              <text x="50" y="88" class="dg-s">вошёл честно, токен настоящий</text>
+              <text x="262" y="66" class="dg-mono dg-fill-danger">GET /api/orders/1043</text>
+              <path d="M254 78 L446 78" class="dg-flow is-danger" marker-end="url(#f08a)"/>
+              <text x="262" y="96" class="dg-s">меняет номер в адресе руками</text>
+              <rect x="452" y="48" width="212" height="56" rx="9" class="dg-box is-danger"/>
+              <text x="468" y="70" class="dg-h">Сервер</text>
+              <text x="468" y="88" class="dg-s">«токен валиден» → выдаю</text>
+              <path d="M672 78 L700 78" class="dg-flow is-danger" marker-end="url(#f08a)"/>
+              <rect x="706" y="48" width="162" height="56" rx="9" class="dg-box is-danger"/>
+              <text x="722" y="70" class="dg-h">Заказ 1043</text>
+              <text x="722" y="88" class="dg-s">принадлежит B</text>
+              <text x="34" y="130" class="dg-s">Проверен только первый вопрос — «вошёл ли». Второй вопрос — «его ли это объект» — не задан ни разу.</text>
+              <text x="16" y="170" class="dg-k">КАК ДОЛЖНО БЫТЬ</text>
+              <rect x="16" y="178" width="868" height="118" rx="14" class="dg-zone is-good"/>
+              <rect x="34" y="198" width="212" height="56" rx="9" class="dg-box"/>
+              <text x="50" y="220" class="dg-h">Пользователь A</text>
+              <text x="50" y="238" class="dg-s">тот же запрос, тот же токен</text>
+              <text x="262" y="216" class="dg-mono dg-fill-good">GET /api/orders/1043</text>
+              <path d="M254 228 L446 228" class="dg-flow is-good" marker-end="url(#f08b)"/>
+              <text x="262" y="246" class="dg-s">адрес по-прежнему подделан</text>
+              <rect x="452" y="198" width="212" height="56" rx="9" class="dg-box is-good"/>
+              <text x="468" y="220" class="dg-h">Сервер</text>
+              <text x="468" y="238" class="dg-s">владелец 1043 = B, запросил A</text>
+              <path d="M672 228 L700 228" class="dg-flow is-good" marker-end="url(#f08b)"/>
+              <rect x="706" y="198" width="162" height="56" rx="9" class="dg-box is-good"/>
+              <text x="722" y="220" class="dg-h">404 или 403</text>
+              <text x="722" y="238" class="dg-s">и запись в журнал</text>
+              <text x="34" y="280" class="dg-s">Проверка владения выполняется на сервере, для каждого запроса, до чтения данных. Клиент при этом не изменился вообще.</text>
+              <text x="16" y="316" class="dg-s">Тот же механизм отвечает за вертикальное повышение прав — когда обычный пользователь вызывает административную функцию,</text>
+              <text x="16" y="332" class="dg-s">— и за обход контроля на уровне отдельной функции.</text>
+            </svg>
+          </div>
+          <figcaption><b>Отрицательный тест, который закрывает тему.</b> «Субъект A не может прочитать и не может изменить объект субъекта B». Пока такого теста нет в наборе, исправление не доказано — оно только описано словами.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>A03 · Цепочка поставки: путь от чужого кода до вашего продакшена</h3><p class="figure-index">Схема 09</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 356" role="img" aria-labelledby="f09t f09d">
+              <title id="f09t">Пять этапов цепочки поставки программного обеспечения с рисками и контролями</title>
+              <desc id="f09d">Для каждого этапа — зависимости, исходный код, сборка, артефакт и развёртывание — указан характерный риск и контроль, который его снижает.</desc>
+              <defs><marker id="f09a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+              <text x="16" y="34" class="dg-k">ЭТАП</text>
+              <rect x="16" y="44" width="164" height="50" rx="9" class="dg-box is-accent"/>
+              <text x="30" y="66" class="dg-h">Зависимости</text>
+              <text x="30" y="83" class="dg-s">пакеты и библиотеки</text>
+              <rect x="192" y="44" width="164" height="50" rx="9" class="dg-box is-accent"/>
+              <text x="206" y="66" class="dg-h">Исходный код</text>
+              <text x="206" y="83" class="dg-s">репозиторий и ветки</text>
+              <rect x="368" y="44" width="164" height="50" rx="9" class="dg-box is-accent"/>
+              <text x="382" y="66" class="dg-h">Сборка</text>
+              <text x="382" y="83" class="dg-s">CI/CD и его агенты</text>
+              <rect x="544" y="44" width="164" height="50" rx="9" class="dg-box is-accent"/>
+              <text x="558" y="66" class="dg-h">Артефакт</text>
+              <text x="558" y="83" class="dg-s">образ, пакет, реестр</text>
+              <rect x="720" y="44" width="164" height="50" rx="9" class="dg-box is-accent"/>
+              <text x="734" y="66" class="dg-h">Развёртывание</text>
+              <text x="734" y="83" class="dg-s">рабочая среда</text>
+              <path d="M182 69 L190 69" class="dg-flow" marker-end="url(#f09a)"/>
+              <path d="M358 69 L366 69" class="dg-flow" marker-end="url(#f09a)"/>
+              <path d="M534 69 L542 69" class="dg-flow" marker-end="url(#f09a)"/>
+              <path d="M710 69 L718 69" class="dg-flow" marker-end="url(#f09a)"/>
+              <text x="16" y="122" class="dg-k">ЧТО ЗДЕСЬ ЛОМАЮТ</text>
+              <rect x="16" y="132" width="164" height="76" rx="9" class="dg-box is-danger"/>
+              <text x="30" y="153" class="dg-s">вредоносный пакет,</text>
+              <text x="30" y="169" class="dg-s">похожее имя,</text>
+              <text x="30" y="185" class="dg-s">захват заброшенной</text>
+              <text x="30" y="201" class="dg-s">библиотеки</text>
+              <rect x="192" y="132" width="164" height="76" rx="9" class="dg-box is-danger"/>
+              <text x="206" y="153" class="dg-s">коммит с закладкой,</text>
+              <text x="206" y="169" class="dg-s">секрет в репозитории,</text>
+              <text x="206" y="185" class="dg-s">слияние без ревью</text>
+              <rect x="368" y="132" width="164" height="76" rx="9" class="dg-box is-danger"/>
+              <text x="382" y="153" class="dg-s">подмена шага сборки,</text>
+              <text x="382" y="169" class="dg-s">кража токена CI,</text>
+              <text x="382" y="185" class="dg-s">агент с лишними</text>
+              <text x="382" y="201" class="dg-s">правами</text>
+              <rect x="544" y="132" width="164" height="76" rx="9" class="dg-box is-danger"/>
+              <text x="558" y="153" class="dg-s">подмена образа</text>
+              <text x="558" y="169" class="dg-s">в реестре,</text>
+              <text x="558" y="185" class="dg-s">неизвестное</text>
+              <text x="558" y="201" class="dg-s">происхождение</text>
+              <rect x="720" y="132" width="164" height="76" rx="9" class="dg-box is-danger"/>
+              <text x="734" y="153" class="dg-s">запуск того, что</text>
+              <text x="734" y="169" class="dg-s">никто не проверял;</text>
+              <text x="734" y="185" class="dg-s">тег latest вместо</text>
+              <text x="734" y="201" class="dg-s">точной версии</text>
+              <text x="16" y="236" class="dg-k">ЧТО СТАВЯТ ПРОТИВ</text>
+              <rect x="16" y="246" width="164" height="76" rx="9" class="dg-box is-good"/>
+              <text x="30" y="267" class="dg-s">lockfile, SCA,</text>
+              <text x="30" y="283" class="dg-s">разрешённые</text>
+              <text x="30" y="299" class="dg-s">источники, проверка</text>
+              <text x="30" y="315" class="dg-s">обновлений</text>
+              <rect x="192" y="246" width="164" height="76" rx="9" class="dg-box is-good"/>
+              <text x="206" y="267" class="dg-s">обязательное ревью,</text>
+              <text x="206" y="283" class="dg-s">защита ветки,</text>
+              <text x="206" y="299" class="dg-s">поиск секретов</text>
+              <text x="206" y="315" class="dg-s">до коммита</text>
+              <rect x="368" y="246" width="164" height="76" rx="9" class="dg-box is-good"/>
+              <text x="382" y="267" class="dg-s">минимальные права,</text>
+              <text x="382" y="283" class="dg-s">изолированный</text>
+              <text x="382" y="299" class="dg-s">агент, отдельные</text>
+              <text x="382" y="315" class="dg-s">секреты на шаг</text>
+              <rect x="544" y="246" width="164" height="76" rx="9" class="dg-box is-good"/>
+              <text x="558" y="267" class="dg-s">подпись артефакта,</text>
+              <text x="558" y="283" class="dg-s">фиксация digest,</text>
+              <text x="558" y="299" class="dg-s">SBOM с составом</text>
+              <text x="558" y="315" class="dg-s">и лицензиями</text>
+              <rect x="720" y="246" width="164" height="76" rx="9" class="dg-box is-good"/>
+              <text x="734" y="267" class="dg-s">проверка подписи</text>
+              <text x="734" y="283" class="dg-s">перед запуском,</text>
+              <text x="734" y="299" class="dg-s">точная версия,</text>
+              <text x="734" y="315" class="dg-s">журнал поставки</text>
+            </svg>
+          </div>
+          <figcaption><b>Почему это отдельная категория.</b> Все пять этапов ведут в доверенное ядро в обход точек входа со схемы 07. Вы можете безупречно проверять пользовательский ввод — и всё равно получить чужой код в продакшене, потому что он пришёл не через форму, а через <code>install</code>.</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="ai" aria-labelledby="ai-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Заключительный блок дня · безопасность ИИ</p>
+            <h2 id="ai-title">Языковая модель не создаёт новый вид уязвимостей. Она создаёт новые входы.</h2>
+          </div>
+          <p>Всё, что разобрано выше — недоверенный ввод, границы доверия, минимальные права, проверяемый результат, — применимо и здесь. Меняется одно: часть решений принимает компонент, поведение которого нельзя задать перечнем правил. Для этой области OWASP ведёт отдельные списки: <a href="https://genai.owasp.org/llm-top-10/" rel="noreferrer">Top 10 for LLM Applications</a>, Top 10 for Agentic Applications и стандарт проверки <a href="https://owasp.org/www-project-artificial-intelligence-security-verification-standard/" rel="noreferrer">AISVS</a>.</p>
+        </div>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Приложение с языковой моделью: где здесь границы доверия</h3><p class="figure-index">Схема 10</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 356" role="img" aria-labelledby="f10t f10d">
+              <title id="f10t">Потоки данных в приложении с языковой моделью и расположение границ доверия</title>
+              <desc id="f10d">Ввод пользователя, содержимое документов и ответы внешних сервисов попадают в контекст модели. Модель формирует ответ и вызовы инструментов, которые проходят через слой политик перед выполнением.</desc>
+              <defs><marker id="f10a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker>
+              <marker id="f10b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker></defs>
+              <text x="16" y="20" class="dg-k">ВСЁ ЭТО — НЕДОВЕРЕННЫЙ ВВОД</text>
+              <rect x="16" y="28" width="226" height="216" rx="14" class="dg-zone is-danger"/>
+              <rect x="32" y="46" width="194" height="44" rx="9" class="dg-box"/>
+              <text x="46" y="66" class="dg-h">Запрос пользователя</text>
+              <text x="46" y="83" class="dg-s">то, что видно и ожидаемо</text>
+              <rect x="32" y="98" width="194" height="44" rx="9" class="dg-box is-danger"/>
+              <text x="46" y="118" class="dg-h">Содержимое документов</text>
+              <text x="46" y="135" class="dg-s">файл, страница, письмо, RAG</text>
+              <rect x="32" y="150" width="194" height="44" rx="9" class="dg-box is-danger"/>
+              <text x="46" y="170" class="dg-h">Ответы внешних систем</text>
+              <text x="46" y="187" class="dg-s">API, поиск, чужой сервис</text>
+              <rect x="32" y="202" width="194" height="30" rx="9" class="dg-box is-quiet"/>
+              <text x="46" y="222" class="dg-s">…и память прошлых сессий</text>
+              <text x="274" y="20" class="dg-k">КОНТЕКСТ И МОДЕЛЬ</text>
+              <rect x="274" y="28" width="266" height="216" rx="14" class="dg-zone"/>
+              <rect x="290" y="46" width="234" height="60" rx="9" class="dg-box is-warn"/>
+              <text x="304" y="68" class="dg-h">Единое окно контекста</text>
+              <text x="304" y="86" class="dg-s">системная инструкция и данные</text>
+              <text x="304" y="100" class="dg-s">лежат в одном тексте</text>
+              <rect x="290" y="118" width="234" height="60" rx="9" class="dg-box is-accent"/>
+              <text x="304" y="140" class="dg-h">Языковая модель</text>
+              <text x="304" y="158" class="dg-s">не различает «инструкцию»</text>
+              <text x="304" y="172" class="dg-s">и «данные» по происхождению</text>
+              <rect x="290" y="190" width="234" height="42" rx="9" class="dg-box is-danger"/>
+              <text x="304" y="211" class="dg-h">Здесь нет границы доверия</text>
+              <text x="304" y="226" class="dg-s">её обязано ставить приложение</text>
+              <text x="572" y="20" class="dg-k">ДЕЙСТВИЯ · ЗДЕСЬ СТАВИТСЯ КОНТРОЛЬ</text>
+              <rect x="572" y="28" width="312" height="216" rx="14" class="dg-zone is-good"/>
+              <rect x="588" y="46" width="280" height="60" rx="9" class="dg-box is-good"/>
+              <text x="602" y="68" class="dg-h">Слой политик приложения</text>
+              <text x="602" y="86" class="dg-s">схема вызова, allow-list инструментов,</text>
+              <text x="602" y="100" class="dg-s">лимиты, подтверждение человеком</text>
+              <rect x="588" y="118" width="280" height="44" rx="9" class="dg-box"/>
+              <text x="602" y="138" class="dg-h">Инструменты и данные</text>
+              <text x="602" y="155" class="dg-s">выполняются под своей учётной записью</text>
+              <rect x="588" y="174" width="280" height="58" rx="9" class="dg-box"/>
+              <text x="602" y="194" class="dg-h">Ответ пользователю</text>
+              <text x="602" y="211" class="dg-s">экранируется по контексту вывода —</text>
+              <text x="602" y="225" class="dg-s">это по-прежнему недоверенная строка</text>
+              <path d="M246 68 L286 68" class="dg-flow" marker-end="url(#f10a)"/>
+              <path d="M246 120 L286 82" class="dg-flow is-danger" marker-end="url(#f10b)"/>
+              <path d="M246 172 L286 92" class="dg-flow is-danger" marker-end="url(#f10b)"/>
+              <path d="M528 148 L584 76" class="dg-flow" marker-end="url(#f10a)"/>
+              <path d="M528 160 L584 196" class="dg-flow" marker-end="url(#f10a)"/>
+              <path d="M728 110 L728 114" class="dg-flow is-good" marker-end="url(#f10a)"/>
+              <path d="M16 282 L884 282" class="dg-rule"/>
+              <text x="16" y="306" class="dg-h">Главный сдвиг: недоверенным становится не только то, что напечатал пользователь.</text>
+              <text x="16" y="328" class="dg-s">Текст внутри загруженного документа, найденной страницы или ответа стороннего API попадает в тот же контекст и может содержать инструкции. Поэтому</text>
+              <text x="16" y="344" class="dg-s">решение «выполнять или нет» принимает приложение по своим правилам, а не модель по своему выводу.</text>
+            </svg>
+          </div>
+          <figcaption><b>Как это связано с первой половиной дня.</b> Схема 10 — это схема 07, пересобранная для другой архитектуры. Точки входа стали шире, доверенное ядро осталось на месте, и контроль по-прежнему ставится на пересечении пунктира.</figcaption>
+        </figure>
+
+        <figure class="figure reveal">
+          <div class="figure-head"><h3>Агент действует через инструменты — значит, права нужны инструментам, а не модели</h3><p class="figure-index">Схема 11</p></div>
+          <div class="figure-scroll">
+            <svg class="dg" viewBox="0 0 900 306" role="img" aria-labelledby="f11t f11d">
+              <title id="f11t">Сравнение агента с широкими правами и агента с ограниченными инструментами</title>
+              <desc id="f11d">В опасном варианте агент получает универсальный инструмент и учётную запись с широкими правами. В безопасном варианте каждый инструмент имеет узкую схему, отдельные права, лимиты и подтверждение для необратимых действий.</desc>
+              <defs>
+                <marker id="f11a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker>
+                <marker id="f11b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-good"/></marker>
+              </defs>
+              <text x="16" y="20" class="dg-k">ОПАСНО · УДОБНО ПИСАТЬ, НЕВОЗМОЖНО ОГРАНИЧИТЬ</text>
+              <rect x="16" y="28" width="428" height="150" rx="14" class="dg-zone is-danger"/>
+              <rect x="34" y="48" width="180" height="46" rx="9" class="dg-box is-accent"/>
+              <text x="48" y="68" class="dg-h">Агент</text>
+              <text x="48" y="85" class="dg-s">решает, что вызвать</text>
+              <rect x="248" y="48" width="178" height="46" rx="9" class="dg-box is-danger"/>
+              <text x="262" y="68" class="dg-h">run_command(cmd)</text>
+              <text x="262" y="85" class="dg-s">выполнит что угодно</text>
+              <path d="M218 71 L244 71" class="dg-flow is-danger" marker-end="url(#f11a)"/>
+              <rect x="34" y="108" width="392" height="52" rx="9" class="dg-box is-danger"/>
+              <text x="48" y="129" class="dg-h">Одна учётная запись с широкими правами</text>
+              <text x="48" y="147" class="dg-s">граница доверия исчезла: что скажет модель — то и произойдёт</text>
+              <text x="472" y="20" class="dg-k">БЕЗОПАСНО · ГРАНИЦА ВОЗВРАЩЕНА В КОД</text>
+              <rect x="472" y="28" width="412" height="150" rx="14" class="dg-zone is-good"/>
+              <rect x="490" y="48" width="170" height="46" rx="9" class="dg-box is-accent"/>
+              <text x="504" y="68" class="dg-h">Агент</text>
+              <text x="504" y="85" class="dg-s">предлагает вызов</text>
+              <rect x="694" y="48" width="172" height="46" rx="9" class="dg-box is-good"/>
+              <text x="708" y="68" class="dg-h">get_order(id)</text>
+              <text x="708" y="85" class="dg-s">узкая схема, свои права</text>
+              <path d="M664 71 L690 71" class="dg-flow is-good" marker-end="url(#f11b)"/>
+              <rect x="490" y="108" width="376" height="52" rx="9" class="dg-box is-good"/>
+              <text x="504" y="129" class="dg-h">Проверка до выполнения</text>
+              <text x="504" y="147" class="dg-s">типы аргументов · лимиты · изоляция · подтверждение человеком</text>
+              <path d="M16 208 L884 208" class="dg-rule"/>
+              <text x="16" y="232" class="dg-h">Четыре правила, которые закрывают большую часть агентных рисков.</text>
+              <text x="16" y="254" class="dg-s">1 · Инструмент делает одну вещь и принимает строго типизированные аргументы — «выполни команду» инструментом не является.</text>
+              <text x="16" y="270" class="dg-s">2 · Права выдаются инструменту, а не агенту: у каждого своя учётная запись и свой минимальный набор.</text>
+              <text x="16" y="286" class="dg-s">3 · Необратимое действие — оплата, удаление, отправка вовне — требует подтверждения человеком.</text>
+              <text x="16" y="302" class="dg-s">4 · Каждый вызов записывается: что предложил агент, что разрешила политика, что выполнилось и с каким результатом.</text>
+            </svg>
+          </div>
+          <figcaption><b>Знакомая мысль в новой обёртке.</b> Это тот же принцип наименьших привилегий из блока A01 и то же разделение кода и данных из A05. Изменился исполнитель, но не инженерное правило.</figcaption>
+        </figure>
+
+        <div class="split">
+          <article class="panel reveal">
+            <span class="tag">Классы рисков</span>
+            <h3>О чём именно предупреждает список OWASP для LLM</h3>
+            <p>Внедрение инструкций через данные, раскрытие чувствительной информации из контекста, отравление цепочки поставки моделей и наборов данных, небезопасная обработка вывода модели, чрезмерные полномочия агента, утечка системной инструкции, уязвимости векторных хранилищ и эмбеддингов, а также правдоподобная дезинформация.</p>
+            <p>Для агентных систем добавляются свои сюжеты: неожиданное выполнение кода, отравление памяти и контекста, эксплуатация доверия человека к агенту.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag good">Проверяемость</span>
+            <h3>Достоверность ответа — отдельный контроль, а не свойство модели</h3>
+            <p>Уверенный тон не является признаком правильности. Если ответ влияет на решение, требуется внешняя проверка: ссылка на первоисточник, повторный расчёт детерминированным кодом, сверка с базой или ревью человеком.</p>
+            <p>В учебной работе это переносится напрямую: ответ, сгенерированный моделью, оценивается по проверяемости, а не по гладкости формулировки.</p>
+          </article>
+        </div>
+
+        <div class="callout-duo reveal">
+          <div class="callout student">
+            <p class="callout-label">Слушателю</p>
+            <p>Проверьте на своём примере: возьмите любого ассистента, которым пользуетесь, и назовите его инструменты и их права. Если ответ звучит как «он просто умеет всё» — вы только что нашли границу доверия, которую никто не поставил.</p>
+          </div>
+          <div class="callout teacher">
+            <p class="callout-label">Заметка преподавателя</p>
+            <p>Этот блок хорошо ставить в конец дня: он собирает воедино весь пройденный материал и снимает частое возражение «ИИ — это отдельная тема, к нам не относится». Полезный приём — предложить группе классифицировать три ИИ-риска по уже знакомым категориям A01–A06; совпадение оказывается почти полным, и это лучший аргумент за то, что база не устарела.</p>
+            <p>Отдельно проговорите методическую сторону: если студенты сдают работы, написанные с помощью модели, критерием оценки становится не текст, а способность объяснить причину и защитить решение устно.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -244,21 +864,23 @@
             <p class="caption">Скачать и переиспользовать</p>
             <h2 id="downloads-title">Авторские методички и открытый архив первого дня.</h2>
           </div>
-          <p>Здесь собраны авторские методички и публичные материалы первого дня: реконструированные слайды, Markdown-протокол и стенограмма, автоматические пересказы, программа, учебный пакет и результаты лабораторных работ. Для пакетов опубликованы контрольные суммы.</p>
+          <p>Здесь собраны авторские методички и материалы первого дня: слайды, Markdown-протокол и стенограмма, автоматические пересказы, программа, учебный пакет и результаты лабораторных работ. Для пакетов опубликованы контрольные суммы.</p>
         </div>
         <div class="download-grid">
-          <article class="download reveal"><span class="file-type">MD · 01</span><h3>Методический конспект первого дня</h3><p>Краткая публичная версия: понятия, A01–A06, ИИ-блок, редакторские ограничения и список источников.</p><a class="button" href="materials/2026-08-11-день-1-методический-конспект.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 01</span><h3>Методический конспект первого дня</h3><p>Ключевые понятия, A01–A06, безопасность ИИ, вопросы для обсуждения и список источников.</p><a class="button" href="materials/2026-08-11-день-1-методический-конспект.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 02</span><h3>Методичка практикума</h3><p>Безопасный порядок локальной работы, правила доказательств, контроль версий образа и запрет публичной экспозиции учебных целей.</p><a class="button" href="materials/практикум-безопасность-приложений-методичка.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 03</span><h3>Шаблон отчёта ЛР</h3><p>Готовая форма: среда, наблюдение, первопричина, последствия, исправление и регрессионная проверка.</p><a class="button" href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 04</span><h3>Чек-лист слушателя</h3><p>Короткий перечень действий до, во время и после занятия: разрешение, изоляция, доказательства, очистка среды.</p><a class="button" href="materials/чек-лист-слушателя.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 05</span><h3>Источники и версии</h3><p>Ссылки на первичные ресурсы OWASP, Kaspersky Academy и Juice Shop с правилами фиксации версий.</p><a class="button" href="materials/источники-и-версии.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 06</span><h3>Права, состав и атрибуция</h3><p>Каталог происхождения авторских и исходных материалов первого дня.</p><a class="button" href="materials/права-и-атрибуция.md" download>Скачать Markdown ↓</a></article>
-          <article class="download reveal"><span class="file-type">HTML · 34 слайда</span><h3>Реконструированные слайды</h3><p>Чистая колода по AppSec, OWASP A01–A06, лабораторной практике и безопасности ИИ.</p><a class="button" href="slides-day-01.html">Открыть слайды ↓</a></article>
-          <article class="download reveal"><span class="file-type">ZIP · MD</span><h3>Стенограмма, протокол и пересказы</h3><p>Редактированная стенограмма-протокол и три автоматических пересказа в Markdown; исходные ASR-тексты не публикуются.</p><a class="button" href="downloads/day-01-edited-transcript-and-summaries.zip" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 07</span><h3>Методика преподавателя</h3><p>Тайминг занятия, три уровня сложности заданий, критерии оценивания и типичные ошибки группы.</p><a class="button" href="materials/методика-преподавателя-день-1.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">HTML · СПРАВОЧНИК</span><h3>Глоссарий терминов</h3><p>Более 60 понятий с расшифровкой аббревиатур и объяснением без предварительных знаний.</p><a class="button" href="glossary.html">Открыть глоссарий ↓</a></article>
+          <article class="download reveal"><span class="file-type">HTML · 34 слайда</span><h3>Слайды первого дня</h3><p>Учебная колода по AppSec, OWASP A01–A06, лабораторной практике и безопасности ИИ.</p><a class="button" href="slides-day-01.html">Открыть слайды ↓</a></article>
+          <article class="download reveal"><span class="file-type">ZIP · MD</span><h3>Стенограмма, протокол и пересказы</h3><p>Редактированная стенограмма-протокол и три автоматических пересказа в Markdown.</p><a class="button" href="downloads/day-01-edited-transcript-and-summaries.zip" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">ZIP · публичный пакет</span><h3>Все материалы первого дня</h3><p>Стенограммы, программа, пакет участника, лабораторные отчёты и материалы среды.</p><a class="button" href="downloads/day-01-public-materials.zip" download>Скачать всё ↓</a></article>
         </div>
         <aside class="notice amber reveal">
-          <strong>Открытый архив первого дня.</strong> В нём доступны реконструированные слайды, Markdown-протокол и стенограмма, автоматические пересказы, программа, пакет участника и результаты лабораторных работ. Исходные ASR-тексты остаются внутренними редакторскими источниками. Полный состав, форматы и статус обработки указаны в <a href="materials/каталог-материалов-дня-1.md" download>каталоге материалов →</a>
+          <strong>Открытый архив первого дня.</strong> В нём доступны слайды, Markdown-протокол и стенограмма, автоматические пересказы, программа, пакет участника и результаты лабораторных работ. Полный состав и форматы указаны в <a href="materials/каталог-материалов-дня-1.md" download>каталоге материалов →</a>
         </aside>
       </div>
     </section>

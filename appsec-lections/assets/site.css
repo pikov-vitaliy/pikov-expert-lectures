@@ -484,17 +484,81 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
 .source p { margin-bottom: 0; color: var(--muted); font-size: 0.84rem; }
 
 .compact-hero { min-height: 580px; }
-.slides-gallery { display: grid; gap: clamp(2.4rem, 5vw, 4.6rem); }
-.slides-group { display: grid; gap: 1rem; }
-.slides-group-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
-.slides-group-heading h2 { margin: 0; font-size: clamp(1.45rem, 2.6vw, 2.2rem); letter-spacing: -0.035em; }
-.slides-group-heading p { margin: 0; color: var(--muted); font-size: 0.88rem; }
-.slides-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
-.slide-card { display: grid; gap: 0.55rem; min-width: 0; margin: 0; padding: 0.55rem; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-subtle); }
-.slide-card a { display: block; overflow: hidden; border-radius: 7px; background: #050b14; }
-.slide-card img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 180ms ease, opacity 180ms ease; }
-.slide-card a:hover img { transform: scale(1.035); opacity: 0.88; }
-.slide-card figcaption { overflow: hidden; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Учебные схемы.
+ *
+ * Схемы рисуются инлайновым SVG без внешних зависимостей: так они остаются
+ * текстом (доступным поиску и вспомогательным технологиям), масштабируются без
+ * потери качества и печатаются вместе со страницей. Цвет НИКОГДА не задаётся
+ * в разметке схемы — только классами ниже, иначе схема пропадёт при
+ * переключении темы. Каждая схема обязана иметь <title> внутри <svg> и
+ * подпись <figcaption> рядом: подпись несёт смысл, если SVG не отрисовался. */
+.figure { display: grid; gap: 0.8rem; min-width: 0; margin: 1.7rem 0 0; padding: clamp(0.9rem, 2.4vw, 1.5rem); border: 1px solid var(--line); border-radius: 16px; background: var(--surface-subtle); }
+.figure-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 0.5rem 1rem; }
+.figure-head h3 { margin: 0; font-size: clamp(1rem, 1.7vw, 1.2rem); letter-spacing: -0.02em; }
+.figure-index { color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
+.figure figcaption { color: var(--muted); font-size: 0.85rem; line-height: 1.55; }
+.figure figcaption b, .figure figcaption strong { color: var(--text-soft); font-weight: 700; }
+.figure-scroll { overflow-x: auto; overscroll-behavior-x: contain; }
+.figure-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.1rem; }
+
+.dg { display: block; width: 100%; min-width: 460px; height: auto; font-family: Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif; }
+.dg text { fill: var(--text); font-size: 13px; font-weight: 600; }
+.dg .dg-h { font-size: 14.5px; font-weight: 800; }
+.dg .dg-s { fill: var(--muted); font-size: 11.5px; font-weight: 500; }
+.dg .dg-k { fill: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10.5px; font-weight: 800; letter-spacing: 0.08em; }
+.dg .dg-mono { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11.5px; font-weight: 600; }
+.dg .dg-box { fill: var(--surface-card); stroke: var(--line-strong); stroke-width: 1.4; }
+.dg .dg-box.is-accent { fill: color-mix(in srgb, var(--cyan) 14%, var(--surface-card)); stroke: var(--cyan); }
+.dg .dg-box.is-good { fill: color-mix(in srgb, var(--good) 15%, var(--surface-card)); stroke: var(--good); }
+.dg .dg-box.is-warn { fill: color-mix(in srgb, var(--amber) 16%, var(--surface-card)); stroke: var(--amber); }
+.dg .dg-box.is-danger { fill: color-mix(in srgb, var(--danger) 15%, var(--surface-card)); stroke: var(--danger); }
+.dg .dg-box.is-quiet { fill: color-mix(in srgb, var(--muted) 9%, var(--surface-card)); stroke: var(--line); stroke-dasharray: 4 4; }
+.dg .dg-zone { fill: color-mix(in srgb, var(--cyan) 5%, transparent); stroke: var(--line-strong); stroke-width: 1.2; stroke-dasharray: 7 5; }
+.dg .dg-zone.is-danger { fill: color-mix(in srgb, var(--danger) 6%, transparent); stroke: var(--danger); }
+.dg .dg-zone.is-good { fill: color-mix(in srgb, var(--good) 6%, transparent); stroke: var(--good); }
+.dg .dg-flow { fill: none; stroke: var(--cyan); stroke-width: 2; stroke-linecap: round; }
+.dg .dg-flow.is-danger { stroke: var(--danger); }
+.dg .dg-flow.is-good { stroke: var(--good); }
+.dg .dg-flow.is-quiet { stroke: var(--muted); stroke-width: 1.4; stroke-dasharray: 5 4; }
+.dg .dg-rule { fill: none; stroke: var(--line); stroke-width: 1; }
+.dg .dg-head { fill: var(--cyan); }
+.dg .dg-head.is-danger { fill: var(--danger); }
+.dg .dg-head.is-good { fill: var(--good); }
+.dg .dg-head.is-quiet { fill: var(--muted); }
+.dg .dg-fill-accent { fill: var(--cyan); }
+.dg .dg-fill-danger { fill: var(--danger); }
+.dg .dg-fill-good { fill: var(--good); }
+.dg .dg-fill-warn { fill: var(--amber); }
+.dg .dg-on-accent { fill: var(--ink); font-weight: 800; }
+
+/* Пояснения на полях: отдельные регистры для слушателя и преподавателя.
+ * Слушателю — что понять и что сделать. Преподавателю — как вести и где
+ * группа обычно спотыкается. Разделение осознанное: один и тот же материал
+ * читают две разные аудитории. */
+.callout { display: grid; gap: 0.4rem; min-width: 0; margin: 1.1rem 0 0; padding: 0.85rem 1rem 0.9rem 1.15rem; border: 1px solid var(--line); border-left: 3px solid var(--cyan); border-radius: 0 12px 12px 0; background: var(--notice-bg); }
+.callout-label { display: flex; align-items: center; gap: 0.45rem; color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
+.callout p { margin: 0; color: var(--notice-text); font-size: 0.88rem; line-height: 1.6; }
+.callout p + p { margin-top: 0.5rem; }
+.callout ul, .callout ol { margin: 0; padding-left: 1.15rem; color: var(--notice-text); font-size: 0.88rem; line-height: 1.6; }
+.callout li + li { margin-top: 0.32rem; }
+.callout code { padding: 0.1rem 0.35rem; border-radius: 5px; background: var(--copy-bg); color: var(--tag-text); font-size: 0.84em; }
+.callout.teacher { border-left-color: var(--amber); }
+.callout.teacher .callout-label { color: var(--amber); }
+.callout.student { border-left-color: var(--good); }
+.callout.student .callout-label { color: var(--good); }
+.callout.warn { border-left-color: var(--danger); }
+.callout.warn .callout-label { color: var(--danger); }
+.callout-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.callout-duo .callout { margin-top: 0; }
+
+/* Глоссарий и разбор терминов. */
+.glossary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }
+.term { display: grid; gap: 0.3rem; align-content: start; min-width: 0; padding: 0.95rem 1.05rem; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-card); }
+.term dt { margin: 0; font-size: 0.98rem; font-weight: 800; letter-spacing: -0.01em; }
+.term dt small { display: block; margin-top: 0.15rem; color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.04em; }
+.term dd { margin: 0; color: var(--muted); font-size: 0.86rem; line-height: 1.55; }
+.term dd + dd { margin-top: 0.4rem; color: var(--text-soft); }
 
 .site-footer { border-top: 1px solid var(--line); background: var(--surface-footer); }
 .footer-inner { width: var(--content); margin: 0 auto; padding: 2rem 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2rem; }
@@ -508,25 +572,30 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
 
 :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
+/* Навигация сворачивается раньше остальной вёрстки: в меню восемь разделов,
+ * и в одну строку они перестают помещаться заметно выше планшетной ширины. */
+@media (max-width: 980px) {
+  .nav-toggle { display: inline-grid; place-items: center; }
+  .nav { position: absolute; top: calc(100% + 1px); right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; margin-left: 0; padding: 0.75rem max(14px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid var(--line); background: var(--nav-mobile-bg); }
+  .nav.is-open { display: flex; }
+  .nav a { padding: 0.72rem; }
+  .header-actions { margin-left: auto; }
+}
+
 @media (max-width: 900px) {
   .hero { min-height: 650px; }
   .hero::after { background: var(--hero-overlay-tablet); }
   .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .download-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
-  .slides-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .glossary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
   :root { --content: min(100% - 28px, 1180px); }
   .header-inner { min-height: 62px; }
   .brand small { display: none; }
-  .nav-toggle { display: inline-grid; place-items: center; }
-  .nav { position: absolute; top: calc(100% + 1px); right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; margin-left: 0; padding: 0.75rem max(14px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid var(--line); background: var(--nav-mobile-bg); }
-  .header-actions { margin-left: auto; }
   .theme-toggle-text { display: none; }
-  .nav.is-open { display: flex; }
-  .nav a { padding: 0.72rem; }
   .hero { min-height: 650px; padding: 3.4rem 0; }
   .hero-art img { object-position: 66% center; }
   .hero::after { background: var(--hero-overlay-mobile); }
@@ -534,8 +603,7 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
   .section-top, .split, .sources, .footer-inner { grid-template-columns: 1fr; }
   .section-top { gap: 0.8rem; }
   .topic-grid, .download-grid, .lab-grid { grid-template-columns: 1fr; }
-  .slides-grid { grid-template-columns: 1fr; }
-  .slides-group-heading { display: grid; gap: 0.3rem; }
+  .figure-duo, .callout-duo, .glossary { grid-template-columns: 1fr; }
   .timeline-item { grid-template-columns: 53px 20px minmax(0, 1fr); gap: 0.5rem; }
   .timeline-time { font-size: 0.76rem; }
   .stat { min-height: 110px; padding: 1rem; }
