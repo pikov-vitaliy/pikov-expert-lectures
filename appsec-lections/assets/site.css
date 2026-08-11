@@ -366,6 +366,19 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
 .source h3 { margin-bottom: 0.35rem; font-size: 0.97rem; }
 .source p { margin-bottom: 0; color: var(--muted); font-size: 0.84rem; }
 
+.compact-hero { min-height: 580px; }
+.slides-gallery { display: grid; gap: clamp(2.4rem, 5vw, 4.6rem); }
+.slides-group { display: grid; gap: 1rem; }
+.slides-group-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--line); }
+.slides-group-heading h2 { margin: 0; font-size: clamp(1.45rem, 2.6vw, 2.2rem); letter-spacing: -0.035em; }
+.slides-group-heading p { margin: 0; color: var(--muted); font-size: 0.88rem; }
+.slides-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.8rem; }
+.slide-card { display: grid; gap: 0.55rem; min-width: 0; margin: 0; padding: 0.55rem; border: 1px solid var(--line); border-radius: 11px; background: rgba(9, 27, 47, 0.72); }
+.slide-card a { display: block; overflow: hidden; border-radius: 7px; background: #050b14; }
+.slide-card img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; transition: transform 180ms ease, opacity 180ms ease; }
+.slide-card a:hover img { transform: scale(1.035); opacity: 0.88; }
+.slide-card figcaption { overflow: hidden; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.7rem; line-height: 1.35; text-overflow: ellipsis; white-space: nowrap; }
+
 .site-footer { border-top: 1px solid var(--line); background: #06101d; }
 .footer-inner { width: var(--content); margin: 0 auto; padding: 2rem 0; display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 2rem; }
 .footer-title { margin: 0 0 0.55rem; font-weight: 800; }
@@ -384,6 +397,7 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
   .topic-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .download-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .stat-row { grid-template-columns: repeat(2, 1fr); }
+  .slides-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 
 @media (max-width: 720px) {
@@ -401,6 +415,8 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
   .section-top, .split, .sources, .footer-inner { grid-template-columns: 1fr; }
   .section-top { gap: 0.8rem; }
   .topic-grid, .download-grid, .lab-grid { grid-template-columns: 1fr; }
+  .slides-grid { grid-template-columns: 1fr; }
+  .slides-group-heading { display: grid; gap: 0.3rem; }
   .timeline-item { grid-template-columns: 53px 20px minmax(0, 1fr); gap: 0.5rem; }
   .timeline-time { font-size: 0.76rem; }
   .stat { min-height: 110px; padding: 1rem; }

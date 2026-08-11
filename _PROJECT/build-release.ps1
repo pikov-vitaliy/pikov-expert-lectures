@@ -119,6 +119,14 @@ $script:ReviewedNestedDistributables = @{
     'materials\downloads\inspector-labs-markdown.zip',
     'materials\downloads\scanner-labs-markdown.zip'
   )
+  # The site owner explicitly authorized publication of the original first-day
+  # lecture package, including slide photographs and source transcripts.
+  'appsec-lections' = @(
+    'downloads\day-01-slides-original.zip',
+    'downloads\day-01-transcripts-original.zip',
+    'downloads\day-01-laboratory-materials-and-reports.zip',
+    'downloads\day-01-full-source-package.zip'
+  )
 }
 
 function Should-IncludeReviewedNestedDistributable([string]$FolderName, [string]$RelativePath) {

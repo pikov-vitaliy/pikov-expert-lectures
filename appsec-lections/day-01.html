@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Авторский методический конспект первого дня программы «Образовательная лаборатория Kaspersky Academy | Безопасность приложений»: AppSec, OWASP Top 10:2025, практическая рефлексия и материалы для преподавателя.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Безопасность приложений — день 1: методический конспект">
+  <meta property="og:description" content="Самостоятельный методический материал: AppSec, OWASP Top 10:2025, карта поверхности атаки и безопасная практика.">
+  <meta property="og:url" content="https://appsec-lections.pikov.expert/day-01.html">
+  <meta property="og:image" content="https://appsec-lections.pikov.expert/assets/appsec-map-hero.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://appsec-lections.pikov.expert/day-01.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111f'/%3E%3Cpath d='M17 32h30M32 17v30' stroke='%2365e5ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Безопасность приложений — день 1: методический конспект</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Безопасность приложений — день 1: методический конспект",
+    "inLanguage": "ru",
+    "url": "https://appsec-lections.pikov.expert/day-01.html",
+    "learningResourceType": "Методический конспект",
+    "educationalLevel": "Высшее образование и дополнительное профессиональное образование",
+    "author": {"@type": "Person", "name": "Виталий Александрович Пиков", "url": "https://pikov.expert/"},
+    "isBasedOn": {"@type": "CreativeWork", "name": "Образовательная лаборатория Kaspersky Academy | Безопасность приложений", "provider": {"@type": "Organization", "name": "АО «Лаборатория Касперского»"}},
+    "dateCreated": "2026-08-11",
+    "license": "https://creativecommons.org/licenses/by/4.0/"
+  }
+  </script>
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <div class="reading-line" aria-hidden="true"></div>
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand brand-back" href="https://pikov.expert/" aria-label="На главный сайт pikov.expert">
+        <span class="brand-mark" aria-hidden="true">↗</span>
+        <span>appsec / lectures<br><small>pikov.expert</small></span>
+      </a>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button>
+      <nav class="nav" id="site-nav" aria-label="Основная навигация">
+        <a href="index.html">Программа</a>
+        <a href="day-01.html" aria-current="page">День 1</a>
+        <a href="day-02.html">День 2</a>
+        <a href="slides-day-01.html">Слайды</a>
+        <a href="practice.html">Практикум</a>
+        <a href="#downloads">Загрузки</a>
+        <a href="rights.html">Права и источники</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true"><img src="assets/appsec-map-hero.png" width="2184" height="1229" alt=""></div>
+      <div class="hero-grid">
+        <div class="hero-copy reveal">
+          <p class="eyebrow">Методический материал · день 01</p>
+          <h1 id="hero-title">Безопасность <span class="accent">приложений</span> — не набор проверок.</h1>
+          <p class="hero-lead">Это работа с активами, границами доверия, архитектурными решениями и доказуемыми свойствами защиты. Здесь собран очищенный преподавательский маршрут первого дня: от поверхности атаки до OWASP Top 10:2025 и безопасной лабораторной рефлексии.</p>
+          <div class="hero-actions">
+            <a class="button primary" href="#route">Открыть маршрут дня <span aria-hidden="true">↓</span></a>
+            <a class="button ghost" href="slides-day-01.html">Открыть слайды <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="hero-meta" aria-label="Сведения о материале">
+            <span><b>11.08.2026</b> первый день</span>
+            <span><b>A01–A06</b> OWASP Top 10:2025</span>
+            <span><b>RU</b> авторский конспект</span>
+          </div>
+          <aside class="notice" aria-label="Атрибуция">
+            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em> (11–12 августа 2026 года). Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.
+          </aside>
+        </div>
+      </div>
+    </section>
+
+    <section class="section tight" aria-label="Ключевые параметры">
+      <div class="content stat-row reveal">
+        <div class="stat"><b>06</b><span>разобранных категорий OWASP Top 10:2025</span></div>
+        <div class="stat"><b>02</b><span>лабораторных блока в разрешённой локальной среде</span></div>
+        <div class="stat"><b>01</b><span>карта поверхности атаки как отправная точка</span></div>
+        <div class="stat"><b>88</b><span>фотографий слайдов и 6 исходных TXT-файлов в открытом архиве</span></div>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="slides-preview-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div><p class="caption">Исходные материалы</p><h2 id="slides-preview-title">Слайды первого дня — уже в открытой галерее.</h2></div>
+          <p>Это исходные фотографии из папки первого дня, а не декоративные изображения. Откройте галерею, чтобы посмотреть все 88 файлов или скачать их единым архивом.</p>
+        </div>
+        <div class="slides-grid reveal">
+          <figure class="slide-card"><a href="downloads/day-01/slides/Scan_20260811_113402.jpg" target="_blank" rel="noopener"><img src="downloads/day-01/slides/Scan_20260811_113402.jpg" alt="Фотография слайда из вводного блока" loading="lazy" decoding="async"></a><figcaption>Введение и основы AppSec</figcaption></figure>
+          <figure class="slide-card"><a href="downloads/day-01/slides/Scan_20260811_133357.jpg" target="_blank" rel="noopener"><img src="downloads/day-01/slides/Scan_20260811_133357.jpg" alt="Фотография слайда OWASP A01–A03" loading="lazy" decoding="async"></a><figcaption>OWASP A01–A03</figcaption></figure>
+          <figure class="slide-card"><a href="downloads/day-01/slides/Scan_20260811_150734.jpg" target="_blank" rel="noopener"><img src="downloads/day-01/slides/Scan_20260811_150734.jpg" alt="Фотография слайда OWASP A04–A06" loading="lazy" decoding="async"></a><figcaption>OWASP A04–A06</figcaption></figure>
+          <figure class="slide-card"><a href="downloads/day-01/slides/Scan_20260811_171444.jpg" target="_blank" rel="noopener"><img src="downloads/day-01/slides/Scan_20260811_171444.jpg" alt="Фотография слайда о безопасности ИИ" loading="lazy" decoding="async"></a><figcaption>Безопасность ИИ</figcaption></figure>
+        </div>
+        <p class="button-row reveal" style="margin-top:1.2rem"><a class="button primary" href="slides-day-01.html">Открыть все слайды →</a><a class="button" href="downloads/day-01-slides-original.zip" download>Скачать 88 JPG ↓</a></p>
+      </div>
+    </section>
+
+    <section class="section" id="route" aria-labelledby="route-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Навигация по первому дню</p>
+            <h2 id="route-title">План занятия и подтверждённая последовательность — это разные сущности.</h2>
+          </div>
+          <p>Расписание ниже воспроизводит программу. Фактическая последовательность сверена с локальной ASR-записью и тематическими кластерами фотографий, но не подменяется выдуманными точными интервалами.</p>
+        </div>
+        <div class="split">
+          <article class="panel reveal">
+            <p class="caption">Как читать этот материал</p>
+            <h3>Не дословная расшифровка, а редакторская реконструкция</h3>
+            <p>Автоматическая стенограмма содержит ошибки терминов и технические метки говорящих. В открытом архиве доступны исходные TXT-файлы и фотографии слайдов; рядом опубликована вычищенная редакторская версия. Метки ASR не являются подтверждённой атрибуцией реплик.</p>
+          </article>
+          <article class="panel reveal">
+            <p class="caption">Учебный результат</p>
+            <h3>От сценария злоупотребления к проверяемой защите</h3>
+            <p>Каждый блок заканчивается инженерным вопросом: какой актив защищаем, где граница доверия, как проявится отказ контроля и каким тестом или ограничением подтверждается исправление.</p>
+          </article>
+        </div>
+        <div class="timeline reveal" style="margin-top:2rem">
+          <div class="timeline-item">
+            <div class="timeline-time">10:20</div><div class="timeline-rail"><span class="timeline-dot"></span></div>
+            <div class="timeline-body"><h3>Основы AppSec и карта атакуемой поверхности</h3><p>Активы, CIA, идентификация → аутентификация → авторизация, клиент/сервер, границы доверия и групповая карта функции приложения.</p></div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">11:00</div><div class="timeline-rail"><span class="timeline-dot"></span></div>
+            <div class="timeline-body"><h3>OWASP A01–A03</h3><p>Контроль доступа, конфигурация и цепочка поставки ПО; затем лабораторный блок 1 в изолированной учебной среде.</p></div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">14:30</div><div class="timeline-rail"><span class="timeline-dot"></span></div>
+            <div class="timeline-body"><h3>OWASP A04–A06</h3><p>Криптографические сбои, инъекции, небезопасное проектирование; затем лабораторный блок 2 и оформление доказательств.</p></div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">16:10</div><div class="timeline-rail"><span class="timeline-dot"></span></div>
+            <div class="timeline-body"><h3>Безопасность ИИ и организация обучения</h3><p>LLM/agentic-системы, источники, границы полномочий инструментов, проверка фактов и методическая ответственность преподавателя.</p></div>
+          </div>
+          <div class="timeline-item">
+            <div class="timeline-time">16:55</div><div class="timeline-rail"><span class="timeline-dot"></span></div>
+            <div class="timeline-body"><h3>Итоги и подготовка к продолжению</h3><p>Фиксация выводов, вопросов и доказательств выполненных работ — без подмены их набором эффектных payload’ов.</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="foundation-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Общее ядро</p>
+            <h2 id="foundation-title">Модель угроз начинается там, где заканчивается удобная схема интерфейса.</h2>
+          </div>
+          <p>Скрытая кнопка, доверенный JavaScript или «внутренний» URL не являются механизмами защиты. Контроль должен выполняться на доверенной стороне и оставлять проверяемый след.</p>
+        </div>
+        <div class="split">
+          <article class="panel reveal">
+            <span class="tag">1 · Актив и последствия</span>
+            <h3>Называем ценность до выбора инструмента</h3>
+            <p>Данные, деньги, непрерывность процесса, интеллектуальная собственность и доверие пользователя определяют, какие сценарии злоупотребления действительно значимы.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag">2 · Граница доверия</span>
+            <h3>Ищем место, где меняется уровень доверия</h3>
+            <p>Браузер → API, API → БД, CI → registry, пользователь → файл, сервис → внешний ресурс. Здесь нужны валидация, авторизация, минимальные права и журналирование.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag">3 · Инвариант</span>
+            <h3>Формулируем свойство, которое нельзя нарушить</h3>
+            <p>Например, чужой объект недоступен, сумма неотрицательна, неподписанный токен не принимается, а внешняя зависимость имеет проверяемое происхождение.</p>
+          </article>
+          <article class="panel reveal">
+            <span class="tag">4 · Доказательство</span>
+            <h3>Закрываем цикл тестом, контролем или ограничением</h3>
+            <p>Защита считается внедрённой, когда её можно проверить отрицательным тестом, политикой CI/CD, журналом решения или ограничением схемы данных.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="owasp" aria-labelledby="owasp-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">OWASP Top 10:2025 · A01–A06</p>
+            <h2 id="owasp-title">Шесть тем — шесть разговоров об инженерной причине, а не о «магическом» запрете ввода.</h2>
+          </div>
+          <p>Классификация OWASP даёт общий язык. Она не отменяет моделирование угроз, требования организации и анализ конкретной архитектуры. Для актуальных редакций используйте первичный <a href="https://owasp.org/Top10/" rel="noreferrer">сайт OWASP</a>.</p>
+        </div>
+        <div class="topic-grid">
+          <article class="topic reveal"><span class="topic-number">A01:2025</span><h3>A01:2025 — Нарушение контроля доступа</h3><p>Серверная проверка субъекта, действия, объекта и контекста. Защита от IDOR/BOLA, вертикального и горизонтального повышения прав.</p><span class="tag">deny by default · ownership</span></article>
+          <article class="topic reveal"><span class="topic-number">A02:2025</span><h3>A02:2025 — Небезопасная конфигурация</h3><p>Устаревший endpoint, debug, лишняя информация в ошибке, открытый сервис или стандартная учётная запись — это часть поверхности атаки.</p><span class="tag">hardening · IaC · logs</span></article>
+          <article class="topic reveal"><span class="topic-number">A03:2025</span><h3>A03:2025 — Сбои в цепочке поставки ПО</h3><p>Происхождение зависимостей, lockfile, SBOM, SCA, подписи и наименьшие права CI/CD защищают путь от исходника к артефакту.</p><span class="tag">SBOM · provenance · SCA</span></article>
+          <article class="topic reveal"><span class="topic-number">A04:2025</span><h3>A04:2025 — Криптографические сбои</h3><p>Ключи, TLS, защита данных и строгая проверка токена. Алгоритмы и claims проверяет сервер; библиотека не заменяет конфигурацию.</p><span class="tag">allow-list · iss/aud/exp</span></article>
+          <article class="topic reveal"><span class="topic-number">A05:2025</span><h3>A05:2025 — Инъекции</h3><p>Разделяем код и данные, используем параметризацию и контекстное экранирование. XSS, SQLi, CSRF и command injection требуют разных рубежей.</p><span class="tag">parameterize · encode</span></article>
+          <article class="topic reveal"><span class="topic-number">A06:2025</span><h3>A06:2025 — Небезопасное проектирование</h3><p>Бизнес-инварианты формулируются до UI: серверный расчёт, точные типы, лимиты, атомарность и ограничения базы данных.</p><span class="tag">abuse cases · invariants</span></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="evidence-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Педагогическая рамка практики</p>
+            <h2 id="evidence-title">Флаг не равен отчёту. Отчёт связывает наблюдение с причиной и защитой.</h2>
+          </div>
+          <p>Практические задания предназначены только для локальных намеренно уязвимых сред, на которые есть разрешение. На публичной странице нет чужих ответов, ключей, payload’ов и маршрутов эксплуатации.</p>
+        </div>
+        <div class="split">
+          <article class="panel reveal">
+            <p class="caption">Минимальная структура отчёта</p>
+            <ol class="checklist">
+              <li>Среда, границы разрешения и исходные условия.</li>
+              <li>Что проверено и какой наблюдаемый результат это подтверждает.</li>
+              <li>Первопричина в проектировании, коде или конфигурации.</li>
+              <li>Вероятные последствия для актива и процесса.</li>
+              <li>Конкретное исправление и способ проверить регрессию.</li>
+            </ol>
+          </article>
+          <article class="panel reveal">
+            <p class="caption">Разделяйте две классификации</p>
+            <h3>Учебный блок не обязан совпадать с собственной категорией задания Juice Shop</h3>
+            <p>На практикуме это отображается двумя метками: «тема учебного блока по notebook» и «класс challenge в Juice Shop». Такое разделение не создаёт ложного впечатления об официальной эквивалентности классификаций.</p>
+            <p><a href="practice.html#mapping">Смотреть пример матрицы классификаций →</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="downloads" aria-labelledby="downloads-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Скачать и переиспользовать</p>
+            <h2 id="downloads-title">Авторские методички и открытый архив первого дня.</h2>
+          </div>
+          <p>Здесь собраны авторские методички и первичные материалы первого дня: фотографии слайдов, ASR-фрагменты, программа, учебный пакет и результаты лабораторных работ. Для пакетов опубликованы контрольные суммы.</p>
+        </div>
+        <div class="download-grid">
+          <article class="download reveal"><span class="file-type">MD · 01</span><h3>Методический конспект первого дня</h3><p>Краткая публичная версия: понятия, A01–A06, ИИ-блок, редакторские ограничения и список источников.</p><a class="button" href="materials/2026-08-11-день-1-методический-конспект.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 02</span><h3>Методичка практикума</h3><p>Безопасный порядок локальной работы, правила доказательств, контроль версий образа и запрет публичной экспозиции учебных целей.</p><a class="button" href="materials/практикум-безопасность-приложений-методичка.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 03</span><h3>Шаблон отчёта ЛР</h3><p>Готовая форма: среда, наблюдение, первопричина, последствия, исправление и регрессионная проверка.</p><a class="button" href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 04</span><h3>Чек-лист слушателя</h3><p>Короткий перечень действий до, во время и после занятия: разрешение, изоляция, доказательства, очистка среды.</p><a class="button" href="materials/чек-лист-слушателя.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 05</span><h3>Источники и версии</h3><p>Ссылки на первичные ресурсы OWASP, Kaspersky Academy и Juice Shop с правилами фиксации версий.</p><a class="button" href="materials/источники-и-версии.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 06</span><h3>Права, состав и атрибуция</h3><p>Каталог происхождения авторских и исходных материалов первого дня.</p><a class="button" href="materials/права-и-атрибуция.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">ZIP · 88 JPG</span><h3>Исходные фотографии слайдов</h3><p>Все 88 JPG с исходными именами файлов. Для просмотра доступна отдельная галерея.</p><a class="button" href="downloads/day-01-slides-original.zip" download>Скачать слайды ↓</a></article>
+          <article class="download reveal"><span class="file-type">ZIP · TXT + MD</span><h3>Стенограммы и протокол</h3><p>Три исходных ASR-фрагмента, три автоматических пересказа и вычищенная стенограмма.</p><a class="button" href="downloads/day-01-transcripts-original.zip" download>Скачать тексты ↓</a></article>
+          <article class="download reveal"><span class="file-type">ZIP · полный пакет</span><h3>Все материалы первого дня</h3><p>Слайды, стенограммы, программа, пакет участника, лабораторные отчёты и материалы среды.</p><a class="button" href="downloads/day-01-full-source-package.zip" download>Скачать всё ↓</a></article>
+        </div>
+        <aside class="notice amber reveal">
+          <strong>Открытый архив первого дня.</strong> В нём доступны исходные фотографии слайдов, ASR-транскрипции, автоматические пересказы, программа, пакет участника и редакторская стенограмма. Полный состав, форматы и статус обработки указаны в <a href="materials/исходные-материалы-дня-1.md" download>каталоге материалов →</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section section-band" aria-labelledby="sources-title">
+      <div class="content">
+        <div class="section-top reveal">
+          <div>
+            <p class="caption">Продолжение работы</p>
+            <h2 id="sources-title">Версия источника — часть доказательства.</h2>
+          </div>
+          <p>Рекомендации по AppSec быстро меняются. Перед занятием и перед выпуском практикума зафиксируйте дату проверки, редакцию стандарта, версию образа и источник лицензии.</p>
+        </div>
+        <div class="sources">
+          <article class="source reveal"><h3><a href="https://owasp.org/Top10/" rel="noreferrer">OWASP Top 10</a></h3><p>Актуальная страница классификации веб-рисков; проверяйте год редакции, а не переносите старые метки автоматически.</p></article>
+          <article class="source reveal"><h3><a href="https://owasp.org/www-project-web-security-testing-guide/" rel="noreferrer">OWASP WSTG</a></h3><p>Web Security Testing Guide — ориентир для планирования и документирования тестирования веб-приложений.</p></article>
+          <article class="source reveal"><h3><a href="https://genai.owasp.org/llm-top-10/" rel="noreferrer">OWASP Top 10 for LLM Applications</a></h3><p>Версионные материалы по рискам систем с LLM; особенно важны контроль инструментов и границы доверия.</p></article>
+          <article class="source reveal"><h3><a href="https://academy.kaspersky.com/" rel="noreferrer">Kaspersky Academy</a></h3><p>Официальная образовательная площадка. Сайт не является её зеркалом и не представляет АО «Лаборатория Касперского».</p></article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <p class="footer-title">appsec / lectures</p>
+        <p>Авторский образовательный материал Виталия Александровича Пикова для преподавателей и слушателей по безопасной разработке.</p>
+      </div>
+      <div>
+        <p class="footer-title">Разделы</p>
+        <ul><li><a href="index.html">Программа на два дня</a></li><li><a href="day-01.html">День 1</a></li><li><a href="day-02.html">День 2</a></li><li><a href="practice.html">Практикум</a></li></ul>
+      </div>
+      <div>
+        <p class="footer-title">Условие использования</p>
+        <p>Лабораторные действия допустимы только в локальной разрешённой среде. При переиспользовании исходных и редакторских материалов указывайте программу, дату и происхождение файла.</p>
+      </div>
+    </div>
+    <div class="footer-bottom">© <span data-year>2026</span> Виталий Александрович Пиков · <a href="https://pikov.expert/">pikov.expert</a> · <a href="rights.html">права и атрибуция</a></div>
+  </footer>
+  <noscript><div class="notice danger" style="margin:1rem">Для интерактивной навигации сайта нужен JavaScript; все учебные материалы и ссылки остаются доступны.</div></noscript>
+  <script src="assets/site.js" defer></script>
+</body>
+</html>

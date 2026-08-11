@@ -15,7 +15,7 @@ Before the repository is made public, review these areas carefully:
 
 - Astra Linux documentation and PDF materials;
 - vendor and course handouts in PDF/PPTX/DOCX format;
-- materials of the programme «Образовательная лаборатория Kaspersky Academy | Безопасность приложений» (АО «Лаборатория Касперского»), including slides, handouts, photographs, transcripts, tests and answer keys;
+- materials of the programme «Образовательная лаборатория Kaspersky Academy | Безопасность приложений» (АО «Лаборатория Касперского»), except for the first-day files explicitly published in `appsec-lections/downloads/day-01/` on the site owner's instruction;
 - logos in `is/logo` and course-branded images;
 - SPDX-derived website/data under `spdx`;
 - any copied screenshots or generated snapshots from previously published pages.
@@ -36,11 +36,12 @@ handouts, distributable office/PDF archives, and Astra Linux material mirrors
 unless redistribution rights are explicit. Prefer linking to authoritative
 sources instead of storing copies when rights are unclear.
 
-The `appsec-lections/` site contains author-created derivative teaching notes
-and original illustrations, with attribution to the above Kaspersky Academy
-programme. It is not an official Kaspersky resource and does not mirror its
-source materials. The external name is used only for factual attribution and
-does not imply endorsement.
+The `appsec-lections/` site contains author-created teaching notes and
+original illustrations, plus the explicitly authorized original first-day
+archive in `appsec-lections/downloads/day-01/` (slide photographs,
+transcripts, participant materials and laboratory results). It is not an
+official Kaspersky resource. The external name is used for factual attribution
+and does not imply endorsement.
 
 ## Contact
 

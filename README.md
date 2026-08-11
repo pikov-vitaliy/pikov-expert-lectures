@@ -68,7 +68,7 @@
 | 29 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | `ready-local` |
 | 30 | Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта | [27-07-2026.pikov.expert](https://27-07-2026.pikov.expert/) | РБПО | `ready-local` |
 | 31 | Языки, архитектура и безопасный SQL | [29-07-2026.pikov.expert](https://29-07-2026.pikov.expert/) | РБПО | `ready-local` |
-| 32 | Безопасность приложений: методическая лекция и разбор первого дня | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `ready-local` |
+| 32 | Безопасность приложений: программа и материалы двух дней | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `ready-local` |
 | 33 | Безопасность приложений: практикум и лабораторные задания | [appsec-lections.pikov.expert/practice.html](https://appsec-lections.pikov.expert/practice.html) | РБПО | `ready-local` |
 
 ## Структура
