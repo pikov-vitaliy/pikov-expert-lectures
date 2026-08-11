@@ -122,7 +122,7 @@ $script:ReviewedNestedDistributables = @{
   # Public first-day materials are an explicit reviewed set. Working photos
   # remain outside the release and are only an editorial source.
   'appsec-lections' = @(
-    'downloads\day-01-transcripts-original.zip',
+    'downloads\day-01-edited-transcript-and-summaries.zip',
     'downloads\day-01-laboratory-materials-and-reports.zip',
     'downloads\day-01-public-materials.zip'
   )
@@ -190,6 +190,12 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       # Photographs taken during the first-day session are a private editorial
       # source. Keep this narrow guard even if a local working folder returns.
       if ($folderName -eq 'appsec-lections' -and $relative -match '^downloads\\day-01\\slides(\\|$)') { return }
+
+      # Published AppSec downloads use Markdown for reader-facing text. Raw
+      # ASR TXT files must not re-enter the public release by accident.
+      if ($folderName -eq 'appsec-lections' -and $relative -match '^downloads\\.*\.txt$') {
+        throw "TXT is not allowed in published AppSec downloads: $relative"
+      }
 
       if (Should-IncludeReviewedNestedDistributable -FolderName $folderName -RelativePath $relative) {
         $files.Add($relative)

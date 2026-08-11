@@ -27,12 +27,12 @@ $programAndEnvironment = Join-Path $dayRoot 'program-and-environment'
 # Рабочие фотографии используются только для редакторской сверки и никогда не
 # входят в публичный пакет. Удаляем прежние артефакты, если они остались от
 # старой сборки, чтобы release не мог подхватить их повторно.
-@('day-01-slides-original.zip', 'day-01-full-source-package.zip') | ForEach-Object {
+@('day-01-slides-original.zip', 'day-01-full-source-package.zip', 'day-01-transcripts-original.zip', 'day-01-SHA256SUMS.txt') | ForEach-Object {
   Remove-Item -LiteralPath (Join-Path $downloadsRoot $_) -Force -ErrorAction SilentlyContinue
 }
 
 $archives = @(
-  @{ Name = 'day-01-transcripts-original.zip'; Paths = @($transcripts) },
+  @{ Name = 'day-01-edited-transcript-and-summaries.zip'; Paths = @($transcripts) },
   @{ Name = 'day-01-laboratory-materials-and-reports.zip'; Paths = @($participantMaterials, $labResults, $programAndEnvironment) },
   @{ Name = 'day-01-public-materials.zip'; Paths = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) }
 )
@@ -47,7 +47,14 @@ foreach ($archive in $archives) {
   Write-Output "BUILT $($archive.Name) $size bytes"
 }
 
-Set-Content -LiteralPath (Join-Path $downloadsRoot 'day-01-SHA256SUMS.txt') -Value $checksumLines -Encoding utf8
+$checksumDocument = @(
+  '# Контрольные суммы SHA-256 — материалы первого дня',
+  '',
+  '> Значения относятся к ZIP-пакетам, собранным из опубликованного набора. Все текстовые материалы внутри архива стенограммы и пересказов представлены в Markdown.',
+  '',
+  '```text'
+) + @($checksumLines) + @('```')
+Set-Content -LiteralPath (Join-Path $downloadsRoot 'day-01-SHA256SUMS.md') -Value $checksumDocument -Encoding utf8
 
 $files = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) | ForEach-Object {
   Get-ChildItem -LiteralPath $_ -File -Recurse
