@@ -23,6 +23,7 @@ $transcripts = Join-Path $dayRoot 'transcripts'
 $participantMaterials = Join-Path $dayRoot 'participant-materials'
 $labResults = Join-Path $dayRoot 'lab-results'
 $programAndEnvironment = Join-Path $dayRoot 'program-and-environment'
+$authorMaterials = Join-Path $siteRoot 'materials'
 
 # Рабочие фотографии используются только для редакторской сверки и никогда не
 # входят в публичный пакет. Удаляем прежние артефакты, если они остались от
@@ -34,7 +35,7 @@ $programAndEnvironment = Join-Path $dayRoot 'program-and-environment'
 $archives = @(
   @{ Name = 'day-01-edited-transcript-and-summaries.zip'; Paths = @($transcripts) },
   @{ Name = 'day-01-laboratory-materials-and-reports.zip'; Paths = @($participantMaterials, $labResults, $programAndEnvironment) },
-  @{ Name = 'day-01-public-materials.zip'; Paths = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) }
+  @{ Name = 'day-01-public-materials.zip'; Paths = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment, $authorMaterials) }
 )
 
 $checksumLines = New-Object System.Collections.Generic.List[string]
@@ -56,7 +57,7 @@ $checksumDocument = @(
 ) + @($checksumLines) + @('```')
 Set-Content -LiteralPath (Join-Path $downloadsRoot 'day-01-SHA256SUMS.md') -Value $checksumDocument -Encoding utf8
 
-$files = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) | ForEach-Object {
+$dayFiles = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) | ForEach-Object {
   Get-ChildItem -LiteralPath $_ -File -Recurse
 } | Sort-Object FullName | ForEach-Object {
   [pscustomobject]@{
@@ -65,6 +66,14 @@ $files = @($transcripts, $participantMaterials, $labResults, $programAndEnvironm
     sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
   }
 }
+$authorFiles = Get-ChildItem -LiteralPath $authorMaterials -File -Recurse | Sort-Object FullName | ForEach-Object {
+  [pscustomobject]@{
+    path = ('materials/' + [System.IO.Path]::GetRelativePath($authorMaterials, $_.FullName).Replace('\', '/'))
+    bytes = $_.Length
+    sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+  }
+}
+$files = @($dayFiles + $authorFiles | Sort-Object path)
 $manifest = [pscustomobject]@{
   title = 'Публичные материалы первого дня — 11 августа 2026 года'
   files = @($files)

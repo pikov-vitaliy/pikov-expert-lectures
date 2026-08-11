@@ -694,7 +694,7 @@
     target.replaceChildren();
     target.classList.add('rs-deck');
     target.tabIndex = 0;
-    target.setAttribute('aria-label', 'Интерактивная коллекция реконструированных слайдов первого дня');
+    target.setAttribute('aria-label', 'Интерактивная коллекция слайдов первого дня');
 
     let activeIndex = 0;
 
