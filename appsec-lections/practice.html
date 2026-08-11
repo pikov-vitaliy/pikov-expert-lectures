@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Авторский безопасный практикум по AppSec: локальная учебная среда, методика лабораторных работ, OWASP Juice Shop, структура отчёта и контроль публикации материалов.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Безопасность приложений — безопасный практикум">
+  <meta property="og:description" content="Локальная учебная среда, методика доказательств и контроль прав при проведении лабораторных работ.">
+  <meta property="og:url" content="https://appsec-lections.pikov.expert/practice.html">
+  <meta property="og:image" content="https://appsec-lections.pikov.expert/assets/appsec-practice-hero.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://appsec-lections.pikov.expert/practice.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111f'/%3E%3Cpath d='M17 32h30M32 17v30' stroke='%2365e5ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Безопасность приложений — безопасный практикум</title>
+  <link rel="stylesheet" href="assets/site.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"LearningResource","name":"Безопасность приложений — безопасный практикум","inLanguage":"ru","url":"https://appsec-lections.pikov.expert/practice.html","learningResourceType":"Практикум и методические материалы","educationalLevel":"Высшее образование и дополнительное профессиональное образование","author":{"@type":"Person","name":"Виталий Александрович Пиков","url":"https://pikov.expert/"},"isBasedOn":{"@type":"CreativeWork","name":"Образовательная лаборатория Kaspersky Academy | Безопасность приложений","provider":{"@type":"Organization","name":"АО «Лаборатория Касперского»"}},"dateCreated":"2026-08-11","license":"https://creativecommons.org/licenses/by/4.0/"}
+  </script>
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a><div class="reading-line" aria-hidden="true"></div>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand brand-back" href="https://pikov.expert/" aria-label="На главный сайт pikov.expert"><span class="brand-mark" aria-hidden="true">↗</span><span>appsec / lectures<br><small>pikov.expert</small></span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button>
+    <nav class="nav" id="site-nav" aria-label="Основная навигация"><a href="index.html">Конспект</a><a href="practice.html" aria-current="page">Практикум</a><a href="#downloads">Загрузки</a><a href="rights.html">Права и источники</a></nav>
+  </div></header>
+  <main id="main">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-art" aria-hidden="true"><img src="assets/appsec-practice-hero.png" width="2184" height="1229" alt=""></div>
+      <div class="hero-grid"><div class="hero-copy reveal">
+        <p class="eyebrow">Практикум · локальная среда</p>
+        <h1 id="hero-title">Лабораторная работа должна учить <span class="accent">защите</span>, а не публикации атаки.</h1>
+        <p class="hero-lead">Маршрут для преподавателя и слушателя: изолировать намеренно уязвимую цель, зафиксировать версию, доказать причину недостатка, предложить серверное исправление и подтвердить регрессию.</p>
+        <div class="hero-actions"><a class="button primary" href="#start">Порядок запуска <span aria-hidden="true">↓</span></a><a class="button ghost" href="#mapping">Карта заданий <span aria-hidden="true">↓</span></a></div>
+        <div class="hero-meta"><span><b>LOCAL ONLY</b> разрешённая цель</span><span><b>Docker</b> изоляция и очистка</span><span><b>MD</b> шаблоны отчёта</span></div>
+        <aside class="notice danger"><strong>Только локальная учебная среда.</strong> Не запускайте намеренно уязвимые сервисы на публичном сервере, не пробрасывайте их на все интерфейсы и не используйте методику против чужих систем. Материалы автора подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em>; сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.</aside>
+      </div></div>
+    </section>
+
+    <section class="section" id="start" aria-labelledby="start-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">01 · Безопасный старт</p><h2 id="start-title">Сначала граница разрешения и версия среды. Потом — учебная задача.</h2></div><p>OWASP Juice Shop — намеренно небезопасное приложение. Оно уместно только для локальной/изолированной практики. Актуальные релизы меняют задания, поэтому образ должен быть закреплён проверенным тегом или digest, который преподаватель записывает в протокол занятия.</p></div>
+      <div class="split">
+        <article class="panel reveal"><p class="caption">Перед запуском</p><ol class="checklist"><li>Подтвердить, что цель локальна и её использование разрешено.</li><li>Проверить источник образа, версию, digest и лицензию.</li><li>Не монтировать Docker socket, секреты, домашний каталог и не использовать <code>--privileged</code>.</li><li>Запретить публикацию target-сервиса в Интернет и на все интерфейсы хоста.</li><li>Подготовить шаблон отчёта и критерий регрессионной проверки.</li></ol></article>
+        <article class="panel reveal"><p class="caption">После занятия</p><ol class="checklist"><li>Остановить контейнер; временная среда должна быть удаляемой.</li><li>Сохранить только обезличенные доказательства, нужные для отчёта.</li><li>Проверить, что в отчёте нет паролей, токенов, ключей и персональных данных.</li><li>Отделить авторские методички от исходных учебных файлов правообладателя.</li><li>Зафиксировать фактическую версию среды для повторяемости.</li></ol></article>
+      </div>
+      <div class="code-card reveal" style="margin-top:1rem"><div class="code-card-inner"><div class="code-card-header"><span>PowerShell / Docker · образ закрепляет преподаватель</span><button class="copy-button" type="button" data-copy="#local-command">Копировать</button></div><pre id="local-command"><code>docker pull bkimminich/juice-shop:&lt;проверенный-тег&gt;&#10;docker run --rm --name appsec-juice-shop `&#10;  -p 127.0.0.1:3000:3000 `&#10;  -e NODE_ENV=unsafe `&#10;  bkimminich/juice-shop:&lt;проверенный-тег&gt;</code></pre></div></div>
+      <aside class="notice amber reveal"><strong>Почему не указан произвольный тег?</strong> Версия среды 11.08.2026 в текущем локальном наборе не зафиксирована детерминированно, а задания Juice Shop меняются между релизами. Не используйте незафиксированный образ как «стабильный» учебный контракт. Сначала проверьте актуальный <a href="https://github.com/juice-shop/juice-shop/releases" rel="noreferrer">release</a>, протестируйте выбранную версию и запишите тег/digest в материалы группы.</aside>
+    </div></section>
+
+    <section class="section section-band" id="mapping" aria-labelledby="mapping-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">02 · Карта учебных тем</p><h2 id="mapping-title">Две метки вместо ложной эквивалентности классификаций.</h2></div><p>Учебный notebook группирует лабораторные по темам A01–A11. У отдельных challenge в Juice Shop есть собственные классы. В отчётах и на слайдах эти уровни нужно подписывать раздельно.</p></div>
+      <div class="table-wrap reveal"><table><thead><tr><th>ЛР</th><th>Тема учебного блока по notebook</th><th>Примеры наблюдаемых тем</th><th>Педагогический итог</th></tr></thead><tbody>
+        <tr><td>ЛР 1</td><td>A01:2025 — контроль доступа</td><td>Маршрут, объект, серверная авторизация</td><td>UI не заменяет проверку владения и полномочий на сервере.</td></tr>
+        <tr><td>ЛР 2</td><td>A02:2025 — конфигурация</td><td>Устаревший интерфейс, диагностическая информация</td><td>Скрытый endpoint остаётся частью поверхности атаки.</td></tr>
+        <tr><td>ЛР 3</td><td>A03:2025 — цепочка поставки ПО</td><td>Уязвимая зависимость, происхождение компонента</td><td>Нужны SBOM, SCA, lockfile и контроль registry/provenance.</td></tr>
+        <tr><td>ЛР 4</td><td>A04:2025 — криптографические сбои</td><td>Конфиденциальные файлы, проверка токена</td><td>Verifier проверяет алгоритм, подпись, ключ и claims.</td></tr>
+        <tr><td>ЛР 5</td><td>A05:2025 — инъекции</td><td>SQLi, DOM XSS, контекст вывода</td><td>Защита основана на разделении кода/данных и безопасных API.</td></tr>
+        <tr><td>ЛР 6</td><td>A06:2025 — небезопасное проектирование</td><td>Бизнес-инвариант, расчёт и состояние заказа</td><td>Серверная доменная логика и ограничения данных важнее UI-валидации.</td></tr>
+      </tbody></table></div>
+      <div class="lab-grid" style="margin-top:1rem">
+        <article class="lab-item reveal"><span class="tag amber">Класс challenge в Juice Shop</span><h3>Документы и резервные данные</h3><p>Некоторые задания классифицируются Juice Shop как Sensitive Data Exposure. Это не отменяет учебной привязки блока, но не делает классификации синонимами.</p></article>
+        <article class="lab-item reveal"><span class="tag amber">Класс challenge в Juice Shop</span><h3>Компоненты и токены</h3><p>Задания, связанные с vulnerable library или unsigned JWT, могут иметь класс Vulnerable Components в собственном каталоге Juice Shop.</p></article>
+        <article class="lab-item reveal"><span class="tag amber">Класс challenge в Juice Shop</span><h3>Клиентская XSS-защита</h3><p>Client-side XSS Protection относится к XSS. В отчёте важны контекст выполнения, причина и защита, а не только демонстрационный результат.</p></article>
+        <article class="lab-item reveal"><span class="tag good">Граница публикации</span><h3>ЛР 7–11 требуют отдельного пакета</h3><p>В текущем рабочем наборе отсутствуют самостоятельные локальные артефакты для deserialization, SSRF и C buffer overflow. Не обещайте их загрузку, пока не предоставлены проверенные и разрешённые материалы.</p></article>
+      </div>
+    </div></section>
+
+    <section class="section" aria-labelledby="protect-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">03 · Примеры корректной профилактики</p><h2 id="protect-title">Практический разбор завершается инженерным ограничением, а не зрелищной демонстрацией.</h2></div><p>Ниже приведены безопасные выводы для обсуждения. Они не содержат атакующих payload’ов и не предназначены для действий за пределами авторизованной лаборатории.</p></div>
+      <div class="split">
+        <article class="panel reveal"><span class="tag">Access control</span><h3>Проверяйте объект, а не только роль</h3><p>Авторизация на сервере связывает пользователя, действие, объект и контекст. Нужен отрицательный тест: субъект A не читает и не изменяет объект субъекта B.</p></article>
+        <article class="panel reveal"><span class="tag">JWT / Crypto</span><h3>Явная политика проверки токенов</h3><p>Allow-list алгоритмов, проверка подписи, ключа, <code>iss</code>, <code>aud</code>, <code>exp</code> и <code>nbf</code>, отрицательные тесты. Смена JWT-библиотеки сама по себе не исправляет систему.</p></article>
+        <article class="panel reveal"><span class="tag">XSS / Injection</span><h3>Разделяйте код, данные и контекст</h3><p>Параметризуйте запросы, используйте безопасный шаблон/DOM API и контекстное экранирование. Кража cookie не предполагается автоматически: она зависит от <code>HttpOnly</code>, <code>SameSite</code> и модели хранения токенов.</p></article>
+        <article class="panel reveal"><span class="tag">SSRF / Network</span><h3>Не публикуйте внутреннюю цель</h3><p>Для учебной SSRF-топологии внешний контейнер при необходимости привязывают только к <code>127.0.0.1:8080:8080</code>; внутренний сервис остаётся в приватной Docker-сети без опубликованного порта. В production нужны allow-list адресатов, DNS/IP-проверки и egress-политики.</p></article>
+        <article class="panel reveal"><span class="tag">C / Memory safety</span><h3>Устраните первопричину до hardening</h3><p>Для C/C++ приоритетны границы буфера, безопасные API, отказ от shell для недоверенных данных и проверка длины. Далее: <code>-fstack-protector-strong</code>, <code>-D_FORTIFY_SOURCE=3</code>, PIE/RELRO/NX, sanitizers и fuzzing.</p></article>
+        <article class="panel reveal"><span class="tag">Supply chain</span><h3>Сохраняйте происхождение среды</h3><p>Образ, пакет, scanner и результат привязываются к версии, digest, лицензии и дате проверки. «Последний» tag не доказывает воспроизводимость.</p></article>
+      </div>
+    </div></section>
+
+    <section class="section section-band" aria-labelledby="report-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">04 · Протокол результата</p><h2 id="report-title">Шаблон превращает лабораторную работу в проверяемый учебный артефакт.</h2></div><p>Не переносите в публичный отчёт ключи, персональные данные, токены и точные маршруты атаки. Храните только достаточные, обезличенные доказательства с явно указанной учебной средой.</p></div>
+      <div class="split">
+        <article class="panel reveal"><p class="caption">Структура, которую можно оценить</p><ol class="checklist"><li><strong>Среда:</strong> локальная цель, дата, версия и границы разрешения.</li><li><strong>Что сделано:</strong> нейтральное описание проверенного сценария.</li><li><strong>Доказательства:</strong> обезличенное наблюдение, запрос/ответ или флаг без ключа.</li><li><strong>Ключевая причина:</strong> техническое и архитектурное объяснение.</li><li><strong>Исправление:</strong> серверная мера, защита в глубину и регрессионный тест.</li></ol></article>
+        <article class="panel reveal"><p class="caption">Критерии обратной связи</p><h3>Оценивайте не эффект, а понимание причины</h3><p>Полезная шкала: результат и полнота обязательных шагов; объяснение первопричины; конкретность профилактики; качество и безопасность оформления. Так слушатель переносит вывод в SSDLC, а не повторяет сценарий вслепую.</p><p><a href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать авторский шаблон отчёта →</a></p></article>
+      </div>
+    </div></section>
+
+    <section class="section" id="downloads" aria-labelledby="downloads-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">Скачать</p><h2 id="downloads-title">Пакет для следующего занятия: методика, отчёт, чек-лист и контроль версий.</h2></div><p>Это самостоятельные материалы автора. Исходные учебные документы, слайды, тесты, ключи и фотографии не включены. Условия использования и атрибуция вынесены отдельно.</p></div>
+      <div class="download-grid">
+        <article class="download reveal"><span class="file-type">MD · ПРАКТИКА</span><h3>Методичка практикума</h3><p>Контракт локальной среды, порядок доказательств, публикационный фильтр и рефлексия.</p><a class="button" href="materials/практикум-безопасность-приложений-методичка.md" download>Скачать Markdown ↓</a></article>
+        <article class="download reveal"><span class="file-type">MD · ОТЧЁТ</span><h3>Шаблон лабораторной работы</h3><p>Структура отчёта без лишнего воспроизведения эксплуатационных деталей.</p><a class="button" href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать Markdown ↓</a></article>
+        <article class="download reveal"><span class="file-type">MD · CHECK</span><h3>Чек-лист слушателя</h3><p>Разрешение, изоляция, версия среды, доказательства и очистка после практики.</p><a class="button" href="materials/чек-лист-слушателя.md" download>Скачать Markdown ↓</a></article>
+        <article class="download reveal"><span class="file-type">MD · SOURCES</span><h3>Источники и версии</h3><p>Официальные ссылки для OWASP, Juice Shop, Kaspersky Academy и контроля версии образа.</p><a class="button" href="materials/источники-и-версии.md" download>Скачать Markdown ↓</a></article>
+        <article class="download reveal"><span class="file-type">MD · RIGHTS</span><h3>Права и атрибуция</h3><p>Граница между авторской переработкой и материалами, для которых нужно разрешение.</p><a class="button" href="materials/права-и-атрибуция.md" download>Скачать Markdown ↓</a></article>
+        <article class="download reveal"><span class="file-type">TXT · SHA-256</span><h3>Контрольные суммы</h3><p>Хеши авторских загрузок. После обновления сверяйте файл перед выдачей группе.</p><a class="button" href="materials/CHECKSUMS.txt" download>Скачать checksums ↓</a></article>
+      </div>
+    </div></section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><div><p class="footer-title">appsec / lectures</p><p>Авторский образовательный материал Виталия Александровича Пикова для преподавателей и слушателей по безопасной разработке.</p></div><div><p class="footer-title">Разделы</p><ul><li><a href="index.html">Конспект первого дня</a></li><li><a href="practice.html">Практикум</a></li><li><a href="rights.html">Права и источники</a></li></ul></div><div><p class="footer-title">Условие использования</p><p>Лабораторные действия допустимы только в локальной разрешённой среде. Не используйте материал против чужих систем.</p></div></div><div class="footer-bottom">© <span data-year>2026</span> Виталий Александрович Пиков · <a href="https://pikov.expert/">pikov.expert</a> · <a href="rights.html">права и атрибуция</a></div></footer>
+  <noscript><div class="notice danger" style="margin:1rem">Для интерактивной навигации сайта нужен JavaScript; все учебные материалы и ссылки остаются доступны.</div></noscript>
+  <script src="assets/site.js" defer></script>
+</body>
+</html>

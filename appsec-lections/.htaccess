@@ -35,14 +35,6 @@ AddType application/vnd.openxmlformats-officedocument.spreadsheetml.sheet .xlsx
 AddType image/svg+xml .svg
 AddType image/x-icon .ico
 
-# SPDX publishes each XHTML page both as <id> and <id>.html. Apache cannot
-# infer a MIME type for names such as 0BSD or Apache-2.0, while nosniff is set.
-# Known non-HTML formats are excluded; smoke-check verifies every remaining
-# matched file has a paired .html page.
-<FilesMatch "(?i)^(?!\.)(?!^(?:LICENSE|NOTICE)$)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip|orig|py)$).+$">
-  ForceType text/html
-</FilesMatch>
-
 <Files ".htaccess">
   Require all denied
 </Files>

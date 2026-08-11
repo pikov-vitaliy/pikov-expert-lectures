@@ -59,8 +59,8 @@ function Should-SkipSitemapPath([string]$RelativePath) {
   return $false
 }
 
-function New-HtaccessLines {
-  @(
+function New-HtaccessLines([switch]$SpdxExtensionlessHtml) {
+  $lines = [System.Collections.ArrayList]@(
     '# pikov.expert static lecture site rules',
     '# Keep text and Markdown files readable as UTF-8 in browsers.',
     '',
@@ -102,6 +102,25 @@ function New-HtaccessLines {
     '  Require all denied',
     '</Files>'
   )
+
+  if ($SpdxExtensionlessHtml) {
+    $index = $lines.IndexOf('<Files ".htaccess">')
+    if ($index -lt 0) {
+      throw 'SPDX .htaccess marker is missing from the common template'
+    }
+    [void]$lines.InsertRange($index, [object[]]@(
+      '# SPDX publishes each XHTML page both as <id> and <id>.html. Apache cannot',
+      '# infer a MIME type for names such as 0BSD or Apache-2.0, while nosniff is set.',
+      '# Known non-HTML formats are excluded; smoke-check verifies every remaining',
+      '# matched file has a paired .html page.',
+      '<FilesMatch "(?i)^(?!\.)(?!^(?:LICENSE|NOTICE)$)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip|orig|py)$).+$">',
+      '  ForceType text/html',
+      '</FilesMatch>',
+      ''
+    ))
+  }
+
+  [string[]]$lines
 }
 
 function New-RobotsLines([string]$SitemapUrl) {
@@ -251,7 +270,7 @@ foreach ($folder in $uniqueFolders) {
   $baseUrl = "https://$domain/"
 
   if ($folder -eq 'spdx') {
-    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -SpdxExtensionlessHtml)
     Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
     Write-Output "controlExternalFolder=$folder"
     continue

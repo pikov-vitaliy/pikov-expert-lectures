@@ -12,12 +12,12 @@
 
 | Показатель | Значение |
 |---|---:|
-| Записей в каталоге | 31 |
-| Канонических папок материалов | 28 |
+| Записей в каталоге | 33 |
+| Канонических папок материалов | 29 |
 | Тематических разделов | 6 |
-| `ready-local` | 19 |
+| `ready-local` | 21 |
 | `published-snapshot` | 12 |
-| Уникальных URL в `sitemap.xml` вместе с корнем | 30 |
+| Уникальных URL в `sitemap.xml` вместе с корнем | 32 |
 
 Несколько записей могут вести в одну папку: например, базовый пентест, углублённый пентест, статический анализ и фаззинг представлены страницами или якорями домена `new-courses.pikov.expert`.
 
@@ -68,6 +68,8 @@
 | 29 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | `ready-local` |
 | 30 | Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта | [27-07-2026.pikov.expert](https://27-07-2026.pikov.expert/) | РБПО | `ready-local` |
 | 31 | Языки, архитектура и безопасный SQL | [29-07-2026.pikov.expert](https://29-07-2026.pikov.expert/) | РБПО | `ready-local` |
+| 32 | Безопасность приложений: методическая лекция и разбор первого дня | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `ready-local` |
+| 33 | Безопасность приложений: практикум и лабораторные задания | [appsec-lections.pikov.expert/practice.html](https://appsec-lections.pikov.expert/practice.html) | РБПО | `ready-local` |
 
 ## Структура
 
@@ -91,6 +93,7 @@
 ├── scaner-vs/
 ├── 27-07-2026/
 ├── 29-07-2026/
+├── appsec-lections/
 ├── ...
 ├── spdx/
 ├── LICENSE.md

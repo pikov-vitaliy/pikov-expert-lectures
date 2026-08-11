@@ -308,15 +308,16 @@ if ($LASTEXITCODE -eq 0 -and $spdxLegacyGoogleAnalytics) {
 
 $spdxHtaccessPath = Join-Path (Join-Path $rootPath 'spdx') '.htaccess'
 $spdxHtaccess = Get-Content -LiteralPath $spdxHtaccessPath -Encoding UTF8 -Raw
-$spdxHtmlFilesMatch = '<FilesMatch "(?i)^(?!\.)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$).+$">'
+$spdxHtmlFilesMatch = '<FilesMatch "(?i)^(?!\.)(?!^(?:LICENSE|NOTICE)$)(?!.*\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip|orig|py)$).+$">'
 $spdxHtmlFilesMatchBlock = '(?is)' + [regex]::Escape($spdxHtmlFilesMatch) + '\s*ForceType\s+text/html\s*</FilesMatch>'
 if ($spdxHtaccess -notmatch $spdxHtmlFilesMatchBlock) {
   Fail "SPDX .htaccess does not assign text/html to paired extensionless pages"
 }
 
-$spdxKnownAssetExtension = '\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip)$'
+$spdxKnownAssetExtension = '\.(?:css|html?|ico|js|json|jsonld|md|ttl|txt|xml|zip|orig|py)$'
+$spdxKnownAssetNames = @('LICENSE', 'NOTICE')
 $spdxHtmlCandidates = @(Get-ChildItem -LiteralPath (Join-Path $rootPath 'spdx') -Recurse -File | Where-Object {
-  -not $_.Name.StartsWith('.') -and $_.Name -notmatch $spdxKnownAssetExtension
+  -not $_.Name.StartsWith('.') -and $_.Name -notin $spdxKnownAssetNames -and $_.Name -notmatch $spdxKnownAssetExtension
 })
 $spdxUnsafeForcedHtml = @($spdxHtmlCandidates | Where-Object {
   -not (Test-Path -LiteralPath ($_.FullName + '.html') -PathType Leaf)
