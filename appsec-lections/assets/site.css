@@ -470,6 +470,10 @@ td .muted { display: block; margin-top: 0.2rem; font-size: 0.83rem; }
 .code-card-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.75rem; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.78rem; }
 pre { margin: 0; overflow-x: auto; color: #d9f8ff; font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; font-size: 0.84rem; line-height: 1.65; }
 code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
+/* Короткие технические токены не переносятся по дефису: иначе флаг вида
+ * --privileged разрывается на «--» и «privileged» и читается как опечатка.
+ * В <pre> это правило не действует — там перенос задаётся отдельно. */
+:not(pre) > code { white-space: nowrap; overflow-wrap: normal; }
 .copy-button { min-height: 32px; padding: 0.35rem 0.55rem; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--copy-bg); color: #f2f7ff; font-size: 0.75rem; font-weight: 750; }
 
 .lab-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.85rem; }
@@ -551,6 +555,15 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
 .callout.warn .callout-label { color: var(--danger); }
 .callout-duo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 .callout-duo .callout { margin-top: 0; }
+
+/* Оглавление длинной страницы: набор якорей одной строкой.
+ * Нужно там, где материал перестал помещаться в один экран прокрутки. */
+.toc { display: grid; gap: 0.7rem; min-width: 0; margin-top: 1.6rem; padding: 1rem 1.15rem 1.1rem; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-subtle); }
+.toc-title { margin: 0; color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.09em; text-transform: uppercase; }
+.toc-list { display: flex; flex-wrap: wrap; gap: 0.45rem; margin: 0; padding: 0; list-style: none; }
+.toc-list a { display: inline-flex; align-items: baseline; gap: 0.45rem; padding: 0.45rem 0.78rem; border: 1px solid var(--line); border-radius: 999px; background: var(--control-bg); color: var(--text-soft); font-size: 0.83rem; font-weight: 650; text-decoration: none; }
+.toc-list a:hover, .toc-list a:focus-visible { border-color: var(--cyan); background: var(--control-hover-bg); color: var(--text); }
+.toc-list b { color: var(--cyan); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.71rem; font-weight: 800; }
 
 /* Глоссарий и разбор терминов. */
 .glossary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.8rem; margin-top: 1.2rem; }

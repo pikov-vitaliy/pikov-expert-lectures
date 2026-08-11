@@ -51,6 +51,47 @@
         <article class="panel reveal"><p class="caption">После занятия</p><ol class="checklist"><li>Остановить контейнер; временная среда должна быть удаляемой.</li><li>Сохранить доказательства, нужные для отчёта, и указать их происхождение.</li><li>Проверить, что в отчёте нет паролей, токенов, ключей и персональных данных.</li><li>Отметить, какие файлы являются исходными, автоматически обработанными и редакторскими.</li><li>Зафиксировать фактическую версию среды для повторяемости.</li></ol></article>
       </div>
       <div class="code-card reveal" style="margin-top:1rem"><div class="code-card-inner"><div class="code-card-header"><span>PowerShell / Docker · образ закрепляет преподаватель</span><button class="copy-button" type="button" data-copy="#local-command">Копировать</button></div><pre id="local-command"><code>docker pull bkimminich/juice-shop:&lt;проверенный-тег&gt;&#10;docker run --rm --name appsec-juice-shop `&#10;  -p 127.0.0.1:3000:3000 `&#10;  -e NODE_ENV=unsafe `&#10;  bkimminich/juice-shop:&lt;проверенный-тег&gt;</code></pre></div></div>
+      <figure class="figure reveal">
+        <div class="figure-head"><h3>Контур практики: что внутри и что снаружи</h3><p class="figure-index">Схема 14</p></div>
+        <div class="figure-scroll">
+          <svg class="dg" viewBox="0 0 900 296" role="img" aria-labelledby="f14t f14d">
+            <title id="f14t">Границы разрешённой учебной среды</title>
+            <desc id="f14d">Уязвимое приложение работает на локальном интерфейсе внутри временного контейнера. Наружу выходит только отчёт. Любые внешние цели находятся за границей разрешения и недопустимы.</desc>
+            <defs><marker id="f14a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-good"/></marker>
+            <marker id="f14b" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head is-danger"/></marker></defs>
+            <text x="16" y="20" class="dg-k">РАЗРЕШЕНО · ВАША МАШИНА</text>
+            <rect x="16" y="28" width="530" height="176" rx="14" class="dg-zone is-good"/>
+            <rect x="34" y="48" width="230" height="66" rx="10" class="dg-box is-good"/>
+            <text x="50" y="72" class="dg-h">Браузер и инструменты</text>
+            <text x="50" y="91" class="dg-s">обращаются только к</text>
+            <text x="50" y="106" class="dg-mono">127.0.0.1:3000</text>
+            <rect x="296" y="48" width="232" height="66" rx="10" class="dg-box is-warn"/>
+            <text x="312" y="72" class="dg-h">Уязвимое приложение</text>
+            <text x="312" y="91" class="dg-s">закреплённый тег или digest,</text>
+            <text x="312" y="106" class="dg-s">контейнер запущен с --rm</text>
+            <rect x="34" y="128" width="494" height="60" rx="10" class="dg-box is-quiet"/>
+            <text x="50" y="151" class="dg-h">Порт опубликован только на локальный интерфейс</text>
+            <text x="50" y="170" class="dg-s">не 3000:3000, а 127.0.0.1:3000:3000 — иначе цель видна всей аудитории и сети.</text>
+            <path d="M268 81 L292 81" class="dg-flow is-good" marker-end="url(#f14a)"/>
+            <text x="580" y="20" class="dg-k">ЗА ГРАНИЦЕЙ РАЗРЕШЕНИЯ</text>
+            <rect x="580" y="28" width="304" height="176" rx="14" class="dg-zone is-danger"/>
+            <rect x="598" y="48" width="268" height="66" rx="10" class="dg-box is-danger"/>
+            <text x="614" y="72" class="dg-h">Чужие сайты и сервисы</text>
+            <text x="614" y="91" class="dg-s">учебные приёмы к ним неприменимы</text>
+            <text x="614" y="106" class="dg-s">ни при каком уровне задания</text>
+            <rect x="598" y="128" width="268" height="60" rx="10" class="dg-box is-danger"/>
+            <text x="614" y="151" class="dg-h">Сеть аудитории и вуза</text>
+            <text x="614" y="170" class="dg-s">тоже снаружи: это не «своя» инфраструктура</text>
+            <path d="M552 116 L576 116" class="dg-flow is-danger" marker-end="url(#f14b)"/>
+            <text x="404" y="126" class="dg-fill-danger dg-mono">✕ нет</text>
+            <path d="M16 236 L884 236" class="dg-rule"/>
+            <text x="16" y="260" class="dg-h">Наружу из контура выходит ровно одно — отчёт.</text>
+            <text x="16" y="282" class="dg-s">И он тоже фильтруется: без ключей, токенов, персональных данных и точных маршрутов эксплуатации.</text>
+          </svg>
+        </div>
+        <figcaption><b>Что проговорить вслух до начала.</b> Правило простое и не смягчается уровнем задания: за пределами выданной локальной среды — ничего и никогда. Объявлять его нужно до практики, а не после.</figcaption>
+      </figure>
+
       <aside class="notice amber reveal"><strong>Почему не указан произвольный тег?</strong> Версия среды 11.08.2026 в текущем локальном наборе не зафиксирована детерминированно, а задания Juice Shop меняются между релизами. Не используйте незафиксированный образ как «стабильный» учебный контракт. Сначала проверьте актуальный <a href="https://github.com/juice-shop/juice-shop/releases" rel="noreferrer">release</a>, протестируйте выбранную версию и запишите тег/digest в материалы группы.</aside>
     </div></section>
 
@@ -86,6 +127,53 @@
 
     <section class="section section-band" aria-labelledby="report-title"><div class="content">
       <div class="section-top reveal"><div><p class="caption">04 · Протокол результата</p><h2 id="report-title">Шаблон превращает лабораторную работу в проверяемый учебный артефакт.</h2></div><p>Не переносите в публичный отчёт ключи, персональные данные, токены и точные маршруты атаки. Храните только достаточные, обезличенные доказательства с явно указанной учебной средой.</p></div>
+      <figure class="figure reveal">
+        <div class="figure-head"><h3>Что превращает «получилось» в результат работы</h3><p class="figure-index">Схема 13</p></div>
+        <div class="figure-scroll">
+          <svg class="dg" viewBox="0 0 900 300" role="img" aria-labelledby="f13t f13d">
+            <title id="f13t">Пять шагов от наблюдения к проверяемому исправлению</title>
+            <desc id="f13d">Наблюдение фиксирует поведение системы, первопричина объясняет его, последствие связывает с активом, исправление устраняет причину, регрессионный тест не даёт ей вернуться.</desc>
+            <defs><marker id="f13a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" class="dg-head"/></marker></defs>
+            <rect x="16" y="34" width="160" height="96" rx="12" class="dg-box is-warn"/>
+            <text x="32" y="58" class="dg-k">01 · НАБЛЮДЕНИЕ</text>
+            <text x="32" y="82" class="dg-h">Что видно</text>
+            <text x="32" y="102" class="dg-s">поведение системы,</text>
+            <text x="32" y="117" class="dg-s">обезличенно и точно</text>
+            <rect x="196" y="34" width="160" height="96" rx="12" class="dg-box is-danger"/>
+            <text x="212" y="58" class="dg-k">02 · ПРИЧИНА</text>
+            <text x="212" y="82" class="dg-h">Почему так</text>
+            <text x="212" y="102" class="dg-s">какой проверки нет</text>
+            <text x="212" y="117" class="dg-s">и на какой стороне</text>
+            <rect x="376" y="34" width="160" height="96" rx="12" class="dg-box"/>
+            <text x="392" y="58" class="dg-k">03 · ПОСЛЕДСТВИЕ</text>
+            <text x="392" y="82" class="dg-h">Кому дорого</text>
+            <text x="392" y="102" class="dg-s">актив и нарушенное</text>
+            <text x="392" y="117" class="dg-s">свойство из триады</text>
+            <rect x="556" y="34" width="160" height="96" rx="12" class="dg-box is-good"/>
+            <text x="572" y="58" class="dg-k">04 · ИСПРАВЛЕНИЕ</text>
+            <text x="572" y="82" class="dg-h">Что менять</text>
+            <text x="572" y="102" class="dg-s">серверная мера,</text>
+            <text x="572" y="117" class="dg-s">а не правка интерфейса</text>
+            <rect x="736" y="34" width="148" height="96" rx="12" class="dg-box is-good"/>
+            <text x="752" y="58" class="dg-k">05 · ТЕСТ</text>
+            <text x="752" y="82" class="dg-h">Чем доказано</text>
+            <text x="752" y="102" class="dg-s">отрицательный тест,</text>
+            <text x="752" y="117" class="dg-s">который раньше падал</text>
+            <path d="M180 82 L192 82" class="dg-flow" marker-end="url(#f13a)"/>
+            <path d="M360 82 L372 82" class="dg-flow" marker-end="url(#f13a)"/>
+            <path d="M540 82 L552 82" class="dg-flow" marker-end="url(#f13a)"/>
+            <path d="M720 82 L732 82" class="dg-flow" marker-end="url(#f13a)"/>
+            <path d="M16 168 L884 168" class="dg-rule"/>
+            <text x="16" y="194" class="dg-h">Работа сделана не там, где что-то получилось, а там, где вы можете это выключить.</text>
+            <text x="16" y="216" class="dg-s">Найденный флаг закрывает шаг 01 и не говорит ничего про шаги 02–05. Именно поэтому он сам по себе не оценивается.</text>
+            <rect x="16" y="236" width="868" height="48" rx="10" class="dg-box is-quiet"/>
+            <text x="34" y="258" class="dg-h">Проверка на честность отчёта</text>
+            <text x="34" y="276" class="dg-s">Прочитайте свой шаг 04 и спросите: если это внедрить, шаг 01 перестанет воспроизводиться? Если нет — причина найдена неверно.</text>
+          </svg>
+        </div>
+        <figcaption><b>Почему пять шагов, а не два.</b> Цепочка держится на связке «причина → исправление»: без неё отчёт описывает симптом, и перенести вывод в собственный проект невозможно.</figcaption>
+      </figure>
+
       <div class="split report-split">
         <article class="panel reveal"><p class="caption">Структура, которую можно оценить</p><ol class="checklist"><li><span class="checklist-copy"><strong>Среда:</strong> локальная цель, дата, версия и границы разрешения.</span></li><li><span class="checklist-copy"><strong>Что сделано:</strong> нейтральное описание проверенного сценария.</span></li><li><span class="checklist-copy"><strong>Доказательства:</strong> обезличенное наблюдение, запрос/ответ или флаг без ключа.</span></li><li><span class="checklist-copy"><strong>Ключевая причина:</strong> техническое и архитектурное объяснение.</span></li><li><span class="checklist-copy"><strong>Исправление:</strong> серверная мера, защита в глубину и регрессионный тест.</span></li></ol></article>
         <article class="panel reveal"><p class="caption">Критерии обратной связи</p><h3>Оценивайте не эффект, а понимание причины</h3><p>Полезная шкала: результат и полнота обязательных шагов; объяснение первопричины; конкретность профилактики; качество и безопасность оформления. Так слушатель переносит вывод в SSDLC, а не повторяет сценарий вслепую.</p><p><a href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать авторский шаблон отчёта →</a></p></article>
