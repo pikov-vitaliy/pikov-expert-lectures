@@ -19,17 +19,22 @@ function New-DayArchive {
   Compress-Archive -LiteralPath $Path -DestinationPath $Destination -CompressionLevel Optimal -Force
 }
 
-$slides = Join-Path $dayRoot 'slides'
 $transcripts = Join-Path $dayRoot 'transcripts'
 $participantMaterials = Join-Path $dayRoot 'participant-materials'
 $labResults = Join-Path $dayRoot 'lab-results'
 $programAndEnvironment = Join-Path $dayRoot 'program-and-environment'
 
+# Рабочие фотографии используются только для редакторской сверки и никогда не
+# входят в публичный пакет. Удаляем прежние артефакты, если они остались от
+# старой сборки, чтобы release не мог подхватить их повторно.
+@('day-01-slides-original.zip', 'day-01-full-source-package.zip') | ForEach-Object {
+  Remove-Item -LiteralPath (Join-Path $downloadsRoot $_) -Force -ErrorAction SilentlyContinue
+}
+
 $archives = @(
-  @{ Name = 'day-01-slides-original.zip'; Paths = @($slides) },
   @{ Name = 'day-01-transcripts-original.zip'; Paths = @($transcripts) },
   @{ Name = 'day-01-laboratory-materials-and-reports.zip'; Paths = @($participantMaterials, $labResults, $programAndEnvironment) },
-  @{ Name = 'day-01-full-source-package.zip'; Paths = @($dayRoot) }
+  @{ Name = 'day-01-public-materials.zip'; Paths = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) }
 )
 
 $checksumLines = New-Object System.Collections.Generic.List[string]
@@ -44,7 +49,9 @@ foreach ($archive in $archives) {
 
 Set-Content -LiteralPath (Join-Path $downloadsRoot 'day-01-SHA256SUMS.txt') -Value $checksumLines -Encoding utf8
 
-$files = Get-ChildItem -LiteralPath $dayRoot -File -Recurse | Sort-Object FullName | ForEach-Object {
+$files = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) | ForEach-Object {
+  Get-ChildItem -LiteralPath $_ -File -Recurse
+} | Sort-Object FullName | ForEach-Object {
   [pscustomobject]@{
     path = [System.IO.Path]::GetRelativePath($dayRoot, $_.FullName).Replace('\', '/')
     bytes = $_.Length
@@ -52,7 +59,7 @@ $files = Get-ChildItem -LiteralPath $dayRoot -File -Recurse | Sort-Object FullNa
   }
 }
 $manifest = [pscustomobject]@{
-  title = 'Исходные материалы первого дня — 11 августа 2026 года'
+  title = 'Публичные материалы первого дня — 11 августа 2026 года'
   files = @($files)
 }
 $manifest | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $downloadsRoot 'day-01-manifest.json') -Encoding utf8

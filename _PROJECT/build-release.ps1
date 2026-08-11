@@ -119,13 +119,12 @@ $script:ReviewedNestedDistributables = @{
     'materials\downloads\inspector-labs-markdown.zip',
     'materials\downloads\scanner-labs-markdown.zip'
   )
-  # The site owner explicitly authorized publication of the original first-day
-  # lecture package, including slide photographs and source transcripts.
+  # Public first-day materials are an explicit reviewed set. Working photos
+  # remain outside the release and are only an editorial source.
   'appsec-lections' = @(
-    'downloads\day-01-slides-original.zip',
     'downloads\day-01-transcripts-original.zip',
     'downloads\day-01-laboratory-materials-and-reports.zip',
-    'downloads\day-01-full-source-package.zip'
+    'downloads\day-01-public-materials.zip'
   )
 }
 
@@ -187,6 +186,10 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       $segments = $relative.Split('\')
       $parentSegments = @($segments | Select-Object -First ([Math]::Max($segments.Count - 1, 0)))
       if (@($parentSegments | Where-Object { Should-ExcludeDirectory $_ }).Count -gt 0) { return }
+
+      # Photographs taken during the first-day session are a private editorial
+      # source. Keep this narrow guard even if a local working folder returns.
+      if ($folderName -eq 'appsec-lections' -and $relative -match '^downloads\\day-01\\slides(\\|$)') { return }
 
       if (Should-IncludeReviewedNestedDistributable -FolderName $folderName -RelativePath $relative) {
         $files.Add($relative)
