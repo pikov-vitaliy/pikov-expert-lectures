@@ -124,7 +124,11 @@ $script:ReviewedNestedDistributables = @{
   'appsec-lections' = @(
     'downloads\day-01-edited-transcript-and-summaries.zip',
     'downloads\day-01-laboratory-materials-and-reports.zip',
-    'downloads\day-01-public-materials.zip'
+    'downloads\day-01-public-materials.zip',
+    'downloads\day-02-edited-transcript-and-protocol.zip',
+    'downloads\day-02-laboratory-materials.zip',
+    'downloads\day-02-public-materials.zip',
+    'downloads\day-02\participant-materials\lr-ssrf\README.md'
   )
 }
 
@@ -190,6 +194,11 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       # Photographs taken during the first-day session are a private editorial
       # source. Keep this narrow guard even if a local working folder returns.
       if ($folderName -eq 'appsec-lections' -and $relative -match '^downloads\\day-01\\slides(\\|$)') { return }
+
+      # Day 2 is published only as a reconstructed accessible HTML deck.
+      # Keep both the former gallery index and its image directory out of a
+      # release even if somebody reintroduces a local working copy.
+      if ($folderName -eq 'appsec-lections' -and ($relative -eq 'assets\\day-02-slides.js' -or $relative -match '^assets\\day-02-slides(\\|$)')) { return }
 
       # Published AppSec downloads use Markdown for reader-facing text. Raw
       # ASR TXT files must not re-enter the public release by accident.

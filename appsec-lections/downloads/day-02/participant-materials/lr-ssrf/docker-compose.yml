@@ -1,0 +1,52 @@
+services:
+  gateway:
+    build:
+      context: ./gateway
+    ports:
+      - "127.0.0.1:${SSRF_LAB_PORT:-8080}:8080"
+    networks:
+      - edge
+      - labnet
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  app:
+    build:
+      context: ./app
+    expose:
+      - "8080"
+    networks:
+      - labnet
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+  internal:
+    build:
+      context: ./internal
+    expose:
+      - "9000"
+    networks:
+      - labnet
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+
+networks:
+  edge:
+    driver: bridge
+  labnet:
+    internal: true

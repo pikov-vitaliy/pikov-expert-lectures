@@ -1,9 +1,1 @@
-# Контрольные суммы SHA-256 — материалы первого дня
-
-> Значения относятся к ZIP-пакетам, собранным из опубликованного набора. Все текстовые материалы внутри архива стенограммы и пересказов представлены в Markdown.
-
-```text
-E0E87270126894E9B1E67FD21D9BF187544E1A718809FD1F8A94CD2692F99BB4  day-01-edited-transcript-and-summaries.zip  58079 bytes
-AF35A835C0115C2CF2BDAAE70547CAE519CAFB64546F1BD21E89077AC2CB6BD5  day-01-laboratory-materials-and-reports.zip  10835645 bytes
-C3544A95623228FF9772790C4D46B74A04CF76933A2610719D4253AC79F2ED1E  day-01-public-materials.zip  10935345 bytes
-```
+# Контрольные суммы SHA-256 — материалы первого дня  > Значения относятся к ZIP-пакетам, собранным из опубликованного набора. Все текстовые материалы внутри архива стенограммы и пересказов представлены в Markdown.  ```text 457E9A52452F79991BF5DBF5AB47DAF7D8FCC8A348B93FE95CD50F0DE830A0A9  day-01-edited-transcript-and-summaries.zip  58934 bytes 1732BA059D852DA62AED1159EF84F920B9E8AC238F676CEFE4D62216E8CE3CD5  day-01-laboratory-materials-and-reports.zip  10826294 bytes A54AE26C33AC43F0939BE067B1255BAB63212C4BF0533D43BF24B679C3E43CA1  day-01-public-materials.zip  10926739 bytes ```
