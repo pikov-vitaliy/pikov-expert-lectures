@@ -227,41 +227,42 @@ if ($publishedSnapshot -ne [int]$data.summary.publishedSnapshot) {
 }
 
 $html = Get-Content -LiteralPath $indexPath -Encoding UTF8 -Raw
-$cardUrls = [regex]::Matches($html, '<a class="card" href="([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+
+# The root catalog is rendered client-side from a `LECTURES` JS array (see
+# index.html) rather than static <a class="card"> markup, and its schema.org
+# ItemList is built and injected by that same script at runtime -- neither
+# exists in the raw file for a naive HTML scrape to find. Read the LECTURES
+# array itself (the single source of truth the page renders from) instead;
+# `url: "..."` only matches that JS array, not the quoted "url": "..." keys
+# inside the static Person/WebSite JSON-LD block that ships in <head>.
+$cardUrls = [regex]::Matches($html, 'url:\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
 if (@($cardUrls).Count -ne $lectures.Count) {
-  Fail "Root card count $(@($cardUrls).Count) != lectures count $($lectures.Count)"
+  Fail "LECTURES array count $(@($cardUrls).Count) != lectures.json count $($lectures.Count)"
 }
+$cardUrlsNormalized = @($cardUrls | ForEach-Object { $_.TrimEnd('/') })
 
 foreach ($lecture in $lectures) {
-  if ($cardUrls -notcontains $lecture.url.TrimEnd('/')) {
-    $withoutSlash = $lecture.url.TrimEnd('/')
-    if ($cardUrls -notcontains $withoutSlash) {
-      Fail "Root card missing URL $($lecture.url)"
-    }
+  if ($cardUrlsNormalized -notcontains $lecture.url.TrimEnd('/')) {
+    Fail "LECTURES array missing URL $($lecture.url)"
   }
 }
 
 $jsonMatch = [regex]::Match($html, '(?s)<script type="application/ld\+json">(.*?)</script>')
-if (-not $jsonMatch.Success) { Fail "Missing JSON-LD block" }
+if (-not $jsonMatch.Success) { Fail "Missing static JSON-LD block (Person/WebSite)" }
 $jsonld = $jsonMatch.Groups[1].Value | ConvertFrom-Json
-$itemList = @($jsonld.'@graph' | Where-Object { $_.'@type' -eq 'ItemList' })[0]
-if (-not $itemList) { Fail "Missing ItemList in JSON-LD" }
-if ([int]$itemList.numberOfItems -ne $lectures.Count) {
-  Fail "JSON-LD numberOfItems $($itemList.numberOfItems) != lectures count $($lectures.Count)"
+if (@($jsonld.'@graph' | Where-Object { $_.'@type' -eq 'Person' }).Count -eq 0) {
+  Fail "Static JSON-LD missing Person"
 }
-$jsonItems = @($itemList.itemListElement)
-if ($jsonItems.Count -ne $lectures.Count) {
-  Fail "JSON-LD item count $($jsonItems.Count) != lectures count $($lectures.Count)"
+if ($html -notmatch '"@type":\s*"ItemList"') { Fail "Root index script no longer builds an ItemList" }
+if ($html -notmatch '"numberOfItems":\s*[a-zA-Z_]\w*') {
+  Fail "Root index ItemList numberOfItems no longer derived from a variable (LECTURES.length) -- looks hardcoded"
 }
-$jsonPositions = @($jsonItems | Sort-Object position | ForEach-Object { [int]$_.position })
-for ($i = 0; $i -lt $expectedPositions.Count; $i++) {
-  if ($jsonPositions[$i] -ne $expectedPositions[$i]) {
-    Fail "JSON-LD position sequence mismatch at index $i"
-  }
+if (-not ($cardUrls -contains 'https://spdx.pikov.expert/' -or $cardUrls -contains 'https://spdx.pikov.expert')) {
+  Fail "LECTURES array does not include spdx.pikov.expert"
 }
-if (-not ($jsonItems | Where-Object { $_.item.url -eq 'https://spdx.pikov.expert/' })) {
-  Fail "JSON-LD does not include spdx.pikov.expert"
-}
+# Deep structural validation of the *rendered* ItemList (position sequence,
+# exact item count matching lectures.json) now needs a live DOM and lives in
+# _PROJECT/qa-root-index.mjs (Playwright) rather than this static-text pass.
 
 [xml]$sitemap = Get-Content -LiteralPath $sitemapPath -Encoding UTF8 -Raw
 $ns = New-Object System.Xml.XmlNamespaceManager($sitemap.NameTable)
