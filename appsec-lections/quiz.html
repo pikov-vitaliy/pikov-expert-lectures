@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Самопроверка по безопасности приложений: 15 вопросов с разбором правильных и неверных ответов и привязкой к OWASP, CWE, NIST и ГОСТ.">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website"><meta property="og:locale" content="ru_RU"><meta property="og:title" content="Безопасность приложений — самопроверка"><meta property="og:description" content="15 вопросов с мгновенной проверкой и разбором: аутентификация, инъекции, SSRF, память, SSDLC и мобильные приложения."><meta property="og:url" content="https://appsec-lections.pikov.expert/quiz.html"><meta property="og:image" content="https://appsec-lections.pikov.expert/assets/appsec-map-hero.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://appsec-lections.pikov.expert/quiz.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111f'/%3E%3Cpath d='M17 32h30M32 17v30' stroke='%2365e5ff' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Безопасность приложений — самопроверка</title>
+  <link rel="stylesheet" href="assets/site.css?v=20260811-theme">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"Quiz","name":"Самопроверка по безопасности приложений","inLanguage":"ru","url":"https://appsec-lections.pikov.expert/quiz.html","about":"Application security","educationalLevel":"professional development","author":{"@type":"Person","name":"Виталий Александрович Пиков","url":"https://pikov.expert/"},"license":"https://creativecommons.org/licenses/by/4.0/","isBasedOn":{"@type":"CreativeWork","name":"Образовательная лаборатория Kaspersky Academy | Безопасность приложений","provider":{"@type":"Organization","name":"АО «Лаборатория Касперского»"}}}</script>
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a><div class="reading-line" aria-hidden="true"></div>
+  <header class="site-header"><div class="header-inner"><a class="brand brand-back" href="https://pikov.expert/" aria-label="На главный сайт pikov.expert"><span class="brand-mark" aria-hidden="true">↗</span><span>appsec / lectures<br><small>pikov.expert</small></span></a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button><nav class="nav" id="site-nav" aria-label="Основная навигация"><a href="index.html">Программа</a><a href="day-01.html">День 1</a><a href="day-02.html">День 2</a><a href="slides-day-01.html">Слайды 1</a><a href="slides-day-02.html">Слайды 2</a><a href="practice.html">Практикум</a><a href="glossary.html">Глоссарий</a><a href="for-teachers.html">Преподавателю</a><a href="quiz.html" aria-current="page">Самопроверка</a><a href="rights.html">Права</a></nav></div></header>
+  <main id="main">
+    <section class="section"><div class="content" style="padding-top:2rem">
+      <p class="eyebrow reveal">Самопроверка · 15 вопросов</p>
+      <div class="section-top reveal"><div><h1 style="max-width:16ch">Проверьте себя <span class="accent">до и после</span> курса.</h1></div><p>Пятнадцать вопросов по темам обоих дней: контроль доступа, инъекции, аутентификация, целостность, логирование, SSRF, безопасность памяти, SSDLC и мобильные приложения. Выберите ответ — страница сразу покажет верный вариант и объяснит, почему остальные не подходят.</p></div>
+      <aside class="notice reveal"><strong>Как это работает.</strong> Отвечайте в любом порядке; счётчик внизу обновляется автоматически. Разбор появляется сразу после выбора. Вопросы — авторская переработка входного теста программы <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em>; сайт не является официальным ресурсом АО «Лаборатория Касперского».</aside>
+      <form id="quiz" class="quiz" aria-label="Вопросы самопроверки"></form>
+      <div class="quiz-bar reveal" role="status" aria-live="polite"><p class="quiz-score">Результат: <b><span id="quiz-correct">0</span> из 15</b></p><p class="quiz-hint" id="quiz-hint">Отвечено 0 из 15 вопросов.</p><button class="button" type="button" id="quiz-reset">Сбросить</button></div>
+      <div class="callout-duo reveal" style="margin-top:1.4rem"><article class="callout student"><p class="callout-label">Слушателю</p><p>Не запоминайте «правильную букву»: читайте разбор, почему остальные варианты не работают. Именно ошибочные ответы показывают типичные ловушки — «проверка на клиенте», «rate limit вместо allowlist», «hardening вместо устранения причины».</p></article><article class="callout teacher"><p class="callout-label">Заметка преподавателя</p><p>Можно дать квиз в начале занятия как входной срез и в конце — как контрольный. Разбор к каждому вопросу связан с конкретной ЛР практикума, поэтому неверный ответ сразу указывает, какую работу стоит пройти внимательнее.</p></article></div>
+      <p class="button-row reveal" style="margin-top:1.2rem"><a class="button primary" href="practice.html#mapping">Перейти к 12 лабораторным →</a><a class="button" href="glossary.html">Открыть глоссарий →</a><a class="button" href="day-02.html">Материалы дня 2 →</a></p>
+    </div></section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><div><p class="footer-title">appsec / lectures</p><p>Образовательный архив Виталия Александровича Пикова по безопасной разработке.</p></div><div><p class="footer-title">Разделы</p><ul><li><a href="index.html">Программа на два дня</a></li><li><a href="practice.html">Практикум</a></li><li><a href="glossary.html">Глоссарий</a></li><li><a href="for-teachers.html">Преподавателю</a></li></ul></div><div><p class="footer-title">Права</p><p><a href="rights.html">Происхождение файлов и атрибуция</a></p></div></div><div class="footer-bottom">© <span data-year>2026</span> Виталий Александрович Пиков · <a href="https://pikov.expert/">pikov.expert</a></div></footer>
+  <noscript><div class="notice danger" style="margin:1rem">Для интерактивной самопроверки нужен JavaScript. Вопросы и разбор тем также доступны в <a href="materials/практикум-день-2-набор-заданий.md">наборе заданий</a> и <a href="glossary.html">глоссарии</a>.</div></noscript>
+  <script>
+  (function () {
+    'use strict';
+    var QUESTIONS = [
+      { q: 'Мобильное приложение банка проверяет лимит перевода в коде на телефоне; при прямом обращении к API лимит не проверяется. Где должна выполняться проверка?',
+        o: ['На сервере приложения', 'На клиенте (в мобильном приложении)', 'На сетевом экране (firewall)', 'В системе журналирования событий'], a: 0,
+        tag: 'CWE-602 · клиентский контроль',
+        e: 'Клиент недоверен: любой контроль в приложении обходится прямым запросом к API. Бизнес-правила и лимиты проверяются на сервере. Firewall не знает бизнес-логику, а журналирование только фиксирует, но не предотвращает.' },
+      { q: 'GET /api/orders/1005 возвращает заказ пользователя. При изменении id на 1006 сервер возвращает заказ другого пользователя с тем же токеном. Какая проверка отсутствовала?',
+        o: ['Проверка принадлежности объекта пользователю', 'Проверка роли пользователя (RBAC) при каждом запросе', 'Повторная проверка валидности подписи JWT на каждом запросе', 'Проверка, что пользователь прошёл аутентификацию'], a: 0,
+        tag: 'A01:2025 · BOLA/IDOR · CWE-639',
+        e: 'Это BOLA/IDOR: сервер не проверяет, что объект принадлежит субъекту запроса. Роль тут одинаковая, токен валиден, аутентификация пройдена — ни одна из этих проверок не закрывает доступ к чужому объекту. Нужна проверка владения на уровне объекта.' },
+      { q: 'Ссылку на старый B2B-загрузчик убрали из интерфейса, но серверный эндпоинт продолжает принимать запросы. Какая мера устраняет риск?',
+        o: ['Полностью отключить или удалить эндпоинт на сервере', 'Требовать API-ключ для доступа к эндпоинту', 'Разместить эндпоинт на поддомене с ограничением по IP', 'Включить подробное логирование запросов к эндпоинту'], a: 0,
+        tag: 'A02:2025 · оставленная поверхность',
+        e: 'Пока эндпоинт доступен, он остаётся частью поверхности атаки — удаление из интерфейса ничего не меняет. Устраняет риск только полное удаление неиспользуемой функции. Ключ, IP-ограничение и логирование лишь сужают или фиксируют доступ.' },
+      { q: 'Разработчик по ошибке установил вредоносный пакет с именем, похожим на requests (опечатка); при установке пакет отправил CI-токены на сторонний сервер. Как называется атака?',
+        o: ['Typosquatting (похожее по написанию имя пакета)', 'Dependency confusion (подмена приватного пакета публичным)', 'Захват аккаунта мейнтейнера легитимного пакета', 'Внедрение кода через скомпрометированный CI/CD'], a: 0,
+        tag: 'A03:2025 · цепочка поставок',
+        e: 'Ставка на опечатку в имени пакета — это typosquatting. Dependency confusion — это подмена приватного пакета публичным с тем же именем и версией. Захват аккаунта и компрометация CI/CD — другие векторы цепочки поставок.' },
+      { q: 'Атакующий изменил заголовок JWT на alg: none, убрал подпись, изменил role на admin — сервер принял токен. Какая мера предотвращает это?',
+        o: ['Запрет alg:none и проверка допустимых алгоритмов подписи', 'Увеличение длины секретного ключа HMAC', 'Добавление поля nonce в payload', 'Уменьшение времени жизни токена до 1 минуты'], a: 0,
+        tag: 'A04:2025 · CWE-347',
+        e: 'Проблема в том, что сервер доверяет заголовку токена и принимает «алгоритм отсутствует». Фиксируем allow-list алгоритмов и обязательно проверяем подпись. Длина ключа, nonce и короткий TTL не мешают принять неподписанный токен.' },
+      { q: 'Форма входа строит запрос через конкатенацию строк; ввод \' or 1=1-- в поле email обходит аутентификацию. Какая мера надёжно устраняет уязвимость?',
+        o: ['Параметризованные запросы вместо конкатенации строк', 'Хранимые процедуры, которые внутри тоже строятся конкатенацией', 'Ограничение прав учётной записи БД до минимальных', 'Валидация формата email только на стороне клиента'], a: 0,
+        tag: 'A05:2025 · SQLi · CWE-89',
+        e: 'SQL-инъекция возникает из смешения кода и данных. Параметризованный запрос разделяет их и устраняет причину. Хранимая процедура с внутренней конкатенацией уязвима так же; минимальные права — полезная защита в глубину, но не фикс; клиентская валидация обходится.' },
+      { q: 'Комментарий сохраняется в базе и выводится на страницах других пользователей через innerHTML без экранирования. Какой это тип XSS?',
+        o: ['Stored XSS', 'Reflected XSS', 'DOM XSS', 'Blind XSS'], a: 0,
+        tag: 'A05:2025 · XSS · CWE-79',
+        e: 'Полезная нагрузка сохраняется на сервере и выполняется у других пользователей — это хранимый (Stored) XSS. Reflected отражается из текущего запроса, DOM-XSS живёт целиком в клиентском коде, Blind — частный случай хранимого без видимой реакции.' },
+      { q: 'Атакующий изменил количество товара в корзине на -100, сумма стала отрицательной, кошелёк пополнился вместо списания. Какая мера устраняет проблему?',
+        o: ['Проверка на сервере, что итоговая сумма и списания/начисления неотрицательны', 'Ограничение поля quantity в HTML-форме атрибутом min="1"', 'Проверка кредитного лимита перед оформлением заказа', 'Логирование каждого изменения количества в корзине'], a: 0,
+        tag: 'A06:2025 · бизнес-логика · CWE-840',
+        e: 'Это нарушение бизнес-инварианта. Серверная проверка неотрицательности сумм и количества восстанавливает правило. Атрибут min в форме обходится прямым запросом; кредитный лимит и логирование не относятся к этому дефекту.' },
+      { q: 'Атакующий использовал пары логин/пароль, украденные с другого сайта, и массово проверил их на форме входа магазина. Как называется атака?',
+        o: ['Credential stuffing', 'Password spraying', 'Брутфорс', 'SQL-инъекция в форму входа'], a: 0,
+        tag: 'A07:2025 · CWE-307',
+        e: 'Подстановка ранее утёкших пар «логин–пароль» — это credential stuffing. Password spraying перебирает несколько популярных паролей по многим аккаунтам; брутфорс перебирает пароли к одному аккаунту; SQLi — совсем другой класс.' },
+      { q: 'Атакующий загрузил небольшой YAML-файл с рекурсивными алиасами (billion laughs); парсер потребил аномально много CPU и памяти. Какая мера предотвращает атаку?',
+        o: ['Парсер с ограничением глубины разворачивания алиасов и schema-валидацией', 'Ограничение максимального размера загружаемого файла', 'Увеличение вычислительных ресурсов сервера', 'Проверка контрольной суммы файла перед разбором'], a: 0,
+        tag: 'A08:2025 · CWE-776',
+        e: 'Опасность не в размере файла, а в рекурсивном разворачивании. Безопасный парсер с лимитом глубины/алиасов и валидацией схемы устраняет причину. Лимит размера обходится (файл крошечный), больше ресурсов лишь отодвигает отказ, контрольная сумма не мешает разбору.' },
+      { q: 'После инцидента не удалось установить, кто и когда отключил учётную запись коллеги — в логах фиксировался только HTTP 200. Какой элемент логирования отсутствовал?',
+        o: ['Контекст «кто-что-когда-откуда» для привилегированных действий', 'Повышение уровня детализации логов до DEBUG для всех запросов', 'Централизация логов в отдельной SIEM-системе', 'Увеличение срока хранения логов до нескольких лет'], a: 0,
+        tag: 'A09:2025 · CWE-778',
+        e: 'Событие безопасности должно нести субъект, объект, время, источник и результат. Без этого контекста расследование невозможно. DEBUG зашумляет логи и добавляет риски, SIEM и срок хранения полезны, но не заменяют содержание самой записи.' },
+      { q: 'Сервис делает HTTP-запрос по переданному пользователем url; запрос к http://internal:9000/meta вернул внутренние данные. Какая мера предотвращает атаку?',
+        o: ['Allowlist доменов и блокировка запросов к внутренним/приватным IP', 'Проверка, что URL начинается со схемы https://', 'Использование исходящего прокси без ограничений по адресатам', 'Ограничение количества запросов в минуту с одного IP'], a: 0,
+        tag: 'A10:2021 · SSRF · CWE-918',
+        e: 'SSRF закрывается allowlist адресатов и блокировкой внутренних/приватных диапазонов после разрешения имени. Проверка схемы https не мешает обратиться к внутреннему https-ресурсу; прокси без ограничений не помогает; rate limit — вообще про другое.' },
+      { q: 'Буфер name[64] расположен рядом с cmd[64], который передаётся в system(); длинный ввод в name перезаписывает cmd командой атакующего. Какой механизм реализован?',
+        o: ['Переполнение буфера, повреждающее соседние данные в памяти', 'Use-after-free — обращение к памяти после освобождения', 'Целочисленное переполнение при вычислении размера буфера', 'Состояние гонки при параллельном доступе к переменной'], a: 0,
+        tag: 'память · CWE-120/787',
+        e: 'Запись за границу name затирает соседний cmd — это переполнение буфера с повреждением смежных данных. Use-after-free, integer overflow и race condition — другие классы дефектов памяти и конкурентности.' },
+      { q: 'Команда систематически перебирает угрозы (спуфинг, подмена данных, отказ в обслуживании) по модели STRIDE до начала написания кода. На каком этапе SDLC выполняется эта практика?',
+        o: ['Проектирование', 'Планирование', 'Тестирование', 'Эксплуатация'], a: 0,
+        tag: 'SSDLC · STRIDE',
+        e: 'Моделирование угроз по STRIDE привязано к архитектуре и потокам данных, поэтому выполняется на этапе проектирования — до кода. На планировании ещё нет архитектуры, на тестировании и эксплуатации уязвимость уже дороже исправлять.' },
+      { q: 'Экран «Перевод средств» открывается только после биометрии в UI, но то же действие вызывается напрямую через deep link myapp://transfer?to=X&amount=Y из другого приложения. Какая мера устраняет уязвимость?',
+        o: ['Проверка авторизации и деталей операции в обработчике deep link, а не только в UI', 'Ограничение вызова ссылки приложениями с тем же сертификатом (App/Universal Links)', 'Подтверждение действия push-уведомлением без указания суммы и получателя', 'Логирование всех вызовов deep link для аудита'], a: 0,
+        tag: 'mobile · CWE-862',
+        e: 'Биометрия в UI — это контроль на клиенте; deep link идёт в обход экрана. Проверять авторизацию и параметры операции нужно в обработчике действия на доверенной стороне. App/Universal Links сужают источник, но не проверяют право на операцию; push без деталей и логирование не предотвращают перевод.' }
+    ];
+
+    var form = document.getElementById('quiz');
+    var correctEl = document.getElementById('quiz-correct');
+    var hintEl = document.getElementById('quiz-hint');
+    var answered = {};
+    var LETTERS = ['А', 'Б', 'В', 'Г'];
+
+    function render() {
+      form.replaceChildren();
+      QUESTIONS.forEach(function (item, qi) {
+        var fs = document.createElement('fieldset');
+        fs.className = 'quiz-q';
+        fs.id = 'q' + qi;
+        var legendNum = document.createElement('p');
+        legendNum.className = 'quiz-num';
+        legendNum.textContent = 'Вопрос ' + (qi + 1) + ' из ' + QUESTIONS.length;
+        var legend = document.createElement('legend');
+        legend.className = 'quiz-text';
+        legend.textContent = item.q;
+        var opts = document.createElement('div');
+        opts.className = 'quiz-opts';
+        item.o.forEach(function (text, oi) {
+          var label = document.createElement('label');
+          label.className = 'quiz-opt';
+          if (oi === item.a) label.classList.add('correct-opt');
+          var input = document.createElement('input');
+          input.type = 'radio';
+          input.name = 'q' + qi;
+          input.value = String(oi);
+          input.addEventListener('change', function () { check(qi, oi); });
+          var span = document.createElement('span');
+          span.className = 'quiz-opt-text';
+          span.textContent = LETTERS[oi] + '. ' + text;
+          var mark = document.createElement('span');
+          mark.className = 'quiz-mark';
+          label.append(input, span, mark);
+          opts.append(label);
+        });
+        var explain = document.createElement('p');
+        explain.className = 'quiz-explain';
+        explain.hidden = true;
+        var tag = document.createElement('span');
+        tag.className = 'quiz-tag';
+        tag.textContent = item.tag;
+        explain.append(tag, document.createElement('br'), document.createTextNode(item.e));
+        fs.append(legendNum, legend, opts, explain);
+        form.append(fs);
+      });
+    }
+
+    function check(qi, oi) {
+      var item = QUESTIONS[qi];
+      var fs = document.getElementById('q' + qi);
+      if (fs.classList.contains('is-checked')) return;
+      fs.classList.add('is-checked');
+      var labels = fs.querySelectorAll('.quiz-opt');
+      labels.forEach(function (label, li) {
+        var input = label.querySelector('input');
+        input.disabled = true;
+        if (li === item.a) label.classList.add('is-correct');
+        else label.classList.add('is-wrong');
+        if (li === oi && li !== item.a) label.classList.add('is-picked');
+      });
+      fs.querySelector('.quiz-explain').hidden = false;
+      answered[qi] = (oi === item.a);
+      updateScore();
+    }
+
+    function updateScore() {
+      var keys = Object.keys(answered);
+      var right = keys.filter(function (k) { return answered[k]; }).length;
+      correctEl.textContent = String(right);
+      hintEl.textContent = 'Отвечено ' + keys.length + ' из ' + QUESTIONS.length + ' вопросов.';
+    }
+
+    document.getElementById('quiz-reset').addEventListener('click', function () {
+      answered = {};
+      render();
+      updateScore();
+      hintEl.textContent = 'Отвечено 0 из ' + QUESTIONS.length + ' вопросов.';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    render();
+  })();
+  </script>
+  <script src="assets/site.js?v=20260811-theme" defer></script>
+</body>
+</html>
