@@ -11,6 +11,7 @@
 <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
 <meta name="googlebot" content="index, follow">
 <meta name="yandex" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23166339'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia,serif' font-size='38' fill='%23ffffff'%3E%D0%9F%3C/text%3E%3C/svg%3E">
 <link rel="canonical" href="https://pikov.expert/">
 <link rel="alternate" hreflang="ru" href="https://pikov.expert/">
 <link rel="alternate" hreflang="x-default" href="https://pikov.expert/">
@@ -25,13 +26,13 @@
 <meta property="og:description" content="Авторские лекции и курсы по информационной безопасности, защите информации, безопасной разработке ПО, мониторингу и SIEM.">
 <meta property="og:image" content="https://pikov.expert/photo.jpg">
 <meta property="og:image:secure_url" content="https://pikov.expert/photo.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="1200">
+<meta property="og:image:width" content="640">
+<meta property="og:image:height" content="640">
 <meta property="og:image:alt" content="Пиков Виталий Александрович — фото">
 <meta property="profile:first_name" content="Виталий">
 <meta property="profile:last_name" content="Пиков">
 <!-- Twitter Card -->
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Виталий Пиков — эксперт по ИБ и ТЗИ">
 <meta name="twitter:description" content="Авторские лекции и курсы по информационной безопасности, защите информации, безопасной разработке ПО и SIEM.">
 <meta name="twitter:image" content="https://pikov.expert/photo.jpg">
@@ -102,7 +103,7 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
   --line-soft: oklch(92.5% 0.004 170);
   --ink: oklch(21% 0.012 180);
   --muted: oklch(45% 0.012 175);
-  --faint: oklch(57% 0.01 175);
+  --faint: oklch(50% 0.012 175);
   --accent: oklch(50% 0.115 160);
   --accent-soft: oklch(93.5% 0.03 160);
   --header-bg: oklch(96.8% 0.003 180 / .82);
@@ -115,7 +116,7 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
   --line-soft: oklch(26.5% 0.015 172);
   --ink: oklch(92.5% 0.006 170);
   --muted: oklch(66% 0.015 168);
-  --faint: oklch(55% 0.014 168);
+  --faint: oklch(64% 0.016 168);
   --accent: oklch(76% 0.11 160);
   --accent-soft: oklch(27% 0.045 165);
   --header-bg: oklch(17.5% 0.014 175 / .82);
@@ -129,7 +130,7 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
     --line-soft: oklch(26.5% 0.015 172);
     --ink: oklch(92.5% 0.006 170);
     --muted: oklch(66% 0.015 168);
-    --faint: oklch(55% 0.014 168);
+    --faint: oklch(64% 0.016 168);
     --accent: oklch(76% 0.11 160);
     --accent-soft: oklch(27% 0.045 165);
     --header-bg: oklch(17.5% 0.014 175 / .82);
@@ -337,7 +338,7 @@ a:hover{ color: var(--ink); }
 }
 .card .go{ margin-left: auto; color: var(--faint); flex: none; }
 .card:hover .go{ color: var(--accent); transform: translateX(2px); }
-noscript.catalog-note{ display: block; padding: 20px 0; color: var(--muted); }
+.catalog-note{ display: block; padding: 20px 0; color: var(--muted); }
 
 /* ============ Поиск и фильтр ============ */
 .toolbar{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 26px 0 0; }
@@ -352,6 +353,8 @@ noscript.catalog-note{ display: block; padding: 20px 0; color: var(--muted); }
 .empty-note{ padding: 34px 0 10px; color: var(--muted); font-size: 15px; }
 .hint-key{ display: none; }
 @media (hover: hover) and (pointer: fine){
+  #q{ padding-right: 40px; }
+  .search-wrap:focus-within .hint-key{ display: none; }
   .hint-key{ display: inline-block; position: absolute; right: 10px; top: 50%; translate: 0 -50%; font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--faint); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
 }
 
@@ -411,10 +414,13 @@ noscript.catalog-note{ display: block; padding: 20px 0; color: var(--muted); }
   .portrait{ width: 148px; }
   .portrait::before{ inset: 10px -10px -10px 10px; }
   .portrait .monogram{ font-size: 44px; }
-  .hero-row{ display: flex; flex-direction: column-reverse; }
+  .hero-grid .portrait{ order: -1; }
   .stats{ grid-template-columns: repeat(2, auto); gap: 18px 44px; width: 100%; }
   .about-grid{ grid-template-columns: 1fr; }
-  .site-nav{ display: none; }
+  .brand{ font-size: 16px; margin-right: 8px; }
+  .site-nav{ min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .site-nav::-webkit-scrollbar{ display: none; }
+  .site-nav a{ padding: 6px 9px; font-size: 13px; }
 }
 @media (max-width: 480px){
   .wrap{ padding: 0 16px; }
@@ -443,8 +449,9 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
 .cat-head .num{ font-weight: 600; }
 
 /* ===== Вид каталога «строки» (data-view="rows" на <html>, переключатель в шапке) ===== */
-:root[data-view="rows"] .cards{ grid-template-columns: 1fr; gap: 0; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--surface); }
-:root[data-view="rows"] .cards > li + li{ border-top: 1px solid var(--line-soft); }
+:root[data-view="rows"] .cards{ grid-template-columns: 1fr; gap: 1px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--line-soft); }
+:root[data-view="rows"] .cards > li{ background: var(--surface); }
+:root[data-view="rows"] .card:focus-visible{ outline-offset: -2px; }
 :root[data-view="rows"] .card{ display: grid; grid-template-columns: 168px minmax(0, 1fr) minmax(0, 200px); gap: 4px 24px; align-items: start; border: 0; border-radius: 0; padding: 18px 20px; }
 :root[data-view="rows"] .card .tag{ grid-column: 1; grid-row: 1; background: transparent; padding: 2px 0; }
 :root[data-view="rows"] .card h4{ grid-column: 2; grid-row: 1; margin: 0; }
@@ -500,7 +507,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       <div>
         <p class="kicker">Авторский каталог · информационная безопасность</p>
         <h1>Пиков Виталий<br>Александрович</h1>
-        <p class="role">Эксперт в области ИТ, информационной безопасности и преподаватель</p>
+        <p class="role">Эксперт в области ИТ и информационной безопасности, преподаватель</p>
         <p class="bio">26 лет в ИТ, более 10 лет преподавательской работы. Заслуженный доцент РосНОУ. Авторизованный преподаватель «Группы Астра» с правом проведения курсов по ОС Astra Linux Special Edition 1.8.</p>
         <div class="hero-contacts">
           <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
@@ -594,7 +601,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
           </ul>
         </div>
       </div>
-      <p class="about-note">Руководитель направления обучения по РБПО в НОУ ДПО «УЦБИ «МАСКОМ».</p>
+      <p class="about-note">Руководитель направления обучения по РБПО в НОУ ДПО «УЦБИ "МАСКОМ"».</p>
     </div>
   </section>
 
@@ -636,7 +643,7 @@ const CATEGORIES = [
   { id: "reg",     name: "Регулирование и право" },
   { id: "rbpo",    name: "Безопасная разработка ПО (РБПО)" },
   { id: "offense", name: "Пентест, фаззинг и статанализ" },
-  { id: "edu",     name: "Учебные курсы для студентов" }
+  { id: "edu",     name: "Учебные курсы и справочники" }
 ];
 
 const LECTURES = [
@@ -644,7 +651,7 @@ const LECTURES = [
   { category: "os", format: "Лекция", title: "Введение в ОС Astra Linux SE 1.7", url: "https://astra-intro.pikov.expert/",
     description: "Обзор ОС специального назначения: продуктовая экосистема «Группы Астра», версии, архитектуры, уровни защищённости и базовый интерфейс." },
   { category: "os", format: "Лекция", title: "Astra Linux: экосистема и уровни защищённости", url: "https://astralinux01.pikov.expert/",
-    description: "Подробный разбор продуктовой линейки, нумерации обновлений и трёх режимов защищённости — базового, усиленного и максимального." },
+    description: "Подробный разбор продуктовой линейки, нумерации обновлений и трёх уровней защищённости — базового, усиленного и максимального." },
   { category: "os", format: "Лекция", title: "Формальные модели безопасности ОС", url: "https://astralinux02.pikov.expert/",
     description: "Дискреционная (DAC), мандатная (MAC) и ролевая (RBAC) модели разграничения доступа, модель Белла-ЛаПадулы и архитектура подсистемы защиты." },
   { category: "os", format: "Практикум · чек-листы", title: "Безопасная настройка Astra Linux 1.7 / 1.8 и ОС Linux (hardening)", url: "https://astra-hardening.pikov.expert/",
@@ -808,7 +815,7 @@ const LECTURES = [
   const resetBtn = document.getElementById("resetFilters");
   const note = document.getElementById("resultNote");
   const emptyNote = document.getElementById("emptyNote");
-  q.placeholder = "Поиск по " + n + " лекциям…";
+  q.placeholder = "Поиск по " + n + " " + plural(n, ["лекции","лекциям","лекциям"]) + "…";
   fmtSel.innerHTML = '<option value="">Все метки</option>' +
     [...new Set(LECTURES.map(l => l.format))].map(f => "<option>" + esc(f) + "</option>").join("");
   function applyFilter(){
@@ -832,7 +839,7 @@ const LECTURES = [
   fmtSel.addEventListener("change", applyFilter);
   resetBtn.addEventListener("click", () => { q.value = ""; fmtSel.value = ""; applyFilter(); q.focus(); });
   document.addEventListener("keydown", e => {
-    if(e.key === "/" && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); q.focus(); }
+    if(e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); q.focus(); }
   });
 })();
 
@@ -853,11 +860,19 @@ const LECTURES = [
     try{ localStorage.setItem("theme", next); }catch(e){}
     applyMeta();
   });
-  document.getElementById("viewToggle").addEventListener("click", () => {
+  const viewBtn = document.getElementById("viewToggle");
+  const applyViewState = () => {
+    const rows = root.dataset.view === "rows";
+    viewBtn.setAttribute("aria-pressed", String(rows));
+    viewBtn.setAttribute("aria-label", rows ? "Вид каталога: строки. Показать карточками" : "Вид каталога: карточки. Показать строками");
+  };
+  viewBtn.addEventListener("click", () => {
     const next = root.dataset.view === "rows" ? "cards" : "rows";
     root.dataset.view = next;
     try{ localStorage.setItem("view", next); }catch(e){}
+    applyViewState();
   });
+  applyViewState();
   media.addEventListener("change", () => { if(!root.dataset.theme) applyMeta(); });
   if(root.dataset.theme) applyMeta();
 })();

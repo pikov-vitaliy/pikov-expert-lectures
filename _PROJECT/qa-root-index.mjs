@@ -132,6 +132,24 @@ try {
   }));
   check("no horizontal overflow at 375px", mobileMetrics.pageWidth <= mobileMetrics.viewport + 1, `${mobileMetrics.pageWidth} > ${mobileMetrics.viewport}`);
   check("lecture cards are a single column at 375px", mobileMetrics.cardColumns === 1, `${mobileMetrics.cardColumns} columns`);
+
+  // The header nav was previously display:none below 880px with nothing in its
+  // place, so a phone visitor had no way to reach "Обо мне" or "Связь".
+  const mobileNav = await mobile.evaluate(() => {
+    const nav = document.querySelector(".site-nav");
+    if (!nav) return { present: false, reachable: 0, total: 0 };
+    const links = [...nav.querySelectorAll("a")];
+    return {
+      present: nav.offsetParent !== null && getComputedStyle(nav).display !== "none",
+      reachable: links.filter(a => a.getBoundingClientRect().width > 0).length,
+      total: links.length,
+    };
+  });
+  check(
+    "header navigation stays reachable at 375px",
+    mobileNav.present && mobileNav.total > 0 && mobileNav.reachable === mobileNav.total,
+    `present=${mobileNav.present} reachable=${mobileNav.reachable}/${mobileNav.total}`,
+  );
   await mobile.close();
 
   console.log(failures.length === 0 ? "ROOT INDEX QA OK" : `ROOT INDEX QA FAILED (${failures.length})`);
