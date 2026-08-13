@@ -45,14 +45,40 @@ function Assert-PublicTree {
   }
 }
 
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
+# Собираем архив из временного staging-каталога через CreateFromDirectory: он
+# пишет записи с прямым слэшем (спецификация ZIP), поэтому дерево папок корректно
+# разворачивается на macOS/Linux, и пути в архиве совпадают с манифестом.
+# $Dir — каталоги, копируемые в корень архива под своим именем;
+# $AuthorFile — файлы, помещаемые в архиве под materials/.
 function New-DayTwoArchive {
   param(
     [Parameter(Mandatory = $true)][string]$Destination,
-    [Parameter(Mandatory = $true)][string[]]$Path
+    [string[]]$Dir = @(),
+    [string[]]$AuthorFile = @()
   )
 
   Remove-Item -LiteralPath $Destination -Force -ErrorAction SilentlyContinue
-  Compress-Archive -LiteralPath $Path -DestinationPath $Destination -CompressionLevel Optimal -Force
+  $staging = Join-Path ([System.IO.Path]::GetTempPath()) ('d2zip-' + [System.Guid]::NewGuid().ToString('N'))
+  New-Item -ItemType Directory -Path $staging -Force | Out-Null
+  try {
+    foreach ($d in $Dir) {
+      Copy-Item -LiteralPath $d -Destination $staging -Recurse -Force
+    }
+    if ($AuthorFile.Count -gt 0) {
+      $materialsStage = Join-Path $staging 'materials'
+      New-Item -ItemType Directory -Path $materialsStage -Force | Out-Null
+      foreach ($f in $AuthorFile) {
+        Copy-Item -LiteralPath $f -Destination $materialsStage -Force
+      }
+    }
+    [System.IO.Compression.ZipFile]::CreateFromDirectory(
+      $staging, $Destination, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+  }
+  finally {
+    Remove-Item -LiteralPath $staging -Recurse -Force -ErrorAction SilentlyContinue
+  }
 }
 
 function Get-RelativeForwardSlashPath {
@@ -83,15 +109,15 @@ Assert-PublicTree -Path (@($transcripts, $participantMaterials) + $authorMateria
 }
 
 $archives = @(
-  @{ Name = 'day-02-edited-transcript-and-protocol.zip'; Paths = @($transcripts) },
-  @{ Name = 'day-02-laboratory-materials.zip'; Paths = @($participantMaterials) },
-  @{ Name = 'day-02-public-materials.zip'; Paths = @($transcripts, $participantMaterials) + $authorMaterialPaths }
+  @{ Name = 'day-02-edited-transcript-and-protocol.zip'; Dir = @($transcripts); AuthorFile = @() },
+  @{ Name = 'day-02-laboratory-materials.zip'; Dir = @($participantMaterials); AuthorFile = @() },
+  @{ Name = 'day-02-public-materials.zip'; Dir = @($transcripts, $participantMaterials); AuthorFile = $authorMaterialPaths }
 )
 
 $checksumLines = New-Object System.Collections.Generic.List[string]
 foreach ($archive in $archives) {
   $destination = Join-Path $downloadsRoot $archive.Name
-  New-DayTwoArchive -Destination $destination -Path $archive.Paths
+  New-DayTwoArchive -Destination $destination -Dir $archive.Dir -AuthorFile $archive.AuthorFile
   $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
   $size = (Get-Item -LiteralPath $destination).Length
   $checksumLines.Add("$hash  $($archive.Name)  $size bytes")
