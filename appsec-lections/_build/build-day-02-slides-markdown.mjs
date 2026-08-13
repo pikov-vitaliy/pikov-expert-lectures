@@ -10,20 +10,37 @@ const outputFile = path.join(root, 'materials', 'день-2-веб-слайды-
 
 const window = { addEventListener() {} };
 const document = { addEventListener() {}, getElementById() { return null; } };
-vm.runInNewContext(fs.readFileSync(deckFile, 'utf8'), { window, document, Object, String, Array, Math }, { filename: deckFile });
-const { deck, slideCount } = window.AppSecDay02ReconstructedSlides ?? {};
+vm.runInNewContext(fs.readFileSync(deckFile, 'utf8'), { window, document, Object, String, Array, Math, Set }, { filename: deckFile });
+const { deck, slideNotes, slideCount } = window.AppSecDay02ReconstructedSlides ?? {};
 const slides = deck?.blocks?.flatMap((block) => block.slides.map((slide) => ({ ...slide, block })));
 
-if (!Array.isArray(slides) || slides.length !== 134 || slideCount !== 134) {
-  throw new Error('Ожидалось 134 HTML-слайда, получено ' + (slides?.length ?? 'неизвестно') + '.');
+// Инвариант качества: колода публикуется только целостной. Проверяем здесь, в
+// трекаемом генераторе (а не только в gitignored-тестах), чтобы регресс —
+// дубли контента, пропуск заметок, рассинхрон счётчика — валил сборку.
+if (!Array.isArray(slides) || slides.length !== slideCount) {
+  throw new Error('Число слайдов деки не совпадает со slideCount.');
+}
+const leads = slides.map((s) => s.lead);
+if (new Set(leads).size !== slides.length) {
+  throw new Error('Тексты слайдов (lead) должны быть уникальны.');
+}
+const titles = slides.map((s) => s.title);
+if (new Set(titles).size !== slides.length) {
+  throw new Error('Заголовки слайдов должны быть уникальны.');
+}
+for (const slide of slides) {
+  const note = slideNotes?.[slide.id];
+  if (!note || !note.student || !note.teacher) {
+    throw new Error('У слайда ' + slide.id + ' нет индивидуальных заметок слушателю и преподавателю.');
+  }
 }
 
 const lines = [
   '# День 2 — веб-слайды: AppSec, SSDLC и ИИ',
   '',
-  '**Всего:** ' + slideCount + ' HTML-слайда.',
+  '**Всего:** ' + slideCount + ' HTML-слайдов.',
   '**Дата занятия:** 12.08.2026.',
-  '**Статус:** самостоятельная редакторская веб-версия для чтения, показа, поиска и копирования; исходные изображения слайдов в неё не входят.',
+  '**Статус:** самостоятельная редакторская веб-версия для чтения, показа, поиска и копирования; исходные изображения слайдов и личный сертификат участника в неё не входят.',
   '',
   '> Важно: SSRF — A10:2021 (Server-Side Request Forgery). В OWASP Top 10:2025 A10 посвящена некорректной обработке исключительных ситуаций. Историческая лабораторная тема и актуальная таксономия в этой колоде явно разделены.',
   ''
@@ -37,15 +54,26 @@ for (const block of deck.blocks) {
     for (const [title, body] of slide.cards) {
       lines.push('- **' + title + '.** ' + body);
     }
-    lines.push('', '**Главная мысль.** ' + slide.takeaway, '', '**Основание.** ' + slide.source, '');
+    const note = slideNotes[slide.id];
+    lines.push(
+      '',
+      '**Главная мысль.** ' + slide.takeaway,
+      '',
+      '**Слушателю.** ' + note.student,
+      '',
+      '**Преподавателю.** ' + note.teacher,
+      '',
+      '**Основание.** ' + slide.source,
+      ''
+    );
   }
 }
 
 lines.push(
   '## Границы публикации',
   '',
-  'Публикуется только авторская текстовая веб-редакция. Рабочие транскрипты, документы подгрупп, изображения слайдов и файловые метаданные не входят в этот Markdown-файл и в публичные ZIP-пакеты.'
+  'Публикуется только авторская текстовая веб-редакция. Рабочие транскрипты, документы подгрупп, изображения слайдов, личный сертификат участника и файловые метаданные не входят в этот Markdown-файл и в публичные ZIP-пакеты.'
 );
 
 fs.writeFileSync(outputFile, lines.join('\n') + '\n', 'utf8');
-console.log('Сформирован ' + path.relative(root, outputFile) + ': ' + slideCount + ' HTML-слайда.');
+console.log('Сформирован ' + path.relative(root, outputFile) + ': ' + slideCount + ' HTML-слайдов, заметки перенесены.');
