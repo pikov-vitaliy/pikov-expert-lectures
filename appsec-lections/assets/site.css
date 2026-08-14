@@ -185,7 +185,7 @@ img { display: block; max-width: 100%; }
 .site-header.is-scrolled { border-color: var(--line); background: var(--header-scrolled-bg); }
 
 .header-inner {
-  width: var(--content);
+  width: min(1500px, calc(100% - 40px));
   min-height: 70px;
   margin: 0 auto;
   display: flex;
@@ -226,6 +226,7 @@ img { display: block; max-width: 100%; }
   font-size: 0.88rem;
   font-weight: 700;
   text-decoration: none;
+  white-space: nowrap;
 }
 .nav a:hover, .nav a[aria-current="page"] { background: var(--nav-active-bg); color: var(--text); }
 
@@ -458,8 +459,8 @@ h1 .accent { color: var(--cyan); }
 .download .button { margin-top: auto; min-height: 40px; padding: 0.5rem 0.7rem; font-size: 0.81rem; }
 
 .checklist { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-.checklist li { display: grid; grid-template-columns: 27px minmax(0, 1fr); gap: 0.7rem; padding: 0.88rem 0; border-bottom: 1px solid var(--line); color: var(--text-soft); }
-.checklist li::before { content: "✓"; color: var(--good); font-weight: 900; }
+.checklist li { position: relative; display: block; padding: 0.88rem 0 0.88rem calc(27px + 0.7rem); border-bottom: 1px solid var(--line); color: var(--text-soft); }
+.checklist li::before { position: absolute; top: 0.88rem; left: 0; content: "✓"; color: var(--good); font-weight: 900; }
 .checklist-copy { min-width: 0; }
 .report-split { align-items: start; }
 
@@ -592,9 +593,9 @@ code { font-family: "Cascadia Code", "SFMono-Regular", Consolas, monospace; }
 
 :focus-visible { outline: 3px solid var(--amber); outline-offset: 3px; }
 
-/* Навигация сворачивается раньше остальной вёрстки: в меню восемь разделов,
+/* Навигация сворачивается раньше остальной вёрстки: в меню десять разделов,
  * и в одну строку они перестают помещаться заметно выше планшетной ширины. */
-@media (max-width: 980px) {
+@media (max-width: 1320px) {
   .nav-toggle { display: inline-grid; place-items: center; }
   .nav { position: absolute; top: calc(100% + 1px); right: 0; left: 0; display: none; flex-direction: column; align-items: stretch; margin-left: 0; padding: 0.75rem max(14px, calc((100vw - 1180px) / 2)); border-bottom: 1px solid var(--line); background: var(--nav-mobile-bg); }
   .nav.is-open { display: flex; }

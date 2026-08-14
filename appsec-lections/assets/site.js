@@ -25,7 +25,6 @@
     const nextTheme = theme === 'light' ? 'dark' : 'light';
     themeIcon.textContent = nextTheme === 'light' ? '☀' : '☾';
     themeText.textContent = nextTheme === 'light' ? 'Светлая' : 'Тёмная';
-    themeToggle.setAttribute('aria-pressed', String(theme === 'light'));
     themeToggle.setAttribute('aria-label', `Включить ${nextTheme === 'light' ? 'светлую' : 'тёмную'} тему`);
     themeToggle.title = `Включить ${nextTheme === 'light' ? 'светлую' : 'тёмную'} тему`;
   };
@@ -76,11 +75,13 @@
   navToggle?.addEventListener('click', () => {
     const open = nav?.classList.toggle('is-open');
     navToggle.setAttribute('aria-expanded', String(Boolean(open)));
+    navToggle.setAttribute('aria-label', open ? 'Закрыть навигацию' : 'Открыть навигацию');
   });
 
   nav?.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => {
     nav.classList.remove('is-open');
     navToggle?.setAttribute('aria-expanded', 'false');
+    navToggle?.setAttribute('aria-label', 'Открыть навигацию');
   }));
 
   const observer = 'IntersectionObserver' in window
