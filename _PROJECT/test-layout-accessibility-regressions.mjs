@@ -92,6 +92,12 @@ try {
   for (const target of targets) {
     const response = await desktop.goto(targetUrl(server.baseUrl, target), { waitUntil: "domcontentloaded" });
     check(response?.status() === 200, `${target.domain}: HTTP ${response?.status()}`);
+    if (target.folder === "27001") {
+      // This self-contained bundle asynchronously replaces documentElement after
+      // DOMContentLoaded. Wait for its semantic root instead of sampling the
+      // deliberate transient DOM between the old and unpacked documents.
+      await desktop.waitForSelector("main[data-smib-root] h1", { state: "attached", timeout: 10_000 }).catch(() => null);
+    }
     const semantics = await desktop.evaluate(() => {
       const parseColor = (value) => {
         const match = String(value).match(/rgba?\((\d+(?:\.\d+)?)[ ,]+(\d+(?:\.\d+)?)[ ,]+(\d+(?:\.\d+)?)(?:[ ,/]+(\d*(?:\.\d+)?))?\)/i);
