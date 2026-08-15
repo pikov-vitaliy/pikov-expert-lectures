@@ -14,7 +14,7 @@
 
 1. В открытом доступе находятся старые AppSec Day 1 материалы с небезопасными и одновременно невоспроизводимыми лабораторными сценариями.
 2. DVWA-методичка закрепляет небезопасные Docker-практики, хотя рядом уже есть качественный изолированный Juice Shop wrapper.
-3. В нескольких лекциях неверно указаны текущие версии или смысл международных источников: MITRE ATT&CK, NIST SP 800-30/SP 800-61, CycloneDX, NIST password guidance, CWE/CVE/NVD.
+3. В нескольких лекциях неверно указан смысл международных источников: MITRE ATT&CK tactics, NIST SP 800-30/SP 800-61, CycloneDX, NIST password guidance, CWE/CVE/NVD.
 4. Часть количественных тезисов не имеет проверяемой методики либо ошибочно приписана NIST/ФСТЭК.
 5. Несколько практикумов не имеют полного RoE, изоляции, stop conditions, rollback и воспроизводимых fixtures.
 6. Есть документные, мобильные и accessibility-дефекты, из-за которых полезное содержание трудно читать или оно недоступно assistive technology.
@@ -100,14 +100,15 @@
 
 | Pri | Где | Проблема | Точная коррекция | Первичный источник |
 |---|---|---|---|---|
-| P1 | `pentest/index.html:422`, `pentest/handout.html:26,54` | Указана несуществующая ATT&CK v19.2. | Зафиксировать `MITRE ATT&CK v19.1`; изменяемые counts привязать к version permalink. | [MITRE ATT&CK Version History](https://attack.mitre.org/resources/versions/) |
-| P1 | `threats-kii/index.html:2040,2049`, `materials.md:548,558` | 14 тактик и старая Defense Evasion. | Enterprise v19.1 — 15 тактик; прежняя Defense Evasion разделена на Stealth и Defense Impairment. | [ATT&CK v19 updates](https://attack.mitre.org/resources/updates/) |
+| P1 | `threats-kii/index.html:2040,2049`, `materials.md:548,558` | 14 тактик и старая Defense Evasion. | Enterprise v19.2 — 15 тактик; прежняя Defense Evasion разделена на Stealth и Defense Impairment. | [ATT&CK v19 updates](https://attack.mitre.org/resources/updates/) |
 | P1 | `risk/index.html:1855`, `risk/materials.md:381-399` | Withdrawn SP 800-30 (2002), схема 9+7, выдана как текущая. | Либо явно назвать исторической, либо заменить структурой Rev.1: Prepare → Conduct → Maintain. | [SP 800-30 Rev.1](https://csrc.nist.gov/pubs/sp/800/30/r1/final) |
 | P1 | `risk/materials.md:1576`, `risk/index.html:3371-3372` | Старое название SP 800-61 и авторская семиступенчатая схема приписана NIST. | Использовать SP 800-61r3 и CSF 2.0; семиступенчатый цикл назвать авторским composite. | [NIST SP 800-61r3](https://csrc.nist.gov/pubs/sp/800/61/r3/final) |
 | P1 | `ppk/index.html:1285,1306` | CycloneDX 1.7 датирована мартом 2026. | Версия 1.7 выпущена 21.10.2025; в evergreen-слайде достаточно версии и official link. | [CycloneDX 1.7](https://cyclonedx.org/news/cyclonedx-v1.7-released/) |
 | P2 | `sast/index.html:1689`, `threats-kii/index.html:3412`, `materials.md:1196` | `CWE-119 = Buffer Overflow`. | CWE-119 — broad Class; использовать конкретную первопричину CWE-787/125/120/121/122. | [CWE-119](https://cwe.mitre.org/data/definitions/119.html) |
 | P2 | `pentest/index.html:1530`, `threats-kii/index.html:3467-3468`, `materials.md:1228-1229` | Смешаны роли CVE и NVD; legacy link. | CVE Program публикует CVE Records; NVD обогащает их CVSS/CWE/CPE; ссылка `cve.org`. | [CVE overview](https://www.cve.org/about/overview), [NVD process](https://nvd.nist.gov/general/cve-process) |
 | P2 | AppSec Day 1 AI block `day-01.html:729-846` | Абсолютный тезис «LLM не создаёт новый вид уязвимостей» и неполный/слитый список рисков. | Сохранить связь с классическими принципами, но отдельно показать model/agent-specific mechanisms; явно сопоставить LLM01–LLM10:2025, Agentic Top 10:2026 и AISVS 1.0. | [OWASP LLM Top 10:2025](https://genai.owasp.org/llm-top-10/), [Agentic Top 10:2026](https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/), [AISVS 1.0](https://owasp.org/www-project-artificial-intelligence-security-verification-standard-aisvs-docs/) |
+
+Коррекция самого аудита: MITRE [Version History](https://attack.mitre.org/resources/versions/) сейчас официально помечает ATT&CK v19.2 как current; Agile update опубликован 06.08.2026. Поэтому упоминание v19.2 в `pentest` корректно и не подлежит откату на v19.1. Исправлять нужно только изменяемые counts/permalink и старую модель тактик в `threats-kii`.
 
 ### 4.2. Пароли
 
@@ -423,7 +424,7 @@ Lifecycle и редакторские поправки:
 
 ### 8.3. Vulnerability intelligence
 
-- MITRE ATT&CK v19.1;
+- MITRE ATT&CK v19.2;
 - конкретные CWE root causes, а не broad class по умолчанию;
 - CVE Program отдельно от NVD enrichment;
 - CVSS v4.0 отдельно от exploit likelihood и business risk;

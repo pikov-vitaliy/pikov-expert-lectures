@@ -35,11 +35,11 @@
 
 ### A. Международная фактология
 
-- [ ] MITRE ATT&CK v19.1 и 15 Enterprise tactics.
-- [ ] NIST SP 800-30 Rev.1 и SP 800-61r3.
+- [x] MITRE ATT&CK v19.2 и 15 Enterprise tactics; version/counts привязаны к official permalink.
+- [x] NIST SP 800-30 Rev.1 и SP 800-61r3.
 - [ ] NIST SP 800-63B-4 password baseline.
 - [ ] OWASP Top 10:2025, включая отдельную A10:2025 lab.
-- [ ] CWE-119 descendants; CVE/NVD distinction.
+- [x] CWE-119 descendants; CVE/NVD distinction.
 - [ ] CycloneDX 1.7 date; SAST/NIST/statistical claims.
 - [ ] LLM Top 10:2025, Agentic Top 10:2026, AISVS 1.0.
 
@@ -121,7 +121,17 @@ $env:RELEASE_DATE='2026-08-15'; node .\_PROJECT\browser-qa.mjs
 - На старте незакоммичены только `_PROJECT/DEEP_CONTENT_AUDIT_2026-08-15.md` и ранее существовавший `pc/`.
 - `.codegraph/` отсутствует; индекс не создаётся по решению владельца репозитория.
 - `gh 2.89.0` установлен; GitHub auth для `pikov-vitaliy` подтверждён.
-- Следующий шаг: зафиксировать audit/ledger, затем запустить параллельные RED→GREEN потоки A–C.
+- Audit correction: official MITRE Version History подтверждает current ATT&CK v19.2; ошибочная рекомендация отката на v19.1 удалена.
+- Audit/ledger сохранены в commit `117f091`, ветка опубликована; открыт draft PR `#5`.
+- Добавлен `_PROJECT/test-layout-accessibility-regressions.mjs`.
+- RED подтверждён: `node .\_PROJECT\test-layout-accessibility-regressions.mjs` завершился с 25 ожидаемыми layout/a11y failures (16 missing main, `27001` lang, SPDX H1, cert overflow 3 viewport, 29-07 root overflow, Astra subtitle size и 3 headerless tables).
+- Запущены параллельные RED→GREEN потоки A–C; UI GREEN выполняется после завершения пересекающихся source-правок.
+- Общая семантика частично исправлена без изменения визуальной структуры: `article.content` заменён на `main` на пяти страницах, презентация ГОСТ обёрнута в `main`, SPDX получил один H1 и `main`, bundled-страница `27001` после распаковки принудительно сохраняет `lang=ru` и корневой `main`.
+- Layout/a11y test расширен проверкой шести вручную подтверждённых WCAG 2.2 SC 1.4.3 failures. RED воспроизведён; локально исправлены `gost56939`, `p19`, `is`, `vkr`, после чего эти четыре контрастных нарушения исчезли из повторного browser-run.
+- Для мобильного `vkr` сначала добавлена регрессия на отсутствие читаемого handout (RED), затем внедрён синхронизируемый со слайдом текстовый transcript ≥16 px (GREEN). Растровая презентация и свайп-навигация сохранены.
+- Текущий focused gate уменьшился с 25 до 17 remaining failures; остаток относится к пересекающимся агентским каталогам и будет закрыт после интеграции их патчей.
+- Международный focused test прошёл повторно у root: 9/9 GREEN; существующие Pentest materials 10/10 и UI 8/8 также GREEN. Помимо ATT&CK исправлены SP 800-30 Rev.1, SP 800-61r3 attribution, CWE-119 descendants, CVE/NVD roles, SAST historical/example-only claims и неподтверждённый MTD percentage.
+- Внутренние `README.md`, `risk/README.md`, `threats-kii/README.md`, `tz/README.md` очищены от прежней организационной атрибуции и несуществующих logo paths; три согласованных исторических примера в `vkr/index.html` сохранены.
 
 ## 6. Точка восстановления контекста
 

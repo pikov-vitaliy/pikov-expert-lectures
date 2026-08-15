@@ -545,7 +545,7 @@
 
 (Модель **Cyber Kill Chain** Lockheed Martin; для целей ФСТЭК — допустимая модель.)
 
-**Альтернативная модель** — **MITRE ATT&CK** — матрица тактик (14 категорий) и техник (сотни конкретных). Применима как для ИТ-систем, так и для АСУ ТП (MITRE ATT&CK for ICS).
+**Альтернативная модель** — **MITRE ATT&CK v19.2** — матрица 15 тактик Enterprise и конкретных техник. Применима как для ИТ-систем, так и для АСУ ТП (MITRE ATT&CK for ICS). Состав матрицы сверяется по [официальному permalink Enterprise v19](https://attack.mitre.org/versions/v19/matrices/enterprise/).
 
 Тактики MITRE ATT&CK:
 
@@ -555,14 +555,15 @@
 4. Execution (выполнение кода);
 5. Persistence (закрепление);
 6. Privilege Escalation (повышение привилегий);
-7. Defense Evasion (уклонение от обнаружения);
-8. Credential Access (доступ к учётным данным);
-9. Discovery (исследование среды);
-10. Lateral Movement (перемещение по сети);
-11. Collection (сбор информации);
-12. Command and Control (управление);
-13. Exfiltration (вывод информации);
-14. Impact (воздействие).
+7. Stealth (сокрытие активности и артефактов);
+8. Defense Impairment (ослабление или нарушение работы защиты);
+9. Credential Access (доступ к учётным данным);
+10. Discovery (исследование среды);
+11. Lateral Movement (перемещение по сети);
+12. Collection (сбор информации);
+13. Command and Control (управление);
+14. Exfiltration (вывод информации);
+15. Impact (воздействие).
 
 Для модели угроз ЗОКИИ полезно указать **типовые техники MITRE ATT&CK**, которые могут применить нарушители Н2–Н4 против данного объекта.
 
@@ -1189,11 +1190,11 @@
 
 ### По типу (классификация CWE — Common Weakness Enumeration)
 
-Международная база CWE — каталог уязвимостей по типам (>1000 записей). Примеры:
+Международная база CWE — каталог типов слабостей, которые могут приводить к уязвимостям. Примеры:
 
 - CWE-79 — Cross-site Scripting (XSS);
 - CWE-89 — SQL Injection;
-- CWE-119 — Buffer Overflow;
+- [CWE-119](https://cwe.mitre.org/data/definitions/119.html) — **Improper Restriction of Operations within the Bounds of a Memory Buffer**, широкий класс ошибок работы в границах буфера; для конкретной первопричины выбирают, например, CWE-787 (out-of-bounds write), CWE-125 (out-of-bounds read), CWE-120, CWE-121 или CWE-122;
 - CWE-287 — Improper Authentication;
 - CWE-352 — CSRF;
 - CWE-787 — Out-of-bounds Write;
@@ -1225,8 +1226,8 @@ CVSS — международная шкала оценки уязвимосте
 
 ### Международные
 
-- **NVD — National Vulnerability Database (nvd.nist.gov)** — крупнейшая публичная база CVE.
-- **CVE — Common Vulnerabilities and Exposures (cve.mitre.org)** — единая система идентификаторов уязвимостей.
+- **[CVE Program](https://www.cve.org/About/Overview)** публикует идентификаторы и CVE Records.
+- **[NVD — National Vulnerability Database](https://nvd.nist.gov/general/cve-process)** обогащает CVE Records данными CVSS, CWE и CPE; это не реестр идентификаторов CVE.
 - **CVSS — Common Vulnerability Scoring System** — система оценки.
 - **CWE — Common Weakness Enumeration** — классификация слабостей.
 - **OWASP Top 10** — ТОП уязвимостей веб-приложений.
@@ -1582,20 +1583,20 @@ V = f( B, T, X, Iat, Iimp )
 ### Международные стандарты (ориентир)
 
 - CVSS v4.0, v3.1 — Common Vulnerability Scoring System.
-- CVE, CWE, NVD — international vulnerability databases.
+- CVE Program — идентификаторы и CVE Records; NVD — их обогащение; CWE — каталог типов слабостей.
 - MITRE ATT&CK, MITRE ATT&CK for ICS.
 - Cyber Kill Chain (Lockheed Martin).
 - OWASP Top 10.
-- NIST SP 800-30 (Risk Management Guide).
+- [NIST SP 800-30 Rev. 1 «Guide for Conducting Risk Assessments»](https://csrc.nist.gov/pubs/sp/800/30/r1/final).
 
 ## Приложение Б. Глоссарий
 
 (Дополняет глоссарий из дня I — содержит только новые термины блока II.)
 
-- **CVE** — Common Vulnerabilities and Exposures, единый идентификатор уязвимости (например, CVE-2025-12345).
+- **CVE** — идентификатор записи об уязвимости в CVE Program (например, CVE-2025-12345).
 - **CVSS** — Common Vulnerability Scoring System, шкала оценки критичности уязвимости от 0 до 10.
 - **CWE** — Common Weakness Enumeration, классификация слабостей по типам.
-- **NVD** — National Vulnerability Database (США), крупнейшая публичная база CVE.
+- **NVD** — National Vulnerability Database (США), база обогащения CVE Records данными CVSS, CWE и CPE.
 - **БДУ** — Банк данных угроз ФСТЭК (bdu.fstec.ru).
 - **VM** — Vulnerability Management, управление уязвимостями.
 - **MTTD / MTTR** — Mean Time to Detect / Remediate, средние времена обнаружения и устранения.
@@ -1635,7 +1636,7 @@ V = f( B, T, X, Iat, Iimp )
 
 ### Международные референсы
 
-- NIST SP 800-30 «Guide for Conducting Risk Assessments».
+- [NIST SP 800-30 Rev. 1 «Guide for Conducting Risk Assessments»](https://csrc.nist.gov/pubs/sp/800/30/r1/final).
 - CVSS v4.0 specification (first.org).
 - MITRE ATT&CK framework (attack.mitre.org).
 - OWASP Top 10 (owasp.org).
