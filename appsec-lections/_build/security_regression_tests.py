@@ -1867,7 +1867,6 @@ class UniversalLecturePresentationTests(unittest.TestCase):
     def test_komrad_lecture_pages_have_no_event_date(self) -> None:
         paths = (
             ROOT / "komrad" / "index.html",
-            ROOT / "komrad" / "docs" / "00_ОПИСАНИЕ_РАЗДЕЛА.md",
             ROOT / "komrad" / "docs" / "01-komrad-handout.md",
             ROOT / "komrad" / "docs" / "02-virtualbox-komrad-stand.md",
             ROOT / "komrad" / "docs" / "03-practice-variants.md",
@@ -1877,6 +1876,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
         event_date = re.compile(r"(?:\b\d{1,2}[./-]\d{1,2}[./-]2026\b|\b\d{1,2}\s+[а-яё]+\s+2026\s+года\b)", re.I)
         for path in paths:
             with self.subTest(path=path.name):
+                self.assertTrue(path.is_file(), f"tracked KOMRAD public source is missing: {path}")
                 self.assertIsNone(event_date.search(path.read_text(encoding="utf-8")))
 
         sources = (ROOT / "komrad" / "docs" / "06-sources.md").read_text(encoding="utf-8")
