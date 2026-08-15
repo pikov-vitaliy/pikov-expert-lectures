@@ -1,6 +1,6 @@
 # Журнал глубокой актуализации учебных материалов pikov.expert
 
-- Статус: `LOCAL RELEASE VERIFIED`; полный release build и независимый локальный review зелёные, commit/CI/main/deploy ещё не выполнены.
+- Статус: `FEATURE CI VERIFIED`; локальный release/review и exact feature-SHA CI зелёные, main/deploy ещё не выполнены.
 - Базовый commit: `5be877ea76eb023e6ea196799cca0b87f86f4c6c`.
 - Рабочая ветка: `agent/deep-content-remediation`.
 - Источник требований: `_PROJECT/DEEP_CONTENT_AUDIT_2026-08-15.md`.
@@ -27,7 +27,8 @@
 - [x] Browser defects исправлены: clipping, mobile reflow, контраст, landmarks/lang/headings/table headers; финальный release-snapshot прошёл 30/30 целей и 90/90 viewport-проверок без замечаний.
 - [x] Педагогический минимум опубликован в course map: audience, prerequisites, outcomes, artifact, rubric, teacher route и versioned sources.
 - [x] Полный release build зелёный: 30 архивов, `staticIssues=0`, public-independence 30/30, browser QA 30/30 целей и 90/90 viewport-проверок, `issues=0`.
-- [ ] Ветка опубликована, CI точного SHA зелёный, изменения приняты в `main`.
+- [x] Ветка опубликована; exact feature SHA `4b2e0e9d47e471bf98ad9843bbd4a08fa51f26fa` прошёл GitHub Actions run `31899611108` со всеми release/browser/deploy-prepare шагами.
+- [ ] Изменения приняты в `main`, и CI точного итогового main SHA зелёный.
 - [ ] Развёрнут точный принятый SHA; local/repository/live сверены по hash/link/header/browser checks.
 - [ ] `main` и `origin/main` синхронны, рабочая копия чиста кроме намеренно непубличного `pc/`.
 
@@ -148,6 +149,7 @@ $env:RELEASE_DATE='2026-08-15'; node .\_PROJECT\browser-qa.mjs
 - Повторный независимый gate после этих правок: international currentness 9/9, platform currentness 10/10, course map 6/6 и полный layout/a11y regression GREEN; Compose-схемы проходят `docker compose config --quiet`, Pentest Juice Shop safety contract — 5/5, DVWA safety contract — 5/5.
 - Deploy boundary закрыта до `rsync --delete`: индекс обязан точно совпадать с 30 canonical targets, поля `domain/archiveName/archivePath` связаны с реестром и проверяются fail closed, удалённый target разрешается строго под `$HOME/<domain>/www`. Mutation/PrepareOnly regression — 9/9 GREEN; workflow имеет `permissions: contents: read`, immutable `actions/checkout` SHA и `persist-credentials: false`, workflow-order regression — 7/7 GREEN.
 - Commit `990021189f1255051567310323fb356a52619225` опубликован в draft PR `#5`; exact-SHA run `31899261148` корректно остановился на clean-checkout regression. Причина: тест KOMRAD ссылался на локальный ignored-файл `docs/00_ОПИСАНИЕ_РАЗДЕЛА.md`, которого нет в Git. Ссылка удалена из public-source списка, для всех перечисленных tracked-файлов добавлена явная проверка существования; полный AppSec security suite повторно прошёл 68/68 локально. Новый exact-SHA CI обязателен до merge.
+- Исправление сохранено commit `4b2e0e9d47e471bf98ad9843bbd4a08fa51f26fa`; exact-SHA run `31899611108`, job `95048195220`, завершился `success`. На чистом GitHub runner зелёные smoke, canonical AppSec build, content regressions, pinned browser install, focused browser tests, сборка release, public independence, release browser QA и deploy prepare-only.
 
 ## 6. Точка восстановления контекста
 
