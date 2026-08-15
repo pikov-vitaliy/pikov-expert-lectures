@@ -119,11 +119,25 @@ $releaseDate = '<YYYY-MM-DD>'
 $releaseIndex = ".\_PROJECT\RELEASE_INDEX_$releaseDate.json"
 if ((git rev-parse HEAD) -ne $acceptedSha) { throw 'HEAD differs from accepted SHA' }
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -FailOnIssues
+$trackedDrift = @(git status --porcelain=v1 --untracked-files=no)
+if ($LASTEXITCODE -ne 0) {
+    throw 'Could not inspect tracked files after release build'
+}
+if ($trackedDrift.Count -ne 0) {
+    $trackedDrift | ForEach-Object { Write-Host $_ }
+    throw 'Tracked files changed during release build'
+}
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -ReleaseIndex $releaseIndex
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\hosting-check.ps1 -ReleaseDate $releaseDate
 $env:RELEASE_DATE=$releaseDate; node .\_PROJECT\browser-qa-online.mjs
 ```
+
+Проверка `--untracked-files=no` намеренно не затрагивает непубличный каталог
+`pc/`, но завершает публикацию ошибкой при любом staged или unstaged изменении
+отслеживаемого файла, которое появилось во время повторной сборки принятого SHA.
+Generated checksum и manifest-файлы должны быть воспроизводимы и уже находиться
+в Git в точном состоянии, соответствующем исходным материалам.
 
 Для адресной публикации корня и одного поддомена без повторного развёртывания
 всей сети:

@@ -18,6 +18,11 @@ function Fail([string]$Message) { throw "MATERIALS ZIP FAIL: $Message" }
 
 $lectureRoot = (Resolve-Path -LiteralPath (Join-Path $PSScriptRoot '..')).Path
 $archive = Join-Path $lectureRoot 'materials.zip'
+$archiveHelper = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\_PROJECT\deterministic-archive.ps1'))
+if (-not (Test-Path -LiteralPath $archiveHelper -PathType Leaf)) {
+    Fail "Нет общего модуля воспроизводимой сборки: $archiveHelper"
+}
+. $archiveHelper
 
 # --- Точный состав раздаточного комплекта ----------------------------------
 # Ключ - путь внутри архива, значение - путь относительно каталога лекции.
@@ -124,8 +129,7 @@ try {
         Fail "В стейджинге $($staged.Count) файлов вместо $($manifest.Count)"
     }
 
-    if (Test-Path -LiteralPath $archive) { Remove-Item -LiteralPath $archive -Force }
-    Get-ChildItem -LiteralPath $stage -Force | Compress-Archive -DestinationPath $archive -Force
+    New-DeterministicArchive -SourceRoot $stage -Destination $archive
 } finally {
     Remove-Item -LiteralPath $stage -Recurse -Force -ErrorAction SilentlyContinue
 }
@@ -148,7 +152,7 @@ try {
 }
 
 # --- Манифест с контрольными суммами ---------------------------------------
-$sha = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
+$sha = (Get-DeterministicFileSha256 -Path $archive).ToLowerInvariant()
 $manifestPath = Join-Path $PSScriptRoot 'materials-zip-manifest.txt'
 $lines = New-Object System.Collections.Generic.List[string]
 $lines.Add("materials.zip")
@@ -157,10 +161,12 @@ $lines.Add("size   = $((Get-Item -LiteralPath $archive).Length) bytes")
 $lines.Add("files  = $($manifest.Count)")
 $lines.Add('')
 foreach ($entry in $manifest.GetEnumerator()) {
-    $h = (Get-FileHash -LiteralPath (Join-Path $lectureRoot $entry.Value) -Algorithm SHA256).Hash.ToLowerInvariant()
-    $lines.Add("$h  $($entry.Key)")
+    $record = Get-DeterministicArchiveFileRecord `
+        -Path (Join-Path $lectureRoot $entry.Value) `
+        -ArchivePath $entry.Key
+    $lines.Add("$($record.sha256.ToLowerInvariant())  $($entry.Key)")
 }
-[System.IO.File]::WriteAllLines($manifestPath, $lines, [System.Text.UTF8Encoding]::new($false))
+Write-DeterministicUtf8Text -Path $manifestPath -Text ($lines -join "`n") -TrailingNewline
 
 Write-Output "MATERIALS ZIP OK"
 Write-Output "archive=$archive"

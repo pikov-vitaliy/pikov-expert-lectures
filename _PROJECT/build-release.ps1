@@ -11,6 +11,12 @@ function Fail([string]$Message) {
   throw "RELEASE FAIL: $Message"
 }
 
+$archiveHelper = Join-Path $PSScriptRoot 'deterministic-archive.ps1'
+if (-not (Test-Path -LiteralPath $archiveHelper -PathType Leaf)) {
+  Fail "Missing deterministic archive helper: $archiveHelper"
+}
+. $archiveHelper
+
 function Get-RelativePathSafe([string]$BasePath, [string]$Path) {
   $base = [System.IO.Path]::GetFullPath($BasePath).TrimEnd('\') + '\'
   $target = [System.IO.Path]::GetFullPath($Path)
@@ -500,13 +506,13 @@ function New-Manifest([string]$StageRoot, [object]$Target, [object[]]$Issues, [s
         [pscustomobject]@{
           path = $relative.Replace('\', '/')
           size = $_.Length
-          sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant()
+          sha256 = (Get-DeterministicFileSha256 -Path $_.FullName).ToLowerInvariant()
         }
       }
   )
 
   [pscustomobject]@{
-    generated = (Get-Date).ToString('s')
+    generated = "$($script:ReleaseDateValue)T00:00:00Z"
     releaseDate = $script:ReleaseDateValue
     target = $Target
     archive = $ArchiveName
@@ -645,6 +651,7 @@ foreach ($target in $targets) {
   foreach ($relativeFile in $relativeFiles) {
     Copy-ReleaseFile -SourceRoot $sourceRoot -StageRoot $stageDir -RelativePath $relativeFile
   }
+  ConvertTo-DeterministicArchiveTree -Root $stageDir
 
   $issues = @(Test-StaticRelease -StageRoot $stageDir -SiteName $target.domain)
   $archivePath = Join-Path $releaseDir $archiveName
@@ -653,7 +660,7 @@ foreach ($target in $targets) {
 
   $stageChildren = @(Get-ChildItem -LiteralPath $stageDir -Force)
   if ($stageChildren.Count -eq 0) { Fail "No files selected for $($target.domain)" }
-  $stageChildren | Compress-Archive -DestinationPath $archivePath -Force
+  New-DeterministicArchive -SourceRoot $stageDir -Destination $archivePath
 
   $verifyDir = Join-Path $releaseDir 'verify-unpacked'
   Reset-Directory -Path $verifyDir -RequiredParent $releaseDir
@@ -663,11 +670,14 @@ foreach ($target in $targets) {
   }
   Remove-Item -LiteralPath $verifyDir -Recurse -Force
 
-  $archiveHash = (Get-FileHash -LiteralPath $archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+  $archiveHash = (Get-DeterministicFileSha256 -Path $archivePath).ToLowerInvariant()
   $archiveItem = Get-Item -LiteralPath $archivePath
   $manifest = New-Manifest -StageRoot $stageDir -Target $target -Issues $issues -ArchiveName $archiveName
   $manifestPath = Join-Path $releaseDir 'MANIFEST.json'
-  $manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $manifestPath -Encoding UTF8
+  Write-DeterministicUtf8Text `
+    -Path $manifestPath `
+    -Text ($manifest | ConvertTo-Json -Depth 10) `
+    -TrailingNewline
 
   $shaPath = Join-Path $releaseDir 'SHA256SUMS.txt'
   $shaLines = New-Object System.Collections.Generic.List[string]
@@ -675,7 +685,7 @@ foreach ($target in $targets) {
   foreach ($file in $manifest.files) {
     $shaLines.Add("$($file.sha256)  $($file.path)")
   }
-  $shaLines | Set-Content -LiteralPath $shaPath -Encoding UTF8
+  Write-DeterministicUtf8Text -Path $shaPath -Text ($shaLines -join "`n") -TrailingNewline
 
   $notesPath = Join-Path $releaseDir 'RELEASE_NOTES.md'
   $staticStatus = if ($issues.Count -eq 0) { 'ok' } else { "issues-$($issues.Count)" }
@@ -704,7 +714,7 @@ foreach ($target in $targets) {
     '',
     '## Residual risks'
   ) + @($riskLines)
-  $noteLines | Set-Content -LiteralPath $notesPath -Encoding UTF8
+  Write-DeterministicUtf8Text -Path $notesPath -Text ($noteLines -join "`n") -TrailingNewline
 
   $results.Add([pscustomobject]@{
     kind = $target.kind
@@ -765,13 +775,16 @@ if ($totalIssues -eq 0) {
   $indexLines.Add("- Static issues found: $totalIssues. See `MANIFEST.json` and `RELEASE_NOTES.md` in each release directory.")
 }
 $indexLines.Add('- Browser QA is not run by this script yet; run a separate Playwright pass for desktop/tablet/mobile.')
-$indexLines | Set-Content -LiteralPath $indexPath -Encoding UTF8
+Write-DeterministicUtf8Text -Path $indexPath -Text ($indexLines -join "`n") -TrailingNewline
 
 if (-not $KeepStaging) {
   Remove-Item -LiteralPath $stagingRoot -Recurse -Force
 }
 
-$results | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath (Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json") -Encoding UTF8
+Write-DeterministicUtf8Text `
+  -Path (Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json") `
+  -Text ($results | ConvertTo-Json -Depth 6) `
+  -TrailingNewline
 
 Write-Output "RELEASE BUILD OK"
 Write-Output "archives=$($results.Count)"

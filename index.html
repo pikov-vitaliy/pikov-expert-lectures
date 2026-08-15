@@ -73,12 +73,12 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
       "url": "https://pikov.expert/",
       "image": "https://pikov.expert/photo.jpg",
       "email": "mailto:vitaly@pikov.expert",
-      "jobTitle": "Эксперт в области ИТ и информационной безопасности, преподаватель",
+      "jobTitle": "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
       "affiliation": {
         "@type": "CollegeOrUniversity",
         "name": "Российский новый университет (РосНОУ)"
       },
-      "knowsAbout": ["Информационная безопасность", "Техническая защита информации", "Astra Linux", "Безопасная разработка ПО", "SIEM", "Тестирование на проникновение"],
+      "knowsAbout": ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение"],
       "sameAs": ["https://t.me/UnderLineSecurity"]
     },
     {
@@ -377,30 +377,87 @@ a:hover{ color: var(--ink); }
 }
 
 /* ============ Обо мне ============ */
-.about{ padding: 56px 0 20px; }
+.about{ padding: 68px 0 24px; }
 .about-head, .contacts-head{ margin-bottom: 8px; }
-.about-head h2, .contacts h2{ font-size: clamp(26px, 3.4vw, 34px); }
+.about-head{
+  display: grid; grid-template-columns: minmax(0, .72fr) minmax(320px, 1.28fr);
+  gap: 28px; align-items: end;
+}
+.about-head h2, .contacts h2{ font-size: clamp(28px, 3.4vw, 38px); }
 .about-head p, .contacts .lead{ color: var(--muted); margin-top: 8px; }
+.about-head > p{ max-width: 68ch; justify-self: end; }
+.about-intro{
+  margin-top: 26px; padding: clamp(22px, 3vw, 34px);
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 16px;
+}
+.about-lead{
+  max-width: 88ch; color: var(--ink); font-size: clamp(17px, 1.65vw, 20px);
+  line-height: 1.6;
+}
+.profile-chips, .standards-list{
+  display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 20px 0 0; padding: 0;
+}
+.profile-chips li, .standards-list li{
+  max-width: 100%; padding: 6px 10px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--accent-soft); color: var(--ink);
+  font: 600 12.5px/1.35 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
 .about-grid{
-  display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 26px;
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; margin-top: 14px;
 }
 .about-block{
+  grid-column: span 6; min-width: 0;
   background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
-  padding: 20px 22px;
+  padding: clamp(20px, 2.5vw, 28px);
 }
-.about-block h3{ font-size: 19px; margin-bottom: 4px; }
-.about-block ul{ list-style: none; margin: 0; padding: 0; }
-.about-block li{
+.about-block--wide{ grid-column: 1 / -1; }
+.about-block h3{ font-size: 20px; margin-bottom: 12px; }
+.about-block p{ color: var(--muted); font-size: 14.5px; overflow-wrap: anywhere; }
+.about-block p + p{ margin-top: 12px; }
+.about-block strong, .about-block b{ color: var(--ink); font-weight: 650; }
+.about-block ul:not(.standards-list){ list-style: none; margin: 0; padding: 0; }
+.about-block ul:not(.standards-list) > li{
   padding: 10px 0; border-bottom: 1px solid var(--line-soft);
   font-size: 14px; color: var(--muted); display: flex; gap: 14px;
 }
-.about-block li:last-child{ border-bottom: 0; padding-bottom: 2px; }
-.about-block li b{ color: var(--ink); font-weight: 600; }
+.about-block ul:not(.standards-list) > li:last-child{ border-bottom: 0; padding-bottom: 2px; }
+.about-block li b{ color: var(--ink); font-weight: 650; }
 .about-block .yr{
   font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--accent);
   flex: none; padding-top: 2px;
 }
-.about-note{ margin-top: 18px; font-size: 13px; color: var(--faint); }
+.standards-list{ margin-top: 16px; }
+.education-card > p{ max-width: 82ch; }
+.education-grid{
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+  margin-top: 20px;
+}
+.education-group{
+  min-width: 0; padding: 17px 18px; border: 1px solid var(--line-soft);
+  border-radius: 10px; background: var(--bg);
+}
+.education-group h4{
+  margin: 0 0 7px; color: var(--ink); font-size: 15px; line-height: 1.35;
+}
+.qualification-list{ list-style: none; margin: 0; padding: 0; }
+.about-block .qualification-list > li{
+  display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px;
+  padding: 8px 0; font-size: 13.5px;
+}
+.qualification-list time, .qualification-list .qualification-period{
+  color: var(--accent); font: 600 11.5px/1.5 ui-monospace, Consolas, monospace;
+}
+.qualification-list span{ min-width: 0; overflow-wrap: anywhere; }
+.credential-list li{ display: block !important; }
+.about-independent{
+  margin-top: 14px; padding: 22px 24px; border: 1px solid var(--line);
+  border-radius: 14px; background: var(--accent-soft);
+}
+.about-independent h3{ font-size: 18px; margin-bottom: 6px; }
+.about-independent p{ max-width: 92ch; color: var(--muted); font-size: 14.5px; }
+.about-independent strong{ color: var(--ink); }
 
 /* ============ Связь ============ */
 .contacts{ padding: 48px 0 72px; }
@@ -434,7 +491,11 @@ a:hover{ color: var(--ink); }
   .portrait .monogram{ font-size: 44px; }
   .hero-grid .portrait{ order: -1; }
   .stats{ grid-template-columns: repeat(2, auto); gap: 18px 44px; width: 100%; }
+  .about-head{ grid-template-columns: 1fr; gap: 6px; }
+  .about-head > p{ justify-self: start; }
   .about-grid{ grid-template-columns: 1fr; }
+  .about-block, .about-block--wide{ grid-column: 1; }
+  .education-grid{ grid-template-columns: 1fr; }
   .brand{ font-size: 16px; margin-right: 8px; }
   .site-nav{ min-width: 0; overflow-x: auto; scrollbar-width: none; }
   .site-nav::-webkit-scrollbar{ display: none; }
@@ -449,6 +510,10 @@ a:hover{ color: var(--ink); }
   .contacts-inner{ padding: 30px 18px; }
   .stats{ gap: 14px 30px; }
   .stat b{ font-size: 26px; }
+  .about{ padding-top: 52px; }
+  .about-intro, .about-block, .about-independent{ padding: 20px 18px; }
+  .profile-chips li, .standards-list li{ border-radius: 8px; }
+  .education-group{ padding: 15px 14px; }
 }
 @media (max-width: 900px){
   .paths-head{ grid-template-columns: 1fr; gap: 10px; }
@@ -530,7 +595,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       <div>
         <p class="kicker">Авторский каталог · информационная безопасность</p>
         <h1>Пиков Виталий<br>Александрович</h1>
-        <p class="role">Эксперт в области ИТ и информационной безопасности, преподаватель</p>
+        <p class="role">Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель</p>
         <p class="bio">26 лет в ИТ, более 10 лет преподавательской работы. Заслуженный доцент РосНОУ. Авторизованный преподаватель «Группы Астра» с правом проведения курсов по ОС Astra Linux Special Edition 1.8.</p>
         <div class="hero-contacts">
           <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
@@ -644,48 +709,120 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
   <section class="about" id="about">
     <div class="wrap">
       <div class="about-head">
-        <h2>Обо мне</h2>
-        <p>Образование, профессиональные переподготовки, сертификаты и публичная экспертиза.</p>
+        <h2 id="about-title">Обо мне</h2>
+        <p>Безопасная разработка, инженерная практика, преподавание и научная работа — от требований и архитектуры до проверяемых артефактов и работающих инструментов.</p>
+      </div>
+      <div class="about-intro">
+        <p class="about-lead">Я занимаюсь безопасной разработкой программного обеспечения, DevSecOps и AppSec: помогаю превращать требования стандартов в архитектурные решения, рабочие процессы, автоматизированные проверки и проверяемые результаты. В центре практики — security-by-design, моделирование угроз и защита на всём жизненном цикле ПО.</p>
+        <ul class="profile-chips" aria-label="Основные профессиональные направления">
+          <li>Secure C/C++</li>
+          <li>SAST и DAST</li>
+          <li>Фаззинг</li>
+          <li>SCA и SBOM</li>
+          <li>Software Supply Chain</li>
+          <li>DevSecOps</li>
+          <li>AppSec</li>
+        </ul>
       </div>
       <div class="about-grid">
-        <div class="about-block">
-          <h3>Образование</h3>
-          <ul>
-            <li><span><b>Высшее</b> — Тамбовский военный авиационный инженерный институт, специальность «Автоматизированные системы обработки информации и управления».</span></li>
-            <li><span><b>Заслуженный доцент</b> Российского нового университета (РосНОУ), преподаватель высшей школы.</span></li>
+        <article class="about-block about-block--wide">
+          <h3>Профессиональный путь</h3>
+          <p><strong>Более 25 лет</strong> работаю на стыке информационных технологий, информационной безопасности, исследований и образования: участвовал в разработке защищённых вычислительных систем, формировании требований безопасности, экспертизе архитектуры и исходного кода, испытаниях средств защиты и управлении техническими командами.</p>
+          <p><strong>Последнее место службы — профильный научно-исследовательский институт государственного сектора.</strong> Там прошёл путь от инженера-программиста до руководителя научно-исследовательской лаборатории по защите информации и испытательной лаборатории. После службы занимался защищёнными вычислительными платформами, развитием программ дополнительного образования и практическим внедрением процессов РБПО.</p>
+        </article>
+
+        <article class="about-block">
+          <h3>Инженерная практика</h3>
+          <p>Выстраиваю РБПО не только как комплект документов, но и как действующий инженерный контур. Создал и внедрил внутренний сервис SCA/SBOM для компонентного анализа, учёта уязвимостей и проверки лицензионной чистоты сторонних компонентов.</p>
+          <p>Работаю с CycloneDX, SPDX, VEX/OpenVEX и CSAF; обогащаю данные из NVD, OSV, EPSS и CISA KEV. Встраиваю ролевой доступ, неизменяемый аудит, контейнеризацию и security gates в CI/CD. Для C/C++ делаю акцент на безопасности памяти, безопасных API, compiler hardening, санитайзерах, SAST, DAST и фаззинге.</p>
+        </article>
+
+        <article class="about-block">
+          <h3>Стандарты и методологии</h3>
+          <p>Соединяю российские нормативные требования с международными инженерными практиками: требования, архитектура, модель угроз, код, тестирование, состав компонентов и выпуск продукта образуют единую проверяемую цепочку.</p>
+          <ul class="standards-list" aria-label="Стандарты и методологии">
+            <li>ГОСТ Р 56939-2024</li>
+            <li>ГОСТ Р 71207-2024</li>
+            <li>NIST SSDF</li>
+            <li>OWASP SAMM</li>
+            <li>OWASP ASVS</li>
+            <li>CWE</li>
+            <li>ISO/IEC 27001</li>
+            <li>ISO/IEC 27034</li>
+            <li>CERT C/C++</li>
+            <li>MISRA C/C++</li>
           </ul>
-        </div>
-        <div class="about-block">
-          <h3>Профессиональные переподготовки</h3>
+        </article>
+
+        <article class="about-block">
+          <h3>Преподавание</h3>
           <ul>
-            <li><span class="yr">2017</span><span>МГТУ им. Н. Э. Баумана — «Информационная безопасность»</span></li>
-            <li><span class="yr">2019</span><span>«Противодействие иностранным техническим разведкам»</span></li>
-            <li><span class="yr">2020</span><span>«Педагогика профессионального обучения и образования»</span></li>
-            <li><span class="yr">2021</span><span>«Техническая защита информации» (ТЗИ)</span></li>
-            <li><span class="yr">2022</span><span>«Практическая психология»</span></li>
+            <li><span><b>Более 10 лет преподаю</b> в высшей школе и дополнительном профессиональном образовании.</span></li>
+            <li><span>Подготовил к успешной защите <b>более 130 студентов</b>: бакалавров, специалистов и магистров, включая ВКР по информационной безопасности и информационным системам.</span></li>
+            <li><span>Разработал <b>10 авторских курсов</b> по РБПО, статическому и динамическому анализу, фаззингу и тестированию на проникновение.</span></li>
+            <li><span>Обучил <b>более 100 специалистов</b> и провёл <b>более 40 вебинаров</b> по безопасной разработке, включая большой совместный цикл с PVS-Studio.</span></li>
           </ul>
-        </div>
-        <div class="about-block">
-          <h3>Сертификаты и звания</h3>
+        </article>
+
+        <article class="about-block">
+          <h3>Наука и публичная экспертиза</h3>
           <ul>
-            <li><span>Авторизованный преподаватель «Группы Астра» — <b>Astra Linux Special Edition 1.8</b></span></li>
-            <li><span>Microsoft Certified: <b>MCT, MCPS, MCSA, MCTS</b></span></li>
-            <li><span>Награды и звания Минобороны России</span></li>
-            <li><span>Автор более <b>40 научных публикаций</b></span></li>
+            <li><span>Автор <b>более 40 научных публикаций</b> по информационной безопасности, безопасной разработке, аппаратным уязвимостям и защищённым информационным системам; работы представлены в Scopus и Web of Science.</span></li>
+            <li><span>Приглашённый эксперт круглого стола по безопасной разработке на МиТСОБИ 2026.</span></li>
+            <li><span>Докладчик Positive Hack Days, Инфофорума, InfoSecurity Russia и международных научных конференций; эксперт соревнований по информационной безопасности.</span></li>
           </ul>
-        </div>
-        <div class="about-block">
-          <h3>Конференции и форумы</h3>
-          <ul>
-            <li><span>Positive Hack Days Fest 2</span></li>
-            <li><span>Национальный форум информационной безопасности «Инфофорум»</span></li>
-            <li><span>Международный военно-технический форум «АРМИЯ»</span></li>
-            <li><span>Международная выставка InfoSecurity Russia</span></li>
-            <li><span>Международная научная конференция «Цивилизация знаний: российские реалии» (РосНОУ)</span></li>
-          </ul>
-        </div>
+        </article>
+
+        <article class="about-block about-block--wide education-card">
+          <h3>Образование и квалификация</h3>
+          <p>Базовое инженерное образование дополнено системной профессиональной переподготовкой и регулярным повышением квалификации в области ИБ, безопасной разработки, педагогики и искусственного интеллекта.</p>
+          <div class="education-grid">
+            <div class="education-group" role="group" aria-labelledby="base-education-title">
+              <h4 id="base-education-title">Базовое высшее образование</h4>
+              <ul class="qualification-list">
+                <li><time datetime="2001">2001</time><span>Высшее инженерное образование по специальности «Автоматизированные системы обработки информации и управления».</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="retraining-title">
+              <h4 id="retraining-title">Профессиональная переподготовка</h4>
+              <ul class="qualification-list">
+                <li><time datetime="2017">2017</time><span>«Информационная безопасность», МГТУ им. Н. Э. Баумана.</span></li>
+                <li><time datetime="2019">2019</time><span>«Противодействие иностранным техническим разведкам».</span></li>
+                <li><time datetime="2020">2020</time><span>Педагогика профессионального образования и дополнительного профессионального образования.</span></li>
+                <li><time datetime="2021">2021</time><span>«Техническая защита информации».</span></li>
+                <li><time datetime="2022">2022</time><span>«Практическая психология».</span></li>
+                <li><time datetime="2024">2024</time><span>«Искусственный интеллект в образовании».</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="continuing-education-title">
+              <h4 id="continuing-education-title">Повышение квалификации и дополнительная подготовка</h4>
+              <ul class="qualification-list">
+                <li><time datetime="2026">2026</time><span>Безопасность приложений.</span></li>
+                <li><time datetime="2025">2025</time><span>Современная ИБ: подходы, инструменты и образовательные практики.</span></li>
+                <li><time datetime="2024">2024</time><span>«Специалист по процессам разработки безопасного программного обеспечения», 200 часов; анализ архитектуры и экспертиза исходного кода; Python, обработка радиолокационной информации, нейронные сети, этика ИИ и качество преподавания ИТ.</span></li>
+                <li><span class="qualification-period">2022–2023</span><span>KasperskyOS, информационная безопасность АСУ ТП и современные киберугрозы.</span></li>
+                <li><time datetime="2016">2016</time><span>Администрирование Astra Linux Special Edition.</span></li>
+                <li><span class="qualification-period">2009–2010</span><span>Системное администрирование, Windows Server, Active Directory и развёртывание Windows.</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="credentials-title">
+              <h4 id="credentials-title">Звания и профессиональные статусы</h4>
+              <ul class="credential-list">
+                <li><span><b>Заслуженный доцент РосНОУ</b>, преподаватель высшей школы.</span></li>
+                <li><span>Авторизованный преподаватель по <b>Astra Linux Special Edition 1.7/1.8</b>.</span></li>
+                <li><span>Microsoft Certified Professional, MCSA, MCTS и MCITP; <b>Microsoft Certified Trainer в 2014–2016 годах</b>.</span></li>
+              </ul>
+            </div>
+          </div>
+        </article>
       </div>
-      <p class="about-note">Автор учебных направлений по РБПО и информационной безопасности.</p>
+      <aside class="about-independent" aria-label="Статус образовательного проекта">
+        <h3>Независимый авторский ресурс</h3>
+        <p><strong>pikov.expert — независимый авторский образовательный проект Виталия Пикова.</strong> Материалы развиваются независимо от прежних работодателей и учебных центров и предназначены для преподавания, самостоятельного обучения и практической работы специалистов.</p>
+      </aside>
     </div>
   </section>
 
@@ -751,7 +888,7 @@ const LECTURES = [
 
   /* --- Регулирование и право --- */
   { category: "reg", format: "Лекция", title: "Сертификация средств защиты информации", url: "https://cert.pikov.expert/",
-    description: "Нормативная база ФСТЭК и Минобороны, процедура сертификации, уровни доверия (1–6), требования к разработке СрЗИ." },
+    description: "Нормативная база ФСТЭК и других государственных систем сертификации, процедура сертификации, уровни доверия (1–6), требования к разработке СрЗИ." },
   { category: "reg", format: "Лекция", title: "Лицензирование в сфере ТЗИ", url: "https://lic-tzi.pikov.expert/",
     description: "Получение лицензии ФСТЭК: ФЗ-99, постановления Правительства РФ № 79 и № 171, лицензионные требования, сроки и типичные ошибки соискателей." },
   { category: "reg", format: "Лекция", title: "Подразделения ТЗИ и их функции", url: "https://tzi-dept.pikov.expert/",
