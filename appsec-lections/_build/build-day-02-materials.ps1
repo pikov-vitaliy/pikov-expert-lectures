@@ -12,12 +12,17 @@ $dayRoot = Join-Path $downloadsRoot 'day-02'
 $transcripts = Join-Path $dayRoot 'transcripts'
 $participantMaterials = Join-Path $dayRoot 'participant-materials'
 $materialsRoot = Join-Path $siteRoot 'materials'
+$archiveHelper = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\_PROJECT\deterministic-archive.ps1'))
 
 foreach ($requiredPath in @($dayRoot, $transcripts, $participantMaterials, $materialsRoot)) {
   if (-not (Test-Path -LiteralPath $requiredPath -PathType Container)) {
     throw "Missing required directory: $requiredPath"
   }
 }
+if (-not (Test-Path -LiteralPath $archiveHelper -PathType Leaf)) {
+  throw "Deterministic archive helper not found: $archiveHelper"
+}
+. $archiveHelper
 
 $authorMaterialNames = @(
   (Convert-FromUtf8Base64 '0LTQtdC90YwtMi3QvNC10YLQvtC00LjRh9C10YHQutC40Lkt0LrQvtC90YHQv9C10LrRgi5tZA=='),
@@ -39,9 +44,9 @@ $authorMaterialPaths = foreach ($name in $authorMaterialNames) {
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Собираем архив из временного staging-каталога через CreateFromDirectory: он
-# пишет записи с прямым слэшем (спецификация ZIP), поэтому дерево папок корректно
-# разворачивается на macOS/Linux, и пути в архиве совпадают с манифестом.
+# Собираем архив из временного staging-каталога общим воспроизводимым writer:
+# пути сортируются ordinal, текст канонизируется в UTF-8/LF без BOM, а mtime
+# каждой ZIP-записи фиксируется, поэтому результат не зависит от EOL и mtime checkout.
 # $Dir — каталоги, копируемые в корень архива под своим именем;
 # $AuthorFile — файлы, помещаемые в архиве под materials/.
 function New-DayTwoArchive {
@@ -65,8 +70,7 @@ function New-DayTwoArchive {
         Copy-Item -LiteralPath $f -Destination $materialsStage -Force
       }
     }
-    [System.IO.Compression.ZipFile]::CreateFromDirectory(
-      $staging, $Destination, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+    New-DeterministicArchive -SourceRoot $staging -Destination $Destination
   }
   finally {
     Remove-Item -LiteralPath $staging -Recurse -Force -ErrorAction SilentlyContinue
@@ -157,7 +161,7 @@ $checksumLines = New-Object System.Collections.Generic.List[string]
 foreach ($archive in $archives) {
   $destination = Join-Path $downloadsRoot $archive.Name
   New-DayTwoArchive -Destination $destination -Dir $archive.Dir -AuthorFile $archive.AuthorFile
-  $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
+  $hash = Get-DeterministicFileSha256 -Path $destination
   $size = (Get-Item -LiteralPath $destination).Length
   $checksumLines.Add("$hash  $($archive.Name)  $size bytes")
   Write-Output "BUILT $($archive.Name) $size bytes"
@@ -170,23 +174,20 @@ $checksumDocument = @(
   '',
   '```text'
 ) + @($checksumLines) + @('```')
-[System.IO.File]::WriteAllText((Join-Path $downloadsRoot 'day-02-SHA256SUMS.md'), ($checksumDocument -join [Environment]::NewLine), (New-Object System.Text.UTF8Encoding($false)))
+Write-DeterministicUtf8Text `
+  -Path (Join-Path $downloadsRoot 'day-02-SHA256SUMS.md') `
+  -Text ($checksumDocument -join "`n")
 
 $dayFiles = @($transcripts, $participantMaterials) | ForEach-Object {
   Get-ChildItem -LiteralPath $_ -File -Recurse
 } | Sort-Object FullName | ForEach-Object {
-  [pscustomobject]@{
-    path = Get-RelativeForwardSlashPath -BasePath $dayRoot -FullPath $_.FullName
-    bytes = $_.Length
-    sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
-  }
+  $archivePath = Get-RelativeForwardSlashPath -BasePath $dayRoot -FullPath $_.FullName
+  Get-DeterministicArchiveFileRecord -Path $_.FullName -ArchivePath $archivePath
 }
 $authorFiles = $authorMaterialPaths | ForEach-Object {
-  [pscustomobject]@{
-    path = ('materials/' + [System.IO.Path]::GetFileName($_))
-    bytes = (Get-Item -LiteralPath $_).Length
-    sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash
-  }
+  Get-DeterministicArchiveFileRecord `
+    -Path $_ `
+    -ArchivePath ('materials/' + [System.IO.Path]::GetFileName($_))
 }
 $files = @($dayFiles + $authorFiles | Sort-Object path)
 $manifest = [pscustomobject]@{
@@ -194,5 +195,5 @@ $manifest = [pscustomobject]@{
   files = @($files)
 }
 $manifestText = $manifest | ConvertTo-Json -Depth 4
-[System.IO.File]::WriteAllText((Join-Path $downloadsRoot 'day-02-manifest.json'), $manifestText, (New-Object System.Text.UTF8Encoding($false)))
+Write-DeterministicUtf8Text -Path (Join-Path $downloadsRoot 'day-02-manifest.json') -Text $manifestText
 Write-Output "BUILT day-02-manifest.json $($files.Count) files"

@@ -97,6 +97,82 @@ try {
   const maskomCount = await desktop.evaluate(() => document.body.innerText.split("МАСКОМ").length - 1);
   check("MASKOM is absent from the rendered page", maskomCount === 0, String(maskomCount));
 
+  const profileViewports = [
+    { label: "1920px", width: 1920, height: 1080, expectedColumns: 2 },
+    { label: "1366px", width: 1366, height: 768, expectedColumns: 2 },
+    { label: "390px", width: 390, height: 844, expectedColumns: 1 },
+  ];
+  const profileThemeColors = new Map();
+  for (const viewport of profileViewports) {
+    for (const theme of ["light", "dark"]) {
+      const page = await browser.newPage({ viewport: { width: viewport.width, height: viewport.height } });
+      const profileConsoleErrors = [];
+      page.on("pageerror", err => profileConsoleErrors.push(String(err)));
+      page.on("console", msg => { if (msg.type() === "error") profileConsoleErrors.push(msg.text()); });
+      await page.addInitScript(selectedTheme => localStorage.setItem("theme", selectedTheme), theme);
+      await page.goto(`${base}/#about`, { waitUntil: "networkidle" });
+
+      const metrics = await page.evaluate(() => {
+        const about = document.querySelector("#about");
+        const cards = [...document.querySelectorAll("#about .about-grid > .about-block")];
+        const halfCards = cards.filter(card => !card.classList.contains("about-block--wide"));
+        const groups = [...document.querySelectorAll("#about .education-group")];
+        const chips = [...document.querySelectorAll("#about .profile-chips > li, #about .standards-list > li")];
+        const uniqueColumns = elements => new Set(elements.map(el => Math.round(el.getBoundingClientRect().left))).size;
+        const visiblySized = elements => elements.every(el => {
+          const rect = el.getBoundingClientRect();
+          return rect.width > 0 && rect.height > 0;
+        });
+        const containedByParent = elements => elements.every(el => {
+          const rect = el.getBoundingClientRect();
+          const parentRect = el.parentElement.getBoundingClientRect();
+          return rect.left >= parentRect.left - 1 && rect.right <= parentRect.right + 1;
+        });
+        return {
+          activeTheme: document.documentElement.dataset.theme,
+          backgroundColor: getComputedStyle(document.body).backgroundColor,
+          viewportWidth: window.innerWidth,
+          pageWidth: document.documentElement.scrollWidth,
+          aboutPresent: !!about,
+          aboutTextLength: about?.innerText.trim().length || 0,
+          cardCount: cards.length,
+          cardsVisible: visiblySized(cards),
+          cardsOverflowing: cards.filter(card => card.scrollWidth > card.clientWidth + 1).length,
+          cardColumns: uniqueColumns(halfCards),
+          educationGroupCount: groups.length,
+          educationGroupsVisible: visiblySized(groups),
+          educationColumns: uniqueColumns(groups),
+          chipsContained: containedByParent(chips),
+          chipCount: chips.length,
+          educationLabelsResolve: groups.every(group => {
+            const id = group.getAttribute("aria-labelledby");
+            return group.getAttribute("role") === "group" && !!id && !!document.getElementById(id);
+          }),
+          cardsHaveHeadings: cards.every(card => !!card.querySelector("h3")),
+        };
+      });
+
+      const state = `${viewport.label} ${theme}`;
+      check(`professional profile applies ${theme} theme at ${viewport.label}`, metrics.activeTheme === theme, metrics.activeTheme);
+      check(`professional profile has no console errors at ${state}`, profileConsoleErrors.length === 0, profileConsoleErrors.join(" | "));
+      check(`professional profile has no horizontal overflow at ${state}`, metrics.pageWidth <= metrics.viewportWidth + 1, `${metrics.pageWidth} > ${metrics.viewportWidth}`);
+      check(`professional profile renders substantive content at ${state}`, metrics.aboutPresent && metrics.aboutTextLength > 2500, String(metrics.aboutTextLength));
+      check(`professional profile cards render at ${state}`, metrics.cardCount >= 6 && metrics.cardsVisible && metrics.cardsOverflowing === 0, `cards=${metrics.cardCount} overflowing=${metrics.cardsOverflowing}`);
+      check(`professional profile uses ${viewport.expectedColumns} card column(s) at ${state}`, metrics.cardColumns === viewport.expectedColumns, String(metrics.cardColumns));
+      check(`education groups render at ${state}`, metrics.educationGroupCount === 4 && metrics.educationGroupsVisible, String(metrics.educationGroupCount));
+      check(`education uses ${viewport.expectedColumns} column(s) at ${state}`, metrics.educationColumns === viewport.expectedColumns, String(metrics.educationColumns));
+      check(`profile chips stay inside their lists at ${state}`, metrics.chipCount >= 15 && metrics.chipsContained, String(metrics.chipCount));
+      check(`profile card headings and education labels are accessible at ${state}`, metrics.cardsHaveHeadings && metrics.educationLabelsResolve);
+      profileThemeColors.set(`${viewport.label}:${theme}`, metrics.backgroundColor);
+      await page.close();
+    }
+    check(
+      `light and dark palettes differ at ${viewport.label}`,
+      profileThemeColors.get(`${viewport.label}:light`) !== profileThemeColors.get(`${viewport.label}:dark`),
+      `${profileThemeColors.get(`${viewport.label}:light`)} == ${profileThemeColors.get(`${viewport.label}:dark`)}`,
+    );
+  }
+
   await desktop.click("#themeToggle");
   const themeAfterClick = await desktop.evaluate(() => document.documentElement.dataset.theme);
   await desktop.reload({ waitUntil: "networkidle" });
@@ -118,7 +194,7 @@ try {
   });
   check("decorative SVGs are marked aria-hidden", decorativeSvgsOk);
 
-  const mobile = await browser.newPage({ viewport: { width: 375, height: 812 } });
+  const mobile = await browser.newPage({ viewport: { width: 390, height: 844 } });
   await mobile.goto(`${base}/`, { waitUntil: "networkidle" });
   const mobileMetrics = await mobile.evaluate(() => ({
     pageWidth: document.documentElement.scrollWidth,
@@ -130,8 +206,8 @@ try {
       return lefts.size;
     })(),
   }));
-  check("no horizontal overflow at 375px", mobileMetrics.pageWidth <= mobileMetrics.viewport + 1, `${mobileMetrics.pageWidth} > ${mobileMetrics.viewport}`);
-  check("lecture cards are a single column at 375px", mobileMetrics.cardColumns === 1, `${mobileMetrics.cardColumns} columns`);
+  check("no horizontal overflow at 390px", mobileMetrics.pageWidth <= mobileMetrics.viewport + 1, `${mobileMetrics.pageWidth} > ${mobileMetrics.viewport}`);
+  check("lecture cards are a single column at 390px", mobileMetrics.cardColumns === 1, `${mobileMetrics.cardColumns} columns`);
 
   // The header nav was previously display:none below 880px with nothing in its
   // place, so a phone visitor had no way to reach "Обо мне" or "Связь".
@@ -146,7 +222,7 @@ try {
     };
   });
   check(
-    "header navigation stays reachable at 375px",
+    "header navigation stays reachable at 390px",
     mobileNav.present && mobileNav.total > 0 && mobileNav.reachable === mobileNav.total,
     `present=${mobileNav.present} reachable=${mobileNav.reachable}/${mobileNav.total}`,
   );

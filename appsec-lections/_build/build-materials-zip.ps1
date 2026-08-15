@@ -4,17 +4,21 @@ $ErrorActionPreference = 'Stop'
 $siteRoot = Split-Path -Parent $PSScriptRoot
 $downloadsRoot = Join-Path $siteRoot 'downloads'
 $dayRoot = Join-Path $downloadsRoot 'day-01'
+$archiveHelper = [System.IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..\..\_PROJECT\deterministic-archive.ps1'))
 
 if (-not (Test-Path -LiteralPath $dayRoot -PathType Container)) {
   throw "Source materials directory not found: $dayRoot"
 }
+if (-not (Test-Path -LiteralPath $archiveHelper -PathType Leaf)) {
+  throw "Deterministic archive helper not found: $archiveHelper"
+}
+. $archiveHelper
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 
-# Собираем архив из временного staging-каталога через CreateFromDirectory: он
-# пишет записи с прямым слэшем, поэтому дерево папок корректно разворачивается на
-# macOS/Linux, а пути в архиве совпадают с манифестом (авторские файлы — под
-# materials/, а не в корне, как это делал Compress-Archive со списком файлов).
+# Собираем архив из временного staging-каталога общим воспроизводимым writer:
+# пути сортируются ordinal, текст канонизируется в UTF-8/LF без BOM, а mtime
+# каждой ZIP-записи фиксируется. Поэтому байты не зависят от EOL и mtime checkout.
 function New-DayArchive {
   param(
     [Parameter(Mandatory = $true)][string]$Destination,
@@ -46,8 +50,7 @@ function New-DayArchive {
         Copy-Item -LiteralPath $f -Destination $materialsStage -Force
       }
     }
-    [System.IO.Compression.ZipFile]::CreateFromDirectory(
-      $staging, $Destination, [System.IO.Compression.CompressionLevel]::Optimal, $false)
+    New-DeterministicArchive -SourceRoot $staging -Destination $Destination
   }
   finally {
     Remove-Item -LiteralPath $staging -Recurse -Force -ErrorAction SilentlyContinue
@@ -179,7 +182,7 @@ foreach ($archive in $archives) {
   $destination = Join-Path $downloadsRoot $archive.Name
   $dirMap = if ($archive.ContainsKey('DirMap')) { @($archive.DirMap) } else { @() }
   New-DayArchive -Destination $destination -Dir $archive.Dir -DirMap $dirMap -AuthorFile $archive.AuthorFile
-  $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
+  $hash = Get-DeterministicFileSha256 -Path $destination
   $size = (Get-Item -LiteralPath $destination).Length
   $checksumLines.Add("$hash  $($archive.Name)  $size bytes")
   Write-Output "BUILT $($archive.Name) $size bytes"
@@ -192,11 +195,9 @@ $checksumDocument = @(
   '',
   '```text'
 ) + @($checksumLines) + @('```')
-[System.IO.File]::WriteAllText(
-  (Join-Path $downloadsRoot 'day-01-SHA256SUMS.md'),
-  ($checksumDocument -join [Environment]::NewLine),
-  (New-Object System.Text.UTF8Encoding($false))
-)
+Write-DeterministicUtf8Text `
+  -Path (Join-Path $downloadsRoot 'day-01-SHA256SUMS.md') `
+  -Text ($checksumDocument -join "`n")
 
 $dayFiles = @(
   @{ Root = $transcripts; Prefix = 'transcripts' },
@@ -204,19 +205,14 @@ $dayFiles = @(
 ) | ForEach-Object {
   $group = $_
   Get-ChildItem -LiteralPath $group.Root -File -Recurse | ForEach-Object {
-    [pscustomobject]@{
-      path = ($group.Prefix + '/' + (Get-RelativeForwardSlashPath -BasePath $group.Root -FullPath $_.FullName))
-      bytes = $_.Length
-      sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
-    }
+    $archivePath = $group.Prefix + '/' + (Get-RelativeForwardSlashPath -BasePath $group.Root -FullPath $_.FullName)
+    Get-DeterministicArchiveFileRecord -Path $_.FullName -ArchivePath $archivePath
   }
 }
 $authorFiles = $dayOneAuthorMaterials | Sort-Object | ForEach-Object {
-  [pscustomobject]@{
-    path = ('materials/' + [System.IO.Path]::GetFileName($_))
-    bytes = (Get-Item -LiteralPath $_).Length
-    sha256 = (Get-FileHash -LiteralPath $_ -Algorithm SHA256).Hash
-  }
+  Get-DeterministicArchiveFileRecord `
+    -Path $_ `
+    -ArchivePath ('materials/' + [System.IO.Path]::GetFileName($_))
 }
 $files = @($dayFiles + $authorFiles | Sort-Object path)
 $manifest = [pscustomobject]@{
@@ -225,7 +221,7 @@ $manifest = [pscustomobject]@{
   files = @($files)
 }
 $manifestText = $manifest | ConvertTo-Json -Depth 4
-[System.IO.File]::WriteAllText((Join-Path $downloadsRoot 'day-01-manifest.json'), $manifestText, (New-Object System.Text.UTF8Encoding($false)))
+Write-DeterministicUtf8Text -Path (Join-Path $downloadsRoot 'day-01-manifest.json') -Text $manifestText
 Write-Output "BUILT day-01-manifest.json $($files.Count) files"
 
 # The site-level release builder invokes this canonical AppSec entry point.

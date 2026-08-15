@@ -57,6 +57,8 @@ jobs:
           node --test .\_PROJECT\test-release-workflow-order.mjs
           node --test .\_PROJECT\test-deploy-manifest-boundary.mjs
           node --test .\_PROJECT\test-root-learning-paths.mjs
+          node --test .\_PROJECT\test-root-professional-profile.mjs
+          node --test .\_PROJECT\test-generated-artifact-determinism.mjs
           node .\_PROJECT\test-pentest-materials.mjs
           python .\appsec-lections\_build\security_regression_tests.py -v
           python .\pentest\lab\dvwa-safety-test.py -v
@@ -95,6 +97,19 @@ jobs:
         shell: pwsh
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+
+      - name: Verify release build did not change tracked files
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $trackedDrift = @(git status --porcelain=v1 --untracked-files=no)
+          if ($LASTEXITCODE -ne 0) {
+            throw 'Could not inspect tracked files after release build'
+          }
+          if ($trackedDrift.Count -ne 0) {
+            $trackedDrift | ForEach-Object { Write-Host $_ }
+            throw 'Tracked files changed during release build'
+          }
 
       - name: Verify public release independence
         shell: pwsh

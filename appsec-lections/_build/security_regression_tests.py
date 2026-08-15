@@ -29,6 +29,17 @@ OLD_LAB = (
 )
 
 
+def install_deterministic_archive_helper(fixture_root: Path) -> None:
+    project = fixture_root / "_PROJECT"
+    project.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(ROOT / "_PROJECT" / "deterministic-archive.ps1", project)
+
+
+def install_release_builder(project: Path) -> None:
+    shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+    shutil.copy2(ROOT / "_PROJECT" / "deterministic-archive.ps1", project / "deterministic-archive.ps1")
+
+
 class CanonicalJuiceShopLabTests(unittest.TestCase):
     def assert_foreign_compose_project_is_not_deleted(self, stop_script: Path) -> None:
         """A same-name foreign Compose project must be rejected before `down`."""
@@ -78,6 +89,7 @@ class CanonicalJuiceShopLabTests(unittest.TestCase):
         # interruption of the test process must not leave one behind.
         with tempfile.TemporaryDirectory(prefix="appsec-builder-stray-") as temp_name:
             temp = Path(temp_name)
+            install_deterministic_archive_helper(temp)
             site = temp / "appsec-lections"
             for relative in (
                 Path("downloads/day-01"),
@@ -135,6 +147,7 @@ class CanonicalJuiceShopLabTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory(prefix="appsec-day1-reparse-") as temp_name:
             temp = Path(temp_name)
+            install_deterministic_archive_helper(temp)
             site = temp / "appsec-lections"
             (site / "_build").mkdir(parents=True)
             shutil.copy2(APPSEC / "_build" / "build-materials-zip.ps1", site / "_build")
@@ -169,6 +182,7 @@ class CanonicalJuiceShopLabTests(unittest.TestCase):
         )
         with tempfile.TemporaryDirectory(prefix="appsec-day2-reparse-") as temp_name:
             temp = Path(temp_name)
+            install_deterministic_archive_helper(temp)
             site = temp / "appsec-lections"
             (site / "_build").mkdir(parents=True)
             shutil.copy2(APPSEC / "_build" / "build-day-02-materials.ps1", site / "_build")
@@ -1195,7 +1209,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             lecture = root / "lecture"
             project.mkdir(parents=True)
             lecture.mkdir()
-            shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+            install_release_builder(project)
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1275,7 +1289,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             lecture = root / "lecture"
             project.mkdir(parents=True)
             lecture.mkdir()
-            shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+            install_release_builder(project)
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1324,7 +1338,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             build_dir = lecture / "_build"
             project.mkdir(parents=True)
             build_dir.mkdir(parents=True)
-            shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+            install_release_builder(project)
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1487,8 +1501,11 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             outside.mkdir()
             (root / "index.html").write_text("<!doctype html><title>root</title>\n", encoding="utf-8")
             (outside / "index.html").write_text("<!doctype html><title>outside</title>\n", encoding="utf-8")
-            for name in ("build-release.ps1", "update-site-control-files.ps1"):
-                shutil.copy2(ROOT / "_PROJECT" / name, project / name)
+            install_release_builder(project)
+            shutil.copy2(
+                ROOT / "_PROJECT" / "update-site-control-files.ps1",
+                project / "update-site-control-files.ps1",
+            )
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1542,7 +1559,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             lecture = root / "lecture"
             project.mkdir(parents=True)
             lecture.mkdir()
-            shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+            install_release_builder(project)
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1587,8 +1604,11 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             root = Path(temp_name) / "site"
             project = root / "_PROJECT"
             project.mkdir(parents=True)
-            for name in ("build-release.ps1", "update-site-control-files.ps1"):
-                shutil.copy2(ROOT / "_PROJECT" / name, project / name)
+            install_release_builder(project)
+            shutil.copy2(
+                ROOT / "_PROJECT" / "update-site-control-files.ps1",
+                project / "update-site-control-files.ps1",
+            )
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )
@@ -1671,7 +1691,7 @@ class UniversalLecturePresentationTests(unittest.TestCase):
             root = Path(temp_name)
             project = root / "_PROJECT"
             project.mkdir()
-            shutil.copy2(ROOT / "_PROJECT" / "build-release.ps1", project / "build-release.ps1")
+            install_release_builder(project)
             (project / "build-astra-hardening-labs.ps1").write_text(
                 "param([switch]$Check)\nWrite-Output 'ASTRA FIXTURE OK'\nreturn\n", encoding="utf-8"
             )

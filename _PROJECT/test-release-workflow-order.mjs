@@ -94,6 +94,8 @@ test('CI runs the static content and workflow regression tests', () => {
     'test-pentest-materials.mjs',
     'test-course-map.mjs',
     'test-27-07-accessible-handout.mjs',
+    'test-generated-artifact-determinism.mjs',
+    'test-root-professional-profile.mjs',
     'test-layout-accessibility-regressions.mjs',
     'security_regression_tests.py',
     'dvwa-safety-test.py',
@@ -105,6 +107,38 @@ test('CI runs the static content and workflow regression tests', () => {
 
   assert.match(workflow, /playwright(?:\.cmd)? install chromium/);
   assert.match(workflow, /browser-qa\.mjs/);
+});
+
+test('CI rejects tracked-file drift immediately after the release build', () => {
+  const build = workflow.indexOf('- name: Build release archives');
+  const driftGate = workflow.indexOf('- name: Verify release build did not change tracked files', build);
+  const independence = workflow.indexOf('- name: Verify public release independence', build);
+  assert.ok(build >= 0, 'release build step is missing');
+  assert.ok(driftGate > build, 'tracked-file drift gate must follow the release build');
+  assert.ok(independence > driftGate, 'public independence must run only after the drift gate');
+
+  const gateBody = workflow.slice(driftGate, independence);
+  assert.match(gateBody, /git status --porcelain=v1 --untracked-files=no/);
+  assert.match(gateBody, /if\s*\(\$LASTEXITCODE -ne 0\)/);
+  assert.match(gateBody, /\$trackedDrift\.Count -ne 0/);
+  assert.match(gateBody, /Tracked files changed during release build/);
+});
+
+test('accepted-main runbook repeats the fail-closed tracked-file drift gate after build', () => {
+  const releaseStart = runbook.indexOf('## 6.');
+  const releaseEnd = runbook.indexOf('Для адресной публикации', releaseStart);
+  const releaseBody = runbook.slice(releaseStart, releaseEnd);
+  const build = releaseBody.indexOf('build-release.ps1');
+  const status = releaseBody.indexOf('git status --porcelain=v1 --untracked-files=no', build);
+  const independence = releaseBody.indexOf('test-public-release-independence.ps1', build);
+
+  assert.ok(build >= 0, 'accepted-main release build is missing');
+  assert.ok(status > build, 'tracked-file drift must be checked after the accepted-main build');
+  assert.ok(independence > status, 'independence check must follow the tracked-file drift gate');
+  const gateBody = releaseBody.slice(status, independence);
+  assert.match(gateBody, /if\s*\(\$LASTEXITCODE -ne 0\)/);
+  assert.match(gateBody, /\$trackedDrift\.Count -ne 0/);
+  assert.match(gateBody, /Tracked files changed during release build/);
 });
 
 test('CI uses least privilege and an immutable checkout action', () => {
