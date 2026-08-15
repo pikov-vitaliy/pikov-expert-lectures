@@ -1,9 +1,9 @@
 # Журнал глубокой актуализации учебных материалов pikov.expert
 
-- Статус: `LATE REMEDIATION IN PROGRESS`; замороженный content/security snapshot принят в `main`, но финальная публикация остановлена после обнаружения невоспроизводимых generated artifacts. Текущий corrective slice ещё не закоммичен, не прошёл CI и не принят в итоговый `main`.
+- Статус: `COMPLETE`; content/security snapshot и late-scope исправления профиля/воспроизводимости приняты в `main`, полный release развёрнут на 30 целях и повторно проверен локальными, hosting и browser gates.
 - Базовый commit: `5be877ea76eb023e6ea196799cca0b87f86f4c6c`.
-- Принятый baseline `main`: `162ca821c6fd68cd8769d6f39a34218378889892`.
-- Текущая рабочая ветка: `agent/profile-release-determinism`.
+- Принятый release `main`: `4773a16bd09fc8d30c8a5d93078d17e02007e51c`.
+- Текущая рабочая ветка: `main`.
 - Источник требований: `_PROJECT/DEEP_CONTENT_AUDIT_2026-08-15.md`.
 - Область: 30 release targets, практикумы, публичные архивы, PDF/DOCX, браузерные представления и корневой каталог.
 
@@ -29,10 +29,10 @@
 - [x] Педагогический минимум опубликован в course map: audience, prerequisites, outcomes, artifact, rubric, teacher route и versioned sources.
 - [x] Полный release build зелёный: 30 архивов, `staticIssues=0`, public-independence 30/30, browser QA 30/30 целей и 90/90 viewport-проверок, `issues=0`.
 - [x] Замороженный feature snapshot `1fee7623e4f5530125cbab9452f1eb8e0d347a13` прошёл GitHub Actions run `31900665072`; PR `#5` принят merge commit `162ca821c6fd68cd8769d6f39a34218378889892`, exact-main run `31901139925` завершился `success`.
-- [ ] Late-scope исправления воспроизводимости и профессионального профиля закоммичены, опубликованы и прошли exact feature-SHA CI.
-- [ ] Late-scope принят в итоговый `main`, и CI точного нового main SHA зелёный.
-- [ ] Развёрнут точный принятый SHA; local/repository/live сверены по hash/link/header/browser checks.
-- [ ] `main` и `origin/main` синхронны, рабочая копия чиста кроме намеренно непубличного `pc/`.
+- [x] Late-scope исправления воспроизводимости и профессионального профиля закоммичены, опубликованы и прошли exact feature-SHA CI.
+- [x] Late-scope принят в итоговый `main`, и CI точного нового main SHA зелёный.
+- [x] Развёрнут точный принятый SHA; local/repository/live сверены по hash/link/header/browser checks.
+- [x] `main` и `origin/main` синхронны, рабочая копия чиста кроме намеренно непубличного `pc/`.
 
 ## 3. Потоки работ
 
@@ -159,8 +159,12 @@ $env:RELEASE_DATE='2026-08-15'; node .\_PROJECT\browser-qa.mjs
 - Добавлен behavioral regression `_PROJECT/test-generated-artifact-determinism.mjs`: отдельные fixtures для 27-07, AppSec Day 1/2 и полного release требуют byte-identical output при разных EOL/mtime, точного равенства ZIP file set и manifest paths и запуска через production Windows PowerShell 5.1. Первые два сценария воспроизвели ожидаемый RED до исправления builders; full-release fixture исправлен с domain label `fixture-course`, а не недопустимым FQDN.
 - После интеграции deterministic helper/builders этот regression прошёл 3/3 через production Windows PowerShell 5.1 и отдельно 3/3 через PowerShell 7 (`PIKOV_TEST_POWERSHELL=pwsh`). Test harness для PS5.1 задаёт нативный Windows PowerShell `PSModulePath`, чтобы Node не передавал несовместимый module path родительского PowerShell 7.
 - Workflow и операционный runbook дополнены fail-closed проверкой `git status --porcelain=v1 --untracked-files=no` сразу после release build: любое staged/unstaged изменение tracked-файла блокирует продолжение, при этом непубличный untracked `pc/` не затрагивается. Workflow-order regression прошёл RED 8/11 → GREEN 11/11 после добавления двух late-scope tests и post-build gate.
-- Открыт отдельный late-scope профессионального профиля: `_PROJECT/test-root-professional-profile.mjs` фиксирует нейтральную биографию, актуальный security engineering/C/C++/SCA/SBOM/VEX/CI-CD профиль, стандарты и проверяемые преподавательские результаты. Финальные GREEN, commit, push, CI, merge, новый exact-main build, deploy и live QA пока не зафиксированы и остаются обязательными.
+- Late-scope профессионального профиля закрыт: `_PROJECT/test-root-professional-profile.mjs` фиксирует нейтральную биографию, актуальный security engineering/C/C++/SCA/SBOM/VEX/CI-CD профиль, стандарты и проверяемые преподавательские результаты.
 - Образовательная траектория в профиле сверена по двум исходным резюме и разделена на высшее инженерное образование, профессиональную переподготовку, повышение квалификации 2009–2026 годов и профессиональные статусы. Последнее место службы обозначено нейтрально как профильный научно-исследовательский институт государственного сектора; номера дипломов и удостоверений, рекомендации и иные приватные реквизиты не публикуются. Независимый review обнаружил неверную категорию 200-часовой подготовки по процессам безопасной разработки и два невалидных диапазона `<time>`; усиленный тест дал ожидаемый RED 6/7, после исправления — GREEN 7/7, а root browser QA повторно прошёл 1920/1366/390 px в светлой и тёмной темах без overflow и console errors.
+- Late-scope commit `9c90282f82ba0a1ad95c0505378f5057825a1fd3` прошёл exact feature-SHA GitHub Actions run `31904220571`; PR `#6` принят merge commit `4773a16bd09fc8d30c8a5d93078d17e02007e51c`, exact-main run `31904650706` завершился `success` со сборкой release, нулевым tracked drift, public-independence и полной browser QA.
+- Production build принятого main через канонический Windows PowerShell 5.1 завершился `archives=30`, `staticIssues=0`, `POST_BUILD_TRACKED_DRIFT=0`; public-independence — 30/30. SHA-256 release index: `B62A17A05255EDD7EFF80F95DE533BAE4E6198F4557FD7D8307001E96AED1C75`; SHA-256 корневого архива: `e2610b1b7d6f9d86169d63abdba544a39645ce7647925ad9a1f9a1fc58154a65`.
+- Первая попытка deployment остановилась до передачи файлов из-за недоступного локального SSH alias `pikov-hosting`. Read-only preflight к ранее проверенному Masterhost target прошёл; повторный deploy с явным target синхронизировал все 30 docroot, создал удалённые backup-архивы и удалил временный deploy root `$HOME/_deploy_pikov_20260815-215611`. Встроенный и отдельный hosting checks дали `OK=191 WARN=0 FAIL=0 targets=30 markdown=71`; online browser QA — `targets=30 issues=0`.
+- Живая `https://pikov.expert/` отвечает HTTP 200 (`text/html; charset=utf-8`) и побайтно совпадает с exact-main `index.html`: SHA-256 `4748e31ab22b0ff66cd6ef84aa22418c6ee4dfcfdbdfe1d685736cc052f3bf86`, 80 644 байта. Все блоки образования присутствуют, квалификация по процессам безопасной разработки встречается ровно один раз; упоминания Министерства обороны, прежнего института, МАСКОМ и приватные номера документов отсутствуют.
 
 ## 6. Точка восстановления контекста
 
