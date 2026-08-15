@@ -8,16 +8,16 @@
 
 ## Состояние репозитория
 
-Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **5 августа 2026 года**:
+Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **15 августа 2026 года**:
 
 | Показатель | Значение |
 |---|---:|
 | Записей в каталоге | 33 |
 | Канонических папок материалов | 29 |
 | Тематических разделов | 6 |
-| `ready-local` | 21 |
-| `published-snapshot` | 12 |
-| Уникальных URL в `sitemap.xml` вместе с корнем | 32 |
+| `ready-local` | 19 |
+| `published-snapshot` | 14 |
+| Уникальных URL в `sitemap.xml` вместе с корнем | 33 |
 
 Несколько записей могут вести в одну папку: например, базовый пентест, углублённый пентест, статический анализ и фаззинг представлены страницами или якорями домена `new-courses.pikov.expert`.
 
@@ -58,11 +58,11 @@
 | 19 | Нефункциональное тестирование безопасности ПО | [p19.pikov.expert](https://p19.pikov.expert/) | РБПО | `ready-local` |
 | 20 | Архитектурный анализ / ППК ФСТЭК | [ppk.pikov.expert](https://ppk.pikov.expert/) | РБПО | `published-snapshot` |
 | 21 | Информационная безопасность и системы менеджмента ИБ | [27001.pikov.expert](https://27001.pikov.expert/) | РБПО | `ready-local` |
-| 22 | Технологии хакеров и оценка защищенности | [pentest.pikov.expert](https://pentest.pikov.expert/) | Новые курсы МАСКОМ | `published-snapshot` |
-| 23 | Статический анализ ПО + PVS-Studio | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Новые курсы МАСКОМ | `ready-local` |
-| 24 | Пентест базовый | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Новые курсы МАСКОМ | `ready-local` |
-| 25 | Пентест углубленный | [new-courses.pikov.expert/pentest-02.html](https://new-courses.pikov.expert/pentest-02.html) | Новые курсы МАСКОМ | `published-snapshot` |
-| 26 | Фаззинг-тестирование | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Новые курсы МАСКОМ | `ready-local` |
+| 22 | Технологии хакеров и оценка защищенности | [pentest.pikov.expert](https://pentest.pikov.expert/) | Авторские учебные направления | `published-snapshot` |
+| 23 | Статический анализ ПО + PVS-Studio | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Авторские учебные направления | `ready-local` |
+| 24 | Пентест базовый | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Авторские учебные направления | `ready-local` |
+| 25 | Пентест углубленный | [new-courses.pikov.expert/pentest-02.html](https://new-courses.pikov.expert/pentest-02.html) | Авторские учебные направления | `published-snapshot` |
+| 26 | Фаззинг-тестирование | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Авторские учебные направления | `ready-local` |
 | 27 | Проектирование информационных систем | [is.pikov.expert](https://is.pikov.expert/) | Студенческие курсы | `ready-local` |
 | 28 | Методика формулирования тем ВКР | [vkr.pikov.expert](https://vkr.pikov.expert/) | Студенческие курсы | `ready-local` |
 | 29 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | `ready-local` |

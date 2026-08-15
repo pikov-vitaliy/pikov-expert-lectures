@@ -51,12 +51,14 @@ $rootPath = (Resolve-Path -LiteralPath $Root).Path
 $projectPath = Join-Path $rootPath '_PROJECT'
 $lecturesPath = Join-Path $projectPath 'lectures.json'
 $indexPath = Join-Path $rootPath 'index.html'
+$courseMapPath = Join-Path $rootPath 'course-map.html'
 $sitemapPath = Join-Path $rootPath 'sitemap.xml'
 $robotsPath = Join-Path $rootPath 'robots.txt'
 $p19HtmlPath = Join-Path (Join-Path $rootPath 'p19') 'index.html'
 
 if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectures.json" }
 if (-not (Test-Path -LiteralPath $indexPath)) { Fail "Missing root index.html" }
+if (-not (Test-Path -LiteralPath $courseMapPath)) { Fail "Missing root course-map.html" }
 if (-not (Test-Path -LiteralPath $sitemapPath)) { Fail "Missing root sitemap.xml" }
 if (-not (Test-Path -LiteralPath $robotsPath)) { Fail "Missing root robots.txt" }
 if (-not (Test-Path -LiteralPath $p19HtmlPath)) { Fail "Missing p19\index.html" }
@@ -82,6 +84,8 @@ if ($p19Html -notmatch '\u043F\u0440\u043E\u0446\u0435\u0441\u0441\s+\u2116\s*19
 $p19Title = Decode-Utf8Base64 '0J3QtdGE0YPQvdC60YbQuNC+0L3QsNC70YzQvdC+0LUg0YLQtdGB0YLQuNGA0L7QstCw0L3QuNC1INCx0LXQt9C+0L/QsNGB0L3QvtGB0YLQuCDQn9Ce'
 $obsoleteP19Title = Decode-Utf8Base64 '0J/RgNC+0LLQtdGA0LrQsCDQsdC10LfQvtC/0LDRgdC90L7RgdGC0Lgg0L/RgNC40LvQvtC20LXQvdC40Y8='
 $rootIndexHtml = Get-Content -LiteralPath $indexPath -Encoding UTF8 -Raw
+$courseMapHtml = Get-Content -LiteralPath $courseMapPath -Encoding UTF8 -Raw
+Assert-PublicHtmlMetadata -Html $courseMapHtml -Label 'course-map.html' -ExpectedUrl 'https://pikov.expert/course-map.html' -RequireBrandBack $true
 $lectureCatalogJson = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw
 foreach ($surface in @(
   [pscustomobject]@{ Label = 'p19'; Text = $p19Html },
@@ -201,7 +205,7 @@ if ($quarantineDirs.Count -ne 1) {
     Fail "Expected at most one quarantine directory, got $($quarantineDirs.Count)"
   }
 }
-$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.serena', '.gigacode', '.qwen', '.vscode', '.idea', '.sbom-tool', '.ruff_cache')
+$allowedLocalToolDirs = @('.git', '.github', '.codegraph', '.codex', '.claude', '.agents', '.serena', '.gigacode', '.qwen', '.vscode', '.idea', '.sbom-tool', '.ruff_cache', 'output')
 $localWorkspaceDirs = @(
   $actualRootDirObjects |
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.obsidian') } |
@@ -270,6 +274,7 @@ $ns.AddNamespace('sm', 'http://www.sitemaps.org/schemas/sitemap/0.9')
 $sitemapUrls = @($sitemap.SelectNodes('//sm:url/sm:loc', $ns) | ForEach-Object { $_.'#text' })
 $expectedSitemapUrls = New-Object System.Collections.Generic.HashSet[string]
 [void]$expectedSitemapUrls.Add('https://pikov.expert/')
+[void]$expectedSitemapUrls.Add('https://pikov.expert/course-map.html')
 foreach ($lecture in $lectures) {
   $loc = [string]$lecture.url
   if ($loc.Contains('#')) { $loc = $loc.Split('#')[0] }

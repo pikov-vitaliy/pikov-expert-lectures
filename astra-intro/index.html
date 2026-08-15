@@ -822,7 +822,7 @@ hr.sep{border:0; border-top:1px solid var(--border); margin:28px 0}
       </div>
       <div class="callout danger">
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span>
-        <div class="co-body"><div class="co-ttl">1.7.0 устанавливать нельзя</div><p class="mb0">Первый релиз ветки (2021&nbsp;г.) содержит устранённые позднее уязвимости. Документация курса — <strong>1.7.5</strong>, установочный образ — <strong>1.7.4</strong>, актуальное кумулятивное состояние — <strong>1.7.10.72</strong> (07.04.2026), до него обновляемся на <a href="#slide-39">ПЗ № 3</a>.</p></div>
+        <div class="co-body"><div class="co-ttl">1.7.0 устанавливать нельзя</div><p class="mb0">Первый релиз ветки (2021&nbsp;г.) содержит устранённые позднее уязвимости. Документация курса — <strong>1.7.5</strong>, установочный образ — <strong>1.7.4</strong>, зафиксированное состояние профиля воспроизводимости — <strong>1.7.10.72</strong> (07.04.2026), до него обновляемся на <a href="#slide-39">ПЗ № 3</a>.</p></div>
       </div>
     </div>
   </section>
@@ -871,6 +871,7 @@ hr.sep{border:0; border-top:1px solid var(--border); margin:28px 0}
       <div class="split-2" style="align-items:start; gap:18px">
         <div class="tbl-wrap" style="margin:18px 0 0">
           <table class="tbl">
+            <thead><tr><th scope="col">Каталог</th><th scope="col">Назначение</th></tr></thead>
             <tbody>
               <tr><td><code>/</code></td><td>Корень — вершина единого дерева</td></tr>
               <tr><td><code>/boot</code></td><td>Ядро, initrd, файлы GRUB</td></tr>
@@ -883,6 +884,7 @@ hr.sep{border:0; border-top:1px solid var(--border); margin:28px 0}
         </div>
         <div class="tbl-wrap" style="margin:18px 0 0">
           <table class="tbl">
+            <thead><tr><th scope="col">Каталог</th><th scope="col">Назначение</th></tr></thead>
             <tbody>
               <tr><td><code>/usr</code></td><td>Программы и данные пользовательского уровня</td></tr>
               <tr><td><code>/var</code></td><td>Изменяемые данные: журналы (<code>/var/log</code>), кэш</td></tr>
@@ -955,6 +957,7 @@ hr.sep{border:0; border-top:1px solid var(--border); margin:28px 0}
       <h2>Механизмы КСЗ (обзор)</h2>
       <div class="tbl-wrap">
         <table class="tbl">
+          <thead><tr><th scope="col">Механизм</th><th scope="col">Назначение</th></tr></thead>
           <tbody>
             <tr><td class="em" style="white-space:nowrap">МКЦ</td><td>Мандатный контроль целостности — метки целостности; запись «снизу вверх» запрещена. <span class="muted">(День 3.)</span></td></tr>
             <tr><td class="em" style="white-space:nowrap">ЗПС</td><td>Замкнутая программная среда — контроль подлинности исполняемых файлов по ЭЦП (<code>digsig_verif</code>, ГОСТ Р 34.10‑2012). <span class="muted">(День 4.)</span></td></tr>
@@ -1457,7 +1460,7 @@ journalctl <span class="fl">--since</span> "today"</pre></div>
       <span class="eyebrow lab">Занятие 3 · Практическая работа · 15:10 — 16:40</span>
       <h2>Установка, настройка и обновление ОС Astra Linux SE</h2>
       <p class="lead">Каждый слушатель выполняет шаги самостоятельно на своей виртуальной машине. Цель — развернуть учебный стенд (VirtualBox), установить Astra Linux SE 1.7.4, выполнить первичную настройку и обновление.</p>
-      <div class="checkpoint" style="background:var(--success-soft)"><span class="cp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span><div class="cp-body"><div class="cp-ttl">Результат занятия</div><p class="mb0">Работающая виртуальная машина с установленной и обновлённой Astra Linux SE 1.7.4, в которую можно войти под учётной записью администратора.</p></div></div>
+      <div class="checkpoint" style="background:var(--success-soft)"><span class="cp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span><div class="cp-body"><div class="cp-ttl">Результат занятия</div><p class="mb0">Работающая виртуальная машина, установленная с носителя Astra Linux SE 1.7.4 и обновлённая до состояния зафиксированного frozen-профиля 1.7.10.72, в которую можно войти под учётной записью администратора.</p></div></div>
       <div class="split-2" style="align-items:center">
         <div class="callout danger" style="margin:0"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m4.9 4.9 14.2 14.2"/></svg></span><div class="co-body"><p class="mb0"><strong>Запрещено</strong> использовать образ <strong>1.7.0</strong>. Только <strong>1.7.4</strong>.</p></div></div>
         <a class="dl-card" href="https://wiki.astralinux.ru/" target="_blank" rel="noopener" style="margin:0"><span class="dl-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg></span><span class="dl-body"><span class="dl-name">Первоисточник по установке</span><span class="dl-meta">Руководство администратора, ч.&nbsp;1 · PDF</span><span class="dl-act">Открыть <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12m0 0 4-4m-4 4-4-4M4 21h16"/></svg></span></span></a>
@@ -1476,6 +1479,16 @@ journalctl <span class="fl">--since</span> "today"</pre></div>
         <div class="lab-step"><span class="ls-num">1</span><div class="ls-body"><p class="mb0">Открыть сайт <code class="ic">https://www.virtualbox.org</code> → раздел <strong>Downloads</strong>.</p></div></div>
         <div class="lab-step"><span class="ls-num">2</span><div class="ls-body"><p>Скачать два файла <strong>одной и той же версии</strong> (актуальная серия на 2026&nbsp;г. — <strong>7.2.x</strong>, например 7.2.8; подойдёт и 7.1.x):</p>
           <ul class="checklist" style="margin:6px 0 0"><li><strong>VirtualBox platform package</strong> для Windows hosts (файл <code class="ic">.exe</code>);</li><li><strong>VirtualBox Extension Pack</strong> — <em>All supported platforms</em> (файл <code class="ic">.vbox-extpack</code>).</li></ul></div></div>
+        <div class="lab-step"><span class="ls-num">3</span><div class="ls-body"><p>До привилегированной установки получить ожидаемые SHA-256 обоих файлов и ожидаемого издателя установщика по независимому аутентифицированному каналу (подписанный реестр преподавателя либо официальный подписанный манифест). Проверить хеши и Authenticode; отсутствие реквизитов или несовпадение — <strong>STOP</strong>.</p></div></div>
+        <div class="cmd"><div class="cmd-head"><span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span><span class="cmd-label">PowerShell · до запуска установщика</span></div><pre>$VirtualBoxInstaller = '.\VirtualBox-installer.exe'
+$ExtensionPack = '.\Oracle_VirtualBox_Extension_Pack.vbox-extpack'
+$ExpectedVirtualBoxSha256 = '&lt;64_HEX_ИЗ_ПОДПИСАННОГО_РЕЕСТРА&gt;'
+$ExpectedExtensionPackSha256 = '&lt;64_HEX_ИЗ_ПОДПИСАННОГО_РЕЕСТРА&gt;'
+$ExpectedPublisher = '&lt;ТОЧНЫЙ_SUBJECT_ИЗ_ПОДПИСАННОГО_РЕЕСТРА&gt;'
+if ($ExpectedVirtualBoxSha256 -notmatch '^[0-9A-Fa-f]{64}$' -or $ExpectedExtensionPackSha256 -notmatch '^[0-9A-Fa-f]{64}$') { throw 'STOP: expected SHA-256 is absent' }
+if ((Get-FileHash -LiteralPath $VirtualBoxInstaller -Algorithm SHA256).Hash -ne $ExpectedVirtualBoxSha256 -or (Get-FileHash -LiteralPath $ExtensionPack -Algorithm SHA256).Hash -ne $ExpectedExtensionPackSha256) { throw 'STOP: SHA-256 mismatch' }
+$Signature = Get-AuthenticodeSignature -LiteralPath $VirtualBoxInstaller
+if ($Signature.Status -ne 'Valid' -or $Signature.SignerCertificate.Subject -ne $ExpectedPublisher) { throw 'STOP: Authenticode publisher mismatch' }</pre></div>
       </div>
       <div class="split-2" style="align-items:start">
         <div class="callout warning" style="margin:0"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span><div class="co-body"><p class="mb0">Версия Extension Pack <strong>обязана точно совпадать</strong> с версией VirtualBox. Иначе он не установится.</p></div></div>
@@ -1603,7 +1616,7 @@ ip a                        <span class="cm"># сетевые интерфейс
     <div class="slide-inner">
       <span class="eyebrow lab">§ 3.4 · Репозитории и обновление</span>
       <h2>Цель: довести систему до 1.7.10.72</h2>
-      <div class="callout success"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span><div class="co-body"><div class="co-ttl">Актуальное кумулятивное состояние</div><p class="mb0">На дату курса — <strong>1.7.10.72</strong> (дата фиксации дистрибутива — <strong>07.04.2026</strong>). Первоисточник — страница «Актуальное кумулятивное оперативное обновление Astra Linux SE (очередное обновление 1.7)» в Справочном центре <code class="ic">wiki.astralinux.ru</code>. Обновление содержит репозитории <strong>main</strong> (установочного диска), <strong>base</strong> (базовый) и <strong>extended</strong> (расширенный).</p></div></div>
+      <div class="callout success"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></span><div class="co-body"><div class="co-ttl">Зафиксированный профиль воспроизводимости</div><p class="mb0">В frozen-профиле используется <strong>1.7.10.72</strong> (дата фиксации дистрибутива — <strong>07.04.2026</strong>). Это не заявление о последнем выпуске: перед каждым проведением преподаватель сверяет официальные бюллетени. Первоисточник — страница «Актуальное кумулятивное оперативное обновление Astra Linux SE (очередное обновление 1.7)» в Справочном центре <code class="ic">wiki.astralinux.ru</code>. Профиль содержит репозитории <strong>main</strong>, <strong>base</strong> и <strong>extended</strong>.</p></div></div>
       <div class="callout warning"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span><div class="co-body"><div class="co-ttl">Если включён МКЦ («Воронеж»/«Смоленск»)</div><p class="mb0">Обновление выполняется <strong>от имени администратора в сессии с максимальной категорией целостности</strong>. На стенде «Орёл» МКЦ выключен — не требуется, но запомните для защищённых конфигураций.</p></div></div>
       <div class="lab" style="margin-bottom:0">
         <span class="lab-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>Практикум</span>
@@ -1675,10 +1688,10 @@ gostsum <span class="fl">-d</span> repository-update.iso
 cat /etc/astra_version       <span class="cm"># ожидаемо — 1.7.10</span>
 <span class="pr">sudo</span> apt update
 apt list --upgradable        <span class="cm"># «непоставленных» быть не должно</span></pre></div>
-        <div class="callout warning" style="margin:0"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span><div class="co-body"><div class="co-ttl">Если обновление прервалось</div><p class="mb0">Сломанные пакеты: <code class="ic">sudo dpkg --configure -a</code>, затем <code class="ic">sudo apt -f install</code>. Отдельный пакет — <code class="ic">apt install --reinstall &lt;пакет&gt;</code>. Ошибка подписи <code class="ic">NO_PUBKEY</code> — установить пакет ключей; на закрытом стенде допустимо <code class="ic">[trusted=yes]</code>, но в реальной эксплуатации так <strong>нельзя</strong>.</p></div></div>
+        <div class="callout warning" style="margin:0"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"/><circle cx="12" cy="12" r="10"/></svg></span><div class="co-body"><div class="co-ttl">Если обновление прервалось</div><p class="mb0">Сломанные пакеты: <code class="ic">sudo dpkg --configure -a</code>, затем <code class="ic">sudo apt -f install</code>. Отдельный пакет — <code class="ic">apt install --reinstall &lt;пакет&gt;</code>. Ошибка подписи <code class="ic">NO_PUBKEY</code> — <strong>STOP</strong>: не отключайте проверку подписи. Получите пакет ключей только из официального источника, сверьте его отпечаток с реквизитом по независимому аутентифицированному каналу и повторите <code class="ic">sudo apt update</code>. Если доверие не восстановлено, верните ВМ к снимку до обновления.</p></div></div>
       </div>
       <p class="note">Полный номер обновления (<code class="ic">1.7.10.72</code>) и вариант исполнения определяются по инструкции «Определение установленных обновлений и варианта исполнения Astra Linux» на <code class="ic">wiki.astralinux.ru</code>.</p>
-      <div class="checkpoint"><span class="cp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span><div class="cp-body"><div class="cp-ttl">Контрольная точка 5</div><p class="mb0"><code class="ic">astra-update</code> отработал без ошибок, <code class="ic">cat /etc/astra_version</code> показывает актуальную версию (1.7.10), система перезагружается штатно.</p></div></div>
+      <div class="checkpoint"><span class="cp-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg></span><div class="cp-body"><div class="cp-ttl">Контрольная точка 5</div><p class="mb0"><code class="ic">astra-update</code> отработал без ошибок, <code class="ic">cat /etc/astra_version</code> показывает <strong>1.7.10.72 из зафиксированного frozen-профиля</strong>, система перезагружается штатно. Это профиль воспроизводимости и не является утверждением о последнем доступном выпуске; перед каждым проведением преподаватель сверяет поддерживаемую версию и бюллетени по официальным источникам.</p></div></div>
     </div>
   </section>
 

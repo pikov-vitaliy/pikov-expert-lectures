@@ -36,6 +36,7 @@
     --nav-bg:rgba(17,17,17,.78);
     --shadow:0 18px 44px rgba(0,0,0,.12);
     --slide-pad: clamp(28px, 4vw, 58px);
+    --nav-reserve:94px;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden}
@@ -44,12 +45,14 @@
     background:#0d1512;
     color:var(--text);
   }
-  .deck{position:relative;width:100%;height:100%}
+  .deck{position:relative;width:100%;height:100%;overflow:hidden}
   .slide{
-    position:absolute; inset:0;
+    position:absolute; inset:0 0 var(--nav-reserve) 0;
     display:grid;
     grid-template-rows:auto 1fr auto;
     padding:var(--slide-pad);
+    padding-bottom:var(--slide-pad);
+    overflow-y:auto;
     opacity:0; visibility:hidden; pointer-events:none;
     transform:translateX(24px);
     transition:opacity .35s ease, transform .35s ease, visibility .35s ease;
@@ -264,7 +267,15 @@
     .slide-header{grid-template-columns:1fr;}
     .footer{align-items:flex-start; flex-direction:column}
   }
+  @media (max-height: 800px) and (min-width: 761px){
+    .title-inner{gap:12px}
+    .eyebrow{padding:7px 12px}
+    h1{font-size:clamp(40px,4vw,58px)}
+    .subtitle{font-size:clamp(19px,1.7vw,26px)}
+    .speaker{font-size:clamp(17px,1.35vw,22px)}
+  }
   @media (max-width: 760px){
+    :root{--nav-reserve:82px}
     .slide{padding:20px}
     .nav{right:10px; bottom:10px}
     .nav button{min-width:44px; height:42px; font-size:18px}
@@ -324,7 +335,7 @@
 </head>
 <body>
 <a class="brand-back site-home-link" href="https://pikov.expert" aria-label="Вернуться в каталог лекций pikov.expert">← pikov.expert</a>
-<div class="deck" id="deck" aria-live="polite">
+<main class="deck" id="deck" aria-live="polite">
 
 <section class="slide title-slide active" aria-label="Титульный слайд">
   <div class="title-inner">
@@ -473,19 +484,19 @@
 
 <section class="slide" aria-label="Слайд 24">
   <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Практический вопрос</p><h2>Почему нельзя подменять сертификацию СЗИ «наличием хорошего SDLC»</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><p class="lead">Безопасная разработка и сертификация продукта связаны, но это разные объекты оценки.</p><div class="grid-2"><div class="card"><h3>Сертификация СЗИ</h3><p>Оценивает конкретное средство, его функции безопасности, документацию, испытания, производство и поддержку.</p></div><div class="card"><h3>Сертификация БРПО</h3><p>Оценивает процессы проектирования и производства ПО средств защиты информации, а не конкретный экземпляр продукта.</p></div></div></div>
+  <div class="content"><p class="lead">Безопасная разработка и сертификация продукта связаны, но это разные объекты оценки.</p><div class="grid-2"><div class="card"><h3>Сертификация СЗИ</h3><p>Оценивает конкретное средство, его функции безопасности, документацию, испытания, производство и поддержку.</p></div><div class="card"><h3>Сертификация РБПО</h3><p>Оценивает процессы проектирования и производства ПО средств защиты информации, а не конкретный экземпляр продукта.</p></div></div></div>
   <footer class="footer"><div class="slide-number">24 из 35</div><div class="footer-right">Это центральная мысль блока «СЗИ vs РБПО»</div></footer>
 </section>
 
 <section class="slide" aria-label="Слайд 25">
   <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">РБПО</p><h2>Что проверяют при сертификации процессов безопасной разработки</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><ul><li>наличие руководства и документации по БРПО;</li><li>наличие инструментальных средств разработки и анализа ПО;</li><li>реальное выполнение процессов безопасной разработки, описанных в документации;</li><li>реализацию процедур поддержки безопасности ПО.</li></ul><p class="note">Для среды РБПО базовым ориентиром выступает ГОСТ Р 56939-2024, а сама процедура сертификации процессов закреплена приказом № 240.</p></div>
+  <div class="content"><ul><li>наличие руководства и документации по РБПО;</li><li>наличие инструментальных средств разработки и анализа ПО;</li><li>реальное выполнение процессов безопасной разработки, описанных в документации;</li><li>реализацию процедур поддержки безопасности ПО.</li></ul><p class="note">Для среды РБПО базовым ориентиром выступает ГОСТ Р 56939-2024, а сама процедура сертификации процессов закреплена приказом № 240.</p></div>
   <footer class="footer"><div class="slide-number">25 из 35</div><div class="footer-right">Процессная зрелость не отменяет продуктовую сертификацию</div></footer>
 </section>
 
 <section class="slide" aria-label="Слайд 26">
-  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Сравнение</p><h2>СЗИ и БРПО: удобная таблица для слушателя</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><table><tr><th>Критерий</th><th>Сертификация СЗИ</th><th>Сертификация БРПО</th></tr><tr><td>Объект</td><td>конкретное средство</td><td>процессы разработки и производства ПО</td></tr><tr><td>Результат</td><td>сертификат на средство / производство</td><td>сертификат на процессы</td></tr><tr><td>Что доказывает</td><td>соответствие функций безопасности и жизненного цикла требованиям</td><td>наличие зрелой и управляемой безопасной разработки</td></tr><tr><td>Заменяет ли другое</td><td>нет</td><td>нет</td></tr></table></div>
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Сравнение</p><h2>СЗИ и РБПО: удобная таблица для слушателя</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
+  <div class="content"><table><tr><th>Критерий</th><th>Сертификация СЗИ</th><th>Сертификация РБПО</th></tr><tr><td>Объект</td><td>конкретное средство</td><td>процессы разработки и производства ПО</td></tr><tr><td>Результат</td><td>сертификат на средство / производство</td><td>сертификат на процессы</td></tr><tr><td>Что доказывает</td><td>соответствие функций безопасности и жизненного цикла требованиям</td><td>наличие зрелой и управляемой безопасной разработки</td></tr><tr><td>Заменяет ли другое</td><td>нет</td><td>нет</td></tr></table></div>
   <footer class="footer"><div class="slide-number">26 из 35</div><div class="footer-right">Слайд удобно использовать в дискуссии со слушателями</div></footer>
 </section>
 
@@ -521,19 +532,19 @@
 
 <section class="slide" aria-label="Слайд 32">
   <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Методический вывод</p><h2>Как объяснить тему слушателю «не из сертификации»</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><div class="qa-box"><p class="quote">Сертификация СЗИ отвечает на вопрос: можно ли доверять конкретному средству защиты информации для применения в определённом регулируемом контуре. Сертификация БРПО отвечает на вопрос: умеет ли организация безопасно разрабатывать такое ПО системно и воспроизводимо.</p></div></div>
+  <div class="content"><div class="qa-box"><p class="quote">Сертификация СЗИ отвечает на вопрос: можно ли доверять конкретному средству защиты информации для применения в определённом регулируемом контуре. Сертификация РБПО отвечает на вопрос: умеет ли организация безопасно разрабатывать такое ПО системно и воспроизводимо.</p></div></div>
   <footer class="footer"><div class="slide-number">32 из 35</div><div class="footer-right">Это удобная формула для устного объяснения на занятии</div></footer>
 </section>
 
 <section class="slide" aria-label="Слайд 33">
-  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Актуализация</p><h2>Что важно учитывать по состоянию на дату подготовки лекции</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><ul><li>приказ № 55 действует с изменениями 2021 и 2022 годов;</li><li>приказ № 76 продолжает использоваться как основа привязки уровней доверия к средствам ТЗИ и средствам ОБИТ;</li><li>приказ № 240 о сертификации процессов БРПО действует и в 2025 году в него внесены изменения;</li><li>ГОСТ Р 56939-2024 введён в действие и применяется как основной стандарт по безопасной разработке в данном контексте;</li><li>для ГИС действуют новые требования приказа № 117 от 11.04.2025, поэтому при учебных примерах ссылаться на приказ № 17 уже нельзя без оговорки.</li></ul></div>
-  <footer class="footer"><div class="slide-number">33 из 35</div><div class="footer-right">Этот слайд нужен именно для актуальной лекции, а не для «вечной» презентации</div></footer>
+  <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Актуализация</p><h2>Как поддерживать регуляторный профиль в актуальном состоянии</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
+  <div class="content"><ul><li>для приказов № 55, № 76 и № 240 перед применением проверяется действующая редакция в официальном источнике;</li><li>приказ № 76 связывает уровни доверия со средствами ТЗИ и средствами ОБИТ в пределах своей области применения;</li><li>приказ № 240 регулирует сертификацию процессов РБПО;</li><li>ГОСТ Р 56939-2024 применяется как основной стандарт по безопасной разработке в данном контексте;</li><li>для ГИС и иных охватываемых систем государственного сектора применяется приказ № 117; приказ № 17 уместен только как исторический источник.</li></ul></div>
+  <footer class="footer"><div class="slide-number">33 из 35</div><div class="footer-right">Проверяемая версия официального источника важнее недатированного тезиса</div></footer>
 </section>
 
 <section class="slide" aria-label="Слайд 34">
   <header class="slide-header"><div class="slide-title-wrap"><p class="section-kicker">Вопросы к аудитории</p><h2>Блок для обсуждения и проверки понимания</h2></div><span class="logo author-mark" aria-label="Авторская лекция">pikov.expert</span></header>
-  <div class="content"><ol><li>Когда сертификат на серийное производство не гарантирует допустимость конкретной поставки?</li><li>Почему уровень доверия нельзя выбирать отдельно от класса или категории системы?</li><li>Чем сертификация процессов БРПО помогает разработчику, но не заменяет сертификацию СЗИ?</li><li>Какие риски возникают при прекращении технической поддержки средства?</li></ol></div>
+  <div class="content"><ol><li>Когда сертификат на серийное производство не гарантирует допустимость конкретной поставки?</li><li>Почему уровень доверия нельзя выбирать отдельно от класса или категории системы?</li><li>Чем сертификация процессов РБПО помогает разработчику, но не заменяет сертификацию СЗИ?</li><li>Какие риски возникают при прекращении технической поддержки средства?</li></ol></div>
   <footer class="footer"><div class="slide-number">34 из 35</div><div class="footer-right">Рекомендуемое время на обсуждение: 8–12 минут</div></footer>
 </section>
 
@@ -556,7 +567,7 @@
   <footer class="footer"><div class="slide-number">35 из 35</div><div class="footer-right">Финальный слайд</div></footer>
 </section>
 
-</div>
+</main>
 
 <nav class="nav" aria-label="Управление слайдами">
   <button type="button" id="btnFirst" aria-label="Первый слайд">⏮</button>

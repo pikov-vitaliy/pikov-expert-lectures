@@ -1205,7 +1205,7 @@
     </ol>
   </aside>
 
-  <article class="content">
+  <main class="content">
 
     <!-- HERO -->
     <header class="hero">
@@ -1254,8 +1254,8 @@
       <h2>Зачем нужен статический анализ</h2>
       <p class="lead">За последние 30 лет программное обеспечение прошло путь от десятков тысяч строк кода до миллионов и десятков миллионов. Вместе с размером кодовых баз изменилась и природа ошибок в них.</p>
 
-      <h3>Кодовые базы растут — плотность ошибок тоже</h3>
-      <p>Промышленные исследования показывают: чем больше проект, тем выше типичная плотность дефектов на тысячу строк кода. Это нелинейная зависимость — после некоторого порога ошибки начинают «множиться» быстрее, чем растёт сам код.</p>
+      <h3>Историческая иллюстрация плотности дефектов</h3>
+      <p>Диапазоны ниже приводились в отраслевой литературе конца XX — начала XXI века для <strong>всех программных дефектов</strong>. Они не являются современным универсальным бенчмарком и не доказывают, что размер проекта сам по себе причинно повышает плотность ошибок. Для управления качеством нужна собственная измеримая baseline: <strong>SAST finding ≠ defect ≠ vulnerability</strong>.</p>
 
       <div class="table-wrap">
         <table class="data">
@@ -1274,42 +1274,42 @@
           </tbody>
         </table>
       </div>
+      <p class="chart-source">Граница применимости: первичная выборка и методика получения этих диапазонов в исходном учебном комплекте не зафиксированы; таблицу нельзя использовать как норматив, KPI или прогноз для конкретного проекта.</p>
 
       <p>Объём контролировать вручную становится физически невозможно. К тому же появляются разные классы ошибок — те, что ловят тесты, и те, что не ловят; критичные для безопасности и косметические; явные и скрытые.</p>
 
-      <h3>Стоимость исправления уязвимости растёт экспоненциально</h3>
-      <p>По данным NIST (National Institute of Standards and Technology), стоимость исправления одной и той же ошибки на разных стадиях жизненного цикла программного обеспечения отличается в десятки и сотни раз.</p>
+      <h3>Раннее исправление обычно сокращает переделки</h3>
+      <p>NIST Planning Report 02-3 приводит шкалу <strong>1× / 5× / 10× / 15× / 30×</strong> с явной пометкой <strong>«Example Only»</strong>. Это историческая иллюстрация для общих дефектов ПО, а не универсальная статистика стоимости уязвимостей.</p>
 
       <div class="chart-wrap">
-        <div class="chart-title">Относительная стоимость исправления уязвимости по этапам жизненного цикла</div>
-        <div class="chart-source">Источник: NIST. Значение «требования» приято за 1× — базовый ориентир.</div>
+        <div class="chart-title">Иллюстративная относительная стоимость исправления дефекта</div>
+        <div class="chart-source">Источник: <a href="https://www.nist.gov/system/files/documents/director/planning/report02-3.pdf" target="_blank" rel="noopener">NIST Planning Report 02-3, Table 5-1 (p. 5-4)</a>, «Example Only». База 1× объединяет сбор требований и архитектурное проектирование.</div>
         <div class="chart">
           <svg viewBox="0 0 720 280" preserveAspectRatio="xMidYMid meet" role="img" aria-label="График стоимости исправления">
             <line x1="60" y1="20" x2="60" y2="220" class="chart-grid"/>
             <line x1="60" y1="220" x2="700" y2="220" class="chart-grid"/>
-            <line x1="60" y1="60" x2="700" y2="60" class="chart-grid" stroke-dasharray="4 4"/>
-            <line x1="60" y1="120" x2="700" y2="120" class="chart-grid" stroke-dasharray="4 4"/>
-            <line x1="60" y1="180" x2="700" y2="180" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="20" x2="700" y2="20" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="87" x2="700" y2="87" class="chart-grid" stroke-dasharray="4 4"/>
+            <line x1="60" y1="153" x2="700" y2="153" class="chart-grid" stroke-dasharray="4 4"/>
             <text x="50" y="225" text-anchor="end" class="chart-axis">0×</text>
-            <text x="50" y="185" text-anchor="end" class="chart-axis">50×</text>
-            <text x="50" y="125" text-anchor="end" class="chart-axis">100×</text>
-            <text x="50" y="65" text-anchor="end" class="chart-axis">150×</text>
-            <text x="50" y="25" text-anchor="end" class="chart-axis">200×</text>
-            <rect x="100" y="216" width="80" height="4" class="chart-bar" rx="2"/>
-            <text x="140" y="240" text-anchor="middle" class="chart-axis">Требования</text>
-            <text x="140" y="210" text-anchor="middle" class="chart-bar-label">1×</text>
-            <rect x="220" y="200" width="80" height="20" class="chart-bar" rx="2"/>
-            <text x="260" y="240" text-anchor="middle" class="chart-axis">Проектирование</text>
-            <text x="260" y="194" text-anchor="middle" class="chart-bar-label">5×</text>
-            <rect x="340" y="180" width="80" height="40" class="chart-bar" rx="2"/>
-            <text x="380" y="240" text-anchor="middle" class="chart-axis">Реализация</text>
-            <text x="380" y="174" text-anchor="middle" class="chart-bar-label">10×</text>
-            <rect x="460" y="100" width="80" height="120" class="chart-bar" rx="2"/>
-            <text x="500" y="240" text-anchor="middle" class="chart-axis">Тестирование</text>
-            <text x="500" y="94" text-anchor="middle" class="chart-bar-label">50×</text>
+            <text x="50" y="158" text-anchor="end" class="chart-axis">10×</text>
+            <text x="50" y="92" text-anchor="end" class="chart-axis">20×</text>
+            <text x="50" y="25" text-anchor="end" class="chart-axis">30×</text>
+            <rect x="100" y="213" width="80" height="7" class="chart-bar" rx="2"/>
+            <text x="140" y="240" text-anchor="middle" class="chart-axis"><tspan x="140">Требования /</tspan><tspan x="140" dy="15">архитектура</tspan></text>
+            <text x="140" y="207" text-anchor="middle" class="chart-bar-label">1×</text>
+            <rect x="220" y="187" width="80" height="33" class="chart-bar" rx="2"/>
+            <text x="260" y="240" text-anchor="middle" class="chart-axis"><tspan x="260">Код /</tspan><tspan x="260" dy="15">unit test</tspan></text>
+            <text x="260" y="181" text-anchor="middle" class="chart-bar-label">5×</text>
+            <rect x="340" y="153" width="80" height="67" class="chart-bar" rx="2"/>
+            <text x="380" y="240" text-anchor="middle" class="chart-axis"><tspan x="380">Интеграция /</tspan><tspan x="380" dy="15">system test</tspan></text>
+            <text x="380" y="147" text-anchor="middle" class="chart-bar-label">10×</text>
+            <rect x="460" y="120" width="80" height="100" class="chart-bar" rx="2"/>
+            <text x="500" y="240" text-anchor="middle" class="chart-axis"><tspan x="500">Beta / ранняя</tspan><tspan x="500" dy="15">обратная связь</tspan></text>
+            <text x="500" y="114" text-anchor="middle" class="chart-bar-label">15×</text>
             <rect x="580" y="20" width="80" height="200" class="chart-bar" rx="2"/>
-            <text x="620" y="240" text-anchor="middle" class="chart-axis">Эксплуатация</text>
-            <text x="620" y="14" text-anchor="middle" class="chart-bar-label">200×</text>
+            <text x="620" y="240" text-anchor="middle" class="chart-axis">После релиза</text>
+            <text x="620" y="14" text-anchor="middle" class="chart-bar-label">30×</text>
           </svg>
         </div>
       </div>
@@ -1686,7 +1686,7 @@
             </div>
           </div>
           <p><strong>Каталог типов слабостей.</strong> Описывает категории ошибок, которые в принципе могут привести к уязвимости — но абстрактно, без привязки к конкретному продукту.</p>
-          <p>Например, <em>CWE-89</em> — SQL-инъекция, <em>CWE-674</em> — неконтролируемая рекурсия, <em>CWE-119</em> — переполнение буфера. Это потенциальные уязвимости.</p>
+          <p>Например, <em>CWE-89</em> — SQL-инъекция, <em>CWE-674</em> — неконтролируемая рекурсия, а <a href="https://cwe.mitre.org/data/definitions/119.html" target="_blank" rel="noopener"><em>CWE-119</em></a> — широкий класс <em>Improper Restriction of Operations within the Bounds of a Memory Buffer</em>. Для конкретной первопричины используют, например, CWE-787 (out-of-bounds write), CWE-125 (out-of-bounds read), CWE-120, CWE-121 или CWE-122.</p>
           <div class="col-tags">
             <span class="col-tag">типы</span>
             <span class="col-tag">потенциальные</span>
@@ -1703,7 +1703,7 @@
               <span class="col-en">Common Vulnerabilities and Exposures</span>
             </div>
           </div>
-          <p><strong>Каталог конкретных уязвимостей.</strong> Каждая запись — это отдельная уязвимость в конкретной версии конкретного продукта, найденная и зарегистрированная.</p>
+          <p><strong><a href="https://www.cve.org/About/Overview" target="_blank" rel="noopener">CVE Program</a> публикует идентификаторы и CVE Records</strong> для публично раскрытых уязвимостей. <a href="https://nvd.nist.gov/general/cve-process" target="_blank" rel="noopener">NVD</a> отдельно обогащает эти записи данными CVSS, CWE и CPE; роли CVE Program и NVD не следует смешивать.</p>
           <p>Например, <em>CVE-2021-44228</em> — log4shell в Apache Log4j 2.x. Уязвимость уже существует и эксплуатируется.</p>
           <div class="col-tags">
             <span class="col-tag">экземпляры</span>
@@ -2201,7 +2201,7 @@
       </div>
     </footer>
 
-  </article>
+  </main>
 
 </div>
 

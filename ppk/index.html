@@ -581,7 +581,7 @@
     </ol>
   </aside>
 
-  <article class="content">
+  <main class="content">
 
     <!-- HERO -->
     <header class="hero">
@@ -816,8 +816,8 @@
       <h2>Поверхность атаки и приоритизация</h2>
       <p class="lead">Перед тем как запускать инструменты, нужно понять — что именно анализировать. Поверхность атаки — это набор точек, через которые недоверенные данные могут попасть в систему.</p>
 
-      <h3>85% уязвимостей — в транзитивных зависимостях</h3>
-      <p>По данным CodeScoring, <strong>85% уязвимостей</strong> находятся в транзитивных зависимостях (библиотеках, которые импортируют ваши прямые зависимости). При определении поверхности атаки критически важно отслеживать, куда именно попадает поток данных — в какие сторонние приложения и библиотеки, а не только в очевидный исполняемый файл.</p>
+      <h3>Вендорский показатель CodeScoring: 85% в опубликованной выборке</h3>
+      <p>На <a href="https://codescoring.ru/sca" target="_blank" rel="noopener">продуктовой странице CodeScoring.SCA</a> опубликован показатель: <strong>85% уязвимостей попадают в продукт через транзитивные зависимости</strong>. Этот показатель CodeScoring полезен как сигнал проверять полный граф зависимостей, но <strong>не является универсальной оценкой</strong>: доля зависит от состава портфеля, периода наблюдения, источников данных и методики подсчёта. В собственной программе SCA измеряйте прямые и транзитивные зависимости отдельно и фиксируйте выборку.</p>
 
       <h3>Стратегия: с каких компонентов начинать</h3>
       <p>Анализ начинаем с компонентов, наиболее подверженных угрозам и доступных наиболее слабым нарушителям:</p>
@@ -1096,7 +1096,7 @@ DB_HOST = get_secret(<span class="str">"db/connection/host"</span>)</code></pre>
             <div class="arch-case-title"><span class="arch-case-num">3</span> Привилегии исполняемого файла</div>
             <span class="arch-case-tag">SUID vs Capabilities</span>
           </div>
-          <div class="arch-case-scenario">Утилите управления СЗИ нужно слушать порт 80 (привилегированный) и читать защищённые файлы конфигурации.</div>
+          <div class="arch-case-scenario">Утилите управления СЗИ нужно слушать порт 80 и читать только собственный файл конфигурации, переданный выделенной учётной записи сервиса.</div>
           <div class="arch-options">
             <div class="arch-opt bad">
               <div class="arch-opt-label"><span class="opt-letter">A</span> Вариант A</div>
@@ -1108,12 +1108,16 @@ $ ls -l /usr/local/bin/szi-tool
             </div>
             <div class="arch-opt good">
               <div class="arch-opt-label"><span class="opt-letter">B</span> Вариант B</div>
-<pre class="code"><code><span class="cm"># Минимально необходимые capabilities</span>
-$ setcap <span class="str">'cap_net_bind_service,cap_dac_read_search=+ep'</span> \
-    /usr/local/bin/szi-tool
+<pre class="code"><code><span class="cm"># Иллюстративный шаблон: не выполняйте дословно.</span>
+<span class="cm"># Создайте выделенную учётную запись и дайте ей доступ</span>
+<span class="cm"># только к конкретному файлу конфигурации.</span>
+$ chown szi-tool:szi-tool /etc/szi-tool/config.yaml
+$ chmod 0640 /etc/szi-tool/config.yaml
 
+<span class="cm"># Для порта &lt;1024 — только одна узкая capability.</span>
+$ setcap <span class="str">'cap_net_bind_service=+ep'</span> /usr/local/bin/szi-tool
 $ getcap /usr/local/bin/szi-tool
-/usr/local/bin/szi-tool = cap_net_bind_service,cap_dac_read_search+ep</code></pre>
+/usr/local/bin/szi-tool = cap_net_bind_service+ep</code></pre>
             </div>
           </div>
           <div class="arch-case-reveal">
@@ -1122,7 +1126,7 @@ $ getcap /usr/local/bin/szi-tool
               Показать правильный вариант
             </button>
             <div class="arch-answer">
-              <span class="gost-ref">B · техника №3</span> SUID — расширение DAC, при котором <em>любой пользователь</em> запускает программу с правами владельца. При наличии в утилите хоть одной уязвимости вся система компрометируется. Linux capabilities — расширение DAC, реализующее принцип <strong>минимально необходимых привилегий</strong>: при запросе привилегированной операции ядро проверяет наличие конкретной capability. Утилита получает только нужные права (привязка к порту &lt; 1024 = <code>CAP_NET_BIND_SERVICE</code>), а не «всё root».
+              <span class="gost-ref">B · техника №3</span> SUID — расширение DAC, при котором <em>любой пользователь</em> запускает программу с правами владельца. При наличии в утилите хоть одной уязвимости вся система компрометируется. Linux capabilities реализуют более узкое делегирование: для привязки к порту &lt; 1024 достаточно <code>CAP_NET_BIND_SERVICE</code>. Чтение конфигурации предоставляется выделенной учётной записи обычными owner/group/ACL; capability, обходящая проверки DAC для произвольных файлов, принципу наименьших привилегий не соответствует. Для production дополнительно предпочтительны systemd socket activation, <code>NoNewPrivileges=yes</code>, <code>ProtectSystem=strict</code> и явный <code>ReadOnlyPaths</code>.
             </div>
           </div>
         </div>
@@ -1282,7 +1286,7 @@ log_security_event(
       </ul>
 
       <div class="callout">
-        <p><strong>Ключевое решение рабочей группы:</strong> уйти от собственной нотации формата ППК и использовать расширенный стандартизованный <strong>CycloneDX</strong> — на момент решения была актуальна версия 1.6, в марте 2026 вышла версия 1.7 (с поддержкой Traffic Light Protocol для распространения BOM). Использование стандарта позволяет переиспользовать существующий tooling экосистемы SBOM.</p>
+        <p><strong>Ключевое решение рабочей группы:</strong> уйти от собственной нотации формата ППК и использовать расширенный стандартизованный <strong>CycloneDX</strong>. Версия 1.7 выпущена <time datetime="2025-10-21">21 октября 2025 года</time>; официальный анонс описывает, в частности, контроль распространения BOM. Дату и состав версии следует сверять по <a href="https://cyclonedx.org/news/cyclonedx-v1.7-released/" target="_blank" rel="noopener">анонсу OWASP CycloneDX</a>. Использование стандарта позволяет переиспользовать существующий tooling экосистемы SBOM.</p>
       </div>
     </section>
 
@@ -1303,7 +1307,7 @@ log_security_event(
       </ul>
 
       <h3>Формат CycloneDX</h3>
-      <p>CycloneDX — открытый стандарт SBOM, который российская рабочая группа выбрала за основу. Текущая версия — 1.7 (релиз марта 2026), также продолжает применяться 1.6. Расширения для ФСТЭК добавляют специфичные поля (классификатор по БДУ, уровень доверия и т. п.).</p>
+      <p>CycloneDX — открытый стандарт SBOM, который российская рабочая группа выбрала за основу. Версия 1.7 опубликована <time datetime="2025-10-21">21 октября 2025 года</time>; профиль конкретного проекта должен явно фиксировать поддерживаемую версию схемы, поскольку инструменты могут поддерживать её не одновременно. Расширения для ФСТЭК добавляют специфичные поля (классификатор по БДУ, уровень доверия и т. п.).</p>
       <div class="technique-tools">
         <a class="tool-tag" href="https://cyclonedx.org/" target="_blank" rel="noopener">cyclonedx.org</a>
         <a class="tool-tag" href="https://cyclonedx.org/specification/overview/" target="_blank" rel="noopener">CycloneDX spec</a>
@@ -1509,7 +1513,7 @@ log_security_event(
       </div>
     </footer>
 
-  </article>
+  </main>
 
 </div>
 

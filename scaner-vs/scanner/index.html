@@ -293,9 +293,16 @@
           <article class="lane">
             <div class="lane-kicker">Windows · базовый маршрут</div>
             <h3>Подготовить WinRM</h3>
-            <p>Официальная документация предлагает <code>winrm.ps1</code> из <code>/var/lib/echelon/0/scanner/scripts</code> либо со страницы <code>https://&lt;IP-сканера&gt;/winrm/</code>. До запуска преподаватель проверяет исходный текст и хеш. Для полной проверки вендор указывает административные права; в лаборатории это отдельная временная запись, HTTPS WinRM на 5986 и правило брандмауэра только для IP сканера.</p>
-            <div class="command">Powershell.exe -ExecutionPolicy Bypass -File winrm.ps1</div>
-            <p class="footnote">Это vendor-команда, а не универсальная рекомендация менять политику PowerShell. Для удаления созданной конфигурации в поставке предусмотрен <code>remove.ps1</code>; <code>Disable-PSRemoting</code> не является точечной отменой и отключает PowerShell Remoting целиком.</p>
+            <p>Официальная документация предлагает <code>winrm.ps1</code> из <code>/var/lib/echelon/0/scanner/scripts</code> либо со страницы <code>https://&lt;IP-сканера&gt;/winrm/</code>. Ожидаемый SHA-256 и ожидаемого издателя преподаватель получает из подписанного реестра вендора по аутентифицированному независимому каналу. Для полной проверки вендор указывает административные права; в лаборатории это отдельная временная запись, HTTPS WinRM на 5986 и правило брандмауэра только для IP сканера.</p>
+            <pre class="command" tabindex="0" aria-label="Проверка vendor-скрипта WinRM до запуска">$WinrmScript = '.\winrm.ps1'
+$ExpectedWinrmSha256 = '&lt;64_HEX_ИЗ_ПОДПИСАННОГО_РЕЕСТРА&gt;'
+$ExpectedPublisher = '&lt;SUBJECT_ИЗ_ПОДПИСАННОГО_РЕЕСТРА_ИЛИ_UNSIGNED&gt;'
+if ($ExpectedWinrmSha256 -notmatch '^[0-9A-Fa-f]{64}$') { throw 'STOP: expected SHA-256 is absent' }
+if ((Get-FileHash -LiteralPath $WinrmScript -Algorithm SHA256).Hash -ne $ExpectedWinrmSha256) { throw 'STOP: SHA-256 mismatch' }
+$Signature = Get-AuthenticodeSignature -LiteralPath $WinrmScript
+if ($Signature.Status -ne 'NotSigned' -and ($Signature.Status -ne 'Valid' -or $Signature.SignerCertificate.Subject -ne $ExpectedPublisher)) { throw 'STOP: Authenticode publisher mismatch' }
+Powershell.exe -NoProfile -ExecutionPolicy Bypass -File $WinrmScript</pre>
+            <p class="footnote">Любое несовпадение — STOP до <code>ExecutionPolicy Bypass</code>. Для точечного отката используйте поставляемый <code>remove.ps1</code> после такой же проверки SHA-256/подписи и убедитесь, что удаляется только конфигурация этого запуска; <code>Disable-PSRemoting</code> не является точечной отменой.</p>
           </article>
           <article class="lane lane--green">
             <div class="lane-kicker">Linux · контролируемый доступ</div>
@@ -334,7 +341,7 @@
           <div class="callout-icon" aria-hidden="true">1</div>
           <div>
             <h3>Сначала получите свежий дистрибутив и лицензию</h3>
-            <p>Имена файлов в конкретной выдаче могут отличаться. В предоставленной инструкции используется <code>scanner-signed-deb.run</code>, а в текущей документации - условное <code>scanner.run</code>. Подставляйте точное имя файла из письма производителя; лицензию не передавайте другим слушателям.</p>
+            <p>Имена файлов в конкретной выдаче могут отличаться. Получайте файл только по прямой ссылке производителя, а ожидаемый SHA-256 — от производителя либо из подписанного преподавателем реестра по независимому аутентифицированному каналу. Без доверенного хеша или проверяемой подписи действует STOP: файл не исполнять.</p>
           </div>
         </div>
 
@@ -354,7 +361,11 @@ wsl --list --verbose</pre>
             <span class="topic-code">PDF · стр. 5</span>
             <h3>Распаковать, положить лицензию, установить</h3>
             <p>Скопируйте выданные файлы в Ubuntu через <code>\\wsl$\</code>. Лицензия должна попасть в созданный каталог <code>pkg</code> до запуска installer.</p>
-            <pre class="command" tabindex="0" aria-label="Команды установки Сканер-ВС 7">sh scanner-signed-deb.run
+            <pre class="command" tabindex="0" aria-label="Проверка SHA-256 и команды установки Сканер-ВС 7">INSTALLER='./scanner-signed-deb.run'
+EXPECTED_INSTALLER_SHA256='&lt;64_HEX_ИЗ_АУТЕНТИФИЦИРОВАННОГО_РЕЕСТРА&gt;'
+ACTUAL_INSTALLER_SHA256="$(sha256sum -- "$INSTALLER" | awk '{print $1}')"
+test "${ACTUAL_INSTALLER_SHA256,,}" = "${EXPECTED_INSTALLER_SHA256,,}" || { echo 'STOP: SHA-256 mismatch' &gt;&amp;2; exit 1; }
+bash -- "$INSTALLER"
 cp license.lic pkg/
 cd pkg/
 ./installer install</pre>
@@ -363,20 +374,14 @@ cd pkg/
 
           <article class="source-card">
             <span class="topic-code">PDF · стр. 4 · опционально</span>
-            <h3>Открыть 443 только при необходимости</h3>
-            <p>Для работы только на самом Windows-компьютере используйте <code>https://localhost</code> и не создавайте сетевые правила. Для доступа из разрешённой лабораторной сети замените заполнители фактическими адресами.</p>
-            <pre class="command" tabindex="0" aria-label="Команда перенаправления HTTPS в WSL">netsh interface portproxy add v4tov4 listenport=443 listenaddress=&lt;IP_Хоста&gt; connectport=443 connectaddress=&lt;IP_WSL&gt;</pre>
-            <pre class="command" tabindex="0" aria-label="Правило брандмауэра из инструкции">New-NetFirewallRule -DisplayName "Allow Scanner UI" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow</pre>
-            <p>Правило из PDF не ограничивает удалённые адреса. В учебной сети добавьте <code>-RemoteAddress &lt;ЛАБОРАТОРНАЯ_ПОДСЕТЬ_CIDR&gt; -Profile Private</code>. Не отключайте брандмауэры целиком и не публикуйте HTTP-порт 80.</p>
+            <h3>Открыть 443 только через проверяемый runbook</h3>
+            <p>Для работы только на самом Windows-компьютере используйте <code>https://localhost</code> и не создавайте сетевые правила. Если нужен доступ из лабораторной сети, выполняйте только <a href="../materials/scanner/03-wsl-individual.md">пошаговый WSL-runbook</a>: он делает STOP при коллизии слушателя, создаёт уникальное правило с маркером владельца, до изменения сохраняет долговечное состояние, ограничивает доступ лабораторной подсетью и предусматривает проверяемую очистку только объектов текущего запуска. Не переносите отдельные команды из runbook вручную.</p>
           </article>
 
           <article class="source-card">
             <span class="topic-code">Контрольная точка</span>
             <h3>Проверить и затем убрать временный доступ</h3>
-            <p>Текущая документация добавляет проверку службы <code>systemctl status scanner</code>; ожидается <code>active (running)</code>. После первого входа немедленно смените первоначальный пароль.</p>
-            <pre class="command" tabindex="0" aria-label="Проверка сетевых правил">netsh interface portproxy show all
-Get-NetFirewallRule -DisplayName "Allow Scanner UI"</pre>
-            <p>После занятия удаляйте только созданное правило и конкретное перенаправление. Общий <code>netsh interface portproxy reset</code> не используют: он затронет чужие правила.</p>
+            <p>Проверьте <code>systemctl status scanner</code>, смените первоначальный пароль и завершите runbook его режимом очистки. Успех — только когда правило с уникальным идентификатором запуска и принадлежащее ему перенаправление отсутствуют, а файл состояния удалён после подтверждённого отката. При частичной ошибке — STOP, состояние сохраняют для восстановления; общий сброс чужих правил запрещён.</p>
           </article>
         </div>
 
@@ -437,7 +442,7 @@ Get-NetFirewallRule -DisplayName "Allow Scanner UI"</pre>
 
         <div class="day day--scanner">
           <div class="day-head"><strong>Практика дня 1</strong><span>4 × 90 минут</span></div>
-          <div class="day-block"><div class="duration">Блок 1</div><div><h3>Подготовка и установка</h3><p>Убедиться, что слушатель получил демоверсию Сканер-ВС 7 Base и файл лицензии через официальную форму; затем выбрать вариант: ScanOVAL, WSL 2, VirtualBox или Live USB. Проверить источник, контрольные суммы (если опубликованы), условия лицензии, снимок ВМ и отсутствие мостового подключения. <strong>Артефакт:</strong> паспорт стенда.</p></div></div>
+          <div class="day-block"><div class="duration">Блок 1</div><div><h3>Подготовка и установка</h3><p>Убедиться, что слушатель получил демоверсию Сканер-ВС 7 Base и файл лицензии через официальную форму; затем выбрать вариант: ScanOVAL, WSL 2, VirtualBox или Live USB. До исполнения или записи обязательно сверить SHA-256 с производителем либо подписанным преподавателем реестром по независимому аутентифицированному каналу; при отсутствии подтверждения — STOP. Проверить условия лицензии, снимок ВМ и отсутствие мостового подключения. <strong>Артефакт:</strong> паспорт стенда.</p></div></div>
           <div class="day-block"><div class="duration">Блок 2</div><div><h3>Исследование сети и подключения</h3><p>Создать проект и задачу исследования сети, сверить найденные активы, подготовить Windows через WinRM и Linux через SSH. <strong>Артефакт:</strong> карта активов и журнал подключений.</p></div></div>
           <div class="day-block"><div class="duration">Блок 3</div><div><h3>Инвентаризация и поиск уязвимостей</h3><p>Собрать ПО и аппаратный состав, запустить задачу поиска, выбрать несколько результатов и проверить версии, CVE/БДУ, CVSS, KEV/EPSS и применимость. <strong>Артефакт:</strong> реестр проверенных находок.</p></div></div>
           <div class="day-block"><div class="duration">Блок 4</div><div><h3>Пароли, конфигурации и отчёт</h3><p>Провести контролируемую проверку синтетической учётной записи, запустить аудит конфигурации по подходящему шаблону, сформировать отчёт и план повторной проверки. <strong>Артефакт:</strong> защищаемый вывод.</p></div></div>
@@ -453,7 +458,7 @@ Get-NetFirewallRule -DisplayName "Allow Scanner UI"</pre>
 
         <h3 style="margin-top:42px">Четыре варианта развертывания</h3>
         <div class="stand-grid" style="margin-top:18px">
-          <article class="stand"><div class="stand-number">01</div><h3>ScanOVAL</h3><p>Локальная проверка поддерживаемой Windows. Это не сетевой сканер и не VM-система. Windows 11 официальная страница сейчас не перечисляет — совместимость проверяется заранее. Дистрибутив не включается в курс.</p><div class="button-row"><a class="button" href="https://bdu.fstec.ru/scanoval" target="_blank" rel="noopener">Скачать из БДУ</a></div></article>
+          <article class="stand"><div class="stand-number">01</div><h3>ScanOVAL</h3><p>Локальная проверка поддерживаемой Windows. Это не сетевой сканер и не VM-система. До запуска требуются SHA-256 из подписанного реестра по независимому каналу и действительная Authenticode-подпись ожидаемого издателя; отсутствие или несовпадение — STOP. Дистрибутив не включается в курс.</p><div class="button-row"><a class="button" href="../materials/scanner/02-scanoval-local.md">Инструкция и проверка</a><a class="button" href="https://bdu.fstec.ru/scanoval" target="_blank" rel="noopener">Скачать из БДУ</a></div></article>
           <article class="stand"><div class="stand-number">02</div><h3>Сканер-ВС в WSL 2</h3><p>Поддержаны Windows 10/11 и WSL 2. Сразу сменить стандартный пароль, не публиковать HTTP и ограничить 443 лабораторной подсетью.</p><div class="button-row"><a class="button" href="https://docs.etecs.ru/scanner/docs/getting-started/installation/windows-wsl-install/" target="_blank" rel="noopener">Инструкция WSL</a></div></article>
           <article class="stand"><div class="stand-number">03</div><h3>VirtualBox</h3><p>Astra Linux со сканером, Metasploitable 2 и учебная Windows размещаются в Host-only/Internal Network. Снимок создаётся до изменения конфигурации.</p></article>
           <article class="stand"><div class="stand-number">04</div><h3>Live USB</h3><p>Вендор документирует носитель от 32 ГБ. Без Persistence результаты исчезают после перезагрузки; с Persistence носитель содержит чувствительные данные и требует защиты.</p><div class="button-row"><a class="button" href="https://docs.etecs.ru/scanner/docs/getting-started/bootable-media/create-boot-drive/" target="_blank" rel="noopener">Инструкция Live USB</a></div></article>

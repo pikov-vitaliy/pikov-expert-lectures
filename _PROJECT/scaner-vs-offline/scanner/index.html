@@ -64,27 +64,28 @@ wsl --list --verbose</pre>
         <article class="source-card">
           <span class="topic-code">2 · Ubuntu</span>
           <h3>Установить продукт</h3>
-          <pre class="command" tabindex="0" aria-label="Команды установки Сканер-ВС">sh scanner-signed-deb.run
+          <pre class="command" tabindex="0" aria-label="Проверка SHA-256 и команды установки Сканер-ВС">INSTALLER='./scanner-signed-deb.run'
+EXPECTED_INSTALLER_SHA256='&lt;64_HEX_ИЗ_АУТЕНТИФИЦИРОВАННОГО_РЕЕСТРА&gt;'
+ACTUAL_INSTALLER_SHA256="$(sha256sum -- "$INSTALLER" | awk '{print $1}')"
+test "${ACTUAL_INSTALLER_SHA256,,}" = "${EXPECTED_INSTALLER_SHA256,,}" || { echo 'STOP: SHA-256 mismatch' &gt;&amp;2; exit 1; }
+bash -- "$INSTALLER"
 cp license.lic pkg/
 cd pkg/
 ./installer install</pre>
-          <p>Подставьте фактическое имя свежего <code>.run</code>-файла. Лицензия должна находиться в <code>pkg</code> до запуска installer.</p>
+          <p>Подставьте фактическое имя свежего <code>.run</code>-файла и ожидаемый SHA-256 из прямого источника производителя либо подписанного преподавателем реестра, полученного по независимому аутентифицированному каналу. Без совпадения хеша или проверяемой подписи — STOP. Лицензия должна находиться в <code>pkg</code> до запуска installer.</p>
         </article>
 
         <article class="source-card">
           <span class="topic-code">3 · Только при сетевом доступе</span>
-          <h3>Перенаправить HTTPS</h3>
-          <pre class="command" tabindex="0" aria-label="Команда portproxy">netsh interface portproxy add v4tov4 listenport=443 listenaddress=&lt;IP_Хоста&gt; connectport=443 connectaddress=&lt;IP_WSL&gt;</pre>
-          <pre class="command" tabindex="0" aria-label="Команда правила Windows Firewall">New-NetFirewallRule -DisplayName "Allow Scanner UI" -Direction Inbound -Protocol TCP -LocalPort 443 -Action Allow</pre>
-          <p>Замените оба заполнителя реальными адресами. Для занятия ограничьте удалённые адреса разрешённой лабораторной подсетью; не отключайте брандмауэры целиком.</p>
+          <h3>Применить полный безопасный runbook</h3>
+          <p>Не копируйте отдельные сетевые команды. Откройте <a href="materials/scanner/03-wsl-individual.md">пошаговую WSL-инструкцию</a>: она проверяет коллизию слушателя, использует уникальное правило с маркером владельца, сохраняет состояние до изменения, ограничивает доступ лабораторной подсетью и выполняет проверяемую очистку только объектов текущего запуска. Любое несоответствие — STOP.</p>
         </article>
 
         <article class="source-card">
           <span class="topic-code">4 · Проверка</span>
           <h3>Подтвердить результат</h3>
-          <pre class="command" tabindex="0" aria-label="Проверка Сканер-ВС и правил">systemctl status scanner
-netsh interface portproxy show all</pre>
-          <p>Откройте <code>https://localhost</code>, смените первоначальный пароль и после занятия удалите только созданные временные правила. Не используйте общий <code>portproxy reset</code>.</p>
+          <pre class="command" tabindex="0" aria-label="Проверка Сканер-ВС">systemctl status scanner</pre>
+          <p>Откройте <code>https://localhost</code>, смените первоначальный пароль и завершите runbook режимом очистки. Если откат не подтверждён, файл состояния сохраняют для восстановления; общий сброс чужих правил запрещён.</p>
         </article>
       </div>
     </section>
@@ -124,7 +125,7 @@ netsh interface portproxy show all</pre>
           <p class="document-card__number">02</p>
           <div>
             <h3><a href="materials/scanner/02-scanoval-local.md">Локальная практика с ScanOVAL</a></h3>
-            <p>Самый компактный вариант: проверка поддерживаемого локального компьютера по OVAL-описаниям из БДУ ФСТЭК России.</p>
+            <p>Самый компактный вариант: проверка поддерживаемого локального компьютера по OVAL-описаниям из БДУ ФСТЭК России. Перед запуском инструкция требует SHA-256 из подписанного реестра и действительную Authenticode-подпись ожидаемого издателя; несовпадение — STOP.</p>
           </div>
         </article>
 

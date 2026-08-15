@@ -19,6 +19,7 @@ function New-DayArchive {
   param(
     [Parameter(Mandatory = $true)][string]$Destination,
     [string[]]$Dir = @(),
+    [hashtable[]]$DirMap = @(),
     [string[]]$AuthorFile = @()
   )
 
@@ -28,6 +29,15 @@ function New-DayArchive {
   try {
     foreach ($d in $Dir) {
       Copy-Item -LiteralPath $d -Destination $staging -Recurse -Force
+    }
+    foreach ($mapping in $DirMap) {
+      $parent = [string]$mapping.Parent
+      if ([System.IO.Path]::IsPathRooted($parent) -or $parent -match '(^|[\\/])\.\.([\\/]|$)') {
+        throw "Unsafe archive parent path: $parent"
+      }
+      $mappedParent = Join-Path $staging $parent
+      New-Item -ItemType Directory -Path $mappedParent -Force | Out-Null
+      Copy-Item -LiteralPath ([string]$mapping.Source) -Destination $mappedParent -Recurse -Force
     }
     if ($AuthorFile.Count -gt 0) {
       $materialsStage = Join-Path $staging 'materials'
@@ -58,6 +68,33 @@ function Get-RelativeForwardSlashPath {
   return $full.Substring($base.Length).Replace('\', '/')
 }
 
+function Assert-ExactPublicFileSet {
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)][string[]]$ExpectedRelativePath
+  )
+
+  $reparsePoints = @(Get-ChildItem -LiteralPath $Root -Force -Recurse | Where-Object {
+    ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
+  })
+  if ($reparsePoints.Count -gt 0) {
+    throw "Unexpected public source reparse point: $($reparsePoints[0].FullName)"
+  }
+
+  $expected = @($ExpectedRelativePath | ForEach-Object { $_.Replace('\', '/') } | Sort-Object -Unique)
+  $actual = @(Get-ChildItem -LiteralPath $Root -Force -File -Recurse | ForEach-Object {
+    Get-RelativeForwardSlashPath -BasePath $Root -FullPath $_.FullName
+  } | Sort-Object -Unique)
+  $unexpected = @($actual | Where-Object { $expected -notcontains $_ })
+  if ($unexpected.Count -gt 0) {
+    throw "Unexpected public source file: $($unexpected[0])"
+  }
+  $missing = @($expected | Where-Object { $actual -notcontains $_ })
+  if ($missing.Count -gt 0) {
+    throw "Missing reviewed public source file: $($missing[0])"
+  }
+}
+
 function Get-LocalizedText {
   param([Parameter(Mandatory = $true)][string]$JsonString)
   return [string](ConvertFrom-Json -InputObject $JsonString)
@@ -68,11 +105,26 @@ $participantMaterials = Join-Path $dayRoot 'participant-materials'
 $labResults = Join-Path $dayRoot 'lab-results'
 $programAndEnvironment = Join-Path $dayRoot 'program-and-environment'
 $materialsRoot = Join-Path $siteRoot 'materials'
+$canonicalLab = Join-Path $siteRoot 'lab\juice-shop'
+
+$dayOneTranscriptFiles = @(
+  (Get-LocalizedText -JsonString '"01-\u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0439-\u043f\u0435\u0440\u0435\u0441\u043a\u0430\u0437-\u0434\u043d\u044f-01.md"'),
+  (Get-LocalizedText -JsonString '"02-\u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0439-\u043f\u0435\u0440\u0435\u0441\u043a\u0430\u0437-\u0434\u043d\u044f-01.md"'),
+  (Get-LocalizedText -JsonString '"03-\u0430\u0432\u0442\u043e\u043c\u0430\u0442\u0438\u0447\u0435\u0441\u043a\u0438\u0439-\u043f\u0435\u0440\u0435\u0441\u043a\u0430\u0437-\u0434\u043d\u044f-01.md"'),
+  (Get-LocalizedText -JsonString '"\u041f\u0440\u043e\u0442\u043e\u043a\u043e\u043b-\u0434\u043d\u044f-01-\u0440\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0439.md"'),
+  (Get-LocalizedText -JsonString '"\u0421\u0442\u0435\u043d\u043e\u0433\u0440\u0430\u043c\u043c\u0430-\u0434\u043d\u044f-01-\u043f\u043e\u0434\u0440\u043e\u0431\u043d\u0430\u044f-\u0440\u0435\u0434\u0430\u043a\u0442\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u0430\u044f.md"')
+)
+$canonicalLabFiles = @('compose.yaml', 'README.md', 'start.ps1', 'stop.ps1')
+
+# Fail closed before changing any published archive. A newly dropped secret,
+# database, binary, nested archive or reparse point is never copied implicitly.
+Assert-ExactPublicFileSet -Root $transcripts -ExpectedRelativePath $dayOneTranscriptFiles
+Assert-ExactPublicFileSet -Root $canonicalLab -ExpectedRelativePath $canonicalLabFiles
 
 # The Day 1 handout is a closed, reviewed set. Do not let newly added Day 2
 # materials silently cross the day boundary merely because they share a folder.
 $dayOneAuthorMaterialNames = @(
-  (Get-LocalizedText -JsonString '"2026-08-11-\u0434\u0435\u043d\u044c-1-\u043c\u0435\u0442\u043e\u0434\u0438\u0447\u0435\u0441\u043a\u0438\u0439-\u043a\u043e\u043d\u0441\u043f\u0435\u043a\u0442.md"'),
+  (Get-LocalizedText -JsonString '"\u0434\u0435\u043d\u044c-1-\u043c\u0435\u0442\u043e\u0434\u0438\u0447\u0435\u0441\u043a\u0438\u0439-\u043a\u043e\u043d\u0441\u043f\u0435\u043a\u0442.md"'),
   (Get-LocalizedText -JsonString '"\u0434\u0435\u043d\u044c-1-\u0441\u043b\u0430\u0439\u0434\u044b-AppSec-OWASP-\u0438-\u0418\u0418.md"'),
   (Get-LocalizedText -JsonString '"\u0438\u0441\u0442\u043e\u0447\u043d\u0438\u043a\u0438-\u0438-\u0432\u0435\u0440\u0441\u0438\u0438.md"'),
   (Get-LocalizedText -JsonString '"\u043a\u0430\u0442\u0430\u043b\u043e\u0433-\u043c\u0430\u0442\u0435\u0440\u0438\u0430\u043b\u043e\u0432-\u0434\u043d\u044f-1.md"'),
@@ -87,25 +139,46 @@ $dayOneAuthorMaterials = foreach ($name in $dayOneAuthorMaterialNames) {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Missing Day 1 author material: $path"
   }
+  $item = Get-Item -LiteralPath $path -Force
+  if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+    throw "Day 1 author material must not be a reparse point: $path"
+  }
   $path
 }
 
-# Working photographs are used only for editorial verification and never enter
-# the public package. Remove stale source artefacts before every release.
-@('day-01-slides-original.zip', 'day-01-full-source-package.zip', 'day-01-transcripts-original.zip', 'day-01-SHA256SUMS.txt') | ForEach-Object {
+# Working photographs and superseded generated packages never enter a release.
+# Keep this an exact-name deletion list: no wildcard may remove an unrelated
+# instructor artefact from downloads/.
+@(
+  'day-01-slides-original.zip',
+  'day-01-full-source-package.zip',
+  'day-01-transcripts-original.zip',
+  'day-01-SHA256SUMS.txt',
+  'day-01-public-materials.zip',
+  'day-01-laboratory-materials-and-reports.zip',
+  'day-01-SHA256SUMS.md',
+  'day-01-manifest.json'
+) | ForEach-Object {
   Remove-Item -LiteralPath (Join-Path $downloadsRoot $_) -Force -ErrorAction SilentlyContinue
 }
 
+# The former combined archives contained unreviewed binaries and legacy
+# commands. Rebuild only the transcript archive and the canonical text/lab set.
 $archives = @(
   @{ Name = 'day-01-edited-transcript-and-summaries.zip'; Dir = @($transcripts); AuthorFile = @() },
-  @{ Name = 'day-01-laboratory-materials-and-reports.zip'; Dir = @($participantMaterials, $labResults, $programAndEnvironment); AuthorFile = @() },
-  @{ Name = 'day-01-public-materials.zip'; Dir = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment); AuthorFile = $dayOneAuthorMaterials }
+  @{
+    Name = 'day-01-canonical-safe-package.zip'
+    Dir = @($transcripts)
+    DirMap = @(@{ Source = $canonicalLab; Parent = 'lab' })
+    AuthorFile = @($dayOneAuthorMaterials)
+  }
 )
 
 $checksumLines = New-Object System.Collections.Generic.List[string]
 foreach ($archive in $archives) {
   $destination = Join-Path $downloadsRoot $archive.Name
-  New-DayArchive -Destination $destination -Dir $archive.Dir -AuthorFile $archive.AuthorFile
+  $dirMap = if ($archive.ContainsKey('DirMap')) { @($archive.DirMap) } else { @() }
+  New-DayArchive -Destination $destination -Dir $archive.Dir -DirMap $dirMap -AuthorFile $archive.AuthorFile
   $hash = (Get-FileHash -LiteralPath $destination -Algorithm SHA256).Hash
   $size = (Get-Item -LiteralPath $destination).Length
   $checksumLines.Add("$hash  $($archive.Name)  $size bytes")
@@ -119,15 +192,23 @@ $checksumDocument = @(
   '',
   '```text'
 ) + @($checksumLines) + @('```')
-[System.IO.File]::WriteAllText((Join-Path $downloadsRoot 'day-01-SHA256SUMS.md'), $checksumDocument, (New-Object System.Text.UTF8Encoding($false)))
+[System.IO.File]::WriteAllText(
+  (Join-Path $downloadsRoot 'day-01-SHA256SUMS.md'),
+  ($checksumDocument -join [Environment]::NewLine),
+  (New-Object System.Text.UTF8Encoding($false))
+)
 
-$dayFiles = @($transcripts, $participantMaterials, $labResults, $programAndEnvironment) | ForEach-Object {
-  Get-ChildItem -LiteralPath $_ -File -Recurse
-} | Sort-Object FullName | ForEach-Object {
-  [pscustomobject]@{
-    path = Get-RelativeForwardSlashPath -BasePath $dayRoot -FullPath $_.FullName
-    bytes = $_.Length
-    sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+$dayFiles = @(
+  @{ Root = $transcripts; Prefix = 'transcripts' },
+  @{ Root = $canonicalLab; Prefix = 'lab/juice-shop' }
+) | ForEach-Object {
+  $group = $_
+  Get-ChildItem -LiteralPath $group.Root -File -Recurse | ForEach-Object {
+    [pscustomobject]@{
+      path = ($group.Prefix + '/' + (Get-RelativeForwardSlashPath -BasePath $group.Root -FullPath $_.FullName))
+      bytes = $_.Length
+      sha256 = (Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash
+    }
   }
 }
 $authorFiles = $dayOneAuthorMaterials | Sort-Object | ForEach-Object {
@@ -139,7 +220,8 @@ $authorFiles = $dayOneAuthorMaterials | Sort-Object | ForEach-Object {
 }
 $files = @($dayFiles + $authorFiles | Sort-Object path)
 $manifest = [pscustomobject]@{
-  title = Get-LocalizedText -JsonString '"\u041F\u0443\u0431\u043B\u0438\u0447\u043D\u044B\u0435 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u043F\u0435\u0440\u0432\u043E\u0433\u043E \u0434\u043D\u044F \u2014 11 \u0430\u0432\u0433\u0443\u0441\u0442\u0430 2026 \u0433\u043E\u0434\u0430"'
+  title = Get-LocalizedText -JsonString '"\u041F\u0443\u0431\u043B\u0438\u0447\u043D\u044B\u0435 \u043A\u0430\u043D\u043E\u043D\u0438\u0447\u0435\u0441\u043A\u0438\u0435 \u043C\u0430\u0442\u0435\u0440\u0438\u0430\u043B\u044B \u043F\u0435\u0440\u0432\u043E\u0433\u043E \u0434\u043D\u044F"'
+  archives = @($archives.Name)
   files = @($files)
 }
 $manifestText = $manifest | ConvertTo-Json -Depth 4

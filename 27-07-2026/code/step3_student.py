@@ -48,7 +48,7 @@ EXPORT_DIR = Path(__file__).parent / "export"
 # навсегда — даже если строку потом удалить. Сменить его можно только
 # пересборкой и перевыпуском программы.
 # ---------------------------------------------------------------------------
-ADMIN_TOKEN = "s3cr3t-admin-token-2026"
+ADMIN_TOKEN = "s3cr3t-admin-token-training"
 
 
 def connect() -> sqlite3.Connection:
@@ -132,7 +132,7 @@ def demo() -> None:
     print("=" * 70)
     print("Д1 и Д2. Секрет в коде и секрет в журнале")
     print("=" * 70)
-    login("ivanova", "s3cr3t-admin-token-2026")
+    login("ivanova", "s3cr3t-admin-token-training")
     print(f"    Токен виден прямо в исходном коде: {ADMIN_TOKEN!r}")
     print("    Он же только что попал в журнал приложения — строка выше.")
 

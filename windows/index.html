@@ -150,7 +150,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <button class="nb" id="btnLast" title="В конец">⏭</button>
 </div>
 
-<div class="presentation" id="presentation">
+<main class="presentation" id="presentation">
 
 <!-- ============ SLIDE 1: TITLE ============ -->
 <div class="slide slide-title active" data-slide="1">
@@ -177,6 +177,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li><strong>Антивирусная защита АРМ</strong> — Windows Defender, политики защиты</li>
 </ol>
 <div class="hl">Каждая тема рассчитана на 1,5 академических часа (90 минут). Общее количество слайдов: 45.</div>
+<div class="ib"><strong>Паспорт стенда:</strong> базовый вариант — поддерживаемый выпуск Windows 11 с зафиксированными редакцией, сборкой и security baseline. Поддержка Windows 10 22H2 завершена 14.10.2025; Windows 10 допустима только как конкретная LTSC/ESU-конфигурация либо изолированный legacy-стенд.</div>
 </div>
 <div class="snc">2 из 45</div>
 </div>
@@ -292,7 +293,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <tr><td><strong>Утечка данных</strong></td><td>Несанкционированное копирование</td><td>Съёмные носители, облачные хранилища</td></tr>
 </tbody>
 </table>
-<div class="wb">По данным ФСТЭК, до 70% инцидентов ИБ связаны с эксплуатацией уязвимостей и вредоносным ПО.</div>
+<div class="wb">Статистику угроз следует брать из датированного отчёта с описанной выборкой и методикой. Доля инцидентов не переносится автоматически между странами, отраслями и организациями.</div>
 </div>
 <div class="snc">7 из 45</div>
 </div>
@@ -302,7 +303,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="slide-header">
 <div class="logo-area" aria-label="Авторская лекция"><div class="logo-fb">pikov.expert</div></div>
 <div class="section-tag">Тема 1</div>
-<h2>Нормативная база: требования к защите АРМ</h2>
+<h2>Local compliance profile: требования к защите АРМ</h2>
 </div>
 <div class="slide-body">
 <ul>
@@ -314,7 +315,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li><strong>Приказ ФСТЭК № 31</strong> от 14.03.2014 — требования к защите АСУ ТП (действующий)</li>
 <li><strong>Приказ ФСТЭК № 17</strong> от 11.02.2013 — историческая база требований к ГИС до вступления в силу приказа № 117</li>
 </ul>
-<div class="ib">Требования ФСТЭК устанавливают <strong>уровни доверия</strong> к средствам защиты и СЗИ, используемым на АРМ.</div>
+<div class="ib">Сначала определяются вид системы, её класс или категория, модель угроз и применимые НПА. Этот local compliance profile дополняет, но не заменяет международную основу курса: Microsoft versioned security baseline, NIST и CIS Controls.</div>
 </div>
 <div class="snc">8 из 45</div>
 </div>
@@ -324,18 +325,18 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="slide-header">
 <div class="logo-area" aria-label="Авторская лекция"><div class="logo-fb">pikov.expert</div></div>
 <div class="section-tag">Тема 1</div>
-<h2>Сертифицированные ОС Windows</h2>
+<h2>Local compliance profile: применимость сертификации</h2>
 </div>
 <div class="slide-body">
-<div class="hl">Для обработки информации ограниченного доступа (в т.ч. ПДн, ГИС) должны применяться сертифицированные средства защиты, включая ОС.</div>
-<h3>Сертифицированные средства:</h3>
+<div class="hl">Необходимость сертифицированного средства определяется применимым НПА, классом или категорией системы, моделью угроз и утверждённой архитектурой защиты — не одним фактом обработки ПДн или работы в ГИС.</div>
+<h3>Примеры вариантов реализации:</h3>
 <ul>
-<li><strong>Windows 10/11</strong> с модулем защиты (СЗИ от НСД) — сертификаты ФСТЭК</li>
+<li><strong>Поддерживаемый выпуск Windows 11</strong> с модулем защиты (СЗИ от НСД), если такой вариант предусмотрен проектом</li>
 <li><strong>«Соболь»</strong> (СЗИ от НСД для Windows) — сертификат ФСТЭК</li>
 <li><strong>«Secret Net Studio»</strong> — комплексная защита АРМ под Windows</li>
 </ul>
-<div class="wb">Использование несертифицированной ОС для обработки конфиденциальной информации нарушает требования ФСТЭК и может повлечь административную ответственность.</div>
-<div class="ib">Для систем 3 класса ГИС и выше требуется применение сертифицированных СЗИ.</div>
+<div class="wb">Наличие сертификата проверять в реестре ФСТЭК для конкретной версии и конфигурации, включая среду функционирования и ограничения применения.</div>
+<div class="ib">Сертификат одного компонента не подтверждает соответствие всей системы: требуется трассировка «область НПА → модель угроз → мера → средство → доказательство».</div>
 </div>
 <div class="snc">9 из 45</div>
 </div>
@@ -451,7 +452,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <h2>Управление учётными записями</h2>
 </div>
 <div class="slide-body">
-<h3>Рекомендуемые меры:</h3>
+<h3>Международная основа и локальная настройка:</h3>
 <ul>
 <li>Отключить встроенную учётную запись <strong>«Администратор»</strong> (Administrator)</li>
 <li>Отключить или переименовать учётную запись <strong>«Гость»</strong> (Guest)</li>
@@ -460,24 +461,26 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 </ul>
 <div class="tc">
 <div class="col">
-<h4>Локальные политики паролей</h4>
+<h4>NIST SP 800-63B-4</h4>
 <ul>
-<li>Минимальная длина: 12 символов</li>
-<li>Сложность: включена</li>
-<li>Срок действия: 90 дней</li>
-<li>История: 24 пароля</li>
+<li>Минимум 15 символов для пароля как единственного фактора; минимум 8 — в составе MFA</li>
+<li>Blocklist известных и скомпрометированных значений</li>
+<li>Поддержка менеджеров паролей и вставки</li>
+<li>Управлять паролем без произвольной периодической смены и обязательной композиции; смена — при компрометации</li>
 </ul>
 </div>
 <div class="col">
-<h4>Блокировка учётных записей</h4>
+<h4>Локальный профиль Windows</h4>
 <ul>
-<li>Порог: 5 неудачных попыток</li>
-<li>Время блокировки: 30 минут</li>
-<li>Сброс счётчика: 30 минут</li>
+<li>Включить rate limiting и мониторинг перебора</li>
+<li>Настроить Windows LAPS для локального администратора</li>
+<li>Предпочесть phishing-resistant MFA для привилегированного доступа</li>
+<li>Порог и длительность блокировки выбирать по модели угроз и риску DoS</li>
 </ul>
 </div>
 </div>
-<div class="wb">Эти настройки соответствуют требованиям Приказа ФСТЭК № 21 для защиты ПДн.</div>
+<div class="wb">Числовые параметры локальной политики не являются прямыми требованиями приказа ФСТЭК № 21. Их обосновывают корпоративной политикой, моделью угроз и Microsoft versioned security baseline; результат оформляют как локальный профиль.</div>
+<div class="ib">Первоисточник: <a href="https://pages.nist.gov/800-63-4/sp800-63b.html" target="_blank" rel="noopener">NIST SP 800-63B-4</a>.</div>
 </div>
 <div class="snc">14 из 45</div>
 </div>
@@ -515,8 +518,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <table>
 <thead><tr><th>Категория</th><th>Политика</th><th>Рекомендация</th></tr></thead>
 <tbody>
-<tr><td>Учётные записи</td><td>Политика паролей</td><td>Сложность, длина ≥ 12, срок 90 дней</td></tr>
-<tr><td>Учётные записи</td><td>Блокировка</td><td>5 попыток, 30 мин блокировка</td></tr>
+<tr><td>Учётные записи</td><td>Политика паролей</td><td>Длина, blocklist, password manager и смена при компрометации</td></tr>
+<tr><td>Учётные записи</td><td>Защита от перебора</td><td>Rate limiting и риск-ориентированная блокировка</td></tr>
 <tr><td>Параметры безопасности</td><td>Анонимный доступ</td><td>Отключён</td></tr>
 <tr><td>Параметры безопасности</td><td>Аудит</td><td>Включён для входа, доступа, изменений</td></tr>
 <tr><td>Система</td><td>Автозапуск</td><td>Отключён для съёмных носителей</td></tr>
@@ -552,11 +555,11 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 </ul>
 </div>
 <div class="col">
-<h4>Требования ФСТЭК</h4>
+<h4>Local compliance profile</h4>
 <ul>
-<li>Брандмауэр должен быть включён</li>
+<li>Применимость меры подтверждена для вида и класса системы</li>
 <li>Набор правил — минимально необходимый</li>
-<li>Журналирование — обязательно</li>
+<li>Журналирование согласовано с моделью угроз и мониторингом</li>
 </ul>
 </div>
 </div>
@@ -621,13 +624,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="hl">Своевременная установка обновлений безопасности — критически важная мера защиты АРМ.</div>
 <h3>Рекомендации:</h3>
 <ul>
-<li>Включить <strong>автоматическую установку обновлений</strong> (не откладывать более чем на 7 дней)</li>
+<li>Использовать кольца развёртывания: test → pilot → production с контролируемым rollback</li>
 <li>В корпоративной среде использовать <strong>WSUS</strong> или <strong>Microsoft Endpoint Configuration Manager</strong></li>
 <li>Регулярно проверять наличие обновлений драйверов</li>
 <li>Вести учёт установленных обновлений (журнал обновлений)</li>
 </ul>
-<div class="wb">Отсутствие критических обновлений безопасности является нарушением требований ФСТЭК и одним из основных факторов успешных атак.</div>
-<div class="ib">Для систем 1–2 класса ГИС и ЗО КИИ обновления должны устанавливаться в течение 30 дней после выпуска.</div>
+<div class="wb">Срок установки обновления задаётся risk-based SLA с учётом эксплуатации уязвимости, критичности актива, совместимости и требований применимого профиля.</div>
+<div class="ib">Фиксированный срок нельзя универсально выводить только из класса ГИС или категории КИИ; решение и исключения должны оставлять проверяемые evidence.</div>
 </div>
 <div class="snc">20 из 45</div>
 </div>
@@ -648,7 +651,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li>«Removable Disks: Deny write access» — запрет записи (чтение разрешено)</li>
 <li>«CD and DVD: Deny all access» — запрет оптических дисков</li>
 </ul>
-<div class="wb">Для АРМ, обрабатывающих ПДн и ГИС, рекомендуется <strong>полностью запретить</strong> использование съёмных носителей или разрешить только сертифицированные устройства.</div>
+<div class="wb">Полный запрет, allowlist устройств, read-only, шифрование и DLP выбираются по сценарию угроз. Сам факт обработки ПДн или работы в ГИС не задаёт один универсальный режим носителей.</div>
 </div>
 <div class="snc">21 из 45</div>
 </div>
@@ -658,21 +661,21 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="slide-header">
 <div class="logo-area" aria-label="Авторская лекция"><div class="logo-fb">pikov.expert</div></div>
 <div class="section-tag">Тема 2</div>
-<h2>AppLocker и Windows Defender Application Control</h2>
+<h2>AppLocker и App Control for Business</h2>
 </div>
 <div class="slide-body">
-<div class="hl">AppLocker и WDAC — механизмы белого списка приложений, разрешающие запуск только доверенных программ.</div>
+<div class="hl">AppLocker и App Control for Business (ранее WDAC) реализуют контроль запуска приложений, но имеют разные модели доверия и границы защиты.</div>
 <table>
-<thead><tr><th>Функция</th><th>AppLocker</th><th>WDAC</th></tr></thead>
+<thead><tr><th>Функция</th><th>AppLocker</th><th>App Control for Business</th></tr></thead>
 <tbody>
-<tr><td>Версия Windows</td><td>Enterprise/Education</td><td>Windows 10/11 Pro и выше</td></tr>
-<tr><td>Управление</td><td>GPO</td><td>Политика WDAC</td></tr>
+<tr><td>Поддержка</td><td>После KB5024351 enforcement доступен на всех редакциях Windows 10 версии 2004 и новее и Windows 11</td><td>Возможности развёртывания и управления зависят от поддерживаемой версии, редакции и лицензии</td></tr>
+<tr><td>Управление</td><td>GPO, MDM, PowerShell</td><td>Политики App Control, MDM, ConfigMgr</td></tr>
 <tr><td>Типы правил</td><td>Путь, хэш, издатель</td><td>Более гибкие: CI-политики</td></tr>
-<tr><td>Безопасность</td><td>Обход через PowerShell</td><td>Более строгий контроль</td></tr>
+<tr><td>Назначение</td><td>Defense-in-depth и управляемое ограничение приложений</td><td>Более строгая защита целостности кода</td></tr>
 </tbody>
 </table>
-<div class="ib">WDAC является рекомендуемым механизмом для новых развёртываний. Microsoft рекомендует использовать WDAC вместо AppLocker.</div>
-<div class="wb">Для систем обработки конфиденциальной информации рекомендуется настройка политики белого списка с минимальным набором разрешённых приложений.</div>
+<div class="ib">Для нового строгого enforcement Microsoft рекомендует App Control for Business; AppLocker остаётся полезным defense-in-depth механизмом. Начинать следует в audit mode, затем переходить pilot → staged enforcement.</div>
+<div class="wb">Первоисточник: <a href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/app-control-for-business/applocker/requirements-to-use-applocker" target="_blank" rel="noopener">Microsoft: Requirements to use AppLocker</a>.</div>
 </div>
 <div class="snc">22 из 45</div>
 </div>
@@ -717,17 +720,17 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <h3>Чек-лист базовой защиты АРМ:</h3>
 <ol>
 <li>✅ UAC включён (уровень не ниже 2)</li>
-<li>✅ Парольная политика: длина ≥ 12, сложность, срок 90 дней</li>
-<li>✅ Блокировка учётных записей: 5 попыток, 30 мин</li>
+<li>✅ Парольная политика: длинные уникальные значения, blocklist, менеджер паролей и MFA</li>
+<li>✅ Rate limiting и блокировка настроены по модели угроз</li>
 <li>✅ Брандмауэр включён для всех профилей</li>
 <li>✅ Аудит включён для ключевых событий</li>
 <li>✅ DEP и ASLR активны</li>
 <li>✅ Обновления устанавливаются автоматически</li>
 <li>✅ Съёмные носители ограничены</li>
-<li>✅ AppLocker / WDAC настроен</li>
+<li>✅ AppLocker / App Control for Business настроен через audit → pilot → enforcement</li>
 <li>✅ Ненужные службы отключены</li>
 </ol>
-<div class="ib">Выполнение данного чек-листа обеспечивает базовый уровень защиты в соответствии с требованиями ФСТЭК.</div>
+<div class="ib">Чек-лист — стартовая baseline-проверка, а не доказательство соответствия. Итоговая конфигурация трассируется к Microsoft versioned security baseline и отдельному local compliance profile.</div>
 </div>
 <div class="snc">24 из 45</div>
 </div>
@@ -748,9 +751,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li><strong>EFS (Encrypting File System)</strong> — шифрование на уровне файловой системы NTFS</li>
 <li><strong>BitLocker</strong> — полное шифрование тома (диска)</li>
 <li><strong>BitLocker To Go</strong> — шифрование съёмных носителей</li>
-<li><strong>Windows Information Protection (WIP)</strong> — защита корпоративных данных</li>
+<li><strong>Microsoft Purview Information Protection / Endpoint DLP</strong> — актуальный контур классификации и предотвращения утечек данных</li>
 </ul>
-<div class="wb">Для систем обработки ПДн и ГИС шифрование является <strong>обязательным требованием</strong> (Приказ ФСТЭК № 21, № 31, № 239).</div>
+<div class="wb">Windows Information Protection удалён начиная с Windows 11 24H2. Шифрование и DLP — разные меры; необходимость каждой определяется видом системы, её классом или категорией, моделью угроз и применимым профилем.</div>
+<div class="ib">Первоисточник: <a href="https://learn.microsoft.com/en-us/windows/whats-new/removed-features" target="_blank" rel="noopener">Microsoft: removed Windows features</a>.</div>
 </div>
 <div class="snc">25 из 45</div>
 </div>
@@ -875,14 +879,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <table>
 <thead><tr><th>Алгоритм</th><th>Режим</th><th>Рекомендация</th></tr></thead>
 <tbody>
-<tr><td><strong>AES-CBC</strong> 128 бит</td><td>Cipher Block Chaining</td><td>Базовый уровень</td></tr>
-<tr><td><strong>AES-CBC</strong> 256 бит</td><td>Cipher Block Chaining</td><td>Рекомендуемый для ПДн/ГИС</td></tr>
-<tr><td><strong>XTS-AES</strong> 128 бит</td><td>XEX-based Tweaked CodeBook</td><td>Современный стандарт</td></tr>
-<tr><td><strong>XTS-AES</strong> 256 бит</td><td>XEX-based Tweaked CodeBook</td><td>Максимальная защита</td></tr>
+<tr><td><strong>AES-CBC</strong> 128 бит</td><td>Cipher Block Chaining</td><td>Профиль совместимости; применимость проверяется по политике</td></tr>
+<tr><td><strong>AES-CBC</strong> 256 бит</td><td>Cipher Block Chaining</td><td>Только если CBC и эта длина ключа требуются утверждённым профилем</td></tr>
+<tr><td><strong>XTS-AES</strong> 128 бит</td><td>XEX-based Tweaked CodeBook</td><td>Профиль шифрования диска; не даёт аутентификацию</td></tr>
+<tr><td><strong>XTS-AES</strong> 256 бит</td><td>XEX-based Tweaked CodeBook</td><td>Вариант с 256-битным ключом AES; выбор определяется профилем</td></tr>
 </tbody>
 </table>
-<div class="hl">XTS-AES является предпочтительным алгоритмом для шифрования дисков, так как обеспечивает защиту от атак на модификацию данных.</div>
-<div class="ib">Для систем 1–2 класса ГИС и ЗО КИИ рекомендуется использовать AES 256 бит в режиме XTS.</div>
+<div class="hl">XTS-AES предназначен для конфиденциальности данных на секторных устройствах хранения и ограничивает некоторые перестановки блоков, но не обеспечивает целостность или аутентификацию данных и их источника (NIST SP 800-38E).</div>
+<div class="ib">Алгоритм и длина ключа выбираются по утверждённому криптографическому профилю, модели угроз и требованиям к совместимости; «класс системы → AES-256» не является универсальным правилом.</div>
 <div class="wb">Проверить текущий алгоритм: <strong>manage-bde -status</strong> в командной строке.</div>
 </div>
 <div class="snc">30 из 45</div>
@@ -931,7 +935,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 </ul>
 <div class="wb">Ключ восстановления <strong>никогда</strong> не должен храниться на том же носителе, что и зашифрованные данные!</div>
 <div class="ib">Для корпоративных сред рекомендуется интеграция с <strong>Active Directory</strong> и хранение ключей в <strong>BitLocker Recovery Password Viewer</strong>.</div>
-<div class="hl">Резервное копирование ключа восстановления — обязательное требование для систем обработки ПДн и ГИС.</div>
+<div class="hl">Резервное копирование и проверка восстановления ключа обязательны в организационном профиле эксплуатации BitLocker; конкретный способ escrow выбирается по архитектуре и применимым требованиям.</div>
 </div>
 <div class="snc">32 из 45</div>
 </div>
@@ -964,10 +968,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="col">
 <h4>Рекомендации</h4>
 <ul>
-<li>Использовать AES 256 XTS</li>
-<li>Пароль не менее 12 символов</li>
-<li>Хранить ключ восстановления в AD</li>
-<li>Запретить использование незашифрованных носителей</li>
+<li>Выбрать алгоритм и protector по утверждённому профилю</li>
+<li>Применить длинную уникальную passphrase либо смарт-карту</li>
+<li>Настроить escrow ключа восстановления в AD DS или Microsoft Entra ID</li>
+<li>Проверить восстановление до запрета записи на незашифрованные носители</li>
 </ul>
 </div>
 </div>
@@ -983,16 +987,16 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <h2>Device Encryption (шифрование устройства)</h2>
 </div>
 <div class="slide-body">
-<div class="hl">Device Encryption — упрощённая версия BitLocker, автоматически включаемая на совместимых устройствах.</div>
-<h3>Требования для автоматического шифрования:</h3>
+<div class="hl">Device Encryption доступно во всех редакциях Windows и автоматически включает BitLocker на совместимых устройствах; возможности ручного включения и корпоративного управления зависят от редакции и лицензии.</div>
+<h3>Условия и управление:</h3>
 <ul>
-<li>Windows 10/11 Pro или Enterprise</li>
-<li>Наличие TPM 2.0 и поддержка Modern Standby</li>
-<li>Вход через учётную запись Microsoft (ключ сохраняется в облаке)</li>
-<li>Secure Boot включён</li>
+<li>Для автоматического включения необходимы совместимая платформа, TPM и Secure Boot</li>
+<li>Начиная с Windows 11 24H2 предварительные требования DMA и HSTI/Modern Standby сняты</li>
+<li>Ключ восстановления резервируется в Microsoft account, Microsoft Entra ID или AD DS в зависимости от типа присоединения и политики</li>
+<li>Перед rollout проверяются алгоритм, protector, escrow, recovery test и соответствие модели угроз</li>
 </ul>
-<div class="wb">Device Encryption не подходит для корпоративных сред с требованиями ФСТЭК — необходимо использовать <strong>полнофункциональный BitLocker</strong> с управлением через GPO и хранением ключей в AD.</div>
-<div class="ib">Device Encryption использует AES-XTS 128 бит и TPM-only аутентификацию, что не обеспечивает достаточный уровень защиты для конфиденциальных данных.</div>
+<div class="wb">Автоматическое шифрование не является готовым compliance-решением: корпоративный профиль должен явно задавать управление, хранение ключей восстановления и проверяемое восстановление.</div>
+<div class="ib">XTS-AES 128 не является само по себе признаком недостаточной защиты. Алгоритм, длина ключа и protector выбираются по модели угроз и утверждённому профилю. <a href="https://learn.microsoft.com/en-us/windows/security/operating-system-security/data-protection/bitlocker/" target="_blank" rel="noopener">Microsoft BitLocker overview</a>.</div>
 </div>
 <div class="snc">34 из 45</div>
 </div>
@@ -1018,7 +1022,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <tr><td>Съёмные носители</td><td>Нет (NTFS)</td><td>Да (BitLocker To Go)</td></tr>
 </tbody>
 </table>
-<div class="hl">Для комплексной защиты рекомендуется использовать <strong>оба механизма</strong>: BitLocker для защиты всего тома + EFS для дополнительной защиты конфиденциальных файлов.</div>
+<div class="hl">BitLocker и EFS решают разные задачи. Совмещать их следует только при обоснованной модели доступа и отработанном восстановлении ключей, а не как универсальную настройку.</div>
 </div>
 <div class="snc">35 из 45</div>
 </div>
@@ -1033,13 +1037,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="slide-body">
 <h3>Рекомендации по управлению ключами:</h3>
 <ul>
-<li><strong>Хранение ключей</strong> — в аппаратных модулях безопасности (HSM) или защищённых хранилищах</li>
-<li><strong>Ротация ключей</strong> — регулярная смена ключей шифрования (не реже 1 раза в год)</li>
+<li><strong>Хранение ключей</strong> — в защищённом хранилище; HSM применяется, когда это обосновано типом ключа, риском и требованиями профиля</li>
+<li><strong>Ротация ключей</strong> — по криптопериоду, событию компрометации и утверждённой политике, а не по универсальному календарному интервалу</li>
 <li><strong>Резервное копирование</strong> — ключи восстановления хранить отдельно от зашифрованных данных</li>
 <li><strong>Уничтожение</strong> — при выводе АРМ из эксплуатации — безопасное уничтожение ключей</li>
 </ul>
 <div class="wb">Утечка ключа шифрования эквивалентна утечке всех зашифрованных данных. Защита ключей — приоритетная задача.</div>
-<div class="ib">Для систем 1–2 класса ГИС ключи шифрования должны храниться на сертифицированных ФСТЭК носителях (токенах, HSM).</div>
+<div class="ib">Требования к токену, HSM, СКЗИ и форме оценки соответствия определяются областью конкретного НПА. Криптографический контур ФСБ нельзя автоматически подменять требованиями ФСТЭК.</div>
 </div>
 <div class="snc">36 из 45</div>
 </div>
@@ -1057,11 +1061,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li><strong>EFS</strong> — шифрование на уровне файлов, удобен для выборочной защиты</li>
 <li><strong>BitLocker</strong> — полное шифрование тома, защищает от утери/хищения носителя</li>
 <li><strong>BitLocker To Go</strong> — шифрование съёмных носителей</li>
-<li>Алгоритм: <strong>AES 256 XTS</strong> — рекомендуемый для конфиденциальных данных</li>
-<li>Метод аутентификации: <strong>TPM + PIN</strong> — оптимальный баланс</li>
+<li>Алгоритм и protector выбираются по модели угроз и versioned baseline; варианты включают XTS-AES и TPM + PIN</li>
 <li>Ключи восстановления — хранить <strong>отдельно</strong> от зашифрованных данных</li>
 </ul>
-<div class="hl">Шифрование является обязательным требованием для систем обработки ПДн, ГИС и ЗО КИИ согласно нормативным актам ФСТЭК.</div>
+<div class="hl">Шифрование применяется, когда это следует из модели угроз, выбранных мер и применимого НПА; факт принадлежности к ПДн, ГИС или КИИ сам по себе не задаёт один универсальный профиль BitLocker.</div>
 </div>
 <div class="snc">37 из 45</div>
 </div>
@@ -1076,14 +1079,14 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <h2>Введение: антивирусная защита в Windows</h2>
 </div>
 <div class="slide-body">
-<div class="hl">Антивирусная защита — обязательный компонент комплексной системы защиты АРМ, предотвращающий проникновение и распространение вредоносного ПО.</div>
+<div class="hl">Защита от вредоносного ПО — базовый security control. Конкретная реализация, сертификация и состав функций выбираются по модели угроз, совместимости и применимому профилю системы.</div>
 <h3>Штатное решение Microsoft:</h3>
 <ul>
 <li><strong>Microsoft Defender Antivirus</strong> — встроенный антивирус Windows 10/11</li>
 <li>Входит в состав <strong>Microsoft Defender for Endpoint</strong></li>
 <li>Включает защиту в реальном времени, облачную защиту, защиту от эксплойтов</li>
 </ul>
-<div class="wb">Согласно требованиям ФСТЭК, антивирусная защита является обязательной для всех АРМ, обрабатывающих информацию ограниченного доступа (ПДн, ГИС, КИИ).</div>
+<div class="wb">Не переносите одно требование на все ПДн, ГИС и КИИ: сначала определите вид системы, класс или категорию и набор мер, затем выберите совместимое средство и доказательства.</div>
 </div>
 <div class="snc">38 из 45</div>
 </div>
@@ -1142,21 +1145,21 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="slide-header">
 <div class="logo-area" aria-label="Авторская лекция"><div class="logo-fb">pikov.expert</div></div>
 <div class="section-tag">Тема 4</div>
-<h2>Сертифицированные антивирусные средства</h2>
+<h2>Local compliance profile: выбор средства защиты</h2>
 </div>
 <div class="slide-body">
-<div class="hl">Для систем обработки конфиденциальной информации (ПДн, ГИС, ЗО КИИ) рекомендуется использование <strong>сертифицированных ФСТЭК</strong> средств антивирусной защиты.</div>
-<h3>Примеры сертифицированных средств:</h3>
+<div class="hl">Если применимый профиль требует сертифицированное средство, проверяются не торговое название, а запись в реестре, точная версия, функции, среда функционирования, срок и ограничения сертификата.</div>
+<h3>Примеры продуктов для проверки по реестру:</h3>
 <table>
-<thead><tr><th>Средство</th><th>Разработчик</th><th>Сертификат ФСТЭК</th></tr></thead>
+<thead><tr><th>Средство</th><th>Разработчик</th><th>Что проверить</th></tr></thead>
 <tbody>
-<tr><td>Kaspersky Endpoint Security</td><td>Kaspersky Lab</td><td>Действующий</td></tr>
-<tr><td>Dr.Web Enterprise Security Suite</td><td>Doctor Web</td><td>Действующий</td></tr>
-<tr><td>Kaspersky Security для Linux Mail Server</td><td>Kaspersky Lab</td><td>Действующий</td></tr>
+<tr><td>Kaspersky Endpoint Security</td><td>Kaspersky Lab</td><td>Точную версию, функции и область сертификата</td></tr>
+<tr><td>Dr.Web Enterprise Security Suite</td><td>Doctor Web</td><td>Точную версию, функции и область сертификата</td></tr>
+<tr><td>Иное средство</td><td>По проекту</td><td>Совместимость, реестр и ограничения применения</td></tr>
 </tbody>
 </table>
-<div class="wb">Microsoft Defender Antivirus <strong>не имеет</strong> сертификата ФСТЭК. Для систем 1–3 класса ГИС и ЗО КИИ необходимо использовать сертифицированные средства защиты от НСД, включающие антивирусную защиту.</div>
-<div class="ib">При использовании сертифицированных СЗИ от НСД штатный антивирус может быть отключён.</div>
+<div class="wb">Статус и применимость сертификата всегда проверять в реестре ФСТЭК для конкретной версии и конфигурации; статическая таблица в лекции не является доказательством.</div>
+<div class="ib">Microsoft Defender не отключать только из-за наличия другого СЗИ. Сначала проверить совместимость, конфликты драйверов и документированную архитектуру; сохранять эшелонированную защиту либо утверждённые компенсирующие меры.</div>
 </div>
 <div class="snc">41 из 45</div>
 </div>
@@ -1228,7 +1231,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <li>✅ Централизованное управление настроено</li>
 <li>✅ Резервное копирование настроено (правило 3-2-1)</li>
 </ol>
-<div class="wb">Для систем обработки ПДн, ГИС и ЗО КИИ необходимо использовать <strong>сертифицированные ФСТЭК</strong> средства антивирусной защиты или СЗИ от НСД с функцией антивирусной защиты.</div>
+<div class="wb">Для регулируемого контура результат чек-листа дополняется матрицей применимости: НПА → класс/категория → мера → средство → версия/сертификат → evidence.</div>
 </div>
 <div class="snc">44 из 45</div>
 </div>
@@ -1248,7 +1251,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:'Segoe UI','Helveti
 <div class="sl">45 из 45</div>
 </div>
 
-</div>
+</main>
 
 <script>
 (function(){

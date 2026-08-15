@@ -167,7 +167,7 @@
   .hero-eyebrow {
     display: inline-flex;
     align-items: center;
-    color: var(--accent);
+    color: var(--accent-strong);
     background: var(--accent-soft);
     border: 1px solid color-mix(in srgb, var(--accent) 18%, transparent);
     border-radius: 999px;
@@ -400,7 +400,7 @@
     </ol>
   </aside>
 
-  <article class="content">
+  <main class="content">
     <header class="hero">
       <span class="hero-eyebrow">Учебная лекция · SIEM · KOMRAD 4.5</span>
       <h1>KOMRAD Enterprise SIEM 4.5</h1>
@@ -430,7 +430,7 @@
         <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5V4a2 2 0 0 1 2-2h11v20H6a2 2 0 0 1-2-2.5Z"/><path d="M8 6h5M8 10h7M8 14h5"/></svg></div><div class="prop-title">Разобраться в классе SIEM</div><div class="prop-desc">События, нормализация, хранение, фильтрация, корреляция, инциденты и реагирование.</div></div>
         <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/><path d="m9 12 2 2 4-5"/></svg></div><div class="prop-title">Увидеть связь с нормативкой</div><div class="prop-desc">ГОСТ Р 59547-2021, 59548-2022 и серия ГОСТ Р 59709-59712 дают язык мониторинга и управления инцидентами.</div></div>
         <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 22h8M12 18v4"/></svg></div><div class="prop-title">Развернуть стенд</div><div class="prop-desc">VirtualBox, Extension Pack, Astra Linux 1.7/1.8, Windows 10 и при необходимости вторая Linux/Astra VM.</div></div>
-        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-7"/></svg></div><div class="prop-title">Проверить события</div><div class="prop-desc">Создание пользователя, смена пароля, очистка журнала Windows, syslog-сообщение Linux и просмотр событий в KOMRAD.</div></div>
+        <div class="prop"><div class="prop-mark"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m7 14 4-4 3 3 5-7"/></svg></div><div class="prop-title">Проверить события</div><div class="prop-desc">Одноразовый пользователь, смена уникального пароля, экспорт перед контролируемой очисткой журнала, syslog-маркер и просмотр событий в KOMRAD.</div></div>
       </div>
     </section>
 
@@ -503,7 +503,7 @@
         <div class="step"><div class="step-num">1</div><div><div class="step-title">KOMRAD + Windows 10</div><p>Установить KOMRAD, импортировать Windows 10, поставить WMI-агент, сгенерировать события и найти их в SIEM.</p></div></div>
         <div class="step"><div class="step-num">2</div><div><div class="step-title">KOMRAD + Windows + Linux</div><p>Добавить вторую Linux/Astra VM, отправить тестовые события и сравнить поведение разных источников.</p></div></div>
       </div>
-      <div class="callout warning"><p><strong>Только учебная VM:</strong> команды вроде <code>wevtutil cl Security</code> очищают журнал безопасности Windows. В реальной инфраструктуре это подозрительное действие, а в лаборатории оно используется как демонстрационный пример.</p></div>
+      <div class="callout warning"><p><strong>Только одноразовая учебная VM:</strong> очистка журнала выполняется лишь после экспорта EVTX и подтверждения приёма событий в KOMRAD. Затем временная учётная запись удаляется, доказательство обезличивается, а VM восстанавливается из исходного снимка.</p></div>
     </section>
 
     <section id="materials" class="section">
@@ -535,9 +535,9 @@
         <table class="data">
           <thead><tr><th>Вопрос</th><th>Короткий ответ</th></tr></thead>
           <tbody>
-            <tr><td>Какой режим сети VirtualBox выбрать?</td><td>Главное, чтобы все VM видели друг друга по IP. Обычно удобны «Сетевой мост» или «Внутренняя сеть».</td></tr>
+            <tr><td>Какой режим сети VirtualBox выбрать?</td><td>«Внутренняя сеть» либо отдельная Host-only сеть без маршрута в LAN. Bridge запрещён; NAT отключается до генерации событий.</td></tr>
             <tr><td>Astra 1.7 или 1.8?</td><td>Документация 4.5.X указывает поддержку Astra Linux SE 1.7-1.8. Используйте установщик, соответствующий полученному дистрибутиву.</td></tr>
-            <tr><td>Имя установщика отличается от примера?</td><td>Используйте фактическое имя файла: <code>chmod +x ./ИМЯ.run</code>, затем <code>sudo ./ИМЯ.run</code>.</td></tr>
+            <tr><td>Имя установщика отличается от примера?</td><td>Сначала получите файл только из <strong>официального источника</strong> и ожидаемый SHA-256 из подписанного реестра преподавателя или вендора по <strong>аутентифицированному независимому каналу</strong>. Выполните <code>INSTALLER='./ИМЯ.run'</code>, <code>EXPECTED_INSTALLER_SHA256='&lt;64_HEX&gt;'</code> и <code>sha256sum -- "$INSTALLER"</code>; отсутствие ожидаемого значения или несовпадение — <strong>STOP:</strong> файл не запускать. Только после точного совпадения: <code>chmod +x -- "$INSTALLER"</code>, затем <code>sudo -- "$INSTALLER"</code>.</td></tr>
             <tr><td>Windows не видит KOMRAD?</td><td>Проверить IP, режим сети VirtualBox, firewall и <code>ping KOMRAD_IP</code> до установки WMI-агента.</td></tr>
             <tr><td>События не появились сразу?</td><td>Проверить сеть, время VM, состояние агента/службы, выбранный журнал, сертификаты и включение сбора в интерфейсе.</td></tr>
           </tbody>
@@ -565,7 +565,7 @@
       </div>
       <p class="copyright">© Учебная страница В.А. Пикова. KOMRAD Enterprise SIEM, документация и официальные материалы продукта принадлежат правообладателю АО НПО «Эшелон». Официальная строка правообладателя на сайте вендора: © 2007–2026 АО НПО «Эшелон». Все права защищены.</p>
     </footer>
-  </article>
+  </main>
 </div>
 
 <script>

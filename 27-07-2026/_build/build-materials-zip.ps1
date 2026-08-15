@@ -4,7 +4,7 @@
 # Запускать после ЛЮБОЙ правки index.html, конспекта, заданий или кода,
 # иначе архив разойдётся с сайтом.
 #
-#     powershell -NoProfile -ExecutionPolicy Bypass -File .\_teacher\build-materials-zip.ps1
+#     powershell -NoProfile -ExecutionPolicy Bypass -File .\27-07-2026\_build\build-materials-zip.ps1
 #
 # Принцип: архив собирается по ЛИТЕРАЛЬНОМУ СПИСКУ файлов, а не «скопировать
 # каталог и вычистить лишнее». Рекурсивное копирование опасно тем, что молча
@@ -26,6 +26,7 @@ $archive = Join-Path $lectureRoot 'materials.zip'
 $manifest = [ordered]@{
     'ЧИТАТЬ-ПЕРВЫМ.md'            = 'materials\ЧИТАТЬ-ПЕРВЫМ.md'
     'index.html'                  = 'index.html'
+    'materials\from-working-code-to-shippable-product.html' = 'materials\from-working-code-to-shippable-product.html'
     'materials\konspekt.md'       = 'materials\konspekt.md'
     'materials\praktikum.md'      = 'materials\praktikum.md'
     'code\spravka.md'             = 'code\spravka.md'
@@ -43,25 +44,6 @@ $manifest = [ordered]@{
     'code\languages\CopyName.pas'   = 'code\languages\CopyName.pas'
     'code\languages\CopyName.cs'    = 'code\languages\CopyName.cs'
     'code\languages\copy_name.py'   = 'code\languages\copy_name.py'
-}
-
-# --- Необязательная часть комплекта ----------------------------------------
-# Файлы, разрешённые к распространению, но НЕ хранящиеся в репозитории
-# (политика держит .pdf и подобное вне git - см. комментарий в .gitignore).
-# Если файл лежит в рабочем дереве - он попадает в архив; если нет, например
-# на чистом клоне в CI, сборка идёт дальше и просто сообщает об этом.
-# Обязательными их делать нельзя: тогда сборка станет невоспроизводимой.
-$optional = [ordered]@{
-    'materials\From_Working_Code_to_Shippable_Product.pdf' = 'materials\From_Working_Code_to_Shippable_Product.pdf'
-}
-
-$missingOptional = New-Object System.Collections.Generic.List[string]
-foreach ($entry in $optional.GetEnumerator()) {
-    if (Test-Path -LiteralPath (Join-Path $lectureRoot $entry.Value) -PathType Leaf) {
-        $manifest[$entry.Key] = $entry.Value
-    } else {
-        $missingOptional.Add($entry.Value)
-    }
 }
 
 # --- Проверка 1: каждый файл списка существует и это обычный файл ----------
@@ -117,10 +99,6 @@ foreach ($scanDir in @('code', 'materials')) {
 foreach ($name in $skipped) {
     Write-Warning "В каталоге лекции лежит нераспространяемый файл, в архив он НЕ включён: $name"
 }
-foreach ($name in $missingOptional) {
-    Write-Warning "Необязательный файл отсутствует в рабочем дереве, архив собран без него: $name"
-}
-
 # --- Проверка 3: явный запрет на секреты и служебные файлы -----------------
 $forbidden = @('.env', '.env.local', 'id_rsa', 'id_ed25519', 'secrets.json', 'journal.db')
 foreach ($name in $manifest.Keys) {

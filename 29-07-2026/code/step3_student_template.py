@@ -162,5 +162,5 @@ def open_read_only(path: str | Path) -> sqlite3.Connection:
 
     # --- ГОТОВОЕ РЕШЕНИЕ (раскомментируйте и удалите raise выше) ---
     # p = Path(path).resolve()
-    # uri = f"file:{p.as_posix()}?mode=ro"
+    # uri = f"{p.as_uri()}?mode=ro"
     # return sqlite3.connect(uri, uri=True)

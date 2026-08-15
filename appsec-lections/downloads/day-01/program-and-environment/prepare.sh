@@ -1,30 +1,30 @@
-#!/bin/bash
-# Подготовка компьютера к тренингу Kaspersky AppSec (11-12 августа 2026)
-# Запусти: bash prepare.sh
+#!/usr/bin/env bash
+# Неразрушающий preflight. Установку Docker выполняет администратор заранее.
 
-set -e
+set -eu
 
-echo "=== Шаг 1/3: Добавление в группу docker ==="
-sudo usermod -aG docker superuser
-echo "Готово. После перезагрузки/перелогина docker будет работать без sudo."
+image='bkimminich/juice-shop@sha256:cd58d79c5cb4d82f22fbaf616f9ff43bbd04ba630cd6b448a9ed99cf652fcebf'
 
-echo ""
-echo "=== Шаг 2/3: Установка docker-compose ==="
-sudo apt-get update -qq
-sudo apt-get install -y docker-compose-v2
-echo "Готово."
-
-echo ""
-echo "=== Шаг 3/3: Загрузка образа Juice Shop ==="
-echo "(требуется членство в группе docker — если вы ещё не перелогинились,"
-echo " этот шаг нужно будет выполнить вручную после перезахода в систему)"
-docker pull bkimminich/juice-shop 2>/dev/null && echo "Готово." || {
-    echo "Не удалось скачать образ без sudo — выполни после перелогина:"
-    echo "  docker pull bkimminich/juice-shop"
+command -v docker >/dev/null 2>&1 || {
+  echo 'ERROR: Docker CLI не найден. Обратитесь к преподавателю.' >&2
+  exit 1
 }
 
-echo ""
-echo "=== Всё готово! ==="
-echo "Для запуска Juice Shop:"
-echo "  docker run --rm -p 3000:3000 -e NODE_ENV=unsafe bkimminich/juice-shop"
-echo "Затем открой http://localhost:3000"
+docker version >/dev/null 2>&1 || {
+  echo 'ERROR: Docker Engine недоступен. Запустите штатно установленный Engine.' >&2
+  exit 1
+}
+
+docker compose version >/dev/null 2>&1 || {
+  echo 'ERROR: Docker Compose v2 недоступен.' >&2
+  exit 1
+}
+
+docker image inspect "$image" >/dev/null 2>&1 || {
+  echo "ERROR: проверенный образ отсутствует: $image" >&2
+  echo 'Не скачивайте latest; получите подготовленный образ у преподавателя.' >&2
+  exit 1
+}
+
+echo 'PREFLIGHT OK'
+echo 'Используйте только appsec-lections/lab/juice-shop/compose.yaml.'

@@ -267,9 +267,11 @@ Assert-Contains 'scaner-vs/scanner/index.html' @(
     'wsl\s+--install\s+Ubuntu',
     'wsl\s+-d\s+Ubuntu',
     'wsl\s+--list\s+--verbose',
-    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
-    'New-NetFirewallRule',
-    'sh\s+scanner-signed-deb\.run',
+    '../materials/scanner/03-wsl-individual\.md',
+    'уникальн[^<]{0,80}(правил|идентификатор)',
+    'состояни[^<]{0,100}(изменен|откат|восстанов)',
+    '(проверяем\w*\s+очист|режим\w*\s+очист)',
+    'bash\s+--\s+"\$INSTALLER"',
     'cp\s+license\.lic\s+pkg/',
     '\./installer\s+install',
     '<pre\s+class="command"\s+tabindex="0"',
@@ -282,12 +284,13 @@ Assert-Contains 'scaner-vs/materials/scanner/03-wsl-individual.md' @(
     'предоставленн[^\r\n]{0,100}учебн[^\r\n]{0,100}инструкц',
     'страниц(?:ы|ах)\s+3.{0,3}5',
     'wsl\s+--install',
-    'wsl\s+--install\s+Ubuntu',
-    'wsl\s+-d\s+Ubuntu',
+    'wsl\s+--install\s+--no-distribution',
+    'wsl\s+--install\s+--distribution\s+<ТОЧНОЕ_ИМЯ',
+    'wsl\s+--distribution\s+<ТОЧНОЕ_ЗАРЕГИСТРИРОВАННОЕ_ИМЯ>',
     'wsl\s+--list\s+--verbose',
     'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
     'New-NetFirewallRule',
-    'sh\s+scanner-signed-deb\.run',
+    'bash\s+--\s+"\$INSTALLER"',
     'cp\s+license\.lic\s+pkg/',
     'cd\s+pkg/',
     '\./installer\s+install',
@@ -301,8 +304,7 @@ Assert-Contains 'scaner-vs/materials/scanner/03-wsl-individual.md' @(
 Assert-Contains '_PROJECT/scaner-vs-offline/scanner/index.html' @(
     'предоставленн[^<]{0,100}учебн[^<]{0,100}инструкц',
     'wsl\s+--install',
-    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
-    'sh\s+scanner-signed-deb\.run',
+    'bash\s+--\s+"\$INSTALLER"',
     '\./installer\s+install',
     '<pre\s+class="command"\s+tabindex="0"',
     'materials/scanner/03-wsl-individual\.md'
@@ -311,7 +313,14 @@ Assert-Contains '_PROJECT/scaner-vs-offline/scanner/index.html' @(
 Assert-NotContains 'scaner-vs/scanner/index.html' @(
     '\bKEF\b', '\bScanVAL\b',
     'два\s+независим\w*\s+продукт',
-    'автоматическ\w*\s+(интеграц|обмен)'
+    'автоматическ\w*\s+(интеграц|обмен)',
+    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+    'New-NetFirewallRule\s+-DisplayName'
+)
+
+Assert-NotContains '_PROJECT/scaner-vs-offline/scanner/index.html' @(
+    'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
+    'New-NetFirewallRule\s+-DisplayName'
 )
 
 Assert-Contains 'scaner-vs/inspector/index.html' @(
@@ -481,7 +490,7 @@ if (Test-Path -LiteralPath $siteRoot) {
                         'предоставленн[^\r\n]{0,100}учебн[^\r\n]{0,100}инструкц',
                         'wsl\s+--install',
                         'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
-                        'sh\s+scanner-signed-deb\.run',
+                        'bash\s+--\s+"\$INSTALLER"',
                         '\./installer\s+install'
                     )) {
                         if ($wslText -notmatch $pattern) {

@@ -1,3 +1,5 @@
+name: appsec-day2-ssrf
+
 services:
   gateway:
     build:
@@ -14,6 +16,12 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 128m
+    cpus: 0.5
+    labels:
+      expert.pikov.lab: appsec-day2-ssrf
+      expert.pikov.config: appsec-day2-ssrf-v1
 
   app:
     build:
@@ -29,6 +37,12 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 128m
+    cpus: 0.5
+    labels:
+      expert.pikov.lab: appsec-day2-ssrf
+      expert.pikov.config: appsec-day2-ssrf-v1
 
   internal:
     build:
@@ -44,9 +58,25 @@ services:
       - ALL
     security_opt:
       - no-new-privileges:true
+    pids_limit: 128
+    mem_limit: 128m
+    cpus: 0.5
+    labels:
+      expert.pikov.lab: appsec-day2-ssrf
+      expert.pikov.config: appsec-day2-ssrf-v1
 
 networks:
   edge:
     driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: 127.0.0.1
+    labels:
+      expert.pikov.lab: appsec-day2-ssrf
+      expert.pikov.config: appsec-day2-ssrf-v1
   labnet:
     internal: true
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: isolated
+    labels:
+      expert.pikov.lab: appsec-day2-ssrf
+      expert.pikov.config: appsec-day2-ssrf-v1

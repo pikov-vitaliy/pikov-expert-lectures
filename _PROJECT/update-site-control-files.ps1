@@ -8,6 +8,39 @@ function Fail([string]$Message) {
   throw "CONTROL FILES FAIL: $Message"
 }
 
+function Assert-SafeLectureFolder([string]$RootPath, [string]$Folder) {
+  if ([string]::IsNullOrWhiteSpace($Folder) -or
+      [System.IO.Path]::IsPathRooted($Folder) -or
+      $Folder -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' -or
+      $Folder.Contains('/') -or
+      $Folder.Contains('\') -or
+      $Folder -in @('.', '..') -or
+      $Folder.ToLowerInvariant() -in @('release', 'source', 'tools', 'output', 'notes', 'tests', 'test-results', 'node_modules') -or
+      $Folder.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -ge 0) {
+    Fail "Unsafe lecture folder in lectures.json: $Folder"
+  }
+  $rootFull = [System.IO.Path]::GetFullPath($RootPath).TrimEnd('\')
+  $folderPath = [System.IO.Path]::GetFullPath((Join-Path $RootPath $Folder)).TrimEnd('\')
+  if (-not $folderPath.StartsWith($rootFull + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+    Fail "Unsafe lecture folder outside repository: $Folder"
+  }
+  if (-not (Test-Path -LiteralPath $folderPath -PathType Container)) {
+    Fail "Missing folder: $Folder"
+  }
+  $item = Get-Item -LiteralPath $folderPath -Force
+  if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+    Fail "Unsafe lecture folder is a reparse point: $Folder"
+  }
+}
+
+function Assert-SafeLectureDomain([string]$Domain) {
+  if ([string]::IsNullOrWhiteSpace($Domain) -or
+      $Domain.Length -gt 63 -or
+      $Domain -notmatch '^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$') {
+    Fail "Unsafe lecture domain in lectures.json: $Domain"
+  }
+}
+
 function Write-Utf8File([string]$Path, [string[]]$Lines) {
   $parent = Split-Path -Parent $Path
   if (-not (Test-Path -LiteralPath $parent)) {
@@ -52,10 +85,12 @@ function Get-RelativePathSafe([string]$BasePath, [string]$Path) {
 
 function Should-SkipSitemapPath([string]$RelativePath) {
   $normalized = $RelativePath.Replace('\', '/')
+  $generatedReadFirstHtml = ((1095, 1080, 1090, 1072, 1090, 1100, 45, 1087, 1077, 1088, 1074, 1099, 1084 | ForEach-Object { [char]$_ }) -join '') + '.html'
   if ($normalized -match '(^|/)(release|source|tools|output|notes|tests|test-results|node_modules)(/|$)') { return $true }
   if ($normalized -match '(^|/)(_PROJECT|_[^/]*|\.git|\.codegraph|\.codex|\.claude|\.agents|\.gigacode|\.qwen|\.vscode|\.idea)(/|$)') { return $true }
   if ($normalized -match '(^|/)index-v[0-9].*\.html$') { return $true }
   if ($normalized -match '(^|/)indexOLD.*\.html$') { return $true }
+  if ([System.IO.Path]::GetFileName($normalized) -ieq $generatedReadFirstHtml) { return $true }
   return $false
 }
 
@@ -239,9 +274,17 @@ if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectur
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $lastMod = [string]$data.updated
 if ($lastMod -notmatch '^\d{4}-\d{2}-\d{2}$') { Fail "Invalid lectures.json updated date: $lastMod" }
+$uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
+foreach ($lectureEntry in @($data.lectures)) {
+  Assert-SafeLectureDomain -Domain ([string]$lectureEntry.domain)
+}
+foreach ($folder in $uniqueFolders) {
+  Assert-SafeLectureFolder -RootPath $rootPath -Folder ([string]$folder)
+}
 
 $rootUrls = New-Object System.Collections.Generic.List[string]
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/'
+Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/course-map.html'
 foreach ($lecture in @($data.lectures | Sort-Object position)) {
   Add-UniqueUrl -List $rootUrls -Url ([string]$lecture.url)
 }
@@ -261,7 +304,6 @@ $customHtaccessFolders = @('27001', '29-07-2026')
 # blocks those downloads in robots.txt, and adds ZIP-specific response headers.
 $customControlFolders = @('scaner-vs')
 
-$uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
 foreach ($folder in $uniqueFolders) {
   $folderPath = Join-Path $rootPath $folder
   if (-not (Test-Path -LiteralPath $folderPath)) { Fail "Missing folder: $folder" }

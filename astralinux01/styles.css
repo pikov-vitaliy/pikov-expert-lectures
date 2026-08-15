@@ -1075,6 +1075,225 @@ body {
 /* ============================================================
    PRINT (Ctrl+P → PDF, one slide per page)
    ============================================================ */
+/* Mobile layout: reflow the 16:9 lecture canvas instead of shrinking it. */
+@media (max-width: 720px) {
+  html,
+  body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .stage {
+    width: 100%;
+    height: 100dvh;
+    overflow-x: hidden;
+    scroll-behavior: auto;
+  }
+
+  .slide {
+    width: 100%;
+    min-height: 100dvh;
+    height: auto;
+    overflow: visible;
+    align-items: stretch;
+  }
+
+  .slide-inner,
+  .cover-content {
+    width: 100%;
+    min-height: 100dvh;
+    height: auto;
+    padding: 76px 22px 100px;
+    justify-content: center;
+  }
+
+  .brand {
+    top: 12px;
+    left: 12px;
+    width: auto;
+    max-width: calc(100vw - 24px);
+    padding: 8px 12px;
+  }
+  .brand-label,
+  .counter {
+    font-size: 12px;
+  }
+  .counter {
+    right: 12px;
+    bottom: 12px;
+    padding: 8px 12px;
+  }
+  .nav {
+    bottom: 12px;
+    width: 44px;
+    height: 44px;
+  }
+  .nav svg {
+    width: 20px;
+    height: 20px;
+  }
+  .nav-prev { left: 12px; }
+  .nav-next { left: 64px; }
+
+  .cover-title { font-size: clamp(42px, 13vw, 58px); }
+  .cover-subtitle { font-size: 24px; max-width: none; }
+  .cover-meta { font-size: 16px; max-width: none; }
+  .cover-author { max-width: none; margin-top: 28px; padding-top: 18px; }
+  .cover-author-label { font-size: 14px; }
+  .cover-author-name { font-size: 20px; }
+  .cover-author-role,
+  .cover-author-tg { font-size: 16px; }
+
+  .kicker,
+  .card-num,
+  .card-mono,
+  .divider-num,
+  .divider-tag,
+  .caption-kicker,
+  .terminal-title,
+  .rbac-head,
+  .rwx-head,
+  .att-num,
+  .tg-label,
+  .cb-head,
+  .tag {
+    font-size: 14px;
+  }
+
+  .h2 { font-size: clamp(32px, 9vw, 42px); max-width: none; }
+  .lede { font-size: 20px; max-width: none; }
+  .footnote,
+  .big-list li,
+  .check-list li,
+  .check-list.small li,
+  .bullets li,
+  .card-text,
+  .term-sub,
+  .term-def,
+  .rule-text,
+  .caption-text,
+  .terminal-body,
+  .rbac-node,
+  .acl-text,
+  .rwx-text,
+  .pyramid-row,
+  .bl-tag,
+  .logo-cell,
+  .attack-list li,
+  .domain-list,
+  .final-text,
+  .big-quote-en,
+  .big-quote-author,
+  .contact-role,
+  .tg-handle,
+  .cb-list li,
+  .cb-list-lg li {
+    font-size: 16px;
+  }
+
+  .quote { font-size: 24px; max-width: none; }
+  .card-title,
+  .caption-title { font-size: 20px; }
+  .card-letter { font-size: 48px; }
+  .divider-title { font-size: clamp(42px, 12vw, 54px); }
+  .term-title { font-size: clamp(38px, 10vw, 48px); max-width: none; }
+  .rule-title { font-size: 34px; max-width: none; }
+  .rule-mark { font-size: 24px; }
+  .rbac-arrow { font-size: 32px; }
+  .rwx-perm { font-size: 42px; }
+  .q-title { font-size: 32px; max-width: none; }
+  .h-final { font-size: clamp(46px, 14vw, 62px); }
+  .big-quote { font-size: 30px; max-width: none; }
+  .contact-name { font-size: 38px; }
+
+  .three-tags,
+  .two-cards,
+  .four-grid,
+  .acl-list,
+  .rwx-grid,
+  .bl-levels,
+  .logo-grid,
+  .domain-grid {
+    max-width: none;
+    width: 100%;
+  }
+
+  .three-cards,
+  .two-cards,
+  .four-grid,
+  .rwx-grid,
+  .logo-grid,
+  .domain-grid,
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .card,
+  .card.big,
+  .domain-box,
+  .rwx-col {
+    padding: 18px;
+  }
+
+  .big-list li { padding: 12px 0; gap: 12px; }
+  .big-list li::before { font-size: 12px; min-width: 28px; }
+  .check-list li,
+  .check-list.small li { padding: 8px 0 8px 28px; }
+  .check-list li::before,
+  .check-list.small li::before { top: 18px; width: 16px; height: 2px; }
+  .bullets li { padding: 6px 0 6px 20px; }
+  .tag { padding: 8px 12px; }
+  .three-tags { gap: 8px; }
+
+  .slide-image {
+    grid-template-rows: minmax(300px, 55dvh) auto;
+  }
+  .image-bleed {
+    min-height: 300px;
+    padding: 76px 16px 24px;
+  }
+  .image-caption {
+    padding: 24px 22px 100px;
+  }
+  .terminal {
+    width: 100%;
+    max-width: none;
+  }
+  .terminal-bar { padding: 10px 12px; gap: 6px; }
+  .dot { width: 10px; height: 10px; }
+  .terminal-body { padding: 16px; }
+
+  .rbac-diagram {
+    width: 100%;
+    padding: 20px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .rbac-col { gap: 8px; }
+  .rbac-node { padding: 12px; }
+  .rbac-arrow {
+    align-self: center;
+    transform: rotate(90deg);
+  }
+  .acl-row { gap: 12px; padding: 12px 14px; }
+  .acl-num { font-size: 18px; min-width: 24px; }
+
+  .contact-grid { width: 100%; }
+  .contact-left { position: static; }
+  .contact-role { max-width: none; }
+  .contact-tg { padding: 14px 16px; }
+  .contact-right { gap: 18px; }
+  .contact-block { padding-top: 14px; }
+  .cb-list { gap: 8px; }
+  .cb-list li,
+  .cb-list-lg li { padding-left: 18px; }
+
+  .caption-text code { font-size: 1em; }
+}
+
 @media print {
   @page { size: 1920px 1080px; margin: 0; }
   html, body { background: #fff; }

@@ -39,6 +39,20 @@ $offlineRoot = Join-Path $repoRoot '_PROJECT\scaner-vs-offline'
 $downloadsRoot = Join-Path $materialsRoot 'downloads'
 $tempBase = [IO.Path]::GetFullPath([IO.Path]::GetTempPath())
 $stageRoot = Join-Path $tempBase ('scaner-vs-archives-' + [guid]::NewGuid().ToString('N'))
+$script:ReviewedMarkdownFiles = @{
+    scanner = @(
+        '01-common-workflow.md'
+        '02-scanoval-local.md'
+        '03-wsl-individual.md'
+        '04-virtualbox-full-lab.md'
+        '05-live-usb.md'
+        'REPORT-TEMPLATE.md'
+    )
+    inspector = @(
+        '01-practicum.md'
+        'REPORT-TEMPLATE.md'
+    )
+}
 
 function Copy-FileChecked {
     param(
@@ -48,6 +62,10 @@ function Copy-FileChecked {
 
     if (-not (Test-Path -LiteralPath $Source -PathType Leaf)) {
         throw "Missing source file: $Source"
+    }
+    $sourceItem = Get-Item -LiteralPath $Source -Force
+    if (($sourceItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Scanner archive source file must not be a reparse point: $Source"
     }
     $destinationDirectory = Split-Path -Parent $Destination
     if (-not (Test-Path -LiteralPath $destinationDirectory -PathType Container)) {
@@ -62,14 +80,48 @@ function Copy-MarkdownDirectory {
         [Parameter(Mandatory)][string]$DestinationRoot
     )
 
+    if (-not $script:ReviewedMarkdownFiles.ContainsKey($Name)) {
+        throw "No reviewed Scanner archive manifest exists for: $Name"
+    }
+
     $sourceDirectory = Join-Path $materialsRoot $Name
+    if (-not (Test-Path -LiteralPath $sourceDirectory -PathType Container)) {
+        throw "Missing Scanner archive source directory: $sourceDirectory"
+    }
+
+    $expectedFiles = @($script:ReviewedMarkdownFiles[$Name])
+    $sourceDirectoryItem = Get-Item -LiteralPath $sourceDirectory -Force
+    if (($sourceDirectoryItem.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+        throw "Scanner archive source directory must not be a reparse point: $sourceDirectory"
+    }
+
+    foreach ($entry in @(Get-ChildItem -LiteralPath $sourceDirectory -Force -Recurse)) {
+        $relativePath = $entry.FullName.Substring($sourceDirectory.Length).TrimStart([char[]]@('\', '/')).Replace('\', '/')
+        if (($entry.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw "Scanner archive source must not be a reparse point: $Name/$relativePath"
+        }
+        if ($entry.PSIsContainer) {
+            throw "Unexpected scanner archive source directory: $Name/$relativePath"
+        }
+        if ($expectedFiles -notcontains $relativePath) {
+            throw "Unexpected scanner archive source file: $Name/$relativePath"
+        }
+    }
+
+    foreach ($expectedFile in $expectedFiles) {
+        $expectedPath = Join-Path $sourceDirectory $expectedFile
+        if (-not (Test-Path -LiteralPath $expectedPath -PathType Leaf)) {
+            throw "Missing reviewed Scanner archive source file: $Name/$expectedFile"
+        }
+    }
+
     $destinationDirectory = Join-Path (Join-Path $DestinationRoot 'materials') $Name
     [void](New-Item -ItemType Directory -Path $destinationDirectory -Force)
-    Get-ChildItem -LiteralPath $sourceDirectory -Filter '*.md' -File |
-        Sort-Object Name |
-        ForEach-Object {
-            Copy-Item -LiteralPath $_.FullName -Destination (Join-Path $destinationDirectory $_.Name) -Force
-        }
+    foreach ($expectedFile in @($expectedFiles | Sort-Object)) {
+        Copy-FileChecked `
+            -Source (Join-Path $sourceDirectory $expectedFile) `
+            -Destination (Join-Path $destinationDirectory $expectedFile)
+    }
 }
 
 function New-DeterministicZip {
