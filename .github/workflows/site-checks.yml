@@ -6,6 +6,9 @@ on:
     branches:
       - main
 
+permissions:
+  contents: read
+
 jobs:
   smoke:
     name: Smoke checks
@@ -13,7 +16,9 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
 
       - name: Parse project scripts
         shell: pwsh
@@ -35,6 +40,57 @@ jobs:
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\smoke-check.ps1
 
+      - name: Build canonical AppSec handouts
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\appsec-lections\_build\build-materials-zip.ps1
+
+      - name: Run content regression tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          node --test .\_PROJECT\test-international-content-currentness.mjs
+          node .\_PROJECT\test-platform-content-currentness.mjs
+          node --test .\_PROJECT\test-evergreen-course-dates.mjs
+          node --test .\_PROJECT\test-release-workflow-order.mjs
+          node --test .\_PROJECT\test-deploy-manifest-boundary.mjs
+          node --test .\_PROJECT\test-root-learning-paths.mjs
+          node .\_PROJECT\test-pentest-materials.mjs
+          python .\appsec-lections\_build\security_regression_tests.py -v
+          python .\pentest\lab\dvwa-safety-test.py -v
+          python .\pentest\lab\juice-shop-safety-test.py -v
+          Push-Location .\29-07-2026\code
+          try {
+            $env:REGISTRY_MODULE = 'step3_student_solution'
+            python -m unittest test_student test_examples -v
+          }
+          finally {
+            Remove-Item Env:REGISTRY_MODULE -ErrorAction SilentlyContinue
+            Pop-Location
+          }
+
+      - name: Install pinned browser test dependency
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          npm ci --prefix .\_PROJECT\.browser-node --ignore-scripts --no-audit --no-fund
+          & .\_PROJECT\.browser-node\node_modules\.bin\playwright.cmd install chromium
+
+      - name: Run focused browser regression tests
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          node --test .\_PROJECT\test-course-map.mjs
+          node --test .\_PROJECT\test-27-07-accessible-handout.mjs
+          node .\_PROJECT\test-layout-accessibility-regressions.mjs
+          node .\_PROJECT\qa-root-index.mjs
+          node .\_PROJECT\qa-pentest-ui.mjs
+          node .\_PROJECT\qa-appsec-layout.mjs
+
       - name: Build release archives
         shell: pwsh
         run: |
@@ -44,6 +100,13 @@ jobs:
         shell: pwsh
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1
+
+      - name: Run release browser QA
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          node .\_PROJECT\browser-qa.mjs
 
       - name: Prepare deploy script
         shell: pwsh

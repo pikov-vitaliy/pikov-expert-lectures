@@ -39,6 +39,17 @@ $forbiddenHashes = [System.Collections.Generic.HashSet[string]]::new([System.Str
   '1206d0daa1de064ee881a7f63c05ba824d047e057c423c7e513e863dd64d393c'
 ) | ForEach-Object { [void]$forbiddenHashes.Add($_) }
 
+# These retired artifacts must never become public again. Unlike the reviewed
+# PDF hash allowlist below, this path-level denylist survives byte changes and
+# therefore fails closed if a regenerated copy is accidentally staged.
+$forbiddenReleasePaths = @(
+  '(?i)(^|/)materials/From_Working_Code_to_Shippable_Product\.pdf$',
+  '(?i)(^|/)downloads/day-01/(?:lab-results|participant-materials|program-and-environment)(?:/|$)',
+  '(?i)(^|/)(?:\.env(?:\.[^/]*)?|id_rsa|id_ed25519)$',
+  '(?i)(^|/)[^/]+\.(?:db|sqlite|sqlite3)(?:-journal|-shm|-wal)?$',
+  '(?i)(^|/)[^/]+\.(?:orig|key|pem|pfx|p12|kdbx|log|exe|dll|msi)$'
+)
+
 $textExtensions = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 @('.html', '.htm', '.md', '.markdown', '.txt', '.json', '.jsonld', '.css', '.js', '.mjs', '.svg', '.xml', '.yml', '.yaml', '.csv') |
   ForEach-Object { [void]$textExtensions.Add($_) }
@@ -50,7 +61,6 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
 @(
   '251c5d734a73b94ac43577e2a7234bedd943f2b172461cdbd45ac043304e19ef',
   '2826c15b97cc7ffeada52f2000a4b0712a7cf4a81a38d7ba4087de350049c350',
-  '39241a1dab8f38ee8fa5d9b898078a8b8af30c98b7251c167f8b1f555cfb66d2',
   '40651600b2550513231ab481323f1a510f47770e29c46344c8a7bb686aa1dfd5',
   '68f68afa6cc90068000a41673862fdf68303938cb0409df838e99c580d89380b',
   '7096c79b69bdb842d81de5947a118befbb8e70a4f3e2593aaf07ad27c28ff31a',
@@ -121,13 +131,37 @@ function Test-TextEntry([System.IO.Compression.ZipArchiveEntry]$Entry, [string]$
   }
 }
 
-function Test-Archive([System.IO.Stream]$InputStream, [string]$DisplayPath, [int]$Depth) {
+function Test-Archive(
+  [System.IO.Stream]$InputStream,
+  [string]$DisplayPath,
+  [int]$Depth,
+  [string]$PolicyPathPrefix = '',
+  [bool]$InsideApprovedDayOneBundle = $false
+) {
   if ($Depth -gt 4) { Fail "Nested archive depth exceeded at $DisplayPath" }
   $archive = [System.IO.Compression.ZipArchive]::new($InputStream, [System.IO.Compression.ZipArchiveMode]::Read, $true)
   try {
     foreach ($entry in $archive.Entries) {
       if ([string]::IsNullOrWhiteSpace($entry.Name)) { continue }
       $entryPath = "$DisplayPath!$($entry.FullName.Replace('\','/'))"
+      $normalizedEntryName = $entry.FullName.Replace('\','/')
+      $policyEntryPath = if ([string]::IsNullOrWhiteSpace($PolicyPathPrefix)) {
+        $normalizedEntryName
+      } else {
+        "$PolicyPathPrefix!/$normalizedEntryName"
+      }
+      $entryStartsApprovedDayOneBundle = $normalizedEntryName -match '(?i)(^|/)downloads/day-01-(?:canonical-safe-package|edited-transcript-and-summaries)\.zip$'
+      $entryInsideApprovedDayOneBundle = $InsideApprovedDayOneBundle -or $entryStartsApprovedDayOneBundle
+      if ($InsideApprovedDayOneBundle -and
+          $normalizedEntryName -match '(?i)(^|/)(?:lab-results|participant-materials|program-and-environment)(?:/|$)') {
+        Add-Failure "$entryPath is a quarantined Day 1 source path inside an approved public bundle"
+      }
+      foreach ($pattern in $script:forbiddenReleasePaths) {
+        if ($policyEntryPath -match $pattern) {
+          Add-Failure "$entryPath is a retired artifact that must not be published"
+          break
+        }
+      }
       if ($entry.FullName -match '(?i)mascom|маском') {
         Add-Failure "$entryPath uses forbidden branded file name"
       }
@@ -155,7 +189,7 @@ function Test-Archive([System.IO.Stream]$InputStream, [string]$DisplayPath, [int
         try {
           $nestedStream.CopyTo($nestedBuffer)
           $nestedBuffer.Position = 0
-          Test-Archive -InputStream $nestedBuffer -DisplayPath $entryPath -Depth ($Depth + 1)
+          Test-Archive -InputStream $nestedBuffer -DisplayPath $entryPath -Depth ($Depth + 1) -PolicyPathPrefix $policyEntryPath -InsideApprovedDayOneBundle $entryInsideApprovedDayOneBundle
         } finally {
           $nestedStream.Dispose()
           $nestedBuffer.Dispose()

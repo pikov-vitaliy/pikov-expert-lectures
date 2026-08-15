@@ -12,43 +12,124 @@ function Fail([string]$Message) {
 }
 
 function Get-RelativePathSafe([string]$BasePath, [string]$Path) {
-  $base = (Resolve-Path -LiteralPath $BasePath).Path.TrimEnd('\') + '\'
-  $target = (Resolve-Path -LiteralPath $Path).Path
+  $base = [System.IO.Path]::GetFullPath($BasePath).TrimEnd('\') + '\'
+  $target = [System.IO.Path]::GetFullPath($Path)
   $baseUri = [Uri]::new($base)
   $targetUri = [Uri]::new($target)
   [Uri]::UnescapeDataString($baseUri.MakeRelativeUri($targetUri).ToString()).Replace('/', '\')
 }
 
-function Assert-ChildPath([string]$Parent, [string]$Child) {
-  $parentResolved = (Resolve-Path -LiteralPath $Parent).Path.TrimEnd('\') + '\'
-  if (Test-Path -LiteralPath $Child) {
-    $childResolved = (Resolve-Path -LiteralPath $Child).Path
-  } else {
-    $childResolved = [System.IO.Path]::GetFullPath($Child)
+function Test-LexicalPathWithin([string]$Parent, [string]$Child, [switch]$AllowEqual) {
+  $parentFull = [System.IO.Path]::GetFullPath($Parent).TrimEnd('\')
+  $childFull = [System.IO.Path]::GetFullPath($Child).TrimEnd('\')
+  if ($AllowEqual -and $childFull.Equals($parentFull, [System.StringComparison]::OrdinalIgnoreCase)) {
+    return $true
   }
-  if (-not ($childResolved + '\').StartsWith($parentResolved, [System.StringComparison]::OrdinalIgnoreCase)) {
-    Fail "Unsafe path outside parent: $childResolved"
+  return $childFull.StartsWith($parentFull + '\', [System.StringComparison]::OrdinalIgnoreCase)
+}
+
+function Assert-ChildPath([string]$Parent, [string]$Child, [switch]$AllowEqual) {
+  if (-not (Test-LexicalPathWithin -Parent $Parent -Child $Child -AllowEqual:$AllowEqual)) {
+    Fail "Unsafe path outside parent: $([System.IO.Path]::GetFullPath($Child))"
+  }
+}
+
+function Assert-NoReparsePathComponents([string]$BoundaryRoot, [string]$TargetPath, [switch]$RequireTarget) {
+  Assert-ChildPath -Parent $BoundaryRoot -Child $TargetPath -AllowEqual
+  $boundaryFull = [System.IO.Path]::GetFullPath($BoundaryRoot).TrimEnd('\')
+  $targetFull = [System.IO.Path]::GetFullPath($TargetPath).TrimEnd('\')
+  $targetItem = Get-Item -LiteralPath $targetFull -Force -ErrorAction SilentlyContinue
+  if ($RequireTarget -and $null -eq $targetItem) {
+    Fail "Missing release source path: $targetFull"
+  }
+
+  $current = $targetFull
+  while ($true) {
+    $item = Get-Item -LiteralPath $current -Force -ErrorAction SilentlyContinue
+    if ($null -ne $item -and (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0)) {
+      Fail "Release path contains a reparse point: $current"
+    }
+    if ($current.Equals($boundaryFull, [System.StringComparison]::OrdinalIgnoreCase)) { break }
+    $parent = Split-Path -Parent $current
+    if ([string]::IsNullOrWhiteSpace($parent) -or $parent.Equals($current, [System.StringComparison]::OrdinalIgnoreCase)) {
+      Fail "Could not validate release path ancestry: $targetFull"
+    }
+    $current = [System.IO.Path]::GetFullPath($parent).TrimEnd('\')
+  }
+}
+
+function Assert-SafeLectureFolder([string]$RootPath, [string]$Folder) {
+  if ([string]::IsNullOrWhiteSpace($Folder) -or
+      [System.IO.Path]::IsPathRooted($Folder) -or
+      $Folder -notmatch '^[A-Za-z0-9][A-Za-z0-9._-]*$' -or
+      $Folder.Contains('/') -or
+      $Folder.Contains('\') -or
+      $Folder -in @('.', '..') -or
+      $Folder.ToLowerInvariant() -in @('release', 'source', 'tools', 'output', 'notes', 'tests', 'test-results', 'node_modules') -or
+      $Folder.IndexOfAny([System.IO.Path]::GetInvalidFileNameChars()) -ge 0) {
+    Fail "Unsafe lecture folder in lectures.json: $Folder"
+  }
+  $folderPath = [System.IO.Path]::GetFullPath((Join-Path $RootPath $Folder))
+  Assert-ChildPath -Parent $RootPath -Child $folderPath
+  if (-not (Test-Path -LiteralPath $folderPath -PathType Container)) {
+    Fail "Missing lecture folder: $Folder"
+  }
+  Assert-NoReparsePathComponents -BoundaryRoot $RootPath -TargetPath $folderPath -RequireTarget
+}
+
+function Assert-SafeLectureDomain([string]$Domain) {
+  if ([string]::IsNullOrWhiteSpace($Domain) -or
+      $Domain.Length -gt 63 -or
+      $Domain -notmatch '^[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?$') {
+    Fail "Unsafe lecture domain in lectures.json: $Domain"
   }
 }
 
 function Reset-Directory([string]$Path, [string]$RequiredParent) {
   Assert-ChildPath -Parent $RequiredParent -Child $Path
+  Assert-NoReparsePathComponents -BoundaryRoot $RequiredParent -TargetPath $RequiredParent -RequireTarget
+  Assert-NoReparsePathComponents -BoundaryRoot $RequiredParent -TargetPath $Path
   if (Test-Path -LiteralPath $Path) {
     Remove-Item -LiteralPath $Path -Recurse -Force
   }
   [void](New-Item -ItemType Directory -Path $Path -Force)
+  Assert-NoReparsePathComponents -BoundaryRoot $RequiredParent -TargetPath $Path -RequireTarget
+}
+
+function Get-ValidatedReleaseSourcePath([string]$SourceRoot, [string]$RelativePath) {
+  if ([string]::IsNullOrWhiteSpace($RelativePath) -or [System.IO.Path]::IsPathRooted($RelativePath)) {
+    Fail "Unsafe release relative path: $RelativePath"
+  }
+  $segments = $RelativePath.Replace('/', '\').Split('\')
+  if ($segments -contains '..' -or $segments -contains '.') {
+    Fail "Unsafe release relative path: $RelativePath"
+  }
+
+  $source = [System.IO.Path]::GetFullPath((Join-Path $SourceRoot $RelativePath))
+  Assert-ChildPath -Parent $SourceRoot -Child $source
+  Assert-ChildPath -Parent $script:ReleaseRepositoryRoot -Child $source -AllowEqual
+  Assert-NoReparsePathComponents -BoundaryRoot $script:ReleaseRepositoryRoot -TargetPath $source -RequireTarget
+  if (-not (Test-Path -LiteralPath $source -PathType Leaf)) {
+    Fail "Missing release source file: $source"
+  }
+
+  Assert-ReleaseSourcePolicy -SourcePath $source
+
+  return $source
 }
 
 function Copy-ReleaseFile([string]$SourceRoot, [string]$StageRoot, [string]$RelativePath) {
-  $source = Join-Path $SourceRoot $RelativePath
-  if (-not (Test-Path -LiteralPath $source)) {
-    Fail "Missing release source file: $source"
-  }
-  $dest = Join-Path $StageRoot $RelativePath
+  $source = Get-ValidatedReleaseSourcePath -SourceRoot $SourceRoot -RelativePath $RelativePath
+
+  $dest = [System.IO.Path]::GetFullPath((Join-Path $StageRoot $RelativePath))
+  Assert-ChildPath -Parent $StageRoot -Child $dest
+  Assert-NoReparsePathComponents -BoundaryRoot $StageRoot -TargetPath $StageRoot -RequireTarget
   $destParent = Split-Path -Parent $dest
+  Assert-NoReparsePathComponents -BoundaryRoot $StageRoot -TargetPath $destParent
   if (-not (Test-Path -LiteralPath $destParent)) {
     [void](New-Item -ItemType Directory -Path $destParent -Force)
   }
+  Assert-NoReparsePathComponents -BoundaryRoot $StageRoot -TargetPath $destParent -RequireTarget
   Copy-Item -LiteralPath $source -Destination $dest -Force
 }
 
@@ -101,13 +182,94 @@ function Should-ExcludeDistributable([string]$Name) {
 # reaches it that was not reviewed.
 $script:MaterialsZipFolders = @('27-07-2026', '29-07-2026')
 
-# Lecture folders cleared to publish PDF handouts. PDFs are excluded globally
-# as "high-risk distributables pending explicit redistribution review"; naming
-# a folder here IS that review, recorded by the rights holder for that lecture.
-# Note the trade-off: PDFs stay untracked in git per repository policy, so a
-# published PDF cannot be rebuilt from a clean checkout - it has to be present
-# in the working tree at release time.
-$script:PublishPdfFolders = @('27-07-2026')
+# Generated archives are ignored in Git by design and are rebuilt from literal
+# source allowlists immediately before release selection. They are the only
+# ignored source artifacts that the global release builder may publish.
+$script:ApprovedIgnoredReleaseArtifacts = @(
+  '27-07-2026/materials.zip',
+  '29-07-2026/materials.zip',
+  'appsec-lections/downloads/day-01-canonical-safe-package.zip',
+  'appsec-lections/downloads/day-01-edited-transcript-and-summaries.zip',
+  'appsec-lections/downloads/day-02-edited-transcript-and-protocol.zip',
+  'appsec-lections/downloads/day-02-laboratory-materials.zip',
+  'appsec-lections/downloads/day-02-public-materials.zip'
+)
+
+function Test-HighRiskReleaseFileName([string]$Name) {
+  $lower = $Name.ToLowerInvariant()
+  if ($lower -eq '.env' -or $lower.StartsWith('.env.')) { return $true }
+  if ($lower -in @('id_rsa', 'id_ed25519')) { return $true }
+  if ($lower -match '\.(?:db|sqlite|sqlite3)(?:-journal|-shm|-wal)?$') { return $true }
+  $extension = [System.IO.Path]::GetExtension($lower)
+  return $extension -in @('.orig', '.key', '.pem', '.pfx', '.p12', '.kdbx', '.log', '.exe', '.dll', '.msi')
+}
+
+function Initialize-IgnoredReleaseSourceGate([string]$RepositoryRoot) {
+  $script:IgnoredReleaseSourcePaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+  $script:UntrackedReleaseSourcePaths = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+  if (-not (Test-Path -LiteralPath (Join-Path $RepositoryRoot '.git'))) { return }
+  $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+  if ($null -eq $gitCommand) {
+    Fail 'Git is required to verify ignored release sources in a repository checkout'
+  }
+  $ignored = @(& $gitCommand.Source -c core.quotepath=false -C $RepositoryRoot ls-files --others --ignored --exclude-standard)
+  if ($LASTEXITCODE -ne 0) {
+    Fail 'Could not enumerate ignored repository artifacts before release selection'
+  }
+  foreach ($relative in $ignored) {
+    if (-not [string]::IsNullOrWhiteSpace($relative)) {
+      [void]$script:IgnoredReleaseSourcePaths.Add($relative.Replace('\', '/'))
+    }
+  }
+  $untracked = @(& $gitCommand.Source -c core.quotepath=false -C $RepositoryRoot ls-files --others --exclude-standard)
+  if ($LASTEXITCODE -ne 0) {
+    Fail 'Could not enumerate untracked repository artifacts before release selection'
+  }
+  foreach ($relative in $untracked) {
+    if (-not [string]::IsNullOrWhiteSpace($relative)) {
+      [void]$script:UntrackedReleaseSourcePaths.Add($relative.Replace('\', '/'))
+    }
+  }
+}
+
+function Assert-ReleaseSourcePolicy([string]$SourcePath) {
+  if (Test-HighRiskReleaseFileName ([System.IO.Path]::GetFileName($SourcePath))) {
+    Fail "High-risk release source file is not allowed: $SourcePath"
+  }
+  if ($null -eq $script:IgnoredReleaseSourcePaths) { return }
+  $relative = Get-RelativePathSafe -BasePath $script:ReleaseRepositoryRoot -Path $SourcePath
+  $normalized = $relative.Replace('\', '/')
+  if ($script:IgnoredReleaseSourcePaths.Contains($normalized) -and
+      $script:ApprovedIgnoredReleaseArtifacts -notcontains $normalized) {
+    Fail "Ignored repository artifact is not approved for release: $normalized"
+  }
+  if ($script:UntrackedReleaseSourcePaths.Contains($normalized)) {
+    Fail "Untracked repository artifact is not approved for release: $normalized"
+  }
+}
+
+# Raw Day 1 working trees are editorial inputs, not public handouts. Their
+# reviewed output is rebuilt into the canonical ZIP, transcript ZIP, checksum
+# document and manifest. Keep this directory-level boundary ahead of the
+# generic nested-file rules so a newly added Markdown or script cannot leak.
+$script:QuarantinedNestedDirectories = @{
+  'appsec-lections' = @(
+    'downloads\day-01\lab-results',
+    'downloads\day-01\participant-materials',
+    'downloads\day-01\program-and-environment'
+  )
+}
+
+function Should-ExcludeQuarantinedNestedDirectory([string]$FolderName, [string]$RelativePath) {
+  if (-not $script:QuarantinedNestedDirectories.ContainsKey($FolderName)) { return $false }
+  $normalized = $RelativePath.Replace('/', '\')
+  foreach ($prefix in $script:QuarantinedNestedDirectories[$FolderName]) {
+    if ($normalized -eq $prefix -or $normalized.StartsWith($prefix + '\', [System.StringComparison]::OrdinalIgnoreCase)) {
+      return $true
+    }
+  }
+  return $false
+}
 
 # Narrow allowlist for reviewed nested handouts that must remain downloadable
 # from the published HTML. The global distributable rules still exclude every
@@ -119,12 +281,15 @@ $script:ReviewedNestedDistributables = @{
     'materials\downloads\inspector-labs-markdown.zip',
     'materials\downloads\scanner-labs-markdown.zip'
   )
-  # Public first-day materials are an explicit reviewed set. Working photos
-  # remain outside the release and are only an editorial source.
+  # Day 1 publishes only the reviewed transcript and the canonical package
+  # rebuilt from Markdown plus the bounded local lab. Legacy combined archives
+  # with unreviewed binaries are deliberately not allowlisted.
   'appsec-lections' = @(
     'downloads\day-01-edited-transcript-and-summaries.zip',
-    'downloads\day-01-laboratory-materials-and-reports.zip',
-    'downloads\day-01-public-materials.zip',
+    'downloads\day-01-canonical-safe-package.zip',
+    'downloads\day-01-SHA256SUMS.md',
+    'downloads\day-01-manifest.json',
+    'lab\juice-shop\README.md',
     'downloads\day-02-edited-transcript-and-protocol.zip',
     'downloads\day-02-laboratory-materials.zip',
     'downloads\day-02-public-materials.zip',
@@ -166,6 +331,12 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
   $files = New-Object System.Collections.Generic.List[string]
 
   Get-ChildItem -LiteralPath $FolderPath -File -Force | ForEach-Object {
+    if (($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      Fail "Release source file is a reparse point: $($_.FullName)"
+    }
+    if (Test-HighRiskReleaseFileName $_.Name) {
+      Fail "High-risk release source file is not allowed: $($_.FullName)"
+    }
     if (-not (Should-ExcludeFile $_.Name)) {
       $files.Add($_.Name)
     }
@@ -181,6 +352,9 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
 
   Get-ChildItem -LiteralPath $FolderPath -Directory -Force | ForEach-Object {
     if (Should-ExcludeDirectory $_.Name) { return }
+    if (($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+      Fail "Release source directory is a reparse point: $($_.FullName)"
+    }
     Get-ChildItem -LiteralPath $_.FullName -File -Recurse -Force | ForEach-Object {
       # Excluded directories must be honoured at EVERY depth, not just at the
       # top level. A lecture folder that ships runnable code grows nested
@@ -190,6 +364,15 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
       $segments = $relative.Split('\')
       $parentSegments = @($segments | Select-Object -First ([Math]::Max($segments.Count - 1, 0)))
       if (@($parentSegments | Where-Object { Should-ExcludeDirectory $_ }).Count -gt 0) { return }
+
+      if (($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+        Fail "Release source file is a reparse point: $($_.FullName)"
+      }
+      if (Test-HighRiskReleaseFileName $_.Name) {
+        Fail "High-risk release source file is not allowed: $($_.FullName)"
+      }
+
+      if (Should-ExcludeQuarantinedNestedDirectory -FolderName $folderName -RelativePath $relative) { return }
 
       # Photographs taken during the first-day session are a private editorial
       # source. Keep this narrow guard even if a local working folder returns.
@@ -211,12 +394,6 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
         return
       }
 
-      if ($script:PublishPdfFolders -contains $folderName -and
-          $_.Extension.ToLowerInvariant() -eq '.pdf') {
-        $files.Add($relative)
-        return
-      }
-
       if (-not (Should-ExcludeNestedFile $_.Name)) {
         $files.Add($relative)
       }
@@ -229,6 +406,7 @@ function Get-DomainReleaseFiles([string]$FolderPath) {
 function Get-RootReleaseFiles([string]$RootPath) {
   $rootNames = @(
     '.htaccess',
+    'course-map.html',
     'index.html',
     'photo.jpg',
     'robots.txt',
@@ -339,6 +517,9 @@ function New-Manifest([string]$StageRoot, [object]$Target, [object[]]$Issues, [s
 }
 
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
+$script:ReleaseRepositoryRoot = [System.IO.Path]::GetFullPath($rootPath).TrimEnd('\')
+Assert-NoReparsePathComponents -BoundaryRoot $script:ReleaseRepositoryRoot -TargetPath $script:ReleaseRepositoryRoot -RequireTarget
+Initialize-IgnoredReleaseSourceGate -RepositoryRoot $script:ReleaseRepositoryRoot
 $projectPath = Join-Path $rootPath '_PROJECT'
 $lecturesPath = Join-Path $projectPath 'lectures.json'
 if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectures.json" }
@@ -358,10 +539,14 @@ if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
 }
 $script:ReleaseDateValue = $ReleaseDate
 
-$stagingRoot = Join-Path $projectPath ".release-staging-$ReleaseDate"
-Reset-Directory -Path $stagingRoot -RequiredParent $projectPath
-
 $uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
+foreach ($lectureEntry in @($data.lectures)) {
+  Assert-SafeLectureDomain -Domain ([string]$lectureEntry.domain)
+}
+foreach ($folder in $uniqueFolders) {
+  Assert-SafeLectureFolder -RootPath $rootPath -Folder ([string]$folder)
+}
+
 $targets = New-Object System.Collections.Generic.List[object]
 
 $targets.Add([pscustomobject]@{
@@ -383,6 +568,55 @@ foreach ($folder in $uniqueFolders) {
   })
 }
 
+# Build every canonical generated handout before selecting any release source.
+# A builder can legitimately replace an ignored generated archive, but it must
+# not be able to create an undeclared ignored/untracked file after the Git gate
+# snapshot and have that file selected by the broad site-file enumerator.
+foreach ($target in @($targets | Where-Object { $_.kind -eq 'domain' })) {
+  $sourceRoot = Join-Path $rootPath $target.folder
+
+  if ($target.folder -eq 'scaner-vs') {
+    $scanerBundleScript = Join-Path $projectPath 'build-scaner-vs-archives.ps1'
+    if (-not (Test-Path -LiteralPath $scanerBundleScript -PathType Leaf)) {
+      Fail "Missing Scanner-VS bundle builder: $scanerBundleScript"
+    }
+    Write-Output 'RUN bundle scaner-vs'
+    & $scanerBundleScript -Root $rootPath | Out-Null
+  }
+
+  $bundleScript = Join-Path $sourceRoot '_build\build-materials-zip.ps1'
+  if (Test-Path -LiteralPath $bundleScript -PathType Leaf) {
+    Write-Output "RUN bundle $($target.folder)"
+    & $bundleScript | Out-Null
+    if ($LASTEXITCODE -ne 0) {
+      Fail "Bundle builder failed for $($target.folder) with exit code $LASTEXITCODE"
+    }
+  }
+}
+
+# Refresh after all builders and before all selection. From this point until
+# staging, release inputs are read-only and every selected path is checked
+# against the post-build tracked/ignored/untracked repository state.
+Initialize-IgnoredReleaseSourceGate -RepositoryRoot $script:ReleaseRepositoryRoot
+
+$rootReleaseFiles = @(Get-RootReleaseFiles $rootPath)
+foreach ($relativeFile in $rootReleaseFiles) {
+  [void](Get-ValidatedReleaseSourcePath -SourceRoot $rootPath -RelativePath $relativeFile)
+}
+
+$domainReleaseFiles = @{}
+foreach ($target in @($targets | Where-Object { $_.kind -eq 'domain' })) {
+  $sourceRoot = Join-Path $rootPath $target.folder
+  $selected = @(Get-DomainReleaseFiles $sourceRoot)
+  foreach ($relativeFile in $selected) {
+    [void](Get-ValidatedReleaseSourcePath -SourceRoot $sourceRoot -RelativePath $relativeFile)
+  }
+  $domainReleaseFiles[$target.folder] = $selected
+}
+
+$stagingRoot = Join-Path $projectPath ".release-staging-$ReleaseDate"
+Reset-Directory -Path $stagingRoot -RequiredParent $projectPath
+
 $results = New-Object System.Collections.Generic.List[object]
 
 foreach ($target in $targets) {
@@ -390,7 +624,7 @@ foreach ($target in $targets) {
     $sourceRoot = $rootPath
     $releaseDir = Join-Path $rootPath 'release'
     $archiveName = "pikov.expert-root-release-$ReleaseDate.zip"
-    $relativeFiles = Get-RootReleaseFiles $rootPath
+    $relativeFiles = $rootReleaseFiles
     $stageName = 'root'
   } else {
     $sourceRoot = Join-Path $rootPath $target.folder
@@ -400,27 +634,7 @@ foreach ($target in $targets) {
     $releaseDir = Join-Path $sourceRoot 'release'
     $archiveName = "$($target.domain)-release-$ReleaseDate.zip"
 
-    if ($target.folder -eq 'scaner-vs') {
-      $scanerBundleScript = Join-Path $projectPath 'build-scaner-vs-archives.ps1'
-      if (-not (Test-Path -LiteralPath $scanerBundleScript -PathType Leaf)) {
-        Fail "Missing Scanner-VS bundle builder: $scanerBundleScript"
-      }
-      Write-Output 'RUN bundle scaner-vs'
-      & $scanerBundleScript -Root $rootPath | Out-Null
-    }
-
-    # A lecture may ship a handout bundle for its learners. The bundle is a
-    # build artifact, so it is NOT tracked in git (the repository policy keeps
-    # ZIP archives out) - it is regenerated here from files that are tracked.
-    # That also guarantees the bundle can never drift out of sync with the
-    # published page: both come from the same run.
-    $bundleScript = Join-Path $sourceRoot '_build\build-materials-zip.ps1'
-    if (Test-Path -LiteralPath $bundleScript -PathType Leaf) {
-      Write-Output "RUN bundle $($target.folder)"
-      & $bundleScript | Out-Null
-    }
-
-    $relativeFiles = Get-DomainReleaseFiles $sourceRoot
+    $relativeFiles = $domainReleaseFiles[$target.folder]
     $stageName = $target.folder
   }
 
@@ -434,6 +648,7 @@ foreach ($target in $targets) {
 
   $issues = @(Test-StaticRelease -StageRoot $stageDir -SiteName $target.domain)
   $archivePath = Join-Path $releaseDir $archiveName
+  Assert-ChildPath -Parent $releaseDir -Child $archivePath
   if (Test-Path -LiteralPath $archivePath) { Remove-Item -LiteralPath $archivePath -Force }
 
   $stageChildren = @(Get-ChildItem -LiteralPath $stageDir -Force)

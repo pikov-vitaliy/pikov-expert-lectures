@@ -296,6 +296,24 @@ a:hover{ color: var(--ink); }
   .tile:hover{ transform: translateY(-2px); }
 }
 
+/* ============ Ролевые учебные маршруты ============ */
+.learning-paths{ padding: 44px 0 18px; }
+.paths-head{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 28px; align-items: end; margin-bottom: 20px; }
+.paths-head h2{ font-size: clamp(26px, 4vw, 38px); }
+.paths-head p{ color: var(--muted); font-size: 14px; line-height: 1.65; }
+.path-intro{ display: grid; gap: 10px; }
+.course-map-link{ width: fit-content; font-size: 13px; font-weight: 700; }
+.path-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.path-card{ display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.path-card .path-role{ width: fit-content; padding: 4px 8px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); font: 600 11px/1.4 ui-monospace, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.path-card h3{ font-size: 21px; }
+.path-card dl{ display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 10px; margin: 0; font-size: 13.5px; line-height: 1.5; }
+.path-card dt{ color: var(--faint); font-weight: 650; }
+.path-card dd{ margin: 0; color: var(--muted); }
+.path-links{ display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 4px; }
+.path-links a{ display: inline-flex; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--bg); text-decoration: none; font-size: 12.5px; }
+.path-links a:hover{ border-color: var(--accent); color: var(--accent); }
+
 /* ============ Каталог ============ */
 .catalog{ padding: 30px 0 20px; }
 .cat-section{ padding: 34px 0 8px; }
@@ -432,6 +450,10 @@ a:hover{ color: var(--ink); }
   .stats{ gap: 14px 30px; }
   .stat b{ font-size: 26px; }
 }
+@media (max-width: 900px){
+  .paths-head{ grid-template-columns: 1fr; gap: 10px; }
+  .path-grid{ grid-template-columns: 1fr; }
+}
 @media (prefers-reduced-motion: reduce){
   *, *::before, *::after{ transition: none !important; animation: none !important; }
 }
@@ -477,6 +499,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
     <a class="brand" href="#">Виталий&nbsp;Пиков</a>
     <nav class="site-nav" aria-label="Основная навигация">
       <a href="#sections">Разделы</a>
+      <a href="#learning-paths">Маршруты</a>
       <a href="#lectures">Лекции</a>
       <a href="#about">Обо мне</a>
       <a href="#contacts">Связь</a>
@@ -536,6 +559,67 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       <ul class="tiles" id="tiles"></ul>
     </div>
   </nav>
+
+  <section class="learning-paths" id="learning-paths" aria-labelledby="learning-paths-title">
+    <div class="wrap">
+      <div class="paths-head">
+        <h2 id="learning-paths-title">Три маршрута по материалам</h2>
+        <div class="path-intro">
+          <p>Это не жёсткие программы, а рекомендуемая последовательность. Начните с ближайшей роли, зафиксируйте итоговый артефакт и переходите к следующему уровню только после проверки результата.</p>
+          <a class="course-map-link" href="course-map.html">Полная преподавательская карта 30 ресурсов →</a>
+        </div>
+      </div>
+      <div class="path-grid">
+        <article class="path-card">
+          <span class="path-role">Начинающий</span>
+          <h3>Базовый язык ИБ</h3>
+          <dl>
+            <dt>Предпосылки</dt><dd>Уверенная работа с компьютером; базовые понятия ОС и сети.</dd>
+            <dt>Длительность</dt><dd>6–8 академических часов.</dd>
+            <dt>Результат</dt><dd>Объяснить актив, угрозу, уязвимость, риск, меру и границу информационной системы.</dd>
+            <dt>Артефакт</dt><dd>Одностраничная карта активов, границ и пяти основных рисков учебной системы.</dd>
+          </dl>
+          <nav class="path-links" aria-label="Материалы маршрута для начинающего">
+            <a href="https://is.pikov.expert/">Информационные системы</a>
+            <a href="https://risk.pikov.expert/">Риски ИБ</a>
+            <a href="https://27001.pikov.expert/">ISO/IEC 27001</a>
+          </nav>
+        </article>
+        <article class="path-card">
+          <span class="path-role">Администратор и специалист по ИБ</span>
+          <h3>Платформа, hardening и наблюдаемость</h3>
+          <dl>
+            <dt>Предпосылки</dt><dd>TCP/IP, командная строка Windows/Linux, принципы учётных записей и журналирования.</dd>
+            <dt>Длительность</dt><dd>2–3 учебных дня с локальным стендом.</dd>
+            <dt>Результат</dt><dd>Проверить конфигурацию, применить безопасное изменение, собрать доказательства и выполнить rollback.</dd>
+            <dt>Артефакт</dt><dd>Паспорт стенда, чек-лист hardening и отчёт «до → изменение → тест → откат».</dd>
+          </dl>
+          <nav class="path-links" aria-label="Материалы маршрута администратора">
+            <a href="https://astra-intro.pikov.expert/">Astra Linux</a>
+            <a href="https://astra-hardening.pikov.expert/">Hardening</a>
+            <a href="https://windows.pikov.expert/">Windows</a>
+            <a href="https://komrad.pikov.expert/">SIEM</a>
+          </nav>
+        </article>
+        <article class="path-card">
+          <span class="path-role">Разработчик и DevSecOps</span>
+          <h3>Security-by-design и цепочка поставки</h3>
+          <dl>
+            <dt>Предпосылки</dt><dd>Git, один язык программирования, сборка и базовый CI/CD; для native-трека — C/C++.</dd>
+            <dt>Длительность</dt><dd>2–3 учебных дня плюс самостоятельная лабораторная работа.</dd>
+            <dt>Результат</dt><dd>Провести threat modeling, проверить зависимости, найти дефект, исправить его и доказать исправление тестом.</dd>
+            <dt>Артефакт</dt><dd>Модель угроз, SBOM/решение о допуске компонента и finding с negative test и retest.</dd>
+          </dl>
+          <nav class="path-links" aria-label="Материалы маршрута разработчика">
+            <a href="https://ppk.pikov.expert/">Архитектура и ППК</a>
+            <a href="https://appsec-lections.pikov.expert/">AppSec</a>
+            <a href="https://sast.pikov.expert/">SAST</a>
+            <a href="https://pentest.pikov.expert/">Пентест</a>
+          </nav>
+        </article>
+      </div>
+    </div>
+  </section>
 
   <!-- Каталог лекций. Секции и карточки генерируются из LECTURES. -->
   <section class="catalog" id="lectures">

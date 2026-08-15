@@ -1,8 +1,8 @@
-"""Регрессионные проверки практикума 29.07.2026.
+"""Регрессионные проверки практикума.
 
-По умолчанию проверяется ``step3_student``. Преподаватель может проверить
-эталон, задав переменную окружения REGISTRY_MODULE=step3_fixed и добавив
-каталог с эталоном в PYTHONPATH.
+По умолчанию проверяется ``step3_student``. Только после собственной попытки
+открытое готовое решение можно проверить, задав переменную окружения
+``REGISTRY_MODULE=step3_student_solution``.
 """
 
 from __future__ import annotations
@@ -296,6 +296,33 @@ class LeastPrivilegeTests(RegistryTestCase):
                 )
         finally:
             read_only.close()
+
+    def test_read_only_connection_handles_uri_reserved_path_characters(self) -> None:
+        """``#``/``?`` в пути не должны становиться fragment/query URI."""
+        filenames = ["components # training.db"]
+        if os.name != "nt":  # Windows запрещает ``?`` в имени файла.
+            filenames.append("components ? training.db")
+
+        for filename in filenames:
+            with self.subTest(filename=filename):
+                special_path = Path(self.tmp.name) / filename
+                with closing(sqlite3.connect(special_path)) as writer:
+                    writer.execute("CREATE TABLE marker (value TEXT NOT NULL)")
+                    writer.execute("INSERT INTO marker(value) VALUES ('expected')")
+                    writer.commit()
+
+                read_only = registry.open_read_only(special_path)
+                try:
+                    self.assertEqual(
+                        read_only.execute("SELECT value FROM marker").fetchone()[0],
+                        "expected",
+                    )
+                    with self.assertRaises(sqlite3.OperationalError):
+                        read_only.execute(
+                            "INSERT INTO marker(value) VALUES ('forbidden')"
+                        )
+                finally:
+                    read_only.close()
 
 
 if __name__ == "__main__":

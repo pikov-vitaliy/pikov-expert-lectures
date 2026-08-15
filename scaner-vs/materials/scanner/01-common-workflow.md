@@ -67,19 +67,26 @@
 Для версии 7.x документация указывает каталог `/var/lib/echelon/0/scanner/scripts` на узле со сканером и веб-адрес `https://<IP-адрес Сканер-ВС>/winrm/`. Путь `/opt/echelon/scanner/scripts` из материалов версии 6 в эту инструкцию не переносится.
 
 1. Получите скрипт только из установленного продукта или по адресу, указанному в официальной документации.
-2. До запуска прочитайте скрипт, проверьте источник и хеш.
+2. До запуска прочитайте скрипт. Ожидаемый SHA-256 и, если скрипт подписан, ожидаемого издателя получите из подписанного реестра преподавателя/вендора по независимому аутентифицированному каналу.
 3. Используйте только лабораторную Windows и временную учетную запись локального администратора.
 4. Настройте HTTPS WinRM на 5986; разрешите порт только от IP сканера.
 5. Basic-аутентификация не передается по HTTP.
 6. Создайте секрет/подключение в Сканер-ВС и проверьте статус.
 
-Документированная vendor-команда:
+Проверка перед документированной vendor-командой:
 
 ```powershell
-Powershell.exe -ExecutionPolicy Bypass -File winrm.ps1
+$WinrmScript = '.\winrm.ps1'
+$ExpectedWinrmSha256 = '<64_HEX_ИЗ_ПОДПИСАННОГО_РЕЕСТРА>'
+$ExpectedPublisher = '<SUBJECT_ИЗ_ПОДПИСАННОГО_РЕЕСТРА_ИЛИ_UNSIGNED>'
+if ($ExpectedWinrmSha256 -notmatch '^[0-9A-Fa-f]{64}$') { throw 'STOP: expected SHA-256 is absent' }
+if ((Get-FileHash -LiteralPath $WinrmScript -Algorithm SHA256).Hash -ne $ExpectedWinrmSha256) { throw 'STOP: SHA-256 mismatch' }
+$Signature = Get-AuthenticodeSignature -LiteralPath $WinrmScript
+if ($Signature.Status -ne 'NotSigned' -and ($Signature.Status -ne 'Valid' -or $Signature.SignerCertificate.Subject -ne $ExpectedPublisher)) { throw 'STOP: Authenticode publisher mismatch' }
+Powershell.exe -NoProfile -ExecutionPolicy Bypass -File $WinrmScript
 ```
 
-Это не рекомендация постоянно ослаблять политику PowerShell. Команда допустима в лаборатории только после проверки содержимого скрипта.
+Это не рекомендация постоянно ослаблять политику PowerShell. Команда допустима в лаборатории только после точного совпадения независимо полученного хеша; если Authenticode присутствует, подпись должна быть действительной, а издатель — совпасть с подписанным реестром. Любое несовпадение — **STOP**.
 
 ### Linux: SSH
 

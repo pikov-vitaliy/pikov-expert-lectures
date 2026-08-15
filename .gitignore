@@ -23,7 +23,9 @@ release/
 **/verify-unpacked/
 
 # Project-local runtime and QA output
-_PROJECT/.browser-node/
+_PROJECT/.browser-node/*
+!_PROJECT/.browser-node/package.json
+!_PROJECT/.browser-node/package-lock.json
 _PROJECT/.browser-qa-*/
 _PROJECT/.hosting-deploy-*/
 _PROJECT/.release-staging-*/
@@ -70,14 +72,9 @@ _PROJECT/Счётчик.md
 # High-risk distributables pending explicit redistribution review.
 # These never enter the repository, and this rule has no exceptions.
 #
-# Publishing one is a separate, per-folder decision recorded in
-# _PROJECT/build-release.ps1 ($script:PublishPdfFolders). Consequence to keep
-# in mind: a file published that way lives only in the working tree, so a
-# clean checkout cannot rebuild the site with it. Reference such a file by
-# absolute URL, never by a relative link, or the static link check fails in CI.
-#
-# Currently approved: 27-07-2026 - lecture slide deck, published on the
-# author's instruction 26.07.2026.
+# The global release builder quarantines these formats without an exception.
+# A future publication decision requires a reproducible, rights-reviewed
+# builder plus an explicit release allowlist and regression gate.
 **/*.pdf
 **/*.pptx
 **/*.docx
@@ -115,3 +112,7 @@ _НА_УДАЛЕНИЕ_*/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Local Python bytecode/cache (never a release input)
+**/__pycache__/
+*.py[cod]

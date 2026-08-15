@@ -32,9 +32,7 @@ tz-pikov-expert/
 │   ├── css/style.css                  # legacy, текущий index.html использует inline CSS
 │   ├── js/main.js                     # legacy, текущий index.html использует inline JS
 │   └── images/
-│       ├── favicon.svg
-│       ├── logo-mascom.svg
-│       └── logo-mascom.png
+│       └── favicon.svg
 └── materials/
     ├── лекции/
     │   └── методичка-по-написанию-ТЗ.md
@@ -87,7 +85,6 @@ node .\tools\build-tz-landing.mjs
 - `.htaccess`;
 - `robots.txt`;
 - `sitemap.xml`;
-- `assets/images/logo-mascom.png`;
 - `assets/images/favicon.svg`;
 - вся папка `materials/`.
 
@@ -111,7 +108,7 @@ Select-String -LiteralPath .\index.html -Pattern 'src="https://|href="https://fo
 ## Контакты
 
 **Виталий Александрович Пиков**  
-Преподаватель НОУ ДПО «УЦБИ «МАСКОМ»
+Автор и преподаватель
 
 - Email: `vitaly@pikov.expert`
 - Telegram: `@UnderLineSecurity`

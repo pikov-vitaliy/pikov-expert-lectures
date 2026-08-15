@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Доступный визуальный конспект о переходе от работающего кода к проверяемому выпуску: Secure SDLC, языки, дефекты и quality gates.">
+  <meta name="author" content="Пиков Виталий Александрович">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2308111f'/%3E%3Cpath d='M18 20h28v24H18z' fill='none' stroke='%2372e39a' stroke-width='5'/%3E%3Cpath d='m27 28-6 4 6 4m10-8 6 4-6 4' fill='none' stroke='%23f4f7fb' stroke-width='3'/%3E%3C/svg%3E">
+  <title>From Working Code to Shippable Product — доступный конспект</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #08111f;
+      --surface: #0f2036;
+      --surface-2: #152b46;
+      --text: #f4f7fb;
+      --muted: #c4d1e2;
+      --line: #31506e;
+      --accent: #72e39a;
+      --accent-2: #8dc8ff;
+      --warning: #ffd27a;
+      --max: 1120px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background:
+        radial-gradient(circle at 82% 4%, rgba(67, 147, 214, .18), transparent 26rem),
+        linear-gradient(180deg, #08111f 0%, #0a1728 100%);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      font-size: clamp(1rem, .35vw + .95rem, 1.2rem);
+      line-height: 1.62;
+    }
+    a { color: var(--accent-2); text-underline-offset: .18em; }
+    a:focus-visible, summary:focus-visible { outline: 3px solid var(--warning); outline-offset: 4px; }
+    .skip-link {
+      position: absolute;
+      left: -9999px;
+      top: 1rem;
+      z-index: 10;
+      padding: .7rem 1rem;
+      background: var(--warning);
+      color: #101820;
+      border-radius: .5rem;
+      font-weight: 800;
+    }
+    .skip-link:focus { left: 1rem; }
+    .page-header, main, .page-footer { width: min(calc(100% - 2rem), var(--max)); margin-inline: auto; }
+    .page-header { padding: clamp(3rem, 8vw, 7rem) 0 2.4rem; }
+    .eyebrow { color: var(--accent); font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    h1, h2, h3 { line-height: 1.12; text-wrap: balance; }
+    h1 { max-width: 16ch; margin: .35rem 0 1rem; font-size: clamp(2.4rem, 7vw, 5.7rem); letter-spacing: -.04em; }
+    h2 { margin: 0; font-size: clamp(1.65rem, 3vw, 2.65rem); }
+    h3 { font-size: clamp(1.12rem, 1.4vw, 1.35rem); }
+    .lead { max-width: 67ch; color: var(--muted); font-size: clamp(1.12rem, 1.4vw, 1.42rem); }
+    .meta { display: flex; flex-wrap: wrap; gap: .65rem; margin-top: 1.5rem; }
+    .chip, .label {
+      display: inline-flex;
+      align-items: center;
+      width: fit-content;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: .35rem .7rem;
+      color: var(--muted);
+      font-size: .86rem;
+      font-weight: 750;
+    }
+    .label { color: #07140b; background: var(--accent); border-color: var(--accent); }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      border-block: 1px solid var(--line);
+      background: rgba(8, 17, 31, .94);
+      backdrop-filter: blur(12px);
+    }
+    nav ul {
+      width: min(calc(100% - 2rem), var(--max));
+      margin: 0 auto;
+      padding: .7rem 0;
+      display: flex;
+      gap: .55rem;
+      list-style: none;
+      overflow-x: auto;
+    }
+    nav a { display: block; white-space: nowrap; padding: .4rem .7rem; border-radius: .45rem; color: var(--muted); text-decoration: none; }
+    nav a:hover { background: var(--surface-2); color: var(--text); }
+    main { padding: clamp(2rem, 5vw, 4rem) 0; }
+    .topic {
+      display: grid;
+      grid-template-columns: minmax(8rem, .34fr) minmax(0, 1fr);
+      gap: clamp(1.2rem, 4vw, 3.4rem);
+      padding: clamp(2rem, 5vw, 4.6rem) 0;
+      border-bottom: 1px solid var(--line);
+      scroll-margin-top: 5rem;
+    }
+    .topic-number { color: var(--accent); font-size: clamp(3rem, 8vw, 6.8rem); font-weight: 900; line-height: .9; opacity: .9; }
+    .topic-body { min-width: 0; }
+    .topic-body > :first-child { margin-top: 0; }
+    .topic-body p, .topic-body li { max-width: 76ch; }
+    .topic-body p, .topic-body ul, .topic-body ol { color: var(--muted); }
+    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.4rem 0; }
+    .card {
+      min-width: 0;
+      padding: 1.1rem 1.2rem;
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: linear-gradient(145deg, rgba(21, 43, 70, .92), rgba(15, 32, 54, .82));
+    }
+    .card h3 { margin: 0 0 .5rem; }
+    .card p { margin: 0; }
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 1.4rem 0; }
+    .flow span { padding: .65rem .8rem; border-radius: .65rem; background: var(--surface-2); border: 1px solid var(--line); font-weight: 750; }
+    .flow i { color: var(--accent); font-style: normal; font-weight: 900; }
+    .evidence { columns: 2; column-gap: 2rem; padding-left: 1.25rem; }
+    .evidence li { break-inside: avoid; margin: 0 0 .45rem; }
+    .note { margin: 1.25rem 0; padding: 1rem 1.2rem; border-left: .3rem solid var(--warning); background: rgba(255, 210, 122, .08); color: var(--text); }
+    .good { border-left-color: var(--accent); background: rgba(114, 227, 154, .08); }
+    .table-wrap { width: 100%; min-width: 0; max-width: 100%; overflow-x: auto; margin: 1.3rem 0; }
+    table { width: 100%; border-collapse: collapse; min-width: 42rem; }
+    caption { text-align: left; color: var(--muted); margin-bottom: .65rem; }
+    th, td { padding: .8rem; text-align: left; vertical-align: top; border: 1px solid var(--line); }
+    th { background: var(--surface-2); }
+    code { color: #d7f3ff; font-family: ui-monospace, "Cascadia Code", monospace; }
+    .provenance {
+      margin-top: 4rem;
+      padding: clamp(1.2rem, 3vw, 2rem);
+      border: 1px solid var(--line);
+      border-radius: 1rem;
+      background: var(--surface);
+    }
+    .provenance li { margin-bottom: .65rem; }
+    .page-footer { padding: 1rem 0 3rem; color: var(--muted); }
+
+    @media (max-width: 700px) {
+      .page-header, main, .page-footer { width: min(calc(100% - 1.2rem), var(--max)); }
+      .topic { grid-template-columns: 1fr; gap: .65rem; }
+      .topic-number { font-size: 2.4rem; }
+      .grid { grid-template-columns: 1fr; }
+      .evidence { columns: 1; }
+      nav ul { width: calc(100% - 1.2rem); }
+    }
+
+    @media print {
+      :root { color-scheme: light; }
+      body { background: #fff; color: #111; font-size: 11pt; }
+      nav, .skip-link { display: none; }
+      .page-header, main, .page-footer { width: 100%; }
+      .page-header { padding-top: 0; }
+      .topic { break-inside: avoid; grid-template-columns: 10% 1fr; padding: 1.2rem 0; border-color: #bbb; }
+      .topic-number, .eyebrow, a { color: #075a31; }
+      .topic-body p, .topic-body li, .lead, .page-footer { color: #333; }
+      .card, .provenance, .note { background: #fff; border-color: #aaa; color: #111; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#content">Перейти к содержанию</a>
+  <header class="page-header">
+    <div class="eyebrow">Secure SDLC · визуальный конспект</div>
+    <h1><span lang="en">From Working Code to Shippable Product</span></h1>
+    <p class="lead">Как перейти от «код запускается» к выпуску, для которого есть проверяемые требования, результаты контроля и воспроизводимые свидетельства.</p>
+    <div class="meta">
+      <span class="chip">Автор: В.А. Пиков</span>
+      <span class="chip">14 смысловых экранов</span>
+      <span class="chip">HTML · текст доступен поиску и экранным дикторам</span>
+    </div>
+  </header>
+
+  <nav aria-label="Навигация по конспекту">
+    <ul>
+      <li><a href="#proofs">Свидетельства</a></li>
+      <li><a href="#cycles">Цикл</a></li>
+      <li><a href="#layers">Слои</a></li>
+      <li><a href="#memory">Память</a></li>
+      <li><a href="#defects">Дефекты</a></li>
+      <li><a href="#tools">Инструменты</a></li>
+      <li><a href="#sources">Источники</a></li>
+    </ul>
+  </nav>
+
+  <main id="content">
+    <section class="topic" id="proofs" aria-labelledby="proofs-title">
+      <div class="topic-number" aria-hidden="true">01</div>
+      <div class="topic-body">
+        <span class="label">Авторская модель</span>
+        <h2 id="proofs-title">Работающий код — одно из 14 свидетельств</h2>
+        <p>В учебной модели выпуск описывают 14 элементов свидетельств. Сам работающий код — только один элемент; ещё 13 можно полностью или частично собирать и проверять автоматикой. Финальное решение о выпуске и принятии риска остаётся за ответственными людьми.</p>
+        <ol class="evidence">
+          <li>требования, включая требования безопасности;</li>
+          <li>модель угроз;</li>
+          <li>контроль входных данных и инвариантов;</li>
+          <li>работающий код;</li>
+          <li>функциональные тесты;</li>
+          <li>регрессионные тесты безопасности;</li>
+          <li>отчёт линтера;</li>
+          <li>результаты SAST;</li>
+          <li>результаты SCA;</li>
+          <li>история изменений;</li>
+          <li>контроль секретов;</li>
+          <li>воспроизводимая сборка;</li>
+          <li>идентифицированная версия выпуска;</li>
+          <li>зафиксированные ограничения продукта.</li>
+        </ol>
+        <p class="note"><strong>Оговорка.</strong> Это дидактический чек-лист автора, а не статистика рынка и не универсальный нормативный перечень. Конкретный набор доказательств задают риски, требования заказчика и применимые стандарты.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="cycles" aria-labelledby="cycles-title">
+      <div class="topic-number" aria-hidden="true">02</div>
+      <div class="topic-body">
+        <span class="label">Авторская схема</span>
+        <h2 id="cycles-title">Те же этапы, короче обратная связь</h2>
+        <p>Для объяснения курса жизненный цикл сгруппирован в семь этапов. Реальные стандарты и организации могут называть и объединять их иначе.</p>
+        <div class="flow" aria-label="Семь этапов учебной модели жизненного цикла">
+          <span>Требования</span><i aria-hidden="true">→</i><span>Проектирование</span><i aria-hidden="true">→</i><span>Реализация</span><i aria-hidden="true">→</i><span>Тестирование</span><i aria-hidden="true">→</i><span>Выпуск</span><i aria-hidden="true">→</i><span>Сопровождение</span><i aria-hidden="true">→</i><span>Вывод</span>
+        </div>
+        <p>Waterfall, итеративная разработка, Agile и DevSecOps различаются организацией работ и длиной обратной связи. Они не образуют простую шкалу «старое → правильное»: выбор процесса зависит от контекста, критичности и требований подтверждения.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="early" aria-labelledby="early-title">
+      <div class="topic-number" aria-hidden="true">03</div>
+      <div class="topic-body">
+        <h2 id="early-title">Раннее исправление уменьшает объём переделок</h2>
+        <div class="grid">
+          <article class="card"><h3>До реализации</h3><p>Меняется требование, интерфейс или решение модели угроз, пока от него ещё мало зависимостей.</p></article>
+          <article class="card"><h3>После выпуска</h3><p>Нужно учитывать миграцию, совместимость, эксплуатацию, уведомления, исправление уже поставленных копий и повторную проверку.</p></article>
+        </div>
+        <p class="note"><strong>Оговорка.</strong> «Минуты против месяцев» на исходном слайде — иллюстрация накопления зависимостей, а не универсальный коэффициент стоимости. Иногда позднее исправление действительно дешевле; решение принимают по риску и фактической цене изменения.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="xp" aria-labelledby="xp-title">
+      <div class="topic-number" aria-hidden="true">04</div>
+      <div class="topic-body">
+        <h2 id="xp-title">Практики XP пережили ярлык методологии</h2>
+        <p>Практики XP — парное программирование, TDD и CI — продолжают использоваться как механики обратной связи в современных процессах. К ним добавились правила безопасного кодирования, регрессионные проверки безопасности и автоматизированный конвейер.</p>
+        <p class="note"><strong>Не подмена.</strong> Ни TDD, ни CI сами по себе не делают продукт безопасным: они помогают быстро проверять явно сформулированные свойства.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="layers" aria-labelledby="layers-title">
+      <div class="topic-number" aria-hidden="true">05</div>
+      <div class="topic-body">
+        <span class="label">Авторская модель</span>
+        <h2 id="layers-title">Выпуск опирается на 10 слоёв</h2>
+        <div class="grid">
+          <ol class="card">
+            <li>язык;</li><li>пакеты;</li><li>фреймворк;</li><li>данные;</li><li>контейнеры и среда;</li>
+          </ol>
+          <ol class="card" start="6">
+            <li>контроль версий;</li><li>CI/CD;</li><li>качество и безопасность;</li><li>наблюдаемость;</li><li>инструменты разработчика.</li>
+          </ol>
+        </div>
+        <p>Фраза «курсы пропускают 6 из 10 слоёв» описывает наблюдение автора и обсуждение на занятии, а не результат репрезентативного исследования. И область сертификации нельзя выводить из этой схемы: она определяется конкретной схемой оценки и её требованиями.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="language" aria-labelledby="language-title">
+      <div class="topic-number" aria-hidden="true">06</div>
+      <div class="topic-body">
+        <h2 id="language-title">Язык меняет доступные классы ошибок</h2>
+        <p>Безопасность памяти может обеспечиваться программной моделью языка, компилятором или средой выполнения. Это снижает вероятность целых классов ошибок, но не отменяет архитектурные дефекты, небезопасные расширения, FFI, режимы <code>unsafe</code> и ошибки зависимостей.</p>
+        <div class="table-wrap">
+          <table>
+            <caption>Учебное сравнение механизма контроля границ памяти</caption>
+            <thead><tr><th scope="col">Пример</th><th scope="col">Основной механизм</th><th scope="col">Граница утверждения</th></tr></thead>
+            <tbody>
+              <tr><td>Assembler / C / C++</td><td>Ответственность разработчика, анализаторы и защитные флаги</td><td>Сам язык не гарантирует безопасный доступ к памяти</td></tr>
+              <tr><td>Object Pascal</td><td>Проверки диапазонов зависят от компилятора и конфигурации</td><td>Проверка может быть отключена</td></tr>
+              <tr><td>C# / Python</td><td>Управляемая среда</td><td>Нативный код и небезопасные интерфейсы остаются отдельной границей</td></tr>
+              <tr><td>Rust</td><td>Гарантии безопасного подмножества</td><td><code>unsafe</code> и FFI требуют отдельного контроля</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="topic" id="memory" aria-labelledby="memory-title">
+      <div class="topic-number" aria-hidden="true">07</div>
+      <div class="topic-body">
+        <h2 id="memory-title">Что на самом деле означает число 70 %</h2>
+        <p>Исторический показатель ~70 % относится к уязвимостям, которым Microsoft назначала CVE в анализировавшийся период, и которые MSRC связывал с проблемами безопасности памяти. Это сильный аргумент в пользу memory-safe подходов для соответствующего кода, но не доля для всех продуктов, языков и лет.</p>
+        <p class="note good"><strong>Корректная формулировка.</strong> Memory-safe язык может исключить или существенно затруднить конкретные классы повреждения памяти в безопасном коде; он не исключает SQL-инъекцию, ошибки авторизации, утечки секретов или небезопасную бизнес-логику.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="defects" aria-labelledby="defects-title">
+      <div class="topic-number" aria-hidden="true">08</div>
+      <div class="topic-body">
+        <h2 id="defects-title">Четыре намеренных дефекта не исчезают от смены языка</h2>
+        <div class="grid">
+          <article class="card"><h3>CWE-89 · SQL-инъекция</h3><p>Управляемые данные смешиваются с синтаксисом SQL. Основная мера — параметризованные запросы и минимальные полномочия БД.</p></article>
+          <article class="card"><h3>CWE-22 · Path traversal</h3><p>Недостаточно ограничен путь к разрешённому каталогу. Нужны нормализация, проверка итогового пути и строгая модель разрешённых ресурсов.</p></article>
+          <article class="card"><h3>CWE-798 · Жёстко заданные учётные данные</h3><p>Общий секрет оказывается в коде или поставке. Нужны внешнее управление секретами, ротация и запрет публикации.</p></article>
+          <article class="card"><h3>CWE-532 · Чувствительные данные в журнале</h3><p>Логирование раскрывает секреты или персональные данные. Нужны минимизация, маскирование, контроль доступа и сроков хранения.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="topic" id="rules" aria-labelledby="rules-title">
+      <div class="topic-number" aria-hidden="true">09</div>
+      <div class="topic-body">
+        <h2 id="rules-title">Правило «никогда» превращается в исполняемый тест</h2>
+        <p>Формулировка «поиск никогда не возвращает запись другого владельца» задаёт наблюдаемое запрещённое поведение. Сначала тест должен упасть на дефектной версии, затем стать зелёным после исправления и остаться регрессионным контролем.</p>
+        <p class="note"><strong>Предел теста.</strong> Зелёный тест доказывает только проверенный сценарий при заданных условиях. Он не заменяет модель угроз, анализ кода и другие методы верификации.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="states" aria-labelledby="states-title">
+      <div class="topic-number" aria-hidden="true">10</div>
+      <div class="topic-body">
+        <h2 id="states-title">Валидное состояние как свойство объекта</h2>
+        <p>Валидное состояние, заданное конструктором и типами, можно обеспечить с момента создания объекта: allowlist, диапазоны, обязательные поля и неизменяемость проверяются в одной границе.</p>
+        <p class="note"><strong>Оговорка.</strong> Фраза «обход невозможен» верна только для доказанной границы. Десериализация, ORM, рефлексия, конкурентные изменения и нативные интерфейсы могут создавать обходные пути — их нужно проверять отдельно.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="tools" aria-labelledby="tools-title">
+      <div class="topic-number" aria-hidden="true">11</div>
+      <div class="topic-body">
+        <h2 id="tools-title">Инструменты соединяются, но не подменяют друг друга</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>Граница демонстрации Ruff и Bandit</caption>
+            <thead><tr><th scope="col">Инструмент</th><th scope="col">Роль</th><th scope="col">SQL-инъекция</th></tr></thead>
+            <tbody>
+              <tr><td>Ruff</td><td>Линтер и набор правил качества для Python</td><td>Не является доказательством отсутствия SQL-инъекции</td></tr>
+              <tr><td>Bandit</td><td>SAST-проверки распространённых опасных конструкций Python</td><td>Правило B608 ищет вероятное формирование SQL-строк, но допускает ложные срабатывания и пропуски</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Вывод слайда сохраняется в точной форме: одного линтера недостаточно; SAST также не даёт 100 % полноты. Нужны несколько независимых проверок и анализ результата человеком.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="gates" aria-labelledby="gates-title">
+      <div class="topic-number" aria-hidden="true">12</div>
+      <div class="topic-body">
+        <h2 id="gates-title">Контроль имеет смысл, если влияет на выпуск</h2>
+        <p>Блокирующий quality gate делает отрицательный результат видимым и требует исправления, принятого исключения или изменения риска до выпуска.</p>
+        <div class="grid">
+          <article class="card"><h3>Обычно блокируют</h3><p>Падение обязательных тестов, нарушение политики секретов, неподписанный или невоспроизводимый артефакт, подтверждённая критичная уязвимость.</p></article>
+          <article class="card"><h3>Решают по политике риска</h3><p>Порог SAST/SCA, допустимый возраст исправления, уровень уверенности и условия временного исключения.</p></article>
+        </div>
+        <p class="note"><strong>Исправление исходного слайда.</strong> Правило «SCA только предупреждает» не универсально. SCA может и должен блокировать выпуск при нарушении заданной политики — например, при запрещённой лицензии, известной эксплуатируемой уязвимости или отсутствии утверждённого исключения.</p>
+      </div>
+    </section>
+
+    <section class="topic" id="shift-left" aria-labelledby="shift-title">
+      <div class="topic-number" aria-hidden="true">13</div>
+      <div class="topic-body">
+        <h2 id="shift-title"><span lang="en">Shift left</span>: обратная связь раньше, контроль — на всём цикле</h2>
+        <p>Смысл shift left — проверить требования, архитектуру, код и зависимости до того, как вокруг дефекта накопятся интеграции и поставленные экземпляры. Это не перенос всей ответственности на разработчика и не отказ от тестирования перед выпуском и в эксплуатации.</p>
+        <p class="note good"><strong>Практический итог.</strong> Встраивайте безопасность в существующий SDLC: требования и модель угроз — до кода; secure coding, тесты, SAST и SCA — в разработке; подпись, provenance и quality gates — в выпуске; мониторинг и реакцию — в сопровождении.</p>
+      </div>
+    </section>
+
+    <aside class="provenance" id="sources" aria-labelledby="sources-title">
+      <h2 id="sources-title">Происхождение, источники и границы</h2>
+      <p>Этот HTML сохраняет последовательность и учебные тезисы исходного 14-слайдового материала, но переводит их в доступный текст и явно помечает авторские схемы. Иллюстрации исходного PDF не переносятся: они не являются доказательствами тезисов и не нужны для понимания.</p>
+      <ul>
+        <li><a href="https://csrc.nist.gov/pubs/sp/800/218/final">NIST SP 800-218, Secure Software Development Framework (SSDF) 1.1</a> — интеграция практик безопасности в существующий SDLC и риск-ориентированный выбор практик.</li>
+        <li><a href="https://owasp.org/www-project-application-security-verification-standard/">OWASP ASVS</a> — проверяемые требования и уровни строгости технической верификации веб-приложений.</li>
+        <li><a href="https://www.microsoft.com/en-us/msrc/blog/2019/07/a-proactive-approach-to-more-secure-code/">Microsoft Security Response Center: A proactive approach to more secure code</a> — первичный контекст исторического показателя около 70 %.</li>
+        <li>MITRE CWE: <a href="https://cwe.mitre.org/data/definitions/89.html">CWE-89</a>, <a href="https://cwe.mitre.org/data/definitions/22.html">CWE-22</a>, <a href="https://cwe.mitre.org/data/definitions/798.html">CWE-798</a>, <a href="https://cwe.mitre.org/data/definitions/532.html">CWE-532</a>.</li>
+        <li><a href="https://docs.astral.sh/ruff/rules/">Ruff Rules</a> и <a href="https://bandit.readthedocs.io/en/latest/plugins/b608_hardcoded_sql_expressions.html">Bandit B608</a> — фактические границы демонстрации анализаторов.</li>
+      </ul>
+      <p><strong>Версионная оговорка.</strong> Внешние стандарты и инструменты развиваются. Перед использованием как контрольного перечня проверьте актуальную редакцию и требования вашей организации. Авторские числа «14 свидетельств», «10 слоёв» и «13 автоматизируемых элементов» — структура этой лекции, а не обязательные нормы NIST или OWASP.</p>
+    </aside>
+  </main>
+
+  <footer class="page-footer">
+    <p>Авторский учебный материал В.А. Пикова. Датированный адрес сайта сохранён как технический идентификатор публикации, а содержание не привязано к календарному занятию.</p>
+  </footer>
+</body>
+</html>

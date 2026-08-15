@@ -63,12 +63,12 @@
             <a class="button ghost" href="slides-day-01.html">Открыть слайды <span aria-hidden="true">→</span></a>
           </div>
           <div class="hero-meta" aria-label="Сведения о материале">
-            <span><b>11.08.2026</b> первый день</span>
+            <span><b>День 01</b> базовая модель AppSec</span>
             <span><b>A01–A06</b> OWASP Top 10:2025</span>
             <span><b>RU</b> авторский конспект</span>
           </div>
           <aside class="notice" aria-label="Атрибуция">
-            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em> (11–12 августа 2026 года). Основной блок первого дня вёл Дмитрий Павлухин, архитектор по информационной безопасности. Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения.
+            <strong>Материалы автора.</strong> Подготовлены по результатам участия в программе АО «Лаборатория Касперского» <em>«Образовательная лаборатория Kaspersky Academy | Безопасность приложений»</em>. Основной исходный блок первого дня вёл Дмитрий Павлухин, архитектор по информационной безопасности. Этот сайт не является официальным ресурсом АО «Лаборатория Касперского» и не означает его одобрения. Дата и полная атрибуция исходной программы сохранены в разделе <a href="rights.html">«Права»</a>.
           </aside>
         </div>
       </div>
@@ -535,7 +535,7 @@
               <text x="16" y="414" class="dg-s">Проверка входа (формат, смысл, происхождение) · авторизация действия · минимально необходимые права · запись в журнал без секретов.</text>
             </svg>
           </div>
-          <figcaption><b>Это и есть групповое упражнение первого дня.</b> Карта превращает абстрактный разговор об угрозах в перечень: субъекты, входы, переходы, полномочия, хранилища, журналы и зависимости. Заполненный пример карточки входит в <a href="#downloads">публичный пакет материалов</a>.</figcaption>
+          <figcaption><b>Это и есть групповое упражнение первого дня.</b> Карта превращает абстрактный разговор об угрозах в перечень: субъекты, входы, переходы, полномочия, хранилища, журналы и зависимости. До чистой пересборки заполненного примера используйте авторский шаблон и обезличенные данные своей группы.</figcaption>
         </figure>
 
         <div class="callout teacher reveal">
@@ -726,9 +726,9 @@
         <div class="section-top reveal">
           <div>
             <p class="caption">Заключительный блок дня · безопасность ИИ</p>
-            <h2 id="ai-title">Языковая модель не создаёт новый вид уязвимостей. Она создаёт новые входы.</h2>
+            <h2 id="ai-title">Языковые модели меняют модель угроз: знакомые слабости сохраняются, но появляются ИИ-специфичные поверхности атаки.</h2>
           </div>
-          <p>Всё, что разобрано выше — недоверенный ввод, границы доверия, минимальные права, проверяемый результат, — применимо и здесь. Меняется одно: часть решений принимает компонент, поведение которого нельзя задать перечнем правил. Для этой области OWASP ведёт отдельные списки: <a href="https://genai.owasp.org/llm-top-10/" rel="noreferrer">Top 10 for LLM Applications</a>, Top 10 for Agentic Applications и стандарт проверки <a href="https://owasp.org/www-project-artificial-intelligence-security-verification-standard/" rel="noreferrer">AISVS</a>.</p>
+          <p>Недоверенный ввод, границы доверия, минимальные права и проверяемый результат применимы и здесь, но их недостаточно считать полным перечнем. Для разных задач OWASP публикует разные версионные источники: <a href="https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/" rel="noreferrer">Top 10 for LLM Applications 2025</a>, отдельный <a href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/" rel="noreferrer">Top 10 for Agentic Applications 2026</a> и проверочный стандарт <a href="https://owasp.org/www-project-artificial-intelligence-security-verification-standard-aisvs-docs/" rel="noreferrer">AISVS 1.0</a>. Не смешивайте таксономию рисков, агентную модель угроз и проверяемые требования.</p>
         </div>
 
         <figure class="figure reveal">
@@ -841,9 +841,10 @@
         <div class="split">
           <article class="panel reveal">
             <span class="tag">Классы рисков</span>
-            <h3>О чём именно предупреждает список OWASP для LLM</h3>
-            <p>Внедрение инструкций через данные, раскрытие чувствительной информации из контекста, отравление цепочки поставки моделей и наборов данных, небезопасная обработка вывода модели, чрезмерные полномочия агента, утечка системной инструкции, уязвимости векторных хранилищ и эмбеддингов, а также правдоподобная дезинформация.</p>
-            <p>Для агентных систем добавляются свои сюжеты: неожиданное выполнение кода, отравление памяти и контекста, эксплуатация доверия человека к агенту.</p>
+            <h3>OWASP Top 10 for LLM Applications 2025 — точные метки редакции</h3>
+            <p><b>LLM01:2025</b> Prompt Injection; <b>LLM02:2025</b> Sensitive Information Disclosure; <b>LLM03:2025</b> Supply Chain; <b>LLM04:2025</b> Data and Model Poisoning; <b>LLM05:2025</b> Improper Output Handling.</p>
+            <p><b>LLM06:2025</b> Excessive Agency; <b>LLM07:2025</b> System Prompt Leakage; <b>LLM08:2025</b> Vector and Embedding Weaknesses; <b>LLM09:2025</b> Misinformation; <b>LLM10:2025</b> Unbounded Consumption.</p>
+            <p><a href="https://genai.owasp.org/resource/owasp-top-10-for-agentic-applications-for-2026/" rel="noreferrer">Agentic Applications 2026</a> — отдельная таксономия для агентных систем; её категории нельзя выдавать за продолжение списка LLM01–LLM10. Для проектирования проверок используйте <a href="https://owasp.org/www-project-artificial-intelligence-security-verification-standard-aisvs-docs/" rel="noreferrer">AISVS 1.0</a>.</p>
           </article>
           <article class="panel reveal">
             <span class="tag good">Проверяемость</span>
@@ -860,7 +861,7 @@
           </div>
           <div class="callout teacher">
             <p class="callout-label">Заметка преподавателя</p>
-            <p>Этот блок хорошо ставить в конец дня: он собирает воедино весь пройденный материал и снимает частое возражение «ИИ — это отдельная тема, к нам не относится». Полезный приём — предложить группе классифицировать три ИИ-риска по уже знакомым категориям A01–A06; совпадение оказывается почти полным, и это лучший аргумент за то, что база не устарела.</p>
+            <p>Этот блок хорошо ставить в конец дня: он связывает пройденные инженерные принципы с новой архитектурой. Предложите группе сопоставить три ИИ-риска с A01–A06, а затем отдельно отметить то, что такое сопоставление не покрывает. Это показывает и переносимость базы, и необходимость самостоятельной модели угроз для LLM- и агентных систем.</p>
             <p>Отдельно проговорите методическую сторону: если студенты сдают работы, написанные с помощью модели, критерием оценки становится не текст, а способность объяснить причину и защитить решение устно.</p>
           </div>
         </div>
@@ -904,10 +905,10 @@
             <p class="caption">Скачать и переиспользовать</p>
             <h2 id="downloads-title">Авторские методички и открытый архив первого дня.</h2>
           </div>
-          <p>Здесь собраны авторские методички и материалы первого дня: слайды, Markdown-протокол и стенограмма, автоматические пересказы, программа, учебный пакет и результаты лабораторных работ. Для пакетов опубликованы контрольные суммы.</p>
+          <p>Доступны авторские Markdown-методички, слайды, протокол, стенограмма, автоматические пересказы и канонический безопасный пакет с локальным стендом. Пакет сопровождается SHA-256 и машинным манифестом; прежние PDF/DOCX и результаты работ остаются в карантине и не публикуются.</p>
         </div>
         <div class="download-grid">
-          <article class="download reveal"><span class="file-type">MD · 01</span><h3>Методический конспект первого дня</h3><p>Ключевые понятия, A01–A06, безопасность ИИ, вопросы для обсуждения и список источников.</p><a class="button" href="materials/2026-08-11-день-1-методический-конспект.md" download>Скачать Markdown ↓</a></article>
+          <article class="download reveal"><span class="file-type">MD · 01</span><h3>Методический конспект первого дня</h3><p>Ключевые понятия, A01–A06, безопасность ИИ, вопросы для обсуждения и список источников.</p><a class="button" href="materials/день-1-методический-конспект.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 02</span><h3>Методичка практикума</h3><p>Безопасный порядок локальной работы, правила доказательств, контроль версий образа и запрет публичной экспозиции учебных целей.</p><a class="button" href="materials/практикум-безопасность-приложений-методичка.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 03</span><h3>Шаблон отчёта ЛР</h3><p>Готовая форма: среда, наблюдение, первопричина, последствия, исправление и регрессионная проверка.</p><a class="button" href="materials/шаблон-отчёта-лабораторной-работы.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · 04</span><h3>Чек-лист слушателя</h3><p>Короткий перечень действий до, во время и после занятия: разрешение, изоляция, доказательства, очистка среды.</p><a class="button" href="materials/чек-лист-слушателя.md" download>Скачать Markdown ↓</a></article>
@@ -919,10 +920,10 @@
           <article class="download reveal"><span class="file-type">MD · стенограмма</span><h3>Подробная стенограмма первого дня</h3><p>Полный очищенный хронологический текст занятия: вопросы, ответы, примеры и отмеченные неразборчивые места.</p><a class="button" href="downloads/day-01/transcripts/Стенограмма-дня-01-подробная-редактированная.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">MD · протокол</span><h3>Редактированный протокол дня</h3><p>Краткий учебный маршрут: темы, лабораторные работы, выводы и методические ориентиры.</p><a class="button" href="downloads/day-01/transcripts/Протокол-дня-01-редактированный.md" download>Скачать Markdown ↓</a></article>
           <article class="download reveal"><span class="file-type">ZIP · MD</span><h3>Стенограмма, протокол и пересказы</h3><p>Подробная стенограмма, отдельный протокол и три автоматических пересказа в Markdown.</p><a class="button" href="downloads/day-01-edited-transcript-and-summaries.zip" download>Скачать Markdown ↓</a></article>
-          <article class="download reveal"><span class="file-type">ZIP · публичный пакет</span><h3>Все материалы первого дня</h3><p>Стенограммы, авторские методички, программа, пакет участника, лабораторные отчёты и материалы среды.</p><a class="button" href="downloads/day-01-public-materials.zip" download>Скачать всё ↓</a></article>
+          <article class="download reveal"><span class="file-type">ZIP · канонический пакет</span><h3>Методички и безопасный локальный стенд</h3><p>Воспроизводимый набор из опубликованных Markdown-материалов и ограниченного Juice Shop fixture. Прежние PDF/DOCX и результаты работ исключены.</p><p class="button-row"><a class="button primary" href="downloads/day-01-canonical-safe-package.zip" download>Скачать пакет ↓</a><a class="button" href="downloads/day-01-SHA256SUMS.md" download>SHA-256 →</a><a class="button" href="downloads/day-01-manifest.json" download>Манифест →</a></p></article>
         </div>
         <aside class="notice amber reveal">
-          <strong>Открытый архив первого дня.</strong> В нём доступны слайды, подробная Markdown-стенограмма, отдельный протокол, автоматические пересказы, программа, пакет участника, авторские методички и результаты лабораторных работ. Полный состав и форматы указаны в <a href="materials/каталог-материалов-дня-1.md" download>каталоге материалов →</a>
+          <strong>Открытый архив первого дня.</strong> Доступны слайды, подробная Markdown-стенограмма, отдельный протокол, автоматические пересказы, авторские методички и канонический безопасный пакет. Состав пакета, его контрольные суммы и статус исключённых бинарных источников указаны в <a href="materials/каталог-материалов-дня-1.md" download>каталоге материалов →</a>
         </aside>
       </div>
     </section>
@@ -939,7 +940,7 @@
         <div class="sources">
           <article class="source reveal"><h3><a href="https://owasp.org/Top10/" rel="noreferrer">OWASP Top 10</a></h3><p>Актуальная страница классификации веб-рисков; проверяйте год редакции, а не переносите старые метки автоматически.</p></article>
           <article class="source reveal"><h3><a href="https://owasp.org/www-project-web-security-testing-guide/" rel="noreferrer">OWASP WSTG</a></h3><p>Web Security Testing Guide — ориентир для планирования и документирования тестирования веб-приложений.</p></article>
-          <article class="source reveal"><h3><a href="https://genai.owasp.org/llm-top-10/" rel="noreferrer">OWASP Top 10 for LLM Applications</a></h3><p>Версионные материалы по рискам систем с LLM; особенно важны контроль инструментов и границы доверия.</p></article>
+          <article class="source reveal"><h3><a href="https://genai.owasp.org/resource/owasp-top-10-for-llm-applications-2025/" rel="noreferrer">OWASP Top 10 for LLM Applications 2025</a></h3><p>Версионная таксономия LLM01:2025–LLM10:2025. Для агентных систем используйте отдельную редакцию Agentic Applications 2026, а для проверяемых требований — AISVS 1.0.</p></article>
           <article class="source reveal"><h3><a href="https://academy.kaspersky.com/" rel="noreferrer">Kaspersky Academy</a></h3><p>Официальная образовательная площадка. Сайт не является её зеркалом и не представляет АО «Лаборатория Касперского».</p></article>
         </div>
       </div>

@@ -20,7 +20,19 @@
 2. Зафиксируйте версию ОС и .NET Framework.
 3. Скачайте программу и руководство с БДУ ФСТЭК России.
 4. Скачайте актуальный XML-набор OVAL-описаний.
-5. Запишите дату и источник каждого файла; проверьте хеш, если он опубликован.
+5. Запишите дату и источник каждого файла. До запуска получите ожидаемые SHA-256 и имя издателя из подписанного реестра преподавателя/вендора по аутентифицированному независимому каналу и выполните проверку:
+
+```powershell
+$ScanOvalInstaller = '.\ScanOVAL-installer.exe'
+$ExpectedScanOvalSha256 = '<64_HEX_ИЗ_ПОДПИСАННОГО_РЕЕСТРА>'
+$ExpectedPublisher = '<ТОЧНЫЙ_SUBJECT_ИЗ_ПОДПИСАННОГО_РЕЕСТРА>'
+if ($ExpectedScanOvalSha256 -notmatch '^[0-9A-Fa-f]{64}$') { throw 'STOP: expected SHA-256 is absent' }
+if ((Get-FileHash -LiteralPath $ScanOvalInstaller -Algorithm SHA256).Hash -ne $ExpectedScanOvalSha256) { throw 'STOP: SHA-256 mismatch' }
+$Signature = Get-AuthenticodeSignature -LiteralPath $ScanOvalInstaller
+if ($Signature.Status -ne 'Valid' -or $Signature.SignerCertificate.Subject -ne $ExpectedPublisher) { throw 'STOP: Authenticode publisher mismatch' }
+```
+
+Отсутствие доверенного ожидаемого значения, невалидная Authenticode-подпись, иной издатель или несовпадение SHA-256 — **STOP: ScanOVAL не запускать**.
 
 ## Задание — 90 минут
 

@@ -20,7 +20,7 @@ foreach ($requiredPath in @($dayRoot, $transcripts, $participantMaterials, $mate
 }
 
 $authorMaterialNames = @(
-  (Convert-FromUtf8Base64 'MjAyNi0wOC0xMi3QtNC10L3RjC0yLdC80LXRgtC+0LTQuNGH0LXRgdC60LjQuS3QutC+0L3RgdC/0LXQutGCLm1k'),
+  (Convert-FromUtf8Base64 '0LTQtdC90YwtMi3QvNC10YLQvtC00LjRh9C10YHQutC40Lkt0LrQvtC90YHQv9C10LrRgi5tZA=='),
   (Convert-FromUtf8Base64 '0L/RgNCw0LrRgtC40LrRg9C8LdC00LXQvdGMLTIt0L3QsNCx0L7RgC3Qt9Cw0LTQsNC90LjQuS5tZA=='),
   (Convert-FromUtf8Base64 '0LjRgdGC0L7Rh9C90LjQutC4LdC4LdCy0LXRgNGB0LjQuC3QtNC10L3RjC0yLm1k'),
   (Convert-FromUtf8Base64 '0LTQtdC90YwtMi3QstC10LEt0YHQu9Cw0LnQtNGLLUFwcFNlYy1TU0RMQy3QuC3QmNCYLm1k')
@@ -30,19 +30,11 @@ $authorMaterialPaths = foreach ($name in $authorMaterialNames) {
   if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
     throw "Missing Day 2 author material: $path"
   }
+  $item = Get-Item -LiteralPath $path -Force
+  if (($item.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0) {
+    throw "Day 2 author material must not be a reparse point: $path"
+  }
   $path
-}
-
-function Assert-PublicTree {
-  param([Parameter(Mandatory = $true)][string[]]$Path)
-
-  $forbidden = Get-ChildItem -LiteralPath $Path -File -Recurse | Where-Object {
-    $_.Extension -in @('.txt', '.jpg', '.jpeg', '.png', '.webp')
-  }
-  if ($forbidden) {
-    $names = ($forbidden | ForEach-Object FullName) -join [Environment]::NewLine
-    throw "Day 2 public package contains forbidden raw text or image files:`n$names"
-  }
 }
 
 Add-Type -AssemblyName System.IO.Compression.FileSystem
@@ -95,7 +87,54 @@ function Get-RelativeForwardSlashPath {
   return $full.Substring($base.Length).Replace('\', '/')
 }
 
-Assert-PublicTree -Path (@($transcripts, $participantMaterials) + $authorMaterialPaths)
+function Assert-ExactPublicFileSet {
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [Parameter(Mandatory = $true)][string[]]$ExpectedRelativePath
+  )
+
+  $reparsePoints = @(Get-ChildItem -LiteralPath $Root -Force -Recurse | Where-Object {
+    ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
+  })
+  if ($reparsePoints.Count -gt 0) {
+    throw "Unexpected public source reparse point: $($reparsePoints[0].FullName)"
+  }
+
+  $expected = @($ExpectedRelativePath | ForEach-Object { $_.Replace('\', '/') } | Sort-Object -Unique)
+  $actual = @(Get-ChildItem -LiteralPath $Root -Force -File -Recurse | ForEach-Object {
+    Get-RelativeForwardSlashPath -BasePath $Root -FullPath $_.FullName
+  } | Sort-Object -Unique)
+  $unexpected = @($actual | Where-Object { $expected -notcontains $_ })
+  if ($unexpected.Count -gt 0) {
+    throw "Unexpected public source file: $($unexpected[0])"
+  }
+  $missing = @($expected | Where-Object { $actual -notcontains $_ })
+  if ($missing.Count -gt 0) {
+    throw "Missing reviewed public source file: $($missing[0])"
+  }
+}
+
+$dayTwoTranscriptFiles = @(
+  (Convert-FromUtf8Base64 '0J/RgNC+0YLQvtC60L7Quy3QtNC90Y8tMDIt0YDQtdC00LDQutGC0LjRgNC+0LLQsNC90L3Ri9C5Lm1k'),
+  (Convert-FromUtf8Base64 '0KHRgtC10L3QvtCz0YDQsNC80LzQsC3QtNC90Y8tMDIt0L/QvtC70L3QsNGPLdGA0LXQtNCw0LrRgtC40YDQvtCy0LDQvdC90LDRjy5tZA==')
+)
+$dayTwoParticipantFiles = @(
+  'lr-ssrf/docker-compose.yml',
+  'lr-ssrf/README.md',
+  'lr-ssrf/app/app.py',
+  'lr-ssrf/app/Dockerfile',
+  'lr-ssrf/gateway/Dockerfile',
+  'lr-ssrf/gateway/gateway.py',
+  'lr-ssrf/internal/app.py',
+  'lr-ssrf/internal/Dockerfile',
+  'lr-ssrf/start.ps1',
+  'lr-ssrf/stop.ps1'
+)
+
+# Fail closed before changing published archives. The package is built only
+# when its source trees exactly match these reviewed relative-file allowlists.
+Assert-ExactPublicFileSet -Root $transcripts -ExpectedRelativePath $dayTwoTranscriptFiles
+Assert-ExactPublicFileSet -Root $participantMaterials -ExpectedRelativePath $dayTwoParticipantFiles
 
 # Keep draft and primary archives from re-entering the public release.
 @(
@@ -151,7 +190,7 @@ $authorFiles = $authorMaterialPaths | ForEach-Object {
 }
 $files = @($dayFiles + $authorFiles | Sort-Object path)
 $manifest = [pscustomobject]@{
-  title = (Convert-FromUtf8Base64 '0J/Rg9Cx0LvQuNGH0L3Ri9C1INC80LDRgtC10YDQuNCw0LvRiyDQstGC0L7RgNC+0LPQviDQtNC90Y8g4oCUIDEyINCw0LLQs9GD0YHRgtCwIDIwMjYg0LPQvtC00LA=')
+  title = (Convert-FromUtf8Base64 '0J/Rg9Cx0LvQuNGH0L3Ri9C1INC80LDRgtC10YDQuNCw0LvRiyDQstGC0L7RgNC+0LPQviDQtNC90Y8=')
   files = @($files)
 }
 $manifestText = $manifest | ConvertTo-Json -Depth 4

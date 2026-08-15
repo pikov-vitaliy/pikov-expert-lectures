@@ -355,6 +355,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     // preserve ordering (React before ReactDOM before Babel before text/babel).
     const outerTitle = document.title;
     const doc = new DOMParser().parseFromString(template, 'text/html');
+    doc.documentElement.setAttribute('lang', 'ru');
+    const contentRoot = doc.querySelector('[data-smib-root]');
+    if (contentRoot && contentRoot.tagName !== 'MAIN') {
+      const main = doc.createElement('main');
+      for (const attr of Array.from(contentRoot.attributes)) {
+        main.setAttribute(attr.name, attr.value);
+      }
+      while (contentRoot.firstChild) main.appendChild(contentRoot.firstChild);
+      contentRoot.replaceWith(main);
+    }
     document.documentElement.replaceWith(doc.documentElement);
     if (outerTitle) document.title = outerTitle;
 

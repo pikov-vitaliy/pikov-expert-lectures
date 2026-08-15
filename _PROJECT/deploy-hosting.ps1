@@ -24,6 +24,94 @@ function Invoke-Checked([string]$FilePath, [string[]]$Arguments) {
   }
 }
 
+function Assert-SafeLeaf([string]$Value, [string]$FieldName, [string]$Pattern) {
+  if ([string]::IsNullOrWhiteSpace($Value)) {
+    Fail "Unsafe ${FieldName}: value is empty"
+  }
+  if ($Value -in @('.', '..') -or $Value.IndexOfAny(@([char]'/', [char]'\')) -ge 0) {
+    Fail "Unsafe $FieldName leaf: $Value"
+  }
+  if (@($Value.ToCharArray() | Where-Object { [char]::IsControl($_) }).Count -gt 0) {
+    Fail "Unsafe ${FieldName}: control character"
+  }
+  if ($Value -notmatch $Pattern) {
+    Fail "Unsafe $FieldName leaf: $Value"
+  }
+}
+
+function Get-CanonicalReleaseTargets([object]$LectureData, [string]$RepositoryRoot, [string]$Date) {
+  $targets = New-Object System.Collections.Generic.List[object]
+  $targets.Add([pscustomobject]@{
+    kind = 'root'
+    folder = ''
+    domain = 'pikov.expert'
+    archiveName = "pikov.expert-root-release-$Date.zip"
+    archivePath = Join-Path $RepositoryRoot "release\pikov.expert-root-release-$Date.zip"
+  })
+
+  $folders = @($LectureData.lectures | Select-Object -ExpandProperty folder -Unique)
+  foreach ($folderValue in $folders) {
+    $folder = [string]$folderValue
+    Assert-SafeLeaf -Value $folder -FieldName 'lecture folder' -Pattern '^[A-Za-z0-9][A-Za-z0-9._-]*$'
+    $lecture = @($LectureData.lectures | Where-Object { ([string]$_.folder) -ceq $folder })[0]
+    $domain = "$([string]$lecture.domain).pikov.expert"
+    Assert-SafeLeaf -Value $domain -FieldName 'canonical domain' -Pattern '^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$'
+    $archiveName = "$domain-release-$Date.zip"
+    $targets.Add([pscustomobject]@{
+      kind = 'domain'
+      folder = $folder
+      domain = $domain
+      archiveName = $archiveName
+      archivePath = Join-Path $RepositoryRoot "$folder\release\$archiveName"
+    })
+  }
+  return $targets
+}
+
+function Assert-CanonicalReleaseIndex([object[]]$Entries, [object[]]$CanonicalTargets) {
+  if ($Entries.Count -ne $CanonicalTargets.Count) {
+    Fail "Release index does not match canonical domain set: expected $($CanonicalTargets.Count), got $($Entries.Count)"
+  }
+
+  $seen = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::Ordinal)
+  foreach ($entry in $Entries) {
+    $domain = [string]$entry.domain
+    $archiveName = [string]$entry.archiveName
+    Assert-SafeLeaf -Value $domain -FieldName 'domain' -Pattern '^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$'
+    Assert-SafeLeaf -Value $archiveName -FieldName 'archiveName' -Pattern '^[A-Za-z0-9][A-Za-z0-9._-]*\.zip$'
+    if (-not $seen.Add($domain)) {
+      Fail "Release index contains duplicate domain: $domain"
+    }
+
+    $expected = @($CanonicalTargets | Where-Object { ([string]$_.domain) -ceq $domain })
+    if ($expected.Count -ne 1) {
+      Fail "Release index does not match canonical domain set: unexpected domain $domain"
+    }
+    $target = $expected[0]
+    if ([string]$entry.kind -cne [string]$target.kind -or [string]$entry.folder -cne [string]$target.folder) {
+      Fail "Release target metadata mismatch for $domain"
+    }
+    if ($archiveName -cne [string]$target.archiveName) {
+      Fail "archiveName mismatch for ${domain}: expected $($target.archiveName), got $archiveName"
+    }
+
+    try {
+      $actualArchivePath = [System.IO.Path]::GetFullPath([string]$entry.archivePath)
+      $expectedArchivePath = [System.IO.Path]::GetFullPath([string]$target.archivePath)
+    } catch {
+      Fail "Invalid archivePath for $domain"
+    }
+    if (-not $actualArchivePath.Equals($expectedArchivePath, [System.StringComparison]::OrdinalIgnoreCase)) {
+      Fail "archivePath mismatch for ${domain}: expected $expectedArchivePath, got $actualArchivePath"
+    }
+  }
+
+  $missing = @($CanonicalTargets | Where-Object { -not $seen.Contains([string]$_.domain) })
+  if ($missing.Count -gt 0) {
+    Fail "Release index does not match canonical domain set: missing $($missing.domain -join ', ')"
+  }
+}
+
 function Remove-OldLocalDeployDirs([string]$ProjectPath, [int]$Keep) {
   if ($Keep -lt 1) { Fail "KeepLocalDeployDirs must be >= 1" }
   $projectResolved = (Resolve-Path -LiteralPath $ProjectPath).Path.TrimEnd('\') + '\'
@@ -63,13 +151,14 @@ if ($SkipPostDeployCheck -and -not $KeepRemoteDeployRoot) {
 
 $releaseIndexPath = Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json"
 if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release index: $releaseIndexPath" }
+$entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
+$canonicalTargets = @(Get-CanonicalReleaseTargets -LectureData $lectureData -RepositoryRoot $rootPath -Date $ReleaseDate)
+Assert-CanonicalReleaseIndex -Entries $entries -CanonicalTargets $canonicalTargets
+
 $independenceGatePath = Join-Path $projectPath 'test-public-release-independence.ps1'
 if (-not (Test-Path -LiteralPath $independenceGatePath)) { Fail "Missing public independence gate: $independenceGatePath" }
 & $independenceGatePath -Root $rootPath -ReleaseIndex $releaseIndexPath
 
-$entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
-$expectedEntries = @($lectureData.lectures | Select-Object -ExpandProperty folder -Unique).Count + 1
-if ($entries.Count -ne $expectedEntries) { Fail "Expected $expectedEntries release entries, got $($entries.Count)" }
 if ($OnlyDomains.Count -gt 0) {
   $requestedDomains = @($OnlyDomains | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ } | Select-Object -Unique)
   $knownDomains = @($entries | ForEach-Object { ([string]$_.domain).ToLowerInvariant() })
@@ -125,12 +214,54 @@ if ! command -v python3 >/dev/null 2>&1; then
   exit 9
 fi
 
+home_real="$(python3 - "$HOME" <<'PY'
+import os
+import sys
+
+home = os.path.realpath(sys.argv[1])
+if not os.path.isabs(home) or home == os.path.sep:
+    raise SystemExit("unsafe remote HOME: %s" % home)
+print(home)
+PY
+)"
+
 while IFS=$'\t' read -r domain archive sha256; do
   domain="${domain%$'\r'}"
   archive="${archive%$'\r'}"
   sha256="${sha256%$'\r'}"
   [ -n "$domain" ] || continue
-  target="$HOME/$domain/www"
+  if [[ ! "$domain" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$ ]]; then
+    echo "Unsafe domain in manifest: $domain" | tee -a "$LOG"
+    exit 16
+  fi
+  if [[ ! "$archive" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*\.zip$ ]]; then
+    echo "Unsafe archive name in manifest: $archive" | tee -a "$LOG"
+    exit 17
+  fi
+  if [[ ! "$sha256" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "Unsafe SHA256 in manifest for $domain" | tee -a "$LOG"
+    exit 18
+  fi
+  target="$(python3 - "$home_real" "$domain" <<'PY'
+import os
+import sys
+
+home = os.path.realpath(sys.argv[1])
+domain = sys.argv[2]
+expected = os.path.join(home, domain, "www")
+resolved = os.path.realpath(expected)
+try:
+    inside_home = os.path.commonpath((home, resolved)) == home
+except ValueError:
+    inside_home = False
+if not inside_home or resolved != expected:
+    raise SystemExit("target escapes expected domain root: %s" % resolved)
+print(resolved)
+PY
+)" || {
+    echo "Unsafe target for $domain" | tee -a "$LOG"
+    exit 19
+  }
   zip_path="$DEPLOY_ROOT/zips/$archive"
   unpack_dir="$DEPLOY_ROOT/unpacked/$domain"
   backup_path="$DEPLOY_ROOT/backups/${domain}-www-${STAMP}.tar.gz"
@@ -156,7 +287,7 @@ while IFS=$'\t' read -r domain archive sha256; do
     exit 13
   fi
 
-  tar -C "$HOME/$domain" -czf "$backup_path" www
+  tar -C "$(dirname "$target")" -czf "$backup_path" www
   rm -rf "$unpack_dir"
   mkdir -p "$unpack_dir"
   python3 - "$zip_path" "$unpack_dir" <<'PY'
