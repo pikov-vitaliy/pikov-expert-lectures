@@ -3,7 +3,7 @@
 > ZIP-пакеты содержат только нормализованные Markdown-материалы и авторский локальный fixture. В них нет raw-ASR TXT, исходных изображений слайдов или документов подгрупп.
 
 ```text
-E5B1CFF4186B923F08CC8196BF0BB3A0E34DBEDCCFC2303481E38F4FAC6431CE  day-02-edited-transcript-and-protocol.zip  67446 bytes
-BA3C869AE1E6BA5C562D17CEBB32FCDD41C2A3B68B4B52EA9540E4AEB8183D30  day-02-laboratory-materials.zip  8200 bytes
-B8AE042D1B4DA3136CD1A8EA99F181A4ADA17C96CAF11F428EDDF930890E34FF  day-02-public-materials.zip  190959 bytes
+EFF5FB7734F77210C561A3FA2A3E66EC650B05FACC90DCF1C38F31A642A6F643  day-02-edited-transcript-and-protocol.zip  68602 bytes
+5895F8DD2C17F1704A33FD8E244A40F03015067553DE2076FC4409B63614E1C0  day-02-laboratory-materials.zip  8148 bytes
+F7D83942AD9E179A2E54AD23A74EAD63CF44BC4128E4748CB4D51B31921BEA38  day-02-public-materials.zip  193921 bytes
 ```

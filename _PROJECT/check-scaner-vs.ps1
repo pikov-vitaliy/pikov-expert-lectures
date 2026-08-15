@@ -262,8 +262,7 @@ Assert-Contains 'scaner-vs/scanner/index.html' @(
     'practical-trajectories\.png',
     'priority-pipeline',
     'href="#installation"',
-    'Установка[^<]{0,100}инструкц[^<]{0,100}УЦ МАСКОМ',
-    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'Установка[^<]{0,100}предоставленн[^<]{0,100}учебн[^<]{0,100}инструкц',
     'wsl\s+--install',
     'wsl\s+--install\s+Ubuntu',
     'wsl\s+-d\s+Ubuntu',
@@ -280,7 +279,7 @@ Assert-Contains 'scaner-vs/scanner/index.html' @(
 )
 
 Assert-Contains 'scaner-vs/materials/scanner/03-wsl-individual.md' @(
-    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'предоставленн[^\r\n]{0,100}учебн[^\r\n]{0,100}инструкц',
     'страниц(?:ы|ах)\s+3.{0,3}5',
     'wsl\s+--install',
     'wsl\s+--install\s+Ubuntu',
@@ -300,7 +299,7 @@ Assert-Contains 'scaner-vs/materials/scanner/03-wsl-individual.md' @(
 )
 
 Assert-Contains '_PROJECT/scaner-vs-offline/scanner/index.html' @(
-    'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+    'предоставленн[^<]{0,100}учебн[^<]{0,100}инструкц',
     'wsl\s+--install',
     'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
     'sh\s+scanner-signed-deb\.run',
@@ -479,7 +478,7 @@ if (Test-Path -LiteralPath $siteRoot) {
                         $reader.Dispose()
                     }
                     foreach ($pattern in @(
-                        'Установка Сканер-ВС 7 для УЦ Маском\.pdf',
+                        'предоставленн[^\r\n]{0,100}учебн[^\r\n]{0,100}инструкц',
                         'wsl\s+--install',
                         'netsh\s+interface\s+portproxy\s+add\s+v4tov4',
                         'sh\s+scanner-signed-deb\.run',

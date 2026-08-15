@@ -23,6 +23,7 @@ jobs:
             '_PROJECT/smoke-check.ps1',
             '_PROJECT/update-site-control-files.ps1',
             '_PROJECT/build-release.ps1',
+            '_PROJECT/test-public-release-independence.ps1',
             '_PROJECT/hosting-check.ps1',
             '_PROJECT/deploy-hosting.ps1'
           )) {
@@ -38,6 +39,11 @@ jobs:
         shell: pwsh
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+
+      - name: Verify public release independence
+        shell: pwsh
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1
 
       - name: Prepare deploy script
         shell: pwsh

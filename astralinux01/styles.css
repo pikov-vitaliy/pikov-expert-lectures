@@ -1,5 +1,5 @@
 /* ============================================================
-   Презентация — Модуль 1. Учебный центр МАСКОМ
+   Презентация — Модуль 1. Авторская лекция В.А. Пикова
    Стиль: чистый минимализм, акцент-зелёный, крупная типографика
    ============================================================ */
 
@@ -10,7 +10,7 @@
   --ink-mute: #8a9099;
   --line: #e5e7eb;
   --line-soft: #f0f2f5;
-  --accent: #00a651;        /* зелёный из лого МАСКОМ */
+  --accent: #00a651;
   --accent-deep: #007a3c;
   --accent-soft: #e6f6ed;
   --warn: #c8331f;
@@ -91,10 +91,14 @@ body {
   padding: 0.6vw 1vw;
   display: block;
 }
-.brand img {
-  width: 100%;
-  height: auto;
+.brand-label {
   display: block;
+  font-family: var(--mono);
+  font-size: 1.05vw;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink);
+  white-space: nowrap;
 }
 
 .counter {
@@ -139,7 +143,7 @@ body {
 .nav-prev { left: 2.4vw; }
 .nav-next { left: calc(2.4vw + 4vw); }
 
-/* On the cover slide we invert chrome colors to read on photo. */
+/* On the dark cover slide we invert chrome colors for contrast. */
 .chrome.on-cover .counter,
 .chrome.on-cover .nav {
   background: rgba(255,255,255,0.18);
@@ -164,14 +168,10 @@ body {
    ============================================================ */
 
 .slide-cover {
-  background: #0c1830;
-}
-.cover-bg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(0, 166, 81, 0.24), transparent 34%),
+    radial-gradient(circle at 16% 86%, rgba(24, 75, 145, 0.42), transparent 42%),
+    #0c1830;
 }
 .cover-content {
   position: relative;

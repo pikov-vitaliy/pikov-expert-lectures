@@ -63,6 +63,9 @@ if ($SkipPostDeployCheck -and -not $KeepRemoteDeployRoot) {
 
 $releaseIndexPath = Join-Path $projectPath "RELEASE_INDEX_$ReleaseDate.json"
 if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release index: $releaseIndexPath" }
+$independenceGatePath = Join-Path $projectPath 'test-public-release-independence.ps1'
+if (-not (Test-Path -LiteralPath $independenceGatePath)) { Fail "Missing public independence gate: $independenceGatePath" }
+& $independenceGatePath -Root $rootPath -ReleaseIndex $releaseIndexPath
 
 $entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
 $expectedEntries = @($lectureData.lectures | Select-Object -ExpandProperty folder -Unique).Count + 1

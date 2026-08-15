@@ -95,7 +95,7 @@ try {
   }
 
   const maskomCount = await desktop.evaluate(() => document.body.innerText.split("МАСКОМ").length - 1);
-  check("MASKOM mentioned at most once on the rendered page", maskomCount <= 1, String(maskomCount));
+  check("MASKOM is absent from the rendered page", maskomCount === 0, String(maskomCount));
 
   await desktop.click("#themeToggle");
   const themeAfterClick = await desktop.evaluate(() => document.documentElement.dataset.theme);

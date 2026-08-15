@@ -113,7 +113,7 @@ $utf8 = [Text.UTF8Encoding]::new($false)
 )
 [IO.File]::WriteAllText(
     (Join-Path $root '04_Residual\markers.txt'),
-    'MASCOM-DEMO-SECRET; ISPDN-DEMO; KII-DEMO',
+    'TRAINING-DEMO-SECRET; ISPDN-DEMO; KII-DEMO',
     $utf8
 )
 
@@ -146,7 +146,7 @@ mkdir -p "$LAB_ROOT"/{01_Public,02_Confidential,03_ControlSum,04_Residual,05_Rep
 printf '%s\n' 'Учебный файл. Реальных персональных данных нет.' > "$LAB_ROOT/01_Public/readme.txt"
 printf '%s\n' 'PASSPORT-TEST-0000; SNILS-TEST-0000' > "$LAB_ROOT/02_Confidential/pdn_demo.txt"
 printf '%s\n' '[service]' 'name=demo_service' 'mode=training' > "$LAB_ROOT/03_ControlSum/critical_config.ini"
-printf '%s\n' 'MASCOM-DEMO-SECRET; ISPDN-DEMO; KII-DEMO' > "$LAB_ROOT/04_Residual/markers.txt"
+printf '%s\n' 'TRAINING-DEMO-SECRET; ISPDN-DEMO; KII-DEMO' > "$LAB_ROOT/04_Residual/markers.txt"
 sha256sum "$LAB_ROOT/03_ControlSum/critical_config.ini" > "$LAB_ROOT/03_ControlSum/critical_config.ini.sha256.txt"
 printf 'Учебный набор: %s\n' "$LAB_ROOT"
 ```
@@ -167,7 +167,7 @@ printf 'Учебный набор: %s\n' "$LAB_ROOT"
 ## Блок 2. Остаточная информация — 90 минут
 
 1. Выберите только каталог/носитель `04_Residual`.
-2. Добавьте синтетические ключевые слова: `MASCOM-DEMO-SECRET`, `ISPDN-DEMO`, `KII-DEMO`.
+2. Добавьте синтетические ключевые слова: `TRAINING-DEMO-SECRET`, `ISPDN-DEMO`, `KII-DEMO`.
 3. Зафиксируйте кодировку и параметры поиска.
 4. Выполните первый поиск и сохраните отчет.
 5. Удалите `markers.txt` штатным способом внутри учебного каталога.
