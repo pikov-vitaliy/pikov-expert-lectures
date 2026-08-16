@@ -1279,6 +1279,16 @@ function plural(n, forms){ // forms: ["материал","материала","�
     document.title = strings.htmlTitle;
     const desc = document.querySelector('meta[name="description"]');
     if(desc) desc.content = strings.metaDescription;
+    /* Русская версия живёт по отдельному адресу ?lang=ru — иначе объявленный
+       в <head> hreflang="ru" указывал бы на страницу, которая канонизирует
+       себя в другой URL, и такая пара альтернатив недействительна. */
+    const selfUrl = "https://pikov.expert/" + (lang() === "ru" ? "?lang=ru" : "");
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if(canonical) canonical.href = selfUrl;
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if(ogUrl) ogUrl.content = selfUrl;
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if(ogLocale) ogLocale.content = lang() === "ru" ? "ru_RU" : "en_US";
     const portrait = document.querySelector("#portrait img");
     if(portrait) portrait.alt = strings.portraitAlt;
     const nav = document.querySelector(".site-nav");

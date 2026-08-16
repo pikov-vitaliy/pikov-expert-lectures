@@ -70,7 +70,7 @@ test('map is neutral, semantic, grouped into five directions and standards-backe
   assert.equal((page.match(/<main\b/g) || []).length, 1);
   assert.equal((page.match(/<h1\b/g) || []).length, 1);
   assert.equal((page.match(/<section\s+class="track"\s+data-track=/g) || []).length, 5);
-  assert.doesNotMatch(page, /МАСКОМ|Mascom/i);
+  assert.doesNotMatch(page, /\u041c\u0410\u0421\u041a\u041e\u041c|Mascom/i);
   assert.doesNotMatch(page, /\b\d{1,2}\s+(?:января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря)\s+20\d{2}\b/iu);
 
   assert.match(page, /https:\/\/www\.nist\.gov\/itl\/applied-cybersecurity\/nice\/nice-framework-resource-center\/nice-framework-current-versions/);

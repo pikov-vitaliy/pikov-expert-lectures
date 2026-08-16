@@ -49,7 +49,7 @@ test("public biography uses the approved neutral state-sector wording", () => {
   // Минобороны как ЛИЧНАЯ регалия запрещено где угодно на странице.
   assert.doesNotMatch(rawRoot, /(?:награды|звания)[^<]{0,40}Минобороны/i);
   // Бывший работодатель — нигде и ни в одной языковой ветке.
-  assert.doesNotMatch(rawRoot, /МАСКОМ|MASCOM/i);
+  assert.doesNotMatch(rawRoot, /\u041c\u0410\u0421\u041a\u041e\u041c|MASCOM/i);
 });
 
 test("professional profile explains current security engineering practice", () => {
