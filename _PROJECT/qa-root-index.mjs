@@ -200,8 +200,12 @@ try {
     };
   `;
 
+  // Страницы переиспользуются, а не создаются под каждую проверку: на
+  // Windows-раннере десяток контекстов подряд исчерпывает сокеты и навигация
+  // падает с ERR_NO_BUFFER_SPACE. По той же причине здесь domcontentloaded —
+  // каталог строится синхронным инлайновым скриптом, ждать сети незачем.
   const fresh = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await fresh.goto(`${base}/`, { waitUntil: "networkidle" });
+  await fresh.goto(`${base}/`, { waitUntil: "domcontentloaded" });
   const defaultLang = await fresh.evaluate(() => ({
     dataset: document.documentElement.dataset.lang,
     attr: document.documentElement.lang,
@@ -247,11 +251,18 @@ try {
   check("language switch offers the other language", langBtnGeometry?.label === "Русский", langBtnGeometry?.label);
   check("language switch has an accessible name", !!langBtnGeometry?.ariaLabel, langBtnGeometry?.ariaLabel);
 
+  // Одна страница на все три состояния темы: явный выбор ставится через
+  // localStorage, «системное» состояние — эмуляцией prefers-color-scheme.
+  const themePage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   for (const theme of ["light", "dark", "system"]) {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, colorScheme: theme === "dark" ? "dark" : "light" });
-    if (theme !== "system") await page.addInitScript(t => localStorage.setItem("theme", t), theme);
-    await page.goto(`${base}/`, { waitUntil: "networkidle" });
-    const metrics = await page.evaluate(helper => {
+    await themePage.emulateMedia({ colorScheme: theme === "dark" ? "dark" : "light" });
+    await themePage.goto(`${base}/`, { waitUntil: "domcontentloaded" });
+    await themePage.evaluate(t => {
+      if (t === "system") localStorage.removeItem("theme");
+      else localStorage.setItem("theme", t);
+    }, theme);
+    await themePage.reload({ waitUntil: "domcontentloaded" });
+    const metrics = await themePage.evaluate(helper => {
       eval(helper);
       const btn = document.getElementById("langToggle");
       const style = getComputedStyle(btn);
@@ -265,8 +276,8 @@ try {
     }, CONTRAST_HELPER);
     check(`language switch text meets WCAG AA in the ${theme} theme`, metrics.text >= 4.5, metrics.text.toFixed(2));
     check(`language switch stands out from the other header controls in the ${theme} theme`, metrics.standsOut);
-    await page.close();
   }
+  await themePage.close();
 
   await fresh.click("#langToggle");
   await fresh.waitForTimeout(60);
@@ -290,7 +301,7 @@ try {
   check("switching language does not duplicate JSON-LD blocks", afterToggle.ldTags === 2, String(afterToggle.ldTags));
   check("document title follows the language", /Виталий Пиков/.test(afterToggle.title), afterToggle.title);
 
-  await fresh.reload({ waitUntil: "networkidle" });
+  await fresh.reload({ waitUntil: "domcontentloaded" });
   const langAfterReload = await fresh.evaluate(() => document.documentElement.dataset.lang);
   check("language choice persists across reload", langAfterReload === "ru", langAfterReload);
 
@@ -303,13 +314,14 @@ try {
     itemLists: [...document.querySelectorAll('script[type="application/ld+json"]')].length,
   }));
   check("repeated switching keeps the DOM stable", afterDoubleToggle.cards === lectures.length && afterDoubleToggle.itemLists === 2, JSON.stringify(afterDoubleToggle));
-  await fresh.close();
 
-  const forced = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-  await forced.goto(`${base}/?lang=ru`, { waitUntil: "networkidle" });
-  const forcedLang = await forced.evaluate(() => document.documentElement.dataset.lang);
-  check("?lang=ru forces the Russian version", forcedLang === "ru", forcedLang);
-  await forced.close();
+  // Та же вкладка: сохранённый выбор принудительно ставится в английский,
+  // чтобы ?lang= проверялся против записанного значения, а не на чистом профиле.
+  await fresh.evaluate(() => localStorage.setItem("lang", "en"));
+  await fresh.goto(`${base}/?lang=ru`, { waitUntil: "domcontentloaded" });
+  const forcedLang = await fresh.evaluate(() => document.documentElement.dataset.lang);
+  check("?lang=ru overrides a stored English choice", forcedLang === "ru", forcedLang);
+  await fresh.close();
 
   await desktop.click("#themeToggle");
   const themeAfterClick = await desktop.evaluate(() => document.documentElement.dataset.theme);
@@ -364,14 +376,12 @@ try {
     mobileNav.present && mobileNav.total > 0 && mobileNav.reachable === mobileNav.total,
     `present=${mobileNav.present} reachable=${mobileNav.reachable}/${mobileNav.total}`,
   );
-  await mobile.close();
-
   // Кнопка языка — третий элемент в шапке; на узком экране она не должна
-  // выдавливать навигацию или сама уезжать за край.
+  // выдавливать навигацию или сама уезжать за край. Вкладка переиспользуется.
   for (const width of [375, 320]) {
-    const narrow = await browser.newPage({ viewport: { width, height: 780 } });
-    await narrow.goto(`${base}/`, { waitUntil: "networkidle" });
-    const header = await narrow.evaluate(() => {
+    await mobile.setViewportSize({ width, height: 780 });
+    await mobile.goto(`${base}/`, { waitUntil: "domcontentloaded" });
+    const header = await mobile.evaluate(() => {
       const btn = document.getElementById("langToggle");
       const rect = btn.getBoundingClientRect();
       const controls = [...document.querySelectorAll(".hdr-actions > button")];
@@ -391,8 +401,8 @@ try {
     check(`language switch falls back to a short label at ${width}px`, header.langLabel === "RU", header.langLabel);
     check(`all header controls stay usable at ${width}px`, header.controlsVisible === header.controlsTotal && header.controlsTotal === 3, `${header.controlsVisible}/${header.controlsTotal}`);
     check(`header navigation stays reachable at ${width}px`, header.navReachable === 5, String(header.navReachable));
-    await narrow.close();
   }
+  await mobile.close();
 
   console.log(failures.length === 0 ? "ROOT INDEX QA OK" : `ROOT INDEX QA FAILED (${failures.length})`);
 } finally {
