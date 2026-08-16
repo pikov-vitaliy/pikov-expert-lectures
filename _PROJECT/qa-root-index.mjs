@@ -173,6 +173,156 @@ try {
     );
   }
 
+  // ---- Двуязычность: английский по умолчанию, заметная кнопка, идемпотентность ----
+  // Читаем цвета через canvas: getComputedStyle отдаёт oklch(), а не rgb().
+  const CONTRAST_HELPER = `
+    globalThis.toRgb = value => {
+      const canvas = document.createElement("canvas");
+      canvas.width = canvas.height = 1;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = "#000";
+      ctx.fillStyle = value;
+      ctx.fillRect(0, 0, 1, 1);
+      const [r, g, b] = ctx.getImageData(0, 0, 1, 1).data;
+      return [r, g, b];
+    };
+    globalThis.luminance = rgb => {
+      const [r, g, b] = rgb.map(channel => {
+        const c = channel / 255;
+        return c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      });
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    globalThis.contrast = (fg, bg) => {
+      const a = luminance(toRgb(fg)), b = luminance(toRgb(bg));
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    };
+  `;
+
+  // Страницы переиспользуются, а не создаются под каждую проверку: на
+  // Windows-раннере десяток контекстов подряд исчерпывает сокеты и навигация
+  // падает с ERR_NO_BUFFER_SPACE. По той же причине здесь domcontentloaded —
+  // каталог строится синхронным инлайновым скриптом, ждать сети незачем.
+  const fresh = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  await fresh.goto(`${base}/`, { waitUntil: "domcontentloaded" });
+  const defaultLang = await fresh.evaluate(() => ({
+    dataset: document.documentElement.dataset.lang,
+    attr: document.documentElement.lang,
+    heroRole: document.querySelector(".hero .role")?.innerText.trim(),
+    title: document.title,
+  }));
+  check("first visit opens in English", defaultLang.dataset === "en" && defaultLang.attr === "en", JSON.stringify(defaultLang));
+  check("hero role renders in English by default", /Expert in secure software development/.test(defaultLang.heroRole || ""), defaultLang.heroRole);
+  check("document title is English by default", /Vitaly Pikov/.test(defaultLang.title), defaultLang.title);
+
+  // Ни одного русского слова не должно просочиться в английскую версию.
+  // Исключение — сама кнопка языка: она по общепринятому правилу называет
+  // язык на этом же языке («Русский»), иначе её не узнает носитель.
+  const cyrillicLeak = await fresh.evaluate(() => {
+    const langBtn = document.getElementById("langToggle");
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    const hits = [];
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      const parent = node.parentElement;
+      if (!parent || langBtn?.contains(parent)) continue;
+      if (!parent.offsetParent && parent !== document.body) continue;
+      const text = node.textContent.trim();
+      if (text && /[Ѐ-ӿ]/.test(text)) hits.push(text.slice(0, 70));
+    }
+    return hits.slice(0, 10);
+  });
+  check("English view contains no untranslated Russian text", cyrillicLeak.length === 0, cyrillicLeak.join(" | "));
+
+  const langBtnGeometry = await fresh.evaluate(() => {
+    const btn = document.getElementById("langToggle");
+    if (!btn) return null;
+    const rect = btn.getBoundingClientRect();
+    const header = document.querySelector(".site-header").getBoundingClientRect();
+    return {
+      width: rect.width, height: rect.height,
+      insideHeader: rect.top >= header.top - 1 && rect.bottom <= header.bottom + 1,
+      // textContent, а не innerText: у кнопки text-transform: uppercase.
+      label: [...btn.querySelectorAll("span")].filter(s => s.offsetParent).map(s => s.textContent).join(""),
+      ariaLabel: btn.getAttribute("aria-label"),
+    };
+  });
+  check("language switch is present in the header", !!langBtnGeometry && langBtnGeometry.insideHeader && langBtnGeometry.width > 40, JSON.stringify(langBtnGeometry));
+  check("language switch offers the other language", langBtnGeometry?.label === "Русский", langBtnGeometry?.label);
+  check("language switch has an accessible name", !!langBtnGeometry?.ariaLabel, langBtnGeometry?.ariaLabel);
+
+  // Одна страница на все три состояния темы: явный выбор ставится через
+  // localStorage, «системное» состояние — эмуляцией prefers-color-scheme.
+  const themePage = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  for (const theme of ["light", "dark", "system"]) {
+    await themePage.emulateMedia({ colorScheme: theme === "dark" ? "dark" : "light" });
+    await themePage.goto(`${base}/`, { waitUntil: "domcontentloaded" });
+    await themePage.evaluate(t => {
+      if (t === "system") localStorage.removeItem("theme");
+      else localStorage.setItem("theme", t);
+    }, theme);
+    await themePage.reload({ waitUntil: "domcontentloaded" });
+    const metrics = await themePage.evaluate(helper => {
+      eval(helper);
+      const btn = document.getElementById("langToggle");
+      const style = getComputedStyle(btn);
+      const header = getComputedStyle(document.querySelector(".site-header"));
+      const view = getComputedStyle(document.getElementById("viewToggle"));
+      return {
+        text: contrast(style.color, style.backgroundColor),
+        // Кнопка должна отличаться от соседних, иначе она не «бросается в глаза».
+        standsOut: style.backgroundColor !== view.backgroundColor && style.backgroundColor !== header.backgroundColor,
+      };
+    }, CONTRAST_HELPER);
+    check(`language switch text meets WCAG AA in the ${theme} theme`, metrics.text >= 4.5, metrics.text.toFixed(2));
+    check(`language switch stands out from the other header controls in the ${theme} theme`, metrics.standsOut);
+  }
+  await themePage.close();
+
+  await fresh.click("#langToggle");
+  await fresh.waitForTimeout(60);
+  const afterToggle = await fresh.evaluate(() => ({
+    lang: document.documentElement.dataset.lang,
+    attr: document.documentElement.lang,
+    heroRole: document.querySelector(".hero .role")?.innerText.trim(),
+    cards: document.querySelectorAll(".card").length,
+    tiles: document.querySelectorAll(".tile").length,
+    itemLists: [...document.querySelectorAll('script[type="application/ld+json"]')]
+      .map(s => { try { return JSON.parse(s.textContent); } catch { return null; } })
+      .filter(b => b?.["@type"] === "ItemList").length,
+    ldTags: document.querySelectorAll('script[type="application/ld+json"]').length,
+    title: document.title,
+  }));
+  check("language switch flips the page to Russian", afterToggle.lang === "ru" && afterToggle.attr === "ru", JSON.stringify({ l: afterToggle.lang, a: afterToggle.attr }));
+  check("Russian view renders the Russian hero role", /Эксперт по безопасной разработке/.test(afterToggle.heroRole || ""), afterToggle.heroRole);
+  check("switching language keeps the card count", afterToggle.cards === lectures.length, `${afterToggle.cards} != ${lectures.length}`);
+  check("switching language keeps the tile count", afterToggle.tiles === 5, String(afterToggle.tiles));
+  check("switching language does not duplicate the ItemList", afterToggle.itemLists === 1, String(afterToggle.itemLists));
+  check("switching language does not duplicate JSON-LD blocks", afterToggle.ldTags === 2, String(afterToggle.ldTags));
+  check("document title follows the language", /Виталий Пиков/.test(afterToggle.title), afterToggle.title);
+
+  await fresh.reload({ waitUntil: "domcontentloaded" });
+  const langAfterReload = await fresh.evaluate(() => document.documentElement.dataset.lang);
+  check("language choice persists across reload", langAfterReload === "ru", langAfterReload);
+
+  // Двойное переключение не должно накапливать узлы.
+  await fresh.click("#langToggle");
+  await fresh.click("#langToggle");
+  await fresh.waitForTimeout(60);
+  const afterDoubleToggle = await fresh.evaluate(() => ({
+    cards: document.querySelectorAll(".card").length,
+    itemLists: [...document.querySelectorAll('script[type="application/ld+json"]')].length,
+  }));
+  check("repeated switching keeps the DOM stable", afterDoubleToggle.cards === lectures.length && afterDoubleToggle.itemLists === 2, JSON.stringify(afterDoubleToggle));
+
+  // Та же вкладка: сохранённый выбор принудительно ставится в английский,
+  // чтобы ?lang= проверялся против записанного значения, а не на чистом профиле.
+  await fresh.evaluate(() => localStorage.setItem("lang", "en"));
+  await fresh.goto(`${base}/?lang=ru`, { waitUntil: "domcontentloaded" });
+  const forcedLang = await fresh.evaluate(() => document.documentElement.dataset.lang);
+  check("?lang=ru overrides a stored English choice", forcedLang === "ru", forcedLang);
+  await fresh.close();
+
   await desktop.click("#themeToggle");
   const themeAfterClick = await desktop.evaluate(() => document.documentElement.dataset.theme);
   await desktop.reload({ waitUntil: "networkidle" });
@@ -226,6 +376,32 @@ try {
     mobileNav.present && mobileNav.total > 0 && mobileNav.reachable === mobileNav.total,
     `present=${mobileNav.present} reachable=${mobileNav.reachable}/${mobileNav.total}`,
   );
+  // Кнопка языка — третий элемент в шапке; на узком экране она не должна
+  // выдавливать навигацию или сама уезжать за край. Вкладка переиспользуется.
+  for (const width of [375, 320]) {
+    await mobile.setViewportSize({ width, height: 780 });
+    await mobile.goto(`${base}/`, { waitUntil: "domcontentloaded" });
+    const header = await mobile.evaluate(() => {
+      const btn = document.getElementById("langToggle");
+      const rect = btn.getBoundingClientRect();
+      const controls = [...document.querySelectorAll(".hdr-actions > button")];
+      return {
+        pageWidth: document.documentElement.scrollWidth,
+        viewport: window.innerWidth,
+        langVisible: rect.width > 0 && rect.height > 0,
+        langInsideViewport: rect.left >= -1 && rect.right <= window.innerWidth + 1,
+        langLabel: [...btn.querySelectorAll("span")].filter(s => s.offsetParent).map(s => s.textContent).join(""),
+        controlsVisible: controls.filter(c => c.getBoundingClientRect().width > 0).length,
+        controlsTotal: controls.length,
+        navReachable: [...document.querySelectorAll(".site-nav a")].filter(a => a.getBoundingClientRect().width > 0).length,
+      };
+    });
+    check(`no horizontal overflow at ${width}px`, header.pageWidth <= header.viewport + 1, `${header.pageWidth} > ${header.viewport}`);
+    check(`language switch is visible and inside the viewport at ${width}px`, header.langVisible && header.langInsideViewport, JSON.stringify(header));
+    check(`language switch falls back to a short label at ${width}px`, header.langLabel === "RU", header.langLabel);
+    check(`all header controls stay usable at ${width}px`, header.controlsVisible === header.controlsTotal && header.controlsTotal === 3, `${header.controlsVisible}/${header.controlsTotal}`);
+    check(`header navigation stays reachable at ${width}px`, header.navReachable === 5, String(header.navReachable));
+  }
   await mobile.close();
 
   console.log(failures.length === 0 ? "ROOT INDEX QA OK" : `ROOT INDEX QA FAILED (${failures.length})`);

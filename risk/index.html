@@ -660,17 +660,19 @@ table.tbl { width: 100%; border-collapse: collapse; font-size: 14px; }
 }
 .click-zone.left { left: 0; }
 .click-zone.right { right: 0; }
+/* Стрелка рисуется глифом, а не картинкой: переменной --arrow-img в документе
+   никогда не было, из-за чего background-image становился недействительным и
+   при наведении показывался пустой кружок без стрелки. */
 .click-zone::after {
   content: ""; position: absolute; top: 50%; transform: translateY(-50%);
   width: 36px; height: 36px; border-radius: 50%;
   background: var(--surface); border: 1px solid var(--border);
+  display: grid; place-items: center;
+  font-size: 18px; line-height: 1; color: var(--text-muted);
   opacity: 0; transition: opacity 0.18s ease;
-  background-image: var(--arrow-img);
-  background-size: 16px 16px;
-  background-position: center; background-repeat: no-repeat;
 }
-.click-zone.left::after { left: 16px; }
-.click-zone.right::after { right: 16px; }
+.click-zone.left::after { content: "\2039"; left: 16px; }
+.click-zone.right::after { content: "\203A"; right: 16px; }
 .click-zone:hover::after { opacity: 0.8; }
 
 /* =========================================================================
