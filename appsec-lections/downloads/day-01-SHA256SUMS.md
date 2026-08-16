@@ -3,6 +3,6 @@
 > Значения относятся к ZIP-пакетам, собранным из опубликованного набора. Все текстовые материалы внутри архива стенограммы и пересказов представлены в Markdown.
 
 ```text
-DDF85B20CA59CBC1A517F581E500D6D2502385728F186075BBCE6C7197E5F817  day-01-edited-transcript-and-summaries.zip  58934 bytes
-6449B40D1FB57DEFB0E5BFD9B63F2EA3A77A27C3A86139026465B5B9AD6C6694  day-01-canonical-safe-package.zip  106355 bytes
+F582CFE53852C0C531951F625737C25F2E63809C72302633F2C1BC517E5576DA  day-01-edited-transcript-and-summaries.zip  58079 bytes
+7232657A32542048D58A7FAB2379A4BE932233E985839738298A64DF8F458B59  day-01-canonical-safe-package.zip  105467 bytes
 ```

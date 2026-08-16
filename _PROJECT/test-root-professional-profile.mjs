@@ -5,7 +5,26 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const projectDir = dirname(fileURLToPath(import.meta.url));
-const root = readFileSync(resolve(projectDir, "..", "index.html"), "utf8");
+const rawRoot = readFileSync(resolve(projectDir, "..", "index.html"), "utf8");
+
+// Страница двуязычная: парные <span data-l="ru"> / <span data-l="en">.
+// Проверки биографии касаются русского варианта, поэтому английская ветка
+// удаляется, а русская разворачивается обратно в голый текст — так все
+// утверждения ниже работают ровно на той разметке, на которую писались,
+// включая точный подсчёт вхождений.
+const stripEnglish = html => html
+  .replace(/<span data-l="en">[\s\S]*?<\/span>/g, "")
+  .replace(/<(p|li|div)\b[^>]*\bdata-l="en"[^>]*>[\s\S]*?<\/\1>/g, "");
+const unwrapRussian = html => html.replace(/<span data-l="ru">([\s\S]*?)<\/span>/g, "$1");
+const root = unwrapRussian(stripEnglish(rawRoot));
+
+test("bilingual markup keeps both language branches present", () => {
+  assert.match(rawRoot, /data-l="ru"/);
+  assert.match(rawRoot, /data-l="en"/);
+  // Вложенный <span> внутри пары сломал бы нежадные регулярки выше.
+  assert.doesNotMatch(rawRoot, /<span data-l="(?:ru|en)">(?:(?!<\/span>)[\s\S])*<span\b/);
+});
+
 const about = root.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
 const aboutText = about
   .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
@@ -22,8 +41,15 @@ function educationGroup(labelId) {
 
 test("public biography uses the approved neutral state-sector wording", () => {
   assert.match(aboutText, /Последнее место службы.{0,160}научно-исследовательск.{0,80}государственного сектора/i);
-  assert.doesNotMatch(root, /Министерств[ао]\s+обороны|Минобороны|ЦНИИ\s+ВВС/i);
-  assert.doesNotMatch(root, /МАСКОМ/i);
+  // Запрет на Минобороны — только в биографии. Раньше он стоял на весь файл,
+  // и из-за этого из описания лекции по сертификации вырезали регулятора,
+  // хотя вся лекция построена вокруг систем ФСТЭК, ФСБ и Минобороны.
+  assert.doesNotMatch(aboutText, /Министерств[ао]\s+обороны|Минобороны|ЦНИИ\s+ВВС|Ministry of Defen/i);
+  assert.doesNotMatch(rawRoot, /Тамбовск|ЦНИИ\s+ВВС/i);
+  // Минобороны как ЛИЧНАЯ регалия запрещено где угодно на странице.
+  assert.doesNotMatch(rawRoot, /(?:награды|звания)[^<]{0,40}Минобороны/i);
+  // Бывший работодатель — нигде и ни в одной языковой ветке.
+  assert.doesNotMatch(rawRoot, /МАСКОМ|MASCOM/i);
 });
 
 test("professional profile explains current security engineering practice", () => {
@@ -110,7 +136,10 @@ test("teaching and research results are specific without overstating scope", () 
 test("credentials are accurate and the personal site is explicitly independent", () => {
   assert.match(aboutText, /Заслуженный доцент.{0,100}РосНОУ/i);
   assert.match(aboutText, /Astra Linux Special Edition 1\.7\/1\.8/i);
-  assert.match(aboutText, /Microsoft Certified Trainer.{0,60}2014.{0,20}2016/i);
+  // Перечень сверен с astralinux01/index.html и astralinux02/index.html.
+  // Прежняя формулировка («MCITP», «MCT в 2014–2016 годах») появилась только
+  // на главной, ничем не подтверждена и противоречила этим двум страницам.
+  assert.match(aboutText, /Microsoft Certified:.{0,60}MCT.{0,40}MCPS.{0,40}MCSA.{0,40}MCTS/i);
   assert.match(aboutText, /независимый авторский образовательный проект/i);
   assert.match(aboutText, /независимо от прежних работодателей и учебных центров/i);
   assert.doesNotMatch(aboutText, /18\s*млн|130\s*тыс.{0,20}строк|142\s+тестов|33\s+ADR/i);

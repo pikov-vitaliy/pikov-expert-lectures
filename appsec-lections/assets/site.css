@@ -50,7 +50,6 @@
   --tag-good-text: #caffdf;
   --code-bg: #09182b;
   --copy-bg: rgba(26, 73, 111, 0.54);
-  --rs-canvas-bg: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rs-accent) 16%, transparent), transparent 35%), linear-gradient(135deg, rgba(13,31,53,.98), rgba(7,17,31,.98));
   --rs-card-bg: rgba(5, 16, 30, .52);
   --rs-shadow: 0 22px 65px rgba(0,0,0,.22);
   --content: min(1180px, calc(100% - 40px));
@@ -109,10 +108,20 @@
   --tag-good-text: #07653f;
   --code-bg: #0b1d31;
   --copy-bg: rgba(28, 92, 132, 0.86);
-  --rs-canvas-bg: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rs-accent) 17%, transparent), transparent 35%), linear-gradient(135deg, #ffffff, #e7f2fa);
   --rs-card-bg: rgba(255, 255, 255, .75);
   --rs-shadow: 0 22px 65px rgba(29, 73, 111, .16);
   color-scheme: light;
+}
+
+/* --rs-accent объявлен только на .rs-deck (его задаёт day-01-reconstructed-slides.js).
+   Поэтому и производные от него значения объявляются здесь же: в :root подстановка
+   var(--rs-accent) не разрешается, всё свойство становится недействительным ещё до
+   того, как акцент появится ниже по дереву, и фон полотна слайда просто не рисуется. */
+.rs-deck {
+  --rs-canvas-bg: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rs-accent) 16%, transparent), transparent 35%), linear-gradient(135deg, rgba(13,31,53,.98), rgba(7,17,31,.98));
+}
+:root[data-theme="light"] .rs-deck {
+  --rs-canvas-bg: radial-gradient(circle at 100% 0%, color-mix(in srgb, var(--rs-accent) 17%, transparent), transparent 35%), linear-gradient(135deg, #ffffff, #e7f2fa);
 }
 
 * { box-sizing: border-box; }

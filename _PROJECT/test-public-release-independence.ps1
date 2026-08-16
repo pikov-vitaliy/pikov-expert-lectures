@@ -95,33 +95,10 @@ function Test-TextEntry([System.IO.Compression.ZipArchiveEntry]$Entry, [string]$
   } finally {
     $reader.Dispose()
   }
-  # The VКР deck may retain exactly three user-approved historical examples. Every
-  # other company reference there remains forbidden, including a provider,
-  # employer, contact, or new slide text.
-  if ($DisplayPath -match '^vkr\.pikov\.expert!index\.html$') {
-    $allowedHistorical = [regex]::Matches(
-      $content,
-      '(?i)(?:\u044d\u043a\u0441\u043f\u0435\u0440\u0442|\u0430\u043a\u0442\s+\u043e\s+\u0432\u043d\u0435\u0434\u0440\u0435\u043d\u0438\u0438\s+\u0432)\s+\u0413\u041a\s+\u00ab?\u043c\u0430\u0441\u043a\u043e\u043c\u00bb?'
-    )
-    if ($allowedHistorical.Count -ne 3) {
-      Add-Failure "$DisplayPath must contain exactly the three approved historical company examples, found $($allowedHistorical.Count)"
-    }
-    foreach ($brandMatch in [regex]::Matches($content, '(?i)\u043c\u0430\u0441\u043a\u043e\u043c')) {
-      $permitted = @($allowedHistorical | Where-Object {
-        $brandMatch.Index -ge $_.Index -and $brandMatch.Index -lt ($_.Index + $_.Length)
-      })
-      if ($permitted.Count -eq 0) {
-        Add-Failure "$DisplayPath contains a non-historical company reference"
-      }
-    }
-    foreach ($pattern in @($script:forbiddenText | Where-Object { $_ -notmatch '\\u043c\\u0430\\u0441\\u043a\\u043e\\u043c' })) {
-      $match = [regex]::Match($content, $pattern)
-      if ($match.Success) {
-        Add-Failure "$DisplayPath contains forbidden public branding: $($match.Value)"
-      }
-    }
-    return
-  }
+  # Здесь стояло исключение для vkr.pikov.expert!index.html: оно ТРЕБОВАЛО ровно
+  # три вхождения бывшего работодателя и потому пропускало в публикацию именно
+  # то, ради чего гейт существует. Колода ВКР вычищена (текст, слайды, PDF и
+  # исходный pptx), исключение снято — файл проверяется общим правилом.
   foreach ($pattern in $script:forbiddenText) {
     $match = [regex]::Match($content, $pattern)
     if ($match.Success) {

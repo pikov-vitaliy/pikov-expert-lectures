@@ -178,7 +178,10 @@ try {
     });
     check(semantics.mainCount === 1, `${target.domain}: expected exactly one main landmark, got ${semantics.mainCount}`);
     check(semantics.h1Count === 1, `${target.domain}: expected exactly one h1, got ${semantics.h1Count}`);
-    check(semantics.lang === "ru", `${target.domain}: expected html lang=ru, got ${JSON.stringify(semantics.lang)}`);
+    // Каталог на pikov.expert двуязычный и по умолчанию открывается на
+    // английском (вход с LinkedIn); сами лекции остаются русскими.
+    const expectedLang = target.folder ? "ru" : "en";
+    check(semantics.lang === expectedLang, `${target.domain}: expected html lang=${expectedLang}, got ${JSON.stringify(semantics.lang)}`);
     const confirmedPatterns = confirmedContrastText.get(target.domain) || [];
     const confirmedFailures = semantics.contrastFailures.filter((failure) => confirmedPatterns.some((pattern) => failure.text.includes(pattern)));
     check(confirmedFailures.length === 0, `${target.domain}: confirmed WCAG text contrast failures ${JSON.stringify(confirmedFailures)}`);
