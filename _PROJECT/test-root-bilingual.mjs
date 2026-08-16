@@ -111,6 +111,15 @@ test("head declares both languages for search engines", () => {
   assert.match(root, /<link rel="canonical" href="https:\/\/pikov\.expert\/">/);
   assert.match(root, /property="og:locale" content="en_US"/);
   assert.match(root, /property="og:locale:alternate" content="ru_RU"/);
+  // Статический canonical описывает английскую версию. Русская объявлена как
+  // отдельный адрес, поэтому на ?lang=ru скрипт обязан переписать canonical и
+  // og:url на него — иначе альтернатива указывает на страницу, которая
+  // канонизирует себя в другой URL, и Google такую пару игнорирует.
+  const catalogue = scripts.find(source => source.includes("applyChromeLanguage"));
+  assert.ok(catalogue, "missing the chrome-language routine");
+  assert.match(catalogue, /link\[rel="canonical"\]/);
+  assert.match(catalogue, /meta\[property="og:url"\]/);
+  assert.match(catalogue, /lang\(\) === "ru" \? "\?lang=ru" : ""/);
 });
 
 test("the English page warns that the courses themselves are in Russian", () => {

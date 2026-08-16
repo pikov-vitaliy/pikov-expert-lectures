@@ -94,8 +94,10 @@ try {
     check("ItemList provider is Person (not an organization)", providers.size === 1 && providers.has("Person"), [...providers].join(","));
   }
 
-  const maskomCount = await desktop.evaluate(() => document.body.innerText.split("МАСКОМ").length - 1);
-  check("MASKOM is absent from the rendered page", maskomCount === 0, String(maskomCount));
+  // Репозиторий публичный, поэтому название бывшего работодателя пишется
+  // \u-последовательностями — так же, как в test-public-release-independence.ps1.
+  const maskomCount = await desktop.evaluate(() => document.body.innerText.split("\u041c\u0410\u0421\u041a\u041e\u041c").length - 1);
+  check("the former employer is absent from the rendered page", maskomCount === 0, String(maskomCount));
 
   const profileViewports = [
     { label: "1920px", width: 1920, height: 1080, expectedColumns: 2 },
@@ -319,8 +321,18 @@ try {
   // чтобы ?lang= проверялся против записанного значения, а не на чистом профиле.
   await fresh.evaluate(() => localStorage.setItem("lang", "en"));
   await fresh.goto(`${base}/?lang=ru`, { waitUntil: "domcontentloaded" });
-  const forcedLang = await fresh.evaluate(() => document.documentElement.dataset.lang);
-  check("?lang=ru overrides a stored English choice", forcedLang === "ru", forcedLang);
+  const forced = await fresh.evaluate(() => ({
+    lang: document.documentElement.dataset.lang,
+    canonical: document.querySelector('link[rel="canonical"]')?.href,
+    ogUrl: document.querySelector('meta[property="og:url"]')?.content,
+    ogLocale: document.querySelector('meta[property="og:locale"]')?.content,
+  }));
+  check("?lang=ru overrides a stored English choice", forced.lang === "ru", forced.lang);
+  // Объявленный в <head> hreflang="ru" указывает на ?lang=ru, поэтому эта
+  // страница обязана канонизировать себя в тот же адрес, а не в корень.
+  check("the Russian URL is self-canonical", forced.canonical === "https://pikov.expert/?lang=ru", forced.canonical);
+  check("og:url follows the Russian URL", forced.ogUrl === "https://pikov.expert/?lang=ru", forced.ogUrl);
+  check("og:locale follows the language", forced.ogLocale === "ru_RU", forced.ogLocale);
   await fresh.close();
 
   await desktop.click("#themeToggle");

@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
 import test from "node:test";
@@ -16,14 +17,31 @@ const projectDir = dirname(fileURLToPath(import.meta.url));
 const rootDir = dirname(projectDir);
 const catalog = JSON.parse(readFileSync(join(projectDir, "lectures.json"), "utf8"));
 
-const pages = [
-  { label: "index.html", file: join(rootDir, "index.html") },
-  { label: "course-map.html", file: join(rootDir, "course-map.html") },
-  ...[...new Set(catalog.lectures.map(lecture => lecture.folder))]
-    .map(folder => ({ label: `${folder}/index.html`, file: join(rootDir, folder, "index.html") })),
-].filter(page => existsSync(page.file));
+// Проверяются файлы, ОТСЛЕЖИВАЕМЫЕ git, а не всё, что лежит в рабочем дереве.
+// Так закрыты обе реальные поверхности утечки, и ровно по разу:
+//  * этот тест — публичный репозиторий на GitHub;
+//  * test-public-release-independence.ps1 — содержимое релизных архивов, то
+//    есть то, что реально отдаётся с хостинга.
+// Локальные черновики («Промпт для Claude Designer.md», «00_ОПИСАНИЕ_*.md»)
+// не входят ни в одну из них, поэтому и не флагуются.
+const LECTURE_FOLDERS = new Set(catalog.lectures.map(lecture => lecture.folder));
+const tracked = execFileSync("git", ["ls-files", "-z"], { cwd: rootDir, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 })
+  .split("\0")
+  .filter(Boolean);
 
-const FORMER_EMPLOYER = /МАСКОМ|MASCOM|УЦБИ|НОУ\s+ДПО/i;
+// Не только index.html: у лекций есть handout.html, practice.html, day-01.html,
+// pentest-02.html и раздаваемые материалы в markdown — они тоже публикуются.
+const pages = tracked
+  .filter(file => /\.(html|md)$/i.test(file))
+  .filter(file => {
+    const [head] = file.split("/");
+    if (file === "index.html" || file === "course-map.html") return true;
+    return LECTURE_FOLDERS.has(head);
+  })
+  .map(file => ({ label: file, file: join(rootDir, file) }))
+  .filter(page => existsSync(page.file));
+
+const FORMER_EMPLOYER = /\u041c\u0410\u0421\u041a\u041e\u041c|MASCOM|\u0423\u0426\u0411\u0418|\u041d\u041e\u0423\s+\u0414\u041f\u041e/i;
 
 // Формулировки, в которых Минобороны или военная служба поданы как личные
 // регалии автора, а не как предмет лекции.
@@ -31,8 +49,8 @@ const PERSONAL_AFFILIATION = [
   { pattern: /(?:награды|звания)[^<]{0,40}Минобороны/i, why: "Минобороны как личная награда автора" },
   { pattern: /Тамбовск\w*\s+военн\w+/i, why: "военный вуз как альма-матер автора" },
   { pattern: /ЦНИИ\s+ВВС/i, why: "прежнее место службы названо прямо" },
-  { pattern: /эксперт\s+ГК\s+«?МАСКОМ/i, why: "бывший работодатель как текущая должность" },
-  { pattern: /(?:преподаватель|сотрудник|эксперт)\s+УЦ\s+МАСКОМ/i, why: "бывший работодатель как текущая должность" },
+  { pattern: /\u044d\u043a\u0441\u043f\u0435\u0440\u0442\s+\u0413\u041a\s+\u00ab?\u041c\u0410\u0421\u041a\u041e\u041c/i, why: "бывший работодатель как текущая должность" },
+  { pattern: /(?:\u043f\u0440\u0435\u043f\u043e\u0434\u0430\u0432\u0430\u0442\u0435\u043b\u044c|\u0441\u043e\u0442\u0440\u0443\u0434\u043d\u0438\u043a|\u044d\u043a\u0441\u043f\u0435\u0440\u0442)\s+\u0423\u0426\s+\u041c\u0410\u0421\u041a\u041e\u041c/i, why: "бывший работодатель как текущая должность" },
 ];
 
 test("published pages carry no former-employer branding", () => {
