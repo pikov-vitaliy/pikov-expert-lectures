@@ -136,13 +136,33 @@ test("teaching and research results are specific without overstating scope", () 
 test("credentials are accurate and the personal site is explicitly independent", () => {
   assert.match(aboutText, /Заслуженный доцент.{0,100}РосНОУ/i);
   assert.match(aboutText, /Astra Linux Special Edition 1\.7\/1\.8/i);
-  // Перечень сверен с astralinux01/index.html и astralinux02/index.html.
-  // Прежняя формулировка («MCITP», «MCT в 2014–2016 годах») появилась только
-  // на главной, ничем не подтверждена и противоречила этим двум страницам.
-  assert.match(aboutText, /Microsoft Certified:.{0,60}MCT.{0,40}MCPS.{0,40}MCSA.{0,40}MCTS/i);
+  // Перечень подтверждён Виталием по его собственному слайду (2026-08-16):
+  // MCT, MCITP, MCPS, MCSA, MCTS — без дат. Датировка «MCT в 2014–2016 годах»
+  // была добавлена сторонним агентом и подтверждения не получила.
+  assert.match(aboutText, /Microsoft Certified:.{0,80}MCT.{0,40}MCITP.{0,40}MCPS.{0,40}MCSA.{0,40}MCTS/i);
+  assert.doesNotMatch(aboutText, /Microsoft Certified Trainer.{0,60}201\d/i);
   assert.match(aboutText, /независимый авторский образовательный проект/i);
   assert.match(aboutText, /независимо от прежних работодателей и учебных центров/i);
   assert.doesNotMatch(aboutText, /18\s*млн|130\s*тыс.{0,20}строк|142\s+тестов|33\s+ADR/i);
+});
+
+test("every public page lists the same Microsoft certifications", () => {
+  // Расхождение уже случалось: главную правил один агент, лекционные страницы
+  // остались с прежним списком, и сайт сам себе противоречил.
+  const expected = ["MCT", "MCITP", "MCPS", "MCSA", "MCTS"];
+  const sources = [
+    ["index.html", rawRoot],
+    ...["astralinux01", "astralinux02"].map(folder => [
+      `${folder}/index.html`,
+      readFileSync(resolve(projectDir, "..", folder, "index.html"), "utf8"),
+    ]),
+  ];
+  for (const [label, html] of sources) {
+    const line = html.match(/Microsoft Certifi[^<]*<b>([^<]+)<\/b>/)?.[1];
+    assert.ok(line, `${label}: no Microsoft certification list found`);
+    const listed = line.split(/[,\s]+/).filter(Boolean);
+    assert.deepEqual(listed, expected, `${label} lists ${listed.join(", ")}`);
+  }
 });
 
 test("hero and Person schema use the same professional positioning", () => {
