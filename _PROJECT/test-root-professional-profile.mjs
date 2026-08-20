@@ -165,8 +165,14 @@ test("every public page lists the same Microsoft certifications", () => {
   }
 });
 
-test("hero and Person schema use the same professional positioning", () => {
-  const role = "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель";
-  assert.match(root, new RegExp(`<p class="role">${role.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/p>`));
-  assert.match(root, new RegExp(`"jobTitle"\\s*:\\s*"${role.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"`));
+test("hero and Person schema use language-consistent professional positioning", () => {
+  const roleRu = "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель";
+  const roleEn = "Expert in secure software development, DevSecOps and AppSec; lecturer";
+  assert.match(rawRoot, new RegExp(`<span data-l="ru">${roleRu.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/span>`));
+  assert.match(rawRoot, new RegExp(`<span data-l="en">${roleEn.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}<\\/span>`));
+  const profileSource = rawRoot.match(/<script[^>]*id="ld-profile"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+  assert.ok(profileSource, "static profile JSON-LD is missing");
+  const profile = JSON.parse(profileSource);
+  const person = profile["@graph"].find(node => node["@type"] === "Person");
+  assert.equal(person.jobTitle, roleEn, "the English default document must ship English static JSON-LD");
 });

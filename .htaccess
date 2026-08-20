@@ -7,6 +7,14 @@ AddDefaultCharset UTF-8
 # HTTPS redirect is handled by the hosting layer. Duplicating it here can
 # create self-redirect loops when Apache runs behind a TLS terminator.
 
+# Legacy Russian locale URL: use the crawlable static /ru/ document.
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{REQUEST_URI} ^/$
+  RewriteCond %{QUERY_STRING} ^lang=ru$ [NC]
+  RewriteRule ^$ /ru/? [R=302,L]
+</IfModule>
+
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"

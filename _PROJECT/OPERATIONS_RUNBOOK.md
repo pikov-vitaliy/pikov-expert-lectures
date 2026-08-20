@@ -1,6 +1,6 @@
 # Операционный протокол pikov.expert
 
-Дата фиксации: 2026-06-21.
+Дата актуализации: 2026-08-21.
 
 Этот файл является стартовой точкой для следующих изменений сайта. Если задача касается контента, метаданных, публикации, очистки или проверки `pikov.expert`, начинать нужно отсюда и не менять порядок без явной причины.
 
@@ -25,7 +25,12 @@ git status --short --branch
 
 Для каждой HTML-страницы, которая публикуется как лекция или карточка курса:
 
-- `lang="ru"` на корневом HTML-элементе;
+- `lang` корневого HTML-элемента совпадает с языком активной версии страницы;
+- иноязычные фрагменты размечены собственным `lang`, когда это требуется
+  [WCAG 2.2 SC 3.1.2](https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html);
+- для bilingual root английская версия имеет `lang="en"` и self-canonical URL,
+  русская — `lang="ru"` и свой self-canonical URL; обе версии публикуют
+  согласованные `hreflang="en"`, `hreflang="ru"` и `hreflang="x-default"`;
 - responsive viewport: `width=device-width, initial-scale=1.0`;
 - `title`, `meta description`, canonical URL;
 - Yandex Metrika `109116119` с `webvisor:false`;
@@ -59,6 +64,13 @@ $env:RELEASE_DATE=$releaseDate; node .\_PROJECT\browser-qa.mjs
 
 Focused-тесты, document render/a11y и browser-проверки изменённых страниц
 добавляются к этой цепочке. Они не заменяют полный release gate.
+
+Сборка без `-AcceptedSourceCommit` всегда создаёт candidate release. Даже из
+чистого дерева он имеет `policyDecision=deny-deploy` и `deployable=false` и
+предназначен только для локальных static/independence/browser gates. Для
+изменённого tracked tree дополнительно записывается `sourceDirty=true`.
+`sourceTreeSha256` в каждой записи связывает выбранное содержимое конкретной
+цели с manifest и архивом.
 
 ## 5. Git и CI gate
 
@@ -114,11 +126,21 @@ Actions завершился с `success`. Если после этой пров
 публичных изменений. Только после успешного exact-SHA CI пересобрать release из
 этого SHA и развернуть его:
 
+`-AcceptedSourceCommit` связывает артефакты с exact clean `HEAD` и отклоняет
+commit вне локально доступной истории `main`, но сам по себе не доказывает, что
+это текущий принятый tip с зелёным CI. Такое решение даёт только цепочка
+PR → merged `main` → синхронизированный `origin/main` → exact-SHA CI `success`
+из раздела 5. Detached accepted build разрешён исключительно для rollback по
+процедуре 6.1 на ранее подтверждённый accepted SHA. Для воспроизводимости
+accepted index использует логический `sourceRef=refs/heads/main` независимо от
+main/detached checkout; фактический checkout ref записывается только в
+недетерминированное deploy evidence.
+
 ```powershell
 $releaseDate = '<YYYY-MM-DD>'
 $releaseIndex = ".\_PROJECT\RELEASE_INDEX_$releaseDate.json"
 if ((git rev-parse HEAD) -ne $acceptedSha) { throw 'HEAD differs from accepted SHA' }
-powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -FailOnIssues
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -AcceptedSourceCommit $acceptedSha -FailOnIssues
 $trackedDrift = @(git status --porcelain=v1 --untracked-files=no)
 if ($LASTEXITCODE -ne 0) {
     throw 'Could not inspect tracked files after release build'
@@ -128,7 +150,16 @@ if ($trackedDrift.Count -ne 0) {
     throw 'Tracked files changed during release build'
 }
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -ReleaseIndex $releaseIndex
-powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate
+$releaseEntries = @(Get-Content -LiteralPath $releaseIndex -Encoding UTF8 -Raw | ConvertFrom-Json)
+$invalidProvenance = @($releaseEntries | Where-Object {
+    $_.sourceCommit -ne $acceptedSha -or
+    $_.releaseKind -ne 'accepted' -or
+    $_.sourceDirty -ne $false -or
+    $_.deployable -ne $true -or
+    $_.policyDecision -ne 'allow-deploy'
+})
+if ($invalidProvenance.Count -ne 0) { throw 'Accepted release provenance mismatch' }
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate -ExpectedSourceCommit $acceptedSha -KeepRemoteDeployRoot
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\hosting-check.ps1 -ReleaseDate $releaseDate
 $env:RELEASE_DATE=$releaseDate; node .\_PROJECT\browser-qa-online.mjs
 ```
@@ -136,22 +167,77 @@ $env:RELEASE_DATE=$releaseDate; node .\_PROJECT\browser-qa-online.mjs
 Проверка `--untracked-files=no` намеренно не затрагивает непубличный каталог
 `pc/`, но завершает публикацию ошибкой при любом staged или unstaged изменении
 отслеживаемого файла, которое появилось во время повторной сборки принятого SHA.
-Generated checksum и manifest-файлы должны быть воспроизводимы и уже находиться
-в Git в точном состоянии, соответствующем исходным материалам.
+Tracked source manifests и checksum-файлы должны быть воспроизводимы и уже
+находиться в Git в точном состоянии, соответствующем исходным материалам.
+Release index, release manifests и ZIP воспроизводимо регенерируются из
+accepted SHA и остаются ignored build artifacts; процесс публикации запрещает
+их подмену между accepted build и deploy.
 
 Для адресной публикации корня и одного поддомена без повторного развёртывания
 всей сети:
 
 ```powershell
-& .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate -OnlyDomains @('pikov.expert', 'example.pikov.expert')
+& .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate -ExpectedSourceCommit $acceptedSha -OnlyDomains @('pikov.expert', 'example.pikov.expert') -KeepRemoteDeployRoot
 ```
 
 `deploy-hosting.ps1` повторно запускает gate публичной независимости, сверяет
-SHA-256 release-архивов, делает временные резервные копии, запускает полный
-`hosting-check.ps1` и только после успешной проверки удаляет удалённый каталог
-`_deploy_pikov_<timestamp>`. Для диагностики неуспешной публикации каталог
-сохраняется автоматически; при осознанной ручной диагностике его можно оставить
-ключом `-KeepRemoteDeployRoot`.
+exact `ExpectedSourceCommit`, accepted policy и SHA-256 release-архивов, а
+per-target source-tree hash пересчитывает по путям, размерам и содержимому
+файлов непосредственно из выбранного ZIP. Затем он делает временные резервные
+копии и запускает полный `hosting-check.ps1` в дочернем процессе: его ненулевой
+exit code переводит попытку в `FAILED`. Каждая попытка получает отдельное
+свидетельство
+`_PROJECT\HOSTING_DEPLOY_<date>_<stamp>_<shortsha>.md` со статусом
+`PREPARED`, `DEPLOYED` или `FAILED`, UTC-временем, exact SHA и хешами всех
+выбранных целей: частичный deploy не перезаписывает историю полного.
+
+Эти проверки обнаруживают stale или внутренне несогласованные артефакты, но не
+заменяют криптографическую подпись/attestation: процесс с write-доступом к
+ignored index и ZIP способен согласованно заменить оба файла и пересчитать
+хеши. Поэтому accepted-сборка и deploy выполняются в одной контролируемой
+exact-SHA CI/операторской цепочке с ограниченным доступом к workspace. Для
+защиты от враждебного процесса в той же среде потребуется подписанная
+attestation либо свежая изолированная пересборка перед публикацией.
+
+Для remediation и rollback удалённый `_deploy_pikov_<timestamp>` сохраняется
+ключом `-KeepRemoteDeployRoot`. Без этого ключа скрипт удаляет его только после
+успешного deploy и post-deploy check. Успешный retained-каталог удаляется лишь
+после независимого verdict `READY` и проверки, что его backups больше не нужны.
+
+### 6.1. Исполнимый rollback на предыдущий принятый SHA
+
+Источник rollback — previous accepted SHA и его заново проверенный release из
+отдельного чистого worktree. Область возврата должна точно совпадать со списком
+доменов неудачной публикации. До запуска нужно подтвердить сохранённые
+exact-SHA CI `success` и deploy/release evidence этого previous SHA:
+
+```powershell
+$previousAcceptedSha = '<40-hex previous accepted main SHA>'
+$rollbackDomains = @('pikov.expert', 'example.pikov.expert')
+$rollbackDate = '<YYYY-MM-DD>'
+$rollbackWorktree = Join-Path (Split-Path -Parent $PWD) "pikov-rollback-$($previousAcceptedSha.Substring(0, 12))"
+
+git worktree add --detach $rollbackWorktree $previousAcceptedSha
+Push-Location $rollbackWorktree
+try {
+    if ((git rev-parse HEAD) -ne $previousAcceptedSha) { throw 'Rollback worktree SHA mismatch' }
+    if (@(git status --porcelain=v1 --untracked-files=no).Count -ne 0) { throw 'Rollback worktree is dirty' }
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $rollbackDate -AcceptedSourceCommit $previousAcceptedSha -FailOnIssues
+    $rollbackIndex = ".\_PROJECT\RELEASE_INDEX_$rollbackDate.json"
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -ReleaseIndex $rollbackIndex
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $rollbackDate -ExpectedSourceCommit $previousAcceptedSha -OnlyDomains $rollbackDomains -KeepRemoteDeployRoot
+    powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\hosting-check.ps1 -ReleaseDate $rollbackDate
+    $env:RELEASE_DATE=$rollbackDate; node .\_PROJECT\browser-qa-online.mjs
+} finally {
+    Pop-Location
+}
+```
+
+После независимого `READY` удалить worktree командой
+`git worktree remove $rollbackWorktree` и отдельно удалить только exact
+retained remote path из deploy evidence. Перед `ssh ... rm -rf` путь обязан
+пройти проверку ожидаемого `$HOME/_deploy_pikov_<timestamp>`; удаление по glob,
+пустой переменной или непроверенному пути запрещено.
 
 После публикации проверить минимум:
 

@@ -30,11 +30,11 @@ test("the catalogue script parses as valid JavaScript", () => {
   assert.doesNotThrow(() => new vm.Script(catalogScript));
 });
 
-test("the site opens in English by default and remembers an explicit choice", () => {
+test("the requested route is the durable language source of truth", () => {
   const boot = scripts.find(source => source.includes("document.documentElement.dataset.lang"));
   assert.ok(boot, "missing the early language bootstrap script");
-  assert.match(boot, /var lang = "en"/, "default language must be English");
-  assert.match(boot, /localStorage\.getItem\("lang"\)/, "a stored choice must win over the default");
+  assert.match(boot, /pathLang[^\n]+\? "ru" : "en"/, "the root path must default to English and /ru/ to Russian");
+  assert.doesNotMatch(root, /localStorage\.(?:getItem|setItem)\("lang"\)/, "language storage must not override a durable route");
   assert.match(boot, /lang=\(ru\|en\)/, "?lang= must be able to force a language");
   // Бутстрап обязан стоять в <head>: иначе русский текст успеет отрисоваться.
   assert.ok(root.indexOf(boot) < root.indexOf("</head>"), "language bootstrap must run before <body>");
@@ -104,22 +104,22 @@ test("both UI dictionaries expose the same keys", () => {
 });
 
 test("head declares both languages for search engines", () => {
-  assert.match(root, /<html lang="en">/);
+  assert.match(root, /<html lang="en" data-lang="en">/);
   assert.match(root, /<link rel="alternate" hreflang="en" href="https:\/\/pikov\.expert\/">/);
-  assert.match(root, /<link rel="alternate" hreflang="ru" href="https:\/\/pikov\.expert\/\?lang=ru">/);
+  assert.match(root, /<link rel="alternate" hreflang="ru" href="https:\/\/pikov\.expert\/ru\/">/);
   assert.match(root, /<link rel="alternate" hreflang="x-default" href="https:\/\/pikov\.expert\/">/);
   assert.match(root, /<link rel="canonical" href="https:\/\/pikov\.expert\/">/);
   assert.match(root, /property="og:locale" content="en_US"/);
   assert.match(root, /property="og:locale:alternate" content="ru_RU"/);
-  // Статический canonical описывает английскую версию. Русская объявлена как
-  // отдельный адрес, поэтому на ?lang=ru скрипт обязан переписать canonical и
-  // og:url на него — иначе альтернатива указывает на страницу, которая
-  // канонизирует себя в другой URL, и Google такую пару игнорирует.
+  // Статический canonical описывает английскую версию. Русская имеет
+  // отдельный crawlable document /ru/, а legacy ?lang= нормализуется скриптом.
   const catalogue = scripts.find(source => source.includes("applyChromeLanguage"));
   assert.ok(catalogue, "missing the chrome-language routine");
   assert.match(catalogue, /link\[rel="canonical"\]/);
   assert.match(catalogue, /meta\[property="og:url"\]/);
-  assert.match(catalogue, /lang\(\) === "ru" \? "\?lang=ru" : ""/);
+  assert.match(catalogue, /function syncLanguageUrl/);
+  assert.match(catalogue, /lang\(\) === "ru" \? "\/ru\/" : "\/"/);
+  assert.match(catalogue, /searchParams\.delete\("lang"\)/);
 });
 
 test("the English page warns that the courses themselves are in Russian", () => {

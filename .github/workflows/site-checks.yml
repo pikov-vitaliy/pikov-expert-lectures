@@ -18,7 +18,25 @@ jobs:
       - name: Checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
+          fetch-depth: 0
           persist-credentials: false
+
+      - name: Check changed range formatting
+        shell: pwsh
+        env:
+          BASE_SHA: ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $baseCandidate = $env:BASE_SHA
+          if ([string]::IsNullOrWhiteSpace($baseCandidate) -or $baseCandidate -match '^0+$') {
+            $baseCandidate = 'HEAD^'
+          }
+          $baseSha = (git merge-base $baseCandidate HEAD).Trim()
+          if ([string]::IsNullOrWhiteSpace($baseSha)) {
+            throw 'Could not resolve the changed-range merge base'
+          }
+          git diff --check "$baseSha..HEAD"
 
       - name: Parse project scripts
         shell: pwsh
@@ -31,6 +49,18 @@ jobs:
             '_PROJECT/test-public-release-independence.ps1',
             '_PROJECT/hosting-check.ps1',
             '_PROJECT/deploy-hosting.ps1'
+          )) {
+            [void][scriptblock]::Create((Get-Content -LiteralPath $script -Raw -Encoding UTF8))
+          }
+
+      - name: Parse Windows PowerShell lab wrappers
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($script in @(
+            'pentest/lab/preflight-juice-shop-lab.ps1',
+            'pentest/lab/start-juice-shop-lab.ps1',
+            'pentest/lab/stop-juice-shop-lab.ps1'
           )) {
             [void][scriptblock]::Create((Get-Content -LiteralPath $script -Raw -Encoding UTF8))
           }
@@ -55,9 +85,19 @@ jobs:
           node .\_PROJECT\test-platform-content-currentness.mjs
           node --test .\_PROJECT\test-evergreen-course-dates.mjs
           node --test .\_PROJECT\test-release-workflow-order.mjs
+          node --test .\_PROJECT\test-release-provenance.mjs
           node --test .\_PROJECT\test-deploy-manifest-boundary.mjs
           node --test .\_PROJECT\test-root-learning-paths.mjs
+          node --test .\_PROJECT\test-root-bilingual.mjs
           node --test .\_PROJECT\test-root-professional-profile.mjs
+          node --test .\_PROJECT\test-root-locale-routes.mjs
+          node .\_PROJECT\build-root-locales.mjs --check
+          node --test .\_PROJECT\test-public-affiliation-hygiene.mjs
+          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -PolicySelfTest
+          node --test .\_PROJECT\test-tz-landing.mjs
+          node .\tz\tools\build-tz-landing.mjs --check
+          node --test .\_PROJECT\test-spdx-page-metadata.mjs
+          node .\_PROJECT\update-spdx-page-metadata.mjs --root .\spdx --check
           node --test .\_PROJECT\test-generated-artifact-determinism.mjs
           node .\_PROJECT\test-pentest-materials.mjs
           python .\appsec-lections\_build\security_regression_tests.py -v
@@ -90,13 +130,29 @@ jobs:
           node --test .\_PROJECT\test-27-07-accessible-handout.mjs
           node .\_PROJECT\test-layout-accessibility-regressions.mjs
           node .\_PROJECT\qa-root-index.mjs
+          node .\_PROJECT\qa-root-locale-routes.mjs
+          node --test .\_PROJECT\qa-tz-navigation.mjs
           node .\_PROJECT\qa-pentest-ui.mjs
           node .\_PROJECT\qa-appsec-layout.mjs
 
       - name: Build release archives
         shell: pwsh
         run: |
-          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $sourceCommit = (git rev-parse --verify HEAD).Trim().ToLowerInvariant()
+          if ($sourceCommit -notmatch '^[0-9a-f]{40}$') {
+            throw "Could not resolve the exact workflow source commit: $sourceCommit"
+          }
+          $isAcceptedMain = $env:GITHUB_EVENT_NAME -eq 'push' -and $env:GITHUB_REF -eq 'refs/heads/main'
+          if ($isAcceptedMain) {
+            powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues -AcceptedSourceCommit $sourceCommit
+          }
+          else {
+            powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+          }
+          "RELEASE_SOURCE_COMMIT=$sourceCommit" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "RELEASE_ACCEPTED_MAIN=$($isAcceptedMain.ToString().ToLowerInvariant())" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
       - name: Verify release build did not change tracked files
         shell: pwsh
@@ -126,4 +182,25 @@ jobs:
       - name: Prepare deploy script
         shell: pwsh
         run: |
-          powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -PrepareOnly
+          $ErrorActionPreference = 'Stop'
+          if ($env:RELEASE_ACCEPTED_MAIN -eq 'true') {
+            powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -PrepareOnly -ExpectedSourceCommit $env:RELEASE_SOURCE_COMMIT
+            if ($LASTEXITCODE -ne 0) { throw "Accepted main PrepareOnly failed with exit code $LASTEXITCODE" }
+          }
+          else {
+            $oldNativePreference = $PSNativeCommandUseErrorActionPreference
+            $PSNativeCommandUseErrorActionPreference = $false
+            try {
+              $rejection = & powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -PrepareOnly -ExpectedSourceCommit $env:RELEASE_SOURCE_COMMIT 2>&1
+              $rejectionExit = $LASTEXITCODE
+            }
+            finally {
+              $PSNativeCommandUseErrorActionPreference = $oldNativePreference
+            }
+            $rejection | ForEach-Object { Write-Host $_ }
+            if ($rejectionExit -eq 0) { throw 'Candidate release was unexpectedly accepted by the deploy gate' }
+            if (($rejection -join "`n") -notmatch '(?i)accepted|deployable|ancestor|main') {
+              throw 'Candidate rejection did not come from an accepted-main provenance gate'
+            }
+            Write-Host 'Candidate release rejection verified.'
+          }

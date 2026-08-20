@@ -456,14 +456,14 @@ verdict `READY`; иначе новые findings добавляются в рее
 | Дата/время | Этап | Статус | SHA/артефакт | Доказательство и решение |
 |---|---|---|---|---|
 | 2026-08-21 | Планирование | `DONE` | `fe7ca09545497cb9d35e9133ea7a4ed13b3c60b3` | Зафиксирован аудит, Goal, scope, gates и разрешение на scoped Git/deploy operations |
-| 2026-08-21 | Этап 0 | `PENDING` | — | Ожидается создание focused RED-набора |
-| 2026-08-21 | Этап 1 | `PENDING` | — | TZ navigation/generator |
-| 2026-08-21 | Этап 2 | `PENDING` | — | bilingual root |
-| 2026-08-21 | Этап 3 | `PENDING` | — | lang/canonical/links |
-| 2026-08-21 | Этап 4 | `PENDING` | — | affiliation/CI gates |
-| 2026-08-21 | Этап 5 | `PENDING` | — | provenance/docs |
-| 2026-08-21 | Этап 6 | `PENDING` | — | full local gate |
-| 2026-08-21 | Этап 7 | `PENDING` | — | commit/push/CI/deploy |
+| 2026-08-21 | Этап 0 | `DONE` | `4cbb4fe14d25c901f63f11cb9eff9947082df844` | RED подтверждён отдельными тестами: TZ ограничивался 100/104 и генератор терял metadata; root не имел статического `/ru/`, устойчивого URL и локализованного JSON-LD/ARIA; SPDX updater отсутствовал, 1624/1625 файлов требовали metadata; provenance-набор был 0/6 |
+| 2026-08-21 | Этап 1 | `DONE` | worktree | TZ unit 3/3, browser 1/1, `--check` read-only, `--write` через same-directory temp + invariants + atomic rename, 104/104 |
+| 2026-08-21 | Этап 2 | `DONE` | worktree | Статические `/` и `/ru/`, self-canonical/hreflang/OG, URL+storage+reload, локализованные ARIA/JSON-LD; root browser QA и locale-route QA GREEN; smoke allowlist ограничен `ru/index.html` |
+| 2026-08-21 | Этап 3 | `DONE` | worktree | SPDX check `files=1625`, 1624 snapshot-файла изменены только в `lang/xml:lang` и canonical; focused tests 13/13; PTES URL HTTP 200; оба handout canonical проверены |
+| 2026-08-21 | Этап 4 | `DONE` | worktree | Affiliation 6/6, workflow-order 16/16, десять прежних visual SHA-256 блокируются в tracked public set и recursive release archives; нейтральный пример компании разрешён при явном авторстве; range-aware `git diff --check` добавлен до build |
+| 2026-08-21 | Этап 5 | `DONE` | worktree | Provenance release 9/9 и deploy 21/21: exact clean SHA, authoritative `origin/main`, candidate deny, rollback ancestor, ZIP tree recomputation, child hosting-check и уникальное evidence; PS5/PS7 parse GREEN; стандарты и runbook актуализированы |
+| 2026-08-21 | Этап 6 | `DONE` | candidate `2026-08-21` | Node 158/158; Python security 68/68 + DVWA 5/5 + Juice Shop 5/5 + SQL 20/20; штатный loopback Juice Shop start/demo/stop GREEN; candidate 30 архивов, static 0, independence 30/30, release browser 30/30; deploy gate ожидаемо отклонил candidate |
+| 2026-08-21 | Этап 7 | `IN PROGRESS` | — | scoped staging, commit/push/PR/exact-SHA CI/deploy |
 | 2026-08-21 | Этап 8 | `PENDING` | — | live QA/final review |
 
 ## 8. Stop conditions

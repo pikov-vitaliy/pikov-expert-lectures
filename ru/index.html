@@ -1,0 +1,1481 @@
+<!DOCTYPE html>
+<html lang="ru" data-lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="format-detection" content="telephone=no">
+<title>Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec</title>
+<meta name="author" content="Пиков Виталий Александрович">
+<meta name="description" content="Авторские лекции и курсы по информационной безопасности, защите информации, ОС Astra Linux и Windows, Сканер-ВС 7, архитектуре ЭВМ, сертификации и лицензированию ТЗИ, безопасной разработке ПО и SIEM.">
+<meta name="keywords" content="Vitaly Pikov, Виталий Пиков, information security, secure software development, DevSecOps, AppSec, SAST, SCA, SBOM, fuzzing, penetration testing, threat modeling, Astra Linux, Windows security, SIEM, GOST R 56939, FSTEC, ISO/IEC 27001, информационная безопасность, ИБ, ТЗИ, Сканер-ВС 7, КОМРАД, РБПО, пентест, фаззинг, РосНОУ">
+<meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+<meta name="googlebot" content="index, follow">
+<meta name="yandex" content="index, follow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23166339'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia,serif' font-size='38' fill='%23ffffff'%3E%D0%9F%3C/text%3E%3C/svg%3E">
+<link rel="canonical" href="https://pikov.expert/ru/">
+<link rel="alternate" hreflang="en" href="https://pikov.expert/">
+<link rel="alternate" hreflang="ru" href="https://pikov.expert/ru/">
+<link rel="alternate" hreflang="x-default" href="https://pikov.expert/">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f6f4">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1512">
+<!-- Open Graph -->
+<meta property="og:type" content="profile">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:site_name" content="pikov.expert">
+<meta property="og:url" content="https://pikov.expert/ru/">
+<meta property="og:title" content="Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec">
+<meta property="og:description" content="Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<meta property="og:image:secure_url" content="https://pikov.expert/photo.jpg">
+<meta property="og:image:width" content="640">
+<meta property="og:image:height" content="640">
+<meta property="og:image:alt" content="Пиков Виталий Александрович — фото">
+<meta property="profile:first_name" content="Виталий">
+<meta property="profile:last_name" content="Пиков">
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec">
+<meta name="twitter:description" content="Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.">
+<meta name="twitter:image" content="https://pikov.expert/photo.jpg">
+<meta name="twitter:image:alt" content="Пиков Виталий Александрович — фото">
+
+<!-- Ранняя установка темы и языка: до отрисовки, чтобы не мигало.
+     Устойчивый URL имеет приоритет; ?lang= поддерживается как legacy-вход. -->
+<script>
+(function(){
+  var pathLang = /^\/ru(?:\/|$)/.test(location.pathname) ? "ru" : "en";
+  var lang = pathLang;
+  try{
+    var t = localStorage.getItem("theme");
+    if(t === "light" || t === "dark"){ document.documentElement.dataset.theme = t; }
+    var v = localStorage.getItem("view");
+    document.documentElement.dataset.view = (v === "cards") ? "cards" : "rows";
+  }catch(e){}
+  var q = /[?&]lang=(ru|en)\b/.exec(location.search);
+  if(q){
+    lang = q[1];
+  }
+  document.documentElement.dataset.lang = lang;
+  document.documentElement.lang = lang;
+})();
+</script>
+
+<!-- Yandex.Metrika: id 109116119 — не удалять и не менять id. -->
+<script type="text/javascript">
+(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+m[i].l=1*new Date();
+for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+(window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+
+<!-- schema.org: Person + WebSite (статично). ItemList лекций генерируется скриптом из массива LECTURES. -->
+<script id="ld-profile" type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://pikov.expert/#person",
+      "name": "Пиков Виталий Александрович",
+      "alternateName": [
+        "Виталий Пиков",
+        "Vitaly Pikov",
+        "Vitaliy Pikov"
+      ],
+      "url": "https://pikov.expert/",
+      "image": "https://pikov.expert/photo.jpg",
+      "email": "mailto:vitaly@pikov.expert",
+      "jobTitle": "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
+      "affiliation": {
+        "@type": "CollegeOrUniversity",
+        "name": "Российский новый университет (РосНОУ)"
+      },
+      "knowsAbout": [
+        "Безопасная разработка ПО",
+        "DevSecOps",
+        "AppSec",
+        "Security by Design",
+        "Моделирование угроз",
+        "SCA и SBOM",
+        "Безопасность цепочки поставок ПО",
+        "Безопасная разработка C/C++",
+        "NIST SSDF",
+        "OWASP",
+        "CWE",
+        "ISO/IEC 27001",
+        "Техническая защита информации",
+        "Astra Linux",
+        "Тестирование на проникновение"
+      ],
+      "sameAs": [
+        "https://t.me/UnderLineSecurity"
+      ]
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://pikov.expert/#website",
+      "url": "https://pikov.expert/",
+      "name": "pikov.expert",
+      "inLanguage": [
+        "en",
+        "ru"
+      ],
+      "description": "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; сами учебные материалы — на русском.",
+      "author": {
+        "@id": "https://pikov.expert/#person"
+      }
+    }
+  ]
+}
+</script>
+
+<style>
+/* ============ Токены тем ============ */
+:root{
+  --bg: oklch(96.8% 0.003 180);
+  --surface: oklch(99% 0.001 180);
+  --line: oklch(88% 0.006 170);
+  --line-soft: oklch(92.5% 0.004 170);
+  --ink: oklch(21% 0.012 180);
+  --muted: oklch(45% 0.012 175);
+  --faint: oklch(50% 0.012 175);
+  --accent: oklch(50% 0.115 160);
+  --accent-soft: oklch(93.5% 0.03 160);
+  --header-bg: oklch(96.8% 0.003 180 / .82);
+  --shadow: 0 1px 2px oklch(25% 0.03 268 / .05), 0 10px 28px -18px oklch(25% 0.05 268 / .35);
+  /* Переключатель языка — намеренно контрастный к зелёной палитре сайта. */
+  --lang-bg: oklch(48% 0.16 42);
+  --lang-bg-hover: oklch(41% 0.15 42);
+  --lang-ink: oklch(99% 0.004 90);
+  --lang-ring: oklch(48% 0.16 42 / .3);
+}
+:root[data-theme="dark"]{
+  --bg: oklch(17.5% 0.014 175);
+  --surface: oklch(21% 0.016 175);
+  --line: oklch(32% 0.018 172);
+  --line-soft: oklch(26.5% 0.015 172);
+  --ink: oklch(92.5% 0.006 170);
+  --muted: oklch(66% 0.015 168);
+  --faint: oklch(64% 0.016 168);
+  --accent: oklch(76% 0.11 160);
+  --accent-soft: oklch(27% 0.045 165);
+  --header-bg: oklch(17.5% 0.014 175 / .82);
+  --shadow: 0 1px 2px oklch(0% 0 0 / .3), 0 12px 30px -18px oklch(0% 0 0 / .6);
+  --lang-bg: oklch(78% 0.15 68);
+  --lang-bg-hover: oklch(85% 0.14 70);
+  --lang-ink: oklch(18% 0.03 60);
+  --lang-ring: oklch(78% 0.15 68 / .32);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg: oklch(17.5% 0.014 175);
+    --surface: oklch(21% 0.016 175);
+    --line: oklch(32% 0.018 172);
+    --line-soft: oklch(26.5% 0.015 172);
+    --ink: oklch(92.5% 0.006 170);
+    --muted: oklch(66% 0.015 168);
+    --faint: oklch(64% 0.016 168);
+    --accent: oklch(76% 0.11 160);
+    --accent-soft: oklch(27% 0.045 165);
+    --header-bg: oklch(17.5% 0.014 175 / .82);
+    --shadow: 0 1px 2px oklch(0% 0 0 / .3), 0 12px 30px -18px oklch(0% 0 0 / .6);
+    --lang-bg: oklch(78% 0.15 68);
+    --lang-bg-hover: oklch(85% 0.14 70);
+    --lang-ink: oklch(18% 0.03 60);
+    --lang-ring: oklch(78% 0.15 68 / .32);
+  }
+}
+
+/* ============ База ============ */
+*{ box-sizing: border-box; }
+html{ scroll-padding-top: 84px; }
+@media (prefers-reduced-motion: no-preference){
+  html{ scroll-behavior: smooth; }
+}
+body{
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.55 system-ui, "Segoe UI", -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1,h2,h3,.serif{
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: .01em;
+  text-wrap: balance;
+  margin: 0;
+}
+p{ margin: 0; text-wrap: pretty; }
+a{ color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover{ color: var(--ink); }
+.mono{ font-family: ui-monospace, "SF Mono", "Cascadia Mono", Consolas, "Liberation Mono", monospace; }
+:is(a,button,summary,input,select):focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.wrap{ max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+.skip{
+  position: absolute; left: -9999px; top: 0; z-index: 100;
+  background: var(--accent); color: var(--surface); padding: 10px 16px; border-radius: 0 0 8px 0;
+}
+.skip:focus{ left: 0; }
+
+/* ============ Шапка ============ */
+.site-header{
+  position: sticky; top: 0; z-index: 50;
+  background: var(--header-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--line-soft);
+}
+.site-header .wrap{
+  display: flex; align-items: center; gap: 20px;
+  height: 60px;
+}
+.brand{
+  font-family: Georgia, serif; font-size: 19px; color: var(--ink);
+  text-decoration: none; letter-spacing: .01em; margin-right: auto;
+}
+.brand:hover{ color: var(--accent); }
+.site-nav{ display: flex; gap: 4px; }
+.site-nav a{
+  color: var(--muted); text-decoration: none; font-size: 14.5px;
+  padding: 7px 11px; border-radius: 7px; white-space: nowrap;
+}
+.site-nav a:hover{ color: var(--ink); background: var(--accent-soft); }
+.theme-btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 9px;
+  border: 1px solid var(--line); background: var(--surface); color: var(--muted);
+  cursor: pointer; padding: 0;
+}
+.theme-btn:hover{ color: var(--accent); border-color: var(--accent); }
+.hdr-actions{ display: flex; gap: 8px; align-items: center; }
+#viewToggle .icon-rows{ display: none; }
+:root[data-view="rows"] #viewToggle .icon-rows{ display: block; }
+:root[data-view="rows"] #viewToggle .icon-grid{ display: none; }
+.theme-btn .icon-moon{ display: none; }
+:root[data-theme="dark"] .theme-btn .icon-sun{ display: none; }
+:root[data-theme="dark"] .theme-btn .icon-moon{ display: block; }
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]) .theme-btn .icon-sun{ display: none; }
+  :root:not([data-theme="light"]) .theme-btn .icon-moon{ display: block; }
+}
+
+/* ============ Двуязычность ============
+   Показывается ровно один языковой вариант. display:none (а не visibility)
+   принципиален: innerText и getBoundingClientRect не видят скрытую ветку,
+   поэтому браузерные проверки считают только активный язык.
+   Правило намеренно узкое: помечаются ТОЛЬКО парные <span data-l>, поэтому
+   структурные элементы (карточки, плитки, ссылки навигации) не дублируются. */
+:root[data-lang="en"] [data-l="ru"]{ display: none !important; }
+:root[data-lang="ru"] [data-l="en"]{ display: none !important; }
+
+/* Переключатель языка: единственный залитый цветом элемент в шапке. */
+.lang-btn{
+  display: inline-flex; align-items: center; gap: 7px;
+  height: 36px; padding: 0 13px; border-radius: 9px;
+  border: 1px solid transparent;
+  background: var(--lang-bg); color: var(--lang-ink);
+  font: 700 13px/1 system-ui, "Segoe UI", -apple-system, Roboto, Arial, sans-serif;
+  letter-spacing: .04em; text-transform: uppercase;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
+  box-shadow: 0 0 0 3px var(--lang-ring);
+}
+.lang-btn:hover{ background: var(--lang-bg-hover); color: var(--lang-ink); }
+.lang-btn svg{ flex: none; }
+.lang-btn .lang-short{ display: none; }
+@media (max-width: 640px){
+  .lang-btn{ padding: 0 10px; gap: 5px; }
+  .lang-btn .lang-full{ display: none; }
+  /* Неактивный вариант всё равно погашен правилом [data-l] выше (!important). */
+  .lang-btn .lang-short{ display: inline; }
+}
+
+/* ============ Герой ============ */
+.hero{ padding: 52px 0 8px; }
+.hero-grid{
+  display: grid; grid-template-columns: 1fr 232px; gap: 48px; align-items: start;
+}
+.kicker{
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 12px; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--accent); margin-bottom: 18px;
+}
+.hero h1{ font-size: clamp(34px, 5vw, 52px); line-height: 1.08; }
+.hero .role{
+  font-size: 18px; color: var(--muted); margin-top: 12px;
+  font-family: Georgia, serif; font-style: italic;
+}
+.hero .bio{ margin-top: 18px; max-width: 60ch; color: var(--muted); font-size: 15.5px; }
+.hero-contacts{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.hero-contacts a{
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 14px; text-decoration: none; color: var(--ink);
+  border: 1px solid var(--line); background: var(--surface);
+  padding: 8px 14px; border-radius: 999px;
+}
+.hero-contacts a:hover{ border-color: var(--accent); color: var(--accent); }
+.portrait{ position: relative; }
+.portrait::before{
+  content: ""; position: absolute; inset: 14px -14px -14px 14px;
+  border: 1px solid var(--line); border-radius: 14px; z-index: 0;
+}
+.portrait .ph{
+  position: relative; z-index: 1; display: block; width: 100%; aspect-ratio: 1;
+  border-radius: 14px; overflow: hidden; background: var(--accent-soft);
+  border: 1px solid var(--line); box-shadow: var(--shadow);
+}
+.portrait img{ width: 100%; height: 100%; object-fit: cover; display: block; }
+.portrait .monogram{
+  position: absolute; inset: 0; display: none; align-items: center; justify-content: center;
+  font-family: Georgia, serif; font-size: 64px; color: var(--accent);
+}
+.portrait.no-photo img{ display: none; }
+.portrait.no-photo .monogram{ display: flex; }
+.stats{
+  display: grid; grid-template-columns: repeat(4, auto); gap: 8px 44px;
+  margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line);
+  width: fit-content;
+}
+.stat b{
+  font-family: Georgia, serif; font-weight: 500; font-size: 32px; color: var(--ink);
+  display: block; line-height: 1.1;
+}
+.stat span{ font-size: 13px; color: var(--faint); }
+
+/* ============ Плитки разделов (первый экран) ============ */
+.sections{ padding: 34px 0 10px; }
+.sections-head{
+  display: flex; align-items: baseline; gap: 14px; margin-bottom: 14px;
+}
+.sections-head h2{ font-size: 15px; color: var(--faint); font-family: inherit; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+.tiles{
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(196px, 1fr));
+  gap: 10px; list-style: none; margin: 0; padding: 0;
+}
+.tile{
+  display: flex; flex-direction: column; gap: 26px; min-height: 118px;
+  border: 1px solid var(--line); border-radius: 12px; background: var(--surface);
+  padding: 14px 16px; text-decoration: none; color: var(--ink);
+  position: relative;
+}
+.tile .idx{ font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--faint); }
+.tile .name{ font-family: Georgia, serif; font-size: 17.5px; line-height: 1.25; margin-top: auto; }
+.tile .cnt{ font-size: 12.5px; color: var(--muted); margin-top: 4px; }
+.tile .arr{ position: absolute; top: 12px; right: 14px; color: var(--faint); }
+.tile:hover{ border-color: var(--accent); box-shadow: var(--shadow); }
+.tile:hover .arr{ color: var(--accent); }
+@media (prefers-reduced-motion: no-preference){
+  .tile, .card, .theme-btn, .hero-contacts a, .site-nav a, .tile .arr, .card .go{ transition: all .18s ease; }
+  .tile:hover{ transform: translateY(-2px); }
+}
+
+/* ============ Ролевые учебные маршруты ============ */
+.learning-paths{ padding: 44px 0 18px; }
+.paths-head{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(280px, .7fr); gap: 28px; align-items: end; margin-bottom: 20px; }
+.paths-head h2{ font-size: clamp(26px, 4vw, 38px); }
+.paths-head p{ color: var(--muted); font-size: 14px; line-height: 1.65; }
+.path-intro{ display: grid; gap: 10px; }
+.course-map-link{ width: fit-content; font-size: 13px; font-weight: 700; }
+.path-grid{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.path-card{ display: flex; flex-direction: column; gap: 14px; min-width: 0; padding: 20px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface); }
+.path-card .path-role{ width: fit-content; padding: 4px 8px; border-radius: 5px; background: var(--accent-soft); color: var(--accent); font: 600 11px/1.4 ui-monospace, Consolas, monospace; letter-spacing: .08em; text-transform: uppercase; }
+.path-card h3{ font-size: 21px; }
+.path-card dl{ display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 8px 10px; margin: 0; font-size: 13.5px; line-height: 1.5; }
+/* «Prerequisites» длиннее «Предпосылок» — колонке нужен запас. */
+:root[data-lang="en"] .path-card dl{ grid-template-columns: 106px minmax(0, 1fr); }
+.path-card dt{ color: var(--faint); font-weight: 650; }
+.path-card dd{ margin: 0; color: var(--muted); }
+.path-links{ display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 4px; }
+.path-links a{ display: inline-flex; padding: 6px 9px; border: 1px solid var(--line); border-radius: 6px; color: var(--ink); background: var(--bg); text-decoration: none; font-size: 12.5px; }
+.path-links a:hover{ border-color: var(--accent); color: var(--accent); }
+
+/* ============ Каталог ============ */
+.catalog{ padding: 30px 0 20px; }
+.cat-section{ padding: 34px 0 8px; }
+.cat-head{
+  display: flex; align-items: baseline; gap: 16px;
+  border-bottom: 1px solid var(--line); padding-bottom: 14px; margin-bottom: 20px;
+}
+.cat-head .num{ font-family: ui-monospace, Consolas, monospace; font-size: 13px; color: var(--accent); }
+.cat-head h3{ font-size: clamp(22px, 3vw, 28px); }
+.cat-head .count{ margin-left: auto; font-size: 13px; color: var(--faint); white-space: nowrap; }
+.cards{
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 14px; list-style: none; margin: 0; padding: 0;
+}
+.card{
+  display: flex; flex-direction: column; gap: 10px;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: 18px 20px 16px; text-decoration: none; color: var(--ink);
+}
+.card:hover{ border-color: var(--accent); box-shadow: var(--shadow); }
+@media (prefers-reduced-motion: no-preference){ .card:hover{ transform: translateY(-2px); } }
+.card .tag{
+  font-family: ui-monospace, "SF Mono", Consolas, monospace;
+  font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--accent); background: var(--accent-soft);
+  padding: 4px 8px; border-radius: 5px; width: fit-content;
+}
+.card h4{
+  font-family: Georgia, serif; font-weight: 500; font-size: 19px; line-height: 1.3;
+  margin: 2px 0 0; letter-spacing: .01em; text-wrap: balance;
+}
+.card .desc{ font-size: 13.5px; line-height: 1.55; color: var(--muted); }
+.card .foot{
+  display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+}
+.card .domain{
+  font-family: ui-monospace, Consolas, monospace; font-size: 11.5px; color: var(--faint);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.card .go{ margin-left: auto; color: var(--faint); flex: none; }
+.card:hover .go{ color: var(--accent); transform: translateX(2px); }
+.catalog-note{ display: block; padding: 20px 0; color: var(--muted); }
+/* Честное предупреждение для англоязычного посетителя: интерфейс переведён,
+   сами лекции — на русском. Показывается только в английской версии. */
+.lang-notice{
+  display: flex; align-items: flex-start; gap: 10px;
+  margin-top: 22px; padding: 13px 16px;
+  border: 1px solid var(--line); border-left: 4px solid var(--lang-bg);
+  border-radius: 10px; background: var(--surface);
+  color: var(--muted); font-size: 13.5px; line-height: 1.55;
+}
+.lang-notice svg{ flex: none; margin-top: 2px; color: var(--lang-bg); }
+.lang-notice b{ color: var(--ink); font-weight: 650; }
+
+/* ============ Поиск и фильтр ============ */
+.toolbar{ display: flex; flex-wrap: wrap; gap: 10px; align-items: center; padding: 26px 0 0; }
+.search-wrap{ position: relative; flex: 0 1 340px; min-width: 220px; }
+.search-wrap > svg{ position: absolute; left: 12px; top: 50%; translate: 0 -50%; color: var(--faint); pointer-events: none; }
+#q{ width: 100%; padding: 10px 14px 10px 36px; font: inherit; font-size: 14.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; }
+#q::placeholder{ color: var(--faint); }
+#fmt{ padding: 10px 12px; font: inherit; font-size: 14.5px; color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: 10px; max-width: 260px; cursor: pointer; }
+.result-note{ font-size: 13px; color: var(--muted); }
+.reset-btn{ font: inherit; font-size: 13.5px; color: var(--accent); background: none; border: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; padding: 4px 2px; }
+.reset-btn:hover{ color: var(--ink); }
+.empty-note{ padding: 34px 0 10px; color: var(--muted); font-size: 15px; }
+.hint-key{ display: none; }
+@media (hover: hover) and (pointer: fine){
+  #q{ padding-right: 40px; }
+  .search-wrap:focus-within .hint-key{ display: none; }
+  .hint-key{ display: inline-block; position: absolute; right: 10px; top: 50%; translate: 0 -50%; font-family: ui-monospace, Consolas, monospace; font-size: 11px; color: var(--faint); border: 1px solid var(--line); border-radius: 5px; padding: 1px 6px; }
+}
+
+/* ============ Обо мне ============ */
+.about{ padding: 68px 0 24px; }
+.about-head, .contacts-head{ margin-bottom: 8px; }
+.about-head{
+  display: grid; grid-template-columns: minmax(0, .72fr) minmax(320px, 1.28fr);
+  gap: 28px; align-items: end;
+}
+.about-head h2, .contacts h2{ font-size: clamp(28px, 3.4vw, 38px); }
+.about-head p, .contacts .lead{ color: var(--muted); margin-top: 8px; }
+.about-head > p{ max-width: 68ch; justify-self: end; }
+.about-intro{
+  margin-top: 26px; padding: clamp(22px, 3vw, 34px);
+  background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent);
+  border-radius: 16px;
+}
+.about-lead{
+  max-width: 88ch; color: var(--ink); font-size: clamp(17px, 1.65vw, 20px);
+  line-height: 1.6;
+}
+.profile-chips, .standards-list{
+  display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 20px 0 0; padding: 0;
+}
+.profile-chips li, .standards-list li{
+  max-width: 100%; padding: 6px 10px; border: 1px solid var(--line);
+  border-radius: 999px; background: var(--accent-soft); color: var(--ink);
+  font: 600 12.5px/1.35 ui-monospace, "SF Mono", "Cascadia Mono", Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+.about-grid{
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 14px; margin-top: 14px;
+}
+.about-block{
+  grid-column: span 6; min-width: 0;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 14px;
+  padding: clamp(20px, 2.5vw, 28px);
+}
+.about-block--wide{ grid-column: 1 / -1; }
+.about-block h3{ font-size: 20px; margin-bottom: 12px; }
+.about-block p{ color: var(--muted); font-size: 14.5px; overflow-wrap: anywhere; }
+.about-block p + p{ margin-top: 12px; }
+.about-block strong, .about-block b{ color: var(--ink); font-weight: 650; }
+.about-block ul:not(.standards-list){ list-style: none; margin: 0; padding: 0; }
+.about-block ul:not(.standards-list) > li{
+  padding: 10px 0; border-bottom: 1px solid var(--line-soft);
+  font-size: 14px; color: var(--muted); display: flex; gap: 14px;
+}
+.about-block ul:not(.standards-list) > li:last-child{ border-bottom: 0; padding-bottom: 2px; }
+.about-block li b{ color: var(--ink); font-weight: 650; }
+.about-block .yr{
+  font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--accent);
+  flex: none; padding-top: 2px;
+}
+.standards-list{ margin-top: 16px; }
+.education-card > p{ max-width: 82ch; }
+.education-grid{
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px;
+  margin-top: 20px;
+}
+.education-group{
+  min-width: 0; padding: 17px 18px; border: 1px solid var(--line-soft);
+  border-radius: 10px; background: var(--bg);
+}
+.education-group h4{
+  margin: 0 0 7px; color: var(--ink); font-size: 15px; line-height: 1.35;
+}
+.qualification-list{ list-style: none; margin: 0; padding: 0; }
+.about-block .qualification-list > li{
+  display: grid; grid-template-columns: 46px minmax(0, 1fr); gap: 10px;
+  padding: 8px 0; font-size: 13.5px;
+}
+.qualification-list time, .qualification-list .qualification-period{
+  color: var(--accent); font: 600 11.5px/1.5 ui-monospace, Consolas, monospace;
+}
+.qualification-list span{ min-width: 0; overflow-wrap: anywhere; }
+.credential-list li{ display: block !important; }
+.about-independent{
+  margin-top: 14px; padding: 22px 24px; border: 1px solid var(--line);
+  border-radius: 14px; background: var(--accent-soft);
+}
+.about-independent h3{ font-size: 18px; margin-bottom: 6px; }
+.about-independent p{ max-width: 92ch; color: var(--muted); font-size: 14.5px; }
+.about-independent strong{ color: var(--ink); }
+
+/* ============ Связь ============ */
+.contacts{ padding: 48px 0 72px; }
+.contacts-inner{
+  background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+  padding: 40px 32px; text-align: center;
+}
+.contacts .lead{ max-width: 46ch; margin: 8px auto 0; }
+.contact-row{ display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+.contact-row a{
+  display: inline-flex; align-items: center; gap: 9px;
+  text-decoration: none; font-size: 15px; padding: 11px 20px; border-radius: 999px;
+}
+.contact-row a.primary{ background: var(--accent); color: var(--bg); }
+.contact-row a.primary:hover{ opacity: .88; color: var(--bg); }
+.contact-row a.ghost{ border: 1px solid var(--line); color: var(--ink); }
+.contact-row a.ghost:hover{ border-color: var(--accent); color: var(--accent); }
+
+/* ============ Подвал ============ */
+.site-footer{ border-top: 1px solid var(--line-soft); padding: 22px 0 30px; }
+.site-footer .wrap{ display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: baseline; }
+.site-footer p{ font-size: 13px; color: var(--faint); }
+.site-footer .dom{ margin-left: auto; font-family: ui-monospace, Consolas, monospace; font-size: 12px; color: var(--faint); }
+
+/* ============ Адаптив ============ */
+@media (max-width: 880px){
+  .hero{ padding-top: 36px; }
+  .hero-grid{ grid-template-columns: 1fr; gap: 28px; }
+  .portrait{ width: 148px; }
+  .portrait::before{ inset: 10px -10px -10px 10px; }
+  .portrait .monogram{ font-size: 44px; }
+  .hero-grid .portrait{ order: -1; }
+  .stats{ grid-template-columns: repeat(2, auto); gap: 18px 44px; width: 100%; }
+  .about-head{ grid-template-columns: 1fr; gap: 6px; }
+  .about-head > p{ justify-self: start; }
+  .about-grid{ grid-template-columns: 1fr; }
+  .about-block, .about-block--wide{ grid-column: 1; }
+  .education-grid{ grid-template-columns: 1fr; }
+  .brand{ font-size: 16px; margin-right: 8px; }
+  .site-nav{ min-width: 0; overflow-x: auto; scrollbar-width: none; }
+  .site-nav::-webkit-scrollbar{ display: none; }
+  .site-nav a{ padding: 6px 9px; font-size: 13px; }
+}
+@media (max-width: 480px){
+  .wrap{ padding: 0 16px; }
+  .hero h1{ font-size: 32px; }
+  .cards{ grid-template-columns: 1fr; }
+  .tiles{ grid-template-columns: 1fr 1fr; }
+  .tile{ min-height: 104px; gap: 18px; }
+  .contacts-inner{ padding: 30px 18px; }
+  .stats{ gap: 14px 30px; }
+  .stat b{ font-size: 26px; }
+  .about{ padding-top: 52px; }
+  .about-intro, .about-block, .about-independent{ padding: 20px 18px; }
+  .profile-chips li, .standards-list li{ border-radius: 8px; }
+  .education-group{ padding: 15px 14px; }
+}
+@media (max-width: 900px){
+  .paths-head{ grid-template-columns: 1fr; gap: 10px; }
+  .path-grid{ grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce){
+  *, *::before, *::after{ transition: none !important; animation: none !important; }
+}
+
+/* ===== Направление: графит и зелёный ===== */
+h1, h2, h3, .serif, .brand, .tile .name, .card h4, .stat b{ font-family: system-ui, "Segoe UI", -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif; }
+h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
+.hero h1{ letter-spacing: -0.02em; }
+.hero .role{ font-family: inherit; font-style: normal; font-weight: 550; color: var(--accent); font-size: 16.5px; }
+.brand{ font-weight: 700; }
+.stat b{ font-weight: 750; letter-spacing: -0.01em; font-size: 30px; }
+.tile .name{ font-weight: 650; font-size: 16px; }
+.tile, .card{ border-radius: 8px; }
+.card h4{ font-weight: 650; font-size: 17px; letter-spacing: -0.005em; }
+.cat-head .num{ font-weight: 600; }
+
+/* ===== Вид каталога «строки» (data-view="rows" на <html>, переключатель в шапке) ===== */
+:root[data-view="rows"] .cards{ grid-template-columns: 1fr; gap: 1px; border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--line-soft); }
+:root[data-view="rows"] .cards > li{ background: var(--surface); }
+:root[data-view="rows"] .card:focus-visible{ outline-offset: -2px; }
+:root[data-view="rows"] .card{ display: grid; grid-template-columns: 168px minmax(0, 1fr) minmax(0, 200px); gap: 4px 24px; align-items: start; border: 0; border-radius: 0; padding: 18px 20px; }
+:root[data-view="rows"] .card .tag{ grid-column: 1; grid-row: 1; background: transparent; padding: 2px 0; }
+:root[data-view="rows"] .card h4{ grid-column: 2; grid-row: 1; margin: 0; }
+:root[data-view="rows"] .card .desc{ grid-column: 2; grid-row: 2; }
+:root[data-view="rows"] .card .foot{ grid-column: 3; grid-row: 1 / span 2; margin: 0; padding: 2px 0 0; border: 0; justify-content: flex-end; }
+:root[data-view="rows"] .card:hover{ transform: none; box-shadow: none; background: var(--accent-soft); }
+@media (max-width: 880px){
+  :root[data-view="rows"] .card{ grid-template-columns: 110px minmax(0, 1fr); }
+  :root[data-view="rows"] .card h4, :root[data-view="rows"] .card .desc{ grid-column: 2; }
+  :root[data-view="rows"] .card .foot{ grid-column: 1 / -1; grid-row: 3; justify-content: flex-start; padding-top: 8px; }
+}
+@media (max-width: 480px){
+  :root[data-view="rows"] .card{ grid-template-columns: 1fr; }
+  :root[data-view="rows"] .card .tag, :root[data-view="rows"] .card h4, :root[data-view="rows"] .card .desc, :root[data-view="rows"] .card .foot{ grid-column: 1; grid-row: auto; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#sections"><span data-l="ru">К разделам лекций</span><span data-l="en">Skip to course sections</span></a>
+
+<header class="site-header">
+  <div class="wrap">
+    <a class="brand" href="#"><span data-l="ru">Виталий&nbsp;Пиков</span><span data-l="en">Vitaly&nbsp;Pikov</span></a>
+    <nav class="site-nav" aria-label="Основная навигация">
+      <a href="#sections"><span data-l="ru">Разделы</span><span data-l="en">Sections</span></a>
+      <a href="#learning-paths"><span data-l="ru">Маршруты</span><span data-l="en">Paths</span></a>
+      <a href="#lectures"><span data-l="ru">Лекции</span><span data-l="en">Catalogue</span></a>
+      <a href="#about"><span data-l="ru">Обо мне</span><span data-l="en">About</span></a>
+      <a href="#contacts"><span data-l="ru">Связь</span><span data-l="en">Contact</span></a>
+    </nav>
+    <div class="hdr-actions">
+    <!-- Кнопка показывает язык, на который переключит, а не текущий. -->
+    <a class="lang-btn" id="langToggle" href="/" aria-label="Переключить сайт на английский язык" title="Переключить сайт на английский язык">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"></path></svg>
+      <span class="lang-full" data-l="en">Русский</span><span class="lang-full" data-l="ru">English</span>
+      <span class="lang-short" data-l="en">RU</span><span class="lang-short" data-l="ru">EN</span>
+    </a>
+    <button class="theme-btn" id="viewToggle" type="button" aria-label="Вид каталога: карточки или строки" title="Карточки / строки">
+      <svg class="icon-grid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
+      <svg class="icon-rows" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5.5h16M4 12h16M4 18.5h16"></path></svg>
+    </button>
+    <button class="theme-btn" id="themeToggle" type="button" aria-label="Переключить светлую/тёмную тему">
+      <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="4.5"></circle>
+        <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"></path>
+      </svg>
+      <svg class="icon-moon" width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <mask id="moonMask"><rect width="24" height="24" fill="white"></rect><circle cx="16" cy="8" r="7" fill="black"></circle></mask>
+        <circle cx="12" cy="12" r="8.5" mask="url(#moonMask)"></circle>
+      </svg>
+    </button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Герой -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <p class="kicker"><span data-l="ru">Авторский каталог · информационная безопасность</span><span data-l="en">Original course catalogue · information security</span></p>
+        <h1><span data-l="ru">Пиков Виталий<br>Александрович</span><span data-l="en">Vitaly<br>Pikov</span></h1>
+        <p class="role"><span data-l="ru">Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель</span><span data-l="en">Expert in secure software development, DevSecOps and AppSec; lecturer</span></p>
+        <p class="bio"><span data-l="ru">26 лет в ИТ, более 10 лет преподавательской работы. Заслуженный доцент РосНОУ. Авторизованный преподаватель «Группы Астра» с правом проведения курсов по ОС Astra Linux Special Edition 1.8.</span><span data-l="en">26 years in IT, more than 10 years of teaching. Honoured Associate Professor of RosNOU (Russian New University) — an honorary academic title. Authorised instructor for Astra Group, certified to deliver courses on Astra Linux Special Edition 1.8.</span></p>
+        <div class="hero-contacts">
+          <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
+          <a href="https://t.me/UnderLineSecurity" rel="noopener">Telegram · @UnderLineSecurity</a>
+        </div>
+        <div class="stats" role="list">
+          <div class="stat" role="listitem"><b>26+</b><span data-l="ru">лет в ИТ</span><span data-l="en">years in IT</span></div>
+          <div class="stat" role="listitem"><b>10+</b><span data-l="ru">лет преподавания</span><span data-l="en">years of teaching</span></div>
+          <div class="stat" role="listitem"><b>40+</b><span data-l="ru">научных публикаций</span><span data-l="en">research publications</span></div>
+          <div class="stat" role="listitem"><b id="lectureCount">33</b><span id="lectureCountLabel">учебных материала</span></div>
+        </div>
+      </div>
+      <div class="portrait" id="portrait">
+        <span class="ph">
+          <img src="/photo.jpg" alt="Vitaly Pikov — portrait" width="232" height="232" onerror="document.getElementById('portrait').classList.add('no-photo')">
+          <span class="monogram" aria-hidden="true"><span data-l="ru">ВП</span><span data-l="en">VP</span></span>
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Разделы: навигация с первого экрана. Плитки генерируются из CATEGORIES. -->
+  <nav class="sections" id="sections" aria-label="Разделы лекций">
+    <div class="wrap">
+      <div class="sections-head"><h2><span data-l="ru">Разделы</span><span data-l="en">Sections</span></h2></div>
+      <ul class="tiles" id="tiles"></ul>
+    </div>
+  </nav>
+
+  <section class="learning-paths" id="learning-paths" aria-labelledby="learning-paths-title">
+    <div class="wrap">
+      <div class="paths-head">
+        <h2 id="learning-paths-title"><span data-l="ru">Три маршрута по материалам</span><span data-l="en">Three learning paths</span></h2>
+        <div class="path-intro">
+          <p><span data-l="ru">Это не жёсткие программы, а рекомендуемая последовательность. Начните с ближайшей роли, зафиксируйте итоговый артефакт и переходите к следующему уровню только после проверки результата.</span><span data-l="en">These are not rigid syllabi but a recommended order. Start from the role closest to you, produce the final artefact, and move on to the next level only once the result has been checked.</span></p>
+          <a class="course-map-link" href="/course-map.html"><span data-l="ru">Полная преподавательская карта 30 ресурсов →</span><span data-l="en">Full teaching map of 30 resources →</span></a>
+        </div>
+      </div>
+      <div class="path-grid">
+        <article class="path-card">
+          <span class="path-role"><span data-l="ru">Начинающий</span><span data-l="en">Beginner</span></span>
+          <h3><span data-l="ru">Базовый язык ИБ</span><span data-l="en">The basic language of security</span></h3>
+          <dl>
+            <dt><span data-l="ru">Предпосылки</span><span data-l="en">Prerequisites</span></dt><dd><span data-l="ru">Уверенная работа с компьютером; базовые понятия ОС и сети.</span><span data-l="en">Confident computer use; basic operating-system and networking concepts.</span></dd>
+            <dt><span data-l="ru">Длительность</span><span data-l="en">Duration</span></dt><dd><span data-l="ru">6–8 академических часов.</span><span data-l="en">6–8 academic hours.</span></dd>
+            <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Объяснить актив, угрозу, уязвимость, риск, меру и границу информационной системы.</span><span data-l="en">Explain asset, threat, vulnerability, risk, control and the boundary of an information system.</span></dd>
+            <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Одностраничная карта активов, границ и пяти основных рисков учебной системы.</span><span data-l="en">A one-page map of assets, boundaries and the five principal risks of a training system.</span></dd>
+          </dl>
+          <nav class="path-links" data-i18n-aria="pathBeginnerLabel" aria-label="Материалы маршрута для начинающего">
+            <a href="https://is.pikov.expert/"><span data-l="ru">Информационные системы</span><span data-l="en">Information systems</span></a>
+            <a href="https://risk.pikov.expert/"><span data-l="ru">Риски ИБ</span><span data-l="en">Security risk</span></a>
+            <a href="https://27001.pikov.expert/">ISO/IEC 27001</a>
+          </nav>
+        </article>
+        <article class="path-card">
+          <span class="path-role"><span data-l="ru">Администратор и специалист по ИБ</span><span data-l="en">Administrator and security engineer</span></span>
+          <h3><span data-l="ru">Платформа, hardening и наблюдаемость</span><span data-l="en">Platform, hardening and observability</span></h3>
+          <dl>
+            <dt><span data-l="ru">Предпосылки</span><span data-l="en">Prerequisites</span></dt><dd><span data-l="ru">TCP/IP, командная строка Windows/Linux, принципы учётных записей и журналирования.</span><span data-l="en">TCP/IP, the Windows/Linux command line, account management and logging fundamentals.</span></dd>
+            <dt><span data-l="ru">Длительность</span><span data-l="en">Duration</span></dt><dd><span data-l="ru">2–3 учебных дня с локальным стендом.</span><span data-l="en">2–3 teaching days with a local lab.</span></dd>
+            <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Проверить конфигурацию, применить безопасное изменение, собрать доказательства и выполнить rollback.</span><span data-l="en">Audit a configuration, apply a safe change, collect evidence and roll the change back.</span></dd>
+            <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Паспорт стенда, чек-лист hardening и отчёт «до → изменение → тест → откат».</span><span data-l="en">A lab specification, a hardening checklist and a “before → change → test → rollback” report.</span></dd>
+          </dl>
+          <nav class="path-links" data-i18n-aria="pathAdminLabel" aria-label="Материалы маршрута администратора">
+            <a href="https://astra-intro.pikov.expert/">Astra Linux</a>
+            <a href="https://astra-hardening.pikov.expert/">Hardening</a>
+            <a href="https://windows.pikov.expert/">Windows</a>
+            <a href="https://komrad.pikov.expert/">SIEM</a>
+          </nav>
+        </article>
+        <article class="path-card">
+          <span class="path-role"><span data-l="ru">Разработчик и DevSecOps</span><span data-l="en">Developer and DevSecOps</span></span>
+          <h3><span data-l="ru">Security-by-design и цепочка поставки</span><span data-l="en">Security by design and the supply chain</span></h3>
+          <dl>
+            <dt><span data-l="ru">Предпосылки</span><span data-l="en">Prerequisites</span></dt><dd><span data-l="ru">Git, один язык программирования, сборка и базовый CI/CD; для native-трека — C/C++.</span><span data-l="en">Git, one programming language, build tooling and basic CI/CD; C/C++ for the native track.</span></dd>
+            <dt><span data-l="ru">Длительность</span><span data-l="en">Duration</span></dt><dd><span data-l="ru">2–3 учебных дня плюс самостоятельная лабораторная работа.</span><span data-l="en">2–3 teaching days plus independent lab work.</span></dd>
+            <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Провести threat modeling, проверить зависимости, найти дефект, исправить его и доказать исправление тестом.</span><span data-l="en">Run threat modelling, review dependencies, find a defect, fix it and prove the fix with a test.</span></dd>
+            <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Модель угроз, SBOM/решение о допуске компонента и finding с negative test и retest.</span><span data-l="en">A threat model, an SBOM with a component-approval decision, and a finding with a negative test and a retest.</span></dd>
+          </dl>
+          <nav class="path-links" data-i18n-aria="pathDeveloperLabel" aria-label="Материалы маршрута разработчика">
+            <a href="https://ppk.pikov.expert/"><span data-l="ru">Архитектура и ППК</span><span data-l="en">Architecture and component list</span></a>
+            <a href="https://appsec-lections.pikov.expert/">AppSec</a>
+            <a href="https://sast.pikov.expert/">SAST</a>
+            <a href="https://pentest.pikov.expert/"><span data-l="ru">Пентест</span><span data-l="en">Pentesting</span></a>
+          </nav>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Каталог лекций. Секции и карточки генерируются из LECTURES. -->
+  <section class="catalog" id="lectures">
+    <div class="wrap">
+      <noscript><p class="catalog-note"><span data-l="ru">Каталог лекций отображается с помощью JavaScript. Включите его или напишите на vitaly@pikov.expert.</span><span data-l="en">The course catalogue is rendered with JavaScript. Please enable it, or email vitaly@pikov.expert.</span></p></noscript>
+      <p class="lang-notice" data-l="en">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"></circle><path d="M12 11v5.5M12 7.6v.1"></path></svg>
+        <span><b>The courses themselves are taught and published in Russian.</b> This catalogue page is available in English so you can see the scope of the work; every linked lecture, slide deck and handout opens in Russian. Write to <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a> if you need an English-language session or materials.</span>
+      </p>
+      <div class="toolbar">
+        <div class="search-wrap">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.8-3.8"></path></svg>
+          <input id="q" type="search" placeholder="Поиск по лекциям" aria-label="Поиск по лекциям" autocomplete="off">
+          <span class="hint-key" aria-hidden="true">/</span>
+        </div>
+        <select id="fmt" aria-label="Фильтр по метке"></select>
+        <button class="reset-btn" id="resetFilters" type="button" hidden><span data-l="ru">Сбросить</span><span data-l="en">Reset</span></button>
+        <span class="result-note" id="resultNote" role="status"></span>
+      </div>
+      <p class="empty-note" id="emptyNote" hidden><span data-l="ru">По запросу ничего не найдено.</span><span data-l="en">Nothing matches your query.</span></p>
+      <div id="catalog"></div>
+    </div>
+  </section>
+
+  <!-- Обо мне -->
+  <section class="about" id="about">
+    <div class="wrap">
+      <div class="about-head">
+        <h2 id="about-title"><span data-l="ru">Обо мне</span><span data-l="en">About</span></h2>
+        <p><span data-l="ru">Безопасная разработка, инженерная практика, преподавание и научная работа — от требований и архитектуры до проверяемых артефактов и работающих инструментов.</span><span data-l="en">Secure development, engineering practice, teaching and research — from requirements and architecture through to verifiable artefacts and working tools.</span></p>
+      </div>
+      <div class="about-intro">
+        <p class="about-lead"><span data-l="ru">Я занимаюсь безопасной разработкой программного обеспечения, DevSecOps и AppSec: помогаю превращать требования стандартов в архитектурные решения, рабочие процессы, автоматизированные проверки и проверяемые результаты. В центре практики — security-by-design, моделирование угроз и защита на всём жизненном цикле ПО.</span><span data-l="en">I work in secure software development, DevSecOps and AppSec, turning the requirements of standards into architectural decisions, working processes, automated checks and verifiable results. At the centre of that practice are security by design, threat modelling, and protection across the whole software lifecycle.</span></p>
+        <ul class="profile-chips" data-i18n-aria="profileAreasLabel" aria-label="Основные профессиональные направления">
+          <li>Secure C/C++</li>
+          <li><span data-l="ru">SAST и DAST</span><span data-l="en">SAST &amp; DAST</span></li>
+          <li><span data-l="ru">Фаззинг</span><span data-l="en">Fuzzing</span></li>
+          <li><span data-l="ru">SCA и SBOM</span><span data-l="en">SCA &amp; SBOM</span></li>
+          <li>Software Supply Chain</li>
+          <li>DevSecOps</li>
+          <li>AppSec</li>
+        </ul>
+      </div>
+      <div class="about-grid">
+        <article class="about-block about-block--wide">
+          <h3><span data-l="ru">Профессиональный путь</span><span data-l="en">Professional background</span></h3>
+          <p><span data-l="ru"><strong>Более 25 лет</strong> работаю на стыке информационных технологий, информационной безопасности, исследований и образования: участвовал в разработке защищённых вычислительных систем, формировании требований безопасности, экспертизе архитектуры и исходного кода, испытаниях средств защиты и управлении техническими командами.</span><span data-l="en"><strong>For more than 25 years</strong> I have worked at the intersection of information technology, information security, research and education: developing trusted computing systems, defining security requirements, reviewing architecture and source code, testing security products, and leading engineering teams.</span></p>
+          <p><span data-l="ru"><strong>Последнее место службы — профильный научно-исследовательский институт государственного сектора.</strong> Там прошёл путь от инженера-программиста до руководителя научно-исследовательской лаборатории по защите информации и испытательной лаборатории. После службы занимался защищёнными вычислительными платформами, развитием программ дополнительного образования и практическим внедрением процессов РБПО.</span><span data-l="en"><strong>My last position in public service was at a specialised state-sector research institute.</strong> There I progressed from software engineer to head of a research laboratory for information protection and of a testing laboratory. Since then I have worked on trusted computing platforms, on developing continuing-education programmes, and on the practical rollout of secure software development processes.</span></p>
+        </article>
+
+        <article class="about-block">
+          <h3><span data-l="ru">Инженерная практика</span><span data-l="en">Engineering practice</span></h3>
+          <p><span data-l="ru">Выстраиваю РБПО не только как комплект документов, но и как действующий инженерный контур. Создал и внедрил внутренний сервис SCA/SBOM для компонентного анализа, учёта уязвимостей и проверки лицензионной чистоты сторонних компонентов.</span><span data-l="en">I build a secure development lifecycle as a working engineering loop, not merely a set of documents. I designed and rolled out an in-house SCA/SBOM service for component analysis, vulnerability tracking and licence-compliance review of third-party components.</span></p>
+          <p><span data-l="ru">Работаю с CycloneDX, SPDX, VEX/OpenVEX и CSAF; обогащаю данные из NVD, OSV, EPSS и CISA KEV. Встраиваю ролевой доступ, неизменяемый аудит, контейнеризацию и security gates в CI/CD. Для C/C++ делаю акцент на безопасности памяти, безопасных API, compiler hardening, санитайзерах, SAST, DAST и фаззинге.</span><span data-l="en">I work with CycloneDX, SPDX, VEX/OpenVEX and CSAF, enriching data from NVD, OSV, EPSS and CISA KEV. I embed role-based access, immutable audit, containerisation and security gates into CI/CD. For C/C++ the emphasis is on memory safety, safe APIs, compiler hardening, sanitisers, SAST, DAST and fuzzing.</span></p>
+        </article>
+
+        <article class="about-block">
+          <h3><span data-l="ru">Стандарты и методологии</span><span data-l="en">Standards and methodologies</span></h3>
+          <p><span data-l="ru">Соединяю российские нормативные требования с международными инженерными практиками: требования, архитектура, модель угроз, код, тестирование, состав компонентов и выпуск продукта образуют единую проверяемую цепочку.</span><span data-l="en">I connect Russian regulatory requirements with international engineering practice, so that requirements, architecture, threat model, code, testing, component inventory and release form one verifiable chain.</span></p>
+          <ul class="standards-list" data-i18n-aria="standardsLabel" aria-label="Стандарты и методологии">
+            <li><span data-l="ru">ГОСТ Р 56939-2024</span><span data-l="en">GOST R 56939-2024</span></li>
+            <li><span data-l="ru">ГОСТ Р 71207-2024</span><span data-l="en">GOST R 71207-2024</span></li>
+            <li>NIST SSDF</li>
+            <li>OWASP SAMM</li>
+            <li>OWASP ASVS</li>
+            <li>CWE</li>
+            <li>ISO/IEC 27001</li>
+            <li>ISO/IEC 27034</li>
+            <li>CERT C/C++</li>
+            <li>MISRA C/C++</li>
+          </ul>
+        </article>
+
+        <article class="about-block">
+          <h3><span data-l="ru">Преподавание</span><span data-l="en">Teaching</span></h3>
+          <ul>
+            <li><span data-l="ru"><b>Более 10 лет преподаю</b> в высшей школе и дополнительном профессиональном образовании.</span><span data-l="en"><b>More than 10 years of teaching</b> in higher education and in continuing professional education.</span></li>
+            <li><span data-l="ru">Подготовил к успешной защите <b>более 130 студентов</b>: бакалавров, специалистов и магистров, включая ВКР по информационной безопасности и информационным системам.</span><span data-l="en">Supervised <b>more than 130 students</b> through to a successful defence — bachelor's, specialist and master's candidates, including graduation theses on information security and information systems.</span></li>
+            <li><span data-l="ru">Разработал <b>10 авторских курсов</b> по РБПО, статическому и динамическому анализу, фаззингу и тестированию на проникновение.</span><span data-l="en">Authored <b>10 original courses</b> on secure software development, static and dynamic analysis, fuzzing and penetration testing.</span></li>
+            <li><span data-l="ru">Обучил <b>более 100 специалистов</b> и провёл <b>более 40 вебинаров</b> по безопасной разработке, включая большой совместный цикл с PVS-Studio.</span><span data-l="en">Trained <b>more than 100 practitioners</b> and delivered <b>more than 40 webinars</b> on secure development, including an extensive joint series with PVS-Studio.</span></li>
+          </ul>
+        </article>
+
+        <article class="about-block">
+          <h3><span data-l="ru">Наука и публичная экспертиза</span><span data-l="en">Research and public expertise</span></h3>
+          <ul>
+            <li><span data-l="ru">Автор <b>более 40 научных публикаций</b> по информационной безопасности, безопасной разработке, аппаратным уязвимостям и защищённым информационным системам; работы представлены в Scopus и Web of Science.</span><span data-l="en">Author of <b>more than 40 research publications</b> on information security, secure development, hardware vulnerabilities and trusted information systems; indexed in Scopus and Web of Science.</span></li>
+            <li><span data-l="ru">Приглашённый эксперт круглого стола по безопасной разработке на МиТСОБИ 2026.</span><span data-l="en">Invited expert on the secure-development round table at MiTSOBI 2026.</span></li>
+            <li><span data-l="ru">Докладчик Positive Hack Days, Инфофорума, InfoSecurity Russia и международных научных конференций; эксперт соревнований по информационной безопасности.</span><span data-l="en">Speaker at Positive Hack Days, Infoforum, InfoSecurity Russia and international academic conferences; judge at information-security competitions.</span></li>
+          </ul>
+        </article>
+
+        <article class="about-block about-block--wide education-card">
+          <h3><span data-l="ru">Образование и квалификация</span><span data-l="en">Education and qualifications</span></h3>
+          <p><span data-l="ru">Базовое инженерное образование дополнено системной профессиональной переподготовкой и регулярным повышением квалификации в области ИБ, безопасной разработки, педагогики и искусственного интеллекта.</span><span data-l="en">A foundation in engineering, extended by systematic professional retraining and regular continuing education in information security, secure development, pedagogy and artificial intelligence.</span></p>
+          <div class="education-grid">
+            <div class="education-group" role="group" aria-labelledby="base-education-title">
+              <h4 id="base-education-title"><span data-l="ru">Базовое высшее образование</span><span data-l="en">Primary degree</span></h4>
+              <ul class="qualification-list">
+                <li><time datetime="2001">2001</time><span data-l="ru">Высшее инженерное образование по специальности «Автоматизированные системы обработки информации и управления».</span><span data-l="en">Engineering degree in Automated Information Processing and Control Systems.</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="retraining-title">
+              <h4 id="retraining-title"><span data-l="ru">Профессиональная переподготовка</span><span data-l="en">Professional retraining</span></h4>
+              <ul class="qualification-list">
+                <li><time datetime="2017">2017</time><span data-l="ru">«Информационная безопасность», МГТУ им. Н. Э. Баумана.</span><span data-l="en">Information Security — Bauman Moscow State Technical University.</span></li>
+                <li><time datetime="2019">2019</time><span data-l="ru">«Противодействие иностранным техническим разведкам».</span><span data-l="en">Counter-technical-intelligence protection.</span></li>
+                <li><time datetime="2020">2020</time><span data-l="ru">Педагогика профессионального образования и дополнительного профессионального образования.</span><span data-l="en">Pedagogy for vocational and continuing professional education.</span></li>
+                <li><time datetime="2021">2021</time><span data-l="ru">«Техническая защита информации».</span><span data-l="en">Technical protection of information.</span></li>
+                <li><time datetime="2022">2022</time><span data-l="ru">«Практическая психология».</span><span data-l="en">Applied psychology.</span></li>
+                <li><time datetime="2024">2024</time><span data-l="ru">«Искусственный интеллект в образовании».</span><span data-l="en">Artificial intelligence in education.</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="continuing-education-title">
+              <h4 id="continuing-education-title"><span data-l="ru">Повышение квалификации и дополнительная подготовка</span><span data-l="en">Continuing education and additional training</span></h4>
+              <ul class="qualification-list">
+                <li><time datetime="2026">2026</time><span data-l="ru">Безопасность приложений.</span><span data-l="en">Application security.</span></li>
+                <li><time datetime="2025">2025</time><span data-l="ru">Современная ИБ: подходы, инструменты и образовательные практики.</span><span data-l="en">Contemporary information security: approaches, tooling and teaching practice.</span></li>
+                <li><time datetime="2024">2024</time><span data-l="ru">«Специалист по процессам разработки безопасного программного обеспечения», 200 часов; анализ архитектуры и экспертиза исходного кода; Python, обработка радиолокационной информации, нейронные сети, этика ИИ и качество преподавания ИТ.</span><span data-l="en">Secure Software Development Process Specialist, 200 hours; architecture analysis and source-code review; Python, radar signal processing, neural networks, AI ethics and quality in IT teaching.</span></li>
+                <li><span class="qualification-period">2022–2023</span><span data-l="ru">KasperskyOS, информационная безопасность АСУ ТП и современные киберугрозы.</span><span data-l="en">KasperskyOS, industrial control system security and the current threat landscape.</span></li>
+                <li><time datetime="2016">2016</time><span data-l="ru">Администрирование Astra Linux Special Edition.</span><span data-l="en">Astra Linux Special Edition administration.</span></li>
+                <li><span class="qualification-period">2009–2010</span><span data-l="ru">Системное администрирование, Windows Server, Active Directory и развёртывание Windows.</span><span data-l="en">Systems administration, Windows Server, Active Directory and Windows deployment.</span></li>
+              </ul>
+            </div>
+
+            <div class="education-group" role="group" aria-labelledby="credentials-title">
+              <h4 id="credentials-title"><span data-l="ru">Звания и профессиональные статусы</span><span data-l="en">Titles and professional standing</span></h4>
+              <ul class="credential-list">
+                <li><span data-l="ru"><b>Заслуженный доцент РосНОУ</b>, преподаватель высшей школы.</span><span data-l="en"><b>Honoured Associate Professor of RosNOU</b> — an honorary title conferred by the Russian New University, not an academic rank or degree. University-level lecturer.</span></li>
+                <li><span data-l="ru">Авторизованный преподаватель по <b>Astra Linux Special Edition 1.7/1.8</b>.</span><span data-l="en">Authorised instructor for <b>Astra Linux Special Edition 1.7/1.8</b>.</span></li>
+                <li><span data-l="ru">Microsoft Certified: <b>MCT, MCITP, MCPS, MCSA, MCTS</b>.</span><span data-l="en">Microsoft Certified: <b>MCT, MCITP, MCPS, MCSA, MCTS</b>.</span></li>
+              </ul>
+            </div>
+          </div>
+        </article>
+      </div>
+      <aside class="about-independent" data-i18n-aria="independentLabel" aria-label="Статус образовательного проекта">
+        <h3><span data-l="ru">Независимый авторский ресурс</span><span data-l="en">An independent, self-authored resource</span></h3>
+        <p><span data-l="ru"><strong>pikov.expert — независимый авторский образовательный проект Виталия Пикова.</strong> Материалы развиваются независимо от прежних работодателей и учебных центров и предназначены для преподавания, самостоятельного обучения и практической работы специалистов.</span><span data-l="en"><strong>pikov.expert is an independent educational project authored by Vitaly Pikov.</strong> The materials are developed independently of any former employer or training centre, and are intended for teaching, self-study and day-to-day practitioner work.</span></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- Связь -->
+  <section class="contacts" id="contacts">
+    <div class="wrap">
+      <div class="contacts-inner">
+        <h2><span data-l="ru">Связь</span><span data-l="en">Contact</span></h2>
+        <p class="lead"><span data-l="ru">По вопросам лекций, курсов и консультаций в области информационной безопасности.</span><span data-l="en">For lectures, courses and consulting on information security.</span></p>
+        <div class="contact-row">
+          <a class="primary" href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
+          <a class="ghost" href="https://t.me/UnderLineSecurity" rel="noopener">Telegram @UnderLineSecurity</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <p>© <span id="year">2026</span> <span data-l="ru">Пиков Виталий Александрович</span><span data-l="en">Vitaly Pikov</span></p>
+    <p class="dom mono">pikov.expert</p>
+  </div>
+</footer>
+
+<script>
+/* =====================================================================
+   ДАННЫЕ ЛЕКЦИЙ — единый источник.
+   Чтобы добавить лекцию: добавьте ОДИН объект в массив LECTURES.
+   Карточка, плитки разделов, счётчики, поиск, фильтр и JSON-LD
+   построятся сами.
+   Поля: title, url, category (ключ из CATEGORIES), format (метка на
+   карточке), description. Домен для отображения выводится из url.
+   Английская версия: titleEn, formatEn, descriptionEn. Если какого-то
+   из них нет, карточка молча покажет русский текст — сайт не сломается,
+   но проверка qa-root-index.mjs поймает пропуск.
+   Новый раздел: добавьте запись в CATEGORIES — вёрстка рассчитана
+   на 7–8 разделов.
+===================================================================== */
+const CATEGORIES = [
+  { id: "os",      name: "ОС и платформы",                    nameEn: "Operating systems and platforms" },
+  { id: "reg",     name: "Регулирование и право",             nameEn: "Regulation and law" },
+  { id: "rbpo",    name: "Безопасная разработка ПО (РБПО)",   nameEn: "Secure software development" },
+  { id: "offense", name: "Пентест, фаззинг и статанализ",     nameEn: "Pentesting, fuzzing and static analysis" },
+  { id: "edu",     name: "Учебные курсы и справочники",       nameEn: "University courses and references" }
+];
+
+const LECTURES = [
+  /* --- ОС и платформы --- */
+  { category: "os", format: "Лекция", title: "Введение в ОС Astra Linux SE 1.7", url: "https://astra-intro.pikov.expert/",
+    description: "Обзор ОС специального назначения: продуктовая экосистема «Группы Астра», версии, архитектуры, уровни защищённости и базовый интерфейс.",
+    formatEn: "Lecture", titleEn: "Introduction to Astra Linux SE 1.7",
+    descriptionEn: "An overview of this special-purpose operating system: the Astra Group product ecosystem, releases, architectures, security levels and the basic interface." },
+  { category: "os", format: "Лекция", title: "Astra Linux: экосистема и уровни защищённости", url: "https://astralinux01.pikov.expert/",
+    description: "Подробный разбор продуктовой линейки, нумерации обновлений и трёх уровней защищённости — базового, усиленного и максимального.",
+    formatEn: "Lecture", titleEn: "Astra Linux: the ecosystem and its security levels",
+    descriptionEn: "A detailed walk-through of the product line, update numbering and the three security levels — base, enhanced and maximum." },
+  { category: "os", format: "Лекция", title: "Формальные модели безопасности ОС", url: "https://astralinux02.pikov.expert/",
+    description: "Дискреционная (DAC), мандатная (MAC) и ролевая (RBAC) модели разграничения доступа, модель Белла-ЛаПадулы и архитектура подсистемы защиты.",
+    formatEn: "Lecture", titleEn: "Formal security models of operating systems",
+    descriptionEn: "Discretionary (DAC), mandatory (MAC) and role-based (RBAC) access control, the Bell–LaPadula model, and the architecture of the protection subsystem." },
+  { category: "os", format: "Практикум · чек-листы", title: "Безопасная настройка Astra Linux 1.7 / 1.8 и ОС Linux (hardening)", url: "https://astra-hardening.pikov.expert/",
+    description: "Систематический разбор трёх документов ФСТЭК России: рекомендации по Linux 2022 и согласованные методические рекомендации по Astra Linux 1.7 и 1.8. С чек-листами для АРМ и сервера, 16 sysctl-параметров, 6 кейсов «найди недочёт», 32-пунктовый чек-лист готовности.",
+    formatEn: "Workshop · checklists", titleEn: "Hardening Astra Linux 1.7 / 1.8 and Linux systems",
+    descriptionEn: "A systematic review of three documents from FSTEC of Russia (the federal technical and export control service): the 2022 Linux recommendations and the agreed guidance for Astra Linux 1.7 and 1.8. Includes workstation and server checklists, 16 sysctl parameters, 6 “spot the flaw” cases and a 32-point readiness checklist." },
+  { category: "os", format: "Лекция", title: "Безопасность ОС Windows", url: "https://windows.pikov.expert/",
+    description: "Архитектура подсистемы безопасности (LSA, SRM, SAM), штатные защитные механизмы, BitLocker и EFS, антивирусная защита и политики обновлений.",
+    formatEn: "Lecture", titleEn: "Windows operating system security",
+    descriptionEn: "The architecture of the security subsystem (LSA, SRM, SAM), built-in protection mechanisms, BitLocker and EFS, anti-malware protection and update policy." },
+  { category: "os", format: "Лекция", title: "Архитектура ЭВМ и аппаратная безопасность", url: "https://pc-elbrus.pikov.expert/",
+    description: "Принципы фон Неймана, Гарвардская архитектура, side-channel атаки, Spectre и Meltdown, TPM и Secure Boot, отечественные платформы.",
+    formatEn: "Lecture", titleEn: "Computer architecture and hardware security",
+    descriptionEn: "Von Neumann principles and the Harvard architecture, side-channel attacks, Spectre and Meltdown, TPM and Secure Boot, and Russian hardware platforms." },
+  { category: "os", format: "Курс · практика на стенде", title: "KOMRAD Enterprise SIEM 4.5", url: "https://komrad.pikov.expert/",
+    description: "Обзор отечественной SIEM от АО НПО «Эшелон» и практика на VirtualBox-стенде: установка на Astra Linux 1.7/1.8, подключение Windows 10 как источника событий, WMI-агент, 6 ГОСТов по мониторингу и три варианта практики.",
+    formatEn: "Course · hands-on lab", titleEn: "KOMRAD Enterprise SIEM 4.5",
+    descriptionEn: "An overview of this Russian SIEM by NPO Echelon, plus hands-on work on a VirtualBox lab: installation on Astra Linux 1.7/1.8, onboarding Windows 10 as an event source, the WMI agent, six national monitoring standards and three practical exercises." },
+  { category: "os", format: "Авторский курс · 2 дня", title: "Сканер-ВС 7 и компонент «Инспектор»", url: "https://scaner-vs.pikov.expert/",
+    description: "Двухдневный практикум: уязвимости, CVSS v4.0, KEV и EPSS, рынок решений, исследование сети, инвентаризация и проверки Сканер-ВС; затем остаточная информация, целостность, права доступа и отчёты «Инспектора».",
+    formatEn: "Original course · 2 days", titleEn: "Scaner-VS 7 and the Inspector component",
+    descriptionEn: "A two-day workshop: vulnerabilities, CVSS v4.0, KEV and EPSS, the vendor landscape, network discovery, asset inventory and Scaner-VS checks; then data remanence, integrity, access rights and Inspector reporting." },
+
+  /* --- Регулирование и право --- */
+  { category: "reg", format: "Лекция", title: "Сертификация средств защиты информации", url: "https://cert.pikov.expert/",
+    description: "Нормативная база ФСТЭК и Минобороны, процедура сертификации, уровни доверия (1–6), требования к разработке СрЗИ.",
+    formatEn: "Lecture", titleEn: "Certification of information protection products",
+    descriptionEn: "The regulatory basis of the FSTEC and Ministry of Defence certification systems, the certification procedure, trust levels 1–6, and development requirements for security products." },
+  { category: "reg", format: "Лекция", title: "Лицензирование в сфере ТЗИ", url: "https://lic-tzi.pikov.expert/",
+    description: "Получение лицензии ФСТЭК: ФЗ-99, постановления Правительства РФ № 79 и № 171, лицензионные требования, сроки и типичные ошибки соискателей.",
+    formatEn: "Lecture", titleEn: "Licensing for technical protection of information",
+    descriptionEn: "Obtaining an FSTEC licence: Federal Law No. 99-FZ, Government Decrees No. 79 and No. 171, licence requirements, timelines, and the mistakes applicants typically make." },
+  { category: "reg", format: "Лекция", title: "Подразделения ТЗИ и их функции", url: "https://tzi-dept.pikov.expert/",
+    description: "Организация работы подразделений ТЗИ: требования Указа Президента РФ № 250, ФСТЭК и ФСБ, типовая структура и взаимодействие с регуляторами.",
+    formatEn: "Lecture", titleEn: "Information protection units and their functions",
+    descriptionEn: "How information-protection units are organised: the requirements of Presidential Decree No. 250 and of the FSTEC and FSB, a typical structure, and how such units work with regulators." },
+  { category: "reg", format: "Учебный день · 5 лекций", title: "День I. Риски ИБ, безопасность ЗО КИИ, инциденты", url: "https://risk.pikov.expert/",
+    description: "Полный учебный день программы профессиональной переподготовки: основы управления рисками ИБ (ГОСТ Р ИСО 31000-2019 и ГОСТ Р ИСО/МЭК 27005-2010), эксплуатация защищённых ИС и значимых объектов КИИ (187-ФЗ с изменениями 2025 г., приказы ФСТЭК России №№ 235, 239, 117 и ФСБ России), планирование работ по ТЗИ и управление компьютерными инцидентами (ГосСОПКА, ГОСТы серии 597XX). 5 лекций × 1,5 ак. ч, ≈100 слайдов.",
+    formatEn: "Teaching day · 5 lectures", titleEn: "Day I. Security risk, protection of CII, incident response",
+    descriptionEn: "A full teaching day from a professional retraining programme: information security risk management (GOST R ISO 31000-2019 and GOST R ISO/IEC 27005-2010); operation of protected systems and of significant critical information infrastructure (CII) facilities (Federal Law No. 187-FZ as amended in 2025, FSTEC orders No. 235, 239 and 117, and FSB regulations); planning of information-protection work; and computer incident management (GosSOPKA, the 597XX standards series). Five lectures of 1.5 academic hours, about 100 slides." },
+  { category: "reg", format: "Учебный день · 5 лекций", title: "День II. Объекты КИИ: угрозы, меры, уязвимости", url: "https://threats-kii.pikov.expert/",
+    description: "Глубокое погружение в безопасность объектов КИИ: оценка угроз (методика ФСТЭК России от 05.02.2021, БДУ ФСТЭК), модель нарушителей (Н1–Н4), структура модели угроз с практическим кейсом, требования к мерам по приказам №№ 235 и 239 (с уровнями доверия СрЗИ, СУБД, виртуализации), порядок выбора мер с практическим заданием, классификация уязвимостей и оценка критичности по методике ФСТЭК России от 30.06.2025. 5 лекций × 1,5 ак. ч, ≈115 слайдов.",
+    formatEn: "Teaching day · 5 lectures", titleEn: "Day II. CII facilities: threats, controls, vulnerabilities",
+    descriptionEn: "A deep dive into the security of critical information infrastructure: threat assessment (the FSTEC methodology of 5 February 2021 and the FSTEC threat database), the intruder model (N1–N4), the structure of a threat model with a worked case, control requirements under orders No. 235 and 239 (including trust levels for security products, database systems and virtualisation), how to select controls with a practical exercise, and vulnerability classification and criticality scoring under the FSTEC methodology of 30 June 2025. Five lectures of 1.5 academic hours, about 115 slides." },
+
+  /* --- Безопасная разработка ПО (РБПО) --- */
+  { category: "rbpo", format: "Учебный день", title: "Техническое задание (ТЗ): проверяемые требования и встраивание РБПО", url: "https://tz.pikov.expert/",
+    description: "Как писать ТЗ, которое можно реализовать и принять: ГОСТ 19/34, атомарные требования и ПМИ. Встраивание РБПО по ГОСТ Р 56939-2024 как несущая ось «требования → архитектура → модель угроз → выявление → доработка», артефакты SAST/SCA/SBOM/фаззинга и приёмочный комплект.",
+    formatEn: "Teaching day", titleEn: "Requirements specifications: verifiable requirements and embedded secure development",
+    descriptionEn: "How to write a specification that can actually be built and accepted: GOST 19 and 34 series, atomic requirements and acceptance test programmes. Secure development under GOST R 56939-2024 as the load-bearing axis — requirements → architecture → threat model → detection → remediation — with SAST/SCA/SBOM/fuzzing artefacts and an acceptance package." },
+  { category: "rbpo", format: "Курс · методика", title: "Подготовка к сертификации процессов РБПО (Приказы №240 и №230 ФСТЭК России)", url: "https://fstec-sdlc.pikov.expert/",
+    description: "Полная методика подготовки изготовителя СрЗИ к сертификации по ГОСТ Р 56939-2024: дорожная карта, 25 регламентов и планов по процессам 5.1-5.25, безопасный компилятор C/C++ по ГОСТ Р 71206-2024, проверка по IDEF0 и AppSec.Table.Top.",
+    formatEn: "Course · methodology", titleEn: "Preparing for certification of secure development processes (FSTEC orders No. 240 and No. 230)",
+    descriptionEn: "A complete methodology for preparing a security-product vendor for certification against GOST R 56939-2024: a road map, 25 process regulations and plans covering processes 5.1–5.25, a hardened C/C++ compiler under GOST R 71206-2024, and verification via IDEF0 and AppSec Table Top." },
+  { category: "rbpo", format: "Учебная серия", title: "РБПО — разработка безопасного программного обеспечения", url: "https://gost56939.pikov.expert/",
+    description: "Учебная серия из шести слайдов: уязвимости и РБПО, 25 процессов безопасной разработки ПО, требования ГОСТ Р 56939-2024, сертификация процессов по Порядку ФСТЭК России № 240 и практическое внедрение.",
+    formatEn: "Lecture series", titleEn: "Secure software development: the fundamentals",
+    descriptionEn: "A six-part teaching series: vulnerabilities and secure development, the 25 secure development processes, the requirements of GOST R 56939-2024, process certification under FSTEC Order No. 240, and practical adoption." },
+  { category: "rbpo", format: "Учебный день", title: "Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта", url: "https://27-07-2026.pikov.expert/",
+    description: "Учебный день целиком: жизненный цикл безопасного ПО и экстремальное программирование, десять слоёв современного стека технологий, одна задача на четырёх языках и разбор четырёх дефектов безопасности с исправлением и тестами.",
+    formatEn: "Teaching day", titleEn: "The secure software lifecycle: languages, stacks and four defects",
+    descriptionEn: "A complete teaching day: the secure software lifecycle and extreme programming, the ten layers of a modern technology stack, one task solved in four languages, and an analysis of four security defects with fixes and tests." },
+  { category: "rbpo", format: "Учебный день", title: "Языки, архитектура и безопасный SQL", url: "https://29-07-2026.pikov.expert/",
+    description: "Учебный день о классификации языков и влиянии выбора технологии на безопасность, Shift Left и архитектурных границах доверия. Практика: защищённая схема SQLite, CWE-89, параметризованные запросы, allowlist и цикл RED → GREEN.",
+    formatEn: "Teaching day", titleEn: "Languages, architecture and safe SQL",
+    descriptionEn: "A teaching day on language classification and how technology choice affects security, on Shift Left, and on architectural trust boundaries. Lab work: a hardened SQLite schema, CWE-89, parameterised queries, allow-lists and the RED → GREEN cycle." },
+  { category: "rbpo", format: "APPSEC · Авторский", title: "Безопасность приложений: программа и материалы двух дней", url: "https://appsec-lections.pikov.expert/",
+    description: "Двухдневная образовательная лаборатория: день 1 с учебной колодой слайдов, 15 авторскими схемами, подробной стенограммой, протоколом и лабораторными материалами; глоссарий на 60+ терминов и методика проведения занятия для преподавателя; день 2 с программой и подготовленной структурой архива.",
+    formatEn: "APPSEC · original", titleEn: "Application security: the two-day programme and its materials",
+    descriptionEn: "A two-day educational lab: day 1 with a teaching slide deck, 15 original diagrams, a full transcript, a session protocol and lab materials; a glossary of 60+ terms and an instructor's guide; day 2 with the programme and a prepared archive structure." },
+  { category: "rbpo", format: "APPSEC · Практикум", title: "Безопасность приложений: практикум и лабораторные задания", url: "https://appsec-lections.pikov.expert/practice.html",
+    description: "Методика локальной учебной практики: изоляция Docker-цели, фиксация версии, доказательства, классификация challenge, профилактика A01–A06 и шаблоны отчёта. Связана с открытым архивом исходных материалов первого дня.",
+    formatEn: "APPSEC · workshop", titleEn: "Application security: workshop and lab assignments",
+    descriptionEn: "A method for local hands-on practice: isolating the Docker target, pinning the version, collecting evidence, classifying challenges, prevention for A01–A06, and report templates. Linked to the open archive of day-one source materials." },
+  { category: "rbpo", format: "МАИ", title: "Композиционный анализ ПО (КАПО)", url: "https://kapo.pikov.expert/",
+    description: "Управление цепочкой поставки сторонних компонентов: проект ГОСТ Р, SBOM в формате CycloneDX, требования к инструментам анализа уязвимостей и лицензий.",
+    formatEn: "MAI", titleEn: "Software composition analysis (SCA)",
+    descriptionEn: "Managing the third-party component supply chain: the draft Russian national standard, SBOM in CycloneDX format, and requirements for vulnerability and licence analysis tooling." },
+  { category: "rbpo", format: "МАИ", title: "Статический анализ безопасности приложений (SAST)", url: "https://sast.pikov.expert/",
+    description: "Принципы статического анализа кода, классы уязвимостей (CWE, OWASP), интеграция в CI/CD, отечественные и зарубежные инструменты, требования РБПО.",
+    formatEn: "MAI", titleEn: "Static application security testing (SAST)",
+    descriptionEn: "The principles of static code analysis, vulnerability classes (CWE, OWASP), CI/CD integration, Russian and international tooling, and secure development requirements." },
+  { category: "rbpo", format: "МАИ", title: "Нефункциональное тестирование безопасности ПО (процесс №19)", url: "https://p19.pikov.expert/",
+    description: "Требования процесса 5.19 ГОСТ Р 56939-2024, имитация действий нарушителя, 11 классов проверок, 6 практических кейсов и авторский чек-лист на 38 пунктов.",
+    formatEn: "MAI", titleEn: "Non-functional software security testing (process No. 19)",
+    descriptionEn: "The requirements of process 5.19 in GOST R 56939-2024, simulating attacker behaviour, 11 classes of checks, 6 practical cases and an original 38-point checklist." },
+  { category: "rbpo", format: "МАИ", title: "Архитектурный анализ. Формирование и предоставление ППК ФСТЭК России (процессы №6, №7, №16, №17)", url: "https://ppk.pikov.expert/",
+    description: "Полный курс по практикам РБПО за пределами фаззинга и статанализа кода: поверхность атаки, 9 техник анализа, 6 архитектурных кейсов, формирование Перечня программных компонентов и предоставление в ФСТЭК России.",
+    formatEn: "MAI", titleEn: "Architecture analysis. Building and submitting the FSTEC software component list (processes 6, 7, 16, 17)",
+    descriptionEn: "A full course on secure development practice beyond fuzzing and static analysis: attack surface, 9 analysis techniques, 6 architecture cases, and building the software component list and submitting it to FSTEC of Russia." },
+  { category: "rbpo", format: "СМИБ · ISO 27001", title: "Информационная безопасность и системы менеджмента ИБ", url: "https://27001.pikov.expert/",
+    description: "Учебный день из пяти лекций: драйверы и терминология ИБ, семейство ISO/IEC 27000, политика и RACI, безопасный жизненный цикл по ГОСТ Р 56939-2024, управление рисками по ISO/IEC 27005, внутренний аудит по ISO 19011 и анализ СМИБ руководством.",
+    formatEn: "ISMS · ISO 27001", titleEn: "Information security and information security management systems",
+    descriptionEn: "A five-lecture teaching day: security drivers and terminology, the ISO/IEC 27000 family, policy and RACI, the secure lifecycle under GOST R 56939-2024, risk management under ISO/IEC 27005, internal audit under ISO 19011, and management review of the ISMS." },
+
+  /* --- Пентест, фаззинг и статанализ --- */
+  { category: "offense", format: "Курс · 5 лекций + практика", title: "Технологии хакеров и оценка защищённости информационной инфраструктуры", url: "https://pentest.pikov.expert/",
+    description: "Авторский курс по методологиям атак и пентестированию: 5 лекций + практическое занятие на Kali Linux и Metasploitable 2. Регуляторика ФСТЭК России, БДУ ФСТЭК, отечественные инструменты, статьи 272–274.1 УК РФ, методология PTES.",
+    formatEn: "Course · 5 lectures + lab", titleEn: "Attacker techniques and infrastructure security assessment",
+    descriptionEn: "An original course on attack methodology and penetration testing: 5 lectures plus a hands-on session on Kali Linux and Metasploitable 2. FSTEC regulation, the FSTEC vulnerability database, Russian tooling, Articles 272–274.1 of the Russian Criminal Code, and the PTES methodology." },
+  { category: "offense", format: "Курс · 3 дня", title: "Статический анализ ПО + PVS-Studio (3 дня)", url: "https://new-courses.pikov.expert/#pvsstat",
+    description: "Курс ПВС СТАТ по ГОСТ Р 71207-2024. Принципы статанализа, практическая работа с PVS-Studio, интеграция в CI/CD, организация процесса по новому ГОСТу.",
+    formatEn: "Course · 3 days", titleEn: "Static analysis with PVS-Studio (3 days)",
+    descriptionEn: "A static analysis course aligned with GOST R 71207-2024: the principles of static analysis, hands-on work with PVS-Studio, CI/CD integration, and organising the process under the new standard." },
+  { category: "offense", format: "Курс · 5 дней", title: "Тестирование на проникновение, базовый (5 дней)", url: "https://new-courses.pikov.expert/#pentest01",
+    description: "Базовый курс по оценке защищённости периметра ИИ для руководителей ИБ, аудиторов, системных администраторов. Нормативная база ФСТЭК России, методологии пентеста, отечественные инструменты.",
+    formatEn: "Course · 5 days", titleEn: "Penetration testing, foundation (5 days)",
+    descriptionEn: "A foundation course on assessing perimeter security, for security managers, auditors and system administrators: the FSTEC regulatory basis, pentest methodologies and Russian tooling." },
+  { category: "offense", format: "Курс · 10 дней", title: "Тестирование на проникновение, углублённый (10 дней)", url: "https://new-courses.pikov.expert/pentest-02.html",
+    description: "Углублённый курс для практикующих пентестеров, специалистов SOC и DevSecOps: 12 модулей, OWASP Top 10, реверс-инжиниринг, обход EDR, постэксплуатация Active Directory, итоговая аттестационная работа. Отдельная подробная посадочная.",
+    formatEn: "Course · 10 days", titleEn: "Penetration testing, advanced (10 days)",
+    descriptionEn: "An advanced course for practising pentesters, SOC analysts and DevSecOps engineers: 12 modules, OWASP Top 10, reverse engineering, EDR evasion, Active Directory post-exploitation and a final assessment project. Has its own detailed landing page." },
+  { category: "offense", format: "Курс", title: "Фаззинг-тестирование для разработки безопасного ПО", url: "https://new-courses.pikov.expert/#fuzzing",
+    description: "Курс по динамическому анализу для разработчиков СрЗИ, экспертов органов сертификации и DevSecOps. AFL++, libFuzzer, Sydr-Fuzz, фаззинг компилируемых, веб- и системных языков по ГОСТ Р 56939-2024 (процесс №11).",
+    formatEn: "Course", titleEn: "Fuzz testing for secure software development",
+    descriptionEn: "A dynamic-analysis course for security-product developers, certification-body experts and DevSecOps engineers: AFL++, libFuzzer, Sydr-Fuzz, and fuzzing of compiled, web and systems languages under GOST R 56939-2024 (process No. 11)." },
+
+  /* --- Учебные курсы для студентов --- */
+  { category: "edu", format: "РосНОУ", title: "Проектирование информационных систем", url: "https://is.pikov.expert/",
+    description: "Курс-путеводитель по курсовому проекту: концептуальная модель, ER-диаграмма, нормализация, физическая БД, проверка качества и типовые ошибки.",
+    formatEn: "RosNOU", titleEn: "Information systems design",
+    descriptionEn: "A guide through the term project: conceptual model, ER diagram, normalisation, the physical database, quality review, and the mistakes students typically make." },
+  { category: "edu", format: "МАИ · кафедра 304", title: "Методика формулирования тем ВКР", url: "https://vkr.pikov.expert/",
+    description: "61 слайд, 11 тематических блоков, 5 чек-листов и 10 разборов типичных ошибок при выборе и формулировке темы выпускной работы.",
+    formatEn: "MAI · Dept. 304", titleEn: "How to formulate a graduation thesis topic",
+    descriptionEn: "61 slides, 11 thematic blocks, 5 checklists and 10 analyses of the mistakes typically made when choosing and wording a graduation thesis topic." },
+  { category: "edu", format: "Справочник", title: "Лицензии SPDX на русском с вердиктами", url: "https://spdx.pikov.expert/",
+    description: "Дословный перевод официальных текстов SPDX и черновые вердикты пригодности для коммерческих проектов 🟢🟡🔴 — разрешения, требования, ограничения.",
+    formatEn: "Reference", titleEn: "SPDX licences in Russian, with suitability verdicts",
+    descriptionEn: "Literal translations of the official SPDX licence texts, plus draft verdicts on suitability for commercial projects 🟢🟡🔴 — permissions, conditions and limitations." }
+];
+
+/* =====================================================================
+   СТРОКИ ИНТЕРФЕЙСА.
+   Статический текст страницы переключается парами <span data-l> в разметке;
+   здесь — только то, что порождает скрипт: подписи каталога, плейсхолдеры,
+   значения aria-* и заголовок вкладки.
+===================================================================== */
+const UI = {
+  ru: {
+    htmlTitle: "Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec",
+    metaDescription: "Авторские лекции и курсы по информационной безопасности, защите информации, ОС Astra Linux и Windows, Сканер-ВС 7, архитектуре ЭВМ, сертификации и лицензированию ТЗИ, безопасной разработке ПО и SIEM.",
+    portraitAlt: "Пиков Виталий Александрович — фото",
+    navLabel: "Основная навигация",
+    sectionsLabel: "Разделы лекций",
+    pathBeginnerLabel: "Материалы маршрута для начинающего",
+    pathAdminLabel: "Материалы маршрута администратора",
+    pathDeveloperLabel: "Материалы маршрута разработчика",
+    profileAreasLabel: "Основные профессиональные направления",
+    standardsLabel: "Стандарты и методологии",
+    independentLabel: "Статус образовательного проекта",
+    langButton: "Переключить сайт на английский язык",
+    themeToLight: "Переключить на светлую тему",
+    themeToDark: "Переключить на тёмную тему",
+    viewRows: "Вид каталога: строки. Показать карточками",
+    viewCards: "Вид каталога: карточки. Показать строками",
+    viewTitle: "Карточки / строки",
+    searchLabel: "Поиск по лекциям",
+    formatLabel: "Фильтр по метке",
+    allFormats: "Все метки",
+    ldName: "Авторские лекции и курсы Виталия Пикова",
+    provider: "Пиков Виталий Александрович",
+    profileName: "Пиков Виталий Александрович",
+    profileJobTitle: "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
+    profileAffiliation: "Российский новый университет (РосНОУ)",
+    profileKnowsAbout: ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение"],
+    websiteDescription: "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; сами учебные материалы — на русском.",
+    materials: n => plural(n, ["материал", "материала", "материалов"]),
+    lectureCount: n => plural(n, ["учебный материал", "учебных материала", "учебных материалов"]),
+    searchPlaceholder: n => "Поиск по " + n + " " + plural(n, ["лекции", "лекциям", "лекциям"]) + "…",
+    shown: (shownCount, total) => "Показано " + shownCount + " из " + total
+  },
+  en: {
+    htmlTitle: "Vitaly Pikov — secure software development, DevSecOps and AppSec expert",
+    metaDescription: "Original lectures and courses on information security by Vitaly Pikov: secure software development (SSDLC), DevSecOps, AppSec, SAST, fuzzing, penetration testing, Astra Linux and Windows hardening, SIEM, certification and licensing. Course materials are in Russian.",
+    portraitAlt: "Vitaly Pikov — portrait",
+    navLabel: "Main navigation",
+    sectionsLabel: "Course sections",
+    pathBeginnerLabel: "Materials for the beginner pathway",
+    pathAdminLabel: "Materials for the administrator pathway",
+    pathDeveloperLabel: "Materials for the developer pathway",
+    profileAreasLabel: "Core professional areas",
+    standardsLabel: "Standards and methodologies",
+    independentLabel: "Educational project status",
+    langButton: "Switch the site to Russian",
+    themeToLight: "Switch to the light theme",
+    themeToDark: "Switch to the dark theme",
+    viewRows: "Catalogue view: list. Switch to cards",
+    viewCards: "Catalogue view: cards. Switch to list",
+    viewTitle: "Cards / list",
+    searchLabel: "Search the catalogue",
+    formatLabel: "Filter by label",
+    allFormats: "All labels",
+    ldName: "Original lectures and courses by Vitaly Pikov",
+    provider: "Vitaly Pikov",
+    profileName: "Vitaly Pikov",
+    profileJobTitle: "Expert in secure software development, DevSecOps and AppSec; lecturer",
+    profileAffiliation: "Russian New University (RosNOU)",
+    profileKnowsAbout: ["Secure software development", "DevSecOps", "AppSec", "Security by Design", "Threat modelling", "SCA and SBOM", "Software supply chain security", "Secure C/C++ development", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Information security", "Astra Linux", "Penetration testing"],
+    websiteDescription: "Vitaly Pikov's catalogue of original information-security lectures and courses. The catalogue interface is available in English and Russian; the teaching materials are in Russian.",
+    materials: n => (n === 1 ? "material" : "materials"),
+    lectureCount: n => (n === 1 ? "teaching material" : "teaching materials"),
+    searchPlaceholder: n => "Search " + n + " " + (n === 1 ? "course" : "courses") + "…",
+    shown: (shownCount, total) => "Showing " + shownCount + " of " + total
+  }
+};
+
+function plural(n, forms){ // forms: ["материал","материала","материалов"]
+  const m10 = n % 10, m100 = n % 100;
+  if(m10 === 1 && m100 !== 11) return forms[0];
+  if(m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return forms[1];
+  return forms[2];
+}
+
+/* ============ Рендер (карточки, плитки, счётчики, JSON-LD) ============ */
+(function(){
+  const root = document.documentElement;
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const domain = u => u.replace(/^https?:\/\//,"").replace(/#.*$/,"").replace(/\/$/,"");
+  const pad = n => String(n).padStart(2,"0");
+  const byCat = id => LECTURES.filter(l => l.category === id);
+  const arrow = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>';
+
+  const lang = () => (root.dataset.lang === "ru" ? "ru" : "en");
+  const t = () => UI[lang()];
+  /* Английский текст необязателен: без него карточка покажет русский. */
+  const catName = c => (lang() === "en" && c.nameEn) ? c.nameEn : c.name;
+  const lecTitle = l => (lang() === "en" && l.titleEn) ? l.titleEn : l.title;
+  const lecDesc = l => (lang() === "en" && l.descriptionEn) ? l.descriptionEn : l.description;
+  const lecFormat = l => (lang() === "en" && l.formatEn) ? l.formatEn : l.format;
+
+  const n = LECTURES.length;
+  const q = document.getElementById("q");
+  const fmtSel = document.getElementById("fmt");
+  const resetBtn = document.getElementById("resetFilters");
+  const note = document.getElementById("resultNote");
+  const emptyNote = document.getElementById("emptyNote");
+  const norm = s => s.toLowerCase().replace(/ё/g, "е");
+  let cardEls = [];
+
+  /* Один и тот же тег ld+json переписывается при смене языка — иначе на
+     странице накапливались бы дубли ItemList. */
+  const ldTag = document.createElement("script");
+  ldTag.type = "application/ld+json";
+  ldTag.id = "ld-lectures";
+  document.head.appendChild(ldTag);
+
+  function renderCatalog(){
+    const strings = t();
+
+    document.getElementById("tiles").innerHTML = CATEGORIES.map((c, i) => {
+      const count = byCat(c.id).length;
+      return '<li><a class="tile" href="#cat-' + c.id + '">' +
+        '<span class="idx">' + pad(i+1) + '</span>' +
+        '<span class="arr">' + arrow + '</span>' +
+        '<span class="name">' + esc(catName(c)) + '</span>' +
+        '<span class="cnt">' + count + ' ' + strings.materials(count) + '</span>' +
+      '</a></li>';
+    }).join("");
+
+    document.getElementById("catalog").innerHTML = CATEGORIES.map((c, i) => {
+      const items = byCat(c.id);
+      return '<section class="cat-section" id="cat-' + c.id + '" aria-labelledby="cat-h-' + c.id + '">' +
+        '<div class="cat-head">' +
+          '<span class="num">' + pad(i+1) + '</span>' +
+          '<h3 id="cat-h-' + c.id + '">' + esc(catName(c)) + '</h3>' +
+          '<span class="count">' + items.length + ' ' + strings.materials(items.length) + '</span>' +
+        '</div>' +
+        '<ul class="cards">' + items.map(l =>
+          '<li><a class="card" href="' + esc(l.url) + '">' +
+            '<span class="tag">' + esc(lecFormat(l)) + '</span>' +
+            '<h4>' + esc(lecTitle(l)) + '</h4>' +
+            '<span class="desc">' + esc(lecDesc(l)) + '</span>' +
+            '<span class="foot"><span class="domain">' + esc(domain(l.url)) + '</span><span class="go">' + arrow + '</span></span>' +
+          '</a></li>'
+        ).join("") + '</ul>' +
+      '</section>';
+    }).join("");
+
+    document.getElementById("lectureCount").textContent = String(n);
+    document.getElementById("lectureCountLabel").textContent = strings.lectureCount(n);
+
+    const ld = {
+      "@context": "https://schema.org",
+      "@type": "ItemList",
+      "@id": "https://pikov.expert/#lectures",
+      "name": strings.ldName,
+      "inLanguage": lang(),
+      "numberOfItems": n,
+      "itemListElement": LECTURES.map((l, i) => ({
+        "@type": "ListItem",
+        "position": i + 1,
+        "item": {
+          "@type": "Course",
+          "name": lecTitle(l),
+          "description": lecDesc(l),
+          "url": l.url,
+          /* Материалы лекций всегда на русском, независимо от языка каталога. */
+          "inLanguage": "ru",
+          "provider": { "@type": "Person", "name": strings.provider, "url": "https://pikov.expert/" }
+        }
+      }))
+    };
+    ldTag.textContent = JSON.stringify(ld, null, 1);
+
+    const flat = CATEGORIES.flatMap(c => byCat(c.id));
+    cardEls = Array.from(document.querySelectorAll(".cards > li"));
+    cardEls.forEach((el, i) => {
+      el.dataset.format = lecFormat(flat[i]);
+      el.dataset.text = norm(lecTitle(flat[i]) + " " + lecDesc(flat[i]) + " " + lecFormat(flat[i]) + " " + domain(flat[i].url));
+    });
+
+    q.placeholder = strings.searchPlaceholder(n);
+    q.setAttribute("aria-label", strings.searchLabel);
+    fmtSel.setAttribute("aria-label", strings.formatLabel);
+    fmtSel.innerHTML = '<option value="">' + esc(strings.allFormats) + '</option>' +
+      [...new Set(LECTURES.map(lecFormat))].map(f => "<option>" + esc(f) + "</option>").join("");
+  }
+
+  function applyFilter(){
+    const query = norm(q.value.trim());
+    const f = fmtSel.value;
+    let shown = 0;
+    cardEls.forEach(el => {
+      const ok = (!f || el.dataset.format === f) && (!query || el.dataset.text.includes(query));
+      el.hidden = !ok;
+      if(ok) shown++;
+    });
+    document.querySelectorAll(".cat-section").forEach(sec => {
+      sec.hidden = !sec.querySelector(".cards > li:not([hidden])");
+    });
+    const active = !!(query || f);
+    resetBtn.hidden = !active;
+    note.textContent = active ? t().shown(shown, n) : "";
+    emptyNote.hidden = shown !== 0;
+  }
+
+  function syncLanguageUrl(){
+    const url = new URL(location.href);
+    url.searchParams.delete("lang");
+    url.pathname = lang() === "ru" ? "/ru/" : "/";
+    const query = url.searchParams.toString();
+    const relative = url.pathname + (query ? "?" + query : "") + location.hash;
+    if(location.pathname + location.search + location.hash !== relative){
+      history.replaceState(history.state, "", relative);
+    }
+    return "https://pikov.expert" + url.pathname + (query ? "?" + query : "");
+  }
+
+  function renderProfileJsonLd(strings){
+    const profileTag = document.getElementById("ld-profile");
+    if(!profileTag) return;
+    profileTag.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://pikov.expert/#person",
+          "name": strings.profileName,
+          "alternateName": ["Виталий Пиков", "Vitaly Pikov", "Vitaliy Pikov"],
+          "url": "https://pikov.expert/",
+          "image": "https://pikov.expert/photo.jpg",
+          "email": "mailto:vitaly@pikov.expert",
+          "jobTitle": strings.profileJobTitle,
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": strings.profileAffiliation
+          },
+          "knowsAbout": strings.profileKnowsAbout,
+          "sameAs": ["https://t.me/UnderLineSecurity"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://pikov.expert/#website",
+          "url": "https://pikov.expert/",
+          "name": "pikov.expert",
+          "inLanguage": ["en", "ru"],
+          "description": strings.websiteDescription,
+          "author": { "@id": "https://pikov.expert/#person" }
+        }
+      ]
+    }, null, 1);
+  }
+
+  function applyChromeLanguage(){
+    const strings = t();
+    const selfUrl = syncLanguageUrl();
+    document.title = strings.htmlTitle;
+    const desc = document.querySelector('meta[name="description"]');
+    if(desc) desc.content = strings.metaDescription;
+    const canonical = document.querySelector('link[rel="canonical"]');
+    if(canonical) canonical.href = selfUrl;
+    const ogUrl = document.querySelector('meta[property="og:url"]');
+    if(ogUrl) ogUrl.content = selfUrl;
+    const ogLocale = document.querySelector('meta[property="og:locale"]');
+    if(ogLocale) ogLocale.content = lang() === "ru" ? "ru_RU" : "en_US";
+    const social = [
+      ['meta[property="og:title"]', strings.htmlTitle],
+      ['meta[property="og:description"]', strings.metaDescription],
+      ['meta[property="og:image:alt"]', strings.portraitAlt],
+      ['meta[name="twitter:title"]', strings.htmlTitle],
+      ['meta[name="twitter:description"]', strings.metaDescription],
+      ['meta[name="twitter:image:alt"]', strings.portraitAlt]
+    ];
+    social.forEach(([selector, value]) => {
+      const meta = document.querySelector(selector);
+      if(meta) meta.content = value;
+    });
+    const portrait = document.querySelector("#portrait img");
+    if(portrait) portrait.alt = strings.portraitAlt;
+    const nav = document.querySelector(".site-nav");
+    if(nav) nav.setAttribute("aria-label", strings.navLabel);
+    const sections = document.getElementById("sections");
+    if(sections) sections.setAttribute("aria-label", strings.sectionsLabel);
+    document.querySelectorAll('[data-i18n-aria]').forEach(element => {
+      const key = element.dataset.i18nAria;
+      if(strings[key]) element.setAttribute("aria-label", strings[key]);
+    });
+    renderProfileJsonLd(strings);
+    const langBtn = document.getElementById("langToggle");
+    langBtn.setAttribute("aria-label", strings.langButton);
+    langBtn.setAttribute("title", strings.langButton);
+    langBtn.setAttribute("href", lang() === "ru" ? "/" : "/ru/");
+    const viewBtn = document.getElementById("viewToggle");
+    const rows = root.dataset.view === "rows";
+    viewBtn.setAttribute("aria-pressed", String(rows));
+    viewBtn.setAttribute("aria-label", rows ? strings.viewRows : strings.viewCards);
+    viewBtn.setAttribute("title", strings.viewTitle);
+    const themeBtn = document.getElementById("themeToggle");
+    const dark = (root.dataset.theme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light")) === "dark";
+    themeBtn.setAttribute("aria-label", dark ? strings.themeToLight : strings.themeToDark);
+  }
+
+  window.__pikovApplyLanguage = function(){
+    /* Русский запрос не найдёт английских карточек — фильтры сбрасываются. */
+    q.value = "";
+    fmtSel.value = "";
+    renderCatalog();
+    applyChromeLanguage();
+    applyFilter();
+  };
+  window.__pikovApplyChrome = applyChromeLanguage;
+
+  document.getElementById("year").textContent = String(new Date().getFullYear());
+  renderCatalog();
+  applyChromeLanguage();
+
+  q.addEventListener("input", applyFilter);
+  fmtSel.addEventListener("change", applyFilter);
+  resetBtn.addEventListener("click", () => { q.value = ""; fmtSel.value = ""; applyFilter(); q.focus(); });
+  document.addEventListener("keydown", e => {
+    if(e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); q.focus(); }
+  });
+})();
+
+/* ==== Язык (data-lang), тема (data-theme) и вид каталога (data-view) на <html> ==== */
+(function(){
+  const root = document.documentElement;
+  const media = window.matchMedia("(prefers-color-scheme: dark)");
+  const current = () => root.dataset.theme || (media.matches ? "dark" : "light");
+  const applyMeta = () => {
+    document.querySelectorAll('meta[name="theme-color"]').forEach(m => {
+      m.content = current() === "dark" ? "#0e1512" : "#f3f6f4";
+      m.removeAttribute("media");
+    });
+  };
+  document.getElementById("themeToggle").addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try{ localStorage.setItem("theme", next); }catch(e){}
+    applyMeta();
+    window.__pikovApplyChrome();
+  });
+  const viewBtn = document.getElementById("viewToggle");
+  viewBtn.addEventListener("click", () => {
+    const next = root.dataset.view === "rows" ? "cards" : "rows";
+    root.dataset.view = next;
+    try{ localStorage.setItem("view", next); }catch(e){}
+    window.__pikovApplyChrome();
+  });
+  document.getElementById("langToggle").addEventListener("click", event => {
+    event.preventDefault();
+    const next = root.dataset.lang === "ru" ? "en" : "ru";
+    root.dataset.lang = next;
+    root.lang = next;
+    window.__pikovApplyLanguage();
+  });
+  media.addEventListener("change", () => { if(!root.dataset.theme){ applyMeta(); window.__pikovApplyChrome(); } });
+  if(root.dataset.theme) applyMeta();
+})();
+</script>
+</body>
+</html>

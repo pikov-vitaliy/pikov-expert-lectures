@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +14,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23166339'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-family='Georgia,serif' font-size='38' fill='%23ffffff'%3E%D0%9F%3C/text%3E%3C/svg%3E">
 <link rel="canonical" href="https://pikov.expert/">
 <link rel="alternate" hreflang="en" href="https://pikov.expert/">
-<link rel="alternate" hreflang="ru" href="https://pikov.expert/?lang=ru">
+<link rel="alternate" hreflang="ru" href="https://pikov.expert/ru/">
 <link rel="alternate" hreflang="x-default" href="https://pikov.expert/">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f3f6f4">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0e1512">
@@ -41,21 +41,21 @@
 <meta name="twitter:image:alt" content="Vitaly Pikov — portrait">
 
 <!-- Ранняя установка темы и языка: до отрисовки, чтобы не мигало.
-     Язык по умолчанию — английский; выбор пользователя и ?lang= имеют приоритет. -->
+     Устойчивый URL имеет приоритет; ?lang= поддерживается как legacy-вход. -->
 <script>
 (function(){
-  var lang = "en";
+  var pathLang = /^\/ru(?:\/|$)/.test(location.pathname) ? "ru" : "en";
+  var lang = pathLang;
   try{
     var t = localStorage.getItem("theme");
     if(t === "light" || t === "dark"){ document.documentElement.dataset.theme = t; }
     var v = localStorage.getItem("view");
     document.documentElement.dataset.view = (v === "cards") ? "cards" : "rows";
-
-    var stored = localStorage.getItem("lang");
-    if(stored === "ru" || stored === "en"){ lang = stored; }
-    var q = /[?&]lang=(ru|en)\b/.exec(location.search);
-    if(q){ lang = q[1]; localStorage.setItem("lang", lang); }
   }catch(e){}
+  var q = /[?&]lang=(ru|en)\b/.exec(location.search);
+  if(q){
+    lang = q[1];
+  }
   document.documentElement.dataset.lang = lang;
   document.documentElement.lang = lang;
 })();
@@ -72,24 +72,24 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
 </script>
 
 <!-- schema.org: Person + WebSite (статично). ItemList лекций генерируется скриптом из массива LECTURES. -->
-<script type="application/ld+json">
+<script id="ld-profile" type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Person",
       "@id": "https://pikov.expert/#person",
-      "name": "Пиков Виталий Александрович",
+      "name": "Vitaly Pikov",
       "alternateName": ["Виталий Пиков", "Vitaly Pikov", "Vitaliy Pikov"],
       "url": "https://pikov.expert/",
       "image": "https://pikov.expert/photo.jpg",
       "email": "mailto:vitaly@pikov.expert",
-      "jobTitle": "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
+      "jobTitle": "Expert in secure software development, DevSecOps and AppSec; lecturer",
       "affiliation": {
         "@type": "CollegeOrUniversity",
-        "name": "Российский новый университет (РосНОУ)"
+        "name": "Russian New University (RosNOU)"
       },
-      "knowsAbout": ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение"],
+      "knowsAbout": ["Secure software development", "DevSecOps", "AppSec", "Security by Design", "Threat modelling", "SCA and SBOM", "Software supply chain security", "Secure C/C++ development", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Information security", "Astra Linux", "Penetration testing"],
       "sameAs": ["https://t.me/UnderLineSecurity"]
     },
     {
@@ -98,7 +98,7 @@ ym(109116119, "init", {ssr:true, webvisor:false, clickmap:false, ecommerce:"data
       "url": "https://pikov.expert/",
       "name": "pikov.expert",
       "inLanguage": ["en", "ru"],
-      "description": "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; сами учебные материалы — на русском.",
+      "description": "Vitaly Pikov's catalogue of original information-security lectures and courses. The catalogue interface is available in English and Russian; the teaching materials are in Russian.",
       "author": { "@id": "https://pikov.expert/#person" }
     }
   ]
@@ -258,7 +258,7 @@ a:hover{ color: var(--ink); }
   background: var(--lang-bg); color: var(--lang-ink);
   font: 700 13px/1 system-ui, "Segoe UI", -apple-system, Roboto, Arial, sans-serif;
   letter-spacing: .04em; text-transform: uppercase;
-  cursor: pointer; white-space: nowrap;
+  cursor: pointer; white-space: nowrap; text-decoration: none;
   box-shadow: 0 0 0 3px var(--lang-ring);
 }
 .lang-btn:hover{ background: var(--lang-bg-hover); color: var(--lang-ink); }
@@ -629,7 +629,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
 <header class="site-header">
   <div class="wrap">
     <a class="brand" href="#"><span data-l="ru">Виталий&nbsp;Пиков</span><span data-l="en">Vitaly&nbsp;Pikov</span></a>
-    <nav class="site-nav" aria-label="Основная навигация">
+    <nav class="site-nav" aria-label="Main navigation">
       <a href="#sections"><span data-l="ru">Разделы</span><span data-l="en">Sections</span></a>
       <a href="#learning-paths"><span data-l="ru">Маршруты</span><span data-l="en">Paths</span></a>
       <a href="#lectures"><span data-l="ru">Лекции</span><span data-l="en">Catalogue</span></a>
@@ -638,16 +638,16 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
     </nav>
     <div class="hdr-actions">
     <!-- Кнопка показывает язык, на который переключит, а не текущий. -->
-    <button class="lang-btn" id="langToggle" type="button">
+    <a class="lang-btn" id="langToggle" href="/ru/" aria-label="Switch the site to Russian" title="Switch the site to Russian">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M3 12h18M12 3c2.6 2.6 3.9 5.6 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.6-3.9-9S9.4 5.6 12 3z"></path></svg>
       <span class="lang-full" data-l="en">Русский</span><span class="lang-full" data-l="ru">English</span>
       <span class="lang-short" data-l="en">RU</span><span class="lang-short" data-l="ru">EN</span>
-    </button>
-    <button class="theme-btn" id="viewToggle" type="button" aria-label="Вид каталога: карточки или строки" title="Карточки / строки">
+    </a>
+    <button class="theme-btn" id="viewToggle" type="button" aria-label="Catalogue view: cards or list" title="Cards / list">
       <svg class="icon-grid" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="3.5" width="7" height="7" rx="1.5"></rect><rect x="3.5" y="13.5" width="7" height="7" rx="1.5"></rect><rect x="13.5" y="13.5" width="7" height="7" rx="1.5"></rect></svg>
       <svg class="icon-rows" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 5.5h16M4 12h16M4 18.5h16"></path></svg>
     </button>
-    <button class="theme-btn" id="themeToggle" type="button" aria-label="Переключить светлую/тёмную тему">
+    <button class="theme-btn" id="themeToggle" type="button" aria-label="Switch the light/dark theme">
       <svg class="icon-sun" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
         <circle cx="12" cy="12" r="4.5"></circle>
         <path d="M12 2.5v2.5M12 19v2.5M2.5 12H5M19 12h2.5M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M19.1 4.9l-1.8 1.8M6.7 17.3l-1.8 1.8"></path>
@@ -683,7 +683,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       </div>
       <div class="portrait" id="portrait">
         <span class="ph">
-          <img src="photo.jpg" alt="Vitaly Pikov — portrait" width="232" height="232" onerror="document.getElementById('portrait').classList.add('no-photo')">
+          <img src="/photo.jpg" alt="Vitaly Pikov — portrait" width="232" height="232" onerror="document.getElementById('portrait').classList.add('no-photo')">
           <span class="monogram" aria-hidden="true"><span data-l="ru">ВП</span><span data-l="en">VP</span></span>
         </span>
       </div>
@@ -691,7 +691,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
   </section>
 
   <!-- Разделы: навигация с первого экрана. Плитки генерируются из CATEGORIES. -->
-  <nav class="sections" id="sections" aria-label="Разделы лекций">
+  <nav class="sections" id="sections" aria-label="Course sections">
     <div class="wrap">
       <div class="sections-head"><h2><span data-l="ru">Разделы</span><span data-l="en">Sections</span></h2></div>
       <ul class="tiles" id="tiles"></ul>
@@ -704,7 +704,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
         <h2 id="learning-paths-title"><span data-l="ru">Три маршрута по материалам</span><span data-l="en">Three learning paths</span></h2>
         <div class="path-intro">
           <p><span data-l="ru">Это не жёсткие программы, а рекомендуемая последовательность. Начните с ближайшей роли, зафиксируйте итоговый артефакт и переходите к следующему уровню только после проверки результата.</span><span data-l="en">These are not rigid syllabi but a recommended order. Start from the role closest to you, produce the final artefact, and move on to the next level only once the result has been checked.</span></p>
-          <a class="course-map-link" href="course-map.html"><span data-l="ru">Полная преподавательская карта 30 ресурсов →</span><span data-l="en">Full teaching map of 30 resources →</span></a>
+          <a class="course-map-link" href="/course-map.html"><span data-l="ru">Полная преподавательская карта 30 ресурсов →</span><span data-l="en">Full teaching map of 30 resources →</span></a>
         </div>
       </div>
       <div class="path-grid">
@@ -717,7 +717,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
             <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Объяснить актив, угрозу, уязвимость, риск, меру и границу информационной системы.</span><span data-l="en">Explain asset, threat, vulnerability, risk, control and the boundary of an information system.</span></dd>
             <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Одностраничная карта активов, границ и пяти основных рисков учебной системы.</span><span data-l="en">A one-page map of assets, boundaries and the five principal risks of a training system.</span></dd>
           </dl>
-          <nav class="path-links" aria-label="Материалы маршрута для начинающего">
+          <nav class="path-links" data-i18n-aria="pathBeginnerLabel" aria-label="Materials for the beginner pathway">
             <a href="https://is.pikov.expert/"><span data-l="ru">Информационные системы</span><span data-l="en">Information systems</span></a>
             <a href="https://risk.pikov.expert/"><span data-l="ru">Риски ИБ</span><span data-l="en">Security risk</span></a>
             <a href="https://27001.pikov.expert/">ISO/IEC 27001</a>
@@ -732,7 +732,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
             <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Проверить конфигурацию, применить безопасное изменение, собрать доказательства и выполнить rollback.</span><span data-l="en">Audit a configuration, apply a safe change, collect evidence and roll the change back.</span></dd>
             <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Паспорт стенда, чек-лист hardening и отчёт «до → изменение → тест → откат».</span><span data-l="en">A lab specification, a hardening checklist and a “before → change → test → rollback” report.</span></dd>
           </dl>
-          <nav class="path-links" aria-label="Материалы маршрута администратора">
+          <nav class="path-links" data-i18n-aria="pathAdminLabel" aria-label="Materials for the administrator pathway">
             <a href="https://astra-intro.pikov.expert/">Astra Linux</a>
             <a href="https://astra-hardening.pikov.expert/">Hardening</a>
             <a href="https://windows.pikov.expert/">Windows</a>
@@ -748,7 +748,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
             <dt><span data-l="ru">Результат</span><span data-l="en">Outcome</span></dt><dd><span data-l="ru">Провести threat modeling, проверить зависимости, найти дефект, исправить его и доказать исправление тестом.</span><span data-l="en">Run threat modelling, review dependencies, find a defect, fix it and prove the fix with a test.</span></dd>
             <dt><span data-l="ru">Артефакт</span><span data-l="en">Artefact</span></dt><dd><span data-l="ru">Модель угроз, SBOM/решение о допуске компонента и finding с negative test и retest.</span><span data-l="en">A threat model, an SBOM with a component-approval decision, and a finding with a negative test and a retest.</span></dd>
           </dl>
-          <nav class="path-links" aria-label="Материалы маршрута разработчика">
+          <nav class="path-links" data-i18n-aria="pathDeveloperLabel" aria-label="Materials for the developer pathway">
             <a href="https://ppk.pikov.expert/"><span data-l="ru">Архитектура и ППК</span><span data-l="en">Architecture and component list</span></a>
             <a href="https://appsec-lections.pikov.expert/">AppSec</a>
             <a href="https://sast.pikov.expert/">SAST</a>
@@ -770,10 +770,10 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       <div class="toolbar">
         <div class="search-wrap">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.8-3.8"></path></svg>
-          <input id="q" type="search" placeholder="Поиск по лекциям" aria-label="Поиск по лекциям" autocomplete="off">
+          <input id="q" type="search" placeholder="Search the catalogue" aria-label="Search the catalogue" autocomplete="off">
           <span class="hint-key" aria-hidden="true">/</span>
         </div>
-        <select id="fmt" aria-label="Фильтр по метке"></select>
+        <select id="fmt" aria-label="Filter by label"></select>
         <button class="reset-btn" id="resetFilters" type="button" hidden><span data-l="ru">Сбросить</span><span data-l="en">Reset</span></button>
         <span class="result-note" id="resultNote" role="status"></span>
       </div>
@@ -791,7 +791,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
       </div>
       <div class="about-intro">
         <p class="about-lead"><span data-l="ru">Я занимаюсь безопасной разработкой программного обеспечения, DevSecOps и AppSec: помогаю превращать требования стандартов в архитектурные решения, рабочие процессы, автоматизированные проверки и проверяемые результаты. В центре практики — security-by-design, моделирование угроз и защита на всём жизненном цикле ПО.</span><span data-l="en">I work in secure software development, DevSecOps and AppSec, turning the requirements of standards into architectural decisions, working processes, automated checks and verifiable results. At the centre of that practice are security by design, threat modelling, and protection across the whole software lifecycle.</span></p>
-        <ul class="profile-chips" aria-label="Основные профессиональные направления">
+        <ul class="profile-chips" data-i18n-aria="profileAreasLabel" aria-label="Core professional areas">
           <li>Secure C/C++</li>
           <li><span data-l="ru">SAST и DAST</span><span data-l="en">SAST &amp; DAST</span></li>
           <li><span data-l="ru">Фаззинг</span><span data-l="en">Fuzzing</span></li>
@@ -817,7 +817,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
         <article class="about-block">
           <h3><span data-l="ru">Стандарты и методологии</span><span data-l="en">Standards and methodologies</span></h3>
           <p><span data-l="ru">Соединяю российские нормативные требования с международными инженерными практиками: требования, архитектура, модель угроз, код, тестирование, состав компонентов и выпуск продукта образуют единую проверяемую цепочку.</span><span data-l="en">I connect Russian regulatory requirements with international engineering practice, so that requirements, architecture, threat model, code, testing, component inventory and release form one verifiable chain.</span></p>
-          <ul class="standards-list" aria-label="Стандарты и методологии">
+          <ul class="standards-list" data-i18n-aria="standardsLabel" aria-label="Standards and methodologies">
             <li><span data-l="ru">ГОСТ Р 56939-2024</span><span data-l="en">GOST R 56939-2024</span></li>
             <li><span data-l="ru">ГОСТ Р 71207-2024</span><span data-l="en">GOST R 71207-2024</span></li>
             <li>NIST SSDF</li>
@@ -896,7 +896,7 @@ h1, h2, h3{ font-weight: 750; letter-spacing: -0.015em; }
           </div>
         </article>
       </div>
-      <aside class="about-independent" aria-label="Статус образовательного проекта">
+      <aside class="about-independent" data-i18n-aria="independentLabel" aria-label="Educational project status">
         <h3><span data-l="ru">Независимый авторский ресурс</span><span data-l="en">An independent, self-authored resource</span></h3>
         <p><span data-l="ru"><strong>pikov.expert — независимый авторский образовательный проект Виталия Пикова.</strong> Материалы развиваются независимо от прежних работодателей и учебных центров и предназначены для преподавания, самостоятельного обучения и практической работы специалистов.</span><span data-l="en"><strong>pikov.expert is an independent educational project authored by Vitaly Pikov.</strong> The materials are developed independently of any former employer or training centre, and are intended for teaching, self-study and day-to-day practitioner work.</span></p>
       </aside>
@@ -1104,7 +1104,13 @@ const UI = {
     portraitAlt: "Пиков Виталий Александрович — фото",
     navLabel: "Основная навигация",
     sectionsLabel: "Разделы лекций",
-    langButton: "Switch the site to English",
+    pathBeginnerLabel: "Материалы маршрута для начинающего",
+    pathAdminLabel: "Материалы маршрута администратора",
+    pathDeveloperLabel: "Материалы маршрута разработчика",
+    profileAreasLabel: "Основные профессиональные направления",
+    standardsLabel: "Стандарты и методологии",
+    independentLabel: "Статус образовательного проекта",
+    langButton: "Переключить сайт на английский язык",
     themeToLight: "Переключить на светлую тему",
     themeToDark: "Переключить на тёмную тему",
     viewRows: "Вид каталога: строки. Показать карточками",
@@ -1115,6 +1121,11 @@ const UI = {
     allFormats: "Все метки",
     ldName: "Авторские лекции и курсы Виталия Пикова",
     provider: "Пиков Виталий Александрович",
+    profileName: "Пиков Виталий Александрович",
+    profileJobTitle: "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
+    profileAffiliation: "Российский новый университет (РосНОУ)",
+    profileKnowsAbout: ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение"],
+    websiteDescription: "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; сами учебные материалы — на русском.",
     materials: n => plural(n, ["материал", "материала", "материалов"]),
     lectureCount: n => plural(n, ["учебный материал", "учебных материала", "учебных материалов"]),
     searchPlaceholder: n => "Поиск по " + n + " " + plural(n, ["лекции", "лекциям", "лекциям"]) + "…",
@@ -1126,7 +1137,13 @@ const UI = {
     portraitAlt: "Vitaly Pikov — portrait",
     navLabel: "Main navigation",
     sectionsLabel: "Course sections",
-    langButton: "Переключить сайт на русский язык",
+    pathBeginnerLabel: "Materials for the beginner pathway",
+    pathAdminLabel: "Materials for the administrator pathway",
+    pathDeveloperLabel: "Materials for the developer pathway",
+    profileAreasLabel: "Core professional areas",
+    standardsLabel: "Standards and methodologies",
+    independentLabel: "Educational project status",
+    langButton: "Switch the site to Russian",
     themeToLight: "Switch to the light theme",
     themeToDark: "Switch to the dark theme",
     viewRows: "Catalogue view: list. Switch to cards",
@@ -1137,6 +1154,11 @@ const UI = {
     allFormats: "All labels",
     ldName: "Original lectures and courses by Vitaly Pikov",
     provider: "Vitaly Pikov",
+    profileName: "Vitaly Pikov",
+    profileJobTitle: "Expert in secure software development, DevSecOps and AppSec; lecturer",
+    profileAffiliation: "Russian New University (RosNOU)",
+    profileKnowsAbout: ["Secure software development", "DevSecOps", "AppSec", "Security by Design", "Threat modelling", "SCA and SBOM", "Software supply chain security", "Secure C/C++ development", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Information security", "Astra Linux", "Penetration testing"],
+    websiteDescription: "Vitaly Pikov's catalogue of original information-security lectures and courses. The catalogue interface is available in English and Russian; the teaching materials are in Russian.",
     materials: n => (n === 1 ? "material" : "materials"),
     lectureCount: n => (n === 1 ? "teaching material" : "teaching materials"),
     searchPlaceholder: n => "Search " + n + " " + (n === 1 ? "course" : "courses") + "…",
@@ -1274,30 +1296,92 @@ function plural(n, forms){ // forms: ["материал","материала","�
     emptyNote.hidden = shown !== 0;
   }
 
+  function syncLanguageUrl(){
+    const url = new URL(location.href);
+    url.searchParams.delete("lang");
+    url.pathname = lang() === "ru" ? "/ru/" : "/";
+    const query = url.searchParams.toString();
+    const relative = url.pathname + (query ? "?" + query : "") + location.hash;
+    if(location.pathname + location.search + location.hash !== relative){
+      history.replaceState(history.state, "", relative);
+    }
+    return "https://pikov.expert" + url.pathname + (query ? "?" + query : "");
+  }
+
+  function renderProfileJsonLd(strings){
+    const profileTag = document.getElementById("ld-profile");
+    if(!profileTag) return;
+    profileTag.textContent = JSON.stringify({
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Person",
+          "@id": "https://pikov.expert/#person",
+          "name": strings.profileName,
+          "alternateName": ["Виталий Пиков", "Vitaly Pikov", "Vitaliy Pikov"],
+          "url": "https://pikov.expert/",
+          "image": "https://pikov.expert/photo.jpg",
+          "email": "mailto:vitaly@pikov.expert",
+          "jobTitle": strings.profileJobTitle,
+          "affiliation": {
+            "@type": "CollegeOrUniversity",
+            "name": strings.profileAffiliation
+          },
+          "knowsAbout": strings.profileKnowsAbout,
+          "sameAs": ["https://t.me/UnderLineSecurity"]
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://pikov.expert/#website",
+          "url": "https://pikov.expert/",
+          "name": "pikov.expert",
+          "inLanguage": ["en", "ru"],
+          "description": strings.websiteDescription,
+          "author": { "@id": "https://pikov.expert/#person" }
+        }
+      ]
+    }, null, 1);
+  }
+
   function applyChromeLanguage(){
     const strings = t();
+    const selfUrl = syncLanguageUrl();
     document.title = strings.htmlTitle;
     const desc = document.querySelector('meta[name="description"]');
     if(desc) desc.content = strings.metaDescription;
-    /* Русская версия живёт по отдельному адресу ?lang=ru — иначе объявленный
-       в <head> hreflang="ru" указывал бы на страницу, которая канонизирует
-       себя в другой URL, и такая пара альтернатив недействительна. */
-    const selfUrl = "https://pikov.expert/" + (lang() === "ru" ? "?lang=ru" : "");
     const canonical = document.querySelector('link[rel="canonical"]');
     if(canonical) canonical.href = selfUrl;
     const ogUrl = document.querySelector('meta[property="og:url"]');
     if(ogUrl) ogUrl.content = selfUrl;
     const ogLocale = document.querySelector('meta[property="og:locale"]');
     if(ogLocale) ogLocale.content = lang() === "ru" ? "ru_RU" : "en_US";
+    const social = [
+      ['meta[property="og:title"]', strings.htmlTitle],
+      ['meta[property="og:description"]', strings.metaDescription],
+      ['meta[property="og:image:alt"]', strings.portraitAlt],
+      ['meta[name="twitter:title"]', strings.htmlTitle],
+      ['meta[name="twitter:description"]', strings.metaDescription],
+      ['meta[name="twitter:image:alt"]', strings.portraitAlt]
+    ];
+    social.forEach(([selector, value]) => {
+      const meta = document.querySelector(selector);
+      if(meta) meta.content = value;
+    });
     const portrait = document.querySelector("#portrait img");
     if(portrait) portrait.alt = strings.portraitAlt;
     const nav = document.querySelector(".site-nav");
     if(nav) nav.setAttribute("aria-label", strings.navLabel);
     const sections = document.getElementById("sections");
     if(sections) sections.setAttribute("aria-label", strings.sectionsLabel);
+    document.querySelectorAll('[data-i18n-aria]').forEach(element => {
+      const key = element.dataset.i18nAria;
+      if(strings[key]) element.setAttribute("aria-label", strings[key]);
+    });
+    renderProfileJsonLd(strings);
     const langBtn = document.getElementById("langToggle");
     langBtn.setAttribute("aria-label", strings.langButton);
     langBtn.setAttribute("title", strings.langButton);
+    langBtn.setAttribute("href", lang() === "ru" ? "/" : "/ru/");
     const viewBtn = document.getElementById("viewToggle");
     const rows = root.dataset.view === "rows";
     viewBtn.setAttribute("aria-pressed", String(rows));
@@ -1355,11 +1439,11 @@ function plural(n, forms){ // forms: ["материал","материала","�
     try{ localStorage.setItem("view", next); }catch(e){}
     window.__pikovApplyChrome();
   });
-  document.getElementById("langToggle").addEventListener("click", () => {
+  document.getElementById("langToggle").addEventListener("click", event => {
+    event.preventDefault();
     const next = root.dataset.lang === "ru" ? "en" : "ru";
     root.dataset.lang = next;
     root.lang = next;
-    try{ localStorage.setItem("lang", next); }catch(e){}
     window.__pikovApplyLanguage();
   });
   media.addEventListener("change", () => { if(!root.dataset.theme){ applyMeta(); window.__pikovApplyChrome(); } });

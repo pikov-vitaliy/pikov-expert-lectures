@@ -89,7 +89,7 @@ test('map is neutral, semantic, grouped into five directions and standards-backe
 });
 
 test('root navigation, release whitelist, smoke gate and sitemap generator publish the map', () => {
-  assert.match(rootIndex, /href="course-map\.html"/);
+  assert.match(rootIndex, /href="\/course-map\.html"/);
   assert.match(buildRelease, /'course-map\.html'/);
   assert.match(updateControls, /Add-UniqueUrl\s+-List\s+\$rootUrls\s+-Url\s+'https:\/\/pikov\.expert\/course-map\.html'/);
   assert.match(smoke, /course-map\.html/);

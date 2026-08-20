@@ -194,6 +194,32 @@ foreach ($folder in $domainFolders) {
   if (-not (Test-Path -LiteralPath $folderIndex)) { Fail "Missing $folder\index.html" }
 }
 
+$rootLocaleDirs = @('ru')
+$expectedRootLocaleFiles = @('ru/index.html')
+$rootPathPrefix = $rootPath.TrimEnd('\') + '\'
+$actualRootLocaleFiles = @(
+  foreach ($localeDir in $rootLocaleDirs) {
+    $localePath = Join-Path $rootPath $localeDir
+    if (-not (Test-Path -LiteralPath $localePath -PathType Container)) {
+      Fail "Missing root locale directory: $localeDir"
+    }
+    Get-ChildItem -LiteralPath $localePath -File -Recurse -Force | ForEach-Object {
+      if (-not $_.FullName.StartsWith($rootPathPrefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+        Fail "Root locale file escapes the repository boundary: $($_.FullName)"
+      }
+      $_.FullName.Substring($rootPathPrefix.Length).Replace('\', '/')
+    }
+  }
+)
+$unexpectedRootLocaleFiles = @($actualRootLocaleFiles | Where-Object { $_ -notin $expectedRootLocaleFiles })
+$missingRootLocaleFiles = @($expectedRootLocaleFiles | Where-Object { $_ -notin $actualRootLocaleFiles })
+if ($unexpectedRootLocaleFiles.Count -gt 0) {
+  Fail "Unexpected root locale files: $($unexpectedRootLocaleFiles -join ', ')"
+}
+if ($missingRootLocaleFiles.Count -gt 0) {
+  Fail "Missing root locale files: $($missingRootLocaleFiles -join ', ')"
+}
+
 $actualRootDirObjects = @(Get-ChildItem -LiteralPath $rootPath -Directory -Force)
 $quarantineDirs = @(
   $actualRootDirObjects |
@@ -211,7 +237,7 @@ $localWorkspaceDirs = @(
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.obsidian') } |
     Select-Object -ExpandProperty Name
 )
-$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests') + $localWorkspaceDirs + $quarantineDirs + $domainFolders
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
@@ -251,7 +277,10 @@ foreach ($lecture in $lectures) {
   }
 }
 
-$jsonMatch = [regex]::Match($html, '(?s)<script type="application/ld\+json">(.*?)</script>')
+$jsonMatch = [regex]::Match(
+  $html,
+  '(?s)<script\b(?=[^>]*\btype="application/ld\+json")(?=[^>]*\bid="ld-profile")[^>]*>(.*?)</script>'
+)
 if (-not $jsonMatch.Success) { Fail "Missing static JSON-LD block (Person/WebSite)" }
 $jsonld = $jsonMatch.Groups[1].Value | ConvertFrom-Json
 if (@($jsonld.'@graph' | Where-Object { $_.'@type' -eq 'Person' }).Count -eq 0) {

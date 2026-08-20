@@ -55,13 +55,21 @@ tz-pikov-expert/
 
 ## Пересборка
 
-Если нужно изменить структуру или текст слайдов:
+`tools/build-tz-landing.mjs` — канонический источник `index.html`. Если нужно
+изменить структуру, текст, стили, логику или метаданные страницы, сначала
+измените генератор, а затем выполните пересборку:
 
 ```powershell
-node .\tools\build-tz-landing.mjs
+node .\tools\build-tz-landing.mjs --write
 ```
 
-Генератор проверяет, что итоговый лендинг содержит ровно `104` слайда.
+Режим `--write` сначала формирует временный файл в каталоге `tz`, проверяет
+непрерывность 104 слайдов и обязательные metadata, а затем атомарно заменяет
+`index.html`. Режим `--check` ничего не записывает и завершается с ошибкой,
+если отслеживаемый snapshot устарел или нарушен инвариант.
+Ручная правка только `index.html` недопустима: следующая пересборка обязана
+воспроизводить отслеживаемый файл побайтно и сохранять Metrika, canonical,
+OpenGraph и JSON-LD.
 
 ## Управление
 
@@ -93,13 +101,20 @@ node .\tools\build-tz-landing.mjs
 ## Проверки перед загрузкой
 
 ```powershell
-node .\tools\build-tz-landing.mjs
+node .\tools\build-tz-landing.mjs --check
+node --test ..\_PROJECT\test-tz-landing.mjs
+node --test ..\_PROJECT\qa-tz-navigation.mjs
 Select-String -LiteralPath .\index.html -Pattern 'src="https://|href="https://fonts|jsdelivr|gstatic|mermaid'
 ```
 
 Ожидаемо:
 
 - 104 слайда;
+- deep link `#slide-104`, клавиша `End` и кнопка перехода в конец открывают
+  слайд 104, а счетчик показывает `104 / 104`;
+- генератор побайтно воспроизводит отслеживаемый `index.html`;
+- сохранены Metrika `109116119` с `webvisor:false`, canonical, OpenGraph и
+  JSON-LD `Course`;
 - нет подключения `photo.jpg`;
 - нет runtime-зависимостей от внешних CDN;
 - ссылка `Markdown` ведет на `materials/лекции/методичка-по-написанию-ТЗ.md`;

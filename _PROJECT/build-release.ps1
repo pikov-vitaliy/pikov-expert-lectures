@@ -1,6 +1,7 @@
 param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot),
   [string]$ReleaseDate = '',
+  [string]$AcceptedSourceCommit = '',
   [switch]$KeepStaging,
   [switch]$FailOnIssues
 )
@@ -9,6 +10,80 @@ $ErrorActionPreference = 'Stop'
 
 function Fail([string]$Message) {
   throw "RELEASE FAIL: $Message"
+}
+
+function Test-GitCommitOnMainHistory(
+  [string]$RepositoryRoot,
+  [string]$Commit,
+  [object]$GitCommand
+) {
+  $originMainRef = 'refs/remotes/origin/main'
+  & $GitCommand.Source -C $RepositoryRoot show-ref --verify --quiet $originMainRef 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    & $GitCommand.Source -C $RepositoryRoot merge-base --is-ancestor $Commit $originMainRef 2>$null
+    return ($LASTEXITCODE -eq 0)
+  }
+
+  $localMainRef = 'refs/heads/main'
+  & $GitCommand.Source -C $RepositoryRoot show-ref --verify --quiet $localMainRef 2>$null
+  if ($LASTEXITCODE -ne 0) { return $false }
+  & $GitCommand.Source -C $RepositoryRoot merge-base --is-ancestor $Commit $localMainRef 2>$null
+  return ($LASTEXITCODE -eq 0)
+}
+
+function Get-GitReleaseState([string]$RepositoryRoot) {
+  if (-not (Test-Path -LiteralPath (Join-Path $RepositoryRoot '.git'))) {
+    return [pscustomobject]@{
+      isRepository = $false
+      sourceCommit = $null
+      sourceRef = $null
+      onMainHistory = $false
+      trackedDirty = $true
+    }
+  }
+
+  $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+  if ($null -eq $gitCommand) {
+    Fail 'Git is required to establish release provenance in a repository checkout'
+  }
+
+  $headOutput = @(& $gitCommand.Source -C $RepositoryRoot rev-parse --verify HEAD 2>&1)
+  $headExitCode = $LASTEXITCODE
+  $sourceCommit = $null
+  if ($headExitCode -eq 0) {
+    $sourceCommit = (($headOutput | Select-Object -First 1) -as [string]).Trim().ToLowerInvariant()
+    if ($sourceCommit -notmatch '^[0-9a-f]{40}$') {
+      Fail "Git HEAD is not a full 40-character commit: $sourceCommit"
+    }
+  }
+
+  $refOutput = @(& $gitCommand.Source -C $RepositoryRoot symbolic-ref -q HEAD 2>$null)
+  $sourceRef = if ($LASTEXITCODE -eq 0 -and $refOutput.Count -gt 0) {
+    ([string]$refOutput[0]).Trim()
+  } else {
+    'detached-HEAD'
+  }
+
+  $statusOutput = @(& $gitCommand.Source -c core.quotepath=false -C $RepositoryRoot status --porcelain=v1 --untracked-files=no 2>&1)
+  if ($LASTEXITCODE -ne 0) {
+    Fail "Could not inspect tracked Git state for release provenance: $($statusOutput -join ' ')"
+  }
+  $trackedChanges = @($statusOutput | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+  $onMainHistory = $false
+  if ($null -ne $sourceCommit) {
+    $onMainHistory = Test-GitCommitOnMainHistory `
+      -RepositoryRoot $RepositoryRoot `
+      -Commit $sourceCommit `
+      -GitCommand $gitCommand
+  }
+
+  return [pscustomobject]@{
+    isRepository = $true
+    sourceCommit = $sourceCommit
+    sourceRef = $sourceRef
+    onMainHistory = $onMainHistory
+    trackedDirty = ($trackedChanges.Count -gt 0)
+  }
 }
 
 $archiveHelper = Join-Path $PSScriptRoot 'deterministic-archive.ps1'
@@ -416,6 +491,7 @@ function Get-RootReleaseFiles([string]$RootPath) {
     'index.html',
     'photo.jpg',
     'robots.txt',
+    'ru/index.html',
     'sitemap.xml',
     'yandex_bf73d77ba788688e.html'
   )
@@ -498,22 +574,49 @@ function Test-StaticRelease([string]$StageRoot, [string]$SiteName) {
 }
 
 function New-Manifest([string]$StageRoot, [object]$Target, [object[]]$Issues, [string]$ArchiveName) {
+  $filesByPath = New-Object 'System.Collections.Generic.Dictionary[string,string]' ([System.StringComparer]::Ordinal)
+  foreach ($file in @(Get-ChildItem -LiteralPath $StageRoot -Recurse -File -Force)) {
+    $relative = (Get-RelativePathSafe -BasePath $StageRoot -Path $file.FullName).Replace('\', '/')
+    if ($filesByPath.ContainsKey($relative)) {
+      Fail "Duplicate source tree path while creating manifest: $relative"
+    }
+    $filesByPath.Add($relative, $file.FullName)
+  }
+
+  [string[]]$relativePaths = @($filesByPath.Keys)
+  [System.Array]::Sort($relativePaths, [System.StringComparer]::Ordinal)
   $files = @(
-    Get-ChildItem -LiteralPath $StageRoot -Recurse -File -Force |
-      Sort-Object FullName |
-      ForEach-Object {
-        $relative = Get-RelativePathSafe -BasePath $StageRoot -Path $_.FullName
-        [pscustomobject]@{
-          path = $relative.Replace('\', '/')
-          size = $_.Length
-          sha256 = (Get-DeterministicFileSha256 -Path $_.FullName).ToLowerInvariant()
-        }
+    foreach ($relative in $relativePaths) {
+      $fullPath = [string]$filesByPath[$relative]
+      $file = Get-Item -LiteralPath $fullPath -Force
+      [pscustomobject]@{
+        path = $relative
+        size = $file.Length
+        sha256 = (Get-DeterministicFileSha256 -Path $fullPath).ToLowerInvariant()
       }
+    }
   )
+
+  $treeLines = @(
+    $files | ForEach-Object {
+      "$($_.path)`t$($_.size)`t$($_.sha256)"
+    }
+  )
+  $treeText = ($treeLines -join "`n") + "`n"
+  $treeBytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($treeText)
+  $sourceTreeSha256 = (Get-DeterministicSha256 -Bytes $treeBytes).ToLowerInvariant()
 
   [pscustomobject]@{
     generated = "$($script:ReleaseDateValue)T00:00:00Z"
     releaseDate = $script:ReleaseDateValue
+    provenanceVersion = 1
+    releaseKind = $script:ReleaseProvenance.releaseKind
+    sourceCommit = $script:ReleaseProvenance.sourceCommit
+    sourceRef = $script:ReleaseProvenance.sourceRef
+    sourceDirty = $script:ReleaseProvenance.sourceDirty
+    deployable = $script:ReleaseProvenance.deployable
+    policyDecision = $script:ReleaseProvenance.policyDecision
+    sourceTreeSha256 = $sourceTreeSha256
     target = $Target
     archive = $ArchiveName
     fileCount = $files.Count
@@ -525,6 +628,10 @@ function New-Manifest([string]$StageRoot, [object]$Target, [object[]]$Issues, [s
 $rootPath = (Resolve-Path -LiteralPath $Root).Path
 $script:ReleaseRepositoryRoot = [System.IO.Path]::GetFullPath($rootPath).TrimEnd('\')
 Assert-NoReparsePathComponents -BoundaryRoot $script:ReleaseRepositoryRoot -TargetPath $script:ReleaseRepositoryRoot -RequireTarget
+$acceptedCommit = $AcceptedSourceCommit.Trim().ToLowerInvariant()
+if ($acceptedCommit.Length -gt 0 -and $acceptedCommit -notmatch '^[0-9a-f]{40}$') {
+  Fail "AcceptedSourceCommit must be a full 40-character hexadecimal commit, got $AcceptedSourceCommit"
+}
 Initialize-IgnoredReleaseSourceGate -RepositoryRoot $script:ReleaseRepositoryRoot
 $projectPath = Join-Path $rootPath '_PROJECT'
 $lecturesPath = Join-Path $projectPath 'lectures.json'
@@ -604,6 +711,39 @@ foreach ($target in @($targets | Where-Object { $_.kind -eq 'domain' })) {
 # staging, release inputs are read-only and every selected path is checked
 # against the post-build tracked/ignored/untracked repository state.
 Initialize-IgnoredReleaseSourceGate -RepositoryRoot $script:ReleaseRepositoryRoot
+
+$gitState = Get-GitReleaseState -RepositoryRoot $script:ReleaseRepositoryRoot
+if ($acceptedCommit.Length -gt 0) {
+  if (-not $gitState.isRepository) {
+    Fail 'AcceptedSourceCommit requires a Git repository checkout'
+  }
+  if ($gitState.sourceCommit -cne $acceptedCommit) {
+    Fail "AcceptedSourceCommit does not match Git HEAD: expected $acceptedCommit, got $($gitState.sourceCommit)"
+  }
+  if (-not $gitState.onMainHistory) {
+    Fail "AcceptedSourceCommit is not in accepted main history: $acceptedCommit"
+  }
+  if ($gitState.trackedDirty) {
+    Fail 'Accepted release requires a clean tracked Git tree after all release builders have run'
+  }
+  $script:ReleaseProvenance = [pscustomobject]@{
+    releaseKind = 'accepted'
+    sourceCommit = $gitState.sourceCommit
+    sourceRef = 'refs/heads/main'
+    sourceDirty = $false
+    deployable = $true
+    policyDecision = 'allow-deploy'
+  }
+} else {
+  $script:ReleaseProvenance = [pscustomobject]@{
+    releaseKind = 'candidate'
+    sourceCommit = $gitState.sourceCommit
+    sourceRef = $gitState.sourceRef
+    sourceDirty = [bool]$gitState.trackedDirty
+    deployable = $false
+    policyDecision = 'deny-deploy'
+  }
+}
 
 $rootReleaseFiles = @(Get-RootReleaseFiles $rootPath)
 foreach ($relativeFile in $rootReleaseFiles) {
@@ -701,6 +841,13 @@ foreach ($target in $targets) {
     "# Release notes: $($target.domain)",
     '',
     "Build date: $ReleaseDate",
+    "Release kind: $($script:ReleaseProvenance.releaseKind)",
+    "Source commit: $($script:ReleaseProvenance.sourceCommit)",
+    "Source ref: $($script:ReleaseProvenance.sourceRef)",
+    "Source tree SHA256: $($manifest.sourceTreeSha256)",
+    "Source dirty: $($script:ReleaseProvenance.sourceDirty.ToString().ToLowerInvariant())",
+    "Deployable: $(if ($script:ReleaseProvenance.deployable) { 'yes' } else { 'no' })",
+    "Policy decision: $($script:ReleaseProvenance.policyDecision)",
     "Target URL: $($target.url)",
     "Archive: $archiveName",
     "Archive SHA256: $archiveHash",
@@ -726,6 +873,15 @@ foreach ($target in $targets) {
     archiveName = $archiveName
     archiveSha256 = $archiveHash
     archiveBytes = $archiveItem.Length
+    releaseDate = $ReleaseDate
+    provenanceVersion = 1
+    releaseKind = $script:ReleaseProvenance.releaseKind
+    sourceCommit = $script:ReleaseProvenance.sourceCommit
+    sourceRef = $script:ReleaseProvenance.sourceRef
+    sourceDirty = $script:ReleaseProvenance.sourceDirty
+    deployable = $script:ReleaseProvenance.deployable
+    policyDecision = $script:ReleaseProvenance.policyDecision
+    sourceTreeSha256 = $manifest.sourceTreeSha256
     fileCount = $manifest.files.Count
     staticIssueCount = $issues.Count
     staticStatus = $staticStatus
@@ -739,6 +895,12 @@ $indexLines = New-Object System.Collections.Generic.List[string]
 $indexLines.Add("# Release index pikov.expert")
 $indexLines.Add('')
 $indexLines.Add("Build date: $ReleaseDate")
+$indexLines.Add("Release kind: $($script:ReleaseProvenance.releaseKind)")
+$indexLines.Add("Source commit: $($script:ReleaseProvenance.sourceCommit)")
+$indexLines.Add("Source ref: $($script:ReleaseProvenance.sourceRef)")
+$indexLines.Add("Source dirty: $($script:ReleaseProvenance.sourceDirty.ToString().ToLowerInvariant())")
+$indexLines.Add("Deployable: $(if ($script:ReleaseProvenance.deployable) { 'yes' } else { 'no' })")
+$indexLines.Add("Policy decision: $($script:ReleaseProvenance.policyDecision)")
 $indexLines.Add("Archives: $($results.Count) ($($uniqueFolders.Count) subdomains + root)")
 $indexLines.Add("Static issues: $totalIssues")
 $indexLines.Add("Browser QA: not-run")
@@ -753,12 +915,12 @@ $indexLines.Add('```')
 $indexLines.Add('')
 $indexLines.Add('## Archives')
 $indexLines.Add('')
-$indexLines.Add('| Target | URL | Archive | Size | SHA256 | Static QA | Browser QA |')
-$indexLines.Add('|---|---|---|---:|---|---|---|')
+$indexLines.Add('| Target | URL | Archive | Size | Archive SHA256 | Source tree SHA256 | Static QA | Browser QA |')
+$indexLines.Add('|---|---|---|---:|---|---|---|---|')
 foreach ($result in $results) {
   $sizeMb = [math]::Round($result.archiveBytes / 1MB, 2)
   $archiveDisplay = $result.archivePath.Replace('\', '\\')
-  $indexLines.Add("| $($result.domain) | $($result.url) | $archiveDisplay | $sizeMb MB | $($result.archiveSha256) | $($result.staticStatus) | $($result.browserQA) |")
+  $indexLines.Add("| $($result.domain) | $($result.url) | $archiveDisplay | $sizeMb MB | $($result.archiveSha256) | $($result.sourceTreeSha256) | $($result.staticStatus) | $($result.browserQA) |")
 }
 $indexLines.Add('')
 $indexLines.Add('## Publishing instruction')
@@ -766,6 +928,7 @@ $indexLines.Add('')
 $indexLines.Add('- Unpack `pikov.expert-root-release-*.zip` into the document root for `pikov.expert`.')
 $indexLines.Add('- Unpack `<subdomain>.pikov.expert-release-*.zip` into the matching subdomain document root.')
 $indexLines.Add('- Archives have no extra top-level wrapper directory: `index.html` must land directly in the site root.')
+$indexLines.Add("- Deployment is permitted only when `Deployable: yes` and `_PROJECT/deploy-hosting.ps1` receives `-ExpectedSourceCommit $($script:ReleaseProvenance.sourceCommit)`.")
 $indexLines.Add('')
 $indexLines.Add('## Residual risks')
 $indexLines.Add('')
