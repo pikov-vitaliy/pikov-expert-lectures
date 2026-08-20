@@ -203,4 +203,7 @@ jobs:
               throw 'Candidate rejection did not come from an accepted-main provenance gate'
             }
             Write-Host 'Candidate release rejection verified.'
+            # GitHub's pwsh wrapper exits with the last native exit code even after
+            # an expected rejection has been validated, so clear only that stale code.
+            $global:LASTEXITCODE = 0
           }

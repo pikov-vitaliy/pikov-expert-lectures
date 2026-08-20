@@ -209,6 +209,11 @@ test('CI proves that a candidate release is rejected by the deploy gate', () => 
   assert.match(prepareStep, /-ExpectedSourceCommit\s+\$env:RELEASE_SOURCE_COMMIT/);
   assert.match(prepareStep, /LASTEXITCODE/);
   assert.match(prepareStep, /candidate release was unexpectedly accepted/i);
+  assert.match(
+    prepareStep,
+    /Candidate release rejection verified[\s\S]*\$global:LASTEXITCODE\s*=\s*0/,
+    'the expected candidate rejection must not leak its native exit code to the GitHub pwsh wrapper',
+  );
 });
 
 test('accepted-main runbook repeats the fail-closed tracked-file drift gate after build', () => {
