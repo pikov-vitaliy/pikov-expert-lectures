@@ -2,7 +2,7 @@
 
 Дата фиксации: 2026-08-21
 
-Статус: `ACTIVE`
+Статус: `READY`
 
 Исходный verdict: `NEEDS_CHANGES`
 
@@ -466,6 +466,7 @@ verdict `READY`; иначе новые findings добавляются в рее
 | 2026-08-21 | Этап 7, PR checkpoint | `FIX IN REVIEW` | `ec11a365ad232bc10a982ecf47b7716dd50fd6e6`, PR `#11`, run `32429589310` | Commit и branch опубликованы; архивы, independence и release browser QA в exact PR run прошли. Последний шаг корректно отклонил candidate, но GitHub pwsh wrapper унаследовал ожидаемый native exit code `1` и пометил job failed. Добавлен точечный reset stale `LASTEXITCODE` после содержательной проверки rejection и regression assertion; повторный exact-SHA CI обязателен до merge |
 | 2026-08-21 | Этап 7, accepted main | `DONE` | `26785cb615bcb3e44939178044edb59ccd06b2f6` | PR `#11` merged; exact PR run `32430378340` и exact-main push run `32431202217` завершены `success`. Accepted build: 30 архивов, static 0, independence 30/30, source ref `refs/heads/main`, deployable/allow-deploy 30/30. Первая попытка остановилась до remote mutation из-за недоступного alias; read-only preflight подтверждённого Masterhost target прошёл. Пять согласованных доменов опубликованы, backup-архивы и remote root `/home/u548355/_deploy_pikov_20260821-022132586` сохранены; hosting-check дважды `OK=191 WARN=0 FAIL=0` |
 | 2026-08-21 | Этап 8, live checkpoint | `FIX IN REVIEW` | `BROWSER_ONLINE_TESTS_2026-08-21.md` | Online browser QA: 30/30, issues 0; source=ZIP=live для `/`, `/ru/` и четырёх остальных изменённых landing pages — 6/6; root resources 2/2. URL-first switch/reload, localized metadata, TZ 104/104, SPDX extensionless/HTML, PTES и handout canonical — GREEN. Дополнительный raw-header test выявил `302 Location: http://pikov.expert/ru/` для `?lang=ru`: Apache за TLS terminator формировал downgrade из относительного RewriteRule. Добавлены RED-тесты для `.htaccess` и generator, затем explicit HTTPS rule; focused tests и smoke GREEN. Follow-up PR, exact-main CI, root-only redeploy и повторный live header test обязательны до READY |
+| 2026-08-21 | Этап 8, closure | `READY` | public payload `e0b3e7f25bc7aa389ca16484a3d2aa94446def32`; PR `#12`; runs `32434206881`, `32434865400`; `HOSTING_DEPLOY_2026-08-21_20260821-032104530_e0b3e7f25bc7.md` | Follow-up PR и exact-main push run завершены `success`; независимый review exact SHA и финальный live review дали `READY`. Accepted release: 30 архивов, invalid provenance/policy/static/archive `0`, independence 30/30, browser 30/30. Root-only manifest содержал только `pikov.expert`; remote root `/home/u548355/_deploy_pikov_20260821-032104530` и backup сохранены. Raw `?lang=ru` возвращает ровно `302 Location: https://pikov.expert/ru/`, дополнительные query-параметры не совпадают; `/` и `/ru/` отдают `200` с шестью security headers и работают без JavaScript. Source=ZIP=live для root payload 4/4; нормализованный `.htaccess` совпал source=ZIP=remote; hosting-check `OK=191 WARN=0 FAIL=0`, online browser QA 30/30, PTES HTTP 200; `pc/` остался только untracked и отсутствует в index/commit tree |
 
 ## 8. Stop conditions
 
