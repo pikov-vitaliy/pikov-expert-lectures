@@ -94,7 +94,7 @@ function Should-SkipSitemapPath([string]$RelativePath) {
   return $false
 }
 
-function New-HtaccessLines([switch]$SpdxExtensionlessHtml) {
+function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect) {
   $lines = [System.Collections.ArrayList]@(
     '# pikov.expert static lecture site rules',
     '# Keep text and Markdown files readable as UTF-8 in browsers.',
@@ -137,6 +137,23 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml) {
     '  Require all denied',
     '</Files>'
   )
+
+  if ($RootLocaleRedirect) {
+    $index = $lines.IndexOf('<IfModule mod_headers.c>')
+    if ($index -lt 0) {
+      throw 'Root locale redirect insertion marker is missing from the common template'
+    }
+    [void]$lines.InsertRange($index, [object[]]@(
+      '# Legacy Russian locale URL: use the crawlable static /ru/ document.',
+      '<IfModule mod_rewrite.c>',
+      '  RewriteEngine On',
+      '  RewriteCond %{REQUEST_URI} ^/$',
+      '  RewriteCond %{QUERY_STRING} ^lang=ru$ [NC]',
+      '  RewriteRule ^$ /ru/? [R=302,L]',
+      '</IfModule>',
+      ''
+    ))
+  }
 
   if ($SpdxExtensionlessHtml) {
     $index = $lines.IndexOf('<Files ".htaccess">')
@@ -284,12 +301,13 @@ foreach ($folder in $uniqueFolders) {
 
 $rootUrls = New-Object System.Collections.Generic.List[string]
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/'
+Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/ru/'
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/course-map.html'
 foreach ($lecture in @($data.lectures | Sort-Object position)) {
   Add-UniqueUrl -List $rootUrls -Url ([string]$lecture.url)
 }
 
-Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines)
+Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines -RootLocaleRedirect)
 Write-Utf8File -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
 Write-SitemapFile -Path (Join-Path $rootPath 'sitemap.xml') -Urls @($rootUrls) -DefaultLastMod $lastMod
 

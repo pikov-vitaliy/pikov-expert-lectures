@@ -4,6 +4,7 @@ param(
   [string]$ReleaseDate = '',
   [int]$KeepLocalDeployDirs = 3,
   [string[]]$OnlyDomains = @(),
+  [string]$ExpectedSourceCommit = '',
   [switch]$KeepRemoteDeployRoot,
   [switch]$SkipPostDeployCheck,
   [switch]$PrepareOnly
@@ -11,8 +12,72 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+Add-Type -AssemblyName System.IO.Compression
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+
 function Fail([string]$Message) {
   throw "DEPLOY FAIL: $Message"
+}
+
+function Test-GitCommitOnMainHistory(
+  [string]$RepositoryRoot,
+  [string]$Commit,
+  [object]$GitCommand
+) {
+  $originMainRef = 'refs/remotes/origin/main'
+  & $GitCommand.Source -C $RepositoryRoot show-ref --verify --quiet $originMainRef 2>$null
+  if ($LASTEXITCODE -eq 0) {
+    & $GitCommand.Source -C $RepositoryRoot merge-base --is-ancestor $Commit $originMainRef 2>$null
+    return ($LASTEXITCODE -eq 0)
+  }
+
+  $localMainRef = 'refs/heads/main'
+  & $GitCommand.Source -C $RepositoryRoot show-ref --verify --quiet $localMainRef 2>$null
+  if ($LASTEXITCODE -ne 0) { return $false }
+  & $GitCommand.Source -C $RepositoryRoot merge-base --is-ancestor $Commit $localMainRef 2>$null
+  return ($LASTEXITCODE -eq 0)
+}
+
+function Get-GitDeploymentState([string]$RepositoryRoot) {
+  if (-not (Test-Path -LiteralPath (Join-Path $RepositoryRoot '.git'))) {
+    Fail 'ExpectedSourceCommit verification requires a Git repository checkout'
+  }
+  $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+  if ($null -eq $gitCommand) {
+    Fail 'Git is required to verify ExpectedSourceCommit before deployment'
+  }
+
+  $headOutput = @(& $gitCommand.Source -C $RepositoryRoot rev-parse --verify HEAD 2>&1)
+  if ($LASTEXITCODE -ne 0) {
+    Fail "Could not resolve Git HEAD before deployment: $($headOutput -join ' ')"
+  }
+  $headCommit = (($headOutput | Select-Object -First 1) -as [string]).Trim().ToLowerInvariant()
+  if ($headCommit -notmatch '^[0-9a-f]{40}$') {
+    Fail "Git HEAD is not a full 40-character commit: $headCommit"
+  }
+
+  $refOutput = @(& $gitCommand.Source -C $RepositoryRoot symbolic-ref -q HEAD 2>$null)
+  $sourceRef = if ($LASTEXITCODE -eq 0 -and $refOutput.Count -gt 0) {
+    ([string]$refOutput[0]).Trim()
+  } else {
+    'detached-HEAD'
+  }
+
+  $statusOutput = @(& $gitCommand.Source -c core.quotepath=false -C $RepositoryRoot status --porcelain=v1 --untracked-files=no 2>&1)
+  if ($LASTEXITCODE -ne 0) {
+    Fail "Could not inspect tracked Git state before deployment: $($statusOutput -join ' ')"
+  }
+  $trackedChanges = @($statusOutput | Where-Object { -not [string]::IsNullOrWhiteSpace([string]$_) })
+  $onMainHistory = Test-GitCommitOnMainHistory `
+    -RepositoryRoot $RepositoryRoot `
+    -Commit $headCommit `
+    -GitCommand $gitCommand
+  return [pscustomobject]@{
+    headCommit = $headCommit
+    sourceRef = $sourceRef
+    onMainHistory = $onMainHistory
+    trackedDirty = ($trackedChanges.Count -gt 0)
+  }
 }
 
 function Invoke-Checked([string]$FilePath, [string[]]$Arguments) {
@@ -22,6 +87,108 @@ function Invoke-Checked([string]$FilePath, [string[]]$Arguments) {
   if ($LASTEXITCODE -ne 0) {
     Fail "Command failed: $display"
   }
+}
+
+function Get-Sha256Stream([System.IO.Stream]$Stream) {
+  $algorithm = [System.Security.Cryptography.SHA256]::Create()
+  try {
+    return ([System.BitConverter]::ToString($algorithm.ComputeHash($Stream))).Replace('-', '').ToLowerInvariant()
+  } finally {
+    $algorithm.Dispose()
+  }
+}
+
+function Get-Sha256File([string]$Path) {
+  $stream = [System.IO.File]::OpenRead($Path)
+  try {
+    return Get-Sha256Stream -Stream $stream
+  } finally {
+    $stream.Dispose()
+  }
+}
+
+function Get-Sha256Bytes([byte[]]$Bytes) {
+  $stream = New-Object System.IO.MemoryStream(,$Bytes)
+  try {
+    return Get-Sha256Stream -Stream $stream
+  } finally {
+    $stream.Dispose()
+  }
+}
+
+function Get-ArchiveSourceTreeSha256([string]$Path) {
+  $archive = [System.IO.Compression.ZipFile]::OpenRead($Path)
+  try {
+    $recordsByPath = [System.Collections.Generic.Dictionary[string,object]]::new(
+      [System.StringComparer]::Ordinal
+    )
+    foreach ($entry in $archive.Entries) {
+      $relative = [string]$entry.FullName
+      $segments = @($relative.Split(@([char]'/'), [System.StringSplitOptions]::None))
+      if ([string]::IsNullOrWhiteSpace($relative) -or
+          [string]::IsNullOrWhiteSpace([string]$entry.Name) -or
+          $relative.Contains('\') -or
+          $relative.StartsWith('/', [System.StringComparison]::Ordinal) -or
+          [System.IO.Path]::IsPathRooted($relative) -or
+          $relative -match '[\x00-\x1f\x7f]' -or
+          @($segments | Where-Object { $_ -in @('', '.', '..') }).Count -gt 0) {
+        Fail "Unsafe archive path while verifying source tree: $relative"
+      }
+      if ($recordsByPath.ContainsKey($relative)) {
+        Fail "Duplicate archive path while verifying source tree: $relative"
+      }
+
+      $entryStream = $entry.Open()
+      try {
+        $entrySha256 = Get-Sha256Stream -Stream $entryStream
+      } finally {
+        $entryStream.Dispose()
+      }
+      $recordsByPath.Add($relative, [pscustomobject]@{
+        size = [long]$entry.Length
+        sha256 = $entrySha256
+      })
+    }
+
+    if ($recordsByPath.Count -eq 0) {
+      Fail 'Archive has no files while verifying source tree'
+    }
+    [string[]]$relativePaths = @($recordsByPath.Keys)
+    [System.Array]::Sort($relativePaths, [System.StringComparer]::Ordinal)
+    $treeLines = @(
+      foreach ($relative in $relativePaths) {
+        $record = $recordsByPath[$relative]
+        $size = ([long]$record.size).ToString([System.Globalization.CultureInfo]::InvariantCulture)
+        "$relative`t$size`t$($record.sha256)"
+      }
+    )
+    $treeText = ($treeLines -join "`n") + "`n"
+    $treeBytes = (New-Object System.Text.UTF8Encoding($false)).GetBytes($treeText)
+    return Get-Sha256Bytes -Bytes $treeBytes
+  } finally {
+    $archive.Dispose()
+  }
+}
+
+function Get-CurrentPowerShellExecutable {
+  $leafNames = if ($PSVersionTable.PSEdition -eq 'Core') {
+    @('pwsh.exe', 'pwsh')
+  } else {
+    @('powershell.exe', 'powershell')
+  }
+  foreach ($leafName in $leafNames) {
+    $candidate = Join-Path $PSHOME $leafName
+    if (Test-Path -LiteralPath $candidate -PathType Leaf) {
+      return $candidate
+    }
+  }
+  foreach ($leafName in $leafNames) {
+    $command = Get-Command $leafName -ErrorAction SilentlyContinue
+    if ($null -ne $command) {
+      return [string]$command.Source
+    }
+  }
+  Fail 'Could not locate a PowerShell executable for the post-deploy check'
 }
 
 function Assert-SafeLeaf([string]$Value, [string]$FieldName, [string]$Pattern) {
@@ -112,6 +279,127 @@ function Assert-CanonicalReleaseIndex([object[]]$Entries, [object[]]$CanonicalTa
   }
 }
 
+function Assert-AcceptedReleaseProvenance(
+  [object[]]$Entries,
+  [string]$ExpectedCommit,
+  [string]$ExpectedDate
+) {
+  foreach ($entry in $Entries) {
+    $domain = [string]$entry.domain
+    if ([int]$entry.provenanceVersion -ne 1) {
+      Fail "Unsupported or missing release provenance for ${domain}: provenanceVersion must be 1"
+    }
+    if ([string]$entry.releaseKind -cne 'accepted') {
+      Fail "Release $domain is not accepted: releaseKind=$($entry.releaseKind)"
+    }
+    if ([string]$entry.sourceCommit -cne $ExpectedCommit) {
+      Fail "Release source commit mismatch for ${domain}: expected $ExpectedCommit, got $($entry.sourceCommit)"
+    }
+    if ([string]$entry.releaseDate -cne $ExpectedDate) {
+      Fail "Release date mismatch for ${domain}: expected $ExpectedDate, got $($entry.releaseDate)"
+    }
+    if ([string]$entry.sourceRef -cne 'refs/heads/main') {
+      Fail "Release $domain has an invalid accepted source ref: $($entry.sourceRef)"
+    }
+    if ($entry.sourceDirty -isnot [bool] -or [bool]$entry.sourceDirty) {
+      Fail "Release $domain has dirty or invalid source provenance"
+    }
+    if ($entry.deployable -isnot [bool] -or -not [bool]$entry.deployable) {
+      Fail "Release $domain is not deployable"
+    }
+    if ([string]$entry.policyDecision -cne 'allow-deploy') {
+      Fail "Release $domain policy does not allow deployment"
+    }
+    if ([string]$entry.sourceTreeSha256 -cnotmatch '^[0-9a-f]{64}$') {
+      Fail "Release $domain has an invalid source tree SHA256"
+    }
+  }
+}
+
+function New-UniqueDeployEvidencePath(
+  [string]$ProjectPath,
+  [string]$Date,
+  [string]$Stamp,
+  [string]$SourceCommit
+) {
+  $baseName = "HOSTING_DEPLOY_${Date}_${Stamp}_$($SourceCommit.Substring(0, 12))"
+  $suffix = 0
+  while ($true) {
+    $name = if ($suffix -eq 0) { "$baseName.md" } else { "$baseName-$suffix.md" }
+    $candidate = Join-Path $ProjectPath $name
+    try {
+      $stream = [System.IO.File]::Open(
+        $candidate,
+        [System.IO.FileMode]::CreateNew,
+        [System.IO.FileAccess]::Write,
+        [System.IO.FileShare]::None
+      )
+      $stream.Dispose()
+      return $candidate
+    } catch [System.IO.IOException] {
+      if (Test-Path -LiteralPath $candidate) {
+        $suffix++
+        continue
+      }
+      throw
+    }
+  }
+}
+
+function Write-DeployEvidence(
+  [string]$Path,
+  [string]$Status,
+  [string]$Date,
+  [string]$Stamp,
+  [string]$EvidenceUtc,
+  [string]$SourceCommit,
+  [string]$ReleaseSourceRef,
+  [string]$CheckoutSourceRef,
+  [string]$RemoteDeployRoot,
+  [object[]]$Entries,
+  [bool]$RetainRemoteRoot,
+  [bool]$PostDeployCheckSkipped,
+  [string]$FailureMessage = ''
+) {
+  $lines = New-Object System.Collections.Generic.List[string]
+  $lines.Add("# Hosting deploy evidence $Date")
+  $lines.Add('')
+  $lines.Add("Status: $Status")
+  $lines.Add("Deploy stamp: $Stamp")
+  $lines.Add("Evidence UTC: $EvidenceUtc")
+  $lines.Add("Source commit: $SourceCommit")
+  $lines.Add("Release source ref: $ReleaseSourceRef")
+  $lines.Add("Deployment checkout ref: $CheckoutSourceRef")
+  $lines.Add('Policy decision: allow-deploy')
+  $lines.Add("Remote deploy root: $RemoteDeployRoot")
+  $lines.Add("Remote deploy root retained: $($RetainRemoteRoot.ToString().ToLowerInvariant())")
+  $lines.Add("Post-deploy check skipped: $($PostDeployCheckSkipped.ToString().ToLowerInvariant())")
+  if (-not [string]::IsNullOrWhiteSpace($FailureMessage)) {
+    $safeFailure = $FailureMessage.Replace("`r", ' ').Replace("`n", ' ').Replace('|', '\|')
+    $lines.Add("Failure: $safeFailure")
+  }
+  $lines.Add('')
+  $lines.Add('## Targets')
+  $lines.Add('')
+  $lines.Add('| Domain | Archive | Archive SHA256 | Source tree SHA256 | Backup |')
+  $lines.Add('|---|---|---|---|---|')
+  foreach ($entry in $Entries) {
+    $backup = "$RemoteDeployRoot/backups/$($entry.domain)-www-$Stamp.tar.gz"
+    $lines.Add("| $($entry.domain) | $($entry.archiveName) | $($entry.archiveSha256) | $($entry.sourceTreeSha256) | $backup |")
+  }
+  $lines.Add('')
+  if ($RetainRemoteRoot) {
+    $lines.Add('The remote deploy root and per-target backups were retained for an operator-controlled rollback.')
+  } else {
+    $lines.Add('The remote deploy root is scheduled for removal only after deployment and post-deploy verification succeed.')
+  }
+  [System.IO.File]::WriteAllText(
+    $Path,
+    (($lines -join "`n").TrimEnd("`n") + "`n"),
+    (New-Object System.Text.UTF8Encoding($false))
+  )
+}
+
 function Remove-OldLocalDeployDirs([string]$ProjectPath, [int]$Keep) {
   if ($Keep -lt 1) { Fail "KeepLocalDeployDirs must be >= 1" }
   $projectResolved = (Resolve-Path -LiteralPath $ProjectPath).Path.TrimEnd('\') + '\'
@@ -145,6 +433,23 @@ if ([string]::IsNullOrWhiteSpace($ReleaseDate)) {
 if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
   Fail "ReleaseDate must be YYYY-MM-DD, got $ReleaseDate"
 }
+$expectedCommit = $ExpectedSourceCommit.Trim().ToLowerInvariant()
+if ([string]::IsNullOrWhiteSpace($expectedCommit)) {
+  Fail 'ExpectedSourceCommit is required and must identify the accepted release commit'
+}
+if ($expectedCommit -notmatch '^[0-9a-f]{40}$') {
+  Fail "ExpectedSourceCommit must be a full 40-character hexadecimal commit, got $ExpectedSourceCommit"
+}
+$gitState = Get-GitDeploymentState -RepositoryRoot $rootPath
+if ($gitState.headCommit -cne $expectedCommit) {
+  Fail "ExpectedSourceCommit does not match Git HEAD: expected $expectedCommit, got $($gitState.headCommit)"
+}
+if (-not $gitState.onMainHistory) {
+  Fail "ExpectedSourceCommit is not in accepted main history: $expectedCommit"
+}
+if ($gitState.trackedDirty) {
+  Fail 'Deployment requires a clean tracked Git tree at ExpectedSourceCommit'
+}
 if ($SkipPostDeployCheck -and -not $KeepRemoteDeployRoot) {
   Fail 'SkipPostDeployCheck requires KeepRemoteDeployRoot so rollback data is not removed without verification'
 }
@@ -154,6 +459,12 @@ if (-not (Test-Path -LiteralPath $releaseIndexPath)) { Fail "Missing release ind
 $entries = @(Get-Content -LiteralPath $releaseIndexPath -Encoding UTF8 -Raw | ConvertFrom-Json | ForEach-Object { $_ })
 $canonicalTargets = @(Get-CanonicalReleaseTargets -LectureData $lectureData -RepositoryRoot $rootPath -Date $ReleaseDate)
 Assert-CanonicalReleaseIndex -Entries $entries -CanonicalTargets $canonicalTargets
+Assert-AcceptedReleaseProvenance -Entries $entries -ExpectedCommit $expectedCommit -ExpectedDate $ReleaseDate
+$releaseSourceRefs = @($entries | ForEach-Object { [string]$_.sourceRef } | Select-Object -Unique)
+if ($releaseSourceRefs.Count -ne 1) {
+  Fail 'Release index contains inconsistent source refs'
+}
+$releaseSourceRef = $releaseSourceRefs[0]
 
 $independenceGatePath = Join-Path $projectPath 'test-public-release-independence.ps1'
 if (-not (Test-Path -LiteralPath $independenceGatePath)) { Fail "Missing public independence gate: $independenceGatePath" }
@@ -178,7 +489,7 @@ if ($PrepareOnly) {
   $remoteHome = $remoteHome.Trim().TrimEnd('/')
 }
 
-$stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
+$stamp = Get-Date -Format 'yyyyMMdd-HHmmssfff'
 $deployRoot = "$remoteHome/_deploy_pikov_$stamp"
 $localDeployDir = Join-Path $projectPath ".hosting-deploy-$stamp"
 New-Item -ItemType Directory -Path $localDeployDir -Force | Out-Null
@@ -188,11 +499,18 @@ $manifestLines = foreach ($entry in $entries) {
   if (-not (Test-Path -LiteralPath $entry.archivePath)) {
     Fail "Missing archive: $($entry.archivePath)"
   }
-  $actual = (Get-FileHash -LiteralPath $entry.archivePath -Algorithm SHA256).Hash.ToLowerInvariant()
+  if ([string]$entry.archiveSha256 -cnotmatch '^[0-9a-f]{64}$') {
+    Fail "Invalid archive SHA256 for $($entry.domain)"
+  }
+  $actual = Get-Sha256File -Path ([string]$entry.archivePath)
   if ($actual -ne $entry.archiveSha256) {
     Fail "Local SHA256 mismatch for $($entry.domain)"
   }
-  "$($entry.domain)`t$($entry.archiveName)`t$($entry.archiveSha256)"
+  $actualSourceTree = Get-ArchiveSourceTreeSha256 -Path ([string]$entry.archivePath)
+  if ($actualSourceTree -cne [string]$entry.sourceTreeSha256) {
+    Fail "Source tree SHA256 mismatch for $($entry.domain): expected $($entry.sourceTreeSha256), got $actualSourceTree"
+  }
+  "$($entry.domain)`t$($entry.archiveName)`t$($entry.archiveSha256)`t$expectedCommit"
 }
 [System.IO.File]::WriteAllText($manifestPath, (($manifestLines -join "`n") + "`n"), [System.Text.Encoding]::ASCII)
 
@@ -203,6 +521,7 @@ set -euo pipefail
 
 DEPLOY_ROOT="$1"
 STAMP="$2"
+EXPECTED_SOURCE_COMMIT="$3"
 MANIFEST="$DEPLOY_ROOT/manifest.tsv"
 LOG="$DEPLOY_ROOT/deploy.log"
 
@@ -212,6 +531,11 @@ mkdir -p "$DEPLOY_ROOT/backups" "$DEPLOY_ROOT/unpacked" "$DEPLOY_ROOT/logs"
 if ! command -v python3 >/dev/null 2>&1; then
   echo "python3 is required to extract ZIP archives with UTF-8 names" | tee -a "$LOG"
   exit 9
+fi
+
+if [[ ! "$EXPECTED_SOURCE_COMMIT" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "Unsafe expected source commit" | tee -a "$LOG"
+  exit 20
 fi
 
 home_real="$(python3 - "$HOME" <<'PY'
@@ -225,10 +549,11 @@ print(home)
 PY
 )"
 
-while IFS=$'\t' read -r domain archive sha256; do
+while IFS=$'\t' read -r domain archive sha256 source_commit; do
   domain="${domain%$'\r'}"
   archive="${archive%$'\r'}"
   sha256="${sha256%$'\r'}"
+  source_commit="${source_commit%$'\r'}"
   [ -n "$domain" ] || continue
   if [[ ! "$domain" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)*$ ]]; then
     echo "Unsafe domain in manifest: $domain" | tee -a "$LOG"
@@ -241,6 +566,10 @@ while IFS=$'\t' read -r domain archive sha256; do
   if [[ ! "$sha256" =~ ^[0-9a-f]{64}$ ]]; then
     echo "Unsafe SHA256 in manifest for $domain" | tee -a "$LOG"
     exit 18
+  fi
+  if [[ "$source_commit" != "$EXPECTED_SOURCE_COMMIT" ]]; then
+    echo "Source commit mismatch in manifest for $domain" | tee -a "$LOG"
+    exit 21
   fi
   target="$(python3 - "$home_real" "$domain" <<'PY'
 import os
@@ -348,6 +677,27 @@ $remoteScript = $remoteScript -replace "`r`n", "`n"
 $remoteScriptBytes = [System.IO.File]::ReadAllBytes($remoteScriptPath)
 if ($remoteScriptBytes -contains 13) { Fail "Generated deploy-remote.sh contains CR bytes" }
 
+$summaryPath = New-UniqueDeployEvidencePath `
+  -ProjectPath $projectPath `
+  -Date $ReleaseDate `
+  -Stamp $stamp `
+  -SourceCommit $expectedCommit
+$evidenceUtc = [DateTime]::UtcNow.ToString('yyyy-MM-ddTHH:mm:ss.fffZ', [System.Globalization.CultureInfo]::InvariantCulture)
+Write-DeployEvidence `
+  -Path $summaryPath `
+  -Status 'PREPARED' `
+  -Date $ReleaseDate `
+  -Stamp $stamp `
+  -EvidenceUtc $evidenceUtc `
+  -SourceCommit $expectedCommit `
+  -ReleaseSourceRef $releaseSourceRef `
+  -CheckoutSourceRef $gitState.sourceRef `
+  -RemoteDeployRoot $deployRoot `
+  -Entries $entries `
+  -RetainRemoteRoot ([bool]$KeepRemoteDeployRoot) `
+  -PostDeployCheckSkipped ([bool]$SkipPostDeployCheck)
+Write-Output "summary=$summaryPath"
+
 if ($PrepareOnly) {
   Write-Output "DEPLOY PREPARE OK"
   Write-Output "manifest=$manifestPath"
@@ -355,44 +705,70 @@ if ($PrepareOnly) {
   return
 }
 
-Write-Output "Deploy root: $deployRoot"
-Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "mkdir -p '$deployRoot/zips'")
-Invoke-Checked -FilePath 'scp' -Arguments @($manifestPath, "$SshAlias`:$deployRoot/manifest.tsv")
-Invoke-Checked -FilePath 'scp' -Arguments @($remoteScriptPath, "$SshAlias`:$deployRoot/deploy-remote.sh")
-Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "chmod 700 '$deployRoot/deploy-remote.sh'")
+try {
+  Write-Output "Deploy root: $deployRoot"
+  Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "mkdir -p '$deployRoot/zips'")
+  Invoke-Checked -FilePath 'scp' -Arguments @($manifestPath, "$SshAlias`:$deployRoot/manifest.tsv")
+  Invoke-Checked -FilePath 'scp' -Arguments @($remoteScriptPath, "$SshAlias`:$deployRoot/deploy-remote.sh")
+  Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "chmod 700 '$deployRoot/deploy-remote.sh'")
 
-foreach ($entry in $entries) {
-  Invoke-Checked -FilePath 'scp' -Arguments @([string]$entry.archivePath, "$SshAlias`:$deployRoot/zips/$($entry.archiveName)")
-}
-
-Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "'$deployRoot/deploy-remote.sh' '$deployRoot' '$stamp'")
-
-if (-not $SkipPostDeployCheck) {
-  $hostingCheckPath = Join-Path $projectPath 'hosting-check.ps1'
-  if (-not (Test-Path -LiteralPath $hostingCheckPath)) { Fail "Missing hosting check: $hostingCheckPath" }
-  & $hostingCheckPath -Root $rootPath -ReleaseDate $ReleaseDate
-}
-
-if (-not $KeepRemoteDeployRoot) {
-  $expectedPrefix = "$remoteHome/_deploy_pikov_"
-  if (-not $deployRoot.StartsWith($expectedPrefix, [System.StringComparison]::Ordinal)) {
-    Fail "Refusing to remove unexpected remote deploy root: $deployRoot"
+  foreach ($entry in $entries) {
+    Invoke-Checked -FilePath 'scp' -Arguments @([string]$entry.archivePath, "$SshAlias`:$deployRoot/zips/$($entry.archiveName)")
   }
-  Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "rm -rf -- '$deployRoot'")
-  Write-Output "removedRemoteDeployRoot=$deployRoot"
-}
 
-$summaryPath = Join-Path $projectPath "HOSTING_DEPLOY_$ReleaseDate.md"
-$lines = @(
-  "# Hosting deploy $ReleaseDate",
-  '',
-  "Deploy stamp: $stamp",
-  "Remote deploy root: $deployRoot",
-  "Targets: $($entries.Count)",
-  '',
-  $(if ($KeepRemoteDeployRoot) { "Remote deploy root retained (including temporary backups and log): $deployRoot" } else { "Remote deploy root removed after successful deployment and hosting check." })
-)
-$lines | Set-Content -LiteralPath $summaryPath -Encoding UTF8
+  Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "'$deployRoot/deploy-remote.sh' '$deployRoot' '$stamp' '$expectedCommit'")
+
+  if (-not $SkipPostDeployCheck) {
+    $hostingCheckPath = Join-Path $projectPath 'hosting-check.ps1'
+    if (-not (Test-Path -LiteralPath $hostingCheckPath)) { Fail "Missing hosting check: $hostingCheckPath" }
+    $powershellExecutable = Get-CurrentPowerShellExecutable
+    Invoke-Checked -FilePath $powershellExecutable -Arguments @(
+      '-NoProfile',
+      '-ExecutionPolicy', 'Bypass',
+      '-File', $hostingCheckPath,
+      '-Root', $rootPath,
+      '-ReleaseDate', $ReleaseDate
+    )
+  }
+
+  if (-not $KeepRemoteDeployRoot) {
+    $expectedPrefix = "$remoteHome/_deploy_pikov_"
+    if (-not $deployRoot.StartsWith($expectedPrefix, [System.StringComparison]::Ordinal)) {
+      Fail "Refusing to remove unexpected remote deploy root: $deployRoot"
+    }
+    Invoke-Checked -FilePath 'ssh' -Arguments @($SshAlias, "rm -rf -- '$deployRoot'")
+    Write-Output "removedRemoteDeployRoot=$deployRoot"
+  }
+
+  Write-DeployEvidence `
+    -Path $summaryPath `
+    -Status 'DEPLOYED' `
+    -Date $ReleaseDate `
+    -Stamp $stamp `
+    -EvidenceUtc $evidenceUtc `
+    -SourceCommit $expectedCommit `
+    -ReleaseSourceRef $releaseSourceRef `
+    -CheckoutSourceRef $gitState.sourceRef `
+    -RemoteDeployRoot $deployRoot `
+    -Entries $entries `
+    -RetainRemoteRoot ([bool]$KeepRemoteDeployRoot) `
+    -PostDeployCheckSkipped ([bool]$SkipPostDeployCheck)
+} catch {
+  Write-DeployEvidence `
+    -Path $summaryPath `
+    -Status 'FAILED' `
+    -Date $ReleaseDate `
+    -Stamp $stamp `
+    -EvidenceUtc $evidenceUtc `
+    -SourceCommit $expectedCommit `
+    -ReleaseSourceRef $releaseSourceRef `
+    -CheckoutSourceRef $gitState.sourceRef `
+    -RemoteDeployRoot $deployRoot `
+    -Entries $entries `
+    -RetainRemoteRoot $true `
+    -PostDeployCheckSkipped ([bool]$SkipPostDeployCheck) `
+    -FailureMessage $_.Exception.Message
+  throw
+}
 Remove-OldLocalDeployDirs -ProjectPath $projectPath -Keep $KeepLocalDeployDirs
 Write-Output "DEPLOY SCRIPT OK"
-Write-Output "summary=$summaryPath"

@@ -131,7 +131,14 @@ attestation о происхождении/build process, но не заменя�
 - основной текст проекционных слайдов: целевой минимум 28 px;
 - заголовок: 44–56 px;
 - таблица, которую нельзя прочитать с последнего ряда, переносится в handout;
-- один `<h1>`, логичная иерархия заголовков, `<main>`, `lang="ru"`;
+- один `<h1>`, логичная иерархия заголовков и `<main>`;
+- `lang` документа соответствует языку активной версии страницы
+  ([WCAG 2.2 SC 3.1.1](https://www.w3.org/WAI/WCAG22/Understanding/language-of-page.html)),
+  а иноязычные смысловые фрагменты при необходимости имеют собственный `lang`
+  ([WCAG 2.2 SC 3.1.2](https://www.w3.org/WAI/WCAG22/Understanding/language-of-parts.html));
+- bilingual root публикует отдельные устойчивые English/Russian URL с
+  `lang="en"`/`lang="ru"`, self-canonical и взаимно согласованными
+  `hreflang="en"`, `hreflang="ru"`, `hreflang="x-default"`;
 - таблицы имеют `<th>` и `scope`;
 - обычный текст соответствует WCAG 2.2 SC 1.4.3 (не менее 4,5:1);
 - keyboard focus видим; смысловые SVG имеют доступное имя/альтернативу;
@@ -158,11 +165,27 @@ attestation о происхождении/build process, но не заменя�
 ## 10. Definition of Done публикации
 
 - focused regression test показал RED до исправления и GREEN после;
-- source, archive manifest и release package согласованы;
+- source, archive manifest и release package согласованы по
+  `sourceCommit`, `sourceRef`, per-target `sourceTreeSha256` и archive SHA-256;
 - ссылки, browser viewports, keyboard, contrast и console проверены;
 - PDF/DOCX прошли all-page render и privacy/a11y checks;
-- public-independence gate исключает организационную атрибуцию;
+- public-independence gate исключает некорректную организационную атрибуцию и
+  брендинг; нейтральные примеры компаний допустимы при явном авторстве
+  Виталия Пикова;
 - commit опубликован, CI точного SHA зелёный;
-- развернут именно принятый SHA;
+- candidate release имеет `policyDecision=deny-deploy` и `deployable=false`;
+- accepted release собран из чистого tracked tree с явно переданным exact
+  accepted SHA, имеет `policyDecision=allow-deploy` и `deployable=true`;
+- deploy fail closed проверил тот же SHA через `-ExpectedSourceCommit` до
+  обращения к хостингу;
+- развернут именно принятый SHA, а уникальное deploy evidence содержит UTC,
+  область публикации и per-target source/archive hashes;
 - live hash/header/link/browser checks зелёные;
 - `main == origin/main`, а рабочее дерево чисто кроме явно непубличных данных.
+
+Нормативная опора controlled release: NIST SSDF
+[PS.3](https://csrc.nist.gov/pubs/sp/800/218/final) требует архивировать и
+защищать каждый release, а PW.8 — проверять исполняемый код на уязвимости.
+Exact-SHA provenance, воспроизводимый manifest, fail-closed policy и
+послерелизная проверка являются доказательствами этих практик; они не заменяют
+предметное тестирование. Языковые gates реализуют WCAG 2.2 SC 3.1.1/3.1.2.

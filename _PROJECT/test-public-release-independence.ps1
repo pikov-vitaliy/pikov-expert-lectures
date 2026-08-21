@@ -1,6 +1,7 @@
 param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot),
-  [string]$ReleaseIndex = ''
+  [string]$ReleaseIndex = '',
+  [switch]$PolicySelfTest
 )
 
 $ErrorActionPreference = 'Stop'
@@ -8,6 +9,10 @@ Add-Type -AssemblyName System.IO.Compression
 
 function Fail([string]$Message) {
   throw "PUBLIC INDEPENDENCE TEST FAIL: $Message"
+}
+
+function Decode-Utf8Base64([string]$Value) {
+  [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($Value))
 }
 
 function Get-LatestReleaseIndex([string]$ProjectPath) {
@@ -18,25 +23,45 @@ function Get-LatestReleaseIndex([string]$ProjectPath) {
   return $candidate.FullName
 }
 
-$forbiddenText = @(
-  '(?i)\u043c\u0430\u0441\u043a\u043e\u043c',
-  '(?i)mascom',
-  '(?i)\u043c\u0430\u0441com',
-  '(?i)\u0423\u0426\u0411\u0418',
-  '(?i)\u041d\u041e\u0423\s+\u0414\u041f\u041e',
-  '(?i)\u0421\u0442\u0430\u0440\u043e\u043a\u0430\u043b\u0443\u0436\u0441\u043a\u043e\u0435\s+\u0448\u043e\u0441\u0441\u0435',
-  '(?i)280-01-06'
+$formerEmployerName = Decode-Utf8Base64 'KD860JzQkNCh0JrQntCcfE1BU0NPTXzQnEHQoUNPTXzQo9CmXHMr0JzQkNCh0JrQntCcKQ=='
+$roleOrAffiliation = Decode-Utf8Base64 'KD860L/RgNC10L/QvtC00LDQstCw0YLQtdC7XHB7TH0qfNGB0L7RgtGA0YPQtNC90LjQulxwe0x9KnzRjdC60YHQv9C10YDRglxwe0x9KnzQu9C10LrRgtC+0YBccHtMfSp80LjQvdGB0YLRgNGD0LrRgtC+0YBccHtMfSp80YDQsNCx0L7RgtCwKD860Y580Lt80LvQsHzQu9C4KXzRgdC70YPQttC4KD860Lt80LvQsHzQu9C4KXzRgNCw0LHQvtGC0L7QtNCw0YLQtdC70YxccHtMfSp80LzQtdGB0YLQvlxzK9GA0LDQsdC+0YLRi3xlbXBsb3llZXxpbnN0cnVjdG9yfGxlY3R1cmVyfGV4cGVydHx3b3JrZWR8ZW1wbG95ZWR8ZW1wbG95ZXJ8YWZmaWxpYXRcdyop'
+$authorshipOrOwnership = Decode-Utf8Base64 'KD860LDQstGC0L7RgFxwe0x9KnzQv9GA0LDQstC+0L7QsdC70LDQtNCw0YLQtdC7XHB7TH0qfNCy0LvQsNC00LXQu9C10YZccHtMfSp80L/QvtC00LPQvtGC0L7QstC70LXQvVxwe0x9KnzRgNCw0LfRgNCw0LHQvtGC0LDQvVxwe0x9KnzRgdC+0LfQtNCw0L1ccHtMfSp8wql8Y29weXJpZ2h0fGF1dGhvcmVkfHByZXBhcmVkfGRldmVsb3BlZHxjcmVhdGVkfG93bmVkKQ=='
+$reverseAttribution = Decode-Utf8Base64 'KD860YDQsNCx0L7RgtC+0LTQsNGC0LXQu9GMXHB7TH0qfNC80LXRgdGC0L5ccyvRgNCw0LHQvtGC0Yt80LDQstGC0L7RgFxwe0x9KnzQv9GA0LDQstC+0L7QsdC70LDQtNCw0YLQtdC7XHB7TH0qfNCy0LvQsNC00LXQu9C10YZccHtMfSp8ZW1wbG95ZXJ8YXV0aG9yfG93bmVyfGNvcHlyaWdodFxzK2hvbGRlcik='
+$brandingLead = Decode-Utf8Base64 'KD860LvQvtCz0L7RgtC40L9ccHtMfSp80YTQuNGA0LzQtdC90L1ccHtMfSpccyvRgdGC0LjQu1xwe0x9KnzQsdGA0LXQvdC00LjRgNC+0LLQsNC9XHB7TH0qfG9mZmljaWFsXHMrKD86Y291cnNlfGxlY3R1cmV8bWF0ZXJpYWwpfGxvZ298YnJhbmRpbmcp'
+$retiredIdentity = Decode-Utf8Base64 'KD860KPQptCR0Jh80J3QntCjXHMr0JTQn9CefNCh0YLQsNGA0L7QutCw0LvRg9C20YHQutC+0LVccyvRiNC+0YHRgdC1fDI4MC0wMS0wNik='
+$publicResource = Decode-Utf8Base64 'KD860LrRg9GA0YFccHtMfSp80LvQtdC60YbQuFxwe0x9KnzQvNCw0YLQtdGA0LjQsNC7XHB7TH0qfNGB0LDQudGCXHB7TH0qfGNvdXJzZXxsZWN0dXJlfHRyYWluaW5nXHMrbWF0ZXJpYWxzP3x3ZWJzaXRlKQ=='
+$resourceConnector = Decode-Utf8Base64 'KD860LrQvtC80L/QsNC90LgoPzrQuHzRjyl8Ynl8b2Yp'
+$ownershipRelation = Decode-Utf8Base64 'KD860L/RgNC40L3QsNC00LvQtdC20LjRgnzQvtGC0L3QvtGB0LjRgtGB0Y9ccyvQunxiZWxvbmdzXHMrdG98b3duZWRccytieSk='
+$clauseGap = '[^.!?;]{0,100}'
+$forbiddenClaimPatterns = @(
+  [pscustomobject]@{ pattern = "(?is)$roleOrAffiliation$clauseGap$formerEmployerName"; why = 'personal role or affiliation' },
+  [pscustomobject]@{ pattern = "(?is)$authorshipOrOwnership$clauseGap(?:by\s+)?$formerEmployerName"; why = 'authorship or ownership' },
+  [pscustomobject]@{ pattern = "(?is)$formerEmployerName[^.!?;]{0,60}$reverseAttribution"; why = 'reverse attribution claim' },
+  [pscustomobject]@{ pattern = "(?is)$brandingLead$clauseGap$formerEmployerName"; why = 'branding claim' },
+  [pscustomobject]@{ pattern = "(?is)$publicResource(?:\s+$resourceConnector)?\s+$formerEmployerName"; why = 'resource attributed to former employer' },
+  [pscustomobject]@{ pattern = "(?is)$formerEmployerName(?:'s)?\s+$publicResource"; why = 'former-employer resource label' },
+  [pscustomobject]@{ pattern = "(?is)$publicResource[^.!?;]{0,50}$ownershipRelation[^.!?;]{0,20}$formerEmployerName"; why = 'resource ownership claim' },
+  [pscustomobject]@{ pattern = "(?is)$retiredIdentity"; why = 'retired contact or legal identity' }
+)
+$forbiddenBrandedFileNames = @(
+  (Decode-Utf8Base64 'KD9pKShefC8pKD86bG9nb1stXy4gXSooPzptYXNjb2180LzQsNGB0LrQvtC8KXwoPzptYXNjb2180LzQsNGB0LrQvtC8KVstXy4gXSooPzpsb2dvfGJyYW5kfGJyYW5kaW5nfGxldHRlcmhlYWR8dGVtcGxhdGV80LvQvtCz0L7RgtC40L980LHRgNC10L3QtHzRiNCw0LHQu9C+0L0pKSg/OlstXy4gL118JCk=')
 )
 
-# These SHA-256 values identify the former MАСКОМ logo, its TЗ variant, and
-# the branded classroom background. Matching the bytes protects direct URLs
-# even when an HTML reference has already been removed.
+# These SHA-256 values identify former-employer logos/backgrounds and the six
+# retired branded VKR slide/thumbnail JPGs. Matching bytes protects direct URLs
+# and nested Office/ZIP content even after an HTML reference has been removed.
 $forbiddenHashes = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 @(
   '9969676d6bf86f114b1d9b4a06b11d0bf5a7ca319df603d2a3fd494d2ebf1fa2',
   '49137f9ce8b6ddd2806daa1576884e8fd0539bda724eccdf9dc5ac2b979f7d17',
   '3e2297ac5b5d9858e23782b7fe5c7a616d770128df999f3765c8ca67e01c4311',
-  '1206d0daa1de064ee881a7f63c05ba824d047e057c423c7e513e863dd64d393c'
+  '1206d0daa1de064ee881a7f63c05ba824d047e057c423c7e513e863dd64d393c',
+  '284482990cba7f331572ebea2f8a98dde900aa5432c32ab0a7428e83fd33b6d8',
+  '053dcabf7cdf2b90c1a17bb8e784622bdfcd9b644a318f9136704d6032b06e14',
+  '29903ed8a2fb5d4d2bc2f04cce7e7a0a518efd1aacbbbe8bdafedaf4d1169d63',
+  'fd487f72c6b891514fc3a9c371d4b98d170049be57fac7d419befb157fdef68e',
+  'ea0e1d060d2fe0e941800a581c6a9a579c7c268eef9dc975edd26690a4bf1ca7',
+  '77239f856e1cfe3f8d1d961195655517abe156888ef718858bfb1efe0363252e'
 ) | ForEach-Object { [void]$forbiddenHashes.Add($_) }
 
 # These retired artifacts must never become public again. Unlike the reviewed
@@ -76,6 +101,28 @@ function Add-Failure([string]$Message) {
   if ($script:failures.Count -lt 250) { $script:failures.Add($Message) }
 }
 
+function Find-ForbiddenFormerEmployerClaim([string]$Content) {
+  $normalized = [regex]::Replace([regex]::Replace($Content, '<[^>]+>', ' '), '\s+', ' ')
+  foreach ($rule in $script:forbiddenClaimPatterns) {
+    $match = [regex]::Match($normalized, [string]$rule.pattern)
+    if ($match.Success) {
+      return [pscustomobject]@{ match = $match.Value; why = [string]$rule.why }
+    }
+  }
+  return $null
+}
+
+function Test-ForbiddenBrandedFileName([string]$EntryName) {
+  foreach ($pattern in $script:forbiddenBrandedFileNames) {
+    if ($EntryName -match $pattern) { return $true }
+  }
+  return $false
+}
+
+function Test-PublicHtmlPrefix([string]$Content) {
+  return $Content -match '(?is)(?:<\?xml\b[^>]*>\s*)?(?:<!doctype\b[^>]*>\s*)?<html\b'
+}
+
 function Get-Sha256Hex([System.IO.Stream]$InputStream) {
   $sha = [System.Security.Cryptography.SHA256]::Create()
   try {
@@ -87,7 +134,20 @@ function Get-Sha256Hex([System.IO.Stream]$InputStream) {
 
 function Test-TextEntry([System.IO.Compression.ZipArchiveEntry]$Entry, [string]$DisplayPath) {
   $extension = [System.IO.Path]::GetExtension($Entry.FullName)
-  if (-not $script:textExtensions.Contains($extension) -and $Entry.Name -ne '.gitkeep') { return }
+  $isKnownText = $script:textExtensions.Contains($extension) -or $Entry.Name -eq '.gitkeep'
+  if (-not $isKnownText) {
+    $probeLength = [int][Math]::Min([int64]4096, $Entry.Length)
+    if ($probeLength -le 0) { return }
+    $probeBytes = New-Object byte[] $probeLength
+    $probeStream = $Entry.Open()
+    try {
+      $bytesRead = $probeStream.Read($probeBytes, 0, $probeBytes.Length)
+    } finally {
+      $probeStream.Dispose()
+    }
+    $probeText = [System.Text.Encoding]::UTF8.GetString($probeBytes, 0, $bytesRead)
+    if (-not (Test-PublicHtmlPrefix -Content $probeText)) { return }
+  }
   $stream = $Entry.Open()
   $reader = [System.IO.StreamReader]::new($stream, [System.Text.UTF8Encoding]::new($false, $false), $true)
   try {
@@ -95,16 +155,9 @@ function Test-TextEntry([System.IO.Compression.ZipArchiveEntry]$Entry, [string]$
   } finally {
     $reader.Dispose()
   }
-  # Здесь стояло исключение для vkr.pikov.expert!index.html: оно ТРЕБОВАЛО ровно
-  # три вхождения бывшего работодателя и потому пропускало в публикацию именно
-  # то, ради чего гейт существует. Колода ВКР вычищена (текст, слайды, PDF и
-  # исходный pptx), исключение снято — файл проверяется общим правилом.
-  foreach ($pattern in $script:forbiddenText) {
-    $match = [regex]::Match($content, $pattern)
-    if ($match.Success) {
-      Add-Failure "$DisplayPath contains forbidden public branding: $($match.Value)"
-      break
-    }
+  $finding = Find-ForbiddenFormerEmployerClaim -Content $content
+  if ($null -ne $finding) {
+    Add-Failure "$DisplayPath contains an incorrect former-employer claim ($($finding.why)): $($finding.match)"
   }
 }
 
@@ -139,7 +192,7 @@ function Test-Archive(
           break
         }
       }
-      if ($entry.FullName -match '(?i)mascom|маском') {
+      if (Test-ForbiddenBrandedFileName -EntryName $entry.FullName.Replace('\','/')) {
         Add-Failure "$entryPath uses forbidden branded file name"
       }
 
@@ -176,6 +229,42 @@ function Test-Archive(
   } finally {
     $archive.Dispose()
   }
+}
+
+if ($PolicySelfTest) {
+  if (-not (Test-PublicHtmlPrefix -Content '<?xml version="1.0"?><html><head></head><body></body></html>')) {
+    Fail 'Extensionless XHTML was not classified as public text'
+  }
+  $neutralExamples = @(
+    (Decode-Utf8Base64 '0KPRh9C10LHQvdGL0Lkg0L/RgNC40LzQtdGAOiDQutC+0LzQv9Cw0L3QuNGPINCc0JDQodCa0J7QnCDQstGL0YHRgtGD0L/QsNC10YIg0LfQsNC60LDQt9GH0LjQutC+0Lwg0L/RgNC4INGA0LDQt9Cx0L7RgNC1INC80L7QtNC10LvQuCDRg9Cz0YDQvtC3Lg=='),
+    (Decode-Utf8Base64 '0JDQstGC0L7RgCDQutGD0YDRgdCwIOKAlCDQktC40YLQsNC70LjQuSDQn9C40LrQvtCyLiDQo9GH0LXQsdC90YvQuSDQv9GA0LjQvNC10YA6INC60L7QvNC/0LDQvdC40Y8g0JzQkNCh0JrQntCcINCy0YvRgdGC0YPQv9Cw0LXRgiDQt9Cw0LrQsNC30YfQuNC60L7QvC4='),
+    'Case study: MASCOM is used as a fictionalized customer in this exercise.'
+  )
+  foreach ($example in $neutralExamples) {
+    if ($null -ne (Find-ForbiddenFormerEmployerClaim -Content $example)) {
+      Fail "Neutral teaching example was rejected: $example"
+    }
+  }
+  $forbiddenExamples = @(
+    (Decode-Utf8Base64 '0JDQstGC0L7RgCDQu9C10LrRhtC40Lg6INCc0JDQodCa0J7QnC4='),
+    (Decode-Utf8Base64 '0JLQuNGC0LDQu9C40Lkg0J/QuNC60L7QsiDigJQg0L/RgNC10L/QvtC00LDQstCw0YLQtdC70Ywg0KPQpiDQnNCQ0KHQmtCe0Jwu'),
+    'This course was developed by MASCOM.',
+    'Copyright © MASCOM. All rights reserved.',
+    'MASCOM course materials.'
+  )
+  foreach ($example in $forbiddenExamples) {
+    if ($null -eq (Find-ForbiddenFormerEmployerClaim -Content $example)) {
+      Fail "Incorrect attribution claim was accepted: $example"
+    }
+  }
+  if (Test-ForbiddenBrandedFileName -EntryName 'examples/mascom-case-study.html') {
+    Fail 'Neutral example filename was rejected'
+  }
+  if (-not (Test-ForbiddenBrandedFileName -EntryName 'images/logo-mascom.svg')) {
+    Fail 'Branded logo filename was accepted'
+  }
+  Write-Output 'PUBLIC AFFILIATION POLICY SELF-TEST OK'
+  return
 }
 
 $rootPath = (Resolve-Path -LiteralPath $Root).Path

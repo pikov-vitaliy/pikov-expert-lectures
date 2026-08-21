@@ -17,7 +17,7 @@
 | Тематических разделов | 6 |
 | `ready-local` | 19 |
 | `published-snapshot` | 14 |
-| Уникальных URL в `sitemap.xml` вместе с корнем | 33 |
+| Уникальных URL в `sitemap.xml` вместе с корнем | 34 |
 
 Несколько записей могут вести в одну папку: например, базовый пентест, углублённый пентест, статический анализ и фаззинг представлены страницами или якорями домена `new-courses.pikov.expert`.
 
@@ -76,6 +76,7 @@
 ```text
 .
 ├── index.html                         # главный каталог
+├── ru/index.html                      # русская версия главного каталога
 ├── .htaccess
 ├── robots.txt
 ├── sitemap.xml
@@ -121,13 +122,25 @@ Python-зависимости внутри учебных папок `27-07-2026
 Обязательная цепочка для изменений сайта выполняется в таком порядке:
 
 ```powershell
+$releaseDate = '<YYYY-MM-DD>'
+$releaseIndex = ".\_PROJECT\RELEASE_INDEX_$releaseDate.json"
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\update-site-control-files.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\smoke-check.ps1
-powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -FailOnIssues
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -FailOnIssues
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -ReleaseIndex $releaseIndex
+$env:RELEASE_DATE=$releaseDate
 node .\_PROJECT\browser-qa.mjs
 ```
 
-Ожидаемый результат: `SMOKE OK`, `RELEASE BUILD OK`, `BROWSER QA OK`, `staticIssues=0` и отсутствие ошибок `git diff --check`.
+Ожидаемый результат: `SMOKE OK`, `RELEASE BUILD OK`,
+`PUBLIC INDEPENDENCE TEST OK`, `BROWSER QA OK`, `staticIssues=0` и отсутствие
+ошибок `git diff --check`.
+
+Такая сборка является candidate: она содержит commit/ref и per-target
+`sourceTreeSha256`, но всегда имеет `policyDecision=deny-deploy` и
+`deployable=false`. Это позволяет проверять изменённое дерево, не превращая
+непринятый результат в production artifact. Accepted release создаётся только
+из exact принятого SHA отдельной командой из runbook.
 
 `update-site-control-files.ps1` перезаписывает `.htaccess`, `robots.txt` и `sitemap.xml` корня и доменных папок, поэтому после его запуска необходимо просмотреть diff до commit.
 
@@ -142,21 +155,40 @@ npm exec --prefix .\_PROJECT\.browser-node -- playwright install chromium
 
 ## Публикация
 
-Публикация выполняется только после зелёной локальной цепочки и только из релизных архивов. `build-release.ps1` создаёт обязательный `RELEASE_INDEX_<дата>.json`, который используют последующие браузерные, HTTP- и deploy-проверки.
+Публикация выполняется только после merge в `main`, успешного CI exact принятого
+SHA и повторной accepted-сборки из чистого tracked tree. `build-release.ps1`
+создаёт обязательный `RELEASE_INDEX_<дата>.json`; deploy принимает только index
+с `releaseKind=accepted`, `policyDecision=allow-deploy`, `deployable=true` и тем
+же exact SHA.
+
+```powershell
+$releaseDate = '<YYYY-MM-DD>'
+$acceptedSha = (git rev-parse HEAD).Trim()
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -AcceptedSourceCommit $acceptedSha -FailOnIssues
+```
 
 Для обычного адресного обновления корня и выбранного поддомена безопаснее явно ограничить область:
 
 ```powershell
-& .\_PROJECT\deploy-hosting.ps1 -OnlyDomains @('pikov.expert', 'example.pikov.expert')
+& .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate -ExpectedSourceCommit $acceptedSha -OnlyDomains @('pikov.expert', 'example.pikov.expert') -KeepRemoteDeployRoot
 ```
 
 Полная публикация всех целей текущего release index — только когда это действительно входит в задачу:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\deploy-hosting.ps1 -ReleaseDate $releaseDate -ExpectedSourceCommit $acceptedSha -KeepRemoteDeployRoot
 ```
 
-Без `-OnlyDomains` скрипт обрабатывает все цели release index. На сервере содержимое каждой выбранной цели синхронизируется командой с семантикой `rsync --delete`: файлы, которых нет в релизе, удаляются. Скрипт использует настроенный SSH alias `pikov-hosting`, создаёт временные резервные архивы, сам запускает `hosting-check.ps1` и сохраняет удалённый диагностический каталог при неуспешной публикации. Автоматического отката нет; порядок проверки и критерии завершения описаны в runbook.
+Без `-OnlyDomains` скрипт обрабатывает все цели release index. На сервере
+содержимое каждой выбранной цели синхронизируется командой с семантикой
+`rsync --delete`: файлы, которых нет в релизе, удаляются. Скрипт использует SSH
+alias `pikov-hosting`, сверяет exact commit и archive hashes, создаёт временные
+резервные архивы и запускает `hosting-check.ps1`. Каждая попытка сохраняет
+отдельное evidence
+`HOSTING_DEPLOY_<date>_<stamp>_<shortsha>.md` с UTC, статусом и per-target
+source/archive hashes. `-KeepRemoteDeployRoot` удерживает backups до
+независимого решения; исполнимый rollback через clean detached worktree
+previous accepted SHA описан в runbook.
 
 Повторная HTTP- и браузерная проверка уже опубликованного сайта без деплоя:
 
@@ -169,8 +201,11 @@ GitHub Actions при push в `main` и в pull request:
 
 - проверяет синтаксис служебных PowerShell-скриптов;
 - запускает `smoke-check.ps1`;
-- собирает релиз с `build-release.ps1 -FailOnIssues`;
-- проверяет подготовку деплоя через `deploy-hosting.ps1 -PrepareOnly`.
+- для pull request/feature собирает non-deployable candidate и подтверждает,
+  что `PrepareOnly` отклоняет его;
+- для push в `main` собирает accepted release exact `GITHUB_SHA` и проверяет
+  `deploy-hosting.ps1 -ExpectedSourceCommit <GITHUB_SHA> -PrepareOnly` без
+  обращения к хостингу.
 
 CI **не публикует** сайт и не заменяет локальную браузерную и последующую онлайн-проверку.
 

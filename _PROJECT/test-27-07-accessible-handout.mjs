@@ -38,6 +38,12 @@ const copyNameCs = read(path.join("code", "languages", "CopyName.cs"));
 
 test("public materials use a reproducible HTML handout instead of the ignored PDF", () => {
   assert.ok(fs.existsSync(handoutPath), "accessible HTML handout is missing");
+  const handout = fs.readFileSync(handoutPath, "utf8");
+  assert.match(
+    handout,
+    /<link\s+rel="canonical"\s+href="https:\/\/27-07-2026\.pikov\.expert\/materials\/from-working-code-to-shippable-product\.html"\s*\/?\s*>/i,
+    "accessible handout canonical URL is missing or incorrect",
+  );
 
   for (const [name, content] of Object.entries({ index, readFirst, buildScript })) {
     assert.doesNotMatch(

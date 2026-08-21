@@ -24,8 +24,12 @@ const mime = new Map([
 ]);
 const server = http.createServer((request, response) => {
   const rawPath = decodeURIComponent((request.url || "/").split("?")[0]);
-  const requested = rawPath === "/" ? "index.html" : rawPath.replace(/^\/+/, "");
-  const resolved = path.resolve(siteRoot, requested);
+  let requested = rawPath === "/" ? "index.html" : rawPath.replace(/^\/+/, "");
+  let resolved = path.resolve(siteRoot, requested);
+  if (resolved.startsWith(`${siteRoot}${path.sep}`) && fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+    requested = path.join(requested, "index.html");
+    resolved = path.resolve(siteRoot, requested);
+  }
   if (!resolved.startsWith(`${siteRoot}${path.sep}`) || !fs.existsSync(resolved) || fs.statSync(resolved).isDirectory()) {
     response.writeHead(404).end();
     return;
@@ -323,15 +327,16 @@ try {
   await fresh.goto(`${base}/?lang=ru`, { waitUntil: "domcontentloaded" });
   const forced = await fresh.evaluate(() => ({
     lang: document.documentElement.dataset.lang,
+    path: location.pathname,
+    search: location.search,
     canonical: document.querySelector('link[rel="canonical"]')?.href,
     ogUrl: document.querySelector('meta[property="og:url"]')?.content,
     ogLocale: document.querySelector('meta[property="og:locale"]')?.content,
   }));
   check("?lang=ru overrides a stored English choice", forced.lang === "ru", forced.lang);
-  // Объявленный в <head> hreflang="ru" указывает на ?lang=ru, поэтому эта
-  // страница обязана канонизировать себя в тот же адрес, а не в корень.
-  check("the Russian URL is self-canonical", forced.canonical === "https://pikov.expert/?lang=ru", forced.canonical);
-  check("og:url follows the Russian URL", forced.ogUrl === "https://pikov.expert/?lang=ru", forced.ogUrl);
+  check("legacy ?lang=ru normalizes to the Russian route", forced.path === "/ru/" && forced.search === "", `${forced.path}${forced.search}`);
+  check("the Russian URL is self-canonical", forced.canonical === "https://pikov.expert/ru/", forced.canonical);
+  check("og:url follows the Russian URL", forced.ogUrl === "https://pikov.expert/ru/", forced.ogUrl);
   check("og:locale follows the language", forced.ogLocale === "ru_RU", forced.ogLocale);
   await fresh.close();
 
@@ -388,7 +393,7 @@ try {
     mobileNav.present && mobileNav.total > 0 && mobileNav.reachable === mobileNav.total,
     `present=${mobileNav.present} reachable=${mobileNav.reachable}/${mobileNav.total}`,
   );
-  // Кнопка языка — третий элемент в шапке; на узком экране она не должна
+  // Ссылка языка — третий элемент в шапке; на узком экране она не должна
   // выдавливать навигацию или сама уезжать за край. Вкладка переиспользуется.
   for (const width of [375, 320]) {
     await mobile.setViewportSize({ width, height: 780 });
@@ -396,7 +401,7 @@ try {
     const header = await mobile.evaluate(() => {
       const btn = document.getElementById("langToggle");
       const rect = btn.getBoundingClientRect();
-      const controls = [...document.querySelectorAll(".hdr-actions > button")];
+      const controls = [...document.querySelectorAll(".hdr-actions > :is(a, button)")];
       return {
         pageWidth: document.documentElement.scrollWidth,
         viewport: window.innerWidth,

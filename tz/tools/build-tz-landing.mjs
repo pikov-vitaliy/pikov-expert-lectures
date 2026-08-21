@@ -1,17 +1,20 @@
-/*  ВНИМАНИЕ. Опубликованный tz/index.html правился вручную ПОСЛЕ генерации:
-    в нём есть счётчик Яндекс.Метрики, rel=canonical, og:image и блок JSON-LD,
-    которых этот шаблон не создаёт. Запуск скрипта перезапишет страницу и молча
-    удалит их. Перед тем как выполнять его «по инструкции» из README, соберите
-    во временный каталог и сравните результат с tz/index.html — расхождения,
-    кроме перечисленных, недопустимы.
-    Брендинг бывшего учебного центра из шаблона удалён 2026-08-16.            */
-import { writeFileSync } from 'node:fs';
+/*  Канонический источник tz/index.html. Любое изменение страницы сначала
+    вносится сюда, после чего index.html пересобирается этим скриптом.
+    Брендинг бывшего учебного центра из шаблона удалён 2026-08-16. */
+import { randomUUID } from 'node:crypto';
+import { existsSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, '..');
 const out = join(root, 'index.html');
+const args = process.argv.slice(2);
+if (args.length !== 1 || !new Set(['--check', '--write']).has(args[0])) {
+  console.error('Usage: node tools/build-tz-landing.mjs --check|--write');
+  process.exit(2);
+}
+const mode = args[0];
 
 const COURSE_TITLE = 'Техническое задание: от идеи до безопасной разработки';
 const COURSE_SUBTITLE = 'В.А. Пиков · ГОСТ · РБПО · ПМИ';
@@ -1640,28 +1643,28 @@ pre.code {
 .contact-card a { font-size: calc(var(--body-size) * .9); font-weight: 750; overflow-wrap: anywhere; }
 
 .expert-avatar-wrap { position: relative; width: 280px; height: 280px; margin: 0 auto; }
-.expert-avatar { 
-  width: 100%; height: 100%; 
-  background: linear-gradient(135deg, var(--accent), var(--info)); 
-  border-radius: 32px; 
-  display: grid; place-items: center; 
-  color: #fff; font-size: 92px; font-weight: 900; 
+.expert-avatar {
+  width: 100%; height: 100%;
+  background: linear-gradient(135deg, var(--accent), var(--info));
+  border-radius: 32px;
+  display: grid; place-items: center;
+  color: #fff; font-size: 92px; font-weight: 900;
   box-shadow: var(--shadow);
 }
-.expert-status { 
-  position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); 
-  background: var(--text); color: #fff; padding: 8px 16px; border-radius: 99px; 
-  font-size: 14px; font-weight: 800; white-space: nowrap; 
+.expert-status {
+  position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%);
+  background: var(--text); color: #fff; padding: 8px 16px; border-radius: 99px;
+  font-size: 14px; font-weight: 800; white-space: nowrap;
 }
-.lead-form { 
-  padding: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2); 
+.lead-form {
+  padding: 32px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface-2);
   box-shadow: var(--shadow); display: grid; gap: 16px;
 }
 .form-group { display: grid; gap: 8px; }
 .form-group label { font-size: 14px; font-weight: 800; color: var(--soft); text-transform: uppercase; }
-.form-group input, .form-group textarea { 
-  padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); 
-  color: var(--text); font-size: 16px; 
+.form-group input, .form-group textarea {
+  padding: 12px 16px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface);
+  color: var(--text); font-size: 16px;
 }
 .form-group textarea { min-height: 100px; resize: vertical; }
 
@@ -1842,7 +1845,8 @@ body.mode-longread .toc-sidebar { display: block; }
 const js = String.raw`
 (function() {
   'use strict';
-  const TOTAL = 100;
+  const slides = Array.from(document.querySelectorAll('.slide'));
+  const TOTAL = slides.length;
   const STORAGE = {
     slide: 'tz_pikov_slide',
     mode: 'tz_pikov_mode',
@@ -1852,7 +1856,6 @@ const js = String.raw`
   const FS = ['normal', 'large', 'xl'];
   const FS_LABEL = { normal: 'A', large: 'A+', xl: 'A++' };
   const body = document.body;
-  const slides = Array.from(document.querySelectorAll('.slide'));
   const tocLinks = Array.from(document.querySelectorAll('.toc-sidebar a[href^="#slide-"]'));
   const btnSlides = document.getElementById('btn-mode-slides');
   const btnLongread = document.getElementById('btn-mode-longread');
@@ -2104,16 +2107,50 @@ const html = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
 <meta name="description" content="Большой учебный лендинг-презентация В.А. Пикова по написанию технических заданий: ГОСТ, РБПО, требования безопасности, SAST, SCA, SBOM и ПМИ.">
 <meta name="author" content="Виталий Александрович Пиков">
 <meta name="keywords" content="техническое задание, ТЗ, ГОСТ 19.201, ГОСТ 34.602, ГОСТ Р 56939-2024, РБПО, безопасная разработка, SAST, SCA, SBOM, ПМИ">
-<meta property="og:title" content="${COURSE_TITLE}">
-<meta property="og:description" content="104 крупных учебных экрана и лонгрид по написанию проверяемых ТЗ с учетом ГОСТ и процессов безопасной разработки.">
-<meta property="og:type" content="website">
+<link rel="canonical" href="https://tz.pikov.expert/">
+<meta property="og:title" content="${COURSE_TITLE} | В.А. Пиков">
+<meta property="og:description" content="Большой учебный лендинг-презентация В.А. Пикова по написанию технических заданий: ГОСТ, РБПО, требования безопасности, SAST, SCA, SBOM и ПМИ.">
+<meta property="og:type" content="article">
 <meta property="og:url" content="https://tz.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
 <title>${COURSE_TITLE} | В.А. Пиков</title>
 <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
 <style>${css}</style>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Course",
+  "name": "Техническое задание: проверяемые требования и РБПО",
+  "description": "Большой учебный лендинг-презентация В.А. Пикова по написанию технических заданий: ГОСТ, РБПО, требования безопасности, SAST, SCA, SBOM и ПМИ.",
+  "url": "https://tz.pikov.expert/",
+  "inLanguage": "ru",
+  "provider": {
+    "@type": "Person",
+    "name": "Виталий Александрович Пиков",
+    "url": "https://pikov.expert/"
+  },
+  "author": {
+    "@type": "Person",
+    "name": "Виталий Александрович Пиков"
+  }
+}
+</script>
 </head>
 <body class="mode-slides" data-theme="light" data-fs="large">
 <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -2160,5 +2197,59 @@ ${slides.map(renderSlide).join('\n')}
 </html>
 `;
 
-writeFileSync(out, html, 'utf8');
-console.log(`Built ${out} with ${slides.length} slides`);
+function assertGeneratedHtml(candidate) {
+  const ids = [...candidate.matchAll(/<section class="slide(?: [^"]*)?" id="slide-(\d+)"/g)]
+    .map(match => Number(match[1]));
+  const expectedIds = Array.from({ length: slides.length }, (_, index) => index + 1);
+  if (ids.length !== expectedIds.length || ids.some((id, index) => id !== expectedIds[index])) {
+    throw new Error(`slide IDs must be continuous from 1 through ${slides.length}`);
+  }
+  const required = [
+    [/const slides = Array\.from\(document\.querySelectorAll\('\.slide'\)\);\s+const TOTAL = slides\.length;/, 'runtime TOTAL derived from DOM slides'],
+    [/ym\(109116119, 'init', \{[^}]*webvisor:false/s, 'Yandex Metrika 109116119 with webvisor:false'],
+    [/<link rel="canonical" href="https:\/\/tz\.pikov\.expert\/">/, 'canonical URL'],
+    [/<meta property="og:url" content="https:\/\/tz\.pikov\.expert\/">/, 'OpenGraph URL'],
+    [/<meta property="og:image" content="https:\/\/pikov\.expert\/photo\.jpg">/, 'OpenGraph image'],
+  ];
+  for (const [pattern, label] of required) {
+    if (!pattern.test(candidate)) throw new Error(`missing ${label}`);
+  }
+  const jsonLdSource = candidate.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)?.[1];
+  if (!jsonLdSource) throw new Error('missing Course JSON-LD');
+  const jsonLd = JSON.parse(jsonLdSource);
+  if (jsonLd['@type'] !== 'Course' || jsonLd.url !== 'https://tz.pikov.expert/' || jsonLd.inLanguage !== 'ru') {
+    throw new Error('Course JSON-LD has invalid identity, URL, or language');
+  }
+}
+
+function fail(operation, error) {
+  const message = error instanceof Error ? error.message : String(error);
+  console.error(`TZ BUILD ${operation} FAIL: ${message}`);
+  process.exitCode = 1;
+}
+
+try {
+  assertGeneratedHtml(html);
+  if (mode === '--check') {
+    if (!existsSync(out)) throw new Error(`${out} does not exist`);
+    if (readFileSync(out, 'utf8') !== html) throw new Error(`${out} is stale; run with --write`);
+    console.log(`TZ BUILD CHECK OK slides=${slides.length}`);
+  } else {
+    const current = existsSync(out) ? readFileSync(out, 'utf8') : null;
+    if (current !== html) {
+      const temporaryOutput = join(root, `.index.html.${process.pid}.${randomUUID()}.tmp`);
+      try {
+        writeFileSync(temporaryOutput, html, { encoding: 'utf8', flag: 'wx' });
+        const staged = readFileSync(temporaryOutput, 'utf8');
+        if (staged !== html) throw new Error('temporary output differs from generated bytes');
+        assertGeneratedHtml(staged);
+        renameSync(temporaryOutput, out);
+      } finally {
+        if (existsSync(temporaryOutput)) unlinkSync(temporaryOutput);
+      }
+    }
+    console.log(`TZ BUILD WRITE OK slides=${slides.length} path=${out}`);
+  }
+} catch (error) {
+  fail(mode === '--check' ? 'CHECK' : 'WRITE', error);
+}
