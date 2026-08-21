@@ -149,7 +149,7 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
       '  RewriteEngine On',
       '  RewriteCond %{REQUEST_URI} ^/$',
       '  RewriteCond %{QUERY_STRING} ^lang=ru$ [NC]',
-      '  RewriteRule ^$ /ru/? [R=302,L]',
+      '  RewriteRule ^$ https://pikov.expert/ru/? [R=302,L]',
       '</IfModule>',
       ''
     ))

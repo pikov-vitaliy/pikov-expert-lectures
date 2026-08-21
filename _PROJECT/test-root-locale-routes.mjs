@@ -90,8 +90,18 @@ test("legacy query and sitemap generation point to the Russian route", () => {
   const sitemap = readFileSync(resolve(rootDir, "sitemap.xml"), "utf8");
   assert.match(control, /https:\/\/pikov\.expert\/ru\//);
   assert.match(control, /QUERY_STRING/);
+  assert.match(
+    control,
+    /RewriteRule \^\$ https:\/\/pikov\.expert\/ru\/\? \[R=302,L\]/,
+    "the control-file generator must preserve the explicit HTTPS legacy redirect",
+  );
   assert.match(htaccess, /QUERY_STRING/);
   assert.match(htaccess, /\/ru\//);
+  assert.match(
+    htaccess,
+    /RewriteRule\s+\^\$\s+https:\/\/pikov\.expert\/ru\/\?/,
+    "the server-side legacy redirect must emit an explicit HTTPS Location behind the TLS terminator",
+  );
   assert.match(sitemap, /<loc>https:\/\/pikov\.expert\/ru\/<\/loc>/);
 });
 
