@@ -99,8 +99,8 @@ test("legacy query and sitemap generation point to the Russian route", () => {
   assert.match(htaccess, /\/ru\//);
   assert.match(
     htaccess,
-    /RewriteRule\s+\^\$\s+https:\/\/pikov\.expert\/ru\/\?/,
-    "the server-side legacy redirect must emit an explicit HTTPS Location behind the TLS terminator",
+    /RewriteRule \^\$ https:\/\/pikov\.expert\/ru\/\? \[R=302,L\]/,
+    "the server-side legacy redirect must preserve HTTPS, 302 status, and query removal",
   );
   assert.match(sitemap, /<loc>https:\/\/pikov\.expert\/ru\/<\/loc>/);
 });

@@ -4,8 +4,9 @@
 DirectoryIndex index.html
 AddDefaultCharset UTF-8
 
-# HTTPS redirect is handled by the hosting layer. Duplicating it here can
-# create self-redirect loops when Apache runs behind a TLS terminator.
+# The hosting layer owns the blanket HTTP-to-HTTPS redirect; duplicating that
+# rule here can create self-redirect loops behind a TLS terminator. The scoped
+# legacy-locale rule below intentionally uses an absolute HTTPS target.
 
 # Legacy Russian locale URL: use the crawlable static /ru/ document.
 <IfModule mod_rewrite.c>
