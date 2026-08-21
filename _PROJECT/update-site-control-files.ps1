@@ -139,6 +139,17 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
   )
 
   if ($RootLocaleRedirect) {
+    $commentIndex = $lines.IndexOf('# HTTPS redirect is handled by the hosting layer. Duplicating it here can')
+    if ($commentIndex -lt 0) {
+      throw 'HTTPS ownership comment is missing from the common template'
+    }
+    $lines.RemoveRange($commentIndex, 2)
+    [void]$lines.InsertRange($commentIndex, [object[]]@(
+      '# The hosting layer owns the blanket HTTP-to-HTTPS redirect; duplicating that',
+      '# rule here can create self-redirect loops behind a TLS terminator. The scoped',
+      '# legacy-locale rule below intentionally uses an absolute HTTPS target.'
+    ))
+
     $index = $lines.IndexOf('<IfModule mod_headers.c>')
     if ($index -lt 0) {
       throw 'Root locale redirect insertion marker is missing from the common template'
@@ -149,7 +160,7 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
       '  RewriteEngine On',
       '  RewriteCond %{REQUEST_URI} ^/$',
       '  RewriteCond %{QUERY_STRING} ^lang=ru$ [NC]',
-      '  RewriteRule ^$ /ru/? [R=302,L]',
+      '  RewriteRule ^$ https://pikov.expert/ru/? [R=302,L]',
       '</IfModule>',
       ''
     ))
