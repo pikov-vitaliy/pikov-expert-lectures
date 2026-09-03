@@ -401,6 +401,9 @@ a:hover{ color: var(--ink); }
   font-family: Georgia, serif; font-weight: 500; font-size: 19px; line-height: 1.3;
   margin: 2px 0 0; letter-spacing: .01em; text-wrap: balance;
 }
+.card--flagship h4{
+  color: var(--lang-bg);
+}
 .card .desc{ font-size: 13.5px; line-height: 1.55; color: var(--muted); }
 .card .foot{
   display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 10px;
@@ -1006,7 +1009,7 @@ const LECTURES = [
     descriptionEn: "A deep dive into the security of critical information infrastructure: threat assessment (the FSTEC methodology of 5 February 2021 and the FSTEC threat database), the intruder model (N1–N4), the structure of a threat model with a worked case, control requirements under orders No. 235 and 239 (including trust levels for security products, database systems and virtualisation), how to select controls with a practical exercise, and vulnerability classification and criticality scoring under the FSTEC methodology of 30 June 2025. Five lectures of 1.5 academic hours, about 115 slides." },
 
   /* --- Безопасная разработка ПО (РБПО) --- */
-  { category: "rbpo", format: "Главная лекция · Авторская", title: "Не ищите шаблон: постройте безопасную разработку", url: "https://main-rbpo.pikov.expert/",
+  { category: "rbpo", format: "Главная лекция · Авторская", title: "Не ищите шаблон: постройте безопасную разработку", url: "https://main-rbpo.pikov.expert/", featured: true,
     description: "Почему чужие регламенты не создают безопасность: люди, инструменты и процессы как несущая триада, evidence как след работы, а документы — как честная проекция действующей системы.",
     formatEn: "Flagship lecture · original", titleEn: "Stop looking for a template: build secure development",
     descriptionEn: "Why borrowed regulations do not create security: people, tools and processes as the load-bearing triad, evidence as the trace of real work, and documents as an honest projection of the operating system." },
@@ -1233,7 +1236,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
           '<span class="count">' + items.length + ' ' + strings.materials(items.length) + '</span>' +
         '</div>' +
         '<ul class="cards">' + items.map(l =>
-          '<li><a class="card" href="' + esc(l.url) + '">' +
+          '<li><a class="card' + (l.featured ? ' card--flagship' : '') + '" href="' + esc(l.url) + '">' +
             '<span class="tag">' + esc(lecFormat(l)) + '</span>' +
             '<h4>' + esc(lecTitle(l)) + '</h4>' +
             '<span class="desc">' + esc(lecDesc(l)) + '</span>' +

@@ -68,6 +68,28 @@ test('the main RBPO lecture is registered as an evergreen author resource', () =
   assert.match(courseMap, /https:\/\/main-rbpo\.pikov\.expert\//);
 });
 
+test('the root catalogue gives the main RBPO lecture a text-only flagship accent', () => {
+  for (const relativePath of ['index.html', join('ru', 'index.html')]) {
+    const html = read(join(rootDir, relativePath));
+    const flagshipMarkers = html.match(/featured:\s*true/g) || [];
+    const titleRule = html.match(/\.card--flagship h4\s*\{([^}]*)\}/);
+
+    assert.equal(flagshipMarkers.length, 1, `${relativePath} must identify exactly one flagship lecture`);
+    assert.match(
+      html,
+      /url:\s*"https:\/\/main-rbpo\.pikov\.expert\/",\s*featured:\s*true/,
+      `${relativePath} must mark main-rbpo as the flagship`,
+    );
+    assert.ok(
+      html.includes("(l.featured ? ' card--flagship' : '')"),
+      `${relativePath} must render the flagship class from catalogue data`,
+    );
+    assert.ok(titleRule, `${relativePath} must define the flagship title rule`);
+    assert.match(titleRule[1], /color:\s*var\(--lang-bg\)/);
+    assert.doesNotMatch(titleRule[1], /\b(?:background|border|box-shadow|outline)\s*:/);
+  }
+});
+
 test('the public lecture is self-contained, accessible and clearly authored', () => {
   const requiredPaths = [
     'index.html',
