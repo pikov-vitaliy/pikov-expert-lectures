@@ -149,6 +149,14 @@ test('CI runs the static content and workflow regression tests', () => {
   );
 });
 
+test('CI exposes a manual exact-ref recovery trigger', () => {
+  assert.match(
+    workflow,
+    /^\s{2}workflow_dispatch:\s*$/mu,
+    'operators need a fail-closed way to run the same workflow when a push event is not delivered',
+  );
+});
+
 test('CI checks the complete changed range for whitespace before any build', () => {
   const checkout = workflow.indexOf('- name: Checkout');
   const diffGate = workflow.indexOf('- name: Check changed range formatting', checkout);
