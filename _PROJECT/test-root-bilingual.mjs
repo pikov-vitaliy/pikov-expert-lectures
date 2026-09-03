@@ -48,7 +48,7 @@ test("every catalogue section carries an English name", () => {
 });
 
 test("every lecture carries an English title, label and description", () => {
-  assert.ok(LECTURES.length >= 33, `expected the full catalogue, got ${LECTURES.length}`);
+  assert.ok(LECTURES.length >= 34, `expected the full catalogue, got ${LECTURES.length}`);
   for (const lecture of LECTURES) {
     assert.ok(lecture.titleEn, `no titleEn for ${lecture.url}`);
     assert.ok(lecture.formatEn, `no formatEn for ${lecture.url}`);

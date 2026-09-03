@@ -31,6 +31,7 @@ test('paths use existing course URLs without adding catalog cards', () => {
   assert.match(root, /https:\/\/risk\.pikov\.expert\//);
   assert.match(root, /https:\/\/astra-hardening\.pikov\.expert\//);
   assert.match(root, /https:\/\/appsec-lections\.pikov\.expert\//);
+  assert.match(root, /https:\/\/main-rbpo\.pikov\.expert\//);
   assert.match(root, /https:\/\/pentest\.pikov\.expert\//);
   assert.match(root, /const LECTURES = \[/);
 });

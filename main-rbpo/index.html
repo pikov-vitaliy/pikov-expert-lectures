@@ -1,0 +1,498 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="format-detection" content="telephone=no">
+  <title>Не ищите шаблон — постройте безопасную разработку | Виталий Пиков</title>
+  <meta name="author" content="Пиков Виталий Александрович">
+  <meta name="description" content="Авторская лекция Виталия Пикова о том, почему безопасную разработку создают люди, инструменты и процессы, а регламент должен честно описывать работающую систему и её доказательства.">
+  <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large">
+  <link rel="canonical" href="https://main-rbpo.pikov.expert/">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230b2640'/%3E%3Cpath d='M14 19h36M14 32h25M14 45h17' stroke='%235de0c0' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#f1f0ea">
+
+  <meta property="og:type" content="article">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:site_name" content="pikov.expert">
+  <meta property="og:url" content="https://main-rbpo.pikov.expert/">
+  <meta property="og:title" content="Не ищите шаблон — постройте безопасную разработку">
+  <meta property="og:description" content="Люди × инструменты × процессы → доказательства → честные документы.">
+  <meta property="og:image" content="https://main-rbpo.pikov.expert/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Триада безопасной разработки: люди, инструменты и процессы">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Не ищите шаблон — постройте безопасную разработку">
+  <meta name="twitter:description" content="Почему чужой регламент не заменяет работающую систему безопасной разработки.">
+  <meta name="twitter:image" content="https://main-rbpo.pikov.expert/og-image.png">
+
+  <link rel="stylesheet" href="assets/site.css">
+  <script src="assets/site.js" defer></script>
+  <!-- Yandex.Metrika 109116119 is initialized in a local script; webvisor:false. -->
+  <script src="assets/metrics.js" defer></script>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    "name": "Не ищите шаблон — постройте безопасную разработку",
+    "description": "Авторская лекция о людях, инструментах, процессах, доказательствах и документах безопасной разработки.",
+    "url": "https://main-rbpo.pikov.expert/",
+    "inLanguage": "ru",
+    "learningResourceType": "lecture",
+    "author": {
+      "@type": "Person",
+      "name": "Пиков Виталий Александрович",
+      "url": "https://pikov.expert/",
+      "email": "mailto:vitaly@pikov.expert",
+      "sameAs": "https://t.me/UnderLineSecurity"
+    }
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Перейти к содержанию</a>
+
+  <header class="site-header">
+    <a class="brand-back" href="https://pikov.expert/" aria-label="Вернуться на pikov.expert">
+      <span class="brand-mark" aria-hidden="true">VP</span>
+      <span><strong>Виталий Пиков</strong><small>авторские материалы · pikov.expert</small></span>
+    </a>
+    <nav class="header-nav" aria-label="Основная навигация">
+      <a href="#triada">Триада</a>
+      <a href="#praktika">Практика</a>
+      <a href="#materialy">Материалы</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Переключить цветовую тему" aria-pressed="false">
+      <span aria-hidden="true">◐</span>
+    </button>
+  </header>
+
+  <progress class="reading-progress" max="100" value="0" aria-label="Прогресс чтения"></progress>
+
+  <aside class="chapter-rail" aria-label="Разделы лекции">
+    <a href="#nachalo" aria-label="Начало"><span>00</span></a>
+    <a href="#lovushka" aria-label="Ловушка шаблона"><span>01</span></a>
+    <a href="#triada" aria-label="Триада"><span>02</span></a>
+    <a href="#dokazatelstva" aria-label="Доказательства"><span>03</span></a>
+    <a href="#praktika" aria-label="Практика"><span>04</span></a>
+    <a href="#dokumenty" aria-label="Документы"><span>05</span></a>
+    <a href="#start" aria-label="Начало внедрения"><span>06</span></a>
+    <a href="#materialy" aria-label="Материалы"><span>07</span></a>
+  </aside>
+
+  <main id="main-content">
+    <section class="hero chapter" id="nachalo" aria-labelledby="page-title">
+      <div class="chapter-number" aria-hidden="true">00 / манифест</div>
+      <div class="hero-grid">
+        <div>
+          <p class="eyebrow">Главная лекция о внедрении РБПО</p>
+          <h1 id="page-title">Не ищите шаблон.<br><em>Постройте</em> безопасную разработку.</h1>
+          <p class="hero-lead">Документ не создаёт безопасность. Её создаёт работающая система: <strong>люди, инструменты и процессы</strong>. Документ появляется следом — как честное описание этой системы и её доказательств.</p>
+          <div class="hero-actions">
+            <a class="button button--primary" href="#lovushka">Разобрать заблуждение</a>
+            <a class="button button--ghost" href="#materialy">Скачать материалы</a>
+          </div>
+        </div>
+        <blockquote class="manifesto-card">
+          <span class="quote-mark" aria-hidden="true">“</span>
+          <p>Чужой регламент — это чужие очки: выглядят правильно, но фокус не ваш.</p>
+          <footer>Виталий Пиков · <a href="https://pikov.expert/">pikov.expert</a></footer>
+        </blockquote>
+      </div>
+      <div class="hero-equation" aria-label="Формула работающей безопасной разработки">
+        <span>Люди</span><b>×</b><span>Инструменты</span><b>×</b><span>Процессы</span><b>→</b><span class="result">Доказательства</span>
+      </div>
+    </section>
+
+    <section class="chapter chapter--ink" id="lovushka" aria-labelledby="trap-title">
+      <div class="chapter-number">01 / неверный вопрос</div>
+      <div class="split-heading">
+        <h2 id="trap-title">«Дайте правильный шаблон» — звучит разумно. И ведёт не туда.</h2>
+        <p>Желание начать с документа понятно: файл видим, его можно согласовать, положить в папку и показать проверяющему. Он даёт ощущение порядка раньше, чем появился сам порядок.</p>
+      </div>
+
+      <div class="myth-grid">
+        <article>
+          <span class="myth-index">МИФ 01</span>
+          <h3>«Кем-то одобренный» текст подойдёт и нам</h3>
+          <p>У другой организации иные продукты, роли, репозитории, стек, поставщики, модель угроз, допустимый риск и способ выпуска. Копирование переносит слова — не способность выполнять работу.</p>
+        </article>
+        <article>
+          <span class="myth-index">МИФ 02</span>
+          <h3>Толстый документ означает зрелый процесс</h3>
+          <p>Объём не доказывает исполнение. Сто страниц текста не компенсируют отсутствующий контроль, неразобранные срабатывания и выпуск без проверки.</p>
+        </article>
+        <article>
+          <span class="myth-index">МИФ 03</span>
+          <h3>Купленный сканер уже является процессом</h3>
+          <p>Инструмент без владельца, правил запуска, triage, срока исправления, повторной проверки и решения по исключению производит шум — не безопасность.</p>
+        </article>
+      </div>
+
+      <div class="hard-stop">
+        <span aria-hidden="true">!</span>
+        <p><strong>Мои шаблоны вам не подойдут как готовая система.</strong> Они могут быть примером структуры, но вашу реальность придётся спроектировать, запустить, проверить и только затем описать.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="triada" aria-labelledby="triad-title">
+      <div class="chapter-number">02 / несущая конструкция</div>
+      <div class="split-heading">
+        <h2 id="triad-title">Триада, без которой РБПО остаётся декорацией</h2>
+        <p>Элементы не складываются — они перемножаются. Если один равен нулю, итоговая способность организации тоже равна нулю.</p>
+      </div>
+
+      <div class="triad-workbench">
+        <div class="triad-controls" role="group" aria-label="Изучить элементы триады">
+          <button class="triad-button" type="button" aria-pressed="true" aria-controls="panel-people" data-triad="people">
+            <span class="triad-code">01</span><strong>Люди</strong><small>кто отвечает и принимает решения</small>
+          </button>
+          <button class="triad-button" type="button" aria-pressed="false" aria-controls="panel-tools" data-triad="tools">
+            <span class="triad-code">02</span><strong>Инструменты</strong><small>чем выполняется и фиксируется работа</small>
+          </button>
+          <button class="triad-button" type="button" aria-pressed="false" aria-controls="panel-process" data-triad="process">
+            <span class="triad-code">03</span><strong>Процессы</strong><small>когда, как и по каким правилам</small>
+          </button>
+        </div>
+
+        <div class="triad-panels" aria-live="polite">
+          <article class="triad-panel" id="panel-people" data-panel="people">
+            <p class="panel-label">ЛЮДИ / субъект ответственности</p>
+            <h3>Назначьте не «ответственных вообще», а владельцев решений</h3>
+            <ul class="check-list">
+              <li><strong>Владелец процесса</strong> задаёт правила, метрики и улучшения.</li>
+              <li><strong>Разработчик</strong> устраняет причину дефекта и добавляет regression test.</li>
+              <li><strong>Security champion или AppSec</strong> помогает с triage и сложными решениями.</li>
+              <li><strong>Владелец риска</strong> принимает ограниченное исключение с причиной и сроком.</li>
+              <li><strong>Владелец выпуска</strong> проверяет gate и комплект доказательств.</li>
+            </ul>
+            <p class="absence"><strong>Если людей нет:</strong> отчёты копятся, ложные срабатывания не отделяются от уязвимостей, а исключения становятся бессрочными.</p>
+          </article>
+
+          <article class="triad-panel" id="panel-tools" data-panel="tools">
+            <p class="panel-label">ИНСТРУМЕНТЫ / техническая способность</p>
+            <h3>Подберите средства под продукт, стек и доказуемую задачу</h3>
+            <ul class="check-list">
+              <li>репозиторий и защищённый pipeline с управляемыми правами;</li>
+              <li>SAST и правила компилятора для используемых языков;</li>
+              <li>SCA, реестр компонентов, SBOM и контроль лицензий;</li>
+              <li>sanitizers, fuzzing и DAST там, где есть проверяемые интерфейсы;</li>
+              <li>issue tracker, хранилище evidence и контролируемые секреты.</li>
+            </ul>
+            <p class="absence"><strong>Если инструментов нет:</strong> требование остаётся намерением, которое нельзя повторяемо выполнить и проверить.</p>
+          </article>
+
+          <article class="triad-panel" id="panel-process" data-panel="process">
+            <p class="panel-label">ПРОЦЕССЫ / воспроизводимый порядок</p>
+            <h3>Свяжите работу с входом, выходом, gate и обратной связью</h3>
+            <ul class="check-list">
+              <li>что запускает действие и какие данные нужны на входе;</li>
+              <li>кто выполняет, проверяет и принимает решение;</li>
+              <li>какой критерий означает pass, fail или допустимое исключение;</li>
+              <li>какой артефакт остаётся и сколько он хранится;</li>
+              <li>как finding возвращается в разработку и как подтверждается исправление.</li>
+            </ul>
+            <p class="absence"><strong>Если процесса нет:</strong> полезные действия случаются эпизодически и исчезают при смене специалиста.</p>
+          </article>
+        </div>
+      </div>
+
+      <p class="core-statement">Безопасная разработка — не папка документов.<br><strong>Это способность организации снова и снова получать проверяемый безопасный результат.</strong></p>
+    </section>
+
+    <section class="chapter chapter--blueprint" id="dokazatelstva" aria-labelledby="evidence-title">
+      <div class="chapter-number">03 / след работающей системы</div>
+      <div class="split-heading">
+        <h2 id="evidence-title">Если процесс есть, он оставляет следы</h2>
+        <p>Не надо сочинять соответствие задним числом. Спроектируйте работу так, чтобы доказательства возникали естественно и были связаны с решением.</p>
+      </div>
+
+      <ol class="evidence-flow">
+        <li><span>01</span><strong>Требование</strong><small>ID, источник, критерий проверки</small></li>
+        <li><span>02</span><strong>Решение</strong><small>архитектура, модель угроз, review</small></li>
+        <li><span>03</span><strong>Проверка</strong><small>лог запуска, отчёт, версия правил</small></li>
+        <li><span>04</span><strong>Triage</strong><small>владелец, приоритет, обоснование</small></li>
+        <li><span>05</span><strong>Изменение</strong><small>commit, тест, связь с finding</small></li>
+        <li><span>06</span><strong>Retest</strong><small>новый результат и release decision</small></li>
+      </ol>
+
+      <div class="evidence-matrix" role="table" aria-label="Матрица процессов и доказательств">
+        <div class="matrix-row matrix-head" role="row">
+          <span role="columnheader">Задача</span><span role="columnheader">Наблюдаемый след</span><span role="columnheader">Решение</span>
+        </div>
+        <div class="matrix-row" role="row">
+          <strong role="cell">Threat modeling</strong><span role="cell">границы доверия, угрозы, меры, review</span><span role="cell">риск покрыт или принят владельцем</span>
+        </div>
+        <div class="matrix-row" role="row">
+          <strong role="cell">SAST</strong><span role="cell">версия анализатора, правила, finding, triage</span><span role="cell">исправить, доказать false positive, ограничить исключение</span>
+        </div>
+        <div class="matrix-row" role="row">
+          <strong role="cell">SCA / SBOM</strong><span role="cell">компонент, версия, источник, лицензия, уязвимость</span><span role="cell">allow, remediate, replace или reject</span>
+        </div>
+        <div class="matrix-row" role="row">
+          <strong role="cell">DAST / fuzzing</strong><span role="cell">зафиксированная сборка, corpus, конфигурация, crash</span><span role="cell">воспроизвести, устранить причину, выполнить retest</span>
+        </div>
+        <div class="matrix-row" role="row">
+          <strong role="cell">Выпуск</strong><span role="cell">сводка gates, исключения, подпись решения</span><span role="cell">release, hold или возврат в разработку</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="chapter" id="praktika" aria-labelledby="practice-title">
+      <div class="chapter-number">04 / проверка реальностью</div>
+      <div class="split-heading">
+        <h2 id="practice-title">Документ может быть безупречным — и полностью мёртвым</h2>
+        <p>Представьте подробный регламент статического анализа: роли, формы, сроки, десятки страниц. Его никто не открывает. В pipeline нет обязательного gate. А динамические проверки C/C++ продукта вообще выпали из поля зрения.</p>
+      </div>
+
+      <div class="case-grid">
+        <article class="case-card case-card--bad">
+          <p class="case-kicker">БУМАЖНАЯ ЗРЕЛОСТЬ</p>
+          <h3>Всё описано</h3>
+          <ul>
+            <li>регламент согласован;</li>
+            <li>форма отчёта существует;</li>
+            <li>сканер закуплен;</li>
+            <li>ответственность размыта;</li>
+            <li>результат не влияет на выпуск.</li>
+          </ul>
+          <strong class="verdict">Доказательство безопасности: отсутствует</strong>
+        </article>
+        <article class="case-card case-card--good">
+          <p class="case-kicker">ОПЕРАЦИОННАЯ ЗРЕЛОСТЬ</p>
+          <h3>Всё выполняется</h3>
+          <ul>
+            <li>gate запускается автоматически;</li>
+            <li>critical finding имеет владельца;</li>
+            <li>исключение ограничено сроком;</li>
+            <li>исправление подтверждает retest;</li>
+            <li>release decision связан с evidence.</li>
+          </ul>
+          <strong class="verdict">Регламент: краткое и точное описание реальности</strong>
+        </article>
+      </div>
+
+      <blockquote class="mortar-story">
+        <p>Нельзя закончить здание, а потом вынуть плитку и доказать, что раствор под ней был приготовлен правильно. Так же нельзя выпустить продукт, а затем восстановить отсутствующие review, логи проверок и решения по риску.</p>
+        <footer><strong>Доказательства проектируются заранее</strong> — в контрольных точках жизненного цикла.</footer>
+      </blockquote>
+
+      <div class="cpp-lane">
+        <div>
+          <p class="panel-label">ПРИМЕР / C/C++ PIPELINE</p>
+          <h3>Не список флагов, а связанный контур контроля</h3>
+          <p>Конкретные параметры зависят от компилятора, libc, целевой ОС, архитектуры и требований к производительности. Но каждый выбор должен иметь владельца, место запуска, критерий и сохранённый результат.</p>
+        </div>
+        <div class="code-stack">
+          <figure>
+            <figcaption>Компиляция · запрет опасных предупреждений</figcaption>
+            <pre><code>-Wall -Wextra -Wpedantic -Wconversion
+-Wshadow -Wformat=2 -Werror=format-security</code></pre>
+          </figure>
+          <figure>
+            <figcaption>Release hardening · пример для ELF toolchain</figcaption>
+            <pre><code>-O2 -D_FORTIFY_SOURCE=3
+-fstack-protector-strong -fPIE
+-Wl,-pie -Wl,-z,relro,-z,now
+-Wl,-z,noexecstack</code></pre>
+          </figure>
+          <figure>
+            <figcaption>Отдельный CI-профиль · динамическая диагностика</figcaption>
+            <pre><code>-O1 -g -fno-omit-frame-pointer
+-fsanitize=address,undefined
+
+# ThreadSanitizer запускается отдельно:
+-fsanitize=thread</code></pre>
+          </figure>
+        </div>
+      </div>
+
+      <p class="technical-note"><strong>Проверяемый минимум контура:</strong> review модели угроз → правила secure coding → компиляторные предупреждения → SAST → SCA и SBOM → unit/negative tests → sanitizers → fuzzing → DAST для доступных интерфейсов → triage → исправление → retest → решение о выпуске. Ни один инструмент не универсален; применимость фиксируется к продукту и сценарию угроз.</p>
+    </section>
+
+    <section class="chapter chapter--paper" id="dokumenty" aria-labelledby="docs-title">
+      <div class="chapter-number">05 / правильное место документов</div>
+      <div class="split-heading">
+        <h2 id="docs-title">Сначала работа. Потом её честная проекция на документы.</h2>
+        <p>Регламент нужен — но не как заклинание. Он служит интерфейсом между исполнителями, руководством, заказчиком и проверяющим.</p>
+      </div>
+
+      <div class="document-stack" aria-label="Архитектура документов">
+        <article>
+          <span>СЛОЙ 01 · СТАБИЛЬНЫЙ</span>
+          <h3>Политика и руководство</h3>
+          <p>Цели, область действия, принципы, роли верхнего уровня, модель governance и связь с риском.</p>
+        </article>
+        <article>
+          <span>СЛОЙ 02 · ОПЕРАЦИОННЫЙ</span>
+          <h3>Регламенты и инструкции</h3>
+          <p>Конкретные входы, действия, инструменты, gates, критерии, исключения, форматы evidence и сроки хранения.</p>
+        </article>
+        <article>
+          <span>СЛОЙ 03 · ДОКАЗАТЕЛЬНЫЙ</span>
+          <h3>Записи и артефакты</h3>
+          <p>Логи, отчёты, approvals, tickets, SBOM, результаты review и retest — автоматически связанные с версией продукта.</p>
+        </article>
+      </div>
+
+      <div class="rule-grid">
+        <article><strong>Документ живой</strong><p>версионируется рядом с изменениями процесса, имеет владельца и дату следующего пересмотра;</p></article>
+        <article><strong>Документ исполнимый</strong><p>называет роль, вход, выход, критерий, систему учёта и маршрут исключения;</p></article>
+        <article><strong>Документ проверяемый</strong><p>позволяет выбрать операцию и дойти до фактического evidence без ручной реконструкции;</p></article>
+        <article><strong>Документ доступный</strong><p>актуальная версия формируется по кнопке, а устаревший файл нельзя принять за действующий.</p></article>
+      </div>
+
+      <h3 class="question-title">Смените вопрос</h3>
+      <div class="question-swap">
+        <p><span>БЫЛО</span>Где взять правильный шаблон?</p>
+        <b aria-hidden="true">→</b>
+        <p><span>СТАЛО</span>Кто, чем и по какому правилу получает результат — и какое доказательство остаётся?</p>
+      </div>
+
+      <div class="acceptance">
+        <div>
+          <p class="panel-label">ЗАКАЗЧИК / ПРОВЕРЯЮЩИЙ / ВЛАДЕЛЕЦ ТРЕБОВАНИЯ</p>
+          <h3>Согласуйте способ проверки до начала работы</h3>
+        </div>
+        <ol>
+          <li>Какое свойство безопасности требуется?</li>
+          <li>Какой метод и на какой версии продукта это проверяет?</li>
+          <li>Кто участвует и кто принимает решение?</li>
+          <li>Как выглядит достаточное evidence?</li>
+          <li>Как оформляется несоответствие, исключение и повторная проверка?</li>
+        </ol>
+      </div>
+
+      <div class="ai-box">
+        <p class="panel-label">ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ / ПРАВИЛЬНАЯ РОЛЬ</p>
+        <h3>Ускорять описание реальности — да. Выдумывать реальность — нет.</h3>
+        <p>Искусственный интеллект может собрать первый черновик инструкции, нормализовать термины, проверить связность ролей и критериев. Но только после того, как вы передали ему правдивый контекст: архитектуру, роли, фактический pipeline, решения и образцы evidence.</p>
+        <ul>
+          <li>не отправляйте исходный код, модели угроз и внутренние документы во внешний сервис без одобрения;</li>
+          <li>учитывайте классификацию данных, договорные ограничения и минимальные привилегии;</li>
+          <li>фиксируйте модель, промпт, версию результата и человеческое согласование;</li>
+          <li>не позволяйте убедительному тексту подменить отсутствующий процесс.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter chapter--standards" aria-labelledby="standards-title">
+      <div class="chapter-number">нормативная рамка / не библиотека Word-файлов</div>
+      <div class="split-heading">
+        <h2 id="standards-title">Стандарты задают задачи и ожидаемые результаты. Систему строите вы.</h2>
+        <p>Нормативная и методическая база помогает определить полноту. Она не знает вашу архитектуру, людей и pipeline — поэтому не может выдать готовый регламент вашей организации.</p>
+      </div>
+
+      <div class="source-grid">
+        <a href="https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64" target="_blank" rel="noopener noreferrer">
+          <span>РОССТАНДАРТ</span><strong>ГОСТ Р 56939-2024</strong><small>Общие требования к работам по созданию безопасного ПО и устранению дефектов безопасности.</small>
+        </a>
+        <a href="https://csrc.nist.gov/pubs/sp/800/218/final" target="_blank" rel="noopener noreferrer">
+          <span>NIST</span><strong>Secure Software Development Framework</strong><small>Набор практик, который встраивается в существующий жизненный цикл и формирует общий язык результатов.</small>
+        </a>
+        <a href="https://owaspsamm.org/model/" target="_blank" rel="noopener noreferrer">
+          <span>OWASP</span><strong>Software Assurance Maturity Model</strong><small>Модель оценки и улучшения практик по бизнес-функциям безопасной разработки.</small>
+        </a>
+        <a href="https://learn.microsoft.com/en-us/compliance/assurance/assurance-microsoft-security-development-lifecycle" target="_blank" rel="noopener noreferrer">
+          <span>MICROSOFT</span><strong>Security Development Lifecycle</strong><small>Пример системного сочетания требований, ролей, инструментов и обязательных действий по всему жизненному циклу.</small>
+        </a>
+        <a href="https://www.iso.org/standard/44378.html" target="_blank" rel="noopener noreferrer">
+          <span>ISO/IEC</span><strong>27034-1 · Application security</strong><small>Рамка интеграции безопасности в процессы управления приложениями.</small>
+        </a>
+      </div>
+
+      <p class="scope-note"><strong>Важная граница:</strong> применимость конкретного стандарта или требования устанавливают по области регулирования, договору, типу продукта и принятой модели соответствия. Исключение задачи обосновывается риском и неприменимостью — отсутствие специалиста или инструмента само по себе не является обоснованием безопасности.</p>
+    </section>
+
+    <section class="chapter" id="start" aria-labelledby="start-title">
+      <div class="chapter-number">06 / внедрение без театра</div>
+      <div class="split-heading">
+        <h2 id="start-title">Начните не с библиотеки шаблонов, а с одного честного пилота</h2>
+        <p>Выберите один продукт и один значимый риск. Постройте короткий сквозной путь, соберите доказательства и используйте его как эталон для масштабирования.</p>
+      </div>
+
+      <ol class="launch-sequence">
+        <li><span>01</span><div><strong>Определите границы</strong><p>Продукт, репозитории, pipeline, версии, поставщики, данные и доверенные зоны.</p></div></li>
+        <li><span>02</span><div><strong>Назовите риск и требование</strong><p>Что именно нельзя допустить и как выглядит проверяемый результат.</p></div></li>
+        <li><span>03</span><div><strong>Назначьте людей</strong><p>Владелец процесса, исполнители, проверяющий, владелец риска и выпуска.</p></div></li>
+        <li><span>04</span><div><strong>Подключите минимальные инструменты</strong><p>Только те, которые команда способна запускать, разбирать и поддерживать.</p></div></li>
+        <li><span>05</span><div><strong>Соберите сквозной процесс</strong><p>Вход → действие → gate → evidence → решение → обратная связь.</p></div></li>
+        <li><span>06</span><div><strong>Прогоните реальную выборку</strong><p>Не демонстрационный happy path, а настоящий finding и его полный жизненный цикл.</p></div></li>
+        <li><span>07</span><div><strong>Опишите то, что выдержало проверку</strong><p>Короткий регламент, конкретная инструкция, формы записей и понятный контроль изменений.</p></div></li>
+      </ol>
+
+      <div class="go-gate">
+        <div><span>GO</span><p>Роли действуют, инструменты воспроизводимы, finding проходит до retest, evidence доступно, регламент совпадает с практикой.</p></div>
+        <div><span>NO-GO</span><p>Есть только файл, сканер или декларация; непонятны владелец, критерий, решение и след исполнения.</p></div>
+      </div>
+    </section>
+
+    <section class="chapter chapter--download" id="materialy" aria-labelledby="downloads-title">
+      <div class="chapter-number">07 / взять с собой</div>
+      <div class="split-heading">
+        <h2 id="downloads-title">Материалы для осмысления и работы</h2>
+        <p>Это не универсальные регламенты. Используйте их как объяснение принципов, основу обсуждения и проверку собственной логики внедрения.</p>
+      </div>
+
+      <div class="download-grid">
+        <article class="download-card download-card--pdf">
+          <div class="file-type">PDF</div>
+          <p class="panel-label">АВТОРСКИЙ PDF</p>
+          <h3>Мантра БРПО–РБПО</h3>
+          <p><strong>Автор материала: Пиков Виталий Александрович.</strong> Материал составлен на основе сообщений Дмитрия Владимировича Пономарёва в Telegram; текст согласован с Дмитрием. Дмитрий Пономарёв — автор исходных сообщений и не участвовал в подготовке и оформлении материала.</p>
+          <dl><dt>Размер</dt><dd>4,11 МБ</dd><dt>SHA-256</dt><dd><code>5637fc29…94dde7</code></dd></dl>
+          <a class="button button--light" href="downloads/mantra-brpo-rbpo-v03.pdf" download="МАНТРА БРПО-РБПО — Виталий Пиков (v.03).pdf">Скачать PDF <span aria-hidden="true">↓</span></a>
+        </article>
+
+        <article class="download-card download-card--md">
+          <div class="file-type">MD</div>
+          <p class="panel-label">АВТОРСКИЙ КОНСПЕКТ</p>
+          <h3>РБПО: от процесса к документам</h3>
+          <p>Автор: <strong>Пиков Виталий Александрович</strong>. Подробный текст для чтения, обсуждения и адаптации к своей системе.</p>
+          <dl><dt>Размер</dt><dd>28,43 КБ</dd><dt>SHA-256</dt><dd><code>67064b43…3e78d7</code></dd></dl>
+          <a class="button button--light" href="downloads/konspekt-rbpo-ot-processa-k-dokumentam.md" download="Конспект — РБПО от процесса к документам.md">Скачать Markdown <span aria-hidden="true">↓</span></a>
+        </article>
+      </div>
+
+      <p class="checksum-link">Полные контрольные суммы: <a href="downloads/SHA256SUMS.txt" download>SHA256SUMS.txt</a></p>
+    </section>
+
+    <section class="chapter closing" aria-labelledby="closing-title">
+      <div class="chapter-number">финал / главный тезис</div>
+      <p class="closing-kicker">Не просите у чужого документа разрешения начать.</p>
+      <h2 id="closing-title">Создайте людей.<br>Подключите инструменты.<br>Запустите процессы.<br><em>Покажите доказательства.</em></h2>
+      <p>И только потом напишите регламент, которому можно верить.</p>
+
+      <div class="author-card">
+        <div class="author-monogram" aria-hidden="true">ВП</div>
+        <div>
+          <p class="panel-label">АВТОР ЛЕКЦИИ</p>
+          <h3>Пиков Виталий Александрович</h3>
+          <p>Эксперт по безопасной разработке ПО, DevSecOps и AppSec</p>
+          <div class="author-links">
+            <a href="https://pikov.expert/">pikov.expert</a>
+            <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a>
+            <a href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener noreferrer">Telegram · @UnderLineSecurity</a>
+          </div>
+        </div>
+      </div>
+
+      <nav class="related" aria-label="Связанные авторские лекции">
+        <span>Продолжить изучение:</span>
+        <a href="https://gost56939.pikov.expert/">Основы РБПО</a>
+        <a href="https://fstec-sdlc.pikov.expert/">Методика внедрения</a>
+        <a href="https://tz.pikov.expert/">Проверяемые требования</a>
+        <a href="https://sast.pikov.expert/">SAST</a>
+        <a href="https://kapo.pikov.expert/">SCA и SBOM</a>
+      </nav>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Авторская лекция Виталия Пикова · <a href="https://pikov.expert/">pikov.expert</a></p>
+    <p><a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a> · <a href="https://t.me/UnderLineSecurity" target="_blank" rel="noopener noreferrer">@UnderLineSecurity</a></p>
+  </footer>
+</body>
+</html>

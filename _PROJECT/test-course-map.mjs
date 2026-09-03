@@ -38,17 +38,17 @@ function cardsFrom(html) {
     .map(match => ({ target: match[1], body: match[2] }));
 }
 
-test('course map covers exactly the 30 release targets', () => {
-  assert.equal(expectedTargets.length, 30, 'release contract must stay at root + 29 unique folders');
+test('course map covers exactly the 31 release targets', () => {
+  assert.equal(expectedTargets.length, 31, 'release contract must stay at root + 30 unique folders');
   const cards = cardsFrom(page);
-  assert.equal(cards.length, 30);
+  assert.equal(cards.length, 31);
   assert.deepEqual(cards.map(card => card.target).sort(), [...expectedTargets].sort());
-  assert.equal(new Set(cards.map(card => card.target)).size, 30);
+  assert.equal(new Set(cards.map(card => card.target)).size, 31);
 });
 
 test('every target has the complete measurable teaching contract', () => {
   const cards = cardsFrom(page);
-  assert.equal(cards.length, 30);
+  assert.equal(cards.length, 31);
   for (const card of cards) {
     for (const label of [
       'Аудитория',
@@ -183,7 +183,7 @@ test('course map reflows cleanly in Chromium at three teaching viewports', async
       assert.deepEqual(errors, [], `${viewport.width}: console/page errors`);
       assert.equal(metrics.main, 1, `${viewport.width}: main`);
       assert.equal(metrics.h1, 1, `${viewport.width}: h1`);
-      assert.equal(metrics.cards, 30, `${viewport.width}: cards`);
+      assert.equal(metrics.cards, 31, `${viewport.width}: cards`);
       assert.ok(metrics.overflow <= 1, `${viewport.width}: horizontal overflow ${metrics.overflow}px`);
       assert.ok(metrics.cardsInsideViewport, `${viewport.width}: card outside viewport`);
       assert.ok(metrics.anchorsResolve, `${viewport.width}: broken local anchor`);

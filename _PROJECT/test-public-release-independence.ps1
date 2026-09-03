@@ -84,6 +84,7 @@ $textExtensions = [System.Collections.Generic.HashSet[string]]::new([System.Stri
 # closed until its text and visual provenance have been reviewed explicitly.
 $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 @(
+  '5637fc29cb8f3c61ed22bd429e6cdbd7ac7f99cb31876f14b3edf2c6b394dde7',
   '251c5d734a73b94ac43577e2a7234bedd943f2b172461cdbd45ac043304e19ef',
   '2826c15b97cc7ffeada52f2000a4b0712a7cf4a81a38d7ba4087de350049c350',
   '40651600b2550513231ab481323f1a510f47770e29c46344c8a7bb686aa1dfd5',

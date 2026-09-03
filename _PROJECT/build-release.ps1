@@ -356,6 +356,11 @@ function Should-ExcludeQuarantinedNestedDirectory([string]$FolderName, [string]$
 # from the published HTML. The global distributable rules still exclude every
 # other ZIP and README file from lecture releases.
 $script:ReviewedNestedDistributables = @{
+  'main-rbpo' = @(
+    'downloads\mantra-brpo-rbpo-v03.pdf',
+    'downloads\konspekt-rbpo-ot-processa-k-dokumentam.md',
+    'downloads\SHA256SUMS.txt'
+  )
   'scaner-vs' = @(
     'materials\README.md',
     'materials\downloads\all-labs-markdown.zip',
