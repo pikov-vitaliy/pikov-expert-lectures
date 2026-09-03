@@ -8,16 +8,16 @@
 
 ## Состояние репозитория
 
-Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **15 августа 2026 года**:
+Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **3 сентября 2026 года**:
 
 | Показатель | Значение |
 |---|---:|
-| Записей в каталоге | 33 |
-| Канонических папок материалов | 29 |
+| Записей в каталоге | 34 |
+| Канонических папок материалов | 30 |
 | Тематических разделов | 6 |
-| `ready-local` | 19 |
+| `ready-local` | 20 |
 | `published-snapshot` | 14 |
-| Уникальных URL в `sitemap.xml` вместе с корнем | 34 |
+| Уникальных URL в `sitemap.xml` вместе с корнем | 35 |
 
 Несколько записей могут вести в одну папку: например, базовый пентест, углублённый пентест, статический анализ и фаззинг представлены страницами или якорями домена `new-courses.pikov.expert`.
 
@@ -70,6 +70,7 @@
 | 31 | Языки, архитектура и безопасный SQL | [29-07-2026.pikov.expert](https://29-07-2026.pikov.expert/) | РБПО | `ready-local` |
 | 32 | Безопасность приложений: программа и материалы двух дней | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `ready-local` |
 | 33 | Безопасность приложений: практикум и лабораторные задания | [appsec-lections.pikov.expert/practice.html](https://appsec-lections.pikov.expert/practice.html) | РБПО | `ready-local` |
+| 34 | Не ищите шаблон: постройте безопасную разработку | [main-rbpo.pikov.expert](https://main-rbpo.pikov.expert/) | РБПО | `ready-local` |
 
 ## Структура
 

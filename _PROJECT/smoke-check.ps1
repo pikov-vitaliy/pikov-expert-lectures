@@ -402,7 +402,7 @@ foreach ($lecture in @($lectures | Where-Object { ([string]$_.url).Split('#')[0]
   Assert-PublicHtmlMetadata -Html $pageHtml -Label "$($lecture.folder)/$fileName" -ExpectedUrl $cleanUrl -RequireBrandBack $true
 }
 
-foreach ($folder in @('tz', 'fstec-sdlc', 'kapo', 'sast', 'p19', 'ppk')) {
+foreach ($folder in @('main-rbpo', 'tz', 'fstec-sdlc', 'kapo', 'sast', 'p19', 'ppk')) {
   $lectureHtmlPath = Join-Path (Join-Path $rootPath $folder) 'index.html'
   $lectureHtml = Get-Content -LiteralPath $lectureHtmlPath -Encoding UTF8 -Raw
   if ($lectureHtml -notmatch '<meta\s+name="description"') { Fail "$folder missing meta description" }
