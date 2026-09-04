@@ -68,6 +68,21 @@ function makeFixture() {
   writeFileSync(join(root, 'index.html'), '<!doctype html>\n<title>Root fixture</title>\n', 'utf8');
   writeFileSync(join(russianRoot, 'index.html'), '<!doctype html>\n<title>Russian root fixture</title>\n', 'utf8');
   writeFileSync(join(russianRoot, 'not-public.html'), '<!doctype html>\n<title>Not allowlisted</title>\n', 'utf8');
+  for (const route of ['new', 'new/ru', 'new/about', 'new/ru/about']) {
+    mkdirSync(join(root, route), { recursive: true });
+    writeFileSync(join(root, route, 'index.html'), '<!doctype html>\n<title>Parallel site fixture</title>\n', 'utf8');
+  }
+  const parallelAssets = join(root, 'new', 'assets');
+  const parallelIllustrations = join(parallelAssets, 'illustrations');
+  mkdirSync(parallelIllustrations, { recursive: true });
+  writeFileSync(join(parallelAssets, 'styles.css'), 'body { color: #172027; }\n', 'utf8');
+  writeFileSync(join(parallelAssets, 'site.js'), '"use strict";\n', 'utf8');
+  for (const category of ['rbpo', 'os', 'reg', 'offense', 'edu']) {
+    writeFileSync(join(parallelIllustrations, `${category}.webp`), `${category} illustration fixture\n`, 'utf8');
+  }
+  writeFileSync(join(root, 'new', 'draft.html'), '<!doctype html>\n<title>Private draft</title>\n', 'utf8');
+  writeFileSync(join(parallelAssets, 'private-notes.txt'), 'Private notes\n', 'utf8');
+  writeFileSync(join(parallelIllustrations, 'source.png'), 'Unapproved original image\n', 'utf8');
   writeFileSync(join(lecture, 'index.html'), '<!doctype html>\n<title>Lecture fixture</title>\n', 'utf8');
   writeFileSync(join(lectureMaterials, 'a.txt'), 'a\n', 'utf8');
   writeFileSync(join(lectureMaterials, 'z.txt'), 'z\n', 'utf8');
@@ -261,7 +276,7 @@ test('origin/main is authoritative over a locally advanced main branch', (t) => 
   assert.match(output(result), /main.*history|accepted main/i);
 });
 
-test('root release includes only the allowlisted Russian locale entry point', (t) => {
+test('root release includes the locale and parallel homepage without extra drafts or source assets', (t) => {
   const fixture = makeFixture();
   t.after(() => rmSync(fixture.root, { recursive: true, force: true }));
 
@@ -273,6 +288,15 @@ test('root release includes only the allowlisted Russian locale entry point', (t
   const paths = manifest.files.map(file => file.path);
   assert.ok(paths.includes('ru/index.html'), 'root release omitted ru/index.html');
   assert.ok(!paths.includes('ru/not-public.html'), 'root release recursively included an unapproved locale file');
+  for (const route of ['new/index.html', 'new/ru/index.html', 'new/about/index.html', 'new/ru/about/index.html']) {
+    assert.ok(paths.includes(route), `root release omitted ${route}`);
+  }
+  for (const asset of ['styles.css', 'site.js', ...['rbpo', 'os', 'reg', 'offense', 'edu'].map(category => `illustrations/${category}.webp`)]) {
+    assert.ok(paths.includes(`new/assets/${asset}`), `root release omitted ${asset}`);
+  }
+  for (const excluded of ['new/draft.html', 'new/assets/private-notes.txt', 'new/assets/illustrations/source.png', 'fixture-course/index.html']) {
+    assert.ok(!paths.includes(excluded), `root release included unrelated ${excluded}`);
+  }
   assert.ok(existsSync(rootEntry.archivePath));
   assert.equal(sha256(rootEntry.archivePath), rootEntry.archiveSha256);
 });

@@ -33,6 +33,18 @@ test("English and Russian routes have static self-canonical metadata", () => {
   assert.match(russian, /property="og:locale" content="ru_RU"/);
 });
 
+test("the current homepage offers a localized parallel version above its unchanged header", () => {
+  for (const html of [english, readFileSync(russianPath, "utf8")]) {
+    const notice = html.match(/<div class="new-site-notice">([\s\S]*?)<header class="site-header">/)?.[1];
+    assert.ok(notice, "the parallel-version notice must appear above the existing header");
+    assert.match(notice, /<span data-l="en"><a href="\/new\/">Explore the new website/);
+    assert.match(notice, /<span data-l="ru"><a href="\/new\/ru\/">Новая версия сайта/);
+    assert.doesNotMatch(html, /http-equiv="refresh"/i, "the current homepage must not automatically redirect");
+  }
+  const htaccess = readFileSync(resolve(rootDir, ".htaccess"), "utf8");
+  assert.doesNotMatch(htaccess, /RewriteRule[^\r\n]*\/new\//, "the current homepage remains the default");
+});
+
 test("static profile JSON-LD follows each document language", () => {
   assert.ok(existsSync(russianPath), "ru/index.html must exist before JSON-LD can be checked");
   const russian = readFileSync(russianPath, "utf8");
