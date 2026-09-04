@@ -94,7 +94,7 @@ function Should-SkipSitemapPath([string]$RelativePath) {
   return $false
 }
 
-function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect) {
+function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect, [switch]$WebpImages) {
   $lines = [System.Collections.ArrayList]@(
     '# pikov.expert static lecture site rules',
     '# Keep text and Markdown files readable as UTF-8 in browsers.',
@@ -137,6 +137,10 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
     '  Require all denied',
     '</Files>'
   )
+
+  if ($WebpImages) {
+    [void]$lines.Insert($lines.IndexOf('AddType image/svg+xml .svg'), 'AddType image/webp .webp')
+  }
 
   if ($RootLocaleRedirect) {
     $commentIndex = $lines.IndexOf('# HTTPS redirect is handled by the hosting layer. Duplicating it here can')
@@ -318,7 +322,7 @@ foreach ($lecture in @($data.lectures | Sort-Object position)) {
   Add-UniqueUrl -List $rootUrls -Url ([string]$lecture.url)
 }
 
-Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines -RootLocaleRedirect)
+Write-Utf8File -Path (Join-Path $rootPath '.htaccess') -Lines (New-HtaccessLines -RootLocaleRedirect -WebpImages)
 Write-Utf8File -Path (Join-Path $rootPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl 'https://pikov.expert/sitemap.xml')
 Write-SitemapFile -Path (Join-Path $rootPath 'sitemap.xml') -Urls @($rootUrls) -DefaultLastMod $lastMod
 
