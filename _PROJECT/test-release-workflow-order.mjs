@@ -100,6 +100,7 @@ test('CI runs the static content and workflow regression tests', () => {
     'test-platform-content-currentness.mjs',
     'test-evergreen-course-dates.mjs',
     'test-main-rbpo-publication.mjs',
+    'test-main-rbpo-layout.mjs',
     'test-release-workflow-order.mjs',
     'test-release-provenance.mjs',
     'test-deploy-manifest-boundary.mjs',
