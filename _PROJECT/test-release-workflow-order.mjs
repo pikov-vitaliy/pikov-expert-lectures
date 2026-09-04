@@ -112,6 +112,8 @@ test('CI runs the static content and workflow regression tests', () => {
     'test-generated-artifact-determinism.mjs',
     'test-root-professional-profile.mjs',
     'test-root-locale-routes.mjs',
+    'test-new-site-catalogue.mjs',
+    'test-new-site.mjs',
     'qa-root-locale-routes.mjs',
     'test-public-affiliation-hygiene.mjs',
     'test-tz-landing.mjs',
@@ -142,6 +144,11 @@ test('CI runs the static content and workflow regression tests', () => {
     workflow,
     /node\s+\.\\_PROJECT\\build-root-locales\.mjs\s+--check/,
     'CI must reject a stale generated Russian root document',
+  );
+  assert.match(
+    workflow,
+    /node\s+\.\\_PROJECT\\build-new-site\.mjs\s+--check/,
+    'CI must reject stale generated parallel homepage documents',
   );
   assert.match(
     workflow,

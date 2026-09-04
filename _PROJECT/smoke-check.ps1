@@ -237,7 +237,9 @@ $localWorkspaceDirs = @(
     Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName '.obsidian') } |
     Select-Object -ExpandProperty Name
 )
-$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
+# The parallel homepage belongs to the root website, not to a lecture domain.
+# Its exact pages and assets are allowlisted by Get-RootReleaseFiles.
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests', 'new') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
