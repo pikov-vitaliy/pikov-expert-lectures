@@ -39,6 +39,7 @@ CSS = r"""
 @media(max-width:520px){html{scroll-padding-top:80px}.wrap{width:calc(100% - 28px)}.masthead{align-items:start;gap:12px}.masthead span{text-align:right;max-width:175px;font-size:.74rem}.hero{padding-block:32px}h1{font-size:2.5rem}.hero-grid{gap:23px}.deck{font-size:1.1rem}.jump-nav .wrap{gap:20px;padding-block:12px}.jump-nav a{font-size:.81rem}main>section{padding-block:35px}.metric{padding:18px 13px 18px 0}.metric strong{font-size:1.9rem}.metric span{font-size:.79rem}.table-wrap th,.table-wrap td{padding:10px 9px}.schedule{min-width:650px}.source-card{padding:18px}.source-card h3{font-size:1.05rem}.path{font-size:.74rem}details.entry>summary{grid-template-columns:34px minmax(0,1fr) auto;gap:10px;padding:16px 14px}.entry-body{padding:5px 16px 20px}.speech-text{font-size:1rem}.note{padding:18px}.document-list>li{grid-template-columns:30px minmax(0,1fr);gap:10px}.contents{padding:18px}.markdown>h1{font-size:1.8rem}.markdown>h2,.lecture-shell .markdown>h2{font-size:1.65rem}.markdown>h3{font-size:1.15rem}.lecture-shell .markdown{font-size:1rem}.button,button.action{font-size:.86rem;padding:9px 13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media print{@page{margin:17mm}body{background:white;font-size:11pt}.wrap{width:100%;max-width:none}.jump-nav,.hero-links,.actions,.skip,.raw-source{display:none!important}h1{font-size:30pt}h2{font-size:21pt}h3{font-size:15pt}.hero{padding:20px 0}.hero-grid,.source-grid,.columns{display:block}.edition{margin-top:20px}main>section{padding-block:25px}details.entry{break-inside:auto;margin-bottom:15px}details.entry>summary{padding:12px;font-size:12pt}details.entry>summary:after{display:none}.entry-body{padding:0 12px 12px}details.entry:not([open])>.entry-body{display:block!important}details.entry{content-visibility:visible}.table-wrap{overflow:visible}.table-wrap table,.markdown .table-wrap table{min-width:0;font-size:9pt}.cover{max-height:130mm;object-fit:contain}.source-card{margin-bottom:15px;break-inside:avoid}a{color:inherit}.print-only{display:block}.contents ol{columns:1}.site-footer{padding-bottom:0}.metric strong{font-size:25pt}}
+@media print{.lecture-shell h2,.lecture-shell h3,.lecture-shell h4{break-after:avoid}.lecture-shell tr{break-inside:avoid}.lecture-shell thead{display:table-header-group}.lecture-shell .contents{background:transparent;border-left:0;padding:0}}
 """
 
 JS = r"""
@@ -159,21 +160,23 @@ def rendered_markdown(text: str, prefix: str) -> tuple[str, list[tuple[str, str]
     return str(soup), headings
 
 
-def toc(headings: list[tuple[str, str]], title: str = "Темы лекции") -> str:
+def toc(headings: list[tuple[str, str]], title: str = "Содержание") -> str:
     rows = "".join(f'<li><a href="#{esc(anchor)}">{esc(label)}</a></li>' for anchor, label in headings)
-    return f'<nav class="contents" aria-label="{esc(title)}"><h2>{esc(title)}</h2><ol>{rows}</ol></nav>'
+    return f'<nav class="contents" id="lecture-contents" aria-label="{esc(title)}"><h2>{esc(title)}</h2><ol>{rows}</ol></nav>'
 
 
-def shell(title: str, description: str, body: str, date_label: str) -> str:
+def shell(title: str, description: str, body: str, date_label: str, *, reader: bool = False) -> str:
+    author = "Виталий Пиков" if reader else "Vitaliy Pikov"
+    masthead = "Виталий Пиков<br>Учебная лекция по безопасной разработке" if reader else f"Secure Software Development in Practice<br>Материалы автора · {esc(date_label)}"
+    footer = "Безопасная разработка программного обеспечения" if reader else "Материалы доступны в этом HTML без подключения к сети. Внешние источники открываются по ссылкам."
     return f'''<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="color-scheme" content="light">
+<title>{esc(title)}</title><meta name="description" content="{esc(description)}"><meta name="author" content="{esc(author)}"><meta name="color-scheme" content="light">
 <style>{CSS}</style></head><body>
 <a class="skip" href="#main">Перейти к материалам</a>
-<header class="masthead wrap"><a class="brand" href="https://pikov.expert">pikov.expert</a><span>Secure Software Development in Practice<br>Рабочие материалы · {esc(date_label)}</span></header>
+<header class="masthead wrap"><a class="brand" href="https://pikov.expert">pikov.expert</a><span>{masthead}</span></header>
 {body}
-<footer class="site-footer wrap"><strong>Vitaliy Pikov · <a href="https://pikov.expert">pikov.expert</a></strong><br>
-Материалы доступны в этом HTML без подключения к сети. Внешние источники открываются по ссылкам.</footer>
+<footer class="site-footer wrap"><strong>{esc(author)} · <a href="https://pikov.expert">pikov.expert</a></strong><br>{footer}</footer>
 <script>{JS}</script></body></html>'''
 
 
@@ -222,19 +225,28 @@ def markdown_archive(paths: list[Path]) -> tuple[str, list[dict]]:
     return "".join(entries), manifest
 
 
-def build_lecture(date_label: str, text: str) -> str:
+def lecture_content(text: str) -> tuple[str, str, str, list[tuple[str, str]]]:
+    """Move the Markdown title into the reader's page hero, without duplicating it."""
     rendered, headings = rendered_markdown(text, "lecture")
-    words = len(text.split())
-    body = f'''<div class="hero wrap"><span class="eyebrow">Архив знаний / PVS-Studio / 02 июля 2025</span>
-<h1>Безопасная разработка.<br>Полная лекция по первому вебинару</h1>
-<p class="deck">Тематический разбор исходного выступления: от истории SDL и появления российского стандарта до процессов, инструментов и ответов на практические вопросы.</p>
-<div class="hero-links"><a class="button" href="#lecture-content">Читать лекцию</a><a class="button secondary" href="review.html">Обновлённая EP01 и материалы</a><a class="button secondary" href="{esc(LECTURE_MD.as_uri())}">Исходный Markdown</a></div></div>
-<main class="wrap lecture-shell" id="main"><section id="lecture-content"><p class="caption">Подробный текст · {words:,} слов по Markdown-источнику · {len(headings)} разделов верхнего уровня</p>
-{toc(headings)}<article class="markdown">{rendered}</article>
-<details class="raw-source"><summary>Полный исходный Markdown</summary><pre><code data-source-file="{esc(LECTURE_MD.name)}">{esc(text)}</code></pre></details></section>
-<section id="lecture-source-files"><h2>Исходные материалы</h2><div class="source-grid">{source_file_cards()}</div>
-<p class="caption" style="margin-top:20px">Полный текст лекции и ссылки на проверочные источники сохранены выше. Исходная транскрипция хранится рядом отдельным файлом.</p></section></main>'''
-    return shell("Первый вебинар по безопасной разработке — подробная лекция · pikov.expert", "Полная тематическая лекция по вебинару с PVS-Studio от 2 июля 2025 года.", body, date_label)
+    soup = BeautifulSoup(rendered, "html.parser")
+    title_node = soup.find("h1")
+    title = title_node.get_text(" ", strip=True) if title_node else "Безопасная разработка: история стандартов и организация работы"
+    title_id = str(title_node.get("id", "lecture-title")) if title_node else "lecture-title"
+    if title_node:
+        title_node.decompose()
+    return title, title_id, str(soup), headings
+
+
+def build_lecture(date_label: str, text: str) -> str:
+    title, title_id, rendered, headings = lecture_content(text)
+    markdown_download = base64.b64encode(text.encode("utf-8")).decode("ascii")
+    body = f'''<div class="hero wrap"><span class="eyebrow">Безопасная разработка / история и практика</span>
+<h1 id="{esc(title_id)}">{esc(title)}</h1>
+<p class="deck">Как развивались методологии безопасной разработки, почему появились национальные стандарты и как связать требования с повседневной инженерной работой.</p>
+<div class="hero-links"><a class="button" href="#lecture-text">Читать лекцию</a><a class="button secondary" href="#lecture-contents">Содержание</a><a class="button secondary" href="data:text/markdown;charset=utf-8;base64,{markdown_download}" download="безопасная-разработка-история-стандартов-и-процессы.md">Лекция в Markdown</a></div></div>
+<main class="wrap lecture-shell" id="main"><section id="lecture-content">
+{toc(headings)}<article class="markdown" id="lecture-text">{rendered}</article></section></main>'''
+    return shell(f"{title} · Виталий Пиков", "Учебная лекция о развитии SDL, истории ГОСТ Р 56939 и организации безопасной разработки программного обеспечения.", body, date_label, reader=True)
 
 
 def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -> tuple[str, dict]:
@@ -259,22 +271,22 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
         link = f'<a href="{esc(url)}">Открыть источник</a>' if safe_url(url) and url and not url.startswith("#") else ""
         source_cards.append(f'<article class="source-card" id="source-{esc(source["id"])}"><span class="tag">{esc(source["id"])}</span><h3>{esc(source["title"])}</h3><p>{esc(source["note"])}</p>{link}</article>')
     files = [
-        ("Подробная лекция по первому вебинару", LECTURE_MD, "Тематический русский текст по полной транскрипции: история, подходы, процессы и вопросы."),
-        ("Лекция для чтения в браузере", LECTURE_HTML, "Отдельная HTML-версия с оглавлением, таблицами и полным текстом."),
+        ("Самостоятельная учебная лекция", LECTURE_MD, "История методологий и стандартов, процессы безопасной разработки и практические примеры."),
+        ("Учебная лекция для чтения в браузере", LECTURE_HTML, "Страница для читателя: содержание, полный текст и библиография."),
         ("Презентация EP01", ROOT / "index.html", "Слайды, режим показа, заметки докладчика и контакты с анонсом EP02."),
         ("Английская речь по каждому слайду", ROOT / "EP01-script-en.md", "Редактируемый источник содержания презентации и полной речи."),
         ("История и границы источников", ROOT / "EP01-history-research.md", "Сопоставление исторического рассказа, исследовательских публикаций и нормативных источников."),
         ("Хронометраж", ROOT / "EP01-timing.md", "Плановые интервалы слайдов и расчёт объёма речи."),
     ]
     file_rows = "".join(f'<li><span class="file-number">{i:02d}</span><div><h3><a href="{esc(path.as_uri())}">{esc(label)}</a></h3><p>{esc(detail)}</p><code class="path">{esc(path)}</code></div></li>' for i, (label, path, detail) in enumerate(files, 1))
-    body = f'''<div class="hero wrap"><span class="eyebrow">EP01 / Полная транскрипция → тематическая лекция → обновлённый выпуск</span>
-<div class="hero-grid"><div><h1>Полный разбор вебинара.<br>Новая версия первой лекции</h1><p class="deck">Исходное выступление с PVS-Studio разложено по темам и сохранено как самостоятельная лекция. Материал EP01 расширен, с отдельным вниманием к созданию национального стандарта и редакции 2016 года.</p></div>
+    body = f'''<div class="hero wrap"><span class="eyebrow">Материалы автора / учебная лекция и выпуск EP01</span>
+<div class="hero-grid"><div><h1>Безопасная разработка.<br>Учебная лекция и материалы серии</h1><p class="deck">Самостоятельная лекция на русском языке объясняет историю методологий, создание национального стандарта и организацию безопасной разработки. Рядом сохранены англоязычный выпуск EP01 и материалы для подготовки к записи.</p></div>
 <aside class="edition"><strong>{duration(total_seconds)} · EP01</strong>{len(slides)} слайдов с полной английской речью.<br>Подробная русская лекция и {len(paths)} Markdown-документов в архиве.</aside></div>
-<div class="hero-links"><a class="button" href="#transcript">Полный разбор исходного вебинара</a><a class="button secondary" href="#speech">Речь для новой EP01</a><a class="button secondary" href="http://127.0.0.1:8765/">Открыть локальную презентацию</a></div></div>
+<div class="hero-links"><a class="button" href="#transcript">Самостоятельная учебная лекция</a><a class="button secondary" href="#speech">Речь для EP01</a><a class="button secondary" href="http://127.0.0.1:8765/">Открыть локальную презентацию</a></div></div>
 <nav class="jump-nav" aria-label="Разделы отчёта"><div class="wrap"><a href="#result">Что подготовлено</a><a href="#transcript">Подробная лекция</a><a href="#schedule">План выпуска</a><a href="#sources">Источники</a><a href="#speech">Полная речь</a><a href="#archive">Все {len(paths)} документов</a><a href="#files">Файлы</a></div></nav>
 <main class="wrap" id="main">
 <section id="result"><span class="section-label">Результат работы</span><h2>Содержание сохранено в двух формах</h2>
-<div class="columns"><div><h3>Архив первого вебинара</h3><p>Подробная лекция на русском языке объединяет темы выступления и обсуждение с участниками. Она помогает вернуться к исходным объяснениям и использовать их при подготовке следующих выпусков.</p></div>
+<div class="columns"><div><h3>Учебная лекция на русском языке</h3><p>Последовательное изложение связывает исторический контекст, требования стандартов и повседневную работу команды. Лекция рассчитана на самостоятельное изучение; примеры и библиография помогают продолжить работу с темой.</p></div>
 <div><h3>Англоязычный выпуск EP01</h3><p>Сценарий, слайды и речь докладчика развивают материал для серии <span lang="en">Secure Software Development in Practice</span>. История связана с практической задачей первого процесса — планированием безопасной разработки.</p></div></div>
 <div class="metric-strip"><div class="metric"><strong>{len(slides)}</strong><span>слайдов в обновлённой EP01</span></div><div class="metric"><strong>{duration(total_seconds)}</strong><span>плановая длительность выпуска</span></div><div class="metric"><strong>{total_words:,}</strong><span>английских слов в речи</span></div><div class="metric"><strong>{len(paths)}</strong><span>Markdown-документов целиком</span></div></div>
 <h3>Ключевые уточнения истории стандарта</h3>
@@ -283,25 +295,25 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
 <tr><td>Утверждение и начало действия</td><td>Росстандарт утвердил ГОСТ Р 56939-2016 1 июня 2016 года приказом № 458-ст. Введение в действие — 1 июня 2017 года.</td><td><a href="https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d">Официальная карточка Росстандарта</a></td></tr>
 <tr><td>Как читать слово «следует»</td><td>В редакции 2016 года это рекомендация по п. 4.2. В редакции 2024 года формулировки «должен» и «следует» выражают требования согласно п. 4.7.</td><td><a href="#source-G16">ГОСТ Р 56939-2016</a>; <a href="#source-G24">ГОСТ Р 56939-2024</a></td></tr>
 </tbody></table></div>
-<div class="note"><h3>Как читать исторические утверждения</h3><p>Транскрипция сохраняет рассказ и позицию участников вебинара. Формальные даты, статус редакций и нормативные требования опираются на проверочные источники. Подробные различия и оговорки приведены в лекции и исследовательских заметках, включённых в этот архив.</p></div>
+<div class="note"><h3>Основания исторических утверждений</h3><p>Формальные даты, статус редакций и нормативные требования опираются на проверочные источники. История подготовки стандарта отделена от требований окончательных редакций. Подробные основания приведены в библиографии лекции и исследовательских заметках.</p></div>
 <p class="notice" id="qa-status">{esc(qa_text)}</p></section>
-<section id="transcript"><span class="section-label">Вебинар с PVS-Studio / 02.07.2025</span><h2>Подробная лекция по всем темам</h2>
-<p class="section-intro">Тематический текст подготовлен по полной транскрипции. В нём сохранены объяснения, примеры, обсуждавшиеся ограничения и вопросы; исправления распознавания и редакционные уточнения обозначены в самом документе.</p>
+<section id="transcript"><span class="section-label">Учебный материал / Виталий Пиков</span><h2>История стандартов и организация безопасной разработки</h2>
+<p class="section-intro">Самостоятельная лекция рассматривает развитие SDL, появление ГОСТ Р 56939 и переход к управляемым процессам. Каждый раздел раскрывает тему через объяснения, примеры и практические следствия для команды.</p>
 <div class="hero-links"><a class="button" href="http://127.0.0.1:8765/PVS-2025-07-02-lecture.html">Отдельная лекция в локальном браузере</a><a class="button secondary" href="{esc(LECTURE_MD.as_uri())}">Markdown лекции</a><a class="button secondary" href="#archive-01">Читать здесь без сети</a></div>
-<nav class="contents" aria-label="Темы исходного вебинара"><h3 style="margin-top:0">Темы подробного разбора</h3><ol>{lecture_topics}</ol></nav>
-<div id="history-source-files"><h3>Файлы, предоставленные автором</h3><div class="source-grid">{source_file_cards()}</div></div></section>
+<nav class="contents" aria-label="Темы учебной лекции"><h3 style="margin-top:0">Содержание лекции</h3><ol>{lecture_topics}</ol></nav>
+<details class="raw-source" id="history-source-files"><summary>Первичные материалы для работы автора</summary><div class="source-grid">{source_file_cards()}</div></details></section>
 <section id="cover"><span class="section-label">Серия / единый визуальный стиль</span><h2 lang="en">{esc(data['title'])}</h2><p class="section-intro" lang="en">{esc(data['subtitle'])}</p><img class="cover" src="data:image/png;base64,{cover}" alt="Обложка EP01 с портретом Vitaliy Pikov"><p class="caption">Бренд серии сохранён. Содержание слайдов и речь обновляются из Markdown-источника.</p></section>
 <section id="schedule"><span class="section-label">Обновлённый сценарий</span><h2>План выпуска · {duration(total_seconds)}</h2>
 <p class="section-intro">Интервалы ниже — план для репетиции. Фактическая длительность зависит от темпа речи, пауз и монтажа. При 120 словах в минуту чтение текста займёт около {duration(round(total_words / 120 * 60))}; при 125 — около {duration(round(total_words / 125 * 60))}.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="План и хронометраж слайдов"><table class="schedule"><thead><tr><th>Слайд</th><th>Интервал</th><th>Название</th><th>Тема</th></tr></thead><tbody>{''.join(rows)}</tbody></table></div>
-<div class="note"><h3>Подготовка к записи</h3><p>Сначала прочитайте речь с таймером и отметьте места для пауз. Развёрнутый исходный вебинар и англоязычный сценарий решают разные задачи: архив сохраняет объяснения, а EP01 выстраивает последовательное выступление для выбранной аудитории.</p><p>Финал выпуска содержит имя Vitaliy Pikov, сайт <a href="https://pikov.expert">pikov.expert</a> и анонс второго эпизода.</p></div></section>
+<div class="note"><h3>Подготовка к записи</h3><p>Сначала прочитайте речь с таймером и отметьте места для пауз. Учебная лекция даёт развёрнутое объяснение темы, а англоязычный сценарий помогает выстроить последовательное выступление для выбранной аудитории.</p><p>Финал выпуска содержит имя Vitaliy Pikov, сайт <a href="https://pikov.expert">pikov.expert</a> и анонс второго эпизода.</p></div></section>
 <section id="sources"><span class="section-label">Проверочные материалы</span><h2>Источники и границы интерпретации</h2><p class="section-intro">Источники связаны со слайдами через короткие идентификаторы. Полные исследовательские заметки и ссылки также сохранены в Markdown-архиве.</p><div class="source-grid">{''.join(source_cards)}</div></section>
 <section id="speech"><span class="section-label">Сценарий докладчика / English</span><h2>Полная речь для {len(slides)} слайдов</h2><p class="section-intro">Текст каждого слайда приведён целиком, без сокращений. Заголовок раскрывает плановый интервал, объём речи и тему.</p>
 <div class="actions"><button class="action" data-toggle-group=".speech-entry" data-open-label="Раскрыть всю речь" data-close-label="Свернуть всю речь" aria-expanded="false">Раскрыть всю речь</button></div><div class="speech-list">{speech_block(data)}</div></section>
 <section id="archive"><span class="section-label">Полный автономный архив</span><h2>Все {len(paths)} Markdown-документов</h2><p class="section-intro">Каждый документ доступен в оформленном виде и как полный исходный Markdown. Контрольные суммы позволяют сопоставить эту версию с файлами проекта.</p>
 <div class="actions"><button class="action secondary" data-toggle-group=".archive-entry" data-open-label="Раскрыть все документы" data-close-label="Свернуть все документы" aria-expanded="false">Раскрыть все документы</button></div><div class="archive-list">{archive}</div></section>
 <section id="files"><span class="section-label">Материалы проекта</span><h2>Где лежат результаты</h2><p class="section-intro">Ссылки на файлы рассчитаны на локальный доступ. Полный текст речи и всех Markdown-документов уже включён в этот HTML; локальная презентация доступна при запущенном сервере на порту 8765.</p><ol class="document-list">{file_rows}</ol></section></main>'''
-    result = shell("Полный разбор вебинара и обновлённая EP01 · pikov.expert", "Подробная лекция по полной транскрипции и обновлённый англоязычный выпуск EP01: история, национальный стандарт и планирование.", body, date_label)
+    result = shell("Учебная лекция и материалы EP01 · pikov.expert", "Самостоятельная лекция по истории стандартов и организации безопасной разработки; англоязычный выпуск EP01 и материалы автора.", body, date_label)
     stats = {"slides": len(slides), "planned_seconds": total_seconds, "planned_duration": duration(total_seconds), "english_words": total_words, "markdown_documents": len(paths), "sources": len(data["sources"]), "manifest": manifest}
     return result, stats
 
@@ -333,9 +345,18 @@ def validate(review: str, lecture: str, data: dict, paths: list[Path]) -> None:
         recovered = "\n\n".join(p.get_text() for p in tag.find_all("p", recursive=False)) if tag else None
         if recovered != slide["notes"]:
             raise ValueError(f"Speech mismatch: slide {slide['id']}")
-    raw_lecture = lecture_soup.find("code", attrs={"data-source-file": LECTURE_MD.name})
-    if raw_lecture is None or raw_lecture.get_text() != LECTURE_MD.read_text(encoding="utf-8"):
-        raise ValueError("Standalone lecture Markdown mismatch")
+    title, title_id, expected, _ = lecture_content(LECTURE_MD.read_text(encoding="utf-8"))
+    actual = lecture_soup.select_one("#lecture-text")
+    heading = lecture_soup.find("h1", id=title_id)
+    if actual is None or actual.decode_contents() != expected or heading is None or heading.get_text() != title:
+        raise ValueError("Standalone lecture content differs from rendered Markdown")
+    download = lecture_soup.select_one('.hero-links a[download]')
+    if download is None or base64.b64decode(download["href"].split(",", 1)[1]).decode("utf-8") != LECTURE_MD.read_text(encoding="utf-8"):
+        raise ValueError("The standalone Markdown download differs from its source")
+    if lecture_soup.select(".metric-strip, .raw-source, #qa-status"):
+        raise ValueError("Author-only report elements must not appear in the reader's lecture")
+    if any("review.html" in link.get("href", "") for link in lecture_soup.select(".hero-links a")):
+        raise ValueError("The reader's lecture must not link to the author report in its main navigation")
     if len(review_soup.select("#qa-status")) != 1:
         raise ValueError("Expected one QA status block")
 

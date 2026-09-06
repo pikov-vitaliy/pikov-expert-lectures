@@ -15,7 +15,7 @@ What turns a security intention into work a software team can actually perform?
 
 In this first episode, Vitaliy Pikov introduces a 25-part series exploring the processes of GOST R 56939-2024 and comparing them with international secure development practices.
 
-We use a review of 28 secure-development methodologies to explore publication milestones, ways of organizing security work, and the limits of effectiveness evidence. Drawing on the full July 2025 webinar discussion with Vitaliy Varenitsa, we trace the Russian standard from early conversations around 2009 through research and drafting from 2013, approval in 2016 and entry into force in 2017.
+We use a review of 28 secure-development methodologies to explore publication milestones, ways of organizing security work, and the limits of effectiveness evidence. The history of the Russian standard follows early conversations around 2009, research and drafting from 2013, approval in 2016 and entry into force in 2017. Vitaliy Varenitsa's account explains the early discussions and the authors' original intentions.
 
 The expanded history separates the author's recollections from official records. It covers the original plan for a family of documents, the roles of developers and reviewers, international connections and the transition to the 2024 edition. We also examine why nine groups of measures cannot be compared arithmetically with 25 processes, and why requirement wording must be read in its specific edition.
 
@@ -39,9 +39,9 @@ Sources:
 - [Secure Software Development Methodologies: A Multivocal Literature Review](https://arxiv.org/abs/2211.16987)
 - [OWASP SAMM v2 release announcement](https://owaspsamm.org/blog/samm2-release/)
 
-Historical presentation: Vitaliy Varenitsa, “История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24”, 26-page PDF supplied with the earlier webinar materials. The accompanying research note records page references and corrections; an external public URL for this exact PDF has not been established.
+Historical source: Vitaliy Varenitsa, “История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24”, presentation at the MASCOM / PVS-Studio webinar, 2 July 2025.
 
-The series builds on an earlier Russian-language webinar project delivered with PVS-Studio. A detailed thematic lecture based on the full discussion is included in the preparation package; a public materials URL will be added after publication. The current comparison and teaching example were prepared for this English series.
+The series builds on an earlier Russian-language webinar project delivered with PVS-Studio. The companion Russian lecture covers the history of the standards and practical ways to organize secure development. The international comparison and worked example extend that teaching material.
 
 Author: **Vitaliy Pikov — [pikov.expert](https://pikov.expert)**.
 
