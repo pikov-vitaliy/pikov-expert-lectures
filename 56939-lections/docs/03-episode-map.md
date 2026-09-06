@@ -10,7 +10,7 @@
 
 ### EP01 — 5.1 Планирование процессов разработки безопасного программного обеспечения
 
-**English title:** Building a Secure Development Program That Teams Can Run.
+**English title:** Where Secure Development Begins: History, GOST and a Working Process.
 
 - Вопрос: с чего начать, если людей и времени недостаточно для одновременного внедрения всех практик?
 - Кандидаты: SSDF PO.1, PO.2, PO.4; SAMM Strategy & Metrics; CISA Secure by Design.

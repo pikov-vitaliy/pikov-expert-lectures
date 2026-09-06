@@ -442,6 +442,23 @@ def main() -> None:
     stats["review_bytes"] = len(review.encode("utf-8"))
     stats["lecture_bytes"] = len(lecture.encode("utf-8"))
     stats["checked_only"] = args.check
+    if args.check:
+        # Сравниваем с тем, что реально лежит на диске. Без этого --check собирал
+        # HTML в памяти и проверял его же, поэтому расхождение Markdown и HTML —
+        # ровно тот дефект, который ловили руками, — проверку всегда проходило.
+        stale = []
+        for label, target, expected in (
+            ("review.html", REVIEW_HTML, review),
+            (LECTURE_HTML.name, LECTURE_HTML, lecture),
+        ):
+            if not target.is_file():
+                stale.append(f"{label}: missing")
+            elif target.read_text(encoding="utf-8") != expected:
+                stale.append(f"{label}: stale")
+        stats["stale"] = stale
+        if stale:
+            print(json.dumps(stats, ensure_ascii=True, indent=2))
+            parser.error("Generated HTML is out of date: " + ", ".join(stale))
     if not args.check:
         REVIEW_HTML.write_text(review, encoding="utf-8", newline="\n")
         LECTURE_HTML.write_text(lecture, encoding="utf-8", newline="\n")

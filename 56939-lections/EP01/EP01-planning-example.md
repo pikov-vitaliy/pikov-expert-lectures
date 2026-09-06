@@ -6,7 +6,7 @@
 
 Software: Importer 2.0, its C++ parser module, small service API and shipped third-party libraries. Include the relevant version and component identifiers in the real record. Rationale: these elements participate in processing externally supplied engineering files or distributing the product.
 
-Connected development context: source repository, build definitions, CI configuration, issue tracker and release workflow. These links support traceability; they do not replace identifying the software composition.
+Connected development context: source repository, build definitions, CI configuration, issue tracker and release workflow. These links support traceability; they do not replace identifying the parts the software is made of.
 
 Proposed exclusion: a retired prototype, only after confirming that its code, generated artifacts and dependencies do not flow into the selected release. Record the reason and supporting inspection. A convenient boundary is not automatically a justified boundary.
 
