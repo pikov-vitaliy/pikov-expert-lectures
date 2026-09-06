@@ -8,11 +8,11 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 02. One process. One useful result. | 01:00–02:30 | 01:30 | 166 | 110.7 |
 | 03. Twenty-five processes, connected | 02:30–04:00 | 01:30 | 162 | 108.0 |
 | 04. Friday's release is blocked | 04:00–05:30 | 01:30 | 169 | 112.7 |
-| 05. Protection principles came first | 05:30–07:00 | 01:30 | 163 | 108.7 |
-| 06. Security becomes organized work | 07:00–08:30 | 01:30 | 169 | 112.7 |
-| 07. Reading a Russian national standard | 08:30–10:00 | 01:30 | 174 | 116.0 |
-| 08. From the 2016 edition to 2024 | 10:00–11:30 | 01:30 | 172 | 114.7 |
-| 09. A map of international approaches | 11:30–13:00 | 01:30 | 166 | 110.7 |
+| 05. A landscape of secure development methods | 05:30–07:00 | 01:30 | 157 | 104.7 |
+| 06. Different ways to organize the work | 07:00–08:30 | 01:30 | 165 | 110.0 |
+| 07. How GOST R 56939 was developed | 08:30–10:00 | 01:30 | 168 | 112.0 |
+| 08. International connections and the 2024 revision | 10:00–11:30 | 01:30 | 169 | 112.7 |
+| 09. Shared practices need evidence | 11:30–13:00 | 01:30 | 170 | 113.3 |
 | 10. Compare obligations, not labels | 13:00–14:30 | 01:30 | 163 | 108.7 |
 | 11. What process 5.1 asks for | 14:30–16:00 | 01:30 | 173 | 115.3 |
 | 12. Start with a defensible scope | 16:00–17:30 | 01:30 | 174 | 116.0 |
@@ -25,17 +25,17 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 19. Would this survive Friday's release? | 27:00–28:30 | 01:30 | 169 | 112.7 |
 | 20. Build your first planning page | 28:30–30:00 | 01:30 | 173 | 115.3 |
 
-**Total: 3390 spoken words.**
+**Total: 3375 spoken words.**
 
 ## Speaking pace sensitivity
 
 | Articulation pace | Speech alone | Space left inside 30:00 for pauses/transitions |
 |---|---|---|
-| 110 words/min | 30:49 | exceeds slot by 00:49 |
-| 115 words/min | 29:29 | 00:31 |
-| 120 words/min | 28:15 | 01:45 |
-| 125 words/min | 27:07 | 02:53 |
-| 130 words/min | 26:05 | 03:55 |
+| 110 words/min | 30:41 | exceeds slot by 00:41 |
+| 115 words/min | 29:21 | 00:39 |
+| 120 words/min | 28:08 | 01:52 |
+| 125 words/min | 27:00 | 03:00 |
+| 130 words/min | 25:58 | 04:02 |
 
 Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.
 

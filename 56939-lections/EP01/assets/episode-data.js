@@ -63,7 +63,19 @@ window.EP01_DATA = {
       "id": "MLR",
       "title": "Kudriavtseva and Gadyatskaya · A Multivocal Literature Review",
       "url": "https://arxiv.org/html/2211.16987v2",
-      "note": "arXiv:2211.16987v2, 4 July 2023. Research map of 28 methodologies; publication dates may differ from origin dates."
+      "note": "The user-provided 27-page PDF was read in full: arXiv v2, 4 July 2023, marked In submission. Table II p.5: selected publication dates; pp.6–9, 10–16, 16–23: practices, operating models and evidence limitations. Figure 2 and Table II contain date discrepancies; our timeline labels its dates explicitly."
+    },
+    {
+      "id": "SAMM20",
+      "title": "OWASP SAMM · Version 2 public release",
+      "url": "https://owaspsamm.org/blog/samm2-release/",
+      "note": "Official announcement, 31 January 2020; a version-release date, not the first appearance of all SAMM ideas."
+    },
+    {
+      "id": "GOSTH",
+      "title": "Vitaliy Varenitsa · Retrospective on GOST R 56939",
+      "url": "#history-source-note",
+      "note": "User-provided local PDF, 26 pages, title: История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24. PDF export 2 July 2025. Pages 2–4: context and drafting history; pp.3/22: international connections. Formal approval dates and current requirements are checked against Rosstandart and the final standard. Exact local path and corrections: EP01-history-research.md."
     },
     {
       "id": "EX",
@@ -183,161 +195,169 @@ window.EP01_DATA = {
     },
     {
       "id": 5,
-      "title": "Protection principles came first",
+      "title": "A landscape of secure development methods",
       "seconds": 90,
-      "section": "Selected historical milestones",
+      "section": "The methodology landscape",
       "kicker": "EP01 / 05",
       "layout": "timeline",
-      "lead": "Architectural questions long before modern pipelines",
+      "lead": "Selected publication / edition dates in a 28-methodology review",
       "items": [
         {
-          "label": "1970",
-          "text": "Ware report: security controls for shared computer systems"
+          "label": "2004",
+          "text": "Lifecycle research · Jones and Rastogi"
         },
         {
-          "label": "1975",
-          "text": "Saltzer–Schroeder: principles for protection mechanisms"
+          "label": "2006",
+          "text": "SDL · Touchpoints · CLASP"
         },
         {
-          "label": "Today",
-          "text": "Least privilege and fail-safe defaults remain useful design questions"
+          "label": "2012",
+          "text": "Microsoft SDL guidance v5.2 / SDL-Agile"
+        },
+        {
+          "label": "2020",
+          "text": "OWASP SAMM v2.0"
+        },
+        {
+          "label": "2022",
+          "text": "NIST SSDF v1.1"
         }
       ],
       "quote": "",
-      "notes": "Secure software development has several historical roots. This is a selection of milestones, rather than a claim that the whole subject began on one particular date.\n\nThe Ware report appeared in February nineteen seventy, following the work of a task force on security controls for shared computer systems. Its subject was broader than today's software development lifecycle.\n\nIn nineteen seventy-five, Jerome Saltzer and Michael Schroeder published a foundational paper on the protection of information in computer systems. Two useful principles are least privilege and fail-safe defaults.\n\nConsider our file importer. Does it need access to every file owned by the user? What happens when an access decision cannot be completed? Those are design questions that can be asked before choosing an analysis tool.\n\nThe historical connection I want to make is practical. Security has long involved decisions about architecture, authority, and failure. Modern development processes give teams repeated opportunities to make those decisions, check their implementation, and revisit them as the system changes.",
+      "notes": "The history of secure development contains several parallel approaches. A useful map is the twenty twenty-three review by Arina Kudriavtseva and Olga Gadyatskaya. It examines twenty-eight methodologies through publications from two thousand four to twenty twenty-two, drawn from industry, government, and academia.\n\nThis slide selects five publication milestones. Early lifecycle research is followed by the SDL, Touchpoints, and CLASP publications. Later examples include guidance for agile development, version two of OWASP SAMM, and NIST's SSDF version one point one.\n\nThese are dates of the publications or editions we are discussing. They are not all dates when the underlying ideas first appeared. Microsoft, for example, made SDL integral to its development process in two thousand four; the SDL book discussed in the review appeared in two thousand six.\n\nThe picture is a landscape of different ways to organize secure development. We should examine what each approach contributes, rather than assume that the newest publication replaces every earlier idea.",
       "sourceIds": [
-        "WARE",
-        "SS75"
+        "MLR",
+        "MSH",
+        "SAMM20",
+        "N11"
       ]
     },
     {
       "id": 6,
-      "title": "Security becomes organized work",
+      "title": "Different ways to organize the work",
       "seconds": 90,
-      "section": "Selected historical milestones",
+      "section": "The methodology landscape",
       "kicker": "EP01 / 06",
-      "layout": "timeline",
-      "lead": "Executive commitment needs an engineering process",
+      "layout": "cards",
+      "lead": "What the reviewed approaches emphasize",
       "items": [
         {
-          "label": "2002",
-          "text": "Microsoft's Trustworthy Computing initiative"
+          "label": "Microsoft SDL",
+          "text": "A coordinated engineering programme"
         },
         {
-          "label": "2004",
-          "text": "SDL becomes integral to development at Microsoft"
+          "label": "Touchpoints",
+          "text": "Risk management, architecture and code review"
         },
         {
-          "label": "Practical lesson",
-          "text": "Ownership, resources and repeatable activities"
+          "label": "CLASP",
+          "text": "Activities connected to roles"
+        },
+        {
+          "label": "SDL-Agile",
+          "text": "One-time · every-sprint · bucket activities"
         }
       ],
       "quote": "",
-      "notes": "Another useful milestone comes from Microsoft. The Trustworthy Computing initiative began in January two thousand two. Microsoft's own history describes its Security Development Lifecycle becoming an integral part of development in two thousand four.\n\nThis does not mean that Microsoft invented secure software development. It gives us a well-documented example of security becoming organized work across a large engineering organization.\n\nThink about the difference between a statement and a working practice. A statement can say that security matters. A working practice needs time in the schedule, people with the relevant skills, and decisions about what happens when a problem is found.\n\nIn our fictional team, a manager might support security in principle. The next step is to reserve time for the parser investigation and decide who can make the release decision. Training and tools support that work, but they do not assign responsibility by themselves.\n\nThis is the bridge from history to today's first process: a security intention becomes useful when the team plans how to carry it out.",
+      "notes": "The review helps us look beyond names. Different approaches give a team different ways to organize its security work.\n\nMicrosoft SDL connects engineering practices with management support and training. Gary McGraw's Touchpoints emphasizes risk management, including architecture analysis and code review. CLASP connects activities to roles. The agile SDL guidance distinguishes activities performed once, in every sprint, or periodically from a group of activities called a bucket.\n\nThat last distinction is practical. A team needs a reasoned schedule for security work; repeating every activity in every sprint is not automatically the best design.\n\nThe review also discusses maturity approaches. SAMM helps structure capability improvement, while BSIMM describes practices observed in organizations. Those purposes differ from giving a developer the next implementation task.\n\nFor our importer team, the shared questions are recognizable: which activity do we need, who performs it, and when? The approaches provide useful answers at different levels. Their activities still need to be interpreted in the context of the actual product and team.",
       "sourceIds": [
-        "MSH"
+        "MLR"
       ]
     },
     {
       "id": 7,
-      "title": "Reading a Russian national standard",
+      "title": "How GOST R 56939 was developed",
       "seconds": 90,
-      "section": "The Russian context",
+      "section": "The creation of GOST R 56939",
       "kicker": "EP01 / 07",
-      "layout": "cards",
-      "lead": "GOST R 56939-2024",
+      "layout": "timeline",
+      "lead": "Development history from Varenitsa's retrospective · formal dates from Rosstandart",
       "items": [
         {
-          "label": "GOST R",
-          "text": "Russian national standard designation"
+          "label": "2013",
+          "text": "April: drafting begins · August: first draft"
         },
         {
-          "label": "56939",
-          "text": "The standard's identifying number"
+          "label": "2014–2015",
+          "text": "Final draft, then a revised final draft"
         },
         {
-          "label": "2024",
-          "text": "The edition year"
+          "label": "2016",
+          "text": "Approved on 1 June · order 458-st"
         },
         {
-          "label": "Context",
-          "text": "State standardization institutions trace their history to 1925"
+          "label": "2017",
+          "text": "Effective from 1 June"
         }
       ],
       "quote": "",
-      "notes": "Before we discuss the specific document, let us read its name. GOST R identifies a Russian national standard. Five six nine three nine is its number, and twenty twenty-four identifies the edition.\n\nRussia's state standardization institutions trace their history to a committee established in nineteen twenty-five. That gives us institutional context. It does not mean that secure software development has existed as a standardized practice since that year.\n\nThe document we use in this series is titled Information protection. Secure software development. General requirements. Its purpose is relevant to software development processes, including the organizational work that supports them.\n\nFor an international audience, the useful starting point is to read the actual requirements and understand their context. The national designation alone does not tell us whether a practice will be useful for a particular team elsewhere.\n\nWe also need to separate a standard's technical content from a specific organization's obligations. Those obligations depend on the applicable context. This series is an engineering comparison; it is not a determination of a particular company's legal duties.",
+      "notes": "Let us now examine the history of this particular Russian standard. GOST R identifies a Russian national standard, followed by its number and edition year.\n\nIn a retrospective presentation, Vitaliy Varenitsa describes the original problem. Vulnerability analysis and product assessment were already developing in Russia, but dedicated requirements for the development process were missing in that context. The proposed response was to make the process itself a subject of requirements and evidence.\n\nAccording to his account, drafting began in April twenty thirteen, and the first draft followed in August. Further drafts appeared in twenty fourteen and twenty fifteen. Public discussion involved twenty-two organizations and around two hundred comments and proposals.\n\nFor the formal dates, we use Rosstandart's official record: approval on the first of June twenty sixteen, and entry into force on the first of June twenty seventeen.\n\nThis is a history of drafting, discussion, and refinement. It is more informative for our series than treating a standard as a document that simply appeared in its final form.",
       "sourceIds": [
-        "RH",
-        "G24"
+        "GOSTH",
+        "G16"
       ]
     },
     {
       "id": 8,
-      "title": "From the 2016 edition to 2024",
+      "title": "International connections and the 2024 revision",
       "seconds": 90,
-      "section": "The Russian context",
+      "section": "The creation of GOST R 56939",
       "kicker": "EP01 / 08",
-      "layout": "timeline",
-      "lead": "One numbered standard, a revised process structure",
+      "layout": "cards",
+      "lead": "Historical design context and the final text serve different purposes",
       "items": [
         {
-          "label": "2016 → 2017",
-          "text": "Approved 1 June 2016 · effective 1 June 2017"
+          "label": "Historical connections",
+          "text": "Common Criteria · ISO/IEC 27001 · lifecycle processes"
         },
         {
-          "label": "2024",
+          "label": "2024 revision",
           "text": "Approved 24 October · effective 20 December"
         },
         {
-          "label": "Current baseline",
-          "text": "The 2024 edition replaces the 2016 edition"
+          "label": "25 processes",
+          "text": "Process name → goals → requirements → artifacts"
         },
         {
-          "label": "Read each process",
-          "text": "Goal → requirements → implementation evidence"
+          "label": "Source discipline",
+          "text": "Retrospective for history · final edition for requirements"
         }
       ],
       "quote": "",
-      "notes": "The first edition of this numbered standard was approved in June twenty sixteen and took effect in June twenty seventeen. The revised twenty twenty-four edition was approved in October and took effect on the twentieth of December, replacing the earlier edition.\n\nThe current document organizes its main content into twenty-five processes. For each process, we will examine its goal, the requirements, and the evidence of implementation.\n\nThis structure gives us a consistent way to prepare the series. It also encourages a useful question: what would we expect to see if this process were actually working?\n\nThe standard does not tie the processes to one particular lifecycle model. That matters when a team uses short iterations, continuous integration, or a more staged delivery model.\n\nThe official record lists several organizations involved in developing the revision. That supports a statement about collaborative authorship. It does not, by itself, establish that the document copied a particular foreign framework or that its practices are unique. Those are questions that require a closer comparison of the content.",
+      "notes": "The same retrospective connects the standard with international ideas: Common Criteria, information security management, and software lifecycle processes. It also emphasizes introducing security procedures early in development.\n\nThese connections support the research question behind this series. They do not establish a direct copy of Microsoft SDL, or make all of those documents normative references in the current edition.\n\nThe twenty twenty-four revision replaced the twenty sixteen edition. It was approved on the twenty-fourth of October and took effect on the twentieth of December. The official record identifies several organizations involved in its development.\n\nFor this series, we follow its twenty-five processes. The final text gives each process a name, goals, requirements, and implementation artifacts. It does not tie those processes to one particular lifecycle model.\n\nSome pages of the archived presentation still show draft material. We therefore use the retrospective to explain history and the final standard to state requirements. That distinction keeps the history useful while preventing an old proposal from becoming a current obligation in our explanation.",
       "sourceIds": [
-        "G16",
+        "GOSTH",
         "G24"
       ]
     },
     {
       "id": 9,
-      "title": "A map of international approaches",
+      "title": "Shared practices need evidence",
       "seconds": 90,
       "section": "Our comparison method",
       "kicker": "EP01 / 09",
       "layout": "compare",
-      "lead": "Different documents answer different questions",
+      "lead": "Findings and limits of the multivocal literature review",
       "items": [
         {
-          "label": "NIST SSDF 1.1",
-          "text": "A framework of high-level secure development practices"
+          "label": "Shared practices",
+          "text": "Similar engineering work, organized in different ways"
         },
         {
-          "label": "OWASP SAMM",
-          "text": "A model for assessing and improving software assurance maturity"
+          "label": "Organizational work",
+          "text": "Risk, culture, people, policy and communication matter"
         },
         {
-          "label": "Microsoft SDL",
-          "text": "An engineering approach with defined security practices"
-        },
-        {
-          "label": "Version discipline",
-          "text": "SSDF 1.2 is a draft at the 6 September 2026 check"
+          "label": "Effectiveness evidence",
+          "text": "Limited and uneven validation of complete methodologies"
         }
       ],
       "quote": "",
-      "notes": "Our international comparison needs more than a collection of familiar names. Different documents have different purposes.\n\nNIST's Secure Software Development Framework offers high-level practices that can be integrated into different development lifecycles. We use version one point one as our final baseline. At our September twenty twenty-six check, version one point two is still listed as a draft.\n\nOWASP SAMM provides a software assurance maturity model. Microsoft SDL provides another engineering approach. A literature review already used in my earlier materials also illustrates the variety of secure development methodologies.\n\nThese sources are useful in different ways. One can help describe a practice. Another can help organize improvement. A research review can help us understand the landscape and the limits of the evidence.\n\nWe will state the version and the purpose before comparing a specific point. A familiar label is not enough to establish equivalence. For the first process, the most useful question is how these approaches help a team turn security priorities into organized, reviewable work.",
+      "notes": "What does the literature review allow us to conclude? The authors identify substantial overlap in practices, together with important organizational concerns. They discuss risk management, culture, human behavior, policies, and communication, among other topics.\n\nTheir synthesis distinguishes work at the organization level, work that crosses the lifecycle, and activities associated with a project stage. That helps explain why a security programme involves more than a list of tools.\n\nEvidence about the effectiveness of complete methodologies is much less consistent. We should not turn that limitation into a claim that secure development does not work. It means we need to examine the evaluation method, the context, and the result being measured.\n\nThe review also selected accessible English-language material. Its omission of GOST cannot establish that the Russian standard is unique.\n\nWe will therefore compare specific practices and their evidence, using identified versions. Our NIST baseline is final SSDF one point one; version one point two remains a draft at our September twenty twenty-six check. Let us make the comparison method explicit.",
       "sourceIds": [
+        "MLR",
         "N11",
-        "N12",
-        "SAMM",
-        "MSH",
-        "MLR"
+        "N12"
       ]
     },
     {

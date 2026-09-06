@@ -15,7 +15,9 @@ What turns a security intention into work a software team can actually perform?
 
 In this first episode, Vitaliy Pikov introduces a 25-part series exploring the processes of GOST R 56939-2024 and comparing them with international secure development practices.
 
-We look at selected historical milestones, explain the Russian standard's context, and build an illustrative plan for a C++ engineering-file importer. The episode covers current-state analysis, resources, process improvement, implementation planning, scope and evidence.
+We use a review of 28 secure-development methodologies to explore publication milestones, different ways of organizing security work, and the limits of effectiveness evidence. We also examine the drafting history of GOST R 56939 from 2013 onward, drawing on Vitaliy Varenitsa's retrospective and checking formal dates against Rosstandart.
+
+The practical half builds an illustrative plan for a C++ engineering-file importer: current-state analysis, resources, process improvement, implementation planning, scope and evidence.
 
 You will also see a bounded comparison with NIST SSDF 1.1 and OWASP SAMM. Similar engineering concerns do not automatically mean equivalent requirements.
 
@@ -30,6 +32,9 @@ Sources:
 - [RAND: Security Controls for Computer Systems](https://www.rand.org/pubs/reports/R609-1.html)
 - [Saltzer and Schroeder](https://web.mit.edu/saltzer/www/publications/protection/index.html)
 - [Secure Software Development Methodologies: A Multivocal Literature Review](https://arxiv.org/abs/2211.16987)
+- [OWASP SAMM v2 release announcement](https://owaspsamm.org/blog/samm2-release/)
+
+Historical presentation: Vitaliy Varenitsa, “История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24”, 26-page PDF supplied with the earlier webinar materials. The accompanying research note records page references and corrections; an external public URL for this exact PDF has not been established.
 
 The series builds on an earlier Russian-language webinar project delivered with PVS-Studio. The current comparison and teaching example were prepared for this English series.
 
@@ -39,9 +44,10 @@ The series builds on an earlier Russian-language webinar project delivered with 
 00:00 Where secure development begins
 01:00 The series and its practical promise
 04:00 A release problem in a fictional C++ team
-05:30 Selected historical milestones
-08:30 Russian standards and the GOST editions
-11:30 International approaches and our comparison method
+05:30 Methodology publications and different operating models
+08:30 How GOST R 56939 was developed
+11:30 Shared practices and effectiveness evidence
+13:00 Our comparison method
 14:30 The five planning requirements
 20:30 Two plans, two questions
 22:00 A 90-day planning example
