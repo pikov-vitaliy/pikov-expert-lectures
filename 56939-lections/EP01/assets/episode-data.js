@@ -1137,7 +1137,7 @@ window.EP01_DATA = {
     {
       "id": 29,
       "title": "Security Training That Changes Engineering Decisions",
-      "seconds": 105,
+      "seconds": 115,
       "section": "Stay in touch · Next episode",
       "kicker": "EP01 / 29",
       "layout": "closing",
@@ -1157,7 +1157,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Today we followed the Russian standard from the early discussions to the editions that were adopted. We connected that history to international work. And we used its first process to organize a practical improvement effort.\n\nYour next step is simple. Choose one product, and start your planning page. Describe the current state. Name the next improvement. Then connect it to an owner, to the capacity you have, and to evidence someone can review. The worksheet with this episode will help you start.\n\nI am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch, and share the questions you would like this series to explore.\n\nThe next episode is called Security Training That Changes Engineering Decisions. We'll look at employee training under clause five point two. What do different roles need to learn? How do we practise those skills? And what evidence can show progress beyond attendance?\n\nWe'll build a role and skills matrix, and use a short exercise before and after the training. So, which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.",
+      "notes": "Today we followed the Russian standard from the early discussions to the editions that were adopted. We connected that history to international work. And we used its first process to organize a practical improvement effort.\n\nYour next step is simple. Choose one product, and start your planning page. Describe the current state. Name the next improvement. Then connect it to an owner, to the capacity you have, and to evidence someone can review. The worksheet with this episode will help you start.\n\nI am Vitaliy Pikov. You can find me at pikov dot expert, and on LinkedIn. My email and my Telegram channel are on the slide. Please keep in touch, and share the questions you would like this series to explore.\n\nThe next episode is called Security Training That Changes Engineering Decisions. We'll look at employee training under clause five point two. What do different roles need to learn? How do we practise those skills? And what evidence can show progress beyond attendance?\n\nWe'll build a role and skills matrix, and use a short exercise before and after the training. So, which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.",
       "sourceIds": [
         "G24",
         "EX"
@@ -1166,7 +1166,24 @@ window.EP01_DATA = {
         "name": "Vitaliy Pikov",
         "label": "pikov.expert",
         "url": "https://pikov.expert"
-      }
+      },
+      "channels": [
+        {
+          "label": "LinkedIn",
+          "value": "in/vitaliy-pikov",
+          "url": "https://www.linkedin.com/in/vitaliy-pikov/"
+        },
+        {
+          "label": "Email",
+          "value": "vitaly@pikov.expert",
+          "url": "mailto:vitaly@pikov.expert"
+        },
+        {
+          "label": "Telegram",
+          "value": "UnderLineSecurity",
+          "url": "https://t.me/UnderLineSecurity"
+        }
+      ]
     }
   ]
 };

@@ -63,6 +63,16 @@ for block in re.split(r'^## ', script, flags=re.M)[1:]:
         name, label, url = field(block, 'Contact').split(' | ', 2)
         assert url.startswith('https://'), 'Contact website must use HTTPS'
         slides[-1]['contact'] = dict(name=name, label=label, url=url)
+    if re.search(r'^Channels:$', block, re.M):
+        channels = []
+        for line in block.split('Channels:\n', 1)[1].splitlines():
+            if not line.startswith('- '):
+                break
+            label, value, url = line.removeprefix('- ').split(' | ', 2)
+            assert url.startswith(('https://', 'mailto:')), f'Channel link must be HTTPS or mailto: {url}'
+            channels.append(dict(label=label, value=value, url=url))
+        assert channels, 'Channels block is empty'
+        slides[-1]['channels'] = channels
     if re.search(r'^Visual: ', block, re.M):
         visual_id = field(block, 'Visual')
         assert visual_id in visuals, f'Unknown visual: {visual_id}'

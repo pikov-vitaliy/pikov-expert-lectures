@@ -1,7 +1,7 @@
 # EP01 — Where Secure Development Begins
 
 Full spoken English script. Author: Vitaliy Pikov. Prepared: 2026-09-06.
-Target: 53:00, including pauses and slide changes. Timings are rehearsal targets, not a measured recording. Text after `Speech:` is spoken; metadata and `Cue:` are not. `Visual:` and the adjacent image identify the SVG replacing the on-screen list; `Items:` remain its text alternative. Visual labels and source notes are maintained in [EP01-visuals.md](EP01-visuals.md).
+Target: 53:10, including pauses and slide changes. Timings are rehearsal targets, not a measured recording. Text after `Speech:` is spoken; metadata and `Cue:` are not. `Visual:` and the adjacent image identify the SVG replacing the on-screen list; `Items:` remain its text alternative. Visual labels and source notes are maintained in [EP01-visuals.md](EP01-visuals.md).
 Working translations of GOST clauses are the author's, not an official English translation.
 
 An introduction to the history of secure development, the two editions of GOST R 56939, and practical process planning. Historical accounts are attributed; requirements refer to the stated editions of the standards.
@@ -756,11 +756,15 @@ Here is the practical test. Can another team member understand the next action? 
 Cue: Провести зрителя по пяти узлам: input file → parser → finding → investigate → decide. Сделать короткую паузу на связи расследования с решением о выпуске. Период и триггеры пересмотра — авторский пример. Визуальная опора: The importer scenario returns with a connected path: identify the input and covered parser, retain the finding evidence, assign time and ownership for investigation, and record a release decision under the team's policy. This is a review of the process, not proof that a release is safe.
 
 ## 29 | Security Training That Changes Engineering Decisions
-Seconds: 105
+Seconds: 115
 Section: Stay in touch · Next episode
 Layout: closing
 Lead: Next: EP02 · Employee training · GOST R 56939-2024, clause 5.2
 Contact: Vitaliy Pikov | pikov.expert | https://pikov.expert
+Channels:
+- LinkedIn | in/vitaliy-pikov | https://www.linkedin.com/in/vitaliy-pikov/
+- Email | vitaly@pikov.expert | mailto:vitaly@pikov.expert
+- Telegram | UnderLineSecurity | https://t.me/UnderLineSecurity
 Items:
 - Roles & skills | What each person needs to learn
 - Practical learning | A short exercise before and after training
@@ -771,9 +775,9 @@ Today we followed the Russian standard from the early discussions to the edition
 
 Your next step is simple. Choose one product, and start your planning page. Describe the current state. Name the next improvement. Then connect it to an owner, to the capacity you have, and to evidence someone can review. The worksheet with this episode will help you start.
 
-I am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch, and share the questions you would like this series to explore.
+I am Vitaliy Pikov. You can find me at pikov dot expert, and on LinkedIn. My email and my Telegram channel are on the slide. Please keep in touch, and share the questions you would like this series to explore.
 
 The next episode is called Security Training That Changes Engineering Decisions. We'll look at employee training under clause five point two. What do different roles need to learn? How do we practise those skills? And what evidence can show progress beyond attendance?
 
 We'll build a role and skills matrix, and use a short exercise before and after the training. So, which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.
-Cue: Произнести «pikov dot expert», выдержать паузу у адреса. Название EP02 прочитать полностью. В конце оставить слайд с контактом и анонсом на несколько секунд; дата выпуска пока не объявлена.
+Cue: Произнести «pikov dot expert», выдержать паузу у адреса. Ссылки на LinkedIn, почту и Telegram — на слайде, вслух их не читать. Название EP02 прочитать полностью. В конце оставить слайд с контактом и анонсом на несколько секунд; дата выпуска пока не объявлена.

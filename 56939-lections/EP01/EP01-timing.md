@@ -1,6 +1,6 @@
 # EP01 — Timing and rehearsal model
 
-Generated from [the full English script](EP01-script-en.md). Timing slots total **53:00**. Count uses written English word tokens, including contractions and hyphenated words. Acronyms and numeric designations may take longer to pronounce than this token count suggests; only a recorded rehearsal establishes the actual duration.
+Generated from [the full English script](EP01-script-en.md). Timing slots total **53:10**. Count uses written English word tokens, including contractions and hyphenated words. Acronyms and numeric designations may take longer to pronounce than this token count suggests; only a recorded rehearsal establishes the actual duration.
 
 | Slide | Start–end | Slot | Speech words | Words/min in slot |
 |---|---|---|---|---|
@@ -32,19 +32,19 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 26. Every process is written the same way | 45:20–47:50 | 02:30 | 276 | 110.4 |
 | 27. A first international crosswalk | 47:50–49:40 | 01:50 | 196 | 106.9 |
 | 28. Would this survive Friday's release? | 49:40–51:15 | 01:35 | 181 | 114.3 |
-| 29. Security Training That Changes Engineering Decisions | 51:15–53:00 | 01:45 | 190 | 108.6 |
+| 29. Security Training That Changes Engineering Decisions | 51:15–53:10 | 01:55 | 203 | 105.9 |
 
-**Total: 5960 spoken words.**
+**Total: 5973 spoken words.**
 
 ## Speaking pace sensitivity
 
-| Articulation pace | Speech alone | Space left inside 53:00 for pauses/transitions |
+| Articulation pace | Speech alone | Space left inside 53:10 for pauses/transitions |
 |---|---|---|
-| 110 words/min | 54:11 | exceeds slot by 01:11 |
-| 115 words/min | 51:50 | 01:10 |
-| 120 words/min | 49:40 | 03:20 |
-| 125 words/min | 47:41 | 05:19 |
-| 130 words/min | 45:51 | 07:09 |
+| 110 words/min | 54:18 | exceeds slot by 01:08 |
+| 115 words/min | 51:56 | 01:14 |
+| 120 words/min | 49:46 | 03:24 |
+| 125 words/min | 47:47 | 05:23 |
+| 130 words/min | 45:57 | 07:13 |
 
 Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.
 

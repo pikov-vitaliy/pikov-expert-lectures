@@ -47,7 +47,7 @@
     if (plain(url).startsWith("#")) return plain(url);
     try {
       const resolved = new URL(plain(url), window.location.href);
-      return ["https:", "http:", "file:"].includes(resolved.protocol) ? resolved.href : "";
+      return ["https:", "http:", "file:", "mailto:"].includes(resolved.protocol) ? resolved.href : "";
     } catch (_) { return ""; }
   }
 
@@ -128,7 +128,7 @@
     parent.append(figure);
   }
 
-  function appendContact(parent, contact) {
+  function appendContact(parent, contact, channels) {
     if (!contact) return;
     const href = safeLink(contact.url);
     if (!href) return;
@@ -142,6 +142,24 @@
     link.rel = "noopener noreferrer";
     block.append(identity, link);
     parent.append(block);
+    if (!Array.isArray(channels) || !channels.length) return;
+    const list = element("ul", "contact-channels");
+    channels.forEach(channel => {
+      const target = safeLink(channel.url);
+      if (!target) return;
+      const row = element("li");
+      row.append(element("span", "channel-label", channel.label));
+      const anchor = element("a", "channel-value", channel.value);
+      anchor.href = target;
+      // mailto: must not open a blank tab, and needs no opener hardening.
+      if (!target.startsWith("mailto:")) {
+        anchor.target = "_blank";
+        anchor.rel = "noopener noreferrer";
+      }
+      row.append(anchor);
+      list.append(row);
+    });
+    if (list.childElementCount) parent.append(list);
   }
 
   function footer(slide, index) {
@@ -202,7 +220,7 @@
     if (slide.visual) appendVisual(content, slide);
     else appendItems(content, Array.isArray(slide.items) ? slide.items : [], layout, slide.title);
     appendQuote(content, slide.quote);
-    appendContact(content, slide.contact);
+    appendContact(content, slide.contact, slide.channels);
     contentRoot.append(content, footer(slide, index));
     section.append(panel);
 
