@@ -73,7 +73,10 @@ function isPublicTracked(file) {
   if (!file.includes("/")) return ROOT_PUBLIC_FILES.has(file);
   const segments = file.split("/");
   const [head] = segments;
-  if (head === "ru") return segments.length === 2 && segments[1] === "index.html";
+  if (head === "ru") return segments.length === 2 && (segments[1] === "index.html" || segments[1] === "course-map.html");
+  // Предпросмотр редизайна публикуется вместе с сайтом и копирует биографию,
+  // поэтому он обязан проходить ту же проверку на упоминания бывшего работодателя.
+  if (head === "new") return true;
   if (!LECTURE_FOLDERS.has(head)) return false;
 
   const directorySegments = segments.slice(1, -1);

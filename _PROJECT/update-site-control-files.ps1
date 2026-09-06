@@ -318,6 +318,7 @@ $rootUrls = New-Object System.Collections.Generic.List[string]
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/'
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/ru/'
 Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/course-map.html'
+Add-UniqueUrl -List $rootUrls -Url 'https://pikov.expert/ru/course-map.html'
 foreach ($lecture in @($data.lectures | Sort-Object position)) {
   Add-UniqueUrl -List $rootUrls -Url ([string]$lecture.url)
 }

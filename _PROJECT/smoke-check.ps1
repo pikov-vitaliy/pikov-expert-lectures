@@ -21,8 +21,10 @@ function Get-ExpectedIndexUrl($Lecture) {
   return $expectedIndexUrl
 }
 
-function Assert-PublicHtmlMetadata([string]$Html, [string]$Label, [string]$ExpectedUrl, [bool]$RequireBrandBack) {
-  if ($Html -notmatch '(?s)<html\b[^>]*\blang="ru"') { Fail "$Label missing lang=`"ru`"" }
+function Assert-PublicHtmlMetadata([string]$Html, [string]$Label, [string]$ExpectedUrl, [bool]$RequireBrandBack, [string]$ExpectedLang = 'ru') {
+  # Язык проверяется параметром, а не константой: корневая карта курсов
+  # отдаётся по умолчанию на английском, лекционные страницы остаются русскими.
+  if ($Html -notmatch ('(?s)<html\b[^>]*\blang="' + [regex]::Escape($ExpectedLang) + '"')) { Fail "$Label missing lang=`"$ExpectedLang`"" }
   if ($Html -notmatch '<meta\s+name="viewport"\s+content="[^"]*width=device-width') { Fail "$Label missing responsive viewport" }
   if ($Html -match '<meta\s+name="viewport"\s+content="width=1920"') { Fail "$Label has fixed 1920px viewport" }
   if ($Html -notmatch '109116119|mc\.yandex\.ru/metrika') { Fail "$Label missing Yandex Metrika" }
@@ -85,7 +87,11 @@ $p19Title = Decode-Utf8Base64 '0J3QtdGE0YPQvdC60YbQuNC+0L3QsNC70YzQvdC+0LUg0YLQt
 $obsoleteP19Title = Decode-Utf8Base64 '0J/RgNC+0LLQtdGA0LrQsCDQsdC10LfQvtC/0LDRgdC90L7RgdGC0Lgg0L/RgNC40LvQvtC20LXQvdC40Y8='
 $rootIndexHtml = Get-Content -LiteralPath $indexPath -Encoding UTF8 -Raw
 $courseMapHtml = Get-Content -LiteralPath $courseMapPath -Encoding UTF8 -Raw
-Assert-PublicHtmlMetadata -Html $courseMapHtml -Label 'course-map.html' -ExpectedUrl 'https://pikov.expert/course-map.html' -RequireBrandBack $true
+Assert-PublicHtmlMetadata -Html $courseMapHtml -Label 'course-map.html' -ExpectedUrl 'https://pikov.expert/course-map.html' -RequireBrandBack $true -ExpectedLang 'en'
+$ruCourseMapPath = Join-Path (Join-Path $rootPath 'ru') 'course-map.html'
+if (-not (Test-Path -LiteralPath $ruCourseMapPath)) { Fail 'Missing ru/course-map.html' }
+$ruCourseMapHtml = Get-Content -LiteralPath $ruCourseMapPath -Encoding UTF8 -Raw
+Assert-PublicHtmlMetadata -Html $ruCourseMapHtml -Label 'ru/course-map.html' -ExpectedUrl 'https://pikov.expert/ru/course-map.html' -RequireBrandBack $true -ExpectedLang 'ru'
 $lectureCatalogJson = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw
 foreach ($surface in @(
   [pscustomobject]@{ Label = 'p19'; Text = $p19Html },
@@ -195,7 +201,7 @@ foreach ($folder in $domainFolders) {
 }
 
 $rootLocaleDirs = @('ru')
-$expectedRootLocaleFiles = @('ru/index.html')
+$expectedRootLocaleFiles = @('ru/index.html', 'ru/course-map.html')
 $rootPathPrefix = $rootPath.TrimEnd('\') + '\'
 $actualRootLocaleFiles = @(
   foreach ($localeDir in $rootLocaleDirs) {
@@ -306,6 +312,7 @@ $sitemapUrls = @($sitemap.SelectNodes('//sm:url/sm:loc', $ns) | ForEach-Object {
 $expectedSitemapUrls = New-Object System.Collections.Generic.HashSet[string]
 [void]$expectedSitemapUrls.Add('https://pikov.expert/')
 [void]$expectedSitemapUrls.Add('https://pikov.expert/course-map.html')
+[void]$expectedSitemapUrls.Add('https://pikov.expert/ru/course-map.html')
 foreach ($lecture in $lectures) {
   $loc = [string]$lecture.url
   if ($loc.Contains('#')) { $loc = $loc.Split('#')[0] }

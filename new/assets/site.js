@@ -15,7 +15,7 @@
     updateTheme();
     themeButton.addEventListener('click', () => {
       root.dataset.theme = currentTheme() === 'dark' ? 'light' : 'dark';
-      try { localStorage.setItem('pikov-new-theme', root.dataset.theme); } catch {}
+      try { localStorage.setItem('theme', root.dataset.theme); } catch {}
       updateTheme();
     });
     systemTheme.addEventListener('change', updateTheme);

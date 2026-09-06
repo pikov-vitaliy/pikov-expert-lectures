@@ -507,6 +507,7 @@ function Get-RootReleaseFiles([string]$RootPath) {
     'new/assets/illustrations/edu.webp',
     'photo.jpg',
     'robots.txt',
+    'ru/course-map.html',
     'ru/index.html',
     'sitemap.xml',
     'yandex_bf73d77ba788688e.html'
