@@ -289,7 +289,7 @@ def build_lecture(date_label: str, text: str) -> str:
 <h1 id="{esc(title_id)}">{esc(title)}</h1>
 <p class="deck">Как развивались методологии безопасной разработки, почему появились национальные стандарты и как связать требования с повседневной инженерной работой.</p>
 {lecture_parts(headings)}
-<div class="hero-links"><a class="button" href="#lecture-text">Читать лекцию</a><a class="button secondary" href="#lecture-contents">Содержание</a><a class="button secondary" href="data:text/markdown;charset=utf-8;base64,{markdown_download}" download="безопасная-разработка-история-стандартов-и-процессы.md">Лекция в Markdown</a></div></div>
+<div class="hero-links"><a class="button" href="#lecture-text">Читать лекцию</a><a class="button secondary" href="#lecture-contents">Содержание</a><a class="button secondary" href="data:text/markdown;charset=utf-8;base64,{markdown_download}" download="{esc(LECTURE_MD.name)}">Лекция в Markdown</a></div></div>
 <main class="wrap lecture-shell" id="main"><section id="lecture-content">
 {toc(headings)}<article class="markdown" id="lecture-text">{rendered}</article></section></main>'''
     return shell(f"{title} · pikov.expert", "Учебные материалы об истории национального стандарта и практическом применении ГОСТ в безопасной разработке программного обеспечения.", body, date_label, reader=True)
