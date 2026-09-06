@@ -128,7 +128,7 @@ try {
   const noJsContext = await browser.newContext({ javaScriptEnabled: false });
   try {
     for (const expected of [
-      { route: "/", language: "en", hero: "Vitaly Pikov", switchHref: "/ru/" },
+      { route: "/", language: "en", hero: "Vitaliy Pikov", switchHref: "/ru/" },
       { route: "/ru/", language: "ru", hero: "Пиков Виталий Александрович", switchHref: "/" },
     ]) {
       const noJsPage = await noJsContext.newPage();

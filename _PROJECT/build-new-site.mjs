@@ -20,12 +20,12 @@ const asset = name => {
 const arrow = '<span aria-hidden="true">↗</span>';
 const copy = {
   en: {
-    name:'Vitaly Pikov', title:'Secure development.\nEngineering practice.', role:'Expert & lecturer',
+    name:'Vitaliy Pikov', title:'Secure development.\nEngineering practice.', role:'Expert & lecturer',
     lead:'I help teams build secure software and teach the people behind it. Explore my lectures, practical workshops and resources for everyday engineering.',
     materials:'Materials', paths:'Where to start', about:'About me', contact:'Contact', browse:'Explore the materials', discuss:'Discuss training',
     classic:'Current website', version:'New website version', skip:'Skip to materials', switchLanguage:'Переключить на русский',
     theme:'Switch colour theme', light:'Use light theme', dark:'Use dark theme',
-    portrait:'Vitaly Pikov, secure software development expert and lecturer',
+    portrait:'Vitaliy Pikov, secure software development expert and lecturer',
     facts:['26 years in IT','10+ years of teaching','40+ research publications'],
     topics:'Explore by subject', topicsIntro:'Different disciplines. One engineering perspective.', topicAction:'View materials',
     selected:'A few places to begin', selectedIntro:'An introduction to how I approach security, teaching and practical work.',
@@ -42,10 +42,10 @@ const copy = {
     shortAbout:'Engineering, research and teaching.', shortAboutText:'My work brings together secure software development, information security and education. I translate requirements into architecture, working processes and checks that teams can use.',
     background:'More about my background', expertise:['Secure C/C++','SCA & SBOM','AppSec & DevSecOps','Threat modelling'],
     contactTitle:'Let’s work on the next step.', contactText:'For lectures, team training and consulting on secure software development and information security.',
-    email:'Email me', independent:'An independent educational project by Vitaly Pikov.',
-    back:'Back to the materials', aboutTitle:'About Vitaly Pikov',
-    meta:'Original lectures, workshops and references by Vitaly Pikov. Secure development, AppSec, DevSecOps, operating systems and information security.',
-    aboutMeta:'Vitaly Pikov: engineering practice, secure software development, teaching, research and professional background.',
+    email:'Email me', independent:'An independent educational project by Vitaliy Pikov.',
+    back:'Back to the materials', aboutTitle:'About Vitaliy Pikov',
+    meta:'Original lectures, workshops and references by Vitaliy Pikov. Secure development, AppSec, DevSecOps, operating systems and information security.',
+    aboutMeta:'Vitaliy Pikov: engineering practice, secure software development, teaching, research and professional background.',
   },
   ru: {
     name:'Виталий Пиков', title:'Безопасная разработка.\nИнженерная практика.', role:'Эксперт и преподаватель',

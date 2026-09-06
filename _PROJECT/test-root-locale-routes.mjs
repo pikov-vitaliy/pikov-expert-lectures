@@ -55,7 +55,7 @@ test("static profile JSON-LD follows each document language", () => {
   const enSite = enProfile["@graph"].find(node => node["@type"] === "WebSite");
   const ruSite = ruProfile["@graph"].find(node => node["@type"] === "WebSite");
 
-  assert.equal(enPerson.name, "Vitaly Pikov");
+  assert.equal(enPerson.name, "Vitaliy Pikov");
   assert.doesNotMatch(enPerson.jobTitle, /[Ѐ-ӿ]/);
   assert.ok(enPerson.knowsAbout.every(value => !/[Ѐ-ӿ]/.test(value)));
   assert.doesNotMatch(enSite.description, /[Ѐ-ӿ]/);

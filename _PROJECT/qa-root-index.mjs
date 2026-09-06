@@ -220,7 +220,7 @@ try {
   }));
   check("first visit opens in English", defaultLang.dataset === "en" && defaultLang.attr === "en", JSON.stringify(defaultLang));
   check("hero role renders in English by default", /Expert in secure software development/.test(defaultLang.heroRole || ""), defaultLang.heroRole);
-  check("document title is English by default", /Vitaly Pikov/.test(defaultLang.title), defaultLang.title);
+  check("document title is English by default", /Vitaliy Pikov/.test(defaultLang.title), defaultLang.title);
 
   // Ни одного русского слова не должно просочиться в английскую версию.
   // Исключение — сама кнопка языка: она по общепринятому правилу называет
