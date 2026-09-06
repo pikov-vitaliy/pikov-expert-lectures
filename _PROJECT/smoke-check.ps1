@@ -245,7 +245,12 @@ $localWorkspaceDirs = @(
 )
 # The parallel homepage belongs to the root website, not to a lecture domain.
 # Its exact pages and assets are allowlisted by Get-RootReleaseFiles.
-$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests', 'new') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
+# 56939-lections — англоязычная серия вебинаров по ГОСТ Р 56939 в работе.
+# Пока это редакционный источник: в релиз он не входит и на pikov.expert не
+# публикуется. Материалы выложены вручную на 56939-lections.pikov.expert.
+# Когда серия получит оформление, её нужно завести в _PROJECT/lectures.json
+# как обычную площадку и убрать отсюда.
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests', 'new', '56939-lections') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |
