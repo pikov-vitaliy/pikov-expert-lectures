@@ -1,0 +1,699 @@
+window.EP01_DATA = {
+  "title": "Where Secure Development Begins",
+  "subtitle": "History, GOST and a working process",
+  "author": "Vitaliy Pikov",
+  "date": "2026-09-06",
+  "cover": "assets/ep01-cover.png",
+  "sources": [
+    {
+      "id": "G24",
+      "title": "GOST R 56939-2024 · clauses 4 and 5.1",
+      "url": "https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64",
+      "note": "Requirements checked against the local final-edition DOCX/PDF; official record verifies edition dates. English clause wording is a working translation."
+    },
+    {
+      "id": "G16",
+      "title": "Rosstandart · GOST R 56939-2016 record",
+      "url": "https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d",
+      "note": "Approved 2016-06-01; effective 2017-06-01; replaced by the 2024 edition."
+    },
+    {
+      "id": "WARE",
+      "title": "RAND · Security Controls for Computer Systems",
+      "url": "https://www.rand.org/pubs/reports/R609-1.html",
+      "note": "Original February 1970 report; the catalogue page describes the 1979 reissue."
+    },
+    {
+      "id": "SS75",
+      "title": "Saltzer and Schroeder · The Protection of Information in Computer Systems",
+      "url": "https://web.mit.edu/saltzer/www/publications/protection/index.html",
+      "note": "Proceedings of the IEEE, September 1975. Selected principles, not a complete account of security history."
+    },
+    {
+      "id": "MSH",
+      "title": "Microsoft · History of the SDL",
+      "url": "https://www.microsoft.com/en-us/securityengineering/sdl/about",
+      "note": "Trustworthy Computing: January 2002; SDL integral to development: 2004."
+    },
+    {
+      "id": "RH",
+      "title": "Rosstandart regional centre · Historical milestones",
+      "url": "https://csm.omsk.ru/about/90-years/rosstandart-istor-vehi/16107/",
+      "note": "Institutional history: standardization committee established 15 September 1925."
+    },
+    {
+      "id": "N11",
+      "title": "NIST SP 800-218 · SSDF 1.1 · Final",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/final",
+      "note": "Final baseline, 3 February 2022; the narrow example uses Table 1, task PO.2.1."
+    },
+    {
+      "id": "N12",
+      "title": "NIST SP 800-218 Rev. 1 · SSDF 1.2 · Draft",
+      "url": "https://csrc.nist.gov/pubs/sp/800/218/r1/ipd",
+      "note": "Initial public draft, 17 December 2025. Status checked 6 September 2026; recheck before recording."
+    },
+    {
+      "id": "SAMM",
+      "title": "OWASP SAMM · Strategy and Metrics · Stream A",
+      "url": "https://owaspsamm.org/model/governance/strategy-and-metrics/stream-a/",
+      "note": "Maturity model; activity G-SM-A-2 is the roadmap/strategy comparison. Living website, checked 6 September 2026."
+    },
+    {
+      "id": "MLR",
+      "title": "Kudriavtseva and Gadyatskaya · A Multivocal Literature Review",
+      "url": "https://arxiv.org/html/2211.16987v2",
+      "note": "arXiv:2211.16987v2, 4 July 2023. Research map of 28 methodologies; publication dates may differ from origin dates."
+    },
+    {
+      "id": "EX",
+      "title": "Illustrative teaching example · Vitaliy Pikov",
+      "url": "#example-note",
+      "note": "Fictional importer, roles, hours, dates, review cadence and tasks. Not a client case, GOST-prescribed schedule, or conformity claim."
+    }
+  ],
+  "slides": [
+    {
+      "id": 1,
+      "title": "Where secure development begins",
+      "seconds": 60,
+      "section": "Welcome",
+      "kicker": "EP01 / 01",
+      "layout": "cover",
+      "lead": "History, GOST and a working process",
+      "items": [
+        {
+          "label": "EP01 / 25",
+          "text": "Planning secure software development processes"
+        }
+      ],
+      "quote": "",
+      "notes": "Hello, and welcome. I am Vitaliy Pikov. I work with secure software development processes, and I teach the engineering ideas behind them.\n\nThis is the first episode of Secure Software Development in Practice. We will explore twenty-five processes from a Russian national standard, GOST R 56939-2024, and compare them with international approaches.\n\nOur question is simple: what can a development team actually use?\n\nToday, we will look at the history behind the subject, learn how to read this standard, and build a small example of a security process plan. You do not need previous knowledge of Russian standards. Bring your experience of building software, reviewing it, or helping a team deliver it safely.",
+      "sourceIds": [
+        "G24"
+      ]
+    },
+    {
+      "id": 2,
+      "title": "One process. One useful result.",
+      "seconds": 90,
+      "section": "The series",
+      "kicker": "EP01 / 02",
+      "layout": "cards",
+      "lead": "A practical question for every episode",
+      "items": [
+        {
+          "label": "Understand",
+          "text": "What problem does the process address?"
+        },
+        {
+          "label": "Compare",
+          "text": "Where do international practices overlap or differ?"
+        },
+        {
+          "label": "Apply",
+          "text": "What can a team do and verify?"
+        }
+      ],
+      "quote": "",
+      "notes": "This series builds on an earlier Russian-language webinar project that I delivered with PVS-Studio. For this English series, I want to extend that work through a systematic comparison with international practices.\n\nEach episode will focus on one process. We will ask three questions. What problem does it address? How do other approaches address a similar problem? And what evidence would show that a team has put the process into practice?\n\nThe audience includes developers, AppSec practitioners, and technical leaders. You may write code, design a delivery pipeline, or decide where the team should invest its limited time. Each of those perspectives matters.\n\nI am also using this project to develop my professional English and deepen my own research. I will explain unfamiliar terms, identify the sources, and make corrections visible when they are needed.\n\nBy the end of an episode, you should have something useful to discuss with your team: a small checklist, a decision record, or an example you can adapt to your own environment.",
+      "sourceIds": [
+        "G24"
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Twenty-five processes, connected",
+      "seconds": 90,
+      "section": "The series",
+      "kicker": "EP01 / 03",
+      "layout": "steps",
+      "lead": "EP01 ↔ clause 5.1 · EP25 ↔ clause 5.25",
+      "items": [
+        {
+          "label": "Organize",
+          "text": "Plan the work, develop skills and assign responsibility"
+        },
+        {
+          "label": "Engineer",
+          "text": "Address threats, design, code, dependencies and builds"
+        },
+        {
+          "label": "Verify",
+          "text": "Review, analyze and test"
+        },
+        {
+          "label": "Sustain",
+          "text": "Deliver updates, handle weaknesses and improve"
+        }
+      ],
+      "quote": "",
+      "notes": "The standard gives us the structure of the series: twenty-five processes, and twenty-five core episodes. Episode one follows section five point one. Episode twenty-five follows section five point twenty-five.\n\nThe four groups on this slide are my teaching guide. They are not additional categories defined by the standard. They help us see how planning, engineering, verification, and continued support connect.\n\nFor example, a static analysis result is useful only when we know what code was analyzed, who reviews the findings, and how a correction reaches a release. A dependency inventory is useful only when somebody maintains it and acts on relevant changes.\n\nWe will keep returning to those connections. Some episodes will include a guest who can explain a specific practice from direct experience. Every core episode will still have its own practical result.\n\nYou can follow the complete series or choose an episode that matches a current problem. Today establishes the vocabulary and a planning example that later episodes can extend.",
+      "sourceIds": [
+        "G24"
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Friday's release is blocked",
+      "seconds": 90,
+      "section": "The engineering problem",
+      "kicker": "EP01 / 04",
+      "layout": "cards",
+      "lead": "Illustrative case · a C++ engineering-file importer",
+      "items": [
+        {
+          "label": "A warning",
+          "text": "A parser issue appears just before release"
+        },
+        {
+          "label": "A gap",
+          "text": "Nobody agreed who investigates it"
+        },
+        {
+          "label": "A decision",
+          "text": "The release owner lacks reliable evidence"
+        }
+      ],
+      "quote": "",
+      "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nThe tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
+      "sourceIds": [
+        "EX"
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Protection principles came first",
+      "seconds": 90,
+      "section": "Selected historical milestones",
+      "kicker": "EP01 / 05",
+      "layout": "timeline",
+      "lead": "Architectural questions long before modern pipelines",
+      "items": [
+        {
+          "label": "1970",
+          "text": "Ware report: security controls for shared computer systems"
+        },
+        {
+          "label": "1975",
+          "text": "Saltzer–Schroeder: principles for protection mechanisms"
+        },
+        {
+          "label": "Today",
+          "text": "Least privilege and fail-safe defaults remain useful design questions"
+        }
+      ],
+      "quote": "",
+      "notes": "Secure software development has several historical roots. This is a selection of milestones, rather than a claim that the whole subject began on one particular date.\n\nThe Ware report appeared in February nineteen seventy, following the work of a task force on security controls for shared computer systems. Its subject was broader than today's software development lifecycle.\n\nIn nineteen seventy-five, Jerome Saltzer and Michael Schroeder published a foundational paper on the protection of information in computer systems. Two useful principles are least privilege and fail-safe defaults.\n\nConsider our file importer. Does it need access to every file owned by the user? What happens when an access decision cannot be completed? Those are design questions that can be asked before choosing an analysis tool.\n\nThe historical connection I want to make is practical. Security has long involved decisions about architecture, authority, and failure. Modern development processes give teams repeated opportunities to make those decisions, check their implementation, and revisit them as the system changes.",
+      "sourceIds": [
+        "WARE",
+        "SS75"
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Security becomes organized work",
+      "seconds": 90,
+      "section": "Selected historical milestones",
+      "kicker": "EP01 / 06",
+      "layout": "timeline",
+      "lead": "Executive commitment needs an engineering process",
+      "items": [
+        {
+          "label": "2002",
+          "text": "Microsoft's Trustworthy Computing initiative"
+        },
+        {
+          "label": "2004",
+          "text": "SDL becomes integral to development at Microsoft"
+        },
+        {
+          "label": "Practical lesson",
+          "text": "Ownership, resources and repeatable activities"
+        }
+      ],
+      "quote": "",
+      "notes": "Another useful milestone comes from Microsoft. The Trustworthy Computing initiative began in January two thousand two. Microsoft's own history describes its Security Development Lifecycle becoming an integral part of development in two thousand four.\n\nThis does not mean that Microsoft invented secure software development. It gives us a well-documented example of security becoming organized work across a large engineering organization.\n\nThink about the difference between a statement and a working practice. A statement can say that security matters. A working practice needs time in the schedule, people with the relevant skills, and decisions about what happens when a problem is found.\n\nIn our fictional team, a manager might support security in principle. The next step is to reserve time for the parser investigation and decide who can make the release decision. Training and tools support that work, but they do not assign responsibility by themselves.\n\nThis is the bridge from history to today's first process: a security intention becomes useful when the team plans how to carry it out.",
+      "sourceIds": [
+        "MSH"
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Reading a Russian national standard",
+      "seconds": 90,
+      "section": "The Russian context",
+      "kicker": "EP01 / 07",
+      "layout": "cards",
+      "lead": "GOST R 56939-2024",
+      "items": [
+        {
+          "label": "GOST R",
+          "text": "Russian national standard designation"
+        },
+        {
+          "label": "56939",
+          "text": "The standard's identifying number"
+        },
+        {
+          "label": "2024",
+          "text": "The edition year"
+        },
+        {
+          "label": "Context",
+          "text": "State standardization institutions trace their history to 1925"
+        }
+      ],
+      "quote": "",
+      "notes": "Before we discuss the specific document, let us read its name. GOST R identifies a Russian national standard. Five six nine three nine is its number, and twenty twenty-four identifies the edition.\n\nRussia's state standardization institutions trace their history to a committee established in nineteen twenty-five. That gives us institutional context. It does not mean that secure software development has existed as a standardized practice since that year.\n\nThe document we use in this series is titled Information protection. Secure software development. General requirements. Its purpose is relevant to software development processes, including the organizational work that supports them.\n\nFor an international audience, the useful starting point is to read the actual requirements and understand their context. The national designation alone does not tell us whether a practice will be useful for a particular team elsewhere.\n\nWe also need to separate a standard's technical content from a specific organization's obligations. Those obligations depend on the applicable context. This series is an engineering comparison; it is not a determination of a particular company's legal duties.",
+      "sourceIds": [
+        "RH",
+        "G24"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "From the 2016 edition to 2024",
+      "seconds": 90,
+      "section": "The Russian context",
+      "kicker": "EP01 / 08",
+      "layout": "timeline",
+      "lead": "One numbered standard, a revised process structure",
+      "items": [
+        {
+          "label": "2016 → 2017",
+          "text": "Approved 1 June 2016 · effective 1 June 2017"
+        },
+        {
+          "label": "2024",
+          "text": "Approved 24 October · effective 20 December"
+        },
+        {
+          "label": "Current baseline",
+          "text": "The 2024 edition replaces the 2016 edition"
+        },
+        {
+          "label": "Read each process",
+          "text": "Goal → requirements → implementation evidence"
+        }
+      ],
+      "quote": "",
+      "notes": "The first edition of this numbered standard was approved in June twenty sixteen and took effect in June twenty seventeen. The revised twenty twenty-four edition was approved in October and took effect on the twentieth of December, replacing the earlier edition.\n\nThe current document organizes its main content into twenty-five processes. For each process, we will examine its goal, the requirements, and the evidence of implementation.\n\nThis structure gives us a consistent way to prepare the series. It also encourages a useful question: what would we expect to see if this process were actually working?\n\nThe standard does not tie the processes to one particular lifecycle model. That matters when a team uses short iterations, continuous integration, or a more staged delivery model.\n\nThe official record lists several organizations involved in developing the revision. That supports a statement about collaborative authorship. It does not, by itself, establish that the document copied a particular foreign framework or that its practices are unique. Those are questions that require a closer comparison of the content.",
+      "sourceIds": [
+        "G16",
+        "G24"
+      ]
+    },
+    {
+      "id": 9,
+      "title": "A map of international approaches",
+      "seconds": 90,
+      "section": "Our comparison method",
+      "kicker": "EP01 / 09",
+      "layout": "compare",
+      "lead": "Different documents answer different questions",
+      "items": [
+        {
+          "label": "NIST SSDF 1.1",
+          "text": "A framework of high-level secure development practices"
+        },
+        {
+          "label": "OWASP SAMM",
+          "text": "A model for assessing and improving software assurance maturity"
+        },
+        {
+          "label": "Microsoft SDL",
+          "text": "An engineering approach with defined security practices"
+        },
+        {
+          "label": "Version discipline",
+          "text": "SSDF 1.2 is a draft at the 6 September 2026 check"
+        }
+      ],
+      "quote": "",
+      "notes": "Our international comparison needs more than a collection of familiar names. Different documents have different purposes.\n\nNIST's Secure Software Development Framework offers high-level practices that can be integrated into different development lifecycles. We use version one point one as our final baseline. At our September twenty twenty-six check, version one point two is still listed as a draft.\n\nOWASP SAMM provides a software assurance maturity model. Microsoft SDL provides another engineering approach. A literature review already used in my earlier materials also illustrates the variety of secure development methodologies.\n\nThese sources are useful in different ways. One can help describe a practice. Another can help organize improvement. A research review can help us understand the landscape and the limits of the evidence.\n\nWe will state the version and the purpose before comparing a specific point. A familiar label is not enough to establish equivalence. For the first process, the most useful question is how these approaches help a team turn security priorities into organized, reviewable work.",
+      "sourceIds": [
+        "N11",
+        "N12",
+        "SAMM",
+        "MSH",
+        "MLR"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Compare obligations, not labels",
+      "seconds": 90,
+      "section": "Our comparison method",
+      "kicker": "EP01 / 10",
+      "layout": "steps",
+      "lead": "Similar goals can still imply different work",
+      "items": [
+        {
+          "label": "Read",
+          "text": "Actor · action · scope · conditions"
+        },
+        {
+          "label": "Compare",
+          "text": "Shared intent and concrete differences"
+        },
+        {
+          "label": "Demonstrate",
+          "text": "One implementation example with evidence"
+        },
+        {
+          "label": "Conclude",
+          "text": "Partial overlap is a useful result"
+        }
+      ],
+      "quote": "",
+      "notes": "Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.\n\nWe also preserve the strength of the original wording. In this GOST, both the Russian words dolzhen and sleduyet express a required condition. Translating every occurrence of sleduyet as an optional English should would lose that meaning.\n\nOn the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.\n\nOur conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.\n\nThis lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.",
+      "sourceIds": [
+        "G24",
+        "N11"
+      ]
+    },
+    {
+      "id": 11,
+      "title": "What process 5.1 asks for",
+      "seconds": 90,
+      "section": "Planning secure development",
+      "kicker": "EP01 / 11",
+      "layout": "steps",
+      "lead": "Five obligations that connect the present to the next action",
+      "items": [
+        {
+          "label": "5.1.2.1",
+          "text": "Periodically analyze the current state"
+        },
+        {
+          "label": "5.1.2.2",
+          "text": "Periodically analyze resource needs"
+        },
+        {
+          "label": "5.1.2.3",
+          "text": "Develop a process improvement plan"
+        },
+        {
+          "label": "5.1.2.4",
+          "text": "Develop a process implementation plan"
+        },
+        {
+          "label": "5.1.2.5",
+          "text": "Define the scope of the processes"
+        }
+      ],
+      "quote": "",
+      "notes": "We can now read the first process directly. Section five point one concerns planning secure software development processes.\n\nIt contains five requirements. Periodically analyze the current state of the processes. Periodically analyze resource needs. Develop a plan for improving the processes. Develop a plan for implementing them. And define their scope.\n\nThe two plans must take the analyses into account. That connection matters. A plan that ignores the team's current practices or available resources may be attractive on paper and impossible to execute.\n\nI use process improvement plan as a working English label for the plan of process development. We will distinguish it from the implementation plan in a moment.\n\nFor our small team, the first action is to describe what already happens and what does not. We then identify the most significant gaps, estimate the capacity needed to address them, and assign realistic work.\n\nThe standard requires periodic analysis, but it does not give us a universal ninety-day schedule. The schedule later in this episode is an illustrative choice for our example.",
+      "sourceIds": [
+        "G24"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Start with a defensible scope",
+      "seconds": 90,
+      "section": "Planning secure development",
+      "kicker": "EP01 / 12",
+      "layout": "table",
+      "lead": "Name the software and explain the boundary",
+      "items": [
+        {
+          "label": "Included",
+          "text": "Importer 2.0 · parser module · service API · shipped libraries"
+        },
+        {
+          "label": "Connected context",
+          "text": "Repository, CI configuration and release workflow"
+        },
+        {
+          "label": "Boundary to justify",
+          "text": "Retired prototype with no code or dependency path into release"
+        },
+        {
+          "label": "Evidence",
+          "text": "Versioned scope record with the selection rationale"
+        }
+      ],
+      "quote": "",
+      "notes": "What exactly does the plan cover? In our example, the scope includes version two point zero of the importer, its parser module, the small service API, and the libraries that ship with it.\n\nThe repository, integration configuration, and release workflow form relevant development context. We record their links so that the plan can be connected to actual work.\n\nSuppose the team also has an old prototype. It may be outside the selected scope, but the team needs a reason. If code or a dependency from that prototype is included in the release, the boundary needs another look.\n\nThe standard's scope artifact includes the software composition and a justification for the selection. Naming a product without identifying its relevant parts leaves room for misunderstanding.\n\nThis is not permission to declare inconvenient components irrelevant. The rationale must make sense for the product and its applicable obligations. For a teaching example, we can keep the scope small. For a real implementation, the team needs to examine the actual relationships and maintain the boundary as the product changes.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Assess reality and assign owners",
+      "seconds": 90,
+      "section": "Planning secure development",
+      "kicker": "EP01 / 13",
+      "layout": "cards",
+      "lead": "Illustrative findings, with people who can act",
+      "items": [
+        {
+          "label": "Engineering lead",
+          "text": "Parser checks run manually; coverage is unclear"
+        },
+        {
+          "label": "AppSec lead",
+          "text": "Review findings and agree investigation criteria"
+        },
+        {
+          "label": "Release owner",
+          "text": "Record release decisions under the team's policy"
+        },
+        {
+          "label": "Sponsor",
+          "text": "Resolve capacity and priority conflicts"
+        }
+      ],
+      "quote": "",
+      "notes": "The current-state record lists implemented and unimplemented processes. It assesses the sufficiency and conformity of existing processes against this standard, other applicable standards, and the team's tools and technologies.\n\nFor the example, we record that parser checks run manually, coverage is unclear, and the decision history is incomplete. These are illustrative findings, not observations about a real organization.\n\nWe then assign responsibilities. The engineering lead owns the integration work. The AppSec lead helps define the investigation criteria and review the security evidence. The release owner records the release decision under the team's agreed policy. A sponsor resolves conflicts over capacity and priorities.\n\nOne person may hold several roles in a small team. What matters is that the responsibility and the decision authority are understandable.\n\nThis role arrangement is our implementation example. The standard's implementation-plan artifact calls for responsible employees, but it does not automatically give an AppSec specialist an independent power to block every release. That authority needs to be defined in the organization's own arrangements.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 14,
+      "title": "Resources include human attention",
+      "seconds": 90,
+      "section": "Planning secure development",
+      "kicker": "EP01 / 14",
+      "layout": "cards",
+      "lead": "Illustrative 90-day estimate · validate it with the team",
+      "items": [
+        {
+          "label": "Engineering",
+          "text": "60 person-hours"
+        },
+        {
+          "label": "AppSec",
+          "text": "24 person-hours"
+        },
+        {
+          "label": "Release and sponsor",
+          "text": "12 person-hours"
+        },
+        {
+          "label": "Total",
+          "text": "96 person-hours · tools and infrastructure assessed separately"
+        }
+      ],
+      "quote": "",
+      "notes": "Resource planning includes more than the price of a tool. It also includes time to configure checks, investigate findings, maintain the workflow, and teach people how to use it.\n\nHere is a deliberately small estimate for our fictional ninety-day improvement effort. We reserve sixty engineering hours, twenty-four AppSec hours, and twelve hours for release coordination and sponsor decisions. The total is ninety-six person-hours.\n\nThese figures are an example, not a benchmark and not a percentage required by GOST. Tool costs, infrastructure capacity, and any additional training costs need their own assessment.\n\nWe should also identify dependencies. If the engineer who maintains the build system is unavailable during the first month, the schedule needs to reflect that fact. Assigning a task does not create capacity.\n\nThe resource-analysis artifact in the standard may contain estimated material and human resource indicators. Our numeric table is one way to make the discussion concrete. The useful test is whether the people responsible for the work agree that the estimate is credible and know what to do when it proves wrong.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Two plans, two questions",
+      "seconds": 90,
+      "section": "Planning secure development",
+      "kicker": "EP01 / 15",
+      "layout": "compare",
+      "lead": "A roadmap and an execution plan can be linked in one tracker",
+      "items": [
+        {
+          "label": "Improvement plan",
+          "text": "What capability changes, in what order, with which resources?"
+        },
+        {
+          "label": "Implementation plan",
+          "text": "What work happens, by whom, at which stage, and by when?"
+        },
+        {
+          "label": "Shared foundation",
+          "text": "Current-state analysis and resource analysis"
+        }
+      ],
+      "quote": "",
+      "notes": "The two plans answer related but different questions. The improvement plan describes how the processes will develop. It establishes priorities and the sequence of changes, taking resources into account.\n\nFor our team, that might mean making parser analysis repeatable first, then improving the handling of findings, and then reviewing whether the process is effective.\n\nThe implementation plan turns those priorities into work. It identifies goals, stages, dates, resources, and responsible people. A task could specify the parser target, the integration milestone, the owner, and the evidence required for review.\n\nThese plans do not have to be disconnected documents. The standard explicitly allows them to be represented in a task management system. A roadmap with linked tasks can preserve the distinction between improving a capability and executing the work.\n\nThe important connection is traceability: why this change was selected, which resource assumption supports it, who performs it, and what will show that the planned stage is complete. If those links are missing, two beautifully formatted files will not solve the planning problem.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 16,
+      "title": "A 90-day plan for the importer",
+      "seconds": 120,
+      "section": "Worked example",
+      "kicker": "EP01 / 16",
+      "layout": "timeline",
+      "lead": "Illustrative implementation choices, not a GOST timetable",
+      "items": [
+        {
+          "label": "Days 1–30",
+          "text": "Confirm scope and baseline · assign owners · agree capacity"
+        },
+        {
+          "label": "Days 31–60",
+          "text": "Connect parser checks to CI · record coverage and triage decisions"
+        },
+        {
+          "label": "Days 61–90",
+          "text": "Review two release cycles · correct gaps · update the next plan"
+        }
+      ],
+      "quote": "",
+      "notes": "Let us put those elements together in a ninety-day example. The product is the engineering-file importer. Our immediate objective is to make the treatment of parser analysis findings repeatable and reviewable.\n\nDuring days one to thirty, the team confirms the software scope, records the current state, and reviews the resource estimate. It identifies the owner of each planned action and the person responsible for the release decision. The result is a small baseline that everybody can inspect.\n\nDuring days thirty-one to sixty, the engineer connects the chosen parser checks to continuous integration. The team records which source targets and configurations are covered. Findings receive a review record, and the release workflow links to that record.\n\nDuring days sixty-one to ninety, the team reviews evidence from two illustrative release cycles. It asks whether the checks ran on the intended versions, whether findings received decisions, and whether the allocated capacity was sufficient. The answers inform the next improvement plan.\n\nThe ninety-day period, two releases, and detailed tasks are our choices. They do not come from the standard. Also, completing this example does not establish conformity with every process in the document.\n\nFor implementation of this GOST, section four point thirteen requires version control, continuous integration, and task management, including defect tracking, in the development environment. It does not say continuous deployment. That distinction is useful when we explain our pipeline choices.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 17,
+      "title": "Five linked records of evidence",
+      "seconds": 90,
+      "section": "Worked example",
+      "kicker": "EP01 / 17",
+      "layout": "steps",
+      "lead": "A one-page summary points to the underlying records",
+      "items": [
+        {
+          "label": "5.1.3.1",
+          "text": "Current-state analysis"
+        },
+        {
+          "label": "5.1.3.2",
+          "text": "Resource analysis"
+        },
+        {
+          "label": "5.1.3.3",
+          "text": "Process improvement plan"
+        },
+        {
+          "label": "5.1.3.4",
+          "text": "Process implementation plan"
+        },
+        {
+          "label": "5.1.3.5",
+          "text": "Scope and selection rationale"
+        }
+      ],
+      "quote": "",
+      "notes": "The standard identifies five corresponding kinds of implementation evidence for this process. We need the current-state analysis, resource analysis, improvement plan, implementation plan, and scope with its selection rationale.\n\nThese are five kinds of information. We should not automatically turn them into five isolated documents. A concise planning page can link to records in a repository or task management system.\n\nFor example, the scope record identifies the importer version and components. The baseline links to the checks that actually ran. The resource record captures the estimate and its assumptions. The improvement plan explains the priorities. The implementation tasks identify owners and milestones.\n\nThe standard recognizes evidence in forms such as electronic files, logs, and tool results. The format serves the information and its traceability.\n\nHowever, a one-page template is only an entry point. It does not replace the supporting analysis or prove that the process is effective. A reviewer should be able to follow the links and understand what happened, which version it concerns, and which questions still remain open.",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 18,
+      "title": "A first international crosswalk",
+      "seconds": 90,
+      "section": "Comparison result",
+      "kicker": "EP01 / 18",
+      "layout": "compare",
+      "lead": "Useful connections · bounded conclusions",
+      "items": [
+        {
+          "label": "People",
+          "text": "GOST 5.1.3.4 ↔ NIST SSDF PO.2.1 · partial overlap"
+        },
+        {
+          "label": "Improvement",
+          "text": "GOST 5.1.2.3 ↔ SAMM Strategy & Metrics · partial overlap"
+        },
+        {
+          "label": "Difference",
+          "text": "GOST explicitly identifies five planning evidence categories"
+        }
+      ],
+      "quote": "",
+      "notes": "We can now make a small, bounded comparison. The implementation-plan artifact in GOST includes responsible employees. NIST SSDF task P O two point one addresses roles and responsibilities for secure software development. There is a useful shared concern: people need to know which work belongs to them.\n\nThe comparison is partial. The GOST artifact also includes goals, timing, stages, and resources. That single SSDF task does not by itself reproduce the complete artifact.\n\nFor process improvement, OWASP SAMM's Strategy and Metrics practice provides a useful connection through its emphasis on an improvement strategy and roadmap. Again, we need to examine the details and the purpose of the model before claiming equivalence.\n\nThese comparisons help us interpret the first process in a wider engineering context. They do not establish that following one document automatically satisfies the other.\n\nOur initial conclusion is modest: planning, responsibility, and improvement have recognizable international counterparts. The exact structure, wording, and evidence expectations still need to be examined requirement by requirement. The accompanying notes preserve those limits and the source versions.",
+      "sourceIds": [
+        "G24",
+        "N11",
+        "SAMM"
+      ]
+    },
+    {
+      "id": 19,
+      "title": "Would this survive Friday's release?",
+      "seconds": 90,
+      "section": "Apply it",
+      "kicker": "EP01 / 19",
+      "layout": "cards",
+      "lead": "A short review before calling the plan usable",
+      "items": [
+        {
+          "label": "Scope",
+          "text": "Which version and components are covered, and why?"
+        },
+        {
+          "label": "Capacity",
+          "text": "Who has time and authority to act?"
+        },
+        {
+          "label": "Evidence",
+          "text": "Can we trace an action to its result?"
+        },
+        {
+          "label": "Review",
+          "text": "When do we revisit the assumptions?"
+        }
+      ],
+      "quote": "",
+      "notes": "Return to the warning on Friday afternoon. A useful plan will not tell us automatically whether the finding is a real vulnerability. It will help the team organize the investigation and the decision.\n\nWe can identify the affected version and component. We can find the engineer responsible for the investigation and the person authorized to make the release decision. We can see what evidence exists and where a missing result needs attention.\n\nWe can also recognize weak planning. A scanner installation without a review owner is incomplete. A roadmap without capacity is unreliable. A scope statement without a rationale is difficult to defend. A plan that is never revisited will gradually stop describing reality.\n\nFor this team, I would review the plan after ninety days and after a material change, such as adding a parser. These triggers are implementation recommendations.\n\nThe practical test is whether another team member can use the plan to understand the next action. If only its author can explain it, the plan needs more work.",
+      "sourceIds": [
+        "EX",
+        "G24"
+      ]
+    },
+    {
+      "id": 20,
+      "title": "Build your first planning page",
+      "seconds": 90,
+      "section": "Take it to your team",
+      "kicker": "EP01 / 20",
+      "layout": "closing",
+      "lead": "Start with one product and five connected records",
+      "items": [
+        {
+          "label": "This week",
+          "text": "Choose a product, describe the baseline and justify the scope"
+        },
+        {
+          "label": "Next action",
+          "text": "Name an owner, reserve capacity and define reviewable evidence"
+        },
+        {
+          "label": "Next episode",
+          "text": "Train the people who will do the work · GOST 5.2"
+        }
+      ],
+      "quote": "",
+      "notes": "Today, we looked at selected historical milestones, learned how to read the Russian standard, and used its first process to organize a small improvement effort.\n\nThe historical lesson is that secure development involves design principles and sustained organizational work. The practical lesson is that a plan connects the current situation to actions the team can actually perform and review.\n\nFor your own exercise, choose one product or component. Describe the current state and justify the scope. Record the resource assumptions. Identify the next improvement and connect it to an implementation task with an owner, a date, and expected evidence.\n\nThe accompanying Markdown materials include a planning example, a blank worksheet, the source notes, and the full script. Use them as a starting point and adapt them to your environment.\n\nIn the next episode, we will examine training: how the people responsible for secure development gain and maintain the skills they need. Thank you for joining me. Which part of planning is hardest in your team: scope, ownership, capacity, or keeping the plan current?",
+      "sourceIds": [
+        "G24",
+        "EX"
+      ]
+    }
+  ]
+};
