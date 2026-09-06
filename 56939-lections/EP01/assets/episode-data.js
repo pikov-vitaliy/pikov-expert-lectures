@@ -7,15 +7,15 @@ window.EP01_DATA = {
   "sources": [
     {
       "id": "G24",
-      "title": "GOST R 56939-2024 · clauses 4 and 5.1",
+      "title": "GOST R 56939-2024 · final edition",
       "url": "https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64",
-      "note": "Requirements checked against the local final-edition DOCX/PDF; official record verifies edition dates. English clause wording is a working translation."
+      "note": "Foreword, structure, clause 4.7 and planning requirements checked against the local final-edition DOCX/PDF; official record verifies edition dates. English clause wording is a working translation."
     },
     {
       "id": "G16",
-      "title": "Rosstandart · GOST R 56939-2016 record",
+      "title": "GOST R 56939-2016 · final edition",
       "url": "https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d",
-      "note": "Approved 2016-06-01; effective 2017-06-01; replaced by the 2024 edition."
+      "note": "Full local final text checked: NPO Echelon developed the standard; submitted by TC 362; nine groups of measures in 5.1–5.9. Clause 4.2 treats sleduyet as a recommendation. Approved by Rosstandart 2016-06-01; effective 2017-06-01; replaced by the 2024 edition."
     },
     {
       "id": "WARE",
@@ -82,6 +82,24 @@ window.EP01_DATA = {
       "title": "Illustrative teaching example · Vitaliy Pikov",
       "url": "#example-note",
       "note": "Fictional importer, roles, hours, dates, review cadence and tasks. Not a client case, GOST-prescribed schedule, or conformity claim."
+    },
+    {
+      "id": "TRANS",
+      "title": "Pikov / PVS-Studio · Webinar of 2 July 2025",
+      "url": "PVS-2025-07-02-lecture.html",
+      "note": "Full user-supplied working transcript, 00:00:05–02:07:28 (last timestamp, not a measured video duration). Thematic lecture includes timestamp references. Speech recognition is imperfect; historical recollections and participant opinions are distinguished from verified final standards. The supplied recap is not an independent factual source."
+    },
+    {
+      "id": "N19",
+      "title": "NIST SSDF · public draft · June 2019",
+      "url": "https://csrc.nist.gov/News/2019/draft-white-paper-on-ssdf",
+      "note": "Official announcement of the public draft, 11 June 2019. Later than the adoption of GOST R 56939-2016."
+    },
+    {
+      "id": "N20",
+      "title": "NIST SSDF 1.0 · final · April 2020",
+      "url": "https://csrc.nist.gov/news/2020/mitigating-risk-of-software-vulns-ssdf",
+      "note": "Official announcement of the final white paper, 23 April 2020. Separate from the 2019 draft and SSDF 1.1 of February 2022."
     }
   ],
   "slides": [
@@ -130,7 +148,8 @@ window.EP01_DATA = {
       "quote": "",
       "notes": "This series builds on an earlier Russian-language webinar project that I delivered with PVS-Studio. For this English series, I want to extend that work through a systematic comparison with international practices.\n\nEach episode will focus on one process. We will ask three questions. What problem does it address? How do other approaches address a similar problem? And what evidence would show that a team has put the process into practice?\n\nThe audience includes developers, AppSec practitioners, and technical leaders. You may write code, design a delivery pipeline, or decide where the team should invest its limited time. Each of those perspectives matters.\n\nI am also using this project to develop my professional English and deepen my own research. I will explain unfamiliar terms, identify the sources, and make corrections visible when they are needed.\n\nBy the end of an episode, you should have something useful to discuss with your team: a small checklist, a decision record, or an example you can adapt to your own environment.",
       "sourceIds": [
-        "G24"
+        "G24",
+        "TRANS"
       ]
     },
     {
@@ -168,7 +187,7 @@ window.EP01_DATA = {
     {
       "id": 4,
       "title": "Friday's release is blocked",
-      "seconds": 90,
+      "seconds": 120,
       "section": "The engineering problem",
       "kicker": "EP01 / 04",
       "layout": "cards",
@@ -188,9 +207,10 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nThe tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
+      "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nThe tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nThe earlier webinar made a related point: an organization may already use an analyzer, yet still need to examine its coverage, configuration, and follow-up. Before proposing another purchase, find out what the team already does and where the actual gap is.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
       "sourceIds": [
-        "EX"
+        "EX",
+        "TRANS"
       ]
     },
     {
@@ -266,24 +286,53 @@ window.EP01_DATA = {
     },
     {
       "id": 7,
-      "title": "How GOST R 56939 was developed",
-      "seconds": 90,
-      "section": "The creation of GOST R 56939",
+      "title": "Before the standard: a practical problem",
+      "seconds": 120,
+      "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 07",
+      "layout": "cards",
+      "lead": "A participant's account of the problem before formal drafting",
+      "items": [
+        {
+          "label": "Around 2009",
+          "text": "Discussions with colleagues and regulators"
+        },
+        {
+          "label": "The engineering gap",
+          "text": "Product assessment also needs confidence in development work"
+        },
+        {
+          "label": "The intended result",
+          "text": "A common reference usable by different development teams"
+        }
+      ],
+      "quote": "",
+      "notes": "Why did Russia develop a national standard for secure software development? The earlier webinar gives us a useful account from someone involved in that work: Vitaliy Varenitsa.\n\nIn the July twenty twenty-five discussion, he recalled conversations with colleagues and regulators beginning around two thousand nine. The practical concern was that assessing a finished product did not, by itself, explain how security work was organized throughout its development.\n\nThe proposed standard would make that work more explicit. Developers needed a common reference for activities, responsibilities, and the evidence supporting a claim that the activities had been performed.\n\nThis was intended to be useful beyond the internal development method of one large software vendor. Different organizations, including smaller teams, should be able to understand the expectations and adapt their implementation to their own products.\n\nThere is an important historical boundary here. Around two thousand nine is the starting point recalled by a participant. It is not the approval date of a standard, and it does not mean that secure development began in Russia at that moment.\n\nFor our series, the useful question is the problem the authors were trying to solve: how do we turn security intentions into work that other people can understand and evaluate?",
+      "sourceIds": [
+        "TRANS",
+        "GOSTH"
+      ]
+    },
+    {
+      "id": 8,
+      "title": "The route from research to publication",
+      "seconds": 120,
+      "section": "The origins of GOST R 56939",
+      "kicker": "EP01 / 08",
       "layout": "timeline",
-      "lead": "Development history from Varenitsa's retrospective · formal dates from Rosstandart",
+      "lead": "Research start, working drafts, approval and effective date are distinct events",
       "items": [
         {
           "label": "2013",
-          "text": "April: drafting begins · August: first draft"
+          "text": "April: research project starts · August: first draft"
         },
         {
           "label": "2014–2015",
-          "text": "Final draft, then a revised final draft"
+          "text": "Draft review and revision"
         },
         {
           "label": "2016",
-          "text": "Approved on 1 June · order 458-st"
+          "text": "Approved 1 June · Rosstandart order 458-st"
         },
         {
           "label": "2017",
@@ -291,51 +340,183 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Let us now examine the history of this particular Russian standard. GOST R identifies a Russian national standard, followed by its number and edition year.\n\nIn a retrospective presentation, Vitaliy Varenitsa describes the original problem. Vulnerability analysis and product assessment were already developing in Russia, but dedicated requirements for the development process were missing in that context. The proposed response was to make the process itself a subject of requirements and evidence.\n\nAccording to his account, drafting began in April twenty thirteen, and the first draft followed in August. Further drafts appeared in twenty fourteen and twenty fifteen. Public discussion involved twenty-two organizations and around two hundred comments and proposals.\n\nFor the formal dates, we use Rosstandart's official record: approval on the first of June twenty sixteen, and entry into force on the first of June twenty seventeen.\n\nThis is a history of drafting, discussion, and refinement. It is more informative for our series than treating a standard as a document that simply appeared in its final form.",
+      "notes": "The transcript makes the next date more precise. April twenty thirteen marks the start of the research project that supported development of the standard. Varenitsa explains that preparatory discussions and the formation of the author team came earlier.\n\nThe retrospective presentation places the first draft in August twenty thirteen. Further drafts and revisions followed in twenty fourteen and twenty fifteen. It describes discussion involving twenty-two organizations and around two hundred comments and proposals.\n\nThose numbers describe the consultation reported in the historical presentation. They do not mean that twenty-two organizations are named as developers in the final standard.\n\nFor the formal publication history, we use the official record. Rosstandart approved GOST R five six nine three nine, edition twenty sixteen, on the first of June twenty sixteen, under order four five eight, s t. It became effective on the first of June twenty seventeen.\n\nKeep the four events separate: research began, drafts were discussed, the standard was approved, and the standard became effective. A year in a document's designation does not replace that chronology.\n\nThis distinction also helps us read later revisions. A working draft can contain valuable ideas without being an adopted edition of the national standard.",
       "sourceIds": [
+        "TRANS",
         "GOSTH",
         "G16"
       ]
     },
     {
-      "id": 8,
-      "title": "International connections and the 2024 revision",
+      "id": 9,
+      "title": "Who wrote it, and who was it for?",
       "seconds": 90,
-      "section": "The creation of GOST R 56939",
-      "kicker": "EP01 / 08",
+      "section": "The origins of GOST R 56939",
+      "kicker": "EP01 / 09",
       "layout": "cards",
-      "lead": "Historical design context and the final text serve different purposes",
+      "lead": "Formal authorship, consultation and intended users play different roles",
       "items": [
         {
-          "label": "Historical connections",
-          "text": "Common Criteria · ISO/IEC 27001 · lifecycle processes"
+          "label": "2016 development",
+          "text": "NPO Echelon · submitted by Technical Committee 362"
         },
         {
-          "label": "2024 revision",
-          "text": "Approved 24 October · effective 20 December"
+          "label": "Consultation",
+          "text": "Other organizations reviewed and commented on drafts"
         },
         {
-          "label": "25 processes",
-          "text": "Process name → goals → requirements → artifacts"
+          "label": "Primary users",
+          "text": "Developers, architects, security specialists and team leaders"
         },
         {
-          "label": "Source discipline",
-          "text": "Retrospective for history · final edition for requirements"
+          "label": "Additional users",
+          "text": "Independent assessors reviewing implementation evidence"
         }
       ],
       "quote": "",
-      "notes": "The same retrospective connects the standard with international ideas: Common Criteria, information security management, and software lifecycle processes. It also emphasizes introducing security procedures early in development.\n\nThese connections support the research question behind this series. They do not establish a direct copy of Microsoft SDL, or make all of those documents normative references in the current edition.\n\nThe twenty twenty-four revision replaced the twenty sixteen edition. It was approved on the twenty-fourth of October and took effect on the twentieth of December. The official record identifies several organizations involved in its development.\n\nFor this series, we follow its twenty-five processes. The final text gives each process a name, goals, requirements, and implementation artifacts. It does not tie those processes to one particular lifecycle model.\n\nSome pages of the archived presentation still show draft material. We therefore use the retrospective to explain history and the final standard to state requirements. That distinction keeps the history useful while preventing an old proposal from becoming a current obligation in our explanation.",
+      "notes": "The foreword of the twenty sixteen edition names NPO Echelon as the developer and Technical Committee three six two as the submitting committee.\n\nIn the webinar, Varenitsa describes a small author group doing the main drafting work, while other organizations reviewed the proposals and raised comments. That account helps us distinguish writing a document from participating in its consultation.\n\nHe also stresses the intended audience. The standard was primarily for the people developing software: architects, programmers, security specialists, and the people organizing their work. Independent assessors were another audience because they needed to evaluate how those practices were implemented.\n\nThat is a useful design tension. The material needs to guide engineering work, while also making the results understandable to somebody reviewing it from outside the team.\n\nFor our importer example, a procedure should help the developer investigate a finding and help a reviewer understand what happened. A document that only satisfies a filing requirement misses much of that practical purpose.\n\nThe standard, a team's implementation, and a particular certification scheme remain distinct subjects. We should identify the actual assessment context before discussing which form of confirmation is required.",
       "sourceIds": [
-        "GOSTH",
+        "G16",
+        "TRANS"
+      ]
+    },
+    {
+      "id": 10,
+      "title": "A wider plan than one published document",
+      "seconds": 90,
+      "section": "The origins of GOST R 56939",
+      "kicker": "EP01 / 10",
+      "layout": "compare",
+      "lead": "The original ambition and the published record answer different questions",
+      "items": [
+        {
+          "label": "Original ambition",
+          "text": "A family of documents covering several perspectives on development"
+        },
+        {
+          "label": "Published baseline",
+          "text": "GOST R 56939-2016, followed by GOST R 56939-2024"
+        },
+        {
+          "label": "Working material",
+          "text": "Recalled drafts and revisions do not establish adopted editions"
+        }
+      ],
+      "quote": "",
+      "notes": "Another detail in the transcript changes the way we tell this history. The original ambition was broader than a single document.\n\nVarenitsa recalls discussions about a family of standards that would address secure development from several perspectives and across the software lifecycle. The number and arrangement of those documents changed during discussion. The twenty sixteen standard was the first published result of that wider intention.\n\nWe should describe that as the author's account of the plan. We should not invent an officially approved series structure or assume that every planned volume later appeared.\n\nThe same care applies to versions. The speaker mentions working material from twenty eighteen, twenty nineteen, twenty twenty, and twenty twenty-two. Those references show continuing revision work. They do not establish published national standards with those edition years.\n\nThe two adopted editions relevant to this episode are twenty sixteen and twenty twenty-four. For each one, we can identify a final text and an official approval record.\n\nThis gives us a simple research habit: use recollections to understand intentions and decisions, and use publication records to establish which document actually became the standard.",
+      "sourceIds": [
+        "TRANS",
+        "G16",
         "G24"
       ]
     },
     {
-      "id": 9,
+      "id": 11,
+      "title": "International roots, without a copying claim",
+      "seconds": 120,
+      "section": "The origins of GOST R 56939",
+      "kicker": "EP01 / 11",
+      "layout": "compare",
+      "lead": "Earlier international work informed the context; chronology limits ancestry claims",
+      "items": [
+        {
+          "label": "Design context",
+          "text": "Common Criteria · ISO/IEC 27034 · lifecycle standards"
+        },
+        {
+          "label": "GOST R 56939",
+          "text": "Approved in 2016"
+        },
+        {
+          "label": "NIST SSDF",
+          "text": "Public draft 2019 · final 1.0 in 2020 · final 1.1 in 2022"
+        }
+      ],
+      "quote": "",
+      "notes": "An original national standard can still draw on international engineering knowledge. These are compatible ideas.\n\nThe webinar and historical presentation describe the context of Common Criteria, information security management, and software lifecycle standards. Varenitsa's account presents the goal as a usable common reference, rather than a direct translation of one vendor's development methodology.\n\nThe twenty sixteen standard itself connects its use to ISO slash IEC twenty-seven thousand thirty-four and Common Criteria assurance components. Its informative appendix includes a related mapping.\n\nThat does not prove that every practice was new. We have already seen earlier work on secure development. To establish a specific borrowing or a specific difference, we need to compare the relevant texts.\n\nNIST's Secure Software Development Framework gives us a useful chronological check. Its public draft was announced in June twenty nineteen. Final version one point zero followed in April twenty twenty, and version one point one in February twenty twenty-two.\n\nThe twenty sixteen GOST therefore cannot have been based on those later SSDF publications. At the same time, being earlier than SSDF does not prove that GOST was the first secure development approach in the world. Nor does similarity prove influence in the opposite direction.\n\nOur comparison asks a more useful question: which engineering concerns are shared, how are obligations organized, and what evidence does each approach expect? That is something we can investigate process by process.",
+      "sourceIds": [
+        "TRANS",
+        "GOSTH",
+        "G16",
+        "N19",
+        "N20",
+        "N11"
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Two editions, different structures",
+      "seconds": 90,
+      "section": "From the 2016 edition to 2024",
+      "kicker": "EP01 / 12",
+      "layout": "cards",
+      "lead": "Re-read the final text before claiming equivalence",
+      "items": [
+        {
+          "label": "2016 edition",
+          "text": "Nine groups of measures · clauses 5.1–5.9"
+        },
+        {
+          "label": "2024 edition",
+          "text": "Twenty-five named processes · clauses 5.1–5.25"
+        },
+        {
+          "label": "A wording change",
+          "text": "«Следует»: recommendation in 2016 · requirement in 2024"
+        },
+        {
+          "label": "Migration",
+          "text": "Map obligations and evidence; preserve practices that work"
+        }
+      ],
+      "quote": "",
+      "notes": "What changed between the two adopted editions? Start with the final documents, because numbers mentioned in a discussion can describe a different grouping.\n\nSection five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.\n\nThere is also a concrete wording change. The Russian word shown on the slide, sleduyet, expresses a recommendation under clause four point two of the twenty sixteen edition. Under clause four point seven of the twenty twenty-four edition, it expresses a requirement.\n\nThat is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.\n\nThe twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.",
+      "sourceIds": [
+        "G16",
+        "G24",
+        "TRANS"
+      ]
+    },
+    {
+      "id": 13,
+      "title": "A process continues after the first tool run",
+      "seconds": 90,
+      "section": "From the 2016 edition to 2024",
+      "kicker": "EP01 / 13",
+      "layout": "steps",
+      "lead": "A useful lesson from the webinar's discussion of measures and processes",
+      "items": [
+        {
+          "label": "Trigger",
+          "text": "What event starts the work?"
+        },
+        {
+          "label": "Ownership",
+          "text": "Who performs it and who reviews the result?"
+        },
+        {
+          "label": "Evidence",
+          "text": "Which version, findings and decisions are recorded?"
+        },
+        {
+          "label": "Feedback",
+          "text": "What changes before the next cycle?"
+        }
+      ],
+      "quote": "",
+      "notes": "The webinar contains a useful debate about the language of measures and processes. One concern is that changing a heading does not, by itself, improve engineering. Another point is that a process emphasizes work that continues and is managed over time.\n\nA memorable example is buying an analysis tool for a short period just before a release. That may produce a report. It does not automatically establish a maintained process for examining changes, reviewing findings, fixing problems, and checking the result again.\n\nFor our importer team, define the trigger, the owner, the recorded evidence, and the feedback into the next cycle. A relevant code change could trigger analysis. A named engineer could review the findings. The record should connect the finding and decision to the product version.\n\nThese four questions are our teaching device, not a quotation defining every process in GOST. The twenty sixteen edition also addressed lifecycle work; we should not portray it as a collection of one-time tool runs.\n\nThe practical lesson is that a tool becomes useful within an organized way of working. Planning gives the team the capacity and agreements needed to sustain that work.",
+      "sourceIds": [
+        "TRANS",
+        "G24",
+        "EX"
+      ]
+    },
+    {
+      "id": 14,
       "title": "Shared practices need evidence",
       "seconds": 90,
       "section": "Our comparison method",
-      "kicker": "EP01 / 09",
+      "kicker": "EP01 / 14",
       "layout": "compare",
       "lead": "Findings and limits of the multivocal literature review",
       "items": [
@@ -353,19 +534,20 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "What does the literature review allow us to conclude? The authors identify substantial overlap in practices, together with important organizational concerns. They discuss risk management, culture, human behavior, policies, and communication, among other topics.\n\nTheir synthesis distinguishes work at the organization level, work that crosses the lifecycle, and activities associated with a project stage. That helps explain why a security programme involves more than a list of tools.\n\nEvidence about the effectiveness of complete methodologies is much less consistent. We should not turn that limitation into a claim that secure development does not work. It means we need to examine the evaluation method, the context, and the result being measured.\n\nThe review also selected accessible English-language material. Its omission of GOST cannot establish that the Russian standard is unique.\n\nWe will therefore compare specific practices and their evidence, using identified versions. Our NIST baseline is final SSDF one point one; version one point two remains a draft at our September twenty twenty-six check. Let us make the comparison method explicit.",
+      "notes": "What does the literature review allow us to conclude? It identifies substantial overlap in practices, together with organizational concerns such as risk management, culture, policies, and communication.\n\nIts synthesis distinguishes organization-level work, work across the lifecycle, and activities associated with a project stage. A security programme therefore involves more than a list of tools.\n\nEvidence about complete methodologies is less consistent. That does not show that secure development fails. It means we must examine the evaluation method, context, and result being measured.\n\nThe review selected accessible English-language material. Its omission of GOST cannot establish that the Russian standard is unique.\n\nThe webinar also includes personal judgments about maturity, cost, and effectiveness. Those judgments can suggest research questions; they do not establish general conclusions on their own.\n\nWe will compare specific practices and evidence using identified versions. Our NIST baseline is final SSDF one point one. Version one point two remains a draft at our September twenty twenty-six check. Let us make the comparison method explicit.",
       "sourceIds": [
         "MLR",
         "N11",
-        "N12"
+        "N12",
+        "TRANS"
       ]
     },
     {
-      "id": 10,
+      "id": 15,
       "title": "Compare obligations, not labels",
       "seconds": 90,
       "section": "Our comparison method",
-      "kicker": "EP01 / 10",
+      "kicker": "EP01 / 15",
       "layout": "steps",
       "lead": "Similar goals can still imply different work",
       "items": [
@@ -394,11 +576,11 @@ window.EP01_DATA = {
       ]
     },
     {
-      "id": 11,
+      "id": 16,
       "title": "What process 5.1 asks for",
       "seconds": 90,
       "section": "Planning secure development",
-      "kicker": "EP01 / 11",
+      "kicker": "EP01 / 16",
       "layout": "steps",
       "lead": "Five obligations that connect the present to the next action",
       "items": [
@@ -430,11 +612,11 @@ window.EP01_DATA = {
       ]
     },
     {
-      "id": 12,
+      "id": 17,
       "title": "Start with a defensible scope",
       "seconds": 90,
       "section": "Planning secure development",
-      "kicker": "EP01 / 12",
+      "kicker": "EP01 / 17",
       "layout": "table",
       "lead": "Name the software and explain the boundary",
       "items": [
@@ -463,11 +645,11 @@ window.EP01_DATA = {
       ]
     },
     {
-      "id": 13,
+      "id": 18,
       "title": "Assess reality and assign owners",
       "seconds": 90,
       "section": "Planning secure development",
-      "kicker": "EP01 / 13",
+      "kicker": "EP01 / 18",
       "layout": "cards",
       "lead": "Illustrative findings, with people who can act",
       "items": [
@@ -489,18 +671,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The current-state record lists implemented and unimplemented processes. It assesses the sufficiency and conformity of existing processes against this standard, other applicable standards, and the team's tools and technologies.\n\nFor the example, we record that parser checks run manually, coverage is unclear, and the decision history is incomplete. These are illustrative findings, not observations about a real organization.\n\nWe then assign responsibilities. The engineering lead owns the integration work. The AppSec lead helps define the investigation criteria and review the security evidence. The release owner records the release decision under the team's agreed policy. A sponsor resolves conflicts over capacity and priorities.\n\nOne person may hold several roles in a small team. What matters is that the responsibility and the decision authority are understandable.\n\nThis role arrangement is our implementation example. The standard's implementation-plan artifact calls for responsible employees, but it does not automatically give an AppSec specialist an independent power to block every release. That authority needs to be defined in the organization's own arrangements.",
+      "notes": "Begin with practices that already work, practices that need improvement, and capabilities that are missing. Introducing a standard does not mean rebuilding everything from zero.\n\nThe current-state record lists implemented and unimplemented processes. It assesses existing processes against this standard, other applicable standards, and the team's tools and technologies.\n\nIn our example, parser checks run manually, coverage is unclear, and decision history is incomplete. These are fictional findings.\n\nWe assign responsibilities. The engineering lead owns integration. The AppSec lead helps define investigation criteria and review security evidence. The release owner records decisions under the team's policy. A sponsor resolves capacity and priority conflicts.\n\nOne person may hold several roles. The arrangement must still make responsibilities and decision authority understandable.\n\nThis allocation is our implementation example. The standard's implementation-plan artifact calls for responsible employees. It does not automatically give AppSec an independent power to block every release. The organization must define that authority and make the relationship between investigation, review, and the release decision clear.",
       "sourceIds": [
         "G24",
-        "EX"
+        "EX",
+        "TRANS"
       ]
     },
     {
-      "id": 14,
+      "id": 19,
       "title": "Resources include human attention",
       "seconds": 90,
       "section": "Planning secure development",
-      "kicker": "EP01 / 14",
+      "kicker": "EP01 / 19",
       "layout": "cards",
       "lead": "Illustrative 90-day estimate · validate it with the team",
       "items": [
@@ -522,18 +705,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Resource planning includes more than the price of a tool. It also includes time to configure checks, investigate findings, maintain the workflow, and teach people how to use it.\n\nHere is a deliberately small estimate for our fictional ninety-day improvement effort. We reserve sixty engineering hours, twenty-four AppSec hours, and twelve hours for release coordination and sponsor decisions. The total is ninety-six person-hours.\n\nThese figures are an example, not a benchmark and not a percentage required by GOST. Tool costs, infrastructure capacity, and any additional training costs need their own assessment.\n\nWe should also identify dependencies. If the engineer who maintains the build system is unavailable during the first month, the schedule needs to reflect that fact. Assigning a task does not create capacity.\n\nThe resource-analysis artifact in the standard may contain estimated material and human resource indicators. Our numeric table is one way to make the discussion concrete. The useful test is whether the people responsible for the work agree that the estimate is credible and know what to do when it proves wrong.",
+      "notes": "Resource planning includes the time to configure checks, investigate findings, maintain the workflow, and teach people how to use it.\n\nFor our fictional ninety-day effort, we reserve sixty engineering hours, twenty-four AppSec hours, and twelve hours for release coordination and sponsor decisions. The total is ninety-six person-hours.\n\nThese figures are a teaching example. They are neither a benchmark nor a percentage required by GOST. Likewise, a percentage mentioned in the webinar is not a universal security budget.\n\nTools, infrastructure, and additional training costs need their own assessment. Dependencies matter too. If the build engineer is unavailable during the first month, the schedule must reflect that. Assigning a task does not create capacity.\n\nThe standard's resource-analysis artifact may contain estimated material and human resource indicators. Our table makes those assumptions discussable. Ask the people doing the work whether the estimate is credible, show it to those deciding priorities, and agree when to revise it. Human attention is part of the resource plan.",
       "sourceIds": [
         "G24",
-        "EX"
+        "EX",
+        "TRANS"
       ]
     },
     {
-      "id": 15,
+      "id": 20,
       "title": "Two plans, two questions",
       "seconds": 90,
       "section": "Planning secure development",
-      "kicker": "EP01 / 15",
+      "kicker": "EP01 / 20",
       "layout": "compare",
       "lead": "A roadmap and an execution plan can be linked in one tracker",
       "items": [
@@ -551,18 +735,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The two plans answer related but different questions. The improvement plan describes how the processes will develop. It establishes priorities and the sequence of changes, taking resources into account.\n\nFor our team, that might mean making parser analysis repeatable first, then improving the handling of findings, and then reviewing whether the process is effective.\n\nThe implementation plan turns those priorities into work. It identifies goals, stages, dates, resources, and responsible people. A task could specify the parser target, the integration milestone, the owner, and the evidence required for review.\n\nThese plans do not have to be disconnected documents. The standard explicitly allows them to be represented in a task management system. A roadmap with linked tasks can preserve the distinction between improving a capability and executing the work.\n\nThe important connection is traceability: why this change was selected, which resource assumption supports it, who performs it, and what will show that the planned stage is complete. If those links are missing, two beautifully formatted files will not solve the planning problem.",
+      "notes": "The webinar presents planning as a shared language for the team, its managers, and the people requesting the product. Two related plans help those people agree both the direction and the work.\n\nThe improvement plan describes how processes will develop. It sets priorities and the sequence of changes, considering available resources. Our team might make parser analysis repeatable, improve the handling of findings, and then review the results.\n\nThe implementation plan identifies goals, stages, dates, resources, and responsible people. A task can specify the parser target, integration milestone, owner, and expected evidence.\n\nThe standard allows these plans to be represented in a task management system. A roadmap with linked tasks can preserve their different purposes without creating disconnected documents.\n\nThe practical test is traceability. Why was this change selected? Which resource assumption supports it? Who performs it? What shows that a stage is complete? A planning page becomes useful when the team can follow those connections and act on them.",
       "sourceIds": [
         "G24",
-        "EX"
+        "EX",
+        "TRANS"
       ]
     },
     {
-      "id": 16,
+      "id": 21,
       "title": "A 90-day plan for the importer",
       "seconds": 120,
       "section": "Worked example",
-      "kicker": "EP01 / 16",
+      "kicker": "EP01 / 21",
       "layout": "timeline",
       "lead": "Illustrative implementation choices, not a GOST timetable",
       "items": [
@@ -587,11 +772,11 @@ window.EP01_DATA = {
       ]
     },
     {
-      "id": 17,
+      "id": 22,
       "title": "Five linked records of evidence",
       "seconds": 90,
       "section": "Worked example",
-      "kicker": "EP01 / 17",
+      "kicker": "EP01 / 22",
       "layout": "steps",
       "lead": "A one-page summary points to the underlying records",
       "items": [
@@ -617,18 +802,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The standard identifies five corresponding kinds of implementation evidence for this process. We need the current-state analysis, resource analysis, improvement plan, implementation plan, and scope with its selection rationale.\n\nThese are five kinds of information. We should not automatically turn them into five isolated documents. A concise planning page can link to records in a repository or task management system.\n\nFor example, the scope record identifies the importer version and components. The baseline links to the checks that actually ran. The resource record captures the estimate and its assumptions. The improvement plan explains the priorities. The implementation tasks identify owners and milestones.\n\nThe standard recognizes evidence in forms such as electronic files, logs, and tool results. The format serves the information and its traceability.\n\nHowever, a one-page template is only an entry point. It does not replace the supporting analysis or prove that the process is effective. A reviewer should be able to follow the links and understand what happened, which version it concerns, and which questions still remain open.",
+      "notes": "The standard identifies five corresponding kinds of evidence: current-state analysis, resource analysis, the improvement plan, the implementation plan, and scope with its selection rationale.\n\nThese are five kinds of information, not an instruction to create five isolated Word files. The webinar stresses that existing systems can support the work. A planning page can link to maintained repository and task records.\n\nIn our example, the scope identifies the importer version and components. The baseline links to checks that ran. The resource record captures estimates and assumptions. The improvement plan explains priorities. Implementation tasks identify owners and milestones.\n\nThe standard recognizes forms such as electronic files, logs, and tool results. Choose a form that supports the required information and traceability.\n\nA one-page template is only an entry point. It does not replace the underlying analysis or prove effectiveness. A reviewer should be able to follow the links, identify the relevant version, understand the decisions, and see which questions remain unresolved. Automation helps when it preserves those connections.",
       "sourceIds": [
         "G24",
-        "EX"
+        "EX",
+        "TRANS"
       ]
     },
     {
-      "id": 18,
+      "id": 23,
       "title": "A first international crosswalk",
-      "seconds": 90,
+      "seconds": 120,
       "section": "Comparison result",
-      "kicker": "EP01 / 18",
+      "kicker": "EP01 / 23",
       "layout": "compare",
       "lead": "Useful connections · bounded conclusions",
       "items": [
@@ -654,11 +840,11 @@ window.EP01_DATA = {
       ]
     },
     {
-      "id": 19,
+      "id": 24,
       "title": "Would this survive Friday's release?",
       "seconds": 90,
       "section": "Apply it",
-      "kicker": "EP01 / 19",
+      "kicker": "EP01 / 24",
       "layout": "cards",
       "lead": "A short review before calling the plan usable",
       "items": [
@@ -680,18 +866,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Return to the warning on Friday afternoon. A useful plan will not tell us automatically whether the finding is a real vulnerability. It will help the team organize the investigation and the decision.\n\nWe can identify the affected version and component. We can find the engineer responsible for the investigation and the person authorized to make the release decision. We can see what evidence exists and where a missing result needs attention.\n\nWe can also recognize weak planning. A scanner installation without a review owner is incomplete. A roadmap without capacity is unreliable. A scope statement without a rationale is difficult to defend. A plan that is never revisited will gradually stop describing reality.\n\nFor this team, I would review the plan after ninety days and after a material change, such as adding a parser. These triggers are implementation recommendations.\n\nThe practical test is whether another team member can use the plan to understand the next action. If only its author can explain it, the plan needs more work.",
+      "notes": "Return to Friday's warning. A plan will not automatically tell us whether it is a real vulnerability. It helps organize the investigation and the decision.\n\nWe can identify the affected version and component, find the investigation owner, and locate the person authorized to make the release decision. We can see the existing evidence and the missing results.\n\nWeak planning is recognizable too. An analyzer without a review owner is incomplete. A roadmap without capacity is unreliable. A scope without a rationale is difficult to defend.\n\nFor this team, I would review the plan after ninety days and after a material change, such as adding a parser. These are our implementation recommendations.\n\nIn a small team, one person may hold several responsibilities. Make the arrangement explicit and check capacity. Scaling the implementation does not establish that applicable requirements can be ignored.\n\nThe practical test is whether another team member can understand the next action. If only the author can explain the plan, improve it.",
       "sourceIds": [
         "EX",
-        "G24"
+        "G24",
+        "TRANS"
       ]
     },
     {
-      "id": 20,
+      "id": 25,
       "title": "Security Training That Changes Engineering Decisions",
       "seconds": 90,
       "section": "Stay in touch · Next episode",
-      "kicker": "EP01 / 20",
+      "kicker": "EP01 / 25",
       "layout": "closing",
       "lead": "Next: EP02 · Employee training · GOST R 56939-2024, clause 5.2",
       "items": [
@@ -709,7 +896,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Today, we explored the history of secure development, learned how to read the Russian standard, and used its first process to organize a practical improvement effort.\n\nYour next step is simple: choose one product and start your planning page. Describe the current state, identify the next improvement, and connect it to an owner, available capacity, and reviewable evidence. The accompanying worksheet will help you get started.\n\nI am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch and share the questions you would like this series to explore.\n\nThe next episode is called Security Training That Changes Engineering Decisions. We will examine employee training under clause five point two: what different roles need to learn, how to practise those skills, and what evidence can show progress beyond attendance.\n\nWe will build a role and skills matrix and use a short exercise before and after training. Which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.",
+      "notes": "Today, we followed the Russian standard from early discussions to its adopted editions, connected that history to international work, and used its first process to organize a practical improvement effort.\n\nYour next step is simple: choose one product and start your planning page. Describe the current state, identify the next improvement, and connect it to an owner, available capacity, and reviewable evidence. The accompanying worksheet will help you get started.\n\nI am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch and share the questions you would like this series to explore.\n\nThe next episode is called Security Training That Changes Engineering Decisions. We will examine employee training under clause five point two: what different roles need to learn, how to practise those skills, and what evidence can show progress beyond attendance.\n\nWe will build a role and skills matrix and use a short exercise before and after training. Which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.",
       "sourceIds": [
         "G24",
         "EX"

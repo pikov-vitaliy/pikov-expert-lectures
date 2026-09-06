@@ -1,41 +1,46 @@
 # EP01 — Timing and rehearsal model
 
-Generated from [the full English script](EP01-script-en.md). Timing slots total **30:00**. Count uses English word tokens, including contractions and hyphenated words; spoken dates/numbers are already expanded in the script.
+Generated from [the full English script](EP01-script-en.md). Timing slots total **40:00**. Count uses English word tokens, including contractions and hyphenated words; spoken dates/numbers are already expanded in the script.
 
 | Slide | Start–end | Slot | Speech words | Words/min in slot |
 |---|---|---|---|---|
 | 01. Where secure development begins | 00:00–01:00 | 01:00 | 112 | 112.0 |
 | 02. One process. One useful result. | 01:00–02:30 | 01:30 | 166 | 110.7 |
 | 03. Twenty-five processes, connected | 02:30–04:00 | 01:30 | 162 | 108.0 |
-| 04. Friday's release is blocked | 04:00–05:30 | 01:30 | 169 | 112.7 |
-| 05. A landscape of secure development methods | 05:30–07:00 | 01:30 | 157 | 104.7 |
-| 06. Different ways to organize the work | 07:00–08:30 | 01:30 | 165 | 110.0 |
-| 07. How GOST R 56939 was developed | 08:30–10:00 | 01:30 | 168 | 112.0 |
-| 08. International connections and the 2024 revision | 10:00–11:30 | 01:30 | 169 | 112.7 |
-| 09. Shared practices need evidence | 11:30–13:00 | 01:30 | 170 | 113.3 |
-| 10. Compare obligations, not labels | 13:00–14:30 | 01:30 | 163 | 108.7 |
-| 11. What process 5.1 asks for | 14:30–16:00 | 01:30 | 173 | 115.3 |
-| 12. Start with a defensible scope | 16:00–17:30 | 01:30 | 174 | 116.0 |
-| 13. Assess reality and assign owners | 17:30–19:00 | 01:30 | 166 | 110.7 |
-| 14. Resources include human attention | 19:00–20:30 | 01:30 | 175 | 116.7 |
-| 15. Two plans, two questions | 20:30–22:00 | 01:30 | 171 | 114.0 |
-| 16. A 90-day plan for the importer | 22:00–24:00 | 02:00 | 229 | 114.5 |
-| 17. Five linked records of evidence | 24:00–25:30 | 01:30 | 170 | 113.3 |
-| 18. A first international crosswalk | 25:30–27:00 | 01:30 | 174 | 116.0 |
-| 19. Would this survive Friday's release? | 27:00–28:30 | 01:30 | 169 | 112.7 |
-| 20. Security Training That Changes Engineering Decisions | 28:30–30:00 | 01:30 | 171 | 114.0 |
+| 04. Friday's release is blocked | 04:00–06:00 | 02:00 | 210 | 105.0 |
+| 05. A landscape of secure development methods | 06:00–07:30 | 01:30 | 157 | 104.7 |
+| 06. Different ways to organize the work | 07:30–09:00 | 01:30 | 165 | 110.0 |
+| 07. Before the standard: a practical problem | 09:00–11:00 | 02:00 | 204 | 102.0 |
+| 08. The route from research to publication | 11:00–13:00 | 02:00 | 198 | 99.0 |
+| 09. Who wrote it, and who was it for? | 13:00–14:30 | 01:30 | 188 | 125.3 |
+| 10. A wider plan than one published document | 14:30–16:00 | 01:30 | 185 | 123.3 |
+| 11. International roots, without a copying claim | 16:00–18:00 | 02:00 | 230 | 115.0 |
+| 12. Two editions, different structures | 18:00–19:30 | 01:30 | 183 | 122.0 |
+| 13. A process continues after the first tool run | 19:30–21:00 | 01:30 | 190 | 126.7 |
+| 14. Shared practices need evidence | 21:00–22:30 | 01:30 | 165 | 110.0 |
+| 15. Compare obligations, not labels | 22:30–24:00 | 01:30 | 163 | 108.7 |
+| 16. What process 5.1 asks for | 24:00–25:30 | 01:30 | 173 | 115.3 |
+| 17. Start with a defensible scope | 25:30–27:00 | 01:30 | 174 | 116.0 |
+| 18. Assess reality and assign owners | 27:00–28:30 | 01:30 | 164 | 109.3 |
+| 19. Resources include human attention | 28:30–30:00 | 01:30 | 161 | 107.3 |
+| 20. Two plans, two questions | 30:00–31:30 | 01:30 | 160 | 106.7 |
+| 21. A 90-day plan for the importer | 31:30–33:30 | 02:00 | 229 | 114.5 |
+| 22. Five linked records of evidence | 33:30–35:00 | 01:30 | 165 | 110.0 |
+| 23. A first international crosswalk | 35:00–37:00 | 02:00 | 174 | 87.0 |
+| 24. Would this survive Friday's release? | 37:00–38:30 | 01:30 | 163 | 108.7 |
+| 25. Security Training That Changes Engineering Decisions | 38:30–40:00 | 01:30 | 175 | 116.7 |
 
-**Total: 3373 spoken words.**
+**Total: 4416 spoken words.**
 
 ## Speaking pace sensitivity
 
-| Articulation pace | Speech alone | Space left inside 30:00 for pauses/transitions |
+| Articulation pace | Speech alone | Space left inside 40:00 for pauses/transitions |
 |---|---|---|
-| 110 words/min | 30:40 | exceeds slot by 00:40 |
-| 115 words/min | 29:20 | 00:40 |
-| 120 words/min | 28:06 | 01:54 |
-| 125 words/min | 26:59 | 03:01 |
-| 130 words/min | 25:57 | 04:03 |
+| 110 words/min | 40:09 | exceeds slot by 00:09 |
+| 115 words/min | 38:24 | 01:36 |
+| 120 words/min | 36:48 | 03:12 |
+| 125 words/min | 35:20 | 04:40 |
+| 130 words/min | 33:58 | 06:02 |
 
 Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.
 

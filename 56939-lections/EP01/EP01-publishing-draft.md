@@ -15,9 +15,11 @@ What turns a security intention into work a software team can actually perform?
 
 In this first episode, Vitaliy Pikov introduces a 25-part series exploring the processes of GOST R 56939-2024 and comparing them with international secure development practices.
 
-We use a review of 28 secure-development methodologies to explore publication milestones, different ways of organizing security work, and the limits of effectiveness evidence. We also examine the drafting history of GOST R 56939 from 2013 onward, drawing on Vitaliy Varenitsa's retrospective and checking formal dates against Rosstandart.
+We use a review of 28 secure-development methodologies to explore publication milestones, ways of organizing security work, and the limits of effectiveness evidence. Drawing on the full July 2025 webinar discussion with Vitaliy Varenitsa, we trace the Russian standard from early conversations around 2009 through research and drafting from 2013, approval in 2016 and entry into force in 2017.
 
-The practical half builds an illustrative plan for a C++ engineering-file importer: current-state analysis, resources, process improvement, implementation planning, scope and evidence.
+The expanded history separates the author's recollections from official records. It covers the original plan for a family of documents, the roles of developers and reviewers, international connections and the transition to the 2024 edition. We also examine why nine groups of measures cannot be compared arithmetically with 25 processes, and why requirement wording must be read in its specific edition.
+
+The practical section builds an illustrative plan for a C++ engineering-file importer: current-state analysis, resources, process improvement, implementation planning, scope and evidence. We look for existing useful practices before proposing new tools, distinguish one-time checks from maintained processes, and connect planning records to work the team can review.
 
 You will also see a bounded comparison with NIST SSDF 1.1 and OWASP SAMM. Similar engineering concerns do not automatically mean equivalent requirements.
 
@@ -26,6 +28,9 @@ The 90-day schedule and resource figures are teaching examples. English translat
 Sources:
 
 - [GOST R 56939-2024, official record](https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64)
+- [GOST R 56939-2016, official record](https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d)
+- [NIST SSDF public draft announcement, June 2019](https://csrc.nist.gov/News/2019/draft-white-paper-on-ssdf)
+- [NIST SSDF 1.0 final announcement, April 2020](https://csrc.nist.gov/news/2020/mitigating-risk-of-software-vulns-ssdf)
 - [NIST SSDF 1.1](https://csrc.nist.gov/pubs/sp/800/218/final)
 - [OWASP SAMM: Strategy and Metrics](https://owaspsamm.org/model/governance/strategy-and-metrics/stream-a/)
 - [Microsoft SDL history](https://www.microsoft.com/en-us/securityengineering/sdl/about)
@@ -36,7 +41,11 @@ Sources:
 
 Historical presentation: Vitaliy Varenitsa, “История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24”, 26-page PDF supplied with the earlier webinar materials. The accompanying research note records page references and corrections; an external public URL for this exact PDF has not been established.
 
-The series builds on an earlier Russian-language webinar project delivered with PVS-Studio. The current comparison and teaching example were prepared for this English series.
+The series builds on an earlier Russian-language webinar project delivered with PVS-Studio. A detailed thematic lecture based on the full discussion is included in the preparation package; a public materials URL will be added after publication. The current comparison and teaching example were prepared for this English series.
+
+Author: **Vitaliy Pikov — [pikov.expert](https://pikov.expert)**.
+
+Next episode: **Security Training That Changes Engineering Decisions** — employee training under clause 5.2, role and skills mapping, practical exercises and evidence of progress.
 
 ## Planned chapters — update after editing
 
@@ -44,15 +53,22 @@ The series builds on an earlier Russian-language webinar project delivered with 
 00:00 Where secure development begins
 01:00 The series and its practical promise
 04:00 A release problem in a fictional C++ team
-05:30 Methodology publications and different operating models
-08:30 How GOST R 56939 was developed
-11:30 Shared practices and effectiveness evidence
-13:00 Our comparison method
-14:30 The five planning requirements
-20:30 Two plans, two questions
-22:00 A 90-day planning example
-25:30 The first international crosswalk
-28:30 Your planning exercise and the next episode
+06:00 Methodology publications and different operating models
+09:00 The problem behind the Russian standard
+11:00 Research, drafts, approval and effective date
+13:00 Authors, reviewers and intended users
+14:30 The original plan for a family of standards
+16:00 International connections and the SSDF timeline
+18:00 Two editions: structure and requirement wording
+19:30 From a tool run to a maintained process
+21:00 Shared practices and effectiveness evidence
+22:30 Our comparison method
+24:00 The five planning requirements
+30:00 Two plans, two questions
+31:30 A 90-day planning example
+35:00 The first international crosswalk
+37:00 Applying the plan to the release decision
+38:30 Stay in touch and the next episode
 ```
 
 ## Pinned comment draft

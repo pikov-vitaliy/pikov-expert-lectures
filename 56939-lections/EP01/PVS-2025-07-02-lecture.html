@@ -1,0 +1,944 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Первый вебинар по безопасной разработке — подробная лекция · pikov.expert</title><meta name="description" content="Полная тематическая лекция по вебинару с PVS-Studio от 2 июля 2025 года."><meta name="color-scheme" content="light">
+<style>
+:root{--paper:#f7f8fa;--ink:#17212b;--blue:#2356a8;--navy:#142c49;--muted:#53677d;--line:#ccd8e5;--white:#fff;--soft:#eaf0f7;--green:#205c4b;color-scheme:light}
+*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.65}a{color:var(--blue);text-underline-offset:.2em;overflow-wrap:anywhere}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e6942e;outline-offset:4px}button,summary{font:inherit}button{cursor:pointer}img{max-width:100%;height:auto}h1,h2,h3,h4{line-height:1.17;text-wrap:balance}h1,h2{font-family:'Bahnschrift','Segoe UI',Arial,sans-serif;font-weight:650}h1{font-size:clamp(2.5rem,5.8vw,5.4rem);letter-spacing:-.045em;margin:18px 0 26px}h2{font-size:clamp(1.85rem,3.4vw,2.8rem);letter-spacing:-.025em;margin:0 0 22px}h3{font-size:1.35rem;margin:30px 0 14px}h4{font-size:1.12rem;margin:24px 0 10px}p{margin:0 0 1.05em}ul,ol{padding-left:1.35em}li{padding-left:.1em;margin:.4em 0}code,kbd,pre,.mono{font-family:Consolas,'Cascadia Mono',monospace}code{font-size:.86em;overflow-wrap:anywhere}pre{font-size:.87rem;line-height:1.6;max-width:100%;overflow:auto;background:var(--soft);border:1px solid var(--line);padding:18px;white-space:pre-wrap;overflow-wrap:anywhere}pre code{font-size:inherit}blockquote{border-left:4px solid var(--blue);margin:24px 0;padding:12px 22px;background:var(--soft)}blockquote>:last-child{margin-bottom:0}hr{border:0;border-top:1px solid var(--line);margin:32px 0}
+.wrap{width:min(1280px,calc(100% - 72px));margin-inline:auto;min-width:0}.skip{position:fixed;top:-100px;left:12px;background:var(--white);padding:10px 20px;z-index:30}.skip:focus{top:12px}.masthead{display:flex;gap:20px;align-items:center;justify-content:space-between;padding-block:25px;border-bottom:1px solid var(--line)}.brand{font-size:1.25rem;letter-spacing:-.03em;text-decoration:none;font-weight:750;color:var(--navy)}.masthead span{font-size:.83rem;color:var(--muted)}.hero{padding:62px 0 55px}.eyebrow{color:var(--blue);font-weight:750;font-size:.78rem;letter-spacing:.13em;text-transform:uppercase}.deck{max-width:960px;font-size:clamp(1.13rem,2vw,1.5rem);line-height:1.55;color:var(--muted)}.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:46px;align-items:end}.edition{border-left:3px solid var(--blue);padding:4px 0 4px 22px;font-size:.96rem;color:var(--muted)}.edition strong{display:block;color:var(--navy);font-size:1.4rem}.hero-links,.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:27px}.button,button.action{display:inline-block;border:1px solid var(--blue);padding:10px 17px;background:var(--blue);color:var(--white);text-decoration:none;border-radius:5px;font-weight:650;font-size:.94rem}.button.secondary,button.action.secondary{color:var(--blue);background:transparent}.button:hover{background:var(--navy);color:var(--white)}.jump-nav{position:sticky;top:0;z-index:10;background:rgba(247,248,250,.98);border-block:1px solid var(--line)}.jump-nav .wrap{display:flex;gap:25px;overflow-x:auto;white-space:nowrap;padding-block:14px;scrollbar-width:thin}.jump-nav a{font-size:.89rem;font-weight:700;text-decoration:none;color:var(--navy)}main>section{padding-block:54px;border-bottom:1px solid var(--line)}.section-intro{max-width:950px;color:var(--muted)}.reading{max-width:900px}.section-label{display:block;margin-bottom:10px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:750}.metric-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:28px 0 36px;border-block:1px solid var(--line)}.metric{padding:20px 18px 21px 0;min-width:0}.metric strong{font-family:'Bahnschrift','Segoe UI',sans-serif;display:block;color:var(--navy);font-size:2.25rem;font-weight:650;line-height:1.2}.metric span{font-size:.87rem;color:var(--muted)}.columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}.note{border-left:4px solid var(--blue);background:var(--soft);padding:23px 26px;margin-block:26px;min-width:0}.note>:last-child{margin-bottom:0}.note h3{margin-top:0}.notice{padding:19px 23px;background:var(--navy);color:var(--white);border-radius:5px}.notice a{color:#c5ddff}.cover{display:block;width:100%;border:1px solid var(--line);border-radius:5px;margin:24px 0 10px}.caption{font-size:.85rem;color:var(--muted)}.table-wrap{overflow-x:auto;max-width:100%;margin:24px 0;scrollbar-width:thin}.table-wrap table{width:100%;border-collapse:collapse;font-size:.93rem;line-height:1.5}.table-wrap th{text-align:left;color:var(--navy);font-weight:750;background:var(--soft)}.table-wrap th,.table-wrap td{padding:13px 15px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}.table-wrap th:first-child,.table-wrap td:first-child{padding-left:12px}.schedule td:first-child{width:62px;color:var(--blue);font-weight:750}.schedule td:nth-child(2){width:140px;white-space:nowrap}.schedule td:nth-child(3){width:40%}.source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.source-card{min-width:0;background:var(--white);padding:23px;border:1px solid var(--line);border-radius:5px}.source-card h3{margin:0 0 12px;font-size:1.12rem}.source-card p{font-size:.95rem;margin-bottom:12px}.source-card>:last-child{margin-bottom:0}.path{display:block;max-width:100%;margin-top:7px;white-space:normal;overflow-wrap:anywhere;word-break:normal;font-size:.78rem;line-height:1.65;color:var(--muted)}.tag{color:var(--blue);font-size:.79rem;font-weight:750}.document-list{display:grid;gap:12px;list-style:none;margin:24px 0;padding:0}.document-list>li{margin:0;min-width:0;display:grid;grid-template-columns:45px minmax(0,1fr);gap:15px;border-top:1px solid var(--line);padding:19px 0}.document-list .file-number{font-family:'Bahnschrift','Segoe UI',sans-serif;font-size:1.4rem;color:var(--blue)}.document-list h3{margin:0 0 6px;font-size:1.13rem}.document-list p{font-size:.92rem;color:var(--muted);margin:0}.document-list>li>div{min-width:0}.speech-list,.archive-list{display:grid;gap:12px;margin-top:25px}details.entry{min-width:0;border:1px solid var(--line);background:var(--white);border-radius:5px}details.entry>summary{display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:start;gap:16px;padding:20px 23px;cursor:pointer;list-style:none}details.entry>summary::-webkit-details-marker{display:none}details.entry>summary:after{content:'+';grid-column:3;font-size:1.55rem;font-weight:400;line-height:1.1;color:var(--blue)}details.entry[open]>summary:after{content:'−'}summary .entry-number{font-family:'Bahnschrift','Segoe UI',sans-serif;color:var(--blue);font-weight:650;font-size:1.18rem}summary .entry-title{font-weight:700;min-width:0;overflow-wrap:anywhere}summary small{display:block;font-weight:400;color:var(--muted);font-size:.81rem;margin-top:5px}.entry-body{padding:8px 28px 28px;min-width:0;border-top:1px solid var(--line)}.speech-text{max-width:920px;font-size:1.06rem;line-height:1.82;margin-top:23px}.speech-text p{margin-bottom:1.25em}.speech-meta{font-size:.85rem;color:var(--muted);margin-block:20px}.source-links{font-size:.86rem;color:var(--muted)}.raw-source{margin-top:24px;border-top:1px solid var(--line);padding-top:15px}.raw-source>summary{font-size:.88rem;color:var(--blue);cursor:pointer}.markdown{min-width:0;overflow-wrap:anywhere}.markdown>h1{font-size:2.25rem;letter-spacing:-.025em;margin-top:28px}.markdown>h2{font-size:1.75rem;margin-top:42px}.markdown>h3{font-size:1.23rem;margin-top:30px}.markdown>h4{font-size:1.08rem}.markdown h1,.markdown h2,.markdown h3,.markdown h4{scroll-margin-top:88px}.markdown .table-wrap{font-size:.9rem}.markdown .table-wrap table{min-width:560px}.markdown .table-wrap th,.markdown .table-wrap td{min-width:100px}.markdown .footnote{font-size:.88rem;border-top:1px solid var(--line);margin-top:35px}.archive-list .markdown{font-size:.98rem}.contents{background:var(--soft);border-left:4px solid var(--blue);padding:24px 29px;margin:30px 0}.contents h2{font-size:1.45rem;margin-bottom:15px}.contents ol{margin:0;padding-left:1.3em;columns:2;column-gap:40px}.contents li{break-inside:avoid;margin:.45em 0;font-size:.94rem}.contents a{text-decoration:none}.lecture-shell{max-width:1000px;margin-inline:auto}.lecture-shell .markdown{max-width:920px;margin-inline:auto;font-size:1.11rem;line-height:1.85}.lecture-shell .markdown>h1{font-size:2.2rem}.lecture-shell .markdown>h2{font-family:'Bahnschrift','Segoe UI',sans-serif;font-size:2rem;border-top:1px solid var(--line);padding-top:32px;margin-top:54px}.lecture-shell .markdown>h3{font-size:1.35rem;line-height:1.35}.lecture-shell .markdown p{margin-bottom:1.15em}.lecture-shell .markdown .table-wrap{font-size:.9rem}.site-footer{padding:34px 0 48px;color:var(--muted);font-size:.87rem}.site-footer strong{color:var(--navy)}.print-only{display:none}
+.contents ol,.markdown .toc ol,.markdown .toc ul{list-style:none;padding-left:0}
+@media(max-width:900px){body{font-size:17px}.wrap{width:calc(100% - 42px)}.hero-grid{grid-template-columns:minmax(0,1fr)}.edition{max-width:650px}.metric-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.source-grid,.columns{grid-template-columns:minmax(0,1fr)}.contents ol{columns:1}.schedule td:nth-child(2){width:auto}.hero{padding-top:40px}.lecture-shell .markdown{font-size:1.04rem}}
+@media(max-width:520px){html{scroll-padding-top:80px}.wrap{width:calc(100% - 28px)}.masthead{align-items:start;gap:12px}.masthead span{text-align:right;max-width:175px;font-size:.74rem}.hero{padding-block:32px}h1{font-size:2.5rem}.hero-grid{gap:23px}.deck{font-size:1.1rem}.jump-nav .wrap{gap:20px;padding-block:12px}.jump-nav a{font-size:.81rem}main>section{padding-block:35px}.metric{padding:18px 13px 18px 0}.metric strong{font-size:1.9rem}.metric span{font-size:.79rem}.table-wrap th,.table-wrap td{padding:10px 9px}.schedule{min-width:650px}.source-card{padding:18px}.source-card h3{font-size:1.05rem}.path{font-size:.74rem}details.entry>summary{grid-template-columns:34px minmax(0,1fr) auto;gap:10px;padding:16px 14px}.entry-body{padding:5px 16px 20px}.speech-text{font-size:1rem}.note{padding:18px}.document-list>li{grid-template-columns:30px minmax(0,1fr);gap:10px}.contents{padding:18px}.markdown>h1{font-size:1.8rem}.markdown>h2,.lecture-shell .markdown>h2{font-size:1.65rem}.markdown>h3{font-size:1.15rem}.lecture-shell .markdown{font-size:1rem}.button,button.action{font-size:.86rem;padding:9px 13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media print{@page{margin:17mm}body{background:white;font-size:11pt}.wrap{width:100%;max-width:none}.jump-nav,.hero-links,.actions,.skip,.raw-source{display:none!important}h1{font-size:30pt}h2{font-size:21pt}h3{font-size:15pt}.hero{padding:20px 0}.hero-grid,.source-grid,.columns{display:block}.edition{margin-top:20px}main>section{padding-block:25px}details.entry{break-inside:auto;margin-bottom:15px}details.entry>summary{padding:12px;font-size:12pt}details.entry>summary:after{display:none}.entry-body{padding:0 12px 12px}details.entry:not([open])>.entry-body{display:block!important}details.entry{content-visibility:visible}.table-wrap{overflow:visible}.table-wrap table,.markdown .table-wrap table{min-width:0;font-size:9pt}.cover{max-height:130mm;object-fit:contain}.source-card{margin-bottom:15px;break-inside:avoid}a{color:inherit}.print-only{display:block}.contents ol{columns:1}.site-footer{padding-bottom:0}.metric strong{font-size:25pt}}
+</style></head><body>
+<a class="skip" href="#main">Перейти к материалам</a>
+<header class="masthead wrap"><a class="brand" href="https://pikov.expert">pikov.expert</a><span>Secure Software Development in Practice<br>Рабочие материалы · 06.09.2026</span></header>
+<div class="hero wrap"><span class="eyebrow">Архив знаний / PVS-Studio / 02 июля 2025</span>
+<h1>Безопасная разработка.<br>Полная лекция по первому вебинару</h1>
+<p class="deck">Тематический разбор исходного выступления: от истории SDL и появления российского стандарта до процессов, инструментов и ответов на практические вопросы.</p>
+<div class="hero-links"><a class="button" href="#lecture-content">Читать лекцию</a><a class="button secondary" href="review.html">Обновлённая EP01 и материалы</a><a class="button secondary" href="file:///V:/pikov.expert/56939-lections/EP01/PVS-2025-07-02-lecture.md">Исходный Markdown</a></div></div>
+<main class="wrap lecture-shell" id="main"><section id="lecture-content"><p class="caption">Подробный текст · 7,467 слов по Markdown-источнику · 25 разделов верхнего уровня</p>
+<nav class="contents" aria-label="Темы лекции"><h2>Темы лекции</h2><ol><li><a href="#lecture-_2">Как читать этот материал</a></li><li><a href="#lecture-_3">Карта содержания и таймкодов</a></li><li><a href="#lecture-1">1. Зачем начинать разговор с истории</a></li><li><a href="#lecture-2">2. Исходная проблема: безопасность продукта зависит от его создания</a></li><li><a href="#lecture-3-2016">3. Как создавалась редакция 2016 года</a></li><li><a href="#lecture-4">4. Международные связи и вопрос об уникальности ГОСТ</a></li><li><a href="#lecture-5">5. Стандарт прежде всего для разработчика</a></li><li><a href="#lecture-6-2024">6. Почему понадобилась редакция 2024 года</a></li><li><a href="#lecture-7">7. Мера, процесс и регулярность работы</a></li><li><a href="#lecture-8">8. Тестирование: почему название метода не заменяет его задачу</a></li><li><a href="#lecture-9">9. Как устроен ГОСТ и как его читать</a></li><li><a href="#lecture-10">10. Планирование — согласование намерения с возможностями</a></li><li><a href="#lecture-11">11. Сначала установить исходное состояние</a></li><li><a href="#lecture-12">12. Область применения и очередность: когда нельзя внедрить всё сразу</a></li><li><a href="#lecture-13">13. Люди, ресурсы и ответственность</a></li><li><a href="#lecture-14">14. Какие результаты должны остаться после планирования</a></li><li><a href="#lecture-15">15. Автоматизация документации и свидетельств</a></li><li><a href="#lecture-16">16. Чужой код, зависимости и ответственность за продукт</a></li><li><a href="#lecture-17">17. Поддержка и обработка выявленных недостатков</a></li><li><a href="#lecture-18">18. Сертификация: несколько разных вопросов, которые нельзя смешивать</a></li><li><a href="#lecture-19">19. Небольшая команда: масштабирование без самообмана</a></li><li><a href="#lecture-20">20. Литература, обучение и формат продолжения</a></li><li><a href="#lecture-21">21. Вопросы аудитории: карта ответов для подготовки преподавателя</a></li><li><a href="#lecture-22-ep01">22. Что сохранить в новом EP01</a></li><li><a href="#lecture-_4">Источники и связанные материалы</a></li></ol></nav><article class="markdown"><h1 id="lecture-_1">Безопасная разработка: история российского стандарта и начало внедрения</h1>
+<p>Подробная тематическая лекция по первому вебинару МАСКОМ и PVS-Studio от <strong>2 июля 2025 года</strong>. Подготовлено <strong>6 сентября 2026 года</strong> для разработки англоязычного EP01 и сохранения содержательной части исходного выступления.</p>
+<p>Ведущие вебинара — <strong>Андрей Карпов</strong> и <strong>Виталий Пиков</strong>. Историю подготовки национального стандарта рассказывает приглашённый эксперт <strong>Виталий Вареница</strong>, представленный в начале записи как руководитель сертификационной лаборатории НПО «Эшелон». Исторические воспоминания Вареницы не следует приписывать Пикову.</p>
+<h2 id="lecture-_2">Как читать этот материал</h2>
+<p>Это связный учебный текст, а не дословная стенограмма. Повторы, оговорки и организационные паузы убраны; близкие обсуждения объединены по темам. Таймкоды позволяют вернуться к соответствующим фрагментам исходной записи. Последняя отметка расшифровки — <strong>02:07:28</strong>; длительность самой видеозаписи отдельно не измерялась.</p>
+<p>Основной источник — <a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%86%D0%B8%D1%8F%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">полная рабочая расшифровка</a>. Аудиозапись построчно не проверена. Распознавание неоднократно искажает названия организаций, термины и фамилии, а все реплики технически приписывает одному «Участнику 1». Имена говорящих восстановлены только там, где представление, передача слова и содержание позволяют сделать это уверенно. В остальных случаях используется нейтральное «участники обсуждают».</p>
+<p>Сопутствующий <a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%9F%D0%B5%D1%80%D0%B5%D1%81%D0%BA%D0%B0%D0%B7%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">краткий пересказ</a> проверен по полному тексту и не используется как самостоятельное доказательство. В частности, из него исключены ошибочные утверждения об основании ГОСТ 2016 года на более позднем NIST SSDF, обратном влиянии ГОСТ на Common Criteria и якобы досрочном завершении вебинара.</p>
+<p>В тексте различаются три вида содержания:</p>
+<ul>
+<li><strong>Содержание вебинара</strong> — объяснения, примеры, вопросы и позиции, прозвучавшие 2 июля 2025 года.</li>
+<li><strong>Историческое свидетельство</strong> — воспоминания участника разработки стандарта. Они ценны для понимания замысла, но не заменяют приказ, окончательную редакцию стандарта или протокол обсуждения.</li>
+<li><strong>Редакционное уточнение</strong> — проверенная поправка или учебное пояснение, добавленное при подготовке лекции. Нормативная основа таких поправок приведена в <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-sources.md">реестре источников EP01</a> и <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-history-research.md">исследовании истории</a>.</li>
+</ul>
+<p>Обсуждавшиеся в 2025 году будущие стандарты, очереди на сертификацию, аккредитации, учебные расписания и планы регуляторов ниже остаются фактами разговора того времени. Этот материал не подтверждает их состояние на сентябрь 2026 года.</p>
+<h2 id="lecture-_3">Карта содержания и таймкодов</h2>
+<div aria-label="Таблица — прокрутка по горизонтали при необходимости" class="table-wrap" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>Тема</th>
+<th>Основные фрагменты записи</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Замысел серии, представление участников, приглашение эксперта</td>
+<td>00:00:52–00:07:19</td>
+</tr>
+<tr>
+<td>Зачем потребовался стандарт процесса разработки</td>
+<td>00:08:01–00:17:33</td>
+</tr>
+<tr>
+<td>НИР, подготовка редакции 2016 года, роль разработчиков и обсуждения</td>
+<td>00:17:33–00:20:19</td>
+</tr>
+<tr>
+<td>Аудитория, качество продукта, мотивация, связь с оценкой соответствия</td>
+<td>00:20:19–00:28:06</td>
+</tr>
+<tr>
+<td>Подготовка обновления и переход от мер к процессам</td>
+<td>00:28:06–00:41:17</td>
+</tr>
+<tr>
+<td>Поддержка, структура требований, международные связи и планы развития</td>
+<td>00:41:17–00:49:47</td>
+</tr>
+<tr>
+<td>Спор о процессах, мерах и тестировании</td>
+<td>00:49:47–00:58:35</td>
+</tr>
+<tr>
+<td>Сертификация, органы оценки и ограничения рынка</td>
+<td>00:58:42–01:03:14</td>
+</tr>
+<tr>
+<td>Связь с ГОСТ Р 58412, методологиями SDL и NIST SSDF</td>
+<td>01:03:14–01:11:38</td>
+</tr>
+<tr>
+<td>Частичное внедрение, уровни оценки, соответствие и сертификат</td>
+<td>01:11:38–01:17:27</td>
+</tr>
+<tr>
+<td>Продолжение серии и приглашение на разговор об обучении</td>
+<td>01:17:44–01:21:10</td>
+</tr>
+<tr>
+<td>Что конкретизировано в редакции 2024 года</td>
+<td>01:21:10–01:27:08</td>
+</tr>
+<tr>
+<td>Структура ГОСТ и работа с окончательной редакцией</td>
+<td>01:27:08–01:33:19</td>
+</tr>
+<tr>
+<td>Практическая актуальность безопасной разработки</td>
+<td>01:33:19–01:35:00</td>
+</tr>
+<tr>
+<td>Планирование и стоимость внедрения</td>
+<td>01:35:00–01:39:53</td>
+</tr>
+<tr>
+<td>Исходное состояние, масштабирование и приоритеты</td>
+<td>01:39:53–01:42:08</td>
+</tr>
+<tr>
+<td>Инвентаризация, ресурсы, развитие процессов</td>
+<td>01:42:08–01:47:01</td>
+</tr>
+<tr>
+<td>Документация, инициативная группа, средства автоматизации</td>
+<td>01:47:01–01:50:49</td>
+</tr>
+<tr>
+<td>Дополнительные материалы, обучение и security champions</td>
+<td>01:50:49–01:55:58</td>
+</tr>
+<tr>
+<td>Open source, учебные материалы, код с участием ИИ</td>
+<td>01:55:58–02:00:47</td>
+</tr>
+<tr>
+<td>Небольшие команды и собственные процессы PVS-Studio</td>
+<td>02:00:47–02:04:48</td>
+</tr>
+<tr>
+<td>Итоги, сертификаты слушателей и анонс следующего выпуска</td>
+<td>02:04:48–02:07:28</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="lecture-1">1. Зачем начинать разговор с истории</h2>
+<p><strong>Основание: 00:00:52–00:08:56.</strong></p>
+<p>Первый вебинар задуман как начало серии из двадцати пяти встреч: по одной на каждый процесс, выделенный в ГОСТ Р 56939-2024. Однако начало серии требует общего основания. Если сразу перейти к пунктам стандарта, слушатель увидит перечень обязанностей, но может не понять, какую инженерную проблему они решают и почему сформулированы именно так.</p>
+<p>Исторический экскурс отвечает на несколько практических вопросов. Почему понадобился отдельный документ о разработке, если уже существовали требования к безопасности продуктов? Почему первая редакция выглядела иначе, чем редакция 2024 года? Что означает изменение структуры для организации, которая уже внедряла меры по старому стандарту? Нужно ли начинать всё заново или можно сохранить работающие практики?</p>
+<p>Для этого организаторы пригласили участника разработки стандарта. Его рассказ важен прежде всего как свидетельство о постановке задачи и работе над документом: какие ожидания были у авторов, с какими возражениями они сталкивались, какие варианты структуры обсуждали. Сам факт участия в разработке не превращает любую оценку выступающего в единственную трактовку стандарта. Поэтому историческую линию полезно слушать вместе с обсуждением других участников и проверять по документам там, где речь идёт о датах и обязательных требованиях.</p>
+<p>Уже в начале определён способ работы всей серии: не только читать ГОСТ, но и обсуждать опыт внедрения, приглашать специалистов и разбирать вопросы аудитории. Это существенно для безопасной разработки. Один и тот же текст стандарта будет реализован по-разному в продуктовой компании, небольшой команде, организации с государственным заказом и лаборатории оценки соответствия. Хорошая лекция должна показать общую инженерную задачу и границы конкретного примера.</p>
+<h2 id="lecture-2">2. Исходная проблема: безопасность продукта зависит от его создания</h2>
+<p><strong>Основание: 00:08:01–00:17:33.</strong></p>
+<p>Вареница описывает безопасную разработку как фундамент, на котором держится последующая работа по обеспечению безопасности. Продукт можно долго проверять перед поставкой, но если требования, архитектура, обращение с исходным кодом, сборка и исправление недостатков организованы плохо, финальное испытание будет постоянно обнаруживать последствия более ранних ошибок.</p>
+<p>Из этого следует важное изменение объекта внимания. Проверять нужно не только получившийся экземпляр программы, но и то, как организация систематически создаёт, изменяет и сопровождает такие программы. Речь идёт не о замене испытаний организационными документами. Напротив, процесс должен обеспечить, чтобы нужные испытания действительно происходили, результаты доходили до ответственных людей, а исправления становились частью управляемого изменения продукта.</p>
+<p>По воспоминаниям Вареницы, обсуждения необходимости стандартизации начались примерно с 2009 года. В них участвовали коллеги и представители регуляторов; осознание задачи и подготовительная работа предшествовали формальному началу НИР. Поэтому фраза «стандарт появился в 2016 году» обозначает год утверждённого документа, но не начало соответствующей инженерной мысли и даже не начало самой разработки стандарта.</p>
+<p>Замысел включал документ, пригодный для разных разработчиков, а не только корпоративную методологию одного крупного вендора. Крупная компания может разработать собственные правила, роли, инструменты и порядок контроля. Для других организаций полезна общая рамка: какие задачи следует решать независимо от конкретного языка программирования, продукта или названия внутреннего подразделения.</p>
+<p>Участник сопоставляет ситуацию середины 2010-х с 2025 годом и отмечает рост осведомлённости руководителей, инженеров и заказчиков. По его оценке, безопасная разработка стала гораздо более узнаваемой темой, появились новые средства автоматизации и специальные документы по отдельным методам анализа. Это профессиональное наблюдение выступающего, а не измеренный в вебинаре показатель зрелости всей отрасли.</p>
+<p>Учебный вывод здесь прост: нормативный документ возникает в контексте уже существующих проблем и практик. Его полезность оценивают по тому, насколько он помогает организовать повторяемую работу и проверить её результат, а не только по количеству страниц или дате публикации.</p>
+<h2 id="lecture-3-2016">3. Как создавалась редакция 2016 года</h2>
+<p><strong>Основание: 00:08:56–00:14:32; 00:17:33–00:20:19; историческая презентация Вареницы, PDF-с. 4.</strong></p>
+<p>В рассказе необходимо разделить подготовительную идею, рабочие редакции проекта, согласование и официальный жизненный цикл стандарта. Эти события связаны, но происходили в разные годы и не означают одно и то же.</p>
+<p>По воспоминаниям Вареницы, обсуждения и формирование замысла шли с конца 2000-х — начала 2010-х годов. Апрель 2013 года он называет началом НИР: к этому времени уже потребовалось согласовать задачу, состав участников и организационную основу работы. Формальный старт не был моментом, когда несколько людей впервые задумались о безопасной разработке.</p>
+<p>Основную подготовку первой редакции Вареница связывает с НПО «Эшелон». Важно передать эту мысль без крайностей. Она не означает, что один человек единолично написал и принял государственный стандарт. Другие организации участвовали в рассмотрении, замечаниях и обсуждении. Вместе с тем характер их участия, по словам докладчика, отличался от непосредственно авторской работы над текстом.</p>
+<p>В исторической презентации приведена более подробная последовательность:</p>
+<div aria-label="Таблица — прокрутка по горизонтали при необходимости" class="table-wrap" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>Этап</th>
+<th>Дата</th>
+<th>Как его понимать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Начало разработки в рамках НИР</td>
+<td>Апрель 2013 года</td>
+<td>Организованная работа над проектом</td>
+</tr>
+<tr>
+<td>Первая редакция проекта</td>
+<td>Август 2013 года</td>
+<td>Рабочий текст, ещё не действующий ГОСТ</td>
+</tr>
+<tr>
+<td>Окончательная редакция проекта</td>
+<td>Май 2014 года</td>
+<td>Этап подготовки и согласования</td>
+</tr>
+<tr>
+<td>Уточнённая окончательная редакция</td>
+<td>Сентябрь 2015 года</td>
+<td>Последующая доработка проекта</td>
+</tr>
+<tr>
+<td>Апробация и публичное обсуждение</td>
+<td>В период подготовки</td>
+<td>В презентации указаны 22 организации и около 200 замечаний и предложений</td>
+</tr>
+<tr>
+<td>Утверждение ГОСТ Р 56939-2016</td>
+<td><strong>1 июня 2016 года</strong></td>
+<td>Приказ Росстандарта № 458-ст</td>
+</tr>
+<tr>
+<td>Введение в действие</td>
+<td><strong>1 июня 2017 года</strong></td>
+<td>Начало действия утверждённой редакции</td>
+</tr>
+</tbody>
+</table></div>
+<p>Последние две даты сверены по <a href="https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d" rel="noopener noreferrer">официальной карточке Росстандарта</a>. Это <strong>редакционное уточнение</strong>: встречающееся в расшифровке «принято Минюстом» не используется как описание процедуры утверждения. Так же исправлено указание мая 2016 года на архивном слайде. Стандарт утверждён Росстандартом в июне, а введён в действие годом позже.</p>
+<p>Вареница вспоминает многочисленные рабочие версии, в том числе после 2016 года: 2018, 2019, 2020 и 2022. Это не основание вводить в лекцию национальные стандарты «ГОСТ Р 56939-2018» или «ГОСТ Р 56939-2022». В данном разговоре речь идёт о редакциях разрабатываемого текста; публичные утверждённые документы, которые сравнивает серия, — редакции 2016 и 2024 годов.</p>
+<p>В дальнейшем, на <strong>00:44:26–00:45:41</strong>, Вареница возвращается к устройству первой редакции. Он описывает её как иерархическую конструкцию, близкую знакомым ему подходам Common Criteria: меры связаны с целями, результатами и требованиями к реализации. Докладчик считает такую структуру удобной для технических специалистов, привыкших к её логике. Другие участники, напротив, отмечают понятность более явно перечисленных процессов новой редакции. Это различие восприятия стоит сохранить: документ может быть удобен одной профессиональной группе и требовать дополнительных объяснений для другой. Оно не доказывает превосходство одной редакции во всех условиях.</p>
+<p>Такое разграничение полезно и вне истории ГОСТ. При работе с любым стандартом нужно установить статус найденного документа. Проект, доклад разработчика, таблица изменений и окончательный нормативный текст могут содержать разные формулировки. Хорошая история показывает эту эволюцию, а практическое внедрение опирается на применимую окончательную редакцию.</p>
+<h2 id="lecture-4">4. Международные связи и вопрос об уникальности ГОСТ</h2>
+<p><strong>Основание: 00:09:41–00:14:32; 00:36:52–00:37:37; 00:44:26–00:46:24; 01:05:17–01:11:38.</strong></p>
+<p>Вареница подчёркивает, что ГОСТ Р 56939 не задумывался как простой перевод одного зарубежного документа. При этом он прямо говорит об учёте международных стандартов, лучших практик и методологий крупных разработчиков. Эти положения совместимы: собственная структура и национальный контекст не требуют изобретать заново каждую инженерную практику.</p>
+<p>В исторической презентации обозначены связи с Common Criteria / серией 15408, процессами жизненного цикла 12207, управлением информационной безопасностью 27001 и безопасностью приложений 27034. Эти связи подтверждаются и самим ГОСТ Р 56939-2016: раздел 1 допускает его использование как источника мер и средств управления безопасностью по ГОСТ Р ИСО/МЭК 27034-1 и для конкретизации или расширения компонентов доверия ГОСТ Р ИСО/МЭК 15408-3. Справочное приложение А показывает взаимосвязи с требованиями 15408-3. Это более предметное основание международного контекста, чем общее утверждение об учёте лучших практик. Но из него нельзя автоматически получить перечень нормативных ссылок окончательной редакции 2024 года или доказать буквальное копирование конкретной методологии.</p>
+<p>В разговоре также появляется обзор <em>Secure Software Development Methodologies: A Multivocal Literature Review</em>. Пиков использует его историческую шкалу для вопроса о различии между появлением подходов у крупных зарубежных разработчиков и российским стандартом. Вареница отвечает, что по его оценке техническое содержание современного ГОСТ нельзя описывать как отставание на десять лет. Он предлагает видеть сходные задачи, разные условия применения и различия в мотивации организаций.</p>
+<p>Здесь полезно сохранить дискуссию, но не превращать оценку «примерно год» в измеренный результат сравнения стандартов. В вебинаре нет опубликованной методики, которая позволила бы выразить сопоставимость ГОСТ и SSDF в годах. Не определены ни шкала, ни выборка требований, ни способ измерения. Это экспертное суждение участника, объясняющее его взгляд на развитие отрасли.</p>
+<p>Отдельное <strong>редакционное уточнение</strong> касается NIST SSDF. Сопоставление дат 2016 и 2019 не доказывает мировое первенство в безопасной разработке. Корпоративные и исследовательские подходы существовали раньше; сам обзор включает ранние публикации 2004–2006 годов. <a href="https://csrc.nist.gov/News/2019/draft-white-paper-on-ssdf" rel="noopener noreferrer">Первый публичный проект SSDF объявлен NIST 11 июня 2019 года</a>, позже первой редакции российского ГОСТ, поэтому он не мог быть её исходным источником. Для конкретного современного сравнения в EP01 используется <a href="https://csrc.nist.gov/pubs/sp/800/218/final" rel="noopener noreferrer">NIST SP 800-218, SSDF 1.1</a>, опубликованный в 2022 году.</p>
+<p>Содержательный вопрос серии следует формулировать иначе: какую задачу решают сопоставляемые практики, кто выполняет работу, когда она повторяется, какие результаты остаются и как подтверждается их достаточность? Такой подход позволяет выявлять и общее, и различия без заранее выбранного ответа «уникален» или «полностью заимствован».</p>
+<h2 id="lecture-5">5. Стандарт прежде всего для разработчика</h2>
+<p><strong>Основание: 00:20:19–00:28:06; 01:07:15–01:11:38; 01:33:19–01:35:00; 01:54:08–01:55:58.</strong></p>
+<p>Вареница описывает исходную аудиторию широко: архитекторы, специалисты по безопасности, программисты, руководители групп и другие участники жизненного цикла. Следовательно, стандарт не следует представлять документом только для отдела информационной безопасности. Решения, влияющие на безопасность, принимаются при постановке требований, выборе архитектуры, реализации, тестировании, поставке и сопровождении.</p>
+<p>Организации, проводящие независимую оценку, также заинтересованы в понятных критериях. Но проверка соответствия не должна полностью определять внутренний смысл процесса. Если организация выполняет действия только ради положительного заключения, возникает вопрос, продолжатся ли эти действия между проверками и помогут ли они при неожиданной проблеме в продукте.</p>
+<p>Докладчик связывает безопасную разработку с привлекательностью продукта: качеством, управляемым сопровождением и обратной связью с заказчиками. Эти свойства не тождественны безопасности, но работа над ними часто пересекается. Например, понятный порядок обработки дефектов полезен и для исправления обычных ошибок, и для своевременного устранения уязвимостей.</p>
+<p>Участники обсуждают два источника мотивации. Первый — зрелая потребность бизнеса снизить риск проблем и обеспечить предсказуемую разработку. Второй — требование заказчика, регулятора или схемы оценки соответствия. На практике они могут сосуществовать. Противопоставление «для себя» и «для сертификата» слишком грубо, если организация одновременно выходит на регулируемый рынок и хочет повысить качество собственной работы.</p>
+<p>Прозвучавшая оценка Вареницы, что значительная доля его заказчиков внедряла процессы без выхода на сертификацию ФСТЭК, иллюстрирует его личную практику. Упомянутые им 70 процентов не являются статистикой российского рынка: в разговоре не представлены состав выборки, период наблюдения и метод подсчёта.</p>
+<p>Для учебной серии из этого следует принцип: каждое нормативное требование стоит связывать с инженерным результатом. Не просто «должен быть документ», а «команда должна знать, как реагировать на выявленный недостаток, а документ и рабочие записи позволяют это воспроизвести и проверить».</p>
+<h3 id="lecture-51">5.1. Замысел серии стандартов и незавершённые на тот момент работы</h3>
+<p><strong>Основание: 00:09:41–00:10:19; 00:25:05–00:25:48; 00:46:24–00:49:47; 01:03:14–01:05:17; 01:29:01–01:29:41; 01:32:03–01:33:19.</strong></p>
+<p>По словам Вареницы, исходно планировался не один изолированный документ, а несколько взаимосвязанных стандартов. Они должны были описывать требования, типовые угрозы, рекомендации по реализации и способы оценки. В разговоре упоминаются разные первоначальные варианты количества «книг»; поэтому точное число задуманного комплекта не следует выдавать за окончательно утверждённую архитектуру серии.</p>
+<p>В качестве следующего опубликованного элемента обсуждается ГОСТ Р 58412-2019 о типовых угрозах безопасности информации при разработке программного обеспечения. Вареница объясняет его связь с мерами первой редакции 56939. При переходе к новой структуре требуется внимательно сопоставить угрозы с обновлёнными процессами: прежняя логика может быть полезной, но номера и группировка уже не совпадают автоматически.</p>
+<p>Отдельно звучит история подготовленного руководства, работа над которым была затем приостановлена или переформатирована в техническом комитете. Это воспоминание о ходе разработки, а не доказательство существования действующего стандарта под предполагаемым названием. Так же нужно читать рассказ о будущем документе по оценке внедрения и специализированных документах по анализаторам, фаззингу, сборке и другим направлениям.</p>
+<p>Ведущие надеются, что отдельные процессы получат более подробную методическую поддержку. Для преподавателя эта мысль полезна и без привязки к конкретному сроку: общий стандарт отвечает, какие задачи должны решаться, но не обязан содержать пошаговую инструкцию по каждому инструменту и каждому продукту. Углубление требует дополнительных источников. А заявления о том, что «в конце года появится» новый документ, в архивной лекции сохраняются как планы 2025 года, не как текущий статус.</p>
+<h2 id="lecture-6-2024">6. Почему понадобилась редакция 2024 года</h2>
+<p><strong>Основание: 00:28:06–00:41:17; 01:21:10–01:27:08.</strong></p>
+<p>Вопрос о переходе на новую редакцию особенно важен для организаций, уже вложившихся во внедрение. Вареница объясняет, что новая редакция не означает полного обнуления результатов. Значительная часть прежних мер получила более подробное описание, была разделена на несколько направлений или перестроена в другую структуру.</p>
+<p>По его воспоминаниям, обновлённый текст готовился уже к 2022 году, но процесс рассмотрения и расширение круга участников привели к выпуску в 2024 году. Это объяснение хода подготовки со стороны участника, а не установленная по административным документам единственная причина сроков. Официальные даты редакции 2024 года: утверждение <strong>24 октября 2024 года</strong>, введение <strong>20 декабря 2024 года</strong>, приказ № 1504-ст. Они приведены в <a href="https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64" rel="noopener noreferrer">карточке Росстандарта</a>.</p>
+<p>В вебинаре изменение описывается как переход от набора мер редакции 2016 года к двадцати пяти процессам редакции 2024 года. Однако прозвучавшую оценку «около четырнадцати, с учётом компенсирующих» необходимо исправить. <strong>Редакционное уточнение по окончательному ГОСТ Р 56939-2016:</strong> в разделе 5 находятся <strong>девять групп мер — 5.1–5.9</strong>. Они охватывают анализ требований; проектирование архитектуры; конструирование и комплексирование; квалификационное тестирование; инсталляцию и приёмку; решение проблем при эксплуатации; документацию и конфигурацию; инфраструктуру среды разработки; людские ресурсы. Основание — оглавление окончательного документа, PDF-с. 3.</p>
+<p>Компенсирующие меры рассмотрены в п. 4.5; это условие достижения целей и результатов базовых мер при особенностях реализации, а не ещё две группы в оглавлении. Поэтому в новой лекции недопустима нормативная формула «14 мер → 25 процессов». Корректнее сопоставлять <strong>девять групп мер</strong> и <strong>двадцать пять процессов</strong>, отдельно объясняя различие единиц группировки. Это не арифметическое доказательство большей безопасности: для реального перехода нужен анализ содержания и сохранения работающих практик.</p>
+<p>Карпов выделяет несколько особенно понятных примеров конкретизации: композиционный анализ, работа с процессом интеграции и сборки, поверхность атаки, привлечение внешних исследователей и программы поиска уязвимостей. Его мысль состоит в том, что многие практики существовали и раньше, но разработчику полезно видеть их явно названными и связанными с ожидаемыми действиями.</p>
+<p>Разделение больших тем помогает назначать работу. Например, поддержка продукта включает не только ответ на обращение пользователя. Нужно принимать сообщения о недостатках, анализировать их, организовывать исправления, выпускать изменения и передавать нужную информацию затронутым сторонам. Чем яснее описаны границы этих действий, тем проще увидеть провалы между командами.</p>
+<p>Вареница отдельно отмечает положение обучения ближе к началу перечня. Для него это отражает практическую зависимость: нельзя построить устойчивую работу, если никто не понимает требований, способов анализа и собственных обязанностей. При этом порядок пунктов стандарта не следует механически превращать в единственный календарный порядок внедрения. Несколько процессов развиваются параллельно и поддерживают друг друга.</p>
+<h2 id="lecture-7">7. Мера, процесс и регулярность работы</h2>
+<p><strong>Основание: 00:31:45–00:32:32; 00:49:47–00:58:35; 01:25:22–01:27:08.</strong></p>
+<p>Один из наиболее содержательных споров вебинара касается терминологии. Вареница критикует сближение «процессов» и «мер» в новой структуре. Он обращает внимание на различие между отдельным воздействием и организованной деятельностью, у которой есть цель, последовательность работ и поддержание во времени. С его точки зрения, замена заголовка сама по себе не создаёт процессный подход.</p>
+<p>Карпов предлагает практическое объяснение полезности слова «процесс». Он приводит типичный запрос: приобрести анализатор на несколько месяцев, один раз проверить код перед выпуском и считать работу по безопасности завершённой. Такой сценарий может дать разовый результат, но не отвечает на вопрос, что произойдёт после следующего изменения кода или появления новой информации об уязвимостях.</p>
+<p>Регулярность означает больше, чем частый запуск инструмента. Нужны условия запуска, правила обработки результата, ответственность за решение и связь с дальнейшими действиями. Если анализ автоматически выполняется в каждой сборке, но предупреждения никто не рассматривает, автоматизация ещё не обеспечивает ожидаемый эффект. И наоборот, осмысленный ручной шаг может быть частью управляемого процесса, если определены его место и результат.</p>
+<p>Обе позиции стоит сохранить. У Вареницы сильна методологическая претензия: нельзя считать разные понятия равнозначными. У Карпова сильна педагогическая иллюстрация: безопасная разработка должна продолжаться вместе с развитием продукта. Для слушателя полезнее понять эту двойную мысль, чем выбирать победителя терминологического спора.</p>
+<p>В разговоре также возникает сопротивление изменениям. Вареница описывает случаи, когда руководство поддерживает программу, а опытные разработчики считают дополнительные проверки ненужными. Это его наблюдение, а не характеристика всех программистов. В учебном изложении такой пример лучше использовать для обсуждения распределения нагрузки и понятной пользы: люди должны видеть, что от них ожидается, почему это нужно и какое время предусмотрено для работы.</p>
+<h2 id="lecture-8">8. Тестирование: почему название метода не заменяет его задачу</h2>
+<p><strong>Основание: 00:33:16–00:35:21; 00:51:41–00:54:46; 01:57:18–01:58:24.</strong></p>
+<p>Вареница высказывает критическое мнение о формулировках нефункционального тестирования в новой редакции. Он связывает описанную работу с тестированием на проникновение и оспаривает предполагаемую возможность отказаться от неё. В его объяснении ценность проверки состоит в воспроизведении действий атакующего и поиске проблем, которые становятся заметны при попытке нарушить ожидаемые ограничения системы.</p>
+<p>Этот фрагмент нельзя превращать в общее определение «нефункциональное тестирование равно пентесту». В широкой инженерной терминологии названия обозначают разные классификации, а в конкретном стандарте нужно читать его собственные определения и содержание соответствующего пункта. Также из устного слова «рекомендовано» нельзя сделать вывод о свободном исключении требования при заявленном соответствии ГОСТ.</p>
+<p><strong>Редакционное уточнение:</strong> правила чтения различаются между редакциями. В ГОСТ Р 56939-2016 п. 4.2 слово «следует» обозначает рекомендацию; в окончательной редакции ГОСТ Р 56939-2024 согласно п. 4.7 формулировки со словами «должен» и «следует» выражают требования, которые должны быть выполнены. Нельзя переносить привычную интерпретацию первой редакции в новую. Выбор области применения и возможные особенности реализации необходимо обосновывать по самому стандарту и применимому контексту, а не по отдельной оценке выступающего. Проверенное основание приведено в <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-sources.md">EP01-sources.md</a>.</p>
+<p>Для понимания темы полезно сопоставить вопросы, на которые отвечают разные проверки. Функциональные тесты проверяют требуемое поведение программы. Статический анализ исследует код без его обычного выполнения; фаззинг подаёт множество входных воздействий и наблюдает поведение; анализ архитектуры позволяет рассматривать решения, которые могут не проявиться как локальная ошибка в строке кода. Это учебное пояснение различий, а не полный словарь, прочитанный на вебинаре.</p>
+<p>Общий вывод докладчика — методы должны работать совместно. Модель угроз, анализ кода, тестирование, проверка интеграции и подготовка специалистов решают взаимосвязанные задачи. Один приобретённый продукт не даёт оснований считать все остальные направления закрытыми. Подробное обучение каждому методу заслуживает отдельного выпуска, что участники прямо отмечают в ответе на вопрос о литературе.</p>
+<h2 id="lecture-9">9. Как устроен ГОСТ и как его читать</h2>
+<p><strong>Основание: 01:21:10–01:21:50; 01:27:08–01:33:19.</strong></p>
+<p>После исторического блока ведущие возвращаются к структуре документа. Они выделяют область применения, нормативные ссылки, термины, общие положения и основную часть с процессами разработки. Цель такого обзора — показать, где искать разные типы информации, прежде чем подробно изучать отдельный процесс.</p>
+<p>Область применения связывает создание безопасного программного обеспечения с устранением выявленных недостатков, включая уязвимости. Это существенное расширение взгляда за пределы финального выпуска: исправление после обнаружения проблемы входит в ту же систему работы. При этом вебинар не даёт самостоятельной исчерпывающей классификации «ошибка — слабость — уязвимость». Если такая схема добавляется в новый EP01, её следует обозначать как отдельное учебное пояснение и опираться на соответствующие определения.</p>
+<p>Общие положения объясняют, как соотнести стандарт с жизненным циклом организации. Ведущие подчёркивают, что ГОСТ не заставляет всех работать по одной конкретной модели разработки. Задача состоит во включении безопасности в существующую организацию работ: где-то нужно дополнить действующую практику, где-то — создать отсутствующий процесс.</p>
+<p>Описания процессов построены единообразно: цели, требования к реализации и артефакты реализации. Такое устройство удобно для первого анализа состояния. Цели помогают понять ожидаемый результат; требования — содержание необходимой работы; артефакты — то, по чему можно рассмотреть её исполнение. При этом перечень артефактов не стоит использовать как замену чтению требований: можно подготовить формально похожие документы и не обеспечить сам процесс.</p>
+<p>Отдельно обсуждается таблица изменений, включённая в проект стандарта. Она полезна как историческая подсказка, но не является автоматически частью окончательной редакции. В подготовленных материалах есть также приложение об инициализации процессов. При использовании этих источников следует подписывать статус: проект, окончательный ГОСТ, поясняющая презентация или методический материал.</p>
+<p><strong>Редакционное уточнение:</strong> встречающееся в разговоре число нормативных ссылок не переносится без проверки. В окончательной локальной редакции раздел 2 содержит ссылки на ГОСТ Р ИСО/МЭК 12207 и ГОСТ Р 50922; проект и архивные слайды могли отличаться.</p>
+<h2 id="lecture-10">10. Планирование — согласование намерения с возможностями</h2>
+<p><strong>Основание: 01:35:00–01:39:53.</strong></p>
+<p>Первый процесс ведущие объясняют через ресурсы. Нельзя просто объявить прежнюю разработку безопасной и ожидать, что все необходимые работы появятся без времени, компетенций, инструментов и управленческих решений. Дополнительные задачи должны занять место в реальном плане команды.</p>
+<p>Карпов использует понятную аналогию с физическим доступом на предприятие: если нужно ограничить проход, потребуются технические и организационные меры, а также люди, которые будут поддерживать установленный порядок. В программной разработке затраты часто менее видимы, поэтому возникает соблазн заменить их пожеланием «пишите аккуратнее». Планирование делает такую подмену заметной.</p>
+<p>ГОСТ в этой логике становится общим языком исполнителя и заказчика — внутреннего или внешнего. Команда может показать, какие работы отсутствуют, какие нужно усилить, кто должен их выполнять и что потребуется приобрести или изменить. Руководитель получает предмет для решения: объём, сроки, зависимости и стоимость, а не абстрактную просьбу «выделить бюджет на безопасность».</p>
+<p>В вебинаре звучат ориентиры увеличения стоимости разработки: 10–15 процентов, затем 15–20 процентов со ссылкой на услышанные оценки участников отраслевого мероприятия. Позже аудитория указывает, что для небольшой команды увеличение может быть намного больше. Эти цифры не сопровождаются единой методикой расчёта, поэтому не должны становиться нормативом бюджета или обещанием экономического эффекта.</p>
+<p>Практически надёжнее разделить разовые затраты на запуск и регулярные затраты на исполнение. К первым могут относиться первичное обследование, настройка интеграций и обучение. Ко вторым — время на анализ результатов, исправления, сопровождение инструментов и поддержание компетенций. Даже бесплатный инструмент требует работы людей, а лицензия не включает автоматически все затраты на процесс.</p>
+<p>Планирование отвечает на четыре вопроса, которые Пиков формулирует в разговоре: что делать, когда делать, за какие средства и кто будет этим заниматься. Горизонт может быть разным — неделя, квартал, год или несколько лет. Но на каждом уровне план должен оставаться связанным с исполнимыми действиями, а не только с желаемым будущим состоянием.</p>
+<h2 id="lecture-11">11. Сначала установить исходное состояние</h2>
+<p><strong>Основание: 01:39:53–01:46:29.</strong></p>
+<p>Инициализация процессов начинается с оценки готовности разработчика и текущего состояния внедрения. Нельзя корректно спланировать изменение, если неизвестно, что уже работает. Ведущие предлагают провести инвентаризацию и сопоставить существующие практики с задачами безопасной разработки.</p>
+<p>При этом исходное состояние редко бывает полностью пустым. У организации могут существовать обучение сотрудников, матрица компетенций, анализ кода, тестирование, управление изменениями и обработка обращений. Они не обязательно назывались процессами безопасной разработки, но это не делает их бесполезными. Разумнее выяснить, какую часть нужной задачи они уже решают.</p>
+<p>Например, наличие статического анализатора ещё не отвечает на вопрос о покрытии требований безопасности. Важно понять, какие проверки включены, какой код анализируется, когда выполняется запуск и что происходит с найденными проблемами. Точно так же факт проведения обучения не показывает, получают ли разработчики знания, необходимые для их конкретных задач.</p>
+<p>Полезное различение, которое следует из обсуждения: <strong>сохранить работающую практику</strong>, <strong>доработать существующую</strong>, <strong>создать отсутствующую</strong>. Эта классификация помогает не покупать и не описывать заново всё подряд. Она также позволяет оценивать ресурсы точнее: настройка уже используемого инструмента и внедрение новой инфраструктуры с нуля — разные работы.</p>
+<p>Результат инвентаризации должен быть проверяемым. Утверждение «тестирование есть» слишком широко. Нужны границы продукта, вид проверки, исполнители и примеры результатов. Если практика выполнялась эпизодически и зависит от одного человека, это тоже часть исходного состояния; её не следует автоматически считать устойчиво внедрённой.</p>
+<p>Ведущие связывают такую оценку с дальнейшим планом развития. Она нужна не ради отдельного отчёта об обследовании, а для определения следующего улучшения и его стоимости. Хорошо проведённая инвентаризация сокращает число необоснованных обещаний и показывает, какие решения руководства действительно необходимы.</p>
+<h2 id="lecture-12">12. Область применения и очередность: когда нельзя внедрить всё сразу</h2>
+<p><strong>Основание: 01:40:42–01:42:08; 01:45:26–01:47:48; 02:00:47–02:03:01.</strong></p>
+<p>Пиков приводит задачу крупной организации с разными продуктами, проектами и подрядчиками. Средств на немедленное одинаковое внедрение всех практик повсюду нет. Поэтому планирование включает выбор очередности и масштабирование успешных решений.</p>
+<p>Такая задача не сводится к выбору самого удобного проекта для отчёта. Нужно объяснить, почему именно он получает приоритет, какие риски и обязательства учитываются, что остаётся за пределами первого этапа и как будет развиваться охват. Категоризация программного обеспечения помогает сделать эту логику явной.</p>
+<p>В обсуждении методологии Positive Technologies упоминаются определение текущего и целевого состояния, перечень внедряемых практик и дорожная карта. Это пример вспомогательного подхода, который можно сопоставить с задачами ГОСТ. Он не объявляется единственной разрешённой методикой и не заменяет требования выбранного стандарта.</p>
+<p>Особенно важно различать постепенное выполнение плана и заявление о полном соответствии. Организация может честно сказать, что внедрила отдельные практики и расширяет охват. Это не равнозначно подтверждению всех требований применимого ГОСТ. Если есть договорные или регуляторные обязательства, допустимые границы и порядок подтверждения нужно определять в их конкретном контексте.</p>
+<p>В качестве простого стартового направления Карпов несколько раз называет композиционный анализ: зависимость и известная проблема в ней дают достаточно понятный предмет работы. Это практическая рекомендация выступающего, а не универсальное требование начинать любой проект именно с SCA. Для другого продукта первыми могут оказаться иные риски или уже выявленные слабые места.</p>
+<h2 id="lecture-13">13. Люди, ресурсы и ответственность</h2>
+<p><strong>Основание: 00:40:08–00:41:17; 00:53:05–00:54:46; 01:43:45–01:49:43; 01:52:45–01:56:33.</strong></p>
+<p>Вопрос «кого назначить ответственным за РБПО?» Вареница называет одним из самых частых при внедрении. Ошибка возникает, когда от назначения одного человека ожидают выполнения всех задач разработки, архитектуры, анализа, тестирования и сопровождения. Ответственный за координацию нужен, но назначение не создаёт необходимые компетенции и не перераспределяет время автоматически.</p>
+<p>Ведущие предлагают начинать с людей, способных понять задачу и организовать внедрение. Если компетенций нет, можно подготовить инициативную группу или привлечь внешних специалистов. Такая группа затем помогает руководству сформировать реалистичный план и поддерживает распространение практик в командах.</p>
+<p>Обучение должно различаться по ролям. Не всем сотрудникам нужен одинаковый объём знаний о стандартах и методах испытаний. Разработчику, архитектору, руководителю процесса и специалисту по безопасности предстоит принимать разные решения. Поэтому матрица компетенций полезна тогда, когда она связана с рабочими обязанностями, а не только с перечнем пройденных курсов.</p>
+<p>В чате упоминается институт security champions. В учебном контексте это удобный переход к следующему вебинару: подготовленные участники команд могут помогать в распространении знаний и поддержании практик. Но сама роль не устраняет необходимость выделить время, определить полномочия и обеспечить взаимодействие со специалистами по безопасности.</p>
+<p>Ресурсный анализ должен учитывать не только деньги на инструменты. Требуются часы на разбор результатов, исправления, обсуждение архитектуры, актуализацию документов и сопровождение инфраструктуры. Если эти работы не отражены в загрузке людей, они будут конкурировать с функциональными задачами скрытым образом. Затем проблема ошибочно выглядит как нежелание команды заниматься безопасностью.</p>
+<p>Вебинар также показывает, что обучение и планирование взаимосвязаны. Для составления первого плана уже нужен некоторый уровень понимания. Затем сам план включает развитие компетенций, без которых нельзя реализовать следующие этапы. Это не замкнутый круг, а повод начать с небольшого достаточного ядра и постепенно расширять возможности организации.</p>
+<h2 id="lecture-14">14. Какие результаты должны остаться после планирования</h2>
+<p><strong>Основание: 01:42:08–01:50:49; редакционное сопоставление с ГОСТ Р 56939-2024, п. 5.1.</strong></p>
+<p>Ведущие предлагают рассматривать артефакты как практический ориентир: что должно получиться после работы? Для планирования это означает не красивую диаграмму сама по себе, а связанный набор результатов, позволяющий перейти к исполнению.</p>
+<p>В подготовленных материалах EP01 первый процесс раскрывается через пять связанных записей: исходное состояние процессов; обоснование области применения; анализ потребности в ресурсах; план развития; план реализации. Это <strong>редакционное сопоставление с окончательным стандартом</strong>, которое уточняет выборочный разбор артефактов на вебинаре. Образец и пустая форма вынесены в <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-planning-example.md">пример планирования</a> и <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-planning-worksheet.md">рабочий шаблон</a>.</p>
+<p>Связь между записями важнее количества отдельных файлов. Обнаруженный пробел должен приводить к объяснимому решению о развитии. Решение — к необходимым ресурсам. Запланированная работа — к исполнителю, сроку и ожидаемому результату. Иначе исходное обследование и календарный план могут существовать параллельно, не отвечая на один и тот же вопрос.</p>
+<p>Пиков перечисляет возможную организационную документацию: политика безопасной разработки, правила категоризации программного обеспечения, регламент и описание контроля исполнения. Названия приведены как варианты реализации. Их не следует превращать в обязательный комплект документов именно с такими заголовками для любой организации.</p>
+<p>Политика полезна, когда задаёт общие правила и ответственность. Регламент помогает понять порядок действий. Рабочие записи показывают, что происходило в конкретном проекте. Эти уровни дополняют друг друга: общий документ не доказывает исполнение каждой задачи, а набор разрозненных заявок не всегда объясняет принятый порядок работы.</p>
+<p>Наконец, планирование должно включать актуализацию. Продукт меняется, команда меняется, появляются новые сведения о недостатках. Если план перестаёт соответствовать этим условиям, его наличие уже не помогает управлять работой. Вопрос «кто и когда пересматривает решение?» столь же практичен, как вопрос о первоначальном утверждении.</p>
+<h2 id="lecture-15">15. Автоматизация документации и свидетельств</h2>
+<p><strong>Основание: 01:47:01–01:50:49.</strong></p>
+<p>Один из полезных ответов на опасение перед ГОСТ звучит ближе к завершению основной части: выполнение требований не обязательно означает создание сотен независимых Word-документов и Excel-таблиц. Участники предлагают рассмотреть средства, которые помогают разложить процессы на задачи, видеть состояние внедрения и фиксировать результаты.</p>
+<p>При этом инструмент управления соответствием не делает процесс работающим автоматически. Процент заполнения карточек или число выставленных отметок полезны лишь при понятных критериях. Если отметка «выполнено» не связана с реальным результатом, красивая визуализация будет отражать качество заполнения системы, а не качество разработки.</p>
+<p>Практический смысл автоматизации — уменьшить ручное дублирование и сохранить связи. Задача может ссылаться на изменение кода, результат проверки и решение ответственного. Правило может храниться в управляемом репозитории. Отчёт может формироваться на основе уже существующих рабочих записей. Конкретный способ выбирают с учётом инфраструктуры и возможностей организации.</p>
+<p>Вебинар не даёт сравнительного обзора рынка таких систем. Упомянутый пример следует воспринимать как указание на класс средств, а не как подтверждённую рекомендацию продукта для любого внедрения. При подготовке собственного процесса сначала нужно установить, какие записи необходимы и кто ими пользуется, а затем выбирать способ их ведения.</p>
+<h2 id="lecture-16">16. Чужой код, зависимости и ответственность за продукт</h2>
+<p><strong>Основание: 01:22:24–01:23:37; 01:55:58–01:56:33; 01:59:32–02:00:47.</strong></p>
+<p>В обсуждении композиционного анализа ведущие формулируют принцип ответственности: включённый в продукт сторонний компонент становится частью продукта, за который отвечает разработчик. Внешнее происхождение кода не устраняет последствия уязвимости для конечного пользователя.</p>
+<p>Ответ на вопрос «чем плох open source?» поэтому начинается с отрицания самой постановки. Открытый код не плох сам по себе. Важно, как организация выбирает компоненты, понимает их применение, отслеживает изменения и реагирует на новые сведения о проблемах. Точно так же собственноручно написанный код не становится безопасным только благодаря внутреннему авторству.</p>
+<p>Ведущие говорят об обновлениях, поиске уязвимостей и анализе используемого кода. Для учебного применения стоит уточнить границу: обнаружение компонента с известной уязвимостью требует оценки конкретной версии и условий использования. Одна запись в базе ещё не описывает полностью достижимость уязвимого поведения в данном продукте. Однако это основание для работы, а не для игнорирования проблемы из-за чужого авторства.</p>
+<p>В конце обсуждения возникает код, написанный с участием искусственного интеллекта. Участники не предлагают отдельную законченную методологию разработки систем ИИ; напротив, говорят, что это большая самостоятельная тема. В пределах обычной разработки основной вывод сохраняется: способ получения кода не освобождает команду от анализа, проверки и ответственности за включение в продукт.</p>
+<p>Это хороший пример сквозного характера процесса. Для собственных модулей, открытых библиотек и предложенных инструментом фрагментов могут потребоваться разные процедуры получения и проверки. Но решение о выпуске конкретного продукта должно учитывать весь его состав, а не только удобную для команды часть.</p>
+<h2 id="lecture-17">17. Поддержка и обработка выявленных недостатков</h2>
+<p><strong>Основание: 00:38:40–00:44:26; 02:03:41–02:04:48.</strong></p>
+<p>Безопасная разработка продолжается после выпуска. Вареница обращает внимание на сопровождение продукта, обработку обнаруженных уязвимостей и взаимодействие с внешними источниками информации. Без этой части даже качественно проверенный релиз постепенно теряет актуальность: появляются новые сведения о компонентах и способах воздействия на систему.</p>
+<p>Практическая цепочка включает получение сообщения, регистрацию, анализ, определение необходимых действий и выпуск изменения. В зависимости от контекста могут потребоваться взаимодействие с заказчиками и сведения для соответствующих реестров. Конкретные обязанности уведомления определяются применимыми требованиями; из общей дискуссии нельзя вывести универсальный порядок для всех организаций.</p>
+<p>Вареница также обсуждает связь сопровождения с действием сертификатов. Этот фрагмент относится к регуляторной практике, о которой он говорил в 2025 году. Он не является достаточным основанием для юридического вывода о судьбе любого конкретного сертификата после окончания поддержки. Для такого решения нужны документы соответствующей системы и условия конкретного продукта.</p>
+<p>В ответе о собственной практике PVS-Studio Карпов упоминает регламент реакции на сообщения о дефектах. Этот пример показывает, что значимые элементы безопасной разработки могут существовать в организации и без отдельного сертификата процессов. Проверять нужно саму работу: принимаются ли сообщения, понятен ли порядок обработки и доходят ли изменения до продукта.</p>
+<h2 id="lecture-18">18. Сертификация: несколько разных вопросов, которые нельзя смешивать</h2>
+<p><strong>Основание: 00:24:25–00:28:06; 00:58:42–01:05:17; 01:11:38–01:17:27; 02:03:01–02:04:48.</strong></p>
+<p>Вопросы аудитории показывают, насколько легко смешать четыре предмета: применение инженерных практик, соответствие требованиям стандарта, сертификацию процессов и сертификацию продукта. К ним добавляется пятый — оценка или сертификация инструмента, которым пользуется разработчик.</p>
+<p>На вопрос о заказчике, требующем ГОСТ 2016 года, Вареница сначала предлагает уточнить контекст: какие требования действуют для заказчика и продукта, какая система оценки применяется? Это правильная последовательность рассуждения. Одного слова «ГОСТ» недостаточно, чтобы определить вид обязательного подтверждения.</p>
+<p>В разговоре подчёркивается, что требование выполнить стандарт не следует автоматически читать как требование получить отдельный сертификат процессов. Но из этого также нельзя сделать обратное универсальное заключение, что сертификат никогда не нужен. Способ подтверждения может быть установлен договором, применимым регулированием или выбранной схемой оценки. Для новой англоязычной серии достаточно ясно обозначить это различие, не пытаться заменить им специализированную консультацию по сертификации.</p>
+<p>Вареница описывает преимущества сертификации процессов при внесении изменений в сертифицированный продукт. Его краткая формулировка отражает обсуждение действовавшей тогда практики; её не нужно использовать как безусловное обещание самостоятельного обновления любого продукта без внешнего участия. Условия зависят от конкретного режима и актуальных документов.</p>
+<p>Большой фрагмент вопросов посвящён числу аккредитованных организаций и очередям. Причём сведения уточняются прямо по ходу разговора: участники спорят, появился ли второй орган и можно ли к нему обратиться. Это наглядный пример информации, которая быстро меняется и даже в момент выступления требует проверки. Содержательный вопрос здесь — доступность компетентной независимой оценки, сроки и возможность выбора; конкретные очереди 2025 года не переносятся в текущую лекцию как факт.</p>
+<p>Обсуждаются также возможные уровни оценки внедрения процессов. Вареница говорит о четырёх уровнях как о рассматриваемом предложении и отдельно подчёркивает внутренний характер дискуссии. Следовательно, в учебном тексте это история разработки подхода, а не утверждённая шкала, которую можно немедленно применять к организации.</p>
+<p>Наконец, Карпов отвечает о самой PVS-Studio: многие практики внедрены, но отдельная сертификация процессов не проходилась. Он отделяет это от работы по требованиям к статическим анализаторам. Для слушателя полезен общий вывод: качество инструмента, его пригодность для определённых проверок и зрелость процессов организации — связанные, но разные объекты оценки.</p>
+<h2 id="lecture-19">19. Небольшая команда: масштабирование без самообмана</h2>
+<p><strong>Основание: 02:00:47–02:03:01.</strong></p>
+<p>Вопрос о малых командах обостряет спор о стоимости. Для двух-трёх разработчиков создание большого набора отдельных ролей и тяжёлой инфраструктуры может быть несоразмерным. Карпов обращает внимание на практическую сложность переноса всей организационной конструкции крупной компании в небольшой проект.</p>
+<p>Пиков возражает против вывода, что безопасная разработка нужна только после достижения некоторого размера. Даже один разработчик может использовать полезные практики, а небольшая организация может создавать продукт, для которого действуют существенные требования. Размер команды сам по себе не определяет ни критичность продукта, ни применимость договорных и регуляторных обязанностей.</p>
+<p>Эти позиции можно совместить. Масштаб исполнения должен соответствовать задаче, но описание достигнутого состояния должно оставаться честным. Один человек может совмещать роли; существующий репозиторий и система задач могут использоваться для нескольких видов записей. Однако отсутствие ресурсов не превращает невыполненную обязательную работу в выполненную.</p>
+<p>Для маленькой команды особенно полезны приоритеты, повторное использование существующих средств и ясное распределение ответственности. Если команда входит в большую организацию, часть инфраструктуры и экспертизы может предоставляться централизованно. Но это нужно запланировать: общая служба безопасности не становится доступным ресурсом проекта только потому, что существует где-то в структуре компании.</p>
+<h2 id="lecture-20">20. Литература, обучение и формат продолжения</h2>
+<p><strong>Основание: 01:17:44–01:21:10; 01:50:49–01:55:58; 01:56:33–01:59:32; 02:04:48–02:07:28.</strong></p>
+<p>В ответе на вопрос о единой книге по РБПО ведущие объясняют широту темы. Функциональное тестирование, архитектурный анализ, безопасность цепочки поставок и управление процессами сами по себе требуют большого учебного объёма. Поэтому вместо обещания универсального учебника предлагается постепенно собирать нормативные документы, методические материалы, статьи и записи обсуждений по каждому процессу.</p>
+<p>В этом подходе важна связь источника с вопросом. Стандарт помогает установить требования; методология — организовать внедрение; статья или пример — рассмотреть частный метод; практика — проверить понимание. Случайная коллекция ссылок менее полезна, чем небольшой объяснённый набор, в котором видно назначение каждого материала.</p>
+<p>Организаторы рассказывают об учебных курсах, партнёрских занятиях и практических заданиях. Упоминаются трудности летнего расписания и формирование групп. Это организационная информация вебинара 2025 года, которая не подтверждает нынешние даты, наличие мест, стоимость или программу обучения.</p>
+<p>Обсуждается итоговая проверка знаний и электронный сертификат для слушателей, успешно прошедших её после серии. Такой сертификат обучения не следует смешивать с сертификацией процессов разработки или продукта. В новой серии любые обещания слушателям должны устанавливаться отдельно; исторический анонс не создаёт автоматически такие же условия.</p>
+<p>Следующий выпуск в конце встречи посвящается обучению сотрудников. В ходе разговора возникает идея пригласить Вареницу и сравнить подходы разных организаций. Для текущего англоязычного проекта полезен сам переход: после определения плана и ресурсов нужно понять, какие решения должны уметь принимать люди. Участие конкретного гостя, дату и формат нельзя считать подтверждёнными только на основании приглашения в записи 2025 года.</p>
+<h2 id="lecture-21">21. Вопросы аудитории: карта ответов для подготовки преподавателя</h2>
+<p>Эта таблица собирает самостоятельные вопросы, в том числе те, которые легко потерять при сокращении двухчасового разговора. Краткие ответы не заменяют объяснения в разделах выше.</p>
+<div aria-label="Таблица — прокрутка по горизонтали при необходимости" class="table-wrap" role="region" tabindex="0"><table>
+<thead>
+<tr>
+<th>Вопрос</th>
+<th>Таймкод</th>
+<th>Содержательный ответ и граница</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Почему перешли от мер к процессам?</td>
+<td>00:49:47–00:51:26; 00:56:07–00:58:35; 01:25:22–01:27:08</td>
+<td>В разговоре есть разные позиции: критика смешения понятий и объяснение через регулярность. Единственная документально доказанная причина не установлена.</td>
+</tr>
+<tr>
+<td>Как применять сложный стандарт управления конфигурацией?</td>
+<td>00:51:41–00:52:25</td>
+<td>Сначала определить контекст продукта и нужный результат; объём документа сам по себе не объясняет способ внедрения. Конкретная методика в этом ответе не разобрана.</td>
+</tr>
+<tr>
+<td>Можно ли исключить тестирование на проникновение?</td>
+<td>00:52:25–00:54:46</td>
+<td>Вареница считает его важным элементом проверки безопасности. Допустимость исключения требования устанавливают по окончательному стандарту и контексту. «Следует» в 2016 и 2024 имеет разный нормативный смысл; устное «рекомендовано» не заменяет п. 4.7 редакции 2024.</td>
+</tr>
+<tr>
+<td>Кто должен отвечать за всю безопасную разработку?</td>
+<td>00:40:46–00:41:17</td>
+<td>Координация не заменяет совместную работу разных ролей; одному назначенному человеку нужны реальные участники и ресурсы.</td>
+</tr>
+<tr>
+<td>Появятся ли дополнительные органы сертификации?</td>
+<td>00:58:42–01:03:14</td>
+<td>Обсуждались доступность и конкуренция на рынке оценки. Сведения о составе реестра и очередях были спорными уже в эфире и требуют отдельной актуализации.</td>
+</tr>
+<tr>
+<td>Согласованы ли ГОСТ Р 58412 и новая редакция 56939?</td>
+<td>01:03:14–01:05:17</td>
+<td>Вареница считает базовые угрозы применимыми, но говорит о необходимости адаптировать связи с изменённой структурой процессов. Это не опубликованная в вебинаре полная матрица соответствия.</td>
+</tr>
+<tr>
+<td>Отстаёт ли российский подход от зарубежных методологий?</td>
+<td>01:05:17–01:11:38</td>
+<td>По мнению Вареницы, различия не следует описывать десятилетним техническим отставанием. Численная оценка в годах в вебинаре не обоснована исследованием.</td>
+</tr>
+<tr>
+<td>Можно ли сертифицировать частично внедрённые процессы?</td>
+<td>01:11:38–01:13:48</td>
+<td>Обсуждался проект уровней оценки. Четыре уровня названы предложением, а не действующей шкалой.</td>
+</tr>
+<tr>
+<td>Заказчик требует ГОСТ 2016 года: нужен ли отдельный сертификат?</td>
+<td>01:14:03–01:17:27</td>
+<td>Сначала уточнить требования заказчика, объект и режим оценки. Соответствие стандарту и наличие отдельного сертификата — разные вопросы; статус редакции проверяют по документам.</td>
+</tr>
+<tr>
+<td>Что делать, если нужного процесса вообще нет?</td>
+<td>01:47:48–01:49:43</td>
+<td>Подготовить людей, обследовать состояние, определить работы и ресурсы; начать с инициативной группы, способной организовать внедрение.</td>
+</tr>
+<tr>
+<td>Обязательно ли вести всё в Word и Excel?</td>
+<td>01:50:20–01:50:49</td>
+<td>Нет необходимости создавать изолированные файлы ради самих файлов. Можно использовать средства управления задачами и свидетельствами, сохраняя проверяемость содержания.</td>
+</tr>
+<tr>
+<td>Когда будут курсы и чем помогают security champions?</td>
+<td>01:52:03–01:54:08</td>
+<td>Курсы и подготовленные участники команд обсуждаются как способ развить компетенции. Расписание 2025 года не является текущим предложением.</td>
+</tr>
+<tr>
+<td>Чем open source хуже собственного кода?</td>
+<td>01:55:58–01:56:33</td>
+<td>Само происхождение не определяет безопасность. Команда отвечает за использование компонента, отслеживание проблем и необходимые действия.</td>
+</tr>
+<tr>
+<td>Будут ли экзамен и сертификаты слушателям?</td>
+<td>01:56:33–01:57:18; 02:06:06–02:06:47</td>
+<td>Такой план был объявлен для исторической серии. Это образовательный сертификат, а не подтверждение соответствия процессов ГОСТ.</td>
+</tr>
+<tr>
+<td>Есть ли одна книга, охватывающая всё РБПО?</td>
+<td>01:57:18–01:59:32</td>
+<td>Ведущие предлагают тематическую подборку и отмечают самостоятельный объём отдельных дисциплин. Публикация материалов должна учитывать права на сторонние книги.</td>
+</tr>
+<tr>
+<td>Что меняется, если код создаёт ИИ?</td>
+<td>01:59:32–02:00:08</td>
+<td>В пределах обычной разработки сохраняется ответственность за принятый код. Специальные вопросы безопасности систем ИИ в вебинаре подробно не раскрываются.</td>
+</tr>
+<tr>
+<td>Как различать упомянутые требования для КИИ и ГИС?</td>
+<td>02:00:08–02:00:47</td>
+<td>Ведущие поправляют смешение разных регуляторных контекстов. Для применения к проекту нужна отдельная проверка области действия актуальных документов.</td>
+</tr>
+<tr>
+<td>Нужны ли процессы команде из нескольких человек?</td>
+<td>02:00:47–02:03:01</td>
+<td>Полезные практики нужны и малым командам; масштаб и обязанности определяют по продукту и условиям, а не только по числу разработчиков.</td>
+</tr>
+<tr>
+<td>Внедрены ли процессы у PVS-Studio?</td>
+<td>02:03:01–02:04:48</td>
+<td>Карпов приводит несколько действующих практик и сообщает об отсутствии отдельной сертификации процессов на момент разговора. Это самоописание организации в 2025 году.</td>
+</tr>
+<tr>
+<td>Должен ли быть сертифицирован любой инструмент безопасной разработки?</td>
+<td>02:03:01–02:04:16</td>
+<td>В ответе отделены инструменты, специальные требования к анализаторам и сертификация процессов. Универсальное заключение для любого регулируемого проекта из этого примера не выводится.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="lecture-22-ep01">22. Что сохранить в новом EP01</h2>
+<p>Самая ценная особенность исходного вебинара — соединение истории с повседневными задачами команды. Рассказ о подготовке ГОСТ объясняет, почему внимание сместилось к организации разработки. Спор о мерах и процессах показывает, что терминология должна отражать регулярную работу. Разбор планирования переводит общие намерения в ресурсы, компетенции и исполнимые действия.</p>
+<p>Для нового выступления особенно полезны следующие опоры:</p>
+<ol>
+<li><strong>Показать происхождение редакции 2016 года отдельной последовательностью.</strong> Предварительные обсуждения, НИР, проектирование, замечания, утверждение и введение в действие — разные этапы. Роль Эшелона и внешнего обсуждения должна быть названа точно.</li>
+<li><strong>Сохранить международный контекст без неподтверждённой причинности.</strong> ГОСТ создавался с учётом существовавших подходов; SSDF удобен для последующего сравнения, но не является источником редакции 2016 года.</li>
+<li><strong>Дать наглядный пример регулярности.</strong> Разовый анализ перед выпуском и действующий порядок анализа изменений — разные состояния организации.</li>
+<li><strong>Объяснить переход к двадцати пяти процессам содержательно.</strong> Исправить прозвучавшее число четырнадцать: в окончательной редакции 2016 года девять групп мер. Новые заголовки, разделение крупных тем и уточнение требований не равны количественному доказательству большей безопасности. Отдельно показать изменение смысла слова «следует».</li>
+<li><strong>Сделать планирование центральным практическим результатом.</strong> Слушатель должен уметь описать исходное состояние, объяснить границы, оценить ресурсы и связать улучшение с рабочей задачей.</li>
+<li><strong>Завершить людьми и следующим эпизодом.</strong> План останется документом, если никто не способен выполнять заложенные в нём решения. Поэтому обучение естественно продолжает первый выпуск.</li>
+</ol>
+<h2 id="lecture-_4">Источники и связанные материалы</h2>
+<ul>
+<li><a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%86%D0%B8%D1%8F%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">Полная расшифровка первого вебинара</a> — основной источник содержания и таймкодов.</li>
+<li><a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%9F%D0%B5%D1%80%D0%B5%D1%81%D0%BA%D0%B0%D0%B7%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">Краткий пересказ</a> — вспомогательный файл с выявленными ошибками, не основание фактических утверждений.</li>
+<li><a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-history-research.md">История SDL и создания ГОСТ: исследование исходных PDF</a> — хронология, связи с международными документами и ограничения обзора методологий.</li>
+<li><a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-sources.md">EP01: реестр источников и нормативные уточнения</a> — окончательный ГОСТ и границы использования исторических материалов.</li>
+<li>Окончательный <strong>ГОСТ Р 56939-2016</strong>, локальная копия <code>ГОСТ Р 56939-2016 (редакция 2016).pdf</code> из раздаточных материалов: PDF-с. 2 — разработчик и приказ; с. 3 — девять групп раздела 5; с. 5 — область применения и международные связи; с. 8 — пп. 4.2 и 4.5. Официальные даты дополнительно сверяются по <a href="https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d" rel="noopener noreferrer">карточке Росстандарта</a>.</li>
+<li><a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-plan.md">План EP01</a>, <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-script-en.md">полная английская речь</a>, <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-planning-example.md">пример планирования</a>, <a href="file:///V:/pikov.expert/56939-lections/EP01/EP01-planning-worksheet.md">рабочий шаблон</a>.</li>
+</ul>
+<p>Исходное видео указано автором по пути:</p>
+<pre><code class="language-text">V:\Yandex.Disk\_МАСКОМ\2025 Вебинары по РБПО с PVS-STUDIO\2025.07.02 Вебинар1 по РБПО с PVS-STUDIO\2025.07.02 Вебинар1 по РБПО с PVS-STUDIO (РАЗДАВАТЬ)\2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4
+</code></pre>
+<p>В этом документе использована предоставленная полная расшифровка. Утверждение о полном просмотре или построчной сверке видеозаписи не делается.</p></article>
+<details class="raw-source"><summary>Полный исходный Markdown</summary><pre><code data-source-file="PVS-2025-07-02-lecture.md"># Безопасная разработка: история российского стандарта и начало внедрения
+
+Подробная тематическая лекция по первому вебинару МАСКОМ и PVS-Studio от **2 июля 2025 года**. Подготовлено **6 сентября 2026 года** для разработки англоязычного EP01 и сохранения содержательной части исходного выступления.
+
+Ведущие вебинара — **Андрей Карпов** и **Виталий Пиков**. Историю подготовки национального стандарта рассказывает приглашённый эксперт **Виталий Вареница**, представленный в начале записи как руководитель сертификационной лаборатории НПО «Эшелон». Исторические воспоминания Вареницы не следует приписывать Пикову.
+
+## Как читать этот материал
+
+Это связный учебный текст, а не дословная стенограмма. Повторы, оговорки и организационные паузы убраны; близкие обсуждения объединены по темам. Таймкоды позволяют вернуться к соответствующим фрагментам исходной записи. Последняя отметка расшифровки — **02:07:28**; длительность самой видеозаписи отдельно не измерялась.
+
+Основной источник — [полная рабочая расшифровка](&lt;Транскрипция 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt&gt;). Аудиозапись построчно не проверена. Распознавание неоднократно искажает названия организаций, термины и фамилии, а все реплики технически приписывает одному «Участнику 1». Имена говорящих восстановлены только там, где представление, передача слова и содержание позволяют сделать это уверенно. В остальных случаях используется нейтральное «участники обсуждают».
+
+Сопутствующий [краткий пересказ](&lt;Пересказ 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt&gt;) проверен по полному тексту и не используется как самостоятельное доказательство. В частности, из него исключены ошибочные утверждения об основании ГОСТ 2016 года на более позднем NIST SSDF, обратном влиянии ГОСТ на Common Criteria и якобы досрочном завершении вебинара.
+
+В тексте различаются три вида содержания:
+
+- **Содержание вебинара** — объяснения, примеры, вопросы и позиции, прозвучавшие 2 июля 2025 года.
+- **Историческое свидетельство** — воспоминания участника разработки стандарта. Они ценны для понимания замысла, но не заменяют приказ, окончательную редакцию стандарта или протокол обсуждения.
+- **Редакционное уточнение** — проверенная поправка или учебное пояснение, добавленное при подготовке лекции. Нормативная основа таких поправок приведена в [реестре источников EP01](EP01-sources.md) и [исследовании истории](EP01-history-research.md).
+
+Обсуждавшиеся в 2025 году будущие стандарты, очереди на сертификацию, аккредитации, учебные расписания и планы регуляторов ниже остаются фактами разговора того времени. Этот материал не подтверждает их состояние на сентябрь 2026 года.
+
+## Карта содержания и таймкодов
+
+| Тема | Основные фрагменты записи |
+|---|---|
+| Замысел серии, представление участников, приглашение эксперта | 00:00:52–00:07:19 |
+| Зачем потребовался стандарт процесса разработки | 00:08:01–00:17:33 |
+| НИР, подготовка редакции 2016 года, роль разработчиков и обсуждения | 00:17:33–00:20:19 |
+| Аудитория, качество продукта, мотивация, связь с оценкой соответствия | 00:20:19–00:28:06 |
+| Подготовка обновления и переход от мер к процессам | 00:28:06–00:41:17 |
+| Поддержка, структура требований, международные связи и планы развития | 00:41:17–00:49:47 |
+| Спор о процессах, мерах и тестировании | 00:49:47–00:58:35 |
+| Сертификация, органы оценки и ограничения рынка | 00:58:42–01:03:14 |
+| Связь с ГОСТ Р 58412, методологиями SDL и NIST SSDF | 01:03:14–01:11:38 |
+| Частичное внедрение, уровни оценки, соответствие и сертификат | 01:11:38–01:17:27 |
+| Продолжение серии и приглашение на разговор об обучении | 01:17:44–01:21:10 |
+| Что конкретизировано в редакции 2024 года | 01:21:10–01:27:08 |
+| Структура ГОСТ и работа с окончательной редакцией | 01:27:08–01:33:19 |
+| Практическая актуальность безопасной разработки | 01:33:19–01:35:00 |
+| Планирование и стоимость внедрения | 01:35:00–01:39:53 |
+| Исходное состояние, масштабирование и приоритеты | 01:39:53–01:42:08 |
+| Инвентаризация, ресурсы, развитие процессов | 01:42:08–01:47:01 |
+| Документация, инициативная группа, средства автоматизации | 01:47:01–01:50:49 |
+| Дополнительные материалы, обучение и security champions | 01:50:49–01:55:58 |
+| Open source, учебные материалы, код с участием ИИ | 01:55:58–02:00:47 |
+| Небольшие команды и собственные процессы PVS-Studio | 02:00:47–02:04:48 |
+| Итоги, сертификаты слушателей и анонс следующего выпуска | 02:04:48–02:07:28 |
+
+## 1. Зачем начинать разговор с истории
+
+**Основание: 00:00:52–00:08:56.**
+
+Первый вебинар задуман как начало серии из двадцати пяти встреч: по одной на каждый процесс, выделенный в ГОСТ Р 56939-2024. Однако начало серии требует общего основания. Если сразу перейти к пунктам стандарта, слушатель увидит перечень обязанностей, но может не понять, какую инженерную проблему они решают и почему сформулированы именно так.
+
+Исторический экскурс отвечает на несколько практических вопросов. Почему понадобился отдельный документ о разработке, если уже существовали требования к безопасности продуктов? Почему первая редакция выглядела иначе, чем редакция 2024 года? Что означает изменение структуры для организации, которая уже внедряла меры по старому стандарту? Нужно ли начинать всё заново или можно сохранить работающие практики?
+
+Для этого организаторы пригласили участника разработки стандарта. Его рассказ важен прежде всего как свидетельство о постановке задачи и работе над документом: какие ожидания были у авторов, с какими возражениями они сталкивались, какие варианты структуры обсуждали. Сам факт участия в разработке не превращает любую оценку выступающего в единственную трактовку стандарта. Поэтому историческую линию полезно слушать вместе с обсуждением других участников и проверять по документам там, где речь идёт о датах и обязательных требованиях.
+
+Уже в начале определён способ работы всей серии: не только читать ГОСТ, но и обсуждать опыт внедрения, приглашать специалистов и разбирать вопросы аудитории. Это существенно для безопасной разработки. Один и тот же текст стандарта будет реализован по-разному в продуктовой компании, небольшой команде, организации с государственным заказом и лаборатории оценки соответствия. Хорошая лекция должна показать общую инженерную задачу и границы конкретного примера.
+
+## 2. Исходная проблема: безопасность продукта зависит от его создания
+
+**Основание: 00:08:01–00:17:33.**
+
+Вареница описывает безопасную разработку как фундамент, на котором держится последующая работа по обеспечению безопасности. Продукт можно долго проверять перед поставкой, но если требования, архитектура, обращение с исходным кодом, сборка и исправление недостатков организованы плохо, финальное испытание будет постоянно обнаруживать последствия более ранних ошибок.
+
+Из этого следует важное изменение объекта внимания. Проверять нужно не только получившийся экземпляр программы, но и то, как организация систематически создаёт, изменяет и сопровождает такие программы. Речь идёт не о замене испытаний организационными документами. Напротив, процесс должен обеспечить, чтобы нужные испытания действительно происходили, результаты доходили до ответственных людей, а исправления становились частью управляемого изменения продукта.
+
+По воспоминаниям Вареницы, обсуждения необходимости стандартизации начались примерно с 2009 года. В них участвовали коллеги и представители регуляторов; осознание задачи и подготовительная работа предшествовали формальному началу НИР. Поэтому фраза «стандарт появился в 2016 году» обозначает год утверждённого документа, но не начало соответствующей инженерной мысли и даже не начало самой разработки стандарта.
+
+Замысел включал документ, пригодный для разных разработчиков, а не только корпоративную методологию одного крупного вендора. Крупная компания может разработать собственные правила, роли, инструменты и порядок контроля. Для других организаций полезна общая рамка: какие задачи следует решать независимо от конкретного языка программирования, продукта или названия внутреннего подразделения.
+
+Участник сопоставляет ситуацию середины 2010-х с 2025 годом и отмечает рост осведомлённости руководителей, инженеров и заказчиков. По его оценке, безопасная разработка стала гораздо более узнаваемой темой, появились новые средства автоматизации и специальные документы по отдельным методам анализа. Это профессиональное наблюдение выступающего, а не измеренный в вебинаре показатель зрелости всей отрасли.
+
+Учебный вывод здесь прост: нормативный документ возникает в контексте уже существующих проблем и практик. Его полезность оценивают по тому, насколько он помогает организовать повторяемую работу и проверить её результат, а не только по количеству страниц или дате публикации.
+
+## 3. Как создавалась редакция 2016 года
+
+**Основание: 00:08:56–00:14:32; 00:17:33–00:20:19; историческая презентация Вареницы, PDF-с. 4.**
+
+В рассказе необходимо разделить подготовительную идею, рабочие редакции проекта, согласование и официальный жизненный цикл стандарта. Эти события связаны, но происходили в разные годы и не означают одно и то же.
+
+По воспоминаниям Вареницы, обсуждения и формирование замысла шли с конца 2000-х — начала 2010-х годов. Апрель 2013 года он называет началом НИР: к этому времени уже потребовалось согласовать задачу, состав участников и организационную основу работы. Формальный старт не был моментом, когда несколько людей впервые задумались о безопасной разработке.
+
+Основную подготовку первой редакции Вареница связывает с НПО «Эшелон». Важно передать эту мысль без крайностей. Она не означает, что один человек единолично написал и принял государственный стандарт. Другие организации участвовали в рассмотрении, замечаниях и обсуждении. Вместе с тем характер их участия, по словам докладчика, отличался от непосредственно авторской работы над текстом.
+
+В исторической презентации приведена более подробная последовательность:
+
+| Этап | Дата | Как его понимать |
+|---|---|---|
+| Начало разработки в рамках НИР | Апрель 2013 года | Организованная работа над проектом |
+| Первая редакция проекта | Август 2013 года | Рабочий текст, ещё не действующий ГОСТ |
+| Окончательная редакция проекта | Май 2014 года | Этап подготовки и согласования |
+| Уточнённая окончательная редакция | Сентябрь 2015 года | Последующая доработка проекта |
+| Апробация и публичное обсуждение | В период подготовки | В презентации указаны 22 организации и около 200 замечаний и предложений |
+| Утверждение ГОСТ Р 56939-2016 | **1 июня 2016 года** | Приказ Росстандарта № 458-ст |
+| Введение в действие | **1 июня 2017 года** | Начало действия утверждённой редакции |
+
+Последние две даты сверены по [официальной карточке Росстандарта](https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d). Это **редакционное уточнение**: встречающееся в расшифровке «принято Минюстом» не используется как описание процедуры утверждения. Так же исправлено указание мая 2016 года на архивном слайде. Стандарт утверждён Росстандартом в июне, а введён в действие годом позже.
+
+Вареница вспоминает многочисленные рабочие версии, в том числе после 2016 года: 2018, 2019, 2020 и 2022. Это не основание вводить в лекцию национальные стандарты «ГОСТ Р 56939-2018» или «ГОСТ Р 56939-2022». В данном разговоре речь идёт о редакциях разрабатываемого текста; публичные утверждённые документы, которые сравнивает серия, — редакции 2016 и 2024 годов.
+
+В дальнейшем, на **00:44:26–00:45:41**, Вареница возвращается к устройству первой редакции. Он описывает её как иерархическую конструкцию, близкую знакомым ему подходам Common Criteria: меры связаны с целями, результатами и требованиями к реализации. Докладчик считает такую структуру удобной для технических специалистов, привыкших к её логике. Другие участники, напротив, отмечают понятность более явно перечисленных процессов новой редакции. Это различие восприятия стоит сохранить: документ может быть удобен одной профессиональной группе и требовать дополнительных объяснений для другой. Оно не доказывает превосходство одной редакции во всех условиях.
+
+Такое разграничение полезно и вне истории ГОСТ. При работе с любым стандартом нужно установить статус найденного документа. Проект, доклад разработчика, таблица изменений и окончательный нормативный текст могут содержать разные формулировки. Хорошая история показывает эту эволюцию, а практическое внедрение опирается на применимую окончательную редакцию.
+
+## 4. Международные связи и вопрос об уникальности ГОСТ
+
+**Основание: 00:09:41–00:14:32; 00:36:52–00:37:37; 00:44:26–00:46:24; 01:05:17–01:11:38.**
+
+Вареница подчёркивает, что ГОСТ Р 56939 не задумывался как простой перевод одного зарубежного документа. При этом он прямо говорит об учёте международных стандартов, лучших практик и методологий крупных разработчиков. Эти положения совместимы: собственная структура и национальный контекст не требуют изобретать заново каждую инженерную практику.
+
+В исторической презентации обозначены связи с Common Criteria / серией 15408, процессами жизненного цикла 12207, управлением информационной безопасностью 27001 и безопасностью приложений 27034. Эти связи подтверждаются и самим ГОСТ Р 56939-2016: раздел 1 допускает его использование как источника мер и средств управления безопасностью по ГОСТ Р ИСО/МЭК 27034-1 и для конкретизации или расширения компонентов доверия ГОСТ Р ИСО/МЭК 15408-3. Справочное приложение А показывает взаимосвязи с требованиями 15408-3. Это более предметное основание международного контекста, чем общее утверждение об учёте лучших практик. Но из него нельзя автоматически получить перечень нормативных ссылок окончательной редакции 2024 года или доказать буквальное копирование конкретной методологии.
+
+В разговоре также появляется обзор *Secure Software Development Methodologies: A Multivocal Literature Review*. Пиков использует его историческую шкалу для вопроса о различии между появлением подходов у крупных зарубежных разработчиков и российским стандартом. Вареница отвечает, что по его оценке техническое содержание современного ГОСТ нельзя описывать как отставание на десять лет. Он предлагает видеть сходные задачи, разные условия применения и различия в мотивации организаций.
+
+Здесь полезно сохранить дискуссию, но не превращать оценку «примерно год» в измеренный результат сравнения стандартов. В вебинаре нет опубликованной методики, которая позволила бы выразить сопоставимость ГОСТ и SSDF в годах. Не определены ни шкала, ни выборка требований, ни способ измерения. Это экспертное суждение участника, объясняющее его взгляд на развитие отрасли.
+
+Отдельное **редакционное уточнение** касается NIST SSDF. Сопоставление дат 2016 и 2019 не доказывает мировое первенство в безопасной разработке. Корпоративные и исследовательские подходы существовали раньше; сам обзор включает ранние публикации 2004–2006 годов. [Первый публичный проект SSDF объявлен NIST 11 июня 2019 года](https://csrc.nist.gov/News/2019/draft-white-paper-on-ssdf), позже первой редакции российского ГОСТ, поэтому он не мог быть её исходным источником. Для конкретного современного сравнения в EP01 используется [NIST SP 800-218, SSDF 1.1](https://csrc.nist.gov/pubs/sp/800/218/final), опубликованный в 2022 году.
+
+Содержательный вопрос серии следует формулировать иначе: какую задачу решают сопоставляемые практики, кто выполняет работу, когда она повторяется, какие результаты остаются и как подтверждается их достаточность? Такой подход позволяет выявлять и общее, и различия без заранее выбранного ответа «уникален» или «полностью заимствован».
+
+## 5. Стандарт прежде всего для разработчика
+
+**Основание: 00:20:19–00:28:06; 01:07:15–01:11:38; 01:33:19–01:35:00; 01:54:08–01:55:58.**
+
+Вареница описывает исходную аудиторию широко: архитекторы, специалисты по безопасности, программисты, руководители групп и другие участники жизненного цикла. Следовательно, стандарт не следует представлять документом только для отдела информационной безопасности. Решения, влияющие на безопасность, принимаются при постановке требований, выборе архитектуры, реализации, тестировании, поставке и сопровождении.
+
+Организации, проводящие независимую оценку, также заинтересованы в понятных критериях. Но проверка соответствия не должна полностью определять внутренний смысл процесса. Если организация выполняет действия только ради положительного заключения, возникает вопрос, продолжатся ли эти действия между проверками и помогут ли они при неожиданной проблеме в продукте.
+
+Докладчик связывает безопасную разработку с привлекательностью продукта: качеством, управляемым сопровождением и обратной связью с заказчиками. Эти свойства не тождественны безопасности, но работа над ними часто пересекается. Например, понятный порядок обработки дефектов полезен и для исправления обычных ошибок, и для своевременного устранения уязвимостей.
+
+Участники обсуждают два источника мотивации. Первый — зрелая потребность бизнеса снизить риск проблем и обеспечить предсказуемую разработку. Второй — требование заказчика, регулятора или схемы оценки соответствия. На практике они могут сосуществовать. Противопоставление «для себя» и «для сертификата» слишком грубо, если организация одновременно выходит на регулируемый рынок и хочет повысить качество собственной работы.
+
+Прозвучавшая оценка Вареницы, что значительная доля его заказчиков внедряла процессы без выхода на сертификацию ФСТЭК, иллюстрирует его личную практику. Упомянутые им 70 процентов не являются статистикой российского рынка: в разговоре не представлены состав выборки, период наблюдения и метод подсчёта.
+
+Для учебной серии из этого следует принцип: каждое нормативное требование стоит связывать с инженерным результатом. Не просто «должен быть документ», а «команда должна знать, как реагировать на выявленный недостаток, а документ и рабочие записи позволяют это воспроизвести и проверить».
+
+### 5.1. Замысел серии стандартов и незавершённые на тот момент работы
+
+**Основание: 00:09:41–00:10:19; 00:25:05–00:25:48; 00:46:24–00:49:47; 01:03:14–01:05:17; 01:29:01–01:29:41; 01:32:03–01:33:19.**
+
+По словам Вареницы, исходно планировался не один изолированный документ, а несколько взаимосвязанных стандартов. Они должны были описывать требования, типовые угрозы, рекомендации по реализации и способы оценки. В разговоре упоминаются разные первоначальные варианты количества «книг»; поэтому точное число задуманного комплекта не следует выдавать за окончательно утверждённую архитектуру серии.
+
+В качестве следующего опубликованного элемента обсуждается ГОСТ Р 58412-2019 о типовых угрозах безопасности информации при разработке программного обеспечения. Вареница объясняет его связь с мерами первой редакции 56939. При переходе к новой структуре требуется внимательно сопоставить угрозы с обновлёнными процессами: прежняя логика может быть полезной, но номера и группировка уже не совпадают автоматически.
+
+Отдельно звучит история подготовленного руководства, работа над которым была затем приостановлена или переформатирована в техническом комитете. Это воспоминание о ходе разработки, а не доказательство существования действующего стандарта под предполагаемым названием. Так же нужно читать рассказ о будущем документе по оценке внедрения и специализированных документах по анализаторам, фаззингу, сборке и другим направлениям.
+
+Ведущие надеются, что отдельные процессы получат более подробную методическую поддержку. Для преподавателя эта мысль полезна и без привязки к конкретному сроку: общий стандарт отвечает, какие задачи должны решаться, но не обязан содержать пошаговую инструкцию по каждому инструменту и каждому продукту. Углубление требует дополнительных источников. А заявления о том, что «в конце года появится» новый документ, в архивной лекции сохраняются как планы 2025 года, не как текущий статус.
+
+## 6. Почему понадобилась редакция 2024 года
+
+**Основание: 00:28:06–00:41:17; 01:21:10–01:27:08.**
+
+Вопрос о переходе на новую редакцию особенно важен для организаций, уже вложившихся во внедрение. Вареница объясняет, что новая редакция не означает полного обнуления результатов. Значительная часть прежних мер получила более подробное описание, была разделена на несколько направлений или перестроена в другую структуру.
+
+По его воспоминаниям, обновлённый текст готовился уже к 2022 году, но процесс рассмотрения и расширение круга участников привели к выпуску в 2024 году. Это объяснение хода подготовки со стороны участника, а не установленная по административным документам единственная причина сроков. Официальные даты редакции 2024 года: утверждение **24 октября 2024 года**, введение **20 декабря 2024 года**, приказ № 1504-ст. Они приведены в [карточке Росстандарта](https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64).
+
+В вебинаре изменение описывается как переход от набора мер редакции 2016 года к двадцати пяти процессам редакции 2024 года. Однако прозвучавшую оценку «около четырнадцати, с учётом компенсирующих» необходимо исправить. **Редакционное уточнение по окончательному ГОСТ Р 56939-2016:** в разделе 5 находятся **девять групп мер — 5.1–5.9**. Они охватывают анализ требований; проектирование архитектуры; конструирование и комплексирование; квалификационное тестирование; инсталляцию и приёмку; решение проблем при эксплуатации; документацию и конфигурацию; инфраструктуру среды разработки; людские ресурсы. Основание — оглавление окончательного документа, PDF-с. 3.
+
+Компенсирующие меры рассмотрены в п. 4.5; это условие достижения целей и результатов базовых мер при особенностях реализации, а не ещё две группы в оглавлении. Поэтому в новой лекции недопустима нормативная формула «14 мер → 25 процессов». Корректнее сопоставлять **девять групп мер** и **двадцать пять процессов**, отдельно объясняя различие единиц группировки. Это не арифметическое доказательство большей безопасности: для реального перехода нужен анализ содержания и сохранения работающих практик.
+
+Карпов выделяет несколько особенно понятных примеров конкретизации: композиционный анализ, работа с процессом интеграции и сборки, поверхность атаки, привлечение внешних исследователей и программы поиска уязвимостей. Его мысль состоит в том, что многие практики существовали и раньше, но разработчику полезно видеть их явно названными и связанными с ожидаемыми действиями.
+
+Разделение больших тем помогает назначать работу. Например, поддержка продукта включает не только ответ на обращение пользователя. Нужно принимать сообщения о недостатках, анализировать их, организовывать исправления, выпускать изменения и передавать нужную информацию затронутым сторонам. Чем яснее описаны границы этих действий, тем проще увидеть провалы между командами.
+
+Вареница отдельно отмечает положение обучения ближе к началу перечня. Для него это отражает практическую зависимость: нельзя построить устойчивую работу, если никто не понимает требований, способов анализа и собственных обязанностей. При этом порядок пунктов стандарта не следует механически превращать в единственный календарный порядок внедрения. Несколько процессов развиваются параллельно и поддерживают друг друга.
+
+## 7. Мера, процесс и регулярность работы
+
+**Основание: 00:31:45–00:32:32; 00:49:47–00:58:35; 01:25:22–01:27:08.**
+
+Один из наиболее содержательных споров вебинара касается терминологии. Вареница критикует сближение «процессов» и «мер» в новой структуре. Он обращает внимание на различие между отдельным воздействием и организованной деятельностью, у которой есть цель, последовательность работ и поддержание во времени. С его точки зрения, замена заголовка сама по себе не создаёт процессный подход.
+
+Карпов предлагает практическое объяснение полезности слова «процесс». Он приводит типичный запрос: приобрести анализатор на несколько месяцев, один раз проверить код перед выпуском и считать работу по безопасности завершённой. Такой сценарий может дать разовый результат, но не отвечает на вопрос, что произойдёт после следующего изменения кода или появления новой информации об уязвимостях.
+
+Регулярность означает больше, чем частый запуск инструмента. Нужны условия запуска, правила обработки результата, ответственность за решение и связь с дальнейшими действиями. Если анализ автоматически выполняется в каждой сборке, но предупреждения никто не рассматривает, автоматизация ещё не обеспечивает ожидаемый эффект. И наоборот, осмысленный ручной шаг может быть частью управляемого процесса, если определены его место и результат.
+
+Обе позиции стоит сохранить. У Вареницы сильна методологическая претензия: нельзя считать разные понятия равнозначными. У Карпова сильна педагогическая иллюстрация: безопасная разработка должна продолжаться вместе с развитием продукта. Для слушателя полезнее понять эту двойную мысль, чем выбирать победителя терминологического спора.
+
+В разговоре также возникает сопротивление изменениям. Вареница описывает случаи, когда руководство поддерживает программу, а опытные разработчики считают дополнительные проверки ненужными. Это его наблюдение, а не характеристика всех программистов. В учебном изложении такой пример лучше использовать для обсуждения распределения нагрузки и понятной пользы: люди должны видеть, что от них ожидается, почему это нужно и какое время предусмотрено для работы.
+
+## 8. Тестирование: почему название метода не заменяет его задачу
+
+**Основание: 00:33:16–00:35:21; 00:51:41–00:54:46; 01:57:18–01:58:24.**
+
+Вареница высказывает критическое мнение о формулировках нефункционального тестирования в новой редакции. Он связывает описанную работу с тестированием на проникновение и оспаривает предполагаемую возможность отказаться от неё. В его объяснении ценность проверки состоит в воспроизведении действий атакующего и поиске проблем, которые становятся заметны при попытке нарушить ожидаемые ограничения системы.
+
+Этот фрагмент нельзя превращать в общее определение «нефункциональное тестирование равно пентесту». В широкой инженерной терминологии названия обозначают разные классификации, а в конкретном стандарте нужно читать его собственные определения и содержание соответствующего пункта. Также из устного слова «рекомендовано» нельзя сделать вывод о свободном исключении требования при заявленном соответствии ГОСТ.
+
+**Редакционное уточнение:** правила чтения различаются между редакциями. В ГОСТ Р 56939-2016 п. 4.2 слово «следует» обозначает рекомендацию; в окончательной редакции ГОСТ Р 56939-2024 согласно п. 4.7 формулировки со словами «должен» и «следует» выражают требования, которые должны быть выполнены. Нельзя переносить привычную интерпретацию первой редакции в новую. Выбор области применения и возможные особенности реализации необходимо обосновывать по самому стандарту и применимому контексту, а не по отдельной оценке выступающего. Проверенное основание приведено в [EP01-sources.md](EP01-sources.md).
+
+Для понимания темы полезно сопоставить вопросы, на которые отвечают разные проверки. Функциональные тесты проверяют требуемое поведение программы. Статический анализ исследует код без его обычного выполнения; фаззинг подаёт множество входных воздействий и наблюдает поведение; анализ архитектуры позволяет рассматривать решения, которые могут не проявиться как локальная ошибка в строке кода. Это учебное пояснение различий, а не полный словарь, прочитанный на вебинаре.
+
+Общий вывод докладчика — методы должны работать совместно. Модель угроз, анализ кода, тестирование, проверка интеграции и подготовка специалистов решают взаимосвязанные задачи. Один приобретённый продукт не даёт оснований считать все остальные направления закрытыми. Подробное обучение каждому методу заслуживает отдельного выпуска, что участники прямо отмечают в ответе на вопрос о литературе.
+
+## 9. Как устроен ГОСТ и как его читать
+
+**Основание: 01:21:10–01:21:50; 01:27:08–01:33:19.**
+
+После исторического блока ведущие возвращаются к структуре документа. Они выделяют область применения, нормативные ссылки, термины, общие положения и основную часть с процессами разработки. Цель такого обзора — показать, где искать разные типы информации, прежде чем подробно изучать отдельный процесс.
+
+Область применения связывает создание безопасного программного обеспечения с устранением выявленных недостатков, включая уязвимости. Это существенное расширение взгляда за пределы финального выпуска: исправление после обнаружения проблемы входит в ту же систему работы. При этом вебинар не даёт самостоятельной исчерпывающей классификации «ошибка — слабость — уязвимость». Если такая схема добавляется в новый EP01, её следует обозначать как отдельное учебное пояснение и опираться на соответствующие определения.
+
+Общие положения объясняют, как соотнести стандарт с жизненным циклом организации. Ведущие подчёркивают, что ГОСТ не заставляет всех работать по одной конкретной модели разработки. Задача состоит во включении безопасности в существующую организацию работ: где-то нужно дополнить действующую практику, где-то — создать отсутствующий процесс.
+
+Описания процессов построены единообразно: цели, требования к реализации и артефакты реализации. Такое устройство удобно для первого анализа состояния. Цели помогают понять ожидаемый результат; требования — содержание необходимой работы; артефакты — то, по чему можно рассмотреть её исполнение. При этом перечень артефактов не стоит использовать как замену чтению требований: можно подготовить формально похожие документы и не обеспечить сам процесс.
+
+Отдельно обсуждается таблица изменений, включённая в проект стандарта. Она полезна как историческая подсказка, но не является автоматически частью окончательной редакции. В подготовленных материалах есть также приложение об инициализации процессов. При использовании этих источников следует подписывать статус: проект, окончательный ГОСТ, поясняющая презентация или методический материал.
+
+**Редакционное уточнение:** встречающееся в разговоре число нормативных ссылок не переносится без проверки. В окончательной локальной редакции раздел 2 содержит ссылки на ГОСТ Р ИСО/МЭК 12207 и ГОСТ Р 50922; проект и архивные слайды могли отличаться.
+
+## 10. Планирование — согласование намерения с возможностями
+
+**Основание: 01:35:00–01:39:53.**
+
+Первый процесс ведущие объясняют через ресурсы. Нельзя просто объявить прежнюю разработку безопасной и ожидать, что все необходимые работы появятся без времени, компетенций, инструментов и управленческих решений. Дополнительные задачи должны занять место в реальном плане команды.
+
+Карпов использует понятную аналогию с физическим доступом на предприятие: если нужно ограничить проход, потребуются технические и организационные меры, а также люди, которые будут поддерживать установленный порядок. В программной разработке затраты часто менее видимы, поэтому возникает соблазн заменить их пожеланием «пишите аккуратнее». Планирование делает такую подмену заметной.
+
+ГОСТ в этой логике становится общим языком исполнителя и заказчика — внутреннего или внешнего. Команда может показать, какие работы отсутствуют, какие нужно усилить, кто должен их выполнять и что потребуется приобрести или изменить. Руководитель получает предмет для решения: объём, сроки, зависимости и стоимость, а не абстрактную просьбу «выделить бюджет на безопасность».
+
+В вебинаре звучат ориентиры увеличения стоимости разработки: 10–15 процентов, затем 15–20 процентов со ссылкой на услышанные оценки участников отраслевого мероприятия. Позже аудитория указывает, что для небольшой команды увеличение может быть намного больше. Эти цифры не сопровождаются единой методикой расчёта, поэтому не должны становиться нормативом бюджета или обещанием экономического эффекта.
+
+Практически надёжнее разделить разовые затраты на запуск и регулярные затраты на исполнение. К первым могут относиться первичное обследование, настройка интеграций и обучение. Ко вторым — время на анализ результатов, исправления, сопровождение инструментов и поддержание компетенций. Даже бесплатный инструмент требует работы людей, а лицензия не включает автоматически все затраты на процесс.
+
+Планирование отвечает на четыре вопроса, которые Пиков формулирует в разговоре: что делать, когда делать, за какие средства и кто будет этим заниматься. Горизонт может быть разным — неделя, квартал, год или несколько лет. Но на каждом уровне план должен оставаться связанным с исполнимыми действиями, а не только с желаемым будущим состоянием.
+
+## 11. Сначала установить исходное состояние
+
+**Основание: 01:39:53–01:46:29.**
+
+Инициализация процессов начинается с оценки готовности разработчика и текущего состояния внедрения. Нельзя корректно спланировать изменение, если неизвестно, что уже работает. Ведущие предлагают провести инвентаризацию и сопоставить существующие практики с задачами безопасной разработки.
+
+При этом исходное состояние редко бывает полностью пустым. У организации могут существовать обучение сотрудников, матрица компетенций, анализ кода, тестирование, управление изменениями и обработка обращений. Они не обязательно назывались процессами безопасной разработки, но это не делает их бесполезными. Разумнее выяснить, какую часть нужной задачи они уже решают.
+
+Например, наличие статического анализатора ещё не отвечает на вопрос о покрытии требований безопасности. Важно понять, какие проверки включены, какой код анализируется, когда выполняется запуск и что происходит с найденными проблемами. Точно так же факт проведения обучения не показывает, получают ли разработчики знания, необходимые для их конкретных задач.
+
+Полезное различение, которое следует из обсуждения: **сохранить работающую практику**, **доработать существующую**, **создать отсутствующую**. Эта классификация помогает не покупать и не описывать заново всё подряд. Она также позволяет оценивать ресурсы точнее: настройка уже используемого инструмента и внедрение новой инфраструктуры с нуля — разные работы.
+
+Результат инвентаризации должен быть проверяемым. Утверждение «тестирование есть» слишком широко. Нужны границы продукта, вид проверки, исполнители и примеры результатов. Если практика выполнялась эпизодически и зависит от одного человека, это тоже часть исходного состояния; её не следует автоматически считать устойчиво внедрённой.
+
+Ведущие связывают такую оценку с дальнейшим планом развития. Она нужна не ради отдельного отчёта об обследовании, а для определения следующего улучшения и его стоимости. Хорошо проведённая инвентаризация сокращает число необоснованных обещаний и показывает, какие решения руководства действительно необходимы.
+
+## 12. Область применения и очередность: когда нельзя внедрить всё сразу
+
+**Основание: 01:40:42–01:42:08; 01:45:26–01:47:48; 02:00:47–02:03:01.**
+
+Пиков приводит задачу крупной организации с разными продуктами, проектами и подрядчиками. Средств на немедленное одинаковое внедрение всех практик повсюду нет. Поэтому планирование включает выбор очередности и масштабирование успешных решений.
+
+Такая задача не сводится к выбору самого удобного проекта для отчёта. Нужно объяснить, почему именно он получает приоритет, какие риски и обязательства учитываются, что остаётся за пределами первого этапа и как будет развиваться охват. Категоризация программного обеспечения помогает сделать эту логику явной.
+
+В обсуждении методологии Positive Technologies упоминаются определение текущего и целевого состояния, перечень внедряемых практик и дорожная карта. Это пример вспомогательного подхода, который можно сопоставить с задачами ГОСТ. Он не объявляется единственной разрешённой методикой и не заменяет требования выбранного стандарта.
+
+Особенно важно различать постепенное выполнение плана и заявление о полном соответствии. Организация может честно сказать, что внедрила отдельные практики и расширяет охват. Это не равнозначно подтверждению всех требований применимого ГОСТ. Если есть договорные или регуляторные обязательства, допустимые границы и порядок подтверждения нужно определять в их конкретном контексте.
+
+В качестве простого стартового направления Карпов несколько раз называет композиционный анализ: зависимость и известная проблема в ней дают достаточно понятный предмет работы. Это практическая рекомендация выступающего, а не универсальное требование начинать любой проект именно с SCA. Для другого продукта первыми могут оказаться иные риски или уже выявленные слабые места.
+
+## 13. Люди, ресурсы и ответственность
+
+**Основание: 00:40:08–00:41:17; 00:53:05–00:54:46; 01:43:45–01:49:43; 01:52:45–01:56:33.**
+
+Вопрос «кого назначить ответственным за РБПО?» Вареница называет одним из самых частых при внедрении. Ошибка возникает, когда от назначения одного человека ожидают выполнения всех задач разработки, архитектуры, анализа, тестирования и сопровождения. Ответственный за координацию нужен, но назначение не создаёт необходимые компетенции и не перераспределяет время автоматически.
+
+Ведущие предлагают начинать с людей, способных понять задачу и организовать внедрение. Если компетенций нет, можно подготовить инициативную группу или привлечь внешних специалистов. Такая группа затем помогает руководству сформировать реалистичный план и поддерживает распространение практик в командах.
+
+Обучение должно различаться по ролям. Не всем сотрудникам нужен одинаковый объём знаний о стандартах и методах испытаний. Разработчику, архитектору, руководителю процесса и специалисту по безопасности предстоит принимать разные решения. Поэтому матрица компетенций полезна тогда, когда она связана с рабочими обязанностями, а не только с перечнем пройденных курсов.
+
+В чате упоминается институт security champions. В учебном контексте это удобный переход к следующему вебинару: подготовленные участники команд могут помогать в распространении знаний и поддержании практик. Но сама роль не устраняет необходимость выделить время, определить полномочия и обеспечить взаимодействие со специалистами по безопасности.
+
+Ресурсный анализ должен учитывать не только деньги на инструменты. Требуются часы на разбор результатов, исправления, обсуждение архитектуры, актуализацию документов и сопровождение инфраструктуры. Если эти работы не отражены в загрузке людей, они будут конкурировать с функциональными задачами скрытым образом. Затем проблема ошибочно выглядит как нежелание команды заниматься безопасностью.
+
+Вебинар также показывает, что обучение и планирование взаимосвязаны. Для составления первого плана уже нужен некоторый уровень понимания. Затем сам план включает развитие компетенций, без которых нельзя реализовать следующие этапы. Это не замкнутый круг, а повод начать с небольшого достаточного ядра и постепенно расширять возможности организации.
+
+## 14. Какие результаты должны остаться после планирования
+
+**Основание: 01:42:08–01:50:49; редакционное сопоставление с ГОСТ Р 56939-2024, п. 5.1.**
+
+Ведущие предлагают рассматривать артефакты как практический ориентир: что должно получиться после работы? Для планирования это означает не красивую диаграмму сама по себе, а связанный набор результатов, позволяющий перейти к исполнению.
+
+В подготовленных материалах EP01 первый процесс раскрывается через пять связанных записей: исходное состояние процессов; обоснование области применения; анализ потребности в ресурсах; план развития; план реализации. Это **редакционное сопоставление с окончательным стандартом**, которое уточняет выборочный разбор артефактов на вебинаре. Образец и пустая форма вынесены в [пример планирования](EP01-planning-example.md) и [рабочий шаблон](EP01-planning-worksheet.md).
+
+Связь между записями важнее количества отдельных файлов. Обнаруженный пробел должен приводить к объяснимому решению о развитии. Решение — к необходимым ресурсам. Запланированная работа — к исполнителю, сроку и ожидаемому результату. Иначе исходное обследование и календарный план могут существовать параллельно, не отвечая на один и тот же вопрос.
+
+Пиков перечисляет возможную организационную документацию: политика безопасной разработки, правила категоризации программного обеспечения, регламент и описание контроля исполнения. Названия приведены как варианты реализации. Их не следует превращать в обязательный комплект документов именно с такими заголовками для любой организации.
+
+Политика полезна, когда задаёт общие правила и ответственность. Регламент помогает понять порядок действий. Рабочие записи показывают, что происходило в конкретном проекте. Эти уровни дополняют друг друга: общий документ не доказывает исполнение каждой задачи, а набор разрозненных заявок не всегда объясняет принятый порядок работы.
+
+Наконец, планирование должно включать актуализацию. Продукт меняется, команда меняется, появляются новые сведения о недостатках. Если план перестаёт соответствовать этим условиям, его наличие уже не помогает управлять работой. Вопрос «кто и когда пересматривает решение?» столь же практичен, как вопрос о первоначальном утверждении.
+
+## 15. Автоматизация документации и свидетельств
+
+**Основание: 01:47:01–01:50:49.**
+
+Один из полезных ответов на опасение перед ГОСТ звучит ближе к завершению основной части: выполнение требований не обязательно означает создание сотен независимых Word-документов и Excel-таблиц. Участники предлагают рассмотреть средства, которые помогают разложить процессы на задачи, видеть состояние внедрения и фиксировать результаты.
+
+При этом инструмент управления соответствием не делает процесс работающим автоматически. Процент заполнения карточек или число выставленных отметок полезны лишь при понятных критериях. Если отметка «выполнено» не связана с реальным результатом, красивая визуализация будет отражать качество заполнения системы, а не качество разработки.
+
+Практический смысл автоматизации — уменьшить ручное дублирование и сохранить связи. Задача может ссылаться на изменение кода, результат проверки и решение ответственного. Правило может храниться в управляемом репозитории. Отчёт может формироваться на основе уже существующих рабочих записей. Конкретный способ выбирают с учётом инфраструктуры и возможностей организации.
+
+Вебинар не даёт сравнительного обзора рынка таких систем. Упомянутый пример следует воспринимать как указание на класс средств, а не как подтверждённую рекомендацию продукта для любого внедрения. При подготовке собственного процесса сначала нужно установить, какие записи необходимы и кто ими пользуется, а затем выбирать способ их ведения.
+
+## 16. Чужой код, зависимости и ответственность за продукт
+
+**Основание: 01:22:24–01:23:37; 01:55:58–01:56:33; 01:59:32–02:00:47.**
+
+В обсуждении композиционного анализа ведущие формулируют принцип ответственности: включённый в продукт сторонний компонент становится частью продукта, за который отвечает разработчик. Внешнее происхождение кода не устраняет последствия уязвимости для конечного пользователя.
+
+Ответ на вопрос «чем плох open source?» поэтому начинается с отрицания самой постановки. Открытый код не плох сам по себе. Важно, как организация выбирает компоненты, понимает их применение, отслеживает изменения и реагирует на новые сведения о проблемах. Точно так же собственноручно написанный код не становится безопасным только благодаря внутреннему авторству.
+
+Ведущие говорят об обновлениях, поиске уязвимостей и анализе используемого кода. Для учебного применения стоит уточнить границу: обнаружение компонента с известной уязвимостью требует оценки конкретной версии и условий использования. Одна запись в базе ещё не описывает полностью достижимость уязвимого поведения в данном продукте. Однако это основание для работы, а не для игнорирования проблемы из-за чужого авторства.
+
+В конце обсуждения возникает код, написанный с участием искусственного интеллекта. Участники не предлагают отдельную законченную методологию разработки систем ИИ; напротив, говорят, что это большая самостоятельная тема. В пределах обычной разработки основной вывод сохраняется: способ получения кода не освобождает команду от анализа, проверки и ответственности за включение в продукт.
+
+Это хороший пример сквозного характера процесса. Для собственных модулей, открытых библиотек и предложенных инструментом фрагментов могут потребоваться разные процедуры получения и проверки. Но решение о выпуске конкретного продукта должно учитывать весь его состав, а не только удобную для команды часть.
+
+## 17. Поддержка и обработка выявленных недостатков
+
+**Основание: 00:38:40–00:44:26; 02:03:41–02:04:48.**
+
+Безопасная разработка продолжается после выпуска. Вареница обращает внимание на сопровождение продукта, обработку обнаруженных уязвимостей и взаимодействие с внешними источниками информации. Без этой части даже качественно проверенный релиз постепенно теряет актуальность: появляются новые сведения о компонентах и способах воздействия на систему.
+
+Практическая цепочка включает получение сообщения, регистрацию, анализ, определение необходимых действий и выпуск изменения. В зависимости от контекста могут потребоваться взаимодействие с заказчиками и сведения для соответствующих реестров. Конкретные обязанности уведомления определяются применимыми требованиями; из общей дискуссии нельзя вывести универсальный порядок для всех организаций.
+
+Вареница также обсуждает связь сопровождения с действием сертификатов. Этот фрагмент относится к регуляторной практике, о которой он говорил в 2025 году. Он не является достаточным основанием для юридического вывода о судьбе любого конкретного сертификата после окончания поддержки. Для такого решения нужны документы соответствующей системы и условия конкретного продукта.
+
+В ответе о собственной практике PVS-Studio Карпов упоминает регламент реакции на сообщения о дефектах. Этот пример показывает, что значимые элементы безопасной разработки могут существовать в организации и без отдельного сертификата процессов. Проверять нужно саму работу: принимаются ли сообщения, понятен ли порядок обработки и доходят ли изменения до продукта.
+
+## 18. Сертификация: несколько разных вопросов, которые нельзя смешивать
+
+**Основание: 00:24:25–00:28:06; 00:58:42–01:05:17; 01:11:38–01:17:27; 02:03:01–02:04:48.**
+
+Вопросы аудитории показывают, насколько легко смешать четыре предмета: применение инженерных практик, соответствие требованиям стандарта, сертификацию процессов и сертификацию продукта. К ним добавляется пятый — оценка или сертификация инструмента, которым пользуется разработчик.
+
+На вопрос о заказчике, требующем ГОСТ 2016 года, Вареница сначала предлагает уточнить контекст: какие требования действуют для заказчика и продукта, какая система оценки применяется? Это правильная последовательность рассуждения. Одного слова «ГОСТ» недостаточно, чтобы определить вид обязательного подтверждения.
+
+В разговоре подчёркивается, что требование выполнить стандарт не следует автоматически читать как требование получить отдельный сертификат процессов. Но из этого также нельзя сделать обратное универсальное заключение, что сертификат никогда не нужен. Способ подтверждения может быть установлен договором, применимым регулированием или выбранной схемой оценки. Для новой англоязычной серии достаточно ясно обозначить это различие, не пытаться заменить им специализированную консультацию по сертификации.
+
+Вареница описывает преимущества сертификации процессов при внесении изменений в сертифицированный продукт. Его краткая формулировка отражает обсуждение действовавшей тогда практики; её не нужно использовать как безусловное обещание самостоятельного обновления любого продукта без внешнего участия. Условия зависят от конкретного режима и актуальных документов.
+
+Большой фрагмент вопросов посвящён числу аккредитованных организаций и очередям. Причём сведения уточняются прямо по ходу разговора: участники спорят, появился ли второй орган и можно ли к нему обратиться. Это наглядный пример информации, которая быстро меняется и даже в момент выступления требует проверки. Содержательный вопрос здесь — доступность компетентной независимой оценки, сроки и возможность выбора; конкретные очереди 2025 года не переносятся в текущую лекцию как факт.
+
+Обсуждаются также возможные уровни оценки внедрения процессов. Вареница говорит о четырёх уровнях как о рассматриваемом предложении и отдельно подчёркивает внутренний характер дискуссии. Следовательно, в учебном тексте это история разработки подхода, а не утверждённая шкала, которую можно немедленно применять к организации.
+
+Наконец, Карпов отвечает о самой PVS-Studio: многие практики внедрены, но отдельная сертификация процессов не проходилась. Он отделяет это от работы по требованиям к статическим анализаторам. Для слушателя полезен общий вывод: качество инструмента, его пригодность для определённых проверок и зрелость процессов организации — связанные, но разные объекты оценки.
+
+## 19. Небольшая команда: масштабирование без самообмана
+
+**Основание: 02:00:47–02:03:01.**
+
+Вопрос о малых командах обостряет спор о стоимости. Для двух-трёх разработчиков создание большого набора отдельных ролей и тяжёлой инфраструктуры может быть несоразмерным. Карпов обращает внимание на практическую сложность переноса всей организационной конструкции крупной компании в небольшой проект.
+
+Пиков возражает против вывода, что безопасная разработка нужна только после достижения некоторого размера. Даже один разработчик может использовать полезные практики, а небольшая организация может создавать продукт, для которого действуют существенные требования. Размер команды сам по себе не определяет ни критичность продукта, ни применимость договорных и регуляторных обязанностей.
+
+Эти позиции можно совместить. Масштаб исполнения должен соответствовать задаче, но описание достигнутого состояния должно оставаться честным. Один человек может совмещать роли; существующий репозиторий и система задач могут использоваться для нескольких видов записей. Однако отсутствие ресурсов не превращает невыполненную обязательную работу в выполненную.
+
+Для маленькой команды особенно полезны приоритеты, повторное использование существующих средств и ясное распределение ответственности. Если команда входит в большую организацию, часть инфраструктуры и экспертизы может предоставляться централизованно. Но это нужно запланировать: общая служба безопасности не становится доступным ресурсом проекта только потому, что существует где-то в структуре компании.
+
+## 20. Литература, обучение и формат продолжения
+
+**Основание: 01:17:44–01:21:10; 01:50:49–01:55:58; 01:56:33–01:59:32; 02:04:48–02:07:28.**
+
+В ответе на вопрос о единой книге по РБПО ведущие объясняют широту темы. Функциональное тестирование, архитектурный анализ, безопасность цепочки поставок и управление процессами сами по себе требуют большого учебного объёма. Поэтому вместо обещания универсального учебника предлагается постепенно собирать нормативные документы, методические материалы, статьи и записи обсуждений по каждому процессу.
+
+В этом подходе важна связь источника с вопросом. Стандарт помогает установить требования; методология — организовать внедрение; статья или пример — рассмотреть частный метод; практика — проверить понимание. Случайная коллекция ссылок менее полезна, чем небольшой объяснённый набор, в котором видно назначение каждого материала.
+
+Организаторы рассказывают об учебных курсах, партнёрских занятиях и практических заданиях. Упоминаются трудности летнего расписания и формирование групп. Это организационная информация вебинара 2025 года, которая не подтверждает нынешние даты, наличие мест, стоимость или программу обучения.
+
+Обсуждается итоговая проверка знаний и электронный сертификат для слушателей, успешно прошедших её после серии. Такой сертификат обучения не следует смешивать с сертификацией процессов разработки или продукта. В новой серии любые обещания слушателям должны устанавливаться отдельно; исторический анонс не создаёт автоматически такие же условия.
+
+Следующий выпуск в конце встречи посвящается обучению сотрудников. В ходе разговора возникает идея пригласить Вареницу и сравнить подходы разных организаций. Для текущего англоязычного проекта полезен сам переход: после определения плана и ресурсов нужно понять, какие решения должны уметь принимать люди. Участие конкретного гостя, дату и формат нельзя считать подтверждёнными только на основании приглашения в записи 2025 года.
+
+## 21. Вопросы аудитории: карта ответов для подготовки преподавателя
+
+Эта таблица собирает самостоятельные вопросы, в том числе те, которые легко потерять при сокращении двухчасового разговора. Краткие ответы не заменяют объяснения в разделах выше.
+
+| Вопрос | Таймкод | Содержательный ответ и граница |
+|---|---|---|
+| Почему перешли от мер к процессам? | 00:49:47–00:51:26; 00:56:07–00:58:35; 01:25:22–01:27:08 | В разговоре есть разные позиции: критика смешения понятий и объяснение через регулярность. Единственная документально доказанная причина не установлена. |
+| Как применять сложный стандарт управления конфигурацией? | 00:51:41–00:52:25 | Сначала определить контекст продукта и нужный результат; объём документа сам по себе не объясняет способ внедрения. Конкретная методика в этом ответе не разобрана. |
+| Можно ли исключить тестирование на проникновение? | 00:52:25–00:54:46 | Вареница считает его важным элементом проверки безопасности. Допустимость исключения требования устанавливают по окончательному стандарту и контексту. «Следует» в 2016 и 2024 имеет разный нормативный смысл; устное «рекомендовано» не заменяет п. 4.7 редакции 2024. |
+| Кто должен отвечать за всю безопасную разработку? | 00:40:46–00:41:17 | Координация не заменяет совместную работу разных ролей; одному назначенному человеку нужны реальные участники и ресурсы. |
+| Появятся ли дополнительные органы сертификации? | 00:58:42–01:03:14 | Обсуждались доступность и конкуренция на рынке оценки. Сведения о составе реестра и очередях были спорными уже в эфире и требуют отдельной актуализации. |
+| Согласованы ли ГОСТ Р 58412 и новая редакция 56939? | 01:03:14–01:05:17 | Вареница считает базовые угрозы применимыми, но говорит о необходимости адаптировать связи с изменённой структурой процессов. Это не опубликованная в вебинаре полная матрица соответствия. |
+| Отстаёт ли российский подход от зарубежных методологий? | 01:05:17–01:11:38 | По мнению Вареницы, различия не следует описывать десятилетним техническим отставанием. Численная оценка в годах в вебинаре не обоснована исследованием. |
+| Можно ли сертифицировать частично внедрённые процессы? | 01:11:38–01:13:48 | Обсуждался проект уровней оценки. Четыре уровня названы предложением, а не действующей шкалой. |
+| Заказчик требует ГОСТ 2016 года: нужен ли отдельный сертификат? | 01:14:03–01:17:27 | Сначала уточнить требования заказчика, объект и режим оценки. Соответствие стандарту и наличие отдельного сертификата — разные вопросы; статус редакции проверяют по документам. |
+| Что делать, если нужного процесса вообще нет? | 01:47:48–01:49:43 | Подготовить людей, обследовать состояние, определить работы и ресурсы; начать с инициативной группы, способной организовать внедрение. |
+| Обязательно ли вести всё в Word и Excel? | 01:50:20–01:50:49 | Нет необходимости создавать изолированные файлы ради самих файлов. Можно использовать средства управления задачами и свидетельствами, сохраняя проверяемость содержания. |
+| Когда будут курсы и чем помогают security champions? | 01:52:03–01:54:08 | Курсы и подготовленные участники команд обсуждаются как способ развить компетенции. Расписание 2025 года не является текущим предложением. |
+| Чем open source хуже собственного кода? | 01:55:58–01:56:33 | Само происхождение не определяет безопасность. Команда отвечает за использование компонента, отслеживание проблем и необходимые действия. |
+| Будут ли экзамен и сертификаты слушателям? | 01:56:33–01:57:18; 02:06:06–02:06:47 | Такой план был объявлен для исторической серии. Это образовательный сертификат, а не подтверждение соответствия процессов ГОСТ. |
+| Есть ли одна книга, охватывающая всё РБПО? | 01:57:18–01:59:32 | Ведущие предлагают тематическую подборку и отмечают самостоятельный объём отдельных дисциплин. Публикация материалов должна учитывать права на сторонние книги. |
+| Что меняется, если код создаёт ИИ? | 01:59:32–02:00:08 | В пределах обычной разработки сохраняется ответственность за принятый код. Специальные вопросы безопасности систем ИИ в вебинаре подробно не раскрываются. |
+| Как различать упомянутые требования для КИИ и ГИС? | 02:00:08–02:00:47 | Ведущие поправляют смешение разных регуляторных контекстов. Для применения к проекту нужна отдельная проверка области действия актуальных документов. |
+| Нужны ли процессы команде из нескольких человек? | 02:00:47–02:03:01 | Полезные практики нужны и малым командам; масштаб и обязанности определяют по продукту и условиям, а не только по числу разработчиков. |
+| Внедрены ли процессы у PVS-Studio? | 02:03:01–02:04:48 | Карпов приводит несколько действующих практик и сообщает об отсутствии отдельной сертификации процессов на момент разговора. Это самоописание организации в 2025 году. |
+| Должен ли быть сертифицирован любой инструмент безопасной разработки? | 02:03:01–02:04:16 | В ответе отделены инструменты, специальные требования к анализаторам и сертификация процессов. Универсальное заключение для любого регулируемого проекта из этого примера не выводится. |
+
+## 22. Что сохранить в новом EP01
+
+Самая ценная особенность исходного вебинара — соединение истории с повседневными задачами команды. Рассказ о подготовке ГОСТ объясняет, почему внимание сместилось к организации разработки. Спор о мерах и процессах показывает, что терминология должна отражать регулярную работу. Разбор планирования переводит общие намерения в ресурсы, компетенции и исполнимые действия.
+
+Для нового выступления особенно полезны следующие опоры:
+
+1. **Показать происхождение редакции 2016 года отдельной последовательностью.** Предварительные обсуждения, НИР, проектирование, замечания, утверждение и введение в действие — разные этапы. Роль Эшелона и внешнего обсуждения должна быть названа точно.
+2. **Сохранить международный контекст без неподтверждённой причинности.** ГОСТ создавался с учётом существовавших подходов; SSDF удобен для последующего сравнения, но не является источником редакции 2016 года.
+3. **Дать наглядный пример регулярности.** Разовый анализ перед выпуском и действующий порядок анализа изменений — разные состояния организации.
+4. **Объяснить переход к двадцати пяти процессам содержательно.** Исправить прозвучавшее число четырнадцать: в окончательной редакции 2016 года девять групп мер. Новые заголовки, разделение крупных тем и уточнение требований не равны количественному доказательству большей безопасности. Отдельно показать изменение смысла слова «следует».
+5. **Сделать планирование центральным практическим результатом.** Слушатель должен уметь описать исходное состояние, объяснить границы, оценить ресурсы и связать улучшение с рабочей задачей.
+6. **Завершить людьми и следующим эпизодом.** План останется документом, если никто не способен выполнять заложенные в нём решения. Поэтому обучение естественно продолжает первый выпуск.
+
+## Источники и связанные материалы
+
+- [Полная расшифровка первого вебинара](&lt;Транскрипция 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt&gt;) — основной источник содержания и таймкодов.
+- [Краткий пересказ](&lt;Пересказ 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt&gt;) — вспомогательный файл с выявленными ошибками, не основание фактических утверждений.
+- [История SDL и создания ГОСТ: исследование исходных PDF](EP01-history-research.md) — хронология, связи с международными документами и ограничения обзора методологий.
+- [EP01: реестр источников и нормативные уточнения](EP01-sources.md) — окончательный ГОСТ и границы использования исторических материалов.
+- Окончательный **ГОСТ Р 56939-2016**, локальная копия `ГОСТ Р 56939-2016 (редакция 2016).pdf` из раздаточных материалов: PDF-с. 2 — разработчик и приказ; с. 3 — девять групп раздела 5; с. 5 — область применения и международные связи; с. 8 — пп. 4.2 и 4.5. Официальные даты дополнительно сверяются по [карточке Росстандарта](https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d).
+- [План EP01](EP01-plan.md), [полная английская речь](EP01-script-en.md), [пример планирования](EP01-planning-example.md), [рабочий шаблон](EP01-planning-worksheet.md).
+
+Исходное видео указано автором по пути:
+
+```text
+V:\Yandex.Disk\_МАСКОМ\2025 Вебинары по РБПО с PVS-STUDIO\2025.07.02 Вебинар1 по РБПО с PVS-STUDIO\2025.07.02 Вебинар1 по РБПО с PVS-STUDIO (РАЗДАВАТЬ)\2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4
+```
+
+В этом документе использована предоставленная полная расшифровка. Утверждение о полном просмотре или построчной сверке видеозаписи не делается.
+</code></pre></details></section>
+<section id="lecture-source-files"><h2>Исходные материалы</h2><div class="source-grid"><article class="source-card"><span class="tag">Краткий пересказ</span><h3>Пересказ 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt</h3><p>Вспомогательная навигация по темам; не заменяет полный текст.</p><a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%9F%D0%B5%D1%80%D0%B5%D1%81%D0%BA%D0%B0%D0%B7%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">Открыть исходный текст</a><code class="path">V:\pikov.expert\56939-lections\EP01\Пересказ 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt</code></article><article class="source-card"><span class="tag">Полная транскрипция</span><h3>Транскрипция 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt</h3><p>Основа подробной тематической лекции; сверка рассказа и вопросов участников.</p><a href="file:///V:/pikov.expert/56939-lections/EP01/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BA%D1%80%D0%B8%D0%BF%D1%86%D0%B8%D1%8F%202025.07.02%20%D0%92%D0%B5%D0%B1%D0%B8%D0%BD%D0%B0%D1%80%201%20%D0%BF%D0%BE%20%D0%A0%D0%91%D0%9F%D0%9E%20%D1%81%20PVS-STUDIO.mp4.txt">Открыть исходный текст</a><code class="path">V:\pikov.expert\56939-lections\EP01\Транскрипция 2025.07.02 Вебинар 1 по РБПО с PVS-STUDIO.mp4.txt</code></article></div>
+<p class="caption" style="margin-top:20px">Полный текст лекции и ссылки на проверочные источники сохранены выше. Исходная транскрипция хранится рядом отдельным файлом.</p></section></main>
+<footer class="site-footer wrap"><strong>Vitaliy Pikov · <a href="https://pikov.expert">pikov.expert</a></strong><br>
+Материалы доступны в этом HTML без подключения к сети. Внешние источники открываются по ссылкам.</footer>
+<script>
+function revealHashTarget() {
+  let id;
+  try { id = decodeURIComponent(location.hash.slice(1)); } catch { return; }
+  const target = document.getElementById(id);
+  if (!target) return;
+  let detail = target.matches('details') ? target : target.closest('details');
+  while (detail) {
+    detail.open = true;
+    detail = detail.parentElement.closest('details');
+  }
+}
+window.addEventListener('hashchange', revealHashTarget);
+document.addEventListener('click', event => {
+  const link = event.target.closest('a[href^="#"]');
+  if (link) requestAnimationFrame(revealHashTarget);
+});
+revealHashTarget();
+document.querySelectorAll('button[data-toggle-group]').forEach(button => {
+  button.addEventListener('click', () => {
+    const entries = [...document.querySelectorAll(button.dataset.toggleGroup)];
+    const open = entries.some(entry => !entry.open);
+    entries.forEach(entry => { entry.open = open; });
+    button.textContent = open ? button.dataset.closeLabel : button.dataset.openLabel;
+    button.setAttribute('aria-expanded', String(open));
+  });
+});
+let printState = [];
+window.addEventListener('beforeprint', () => {
+  printState = [...document.querySelectorAll('details.entry')].map(entry => [entry, entry.open]);
+  printState.forEach(([entry]) => { entry.open = true; });
+});
+window.addEventListener('afterprint', () => {
+  printState.forEach(([entry, open]) => { entry.open = open; });
+  printState = [];
+});
+</script></body></html>
