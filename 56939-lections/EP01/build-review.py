@@ -35,11 +35,14 @@ CSS = r"""
 *{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:'Segoe UI',Arial,sans-serif;font-size:18px;line-height:1.65}a{color:var(--blue);text-underline-offset:.2em;overflow-wrap:anywhere}a:hover{text-decoration-thickness:2px}a:focus-visible,button:focus-visible,summary:focus-visible{outline:3px solid #e6942e;outline-offset:4px}button,summary{font:inherit}button{cursor:pointer}img{max-width:100%;height:auto}h1,h2,h3,h4{line-height:1.17;text-wrap:balance}h1,h2{font-family:'Bahnschrift','Segoe UI',Arial,sans-serif;font-weight:650}h1{font-size:clamp(2.5rem,5.8vw,5.4rem);letter-spacing:-.045em;margin:18px 0 26px}h2{font-size:clamp(1.85rem,3.4vw,2.8rem);letter-spacing:-.025em;margin:0 0 22px}h3{font-size:1.35rem;margin:30px 0 14px}h4{font-size:1.12rem;margin:24px 0 10px}p{margin:0 0 1.05em}ul,ol{padding-left:1.35em}li{padding-left:.1em;margin:.4em 0}code,kbd,pre,.mono{font-family:Consolas,'Cascadia Mono',monospace}code{font-size:.86em;overflow-wrap:anywhere}pre{font-size:.87rem;line-height:1.6;max-width:100%;overflow:auto;background:var(--soft);border:1px solid var(--line);padding:18px;white-space:pre-wrap;overflow-wrap:anywhere}pre code{font-size:inherit}blockquote{border-left:4px solid var(--blue);margin:24px 0;padding:12px 22px;background:var(--soft)}blockquote>:last-child{margin-bottom:0}hr{border:0;border-top:1px solid var(--line);margin:32px 0}
 .wrap{width:min(1280px,calc(100% - 72px));margin-inline:auto;min-width:0}.skip{position:fixed;top:-100px;left:12px;background:var(--white);padding:10px 20px;z-index:30}.skip:focus{top:12px}.masthead{display:flex;gap:20px;align-items:center;justify-content:space-between;padding-block:25px;border-bottom:1px solid var(--line)}.brand{font-size:1.25rem;letter-spacing:-.03em;text-decoration:none;font-weight:750;color:var(--navy)}.masthead span{font-size:.83rem;color:var(--muted)}.hero{padding:62px 0 55px}.eyebrow{color:var(--blue);font-weight:750;font-size:.78rem;letter-spacing:.13em;text-transform:uppercase}.deck{max-width:960px;font-size:clamp(1.13rem,2vw,1.5rem);line-height:1.55;color:var(--muted)}.hero-grid{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:46px;align-items:end}.edition{border-left:3px solid var(--blue);padding:4px 0 4px 22px;font-size:.96rem;color:var(--muted)}.edition strong{display:block;color:var(--navy);font-size:1.4rem}.hero-links,.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:27px}.button,button.action{display:inline-block;border:1px solid var(--blue);padding:10px 17px;background:var(--blue);color:var(--white);text-decoration:none;border-radius:5px;font-weight:650;font-size:.94rem}.button.secondary,button.action.secondary{color:var(--blue);background:transparent}.button:hover{background:var(--navy);color:var(--white)}.jump-nav{position:sticky;top:0;z-index:10;background:rgba(247,248,250,.98);border-block:1px solid var(--line)}.jump-nav .wrap{display:flex;gap:25px;overflow-x:auto;white-space:nowrap;padding-block:14px;scrollbar-width:thin}.jump-nav a{font-size:.89rem;font-weight:700;text-decoration:none;color:var(--navy)}main>section{padding-block:54px;border-bottom:1px solid var(--line)}.section-intro{max-width:950px;color:var(--muted)}.reading{max-width:900px}.section-label{display:block;margin-bottom:10px;font-size:.8rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);font-weight:750}.metric-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));margin:28px 0 36px;border-block:1px solid var(--line)}.metric{padding:20px 18px 21px 0;min-width:0}.metric strong{font-family:'Bahnschrift','Segoe UI',sans-serif;display:block;color:var(--navy);font-size:2.25rem;font-weight:650;line-height:1.2}.metric span{font-size:.87rem;color:var(--muted)}.columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:30px}.note{border-left:4px solid var(--blue);background:var(--soft);padding:23px 26px;margin-block:26px;min-width:0}.note>:last-child{margin-bottom:0}.note h3{margin-top:0}.notice{padding:19px 23px;background:var(--navy);color:var(--white);border-radius:5px}.notice a{color:#c5ddff}.cover{display:block;width:100%;border:1px solid var(--line);border-radius:5px;margin:24px 0 10px}.caption{font-size:.85rem;color:var(--muted)}.table-wrap{overflow-x:auto;max-width:100%;margin:24px 0;scrollbar-width:thin}.table-wrap table{width:100%;border-collapse:collapse;font-size:.93rem;line-height:1.5}.table-wrap th{text-align:left;color:var(--navy);font-weight:750;background:var(--soft)}.table-wrap th,.table-wrap td{padding:13px 15px;border-bottom:1px solid var(--line);vertical-align:top;overflow-wrap:anywhere}.table-wrap th:first-child,.table-wrap td:first-child{padding-left:12px}.schedule td:first-child{width:62px;color:var(--blue);font-weight:750}.schedule td:nth-child(2){width:140px;white-space:nowrap}.schedule td:nth-child(3){width:40%}.source-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.source-card{min-width:0;background:var(--white);padding:23px;border:1px solid var(--line);border-radius:5px}.source-card h3{margin:0 0 12px;font-size:1.12rem}.source-card p{font-size:.95rem;margin-bottom:12px}.source-card>:last-child{margin-bottom:0}.path{display:block;max-width:100%;margin-top:7px;white-space:normal;overflow-wrap:anywhere;word-break:normal;font-size:.78rem;line-height:1.65;color:var(--muted)}.tag{color:var(--blue);font-size:.79rem;font-weight:750}.document-list{display:grid;gap:12px;list-style:none;margin:24px 0;padding:0}.document-list>li{margin:0;min-width:0;display:grid;grid-template-columns:45px minmax(0,1fr);gap:15px;border-top:1px solid var(--line);padding:19px 0}.document-list .file-number{font-family:'Bahnschrift','Segoe UI',sans-serif;font-size:1.4rem;color:var(--blue)}.document-list h3{margin:0 0 6px;font-size:1.13rem}.document-list p{font-size:.92rem;color:var(--muted);margin:0}.document-list>li>div{min-width:0}.speech-list,.archive-list{display:grid;gap:12px;margin-top:25px}details.entry{min-width:0;border:1px solid var(--line);background:var(--white);border-radius:5px}details.entry>summary{display:grid;grid-template-columns:50px minmax(0,1fr) auto;align-items:start;gap:16px;padding:20px 23px;cursor:pointer;list-style:none}details.entry>summary::-webkit-details-marker{display:none}details.entry>summary:after{content:'+';grid-column:3;font-size:1.55rem;font-weight:400;line-height:1.1;color:var(--blue)}details.entry[open]>summary:after{content:'−'}summary .entry-number{font-family:'Bahnschrift','Segoe UI',sans-serif;color:var(--blue);font-weight:650;font-size:1.18rem}summary .entry-title{font-weight:700;min-width:0;overflow-wrap:anywhere}summary small{display:block;font-weight:400;color:var(--muted);font-size:.81rem;margin-top:5px}.entry-body{padding:8px 28px 28px;min-width:0;border-top:1px solid var(--line)}.speech-text{max-width:920px;font-size:1.06rem;line-height:1.82;margin-top:23px}.speech-text p{margin-bottom:1.25em}.speech-meta{font-size:.85rem;color:var(--muted);margin-block:20px}.source-links{font-size:.86rem;color:var(--muted)}.raw-source{margin-top:24px;border-top:1px solid var(--line);padding-top:15px}.raw-source>summary{font-size:.88rem;color:var(--blue);cursor:pointer}.markdown{min-width:0;overflow-wrap:anywhere}.markdown>h1{font-size:2.25rem;letter-spacing:-.025em;margin-top:28px}.markdown>h2{font-size:1.75rem;margin-top:42px}.markdown>h3{font-size:1.23rem;margin-top:30px}.markdown>h4{font-size:1.08rem}.markdown h1,.markdown h2,.markdown h3,.markdown h4{scroll-margin-top:88px}.markdown .table-wrap{font-size:.9rem}.markdown .table-wrap table{min-width:560px}.markdown .table-wrap th,.markdown .table-wrap td{min-width:100px}.markdown .footnote{font-size:.88rem;border-top:1px solid var(--line);margin-top:35px}.archive-list .markdown{font-size:.98rem}.contents{background:var(--soft);border-left:4px solid var(--blue);padding:24px 29px;margin:30px 0}.contents h2{font-size:1.45rem;margin-bottom:15px}.contents ol{margin:0;padding-left:1.3em;columns:2;column-gap:40px}.contents li{break-inside:avoid;margin:.45em 0;font-size:.94rem}.contents a{text-decoration:none}.lecture-shell{max-width:1000px;margin-inline:auto}.lecture-shell .markdown{max-width:920px;margin-inline:auto;font-size:1.11rem;line-height:1.85}.lecture-shell .markdown>h1{font-size:2.2rem}.lecture-shell .markdown>h2{font-family:'Bahnschrift','Segoe UI',sans-serif;font-size:2rem;border-top:1px solid var(--line);padding-top:32px;margin-top:54px}.lecture-shell .markdown>h3{font-size:1.35rem;line-height:1.35}.lecture-shell .markdown p{margin-bottom:1.15em}.lecture-shell .markdown .table-wrap{font-size:.9rem}.site-footer{padding:34px 0 48px;color:var(--muted);font-size:.87rem}.site-footer strong{color:var(--navy)}.print-only{display:none}
 .contents ol,.markdown .toc ol,.markdown .toc ul{list-style:none;padding-left:0}
+.lecture-parts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px;margin:30px 0}.lecture-part{min-width:0;padding:23px 25px;border-left:3px solid var(--blue);background:var(--soft)}.lecture-part h2{font-size:1.3rem;line-height:1.3;letter-spacing:0;margin:0 0 13px}.lecture-part h2 a{text-decoration:none}.lecture-part p{font-size:.95rem;line-height:1.6;color:var(--muted);margin:0}.contents .toc-parts{display:block;columns:auto}.contents .toc-parts>li{margin:0 0 21px;padding:0;break-inside:auto}.contents .toc-parts>li>a{font-weight:750}.contents .toc-chapters{columns:2;column-gap:38px;margin:11px 0 0;padding-left:18px;border-left:1px solid var(--line)}.contents .toc-chapters>li{font-size:.89rem;margin:.5em 0;break-inside:avoid}
 @media(max-width:900px){body{font-size:17px}.wrap{width:calc(100% - 42px)}.hero-grid{grid-template-columns:minmax(0,1fr)}.edition{max-width:650px}.metric-strip{grid-template-columns:repeat(2,minmax(0,1fr))}.source-grid,.columns{grid-template-columns:minmax(0,1fr)}.contents ol{columns:1}.schedule td:nth-child(2){width:auto}.hero{padding-top:40px}.lecture-shell .markdown{font-size:1.04rem}}
 @media(max-width:520px){html{scroll-padding-top:80px}.wrap{width:calc(100% - 28px)}.masthead{align-items:start;gap:12px}.masthead span{text-align:right;max-width:175px;font-size:.74rem}.hero{padding-block:32px}h1{font-size:2.5rem}.hero-grid{gap:23px}.deck{font-size:1.1rem}.jump-nav .wrap{gap:20px;padding-block:12px}.jump-nav a{font-size:.81rem}main>section{padding-block:35px}.metric{padding:18px 13px 18px 0}.metric strong{font-size:1.9rem}.metric span{font-size:.79rem}.table-wrap th,.table-wrap td{padding:10px 9px}.schedule{min-width:650px}.source-card{padding:18px}.source-card h3{font-size:1.05rem}.path{font-size:.74rem}details.entry>summary{grid-template-columns:34px minmax(0,1fr) auto;gap:10px;padding:16px 14px}.entry-body{padding:5px 16px 20px}.speech-text{font-size:1rem}.note{padding:18px}.document-list>li{grid-template-columns:30px minmax(0,1fr);gap:10px}.contents{padding:18px}.markdown>h1{font-size:1.8rem}.markdown>h2,.lecture-shell .markdown>h2{font-size:1.65rem}.markdown>h3{font-size:1.15rem}.lecture-shell .markdown{font-size:1rem}.button,button.action{font-size:.86rem;padding:9px 13px}}
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 @media print{@page{margin:17mm}body{background:white;font-size:11pt}.wrap{width:100%;max-width:none}.jump-nav,.hero-links,.actions,.skip,.raw-source{display:none!important}h1{font-size:30pt}h2{font-size:21pt}h3{font-size:15pt}.hero{padding:20px 0}.hero-grid,.source-grid,.columns{display:block}.edition{margin-top:20px}main>section{padding-block:25px}details.entry{break-inside:auto;margin-bottom:15px}details.entry>summary{padding:12px;font-size:12pt}details.entry>summary:after{display:none}.entry-body{padding:0 12px 12px}details.entry:not([open])>.entry-body{display:block!important}details.entry{content-visibility:visible}.table-wrap{overflow:visible}.table-wrap table,.markdown .table-wrap table{min-width:0;font-size:9pt}.cover{max-height:130mm;object-fit:contain}.source-card{margin-bottom:15px;break-inside:avoid}a{color:inherit}.print-only{display:block}.contents ol{columns:1}.site-footer{padding-bottom:0}.metric strong{font-size:25pt}}
 @media print{.lecture-shell h2,.lecture-shell h3,.lecture-shell h4{break-after:avoid}.lecture-shell tr{break-inside:avoid}.lecture-shell thead{display:table-header-group}.lecture-shell .contents{background:transparent;border-left:0;padding:0}}
+@media(max-width:900px){.lecture-parts{grid-template-columns:minmax(0,1fr);gap:15px}.contents .toc-chapters{columns:1}.lecture-part{padding:18px 20px}.lecture-part h2{font-size:1.18rem}}
+@media print{.lecture-parts{display:block;margin:20px 0}.lecture-part{background:transparent;padding:12px 16px;margin-bottom:14px;break-inside:avoid}.lecture-part h2{font-size:14pt}.lecture-part p{font-size:11pt}.contents .toc-chapters{columns:1}.contents .toc-parts>li>a{break-after:avoid}}
 """
 
 JS = r"""
@@ -160,14 +163,56 @@ def rendered_markdown(text: str, prefix: str) -> tuple[str, list[tuple[str, str]
     return str(soup), headings
 
 
-def toc(headings: list[tuple[str, str]], title: str = "Содержание") -> str:
-    rows = "".join(f'<li><a href="#{esc(anchor)}">{esc(label)}</a></li>' for anchor, label in headings)
-    return f'<nav class="contents" id="lecture-contents" aria-label="{esc(title)}"><h2>{esc(title)}</h2><ol>{rows}</ol></nav>'
+def lecture_outline(rendered: str) -> list[dict]:
+    """Use the document's own H2/H3 hierarchy and explicit speaker attribution."""
+    soup = BeautifulSoup(rendered, "html.parser")
+    outline = []
+    current = None
+    attribution_re = re.compile(r"^(?:Исторический доклад|Совместный практический разбор|Практический разбор|Докладчики?)\s*:", re.I)
+    for heading in soup.find_all(["h2", "h3"], id=True):
+        item = {"id": heading["id"], "title": heading.get_text(" ", strip=True)}
+        if heading.name == "h2":
+            current = {**item, "children": [], "attribution": ""}
+            for sibling in heading.find_next_siblings():
+                if sibling.name in {"h2", "h3"}:
+                    break
+                if sibling.name == "p":
+                    text = sibling.get_text(" ", strip=True)
+                    if attribution_re.match(text):
+                        current["attribution"] = text
+                        break
+            outline.append(current)
+        elif current is not None and re.match(r"^\d+\.\s", item["title"]):
+            current["children"].append(item)
+    return outline
+
+
+def toc_rows(outline: list[dict]) -> str:
+    rows = []
+    for section in outline:
+        children = "".join(f'<li><a href="#{esc(child["id"])}">{esc(child["title"])}</a></li>' for child in section["children"])
+        nested = f'<ol class="toc-chapters">{children}</ol>' if children else ""
+        rows.append(f'<li><a href="#{esc(section["id"])}">{esc(section["title"])}</a>{nested}</li>')
+    return "".join(rows)
+
+
+def toc(outline: list[dict], title: str = "Содержание") -> str:
+    return f'<nav class="contents" id="lecture-contents" aria-label="{esc(title)}"><h2>{esc(title)}</h2><ol class="toc-parts">{toc_rows(outline)}</ol></nav>'
+
+
+def lecture_parts(outline: list[dict]) -> str:
+    parts = [section for section in outline if re.match(r"^Часть\s+[IVX]+\.", section["title"])]
+    cards = []
+    for part in parts:
+        if not part["attribution"]:
+            raise ValueError(f"Thematic block needs explicit speaker attribution in Markdown: {part['title']}")
+        cards.append(f'<article class="lecture-part"><h2><a href="#{esc(part["id"])}">{esc(part["title"])}</a></h2><p>{esc(part["attribution"])}</p></article>')
+    return f'<section class="lecture-parts" aria-label="Основные тематические блоки">{"".join(cards)}</section>' if cards else ""
 
 
 def shell(title: str, description: str, body: str, date_label: str, *, reader: bool = False) -> str:
-    author = "Виталий Пиков" if reader else "Vitaliy Pikov"
-    masthead = "Виталий Пиков<br>Учебная лекция по безопасной разработке" if reader else f"Secure Software Development in Practice<br>Материалы автора · {esc(date_label)}"
+    author = "Виталий Пиков — составитель" if reader else "Vitaliy Pikov"
+    masthead = "Учебные материалы<br>по безопасной разработке" if reader else f"Secure Software Development in Practice<br>Материалы автора · {esc(date_label)}"
     footer = "Безопасная разработка программного обеспечения" if reader else "Материалы доступны в этом HTML без подключения к сети. Внешние источники открываются по ссылкам."
     return f'''<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -225,16 +270,16 @@ def markdown_archive(paths: list[Path]) -> tuple[str, list[dict]]:
     return "".join(entries), manifest
 
 
-def lecture_content(text: str) -> tuple[str, str, str, list[tuple[str, str]]]:
+def lecture_content(text: str) -> tuple[str, str, str, list[dict]]:
     """Move the Markdown title into the reader's page hero, without duplicating it."""
-    rendered, headings = rendered_markdown(text, "lecture")
+    rendered, _ = rendered_markdown(text, "lecture")
     soup = BeautifulSoup(rendered, "html.parser")
     title_node = soup.find("h1")
     title = title_node.get_text(" ", strip=True) if title_node else "Безопасная разработка: история стандартов и организация работы"
     title_id = str(title_node.get("id", "lecture-title")) if title_node else "lecture-title"
     if title_node:
         title_node.decompose()
-    return title, title_id, str(soup), headings
+    return title, title_id, str(soup), lecture_outline(rendered)
 
 
 def build_lecture(date_label: str, text: str) -> str:
@@ -243,10 +288,11 @@ def build_lecture(date_label: str, text: str) -> str:
     body = f'''<div class="hero wrap"><span class="eyebrow">Безопасная разработка / история и практика</span>
 <h1 id="{esc(title_id)}">{esc(title)}</h1>
 <p class="deck">Как развивались методологии безопасной разработки, почему появились национальные стандарты и как связать требования с повседневной инженерной работой.</p>
+{lecture_parts(headings)}
 <div class="hero-links"><a class="button" href="#lecture-text">Читать лекцию</a><a class="button secondary" href="#lecture-contents">Содержание</a><a class="button secondary" href="data:text/markdown;charset=utf-8;base64,{markdown_download}" download="безопасная-разработка-история-стандартов-и-процессы.md">Лекция в Markdown</a></div></div>
 <main class="wrap lecture-shell" id="main"><section id="lecture-content">
 {toc(headings)}<article class="markdown" id="lecture-text">{rendered}</article></section></main>'''
-    return shell(f"{title} · Виталий Пиков", "Учебная лекция о развитии SDL, истории ГОСТ Р 56939 и организации безопасной разработки программного обеспечения.", body, date_label, reader=True)
+    return shell(f"{title} · pikov.expert", "Учебные материалы об истории национального стандарта и практическом применении ГОСТ в безопасной разработке программного обеспечения.", body, date_label, reader=True)
 
 
 def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -> tuple[str, dict]:
@@ -255,8 +301,8 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
     total_words = sum(len(WORD_RE.findall(slide["notes"])) for slide in slides)
     archive, manifest = markdown_archive(paths)
     lecture_text = LECTURE_MD.read_text(encoding="utf-8")
-    _, lecture_headings = rendered_markdown(lecture_text, "doc-01")
-    lecture_topics = "".join(f'<li><a href="#{esc(anchor)}">{esc(label)}</a></li>' for anchor, label in lecture_headings)
+    lecture_rendered, _ = rendered_markdown(lecture_text, "doc-01")
+    lecture_topics = toc_rows(lecture_outline(lecture_rendered))
     cover_file = ROOT / data["cover"]
     cover = base64.b64encode(cover_file.read_bytes()).decode("ascii")
     rows = []
@@ -297,10 +343,10 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
 </tbody></table></div>
 <div class="note"><h3>Основания исторических утверждений</h3><p>Формальные даты, статус редакций и нормативные требования опираются на проверочные источники. История подготовки стандарта отделена от требований окончательных редакций. Подробные основания приведены в библиографии лекции и исследовательских заметках.</p></div>
 <p class="notice" id="qa-status">{esc(qa_text)}</p></section>
-<section id="transcript"><span class="section-label">Учебный материал / Виталий Пиков</span><h2>История стандартов и организация безопасной разработки</h2>
-<p class="section-intro">Самостоятельная лекция рассматривает развитие SDL, появление ГОСТ Р 56939 и переход к управляемым процессам. Каждый раздел раскрывает тему через объяснения, примеры и практические следствия для команды.</p>
+<section id="transcript"><span class="section-label">Учебные материалы / составитель Виталий Пиков</span><h2>История стандартов и организация безопасной разработки</h2>
+<p class="section-intro">В учебном материале сохранены два основных блока: исторический доклад и совместный практический разбор. Введение, практикум, вопросы и библиография помогают изучить материал последовательно и применить его в работе команды.</p>
 <div class="hero-links"><a class="button" href="http://127.0.0.1:8765/PVS-2025-07-02-lecture.html">Отдельная лекция в локальном браузере</a><a class="button secondary" href="{esc(LECTURE_MD.as_uri())}">Markdown лекции</a><a class="button secondary" href="#archive-01">Читать здесь без сети</a></div>
-<nav class="contents" aria-label="Темы учебной лекции"><h3 style="margin-top:0">Содержание лекции</h3><ol>{lecture_topics}</ol></nav>
+<nav class="contents" aria-label="Темы учебной лекции"><h3 style="margin-top:0">Содержание лекции</h3><ol class="toc-parts">{lecture_topics}</ol></nav>
 <details class="raw-source" id="history-source-files"><summary>Первичные материалы для работы автора</summary><div class="source-grid">{source_file_cards()}</div></details></section>
 <section id="cover"><span class="section-label">Серия / единый визуальный стиль</span><h2 lang="en">{esc(data['title'])}</h2><p class="section-intro" lang="en">{esc(data['subtitle'])}</p><img class="cover" src="data:image/png;base64,{cover}" alt="Обложка EP01 с портретом Vitaliy Pikov"><p class="caption">Бренд серии сохранён. Содержание слайдов и речь обновляются из Markdown-источника.</p></section>
 <section id="schedule"><span class="section-label">Обновлённый сценарий</span><h2>План выпуска · {duration(total_seconds)}</h2>
