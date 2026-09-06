@@ -688,32 +688,37 @@ window.EP01_DATA = {
     },
     {
       "id": 20,
-      "title": "Build your first planning page",
+      "title": "Security Training That Changes Engineering Decisions",
       "seconds": 90,
-      "section": "Take it to your team",
+      "section": "Stay in touch · Next episode",
       "kicker": "EP01 / 20",
       "layout": "closing",
-      "lead": "Start with one product and five connected records",
+      "lead": "Next: EP02 · Employee training · GOST R 56939-2024, clause 5.2",
       "items": [
         {
-          "label": "This week",
-          "text": "Choose a product, describe the baseline and justify the scope"
+          "label": "Roles & skills",
+          "text": "What each person needs to learn"
         },
         {
-          "label": "Next action",
-          "text": "Name an owner, reserve capacity and define reviewable evidence"
+          "label": "Practical learning",
+          "text": "A short exercise before and after training"
         },
         {
-          "label": "Next episode",
-          "text": "Train the people who will do the work · GOST 5.2"
+          "label": "Evidence of progress",
+          "text": "Look beyond attendance to demonstrated skills"
         }
       ],
       "quote": "",
-      "notes": "Today, we looked at selected historical milestones, learned how to read the Russian standard, and used its first process to organize a small improvement effort.\n\nThe historical lesson is that secure development involves design principles and sustained organizational work. The practical lesson is that a plan connects the current situation to actions the team can actually perform and review.\n\nFor your own exercise, choose one product or component. Describe the current state and justify the scope. Record the resource assumptions. Identify the next improvement and connect it to an implementation task with an owner, a date, and expected evidence.\n\nThe accompanying Markdown materials include a planning example, a blank worksheet, the source notes, and the full script. Use them as a starting point and adapt them to your environment.\n\nIn the next episode, we will examine training: how the people responsible for secure development gain and maintain the skills they need. Thank you for joining me. Which part of planning is hardest in your team: scope, ownership, capacity, or keeping the plan current?",
+      "notes": "Today, we explored the history of secure development, learned how to read the Russian standard, and used its first process to organize a practical improvement effort.\n\nYour next step is simple: choose one product and start your planning page. Describe the current state, identify the next improvement, and connect it to an owner, available capacity, and reviewable evidence. The accompanying worksheet will help you get started.\n\nI am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch and share the questions you would like this series to explore.\n\nThe next episode is called Security Training That Changes Engineering Decisions. We will examine employee training under clause five point two: what different roles need to learn, how to practise those skills, and what evidence can show progress beyond attendance.\n\nWe will build a role and skills matrix and use a short exercise before and after training. Which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.",
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "contact": {
+        "name": "Vitaliy Pikov",
+        "label": "pikov.expert",
+        "url": "https://pikov.expert"
+      }
     }
   ]
 };

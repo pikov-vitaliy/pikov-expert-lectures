@@ -111,6 +111,22 @@
     parent.append(quote);
   }
 
+  function appendContact(parent, contact) {
+    if (!contact) return;
+    const href = safeLink(contact.url);
+    if (!href) return;
+    const block = element("div", "closing-contact");
+    const identity = element("div", "contact-identity");
+    identity.append(element("p", "contact-caption", "Your host · Stay in touch"),
+      element("p", "contact-name", contact.name));
+    const link = element("a", "contact-website", contact.label);
+    link.href = href;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    block.append(identity, link);
+    parent.append(block);
+  }
+
   function footer(slide, index) {
     const foot = element("footer", "slide-footer");
     const refs = element("div", "slide-source-links");
@@ -165,6 +181,7 @@
     const content = element("div", "slide-content");
     appendItems(content, Array.isArray(slide.items) ? slide.items : [], layout, slide.title);
     appendQuote(content, slide.quote);
+    appendContact(content, slide.contact);
     contentRoot.append(content, footer(slide, index));
     section.append(panel);
 

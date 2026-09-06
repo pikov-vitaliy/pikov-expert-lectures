@@ -44,6 +44,10 @@ for block in re.split(r'^## ', (ROOT / 'EP01-script-en.md').read_text(encoding='
                        layout=field(block, 'Layout'), lead=field(block, 'Lead'),
                        items=items, quote='', notes=speech,
                        sourceIds=[s.strip() for s in field(block, 'Sources').split(',')]))
+    if re.search(r'^Contact: ', block, re.M):
+        name, label, url = field(block, 'Contact').split(' | ', 2)
+        assert url.startswith('https://'), 'Contact website must use HTTPS'
+        slides[-1]['contact'] = dict(name=name, label=label, url=url)
 
 assert [s['id'] for s in slides] == list(range(1, 21)), 'Expected 20 ordered slides'
 assert sum(s['seconds'] for s in slides) == 1800, 'Timing must sum to 30:00'

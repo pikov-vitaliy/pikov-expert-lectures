@@ -435,24 +435,25 @@ For this team, I would review the plan after ninety days and after a material ch
 The practical test is whether another team member can use the plan to understand the next action. If only its author can explain it, the plan needs more work.
 Cue: Дать зрителю 3–4 секунды на четыре вопроса. Период и триггеры пересмотра — авторский пример.
 
-## 20 | Build your first planning page
+## 20 | Security Training That Changes Engineering Decisions
 Seconds: 90
-Section: Take it to your team
+Section: Stay in touch · Next episode
 Layout: closing
-Lead: Start with one product and five connected records
+Lead: Next: EP02 · Employee training · GOST R 56939-2024, clause 5.2
+Contact: Vitaliy Pikov | pikov.expert | https://pikov.expert
 Items:
-- This week | Choose a product, describe the baseline and justify the scope
-- Next action | Name an owner, reserve capacity and define reviewable evidence
-- Next episode | Train the people who will do the work · GOST 5.2
+- Roles & skills | What each person needs to learn
+- Practical learning | A short exercise before and after training
+- Evidence of progress | Look beyond attendance to demonstrated skills
 Sources: G24, EX
 Speech:
-Today, we looked at selected historical milestones, learned how to read the Russian standard, and used its first process to organize a small improvement effort.
+Today, we explored the history of secure development, learned how to read the Russian standard, and used its first process to organize a practical improvement effort.
 
-The historical lesson is that secure development involves design principles and sustained organizational work. The practical lesson is that a plan connects the current situation to actions the team can actually perform and review.
+Your next step is simple: choose one product and start your planning page. Describe the current state, identify the next improvement, and connect it to an owner, available capacity, and reviewable evidence. The accompanying worksheet will help you get started.
 
-For your own exercise, choose one product or component. Describe the current state and justify the scope. Record the resource assumptions. Identify the next improvement and connect it to an implementation task with an owner, a date, and expected evidence.
+I am Vitaliy Pikov. You can find me at pikov dot expert. Please keep in touch and share the questions you would like this series to explore.
 
-The accompanying Markdown materials include a planning example, a blank worksheet, the source notes, and the full script. Use them as a starting point and adapt them to your environment.
+The next episode is called Security Training That Changes Engineering Decisions. We will examine employee training under clause five point two: what different roles need to learn, how to practise those skills, and what evidence can show progress beyond attendance.
 
-In the next episode, we will examine training: how the people responsible for secure development gain and maintain the skills they need. Thank you for joining me. Which part of planning is hardest in your team: scope, ownership, capacity, or keeping the plan current?
-Cue: Завершить вопросом для комментариев, выдержать паузу. Ссылку на материалы добавить в описание после публикации.
+We will build a role and skills matrix and use a short exercise before and after training. Which engineering decision would you most like your security training to improve? Thank you for watching. See you in episode two.
+Cue: Произнести «pikov dot expert», выдержать паузу у адреса. Название EP02 прочитать полностью. В конце оставить слайд с контактом и анонсом на несколько секунд; дата выпуска пока не объявлена.
