@@ -51,24 +51,24 @@ Next episode: **Security Training That Changes Engineering Decisions** — emplo
 
 ```text
 00:00 Where secure development begins
-01:00 The series and its practical promise
-04:00 A release problem in a fictional C++ team
-06:00 Methodology publications and different operating models
-09:00 The problem behind the Russian standard
-11:00 Research, drafts, approval and effective date
-13:00 Authors, reviewers and intended users
-14:30 The original plan for a family of standards
-16:00 International connections and the SSDF timeline
-18:00 Two editions: structure and requirement wording
-19:30 From a tool run to a maintained process
-21:00 Shared practices and effectiveness evidence
-22:30 Our comparison method
-24:00 The five planning requirements
-30:00 Two plans, two questions
-31:30 A 90-day planning example
-35:00 The first international crosswalk
-37:00 Applying the plan to the release decision
-38:30 Stay in touch and the next episode
+01:05 The series and its practical promise
+04:15 A release problem in a fictional C++ team
+06:15 Methodology publications and different operating models
+09:35 The problem behind the Russian standard
+11:10 Research, drafts, approval and effective date
+12:55 Authors, reviewers and intended users
+14:40 The original plan for a family of standards
+16:15 International connections and the SSDF timeline
+18:20 Two editions: structure and requirement wording
+20:05 From a tool run to a maintained process
+21:45 Shared practices and effectiveness evidence
+23:15 Our comparison method
+25:05 The five planning requirements
+31:40 Two plans, two questions
+33:20 A 90-day planning example
+37:10 The first international crosswalk
+39:00 Applying the plan to the release decision
+40:35 Stay in touch and the next episode
 ```
 
 ## Pinned comment draft

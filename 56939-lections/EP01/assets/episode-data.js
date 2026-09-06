@@ -106,7 +106,7 @@ window.EP01_DATA = {
     {
       "id": 1,
       "title": "Where secure development begins",
-      "seconds": 60,
+      "seconds": 65,
       "section": "Welcome",
       "kicker": "EP01 / 01",
       "layout": "cover",
@@ -126,7 +126,7 @@ window.EP01_DATA = {
     {
       "id": 2,
       "title": "One process. One useful result.",
-      "seconds": 90,
+      "seconds": 95,
       "section": "The series",
       "kicker": "EP01 / 02",
       "layout": "cards",
@@ -154,7 +154,7 @@ window.EP01_DATA = {
     {
       "id": 3,
       "title": "Twenty-five processes, connected",
-      "seconds": 90,
+      "seconds": 95,
       "section": "The series",
       "kicker": "EP01 / 03",
       "layout": "steps",
@@ -212,7 +212,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nThe tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nAn organization may already use an analyzer, yet still need to examine its coverage, configuration, and follow-up. Before proposing another purchase, find out what the team already does and where the actual gap is.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
+      "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nLook at the break between the finding and the investigation. The tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nAn organization may already use an analyzer, yet still need to examine its coverage, configuration, and follow-up. Before proposing another purchase, find out what the team already does and where the actual gap is.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
       "sourceIds": [
         "EX"
       ],
@@ -226,7 +226,7 @@ window.EP01_DATA = {
     {
       "id": 5,
       "title": "A landscape of secure development methods",
-      "seconds": 90,
+      "seconds": 105,
       "section": "The methodology landscape",
       "kicker": "EP01 / 05",
       "layout": "timeline",
@@ -275,7 +275,7 @@ window.EP01_DATA = {
     {
       "id": 6,
       "title": "Different ways to organize the work",
-      "seconds": 90,
+      "seconds": 95,
       "section": "The methodology landscape",
       "kicker": "EP01 / 06",
       "layout": "cards",
@@ -307,7 +307,7 @@ window.EP01_DATA = {
     {
       "id": 7,
       "title": "Before the standard: a practical problem",
-      "seconds": 120,
+      "seconds": 95,
       "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 07",
       "layout": "cards",
@@ -336,7 +336,7 @@ window.EP01_DATA = {
     {
       "id": 8,
       "title": "The route from research to publication",
-      "seconds": 120,
+      "seconds": 105,
       "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 08",
       "layout": "timeline",
@@ -376,7 +376,7 @@ window.EP01_DATA = {
     {
       "id": 9,
       "title": "Who wrote it, and who was it for?",
-      "seconds": 90,
+      "seconds": 105,
       "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 09",
       "layout": "cards",
@@ -409,7 +409,7 @@ window.EP01_DATA = {
     {
       "id": 10,
       "title": "A wider plan than one published document",
-      "seconds": 90,
+      "seconds": 95,
       "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 10",
       "layout": "compare",
@@ -439,7 +439,7 @@ window.EP01_DATA = {
     {
       "id": 11,
       "title": "GOST in the international context",
-      "seconds": 120,
+      "seconds": 125,
       "section": "The origins of GOST R 56939",
       "kicker": "EP01 / 11",
       "layout": "compare",
@@ -478,11 +478,11 @@ window.EP01_DATA = {
     {
       "id": 12,
       "title": "Two editions, different structures",
-      "seconds": 90,
+      "seconds": 105,
       "section": "From the 2016 edition to 2024",
       "kicker": "EP01 / 12",
       "layout": "cards",
-      "lead": "Re-read the final text before claiming equivalence",
+      "lead": "The same source term has different normative force",
       "items": [
         {
           "label": "2016 edition",
@@ -502,22 +502,22 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The two editions organize related engineering work differently.\n\nSection five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.\n\nThere is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. An English translation must preserve the force assigned by the relevant edition.\n\nThat is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.\n\nThe twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.",
+      "notes": "The two editions organize related engineering work differently.\n\nSection five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.\n\nThere is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. These labels describe the force of that specific term. An English translation must preserve the force assigned by the relevant edition.\n\nThat is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.\n\nThe twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.",
       "sourceIds": [
         "G16",
         "G24"
       ],
       "visual": {
         "id": "slide-12",
-        "src": "assets/visuals/slide-12.svg?v=244084dc6146",
+        "src": "assets/visuals/slide-12.svg?v=5d66ca91925b",
         "alt": "The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.",
-        "caption": "Read the structure and wording rules of the edition you actually use."
+        "caption": "These labels compare the normative force of one term in the original text."
       }
     },
     {
       "id": 13,
       "title": "A process continues after the first tool run",
-      "seconds": 90,
+      "seconds": 100,
       "section": "From the 2016 edition to 2024",
       "kicker": "EP01 / 13",
       "layout": "steps",
@@ -541,7 +541,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "A process requires more than a new heading. It organizes work that continues over time, with clear responsibilities, repeatable actions, and results that inform the next cycle.\n\nA memorable example is buying an analysis tool for a short period just before a release. That may produce a report. It does not automatically establish a maintained process for examining changes, reviewing findings, fixing problems, and checking the result again.\n\nFor our importer team, define the trigger, the owner, the recorded evidence, and the feedback into the next cycle. A relevant code change could trigger analysis. A named engineer could review the findings. The record should connect the finding and decision to the product version.\n\nTrigger, ownership, evidence, and feedback give us a practical way to examine a process. The twenty sixteen edition already addressed lifecycle work, internal checks, and improvement.\n\nThe practical lesson is that a tool becomes useful within an organized way of working. Planning gives the team the capacity and agreements needed to sustain that work.",
+      "notes": "A process requires more than a new heading. It organizes work that continues over time, with clear responsibilities, repeatable actions, and results that inform the next cycle.\n\nA memorable example is buying an analysis tool for a short period just before a release. That may produce a report. It does not automatically establish a maintained process for examining changes, reviewing findings, fixing problems, and checking the result again.\n\nFollow the loop for our importer team. A relevant code change triggers analysis. A named engineer performs the check and reviews the findings. The team records a decision, then reviews what should change before the next cycle. At the centre, the evidence connects the finding and decision to the product version.\n\nTrigger, ownership, evidence, and feedback give us a practical way to examine a process. The twenty sixteen edition already addressed lifecycle work, internal checks, and improvement.\n\nThe practical lesson is that a tool becomes useful within an organized way of working. Planning gives the team the capacity and agreements needed to sustain that work.",
       "sourceIds": [
         "G24",
         "EX"
@@ -586,7 +586,7 @@ window.EP01_DATA = {
     {
       "id": 15,
       "title": "Compare obligations, not labels",
-      "seconds": 90,
+      "seconds": 110,
       "section": "Our comparison method",
       "kicker": "EP01 / 15",
       "layout": "steps",
@@ -610,7 +610,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.\n\nWe also preserve the strength of the original wording. Clause four point seven of the twenty twenty-four GOST defines which wording expresses a required condition. When translating such a condition, we must convey a requirement rather than turn it into an optional recommendation.\n\nOn the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.\n\nOur conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.\n\nThis lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.",
+      "notes": "Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.\n\nWe also preserve the strength of the original wording. Clause four point seven of the twenty twenty-four GOST defines which wording expresses a required condition. When translating such a condition, we must convey a requirement rather than turn it into an optional recommendation.\n\nOn the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.\n\nThird, we demonstrate one concrete implementation and identify the records that would let another person verify the result.\n\nOur conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.\n\nThis lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.",
       "sourceIds": [
         "G24",
         "N11"
@@ -625,7 +625,7 @@ window.EP01_DATA = {
     {
       "id": 16,
       "title": "What process 5.1 asks for",
-      "seconds": 90,
+      "seconds": 105,
       "section": "Planning secure development",
       "kicker": "EP01 / 16",
       "layout": "steps",
@@ -667,7 +667,7 @@ window.EP01_DATA = {
     {
       "id": 17,
       "title": "Start with a defensible scope",
-      "seconds": 90,
+      "seconds": 100,
       "section": "Planning secure development",
       "kicker": "EP01 / 17",
       "layout": "table",
@@ -706,7 +706,7 @@ window.EP01_DATA = {
     {
       "id": 18,
       "title": "Assess reality and assign owners",
-      "seconds": 90,
+      "seconds": 95,
       "section": "Planning secure development",
       "kicker": "EP01 / 18",
       "layout": "cards",
@@ -739,7 +739,7 @@ window.EP01_DATA = {
     {
       "id": 19,
       "title": "Resources include human attention",
-      "seconds": 90,
+      "seconds": 95,
       "section": "Planning secure development",
       "kicker": "EP01 / 19",
       "layout": "cards",
@@ -763,7 +763,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Resource planning includes the time to configure checks, investigate findings, maintain the workflow, and teach people how to use it.\n\nFor our fictional ninety-day effort, we reserve sixty engineering hours, twenty-four AppSec hours, and twelve hours for release coordination and sponsor decisions. The total is ninety-six person-hours.\n\nThese figures are a teaching example. They are neither a benchmark nor a percentage required by GOST. There is no universal percentage that can replace an estimate of the actual work.\n\nTools, infrastructure, and additional training costs need their own assessment. Dependencies matter too. If the build engineer is unavailable during the first month, the schedule must reflect that. Assigning a task does not create capacity.\n\nThe standard's resource-analysis artifact may contain estimated material and human resource indicators. Our table makes those assumptions discussable. Ask the people doing the work whether the estimate is credible, show it to those deciding priorities, and agree when to revise it. Human attention is part of the resource plan.",
+      "notes": "Resource planning includes the time to configure checks, investigate findings, maintain the workflow, and teach people how to use it.\n\nFor our fictional ninety-day effort, we reserve sixty engineering hours, twenty-four AppSec hours, and twelve hours for release coordination and sponsor decisions. The total is ninety-six person-hours.\n\nThese figures are a teaching example. They are neither a benchmark nor a percentage required by GOST. There is no universal percentage that can replace an estimate of the actual work.\n\nTools, infrastructure, and additional training costs need their own assessment. Dependencies matter too. If the build engineer is unavailable during the first month, the schedule must reflect that. Assigning a task does not create capacity.\n\nThe standard's resource-analysis artifact may contain estimated material and human resource indicators. The chart makes those assumptions discussable. Ask the people doing the work whether the estimate is credible, show it to those deciding priorities, and agree when to revise it. Human attention is part of the resource plan.",
       "sourceIds": [
         "G24",
         "EX"
@@ -778,7 +778,7 @@ window.EP01_DATA = {
     {
       "id": 20,
       "title": "Two plans, two questions",
-      "seconds": 90,
+      "seconds": 100,
       "section": "Planning secure development",
       "kicker": "EP01 / 20",
       "layout": "compare",
@@ -798,7 +798,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Planning gives the team, its managers, and the people requesting the product a shared language. Two related plans help them agree both the direction and the work.\n\nThe improvement plan describes how processes will develop. It sets priorities and the sequence of changes, considering available resources. Our team might make parser analysis repeatable, improve the handling of findings, and then review the results.\n\nThe implementation plan identifies goals, stages, dates, resources, and responsible people. A task can specify the parser target, integration milestone, owner, and expected evidence.\n\nThe standard allows these plans to be represented in a task management system. A roadmap with linked tasks can preserve their different purposes without creating disconnected documents.\n\nThe practical test is traceability. Why was this change selected? Which resource assumption supports it? Who performs it? What shows that a stage is complete? A planning page becomes useful when the team can follow those connections and act on them.",
+      "notes": "Planning gives the team, its managers, and the people requesting the product a shared language. Two related plans help them agree both the direction and the work.\n\nThe improvement plan describes how processes will develop. It sets priorities and the sequence of changes, considering available resources. Our team might make parser analysis repeatable, improve the handling of findings, and then review the results.\n\nThe implementation plan identifies goals, stages, dates, resources, and responsible people. In the middle of the diagram, a task specifies the parser target, integration milestone and owner. On the right, the evidence records coverage and the review of findings.\n\nThe standard allows these plans to be represented in a task management system. A roadmap with linked tasks can preserve their different purposes without creating disconnected documents.\n\nThe practical test is traceability. Why was this change selected? Which resource assumption supports it? Who performs it? What shows that a stage is complete? A planning page becomes useful when the team can follow those connections and act on them.",
       "sourceIds": [
         "G24",
         "EX"
@@ -813,7 +813,7 @@ window.EP01_DATA = {
     {
       "id": 21,
       "title": "A 90-day plan for the importer",
-      "seconds": 120,
+      "seconds": 135,
       "section": "Worked example",
       "kicker": "EP01 / 21",
       "layout": "timeline",
@@ -848,7 +848,7 @@ window.EP01_DATA = {
     {
       "id": 22,
       "title": "Five linked records of evidence",
-      "seconds": 90,
+      "seconds": 95,
       "section": "Worked example",
       "kicker": "EP01 / 22",
       "layout": "steps",
@@ -891,7 +891,7 @@ window.EP01_DATA = {
     {
       "id": 23,
       "title": "A first international crosswalk",
-      "seconds": 120,
+      "seconds": 110,
       "section": "Comparison result",
       "kicker": "EP01 / 23",
       "layout": "compare",
@@ -927,7 +927,7 @@ window.EP01_DATA = {
     {
       "id": 24,
       "title": "Would this survive Friday's release?",
-      "seconds": 90,
+      "seconds": 95,
       "section": "Apply it",
       "kicker": "EP01 / 24",
       "layout": "cards",
@@ -966,7 +966,7 @@ window.EP01_DATA = {
     {
       "id": 25,
       "title": "Security Training That Changes Engineering Decisions",
-      "seconds": 90,
+      "seconds": 105,
       "section": "Stay in touch · Next episode",
       "kicker": "EP01 / 25",
       "layout": "closing",

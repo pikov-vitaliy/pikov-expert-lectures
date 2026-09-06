@@ -121,7 +121,7 @@
 {
   "id": "slide-12", "kind": "editions", "lang": "en",
   "alt": "The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.",
-  "caption": "Read the structure and wording rules of the edition you actually use.",
+  "caption": "These labels compare the normative force of one term in the original text.",
   "sourceIds": ["G16", "G24"],
   "nodes": [
     {"label": "2016", "title": "9 groups of measures", "detail": "Recommendation · clause 4.2"},

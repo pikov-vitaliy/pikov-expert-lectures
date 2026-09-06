@@ -1,13 +1,13 @@
 # EP01 — Where Secure Development Begins
 
 Full spoken English script. Author: Vitaliy Pikov. Prepared: 2026-09-06.
-Target: 40:00, including pauses and slide changes. Timings are rehearsal targets, not a measured recording. Text after `Speech:` is spoken; metadata and `Cue:` are not. `Visual:` and the adjacent image identify the SVG replacing the on-screen list; `Items:` remain its text alternative. Visual labels and source notes are maintained in [EP01-visuals.md](EP01-visuals.md).
+Target: 42:20, including pauses and slide changes. Timings are rehearsal targets, not a measured recording. Text after `Speech:` is spoken; metadata and `Cue:` are not. `Visual:` and the adjacent image identify the SVG replacing the on-screen list; `Items:` remain its text alternative. Visual labels and source notes are maintained in [EP01-visuals.md](EP01-visuals.md).
 Working translations of GOST clauses are the author's, not an official English translation.
 
 An introduction to the history of secure development, the two editions of GOST R 56939, and practical process planning. Historical accounts are attributed; requirements refer to the stated editions of the standards.
 
 ## 01 | Where secure development begins
-Seconds: 60
+Seconds: 65
 Section: Welcome
 Layout: cover
 Lead: History, GOST and a working process
@@ -25,7 +25,7 @@ Today, we will look at the history behind the subject, learn how to read this st
 Cue: Улыбка, короткая пауза после вопроса. Не читать цифровой номер слишком быстро.
 
 ## 02 | One process. One useful result.
-Seconds: 90
+Seconds: 95
 Section: The series
 Layout: cards
 Lead: A practical question for every episode
@@ -47,7 +47,7 @@ By the end of an episode, you should have something useful to discuss with your 
 Cue: Личный мотив произнести спокойно, без извинений за английский. Архивное происхождение подтверждено презентацией 2025 года.
 
 ## 03 | Twenty-five processes, connected
-Seconds: 90
+Seconds: 95
 Section: The series
 Layout: steps
 Visual: slide-03
@@ -94,7 +94,7 @@ Let us begin with a small fictional team. It develops a C++ tool that imports en
 
 On Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.
 
-The tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.
+Look at the break between the finding and the investigation. The tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.
 
 We cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.
 
@@ -104,7 +104,7 @@ Keep this team in mind. At the end of the episode, we will return to Friday's re
 Cue: История вымышленная. Не говорить, что это конкретный проект заказчика или реальный инцидент. Визуальная опора: A file reaches the C++ parser, analysis produces a finding, and the path toward investigation and a release decision is interrupted by unclear ownership and capacity.
 
 ## 05 | A landscape of secure development methods
-Seconds: 90
+Seconds: 105
 Section: The methodology landscape
 Layout: timeline
 Visual: slide-05
@@ -132,7 +132,7 @@ The picture is a landscape of different ways to organize secure development. We 
 Cue: Все годы на шкале — выбранные публикации/редакции. В локальном PDF Figure 2 и Table II имеют расхождения; наша шкала собрана по Table II с явными подписями. Не переносить рисунок целиком. Визуальная опора: Selected publication and edition milestones: lifecycle research in 2004; SDL, Touchpoints and CLASP publications in 2006; SDL-Agile guidance v5.2 in 2012; Singapore Security-by-Design in 2017; SAMM v2.0 in 2020; SSDF v1.1 in 2022.
 
 ## 06 | Different ways to organize the work
-Seconds: 90
+Seconds: 95
 Section: The methodology landscape
 Layout: cards
 Lead: What the reviewed approaches emphasize
@@ -155,7 +155,7 @@ For our importer team, the shared questions are recognizable: which activity do 
 Cue: Это характеристика рассмотренных в обзоре редакций, не исчерпывающее описание современных frameworks. Bucket объяснить как группу периодических работ; не как произвольное пропускание проверок.
 
 ## 07 | Before the standard: a practical problem
-Seconds: 120
+Seconds: 95
 Section: The origins of GOST R 56939
 Layout: cards
 Lead: The practical problem behind the national standard
@@ -177,7 +177,7 @@ For our series, the useful question is the problem the authors were trying to so
 Cue: TRANS 00:08:01–00:14:32. Около 2009 — воспоминание участника, не дата утверждённого документа. Не объявлять отсутствие требований во всём мире.
 
 ## 08 | The route from research to publication
-Seconds: 120
+Seconds: 105
 Section: The origins of GOST R 56939
 Layout: timeline
 Visual: slide-08
@@ -207,7 +207,7 @@ This distinction also helps us read later revisions. A working draft can contain
 Cue: TRANS 00:17:33–00:20:19; PDF истории с.4; предисловие ГОСТ 2016 и карточка Росстандарта. В речи не повторять «принят Минюстом» и ошибочный май 2016. Визуальная опора: GOST development milestones: research began in April 2013 and a first draft followed in August; review and revision continued in 2014–2015; Rosstandart approved the standard on 1 June 2016; it became effective on 1 June 2017. Project milestones come from Varenitsa's historical account, while the final two dates are formal publication facts.
 
 ## 09 | Who wrote it, and who was it for?
-Seconds: 90
+Seconds: 105
 Section: The origins of GOST R 56939
 Layout: cards
 Lead: Formal authorship, consultation and intended users play different roles
@@ -232,7 +232,7 @@ The standard, a team's implementation, and a particular certification scheme rem
 Cue: TRANS 00:19:00–00:24:25, 01:14:03–01:17:27. Формальное авторство — предисловие 2016. Не превращать целевую аудиторию в обещание универсальной сертификационной процедуры.
 
 ## 10 | A wider plan than one published document
-Seconds: 90
+Seconds: 95
 Section: The origins of GOST R 56939
 Layout: compare
 Lead: The original ambition and the published record answer different questions
@@ -256,7 +256,7 @@ For a development team, the practical distinction is between an adopted requirem
 Cue: TRANS 00:09:41–00:11:06, 00:18:19–00:20:19, 00:29:25. Не называть внутренние версии 2018/2019/2020/2022 опубликованными редакциями ГОСТ.
 
 ## 11 | GOST in the international context
-Seconds: 120
+Seconds: 125
 Section: The origins of GOST R 56939
 Layout: compare
 Visual: slide-11
@@ -287,11 +287,11 @@ Our comparison asks a more useful question: which engineering concerns are share
 Cue: TRANS 00:10:19–00:14:32; PDF истории с.3/22. NIST: 11.06.2019 draft, 23.04.2020 final1.0, 03.02.2022 final1.1. Не повторять ошибку пересказа «ГОСТ основан на SSDF» и неподтверждённое мировое первенство. Визуальная опора: On a common time axis, GOST R 56939 was approved in 2016; the first public SSDF draft appeared in 2019, final SSDF 1.0 in 2020, and final SSDF 1.1 in 2022. The timeline does not assert ancestry between the documents.
 
 ## 12 | Two editions, different structures
-Seconds: 90
+Seconds: 105
 Section: From the 2016 edition to 2024
 Layout: cards
 Visual: slide-12
-Lead: Re-read the final text before claiming equivalence
+Lead: The same source term has different normative force
 Items:
 - 2016 edition | Nine groups of measures · clauses 5.1–5.9
 - 2024 edition | Twenty-five named processes · clauses 5.1–5.25
@@ -300,14 +300,14 @@ Items:
 Sources: G16, G24
 ![The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.](assets/visuals/slide-12.svg)
 
-*Read the structure and wording rules of the edition you actually use.*
+*These labels compare the normative force of one term in the original text.*
 
 Speech:
 The two editions organize related engineering work differently.
 
 Section five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.
 
-There is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. An English translation must preserve the force assigned by the relevant edition.
+There is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. These labels describe the force of that specific term. An English translation must preserve the force assigned by the relevant edition.
 
 That is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.
 
@@ -315,7 +315,7 @@ The twenty twenty-four edition was approved in October and became effective in D
 Cue: Оглавление и п.4.2 ГОСТ2016; оглавление и п.4.7 ГОСТ2024. В записи «14 мер» не совпадает с девятью группами финального оглавления. 2024: утверждён24.10, действует20.12. Английский перевод модальности пояснить по конкретной редакции. Визуальная опора: The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.
 
 ## 13 | A process continues after the first tool run
-Seconds: 90
+Seconds: 100
 Section: From the 2016 edition to 2024
 Layout: steps
 Visual: slide-13
@@ -335,7 +335,7 @@ A process requires more than a new heading. It organizes work that continues ove
 
 A memorable example is buying an analysis tool for a short period just before a release. That may produce a report. It does not automatically establish a maintained process for examining changes, reviewing findings, fixing problems, and checking the result again.
 
-For our importer team, define the trigger, the owner, the recorded evidence, and the feedback into the next cycle. A relevant code change could trigger analysis. A named engineer could review the findings. The record should connect the finding and decision to the product version.
+Follow the loop for our importer team. A relevant code change triggers analysis. A named engineer performs the check and reviews the findings. The team records a decision, then reviews what should change before the next cycle. At the centre, the evidence connects the finding and decision to the product version.
 
 Trigger, ownership, evidence, and feedback give us a practical way to examine a process. The twenty sixteen edition already addressed lifecycle work, internal checks, and improvement.
 
@@ -367,7 +367,7 @@ We will compare specific practices and evidence using identified versions. Our N
 Cue: Результат обзора не равен доказательству причинного снижения уязвимостей. Не говорить «доказательств вообще нет» и не интерпретировать авторскую разметку Waterfall/Agile как статистику отрасли.
 
 ## 15 | Compare obligations, not labels
-Seconds: 90
+Seconds: 110
 Section: Our comparison method
 Layout: steps
 Visual: slide-15
@@ -389,13 +389,15 @@ We also preserve the strength of the original wording. Clause four point seven o
 
 On the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.
 
+Third, we demonstrate one concrete implementation and identify the records that would let another person verify the result.
+
 Our conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.
 
 This lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.
 Cue: Русские термины объяснить, не превращать в упражнение для зрителя. Слайд даёт метод, не формальную сертификационную оценку. Визуальная опора: The comparison method proceeds from reading actors, actions and conditions, to examining differences, demonstrating an implementation, and stating a bounded conclusion.
 
 ## 16 | What process 5.1 asks for
-Seconds: 90
+Seconds: 105
 Section: Planning secure development
 Layout: steps
 Visual: slide-16
@@ -426,7 +428,7 @@ The standard requires periodic analysis, but it does not give us a universal nin
 Cue: Все пять требований на экране. Не объявлять квартал обязательной частотой ГОСТ. Визуальная опора: Within the defined scope, current-state analysis and resource analysis support both the process improvement plan and the process implementation plan. The five nodes carry clauses 5.1.2.1 through 5.1.2.5.
 
 ## 17 | Start with a defensible scope
-Seconds: 90
+Seconds: 100
 Section: Planning secure development
 Layout: table
 Visual: slide-17
@@ -454,7 +456,7 @@ This is not permission to declare inconvenient components irrelevant. The ration
 Cue: «Connected context» не смешивать с буквальным составом ПО из 5.1.3.5. Это полезные связанные записи примера. Визуальная опора: Importer 2.0 contains the parser, service API and shipped libraries. Repository, CI configuration and release workflow form connected development context. Excluding a retired prototype requires evidence that it has no code or dependency path into the release.
 
 ## 18 | Assess reality and assign owners
-Seconds: 90
+Seconds: 95
 Section: Planning secure development
 Layout: cards
 Lead: Illustrative findings, with people who can act
@@ -479,7 +481,7 @@ This allocation is our implementation example. The standard's implementation-pla
 Cue: Отличать ответственного за действие от того, кто уполномочен принимать остаточный риск.
 
 ## 19 | Resources include human attention
-Seconds: 90
+Seconds: 95
 Section: Planning secure development
 Layout: cards
 Visual: slide-19
@@ -503,11 +505,11 @@ These figures are a teaching example. They are neither a benchmark nor a percent
 
 Tools, infrastructure, and additional training costs need their own assessment. Dependencies matter too. If the build engineer is unavailable during the first month, the schedule must reflect that. Assigning a task does not create capacity.
 
-The standard's resource-analysis artifact may contain estimated material and human resource indicators. Our table makes those assumptions discussable. Ask the people doing the work whether the estimate is credible, show it to those deciding priorities, and agree when to revise it. Human attention is part of the resource plan.
+The standard's resource-analysis artifact may contain estimated material and human resource indicators. The chart makes those assumptions discussable. Ask the people doing the work whether the estimate is credible, show it to those deciding priorities, and agree when to revise it. Human attention is part of the resource plan.
 Cue: Сделать паузу на сумме 96. Часы для всего учебного плана, не недельная нагрузка. Визуальная опора: An illustrative 90-day effort allocates 60 person-hours to engineering, 24 to AppSec, and 12 to release coordination and sponsor decisions, for a total of 96 person-hours. Tools and infrastructure are assessed separately.
 
 ## 20 | Two plans, two questions
-Seconds: 90
+Seconds: 100
 Section: Planning secure development
 Layout: compare
 Visual: slide-20
@@ -526,7 +528,7 @@ Planning gives the team, its managers, and the people requesting the product a s
 
 The improvement plan describes how processes will develop. It sets priorities and the sequence of changes, considering available resources. Our team might make parser analysis repeatable, improve the handling of findings, and then review the results.
 
-The implementation plan identifies goals, stages, dates, resources, and responsible people. A task can specify the parser target, integration milestone, owner, and expected evidence.
+The implementation plan identifies goals, stages, dates, resources, and responsible people. In the middle of the diagram, a task specifies the parser target, integration milestone and owner. On the right, the evidence records coverage and the review of findings.
 
 The standard allows these plans to be represented in a task management system. A roadmap with linked tasks can preserve their different purposes without creating disconnected documents.
 
@@ -534,7 +536,7 @@ The practical test is traceability. Why was this change selected? Which resource
 Cue: Не говорить, что стандарт требует два отдельных файла или конкретный формат Jira. Визуальная опора: A process improvement goal, repeatable parser checks, is linked to an implementation task with an owner and milestone, and then to evidence of coverage and triage decisions. Current-state and resource analysis support the entire chain.
 
 ## 21 | A 90-day plan for the importer
-Seconds: 120
+Seconds: 135
 Section: Worked example
 Layout: timeline
 Visual: slide-21
@@ -563,7 +565,7 @@ For implementation of this GOST, section four point thirteen requires version co
 Cue: Здесь главная практическая пауза: провести взглядом по трём этапам. Не уходить в live demo настройки анализатора. Визуальная опора: The illustrative plan has three equal 30-day periods: establish scope, baseline and ownership; integrate parser checks and record decisions; then review two release cycles, close gaps and update the next plan.
 
 ## 22 | Five linked records of evidence
-Seconds: 90
+Seconds: 95
 Section: Worked example
 Layout: steps
 Visual: slide-22
@@ -592,7 +594,7 @@ A one-page template is only an entry point. It does not replace the underlying a
 Cue: На слайде артефакты 5.1.3.1–5; подробный шаблон приложен Markdown. Не обещать «одной страницы достаточно для соответствия». Визуальная опора: Five evidence categories mirror the planning requirements: baseline checks and gaps, resource estimates and assumptions, improvement priorities, implementation owners and milestones, and the importer scope with its rationale.
 
 ## 23 | A first international crosswalk
-Seconds: 120
+Seconds: 110
 Section: Comparison result
 Layout: compare
 Visual: slide-23
@@ -619,7 +621,7 @@ Our initial conclusion is modest: planning, responsibility, and improvement have
 Cue: PO.2.1 произнести «P O, two point one». Сопоставлены узкие положения, не все пять требований полностью. Визуальная опора: Two partial overlaps are shown: GOST 5.1.3.4 and NIST SSDF PO.2.1 share a concern with roles and responsibility; GOST 5.1.2.3 and SAMM Strategy and Metrics share a concern with an improvement roadmap. Scope and evidence expectations still differ.
 
 ## 24 | Would this survive Friday's release?
-Seconds: 90
+Seconds: 95
 Section: Apply it
 Layout: cards
 Visual: slide-24
@@ -646,10 +648,10 @@ For this team, I would review the plan after ninety days and after a material ch
 In a small team, one person may hold several responsibilities. Make the arrangement explicit and check capacity. Scaling the implementation does not establish that applicable requirements can be ignored.
 
 The practical test is whether another team member can understand the next action. If only the author can explain the plan, improve it.
-Cue: Дать зрителю 3–4 секунды на четыре вопроса. Период и триггеры пересмотра — авторский пример. Визуальная опора: The importer scenario returns with a connected path: identify the input and covered parser, retain the finding evidence, assign time and ownership for investigation, and record a release decision under the team's policy. This is a review of the process, not proof that a release is safe.
+Cue: Провести зрителя по пяти узлам: input file → parser → finding → investigate → decide. Сделать короткую паузу на связи расследования с решением о выпуске. Период и триггеры пересмотра — авторский пример. Визуальная опора: The importer scenario returns with a connected path: identify the input and covered parser, retain the finding evidence, assign time and ownership for investigation, and record a release decision under the team's policy. This is a review of the process, not proof that a release is safe.
 
 ## 25 | Security Training That Changes Engineering Decisions
-Seconds: 90
+Seconds: 105
 Section: Stay in touch · Next episode
 Layout: closing
 Lead: Next: EP02 · Employee training · GOST R 56939-2024, clause 5.2

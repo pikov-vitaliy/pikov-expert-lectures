@@ -81,7 +81,7 @@ data = dict(title='Where Secure Development Begins', subtitle='History, GOST and
 visual_module['require_english'](data, 'English presentation data and source register')
 (ROOT / 'assets').mkdir(exist_ok=True)
 (ROOT / 'assets' / 'episode-data.js').write_text('window.EP01_DATA = ' + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8', newline='\n')
-rows = ['# EP01 — Timing and rehearsal model', '', f'Generated from [the full English script](EP01-script-en.md). Timing slots total **{stamp(target_seconds)}**. Count uses English word tokens, including contractions and hyphenated words; spoken dates/numbers are already expanded in the script.', '', '| Slide | Start–end | Slot | Speech words | Words/min in slot |', '|---|---|---|---|---|']
+rows = ['# EP01 — Timing and rehearsal model', '', f'Generated from [the full English script](EP01-script-en.md). Timing slots total **{stamp(target_seconds)}**. Count uses written English word tokens, including contractions and hyphenated words. Acronyms and numeric designations may take longer to pronounce than this token count suggests; only a recorded rehearsal establishes the actual duration.', '', '| Slide | Start–end | Slot | Speech words | Words/min in slot |', '|---|---|---|---|---|']
 elapsed = 0
 total = 0
 for s in slides:
@@ -95,6 +95,7 @@ for pace in [110, 115, 120, 125, 130]:
     remaining = target_seconds-speaking
     rows.append(f'| {pace} words/min | {stamp(speaking)} | {stamp(remaining) if remaining >= 0 else "exceeds slot by " + stamp(-remaining)} |')
 rows += ['', 'Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.', '', 'The deck has slide navigation and notes; it does not auto-advance or claim to measure speech. Final YouTube chapters must use the edited recording timestamps, not these planning slots.']
+rows += ['', 'The current slot allocation and explicit pause assumptions are documented in [the speech-to-slide review](EP01-speech-review.md). Extra diagram-viewing time is counted once; do not add it again to a delivery pace already measured over a complete rehearsal.']
 (ROOT / 'EP01-timing.md').write_text('\n'.join(rows)+'\n', encoding='utf-8', newline='\n')
 # File timestamps can be cached by the local browser. Content hashes make a
 # rebuilt deck request its matching CSS, renderer and slide data together.
