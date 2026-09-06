@@ -1,0 +1,23 @@
+/* Diagram geometry scales with the stage; labels are embedded as vector text. */
+.slide-visual{margin:0;width:100%;min-width:0}
+.diagram-image{display:block;width:100%;height:auto;max-width:100%;border:0}
+.diagram-caption{font:600 clamp(15px,1.02vw,24px)/1.35 var(--body,'Segoe UI',sans-serif);color:#43566c;margin-top:10px;max-width:100%;text-wrap:pretty}
+.has-visual .slide-content{justify-content:flex-start;padding-top:0;padding-bottom:15px}
+.has-visual .slide-lead{margin-bottom:18px}
+.has-visual .slide-title{max-width:none}
+.diagram-text-version{margin:0 0 25px;padding:18px 20px;background:#e4edf7;border-left:4px solid #245dba}
+.diagram-text-version>summary{display:list-item;padding:0;font-size:17px;color:#15334f;font-weight:700;cursor:pointer}
+.diagram-text-version>summary::after{content:none}
+.diagram-text-version p{margin-top:16px}.diagram-text-version li{margin-block:8px}
+.mode-presentation .diagram-caption{font-size:clamp(15px,1.02vw,40px)}
+.mode-presentation .has-visual .slide-content{flex:0 1 auto}
+/* The stage already has a title, lead and source references. Keep the longer
+   explanatory captions in reading mode, leaving the graphic room to breathe. */
+@media screen and (min-width:761px){
+  .mode-presentation .slide-kicker{display:none}
+  .mode-presentation .slide .slide-header{margin-bottom:.65em}
+  .mode-presentation .diagram-caption{display:none}
+  .mode-presentation .has-visual .slide-content{padding-bottom:10px}
+}
+@media(max-width:760px){.has-visual .slide-panel{padding-inline:18px}.slide-visual{overflow-x:auto;overscroll-behavior-x:contain}.diagram-image{min-width:1000px;width:100%;max-width:none}.diagram-caption{font-size:15px;position:sticky;left:0;width:100%}.diagram-text-version{padding:15px}.has-visual .slide-lead{margin-bottom:20px}}
+@media print{.slide-visual{overflow:visible}.diagram-image{min-width:0;max-width:100%;width:100%;max-height:112mm;object-fit:contain}.diagram-caption,.mode-presentation .diagram-caption{font-size:9pt}.diagram-text-version{display:none}}

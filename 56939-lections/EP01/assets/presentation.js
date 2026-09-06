@@ -111,6 +111,23 @@
     parent.append(quote);
   }
 
+  function appendVisual(parent, slide) {
+    const visual = slide.visual;
+    const figure = element("figure", "slide-visual");
+    figure.dataset.visual = plain(visual.id);
+    const image = element("img", "diagram-image");
+    image.src = plain(visual.src);
+    image.alt = plain(visual.alt);
+    image.decoding = "sync";
+    // A local SVG stays sharp at 1080p/4K and contains no runtime dependencies.
+    figure.append(image, element("figcaption", "diagram-caption", visual.caption));
+    image.addEventListener("error", () => {
+      figure.replaceChildren(element("p", "", visual.alt));
+      appendItems(figure, slide.items || [], "cards", slide.title);
+    }, { once: true });
+    parent.append(figure);
+  }
+
   function appendContact(parent, contact) {
     if (!contact) return;
     const href = safeLink(contact.url);
@@ -134,7 +151,9 @@
     if (referenced.length) {
       refs.append(element("span", "source-prefix", "Sources"));
       referenced.forEach(source => {
-        const a = element("a", "", `[${plain(source.id)}] ${plain(source.title)}`);
+        const a = element("a", "", `[${plain(source.id)}]`);
+        a.title = plain(source.title);
+        a.setAttribute("aria-label", `[${plain(source.id)}] ${plain(source.title)}`);
         a.href = `#source-${safeId(source.id)}`;
         a.dataset.sourceLink = "true";
         refs.append(a);
@@ -153,6 +172,7 @@
   function renderSlide(slide, index) {
     const layout = layouts.has(slide.layout) ? slide.layout : "cards";
     const section = element("section", `slide layout-${layout}`);
+    if (slide.visual) section.classList.add("has-visual");
     section.id = `slide-${two(index + 1)}`;
     section.dataset.slideIndex = String(index);
     section.setAttribute("aria-roledescription", "slide");
@@ -179,7 +199,8 @@
     title.id = `${section.id}-title`; contentRoot.append(title);
     if (slide.lead) contentRoot.append(element("p", "slide-lead", slide.lead));
     const content = element("div", "slide-content");
-    appendItems(content, Array.isArray(slide.items) ? slide.items : [], layout, slide.title);
+    if (slide.visual) appendVisual(content, slide);
+    else appendItems(content, Array.isArray(slide.items) ? slide.items : [], layout, slide.title);
     appendQuote(content, slide.quote);
     appendContact(content, slide.contact);
     contentRoot.append(content, footer(slide, index));
@@ -192,6 +213,15 @@
     if (Number(slide.seconds) > 0) noteHeading.append(element("span", "note-duration", `Planned delivery ${minutes(slide.seconds)}`));
     summary.append(noteHeading); notes.append(summary);
     const body = element("div", "notes-body");
+    if (slide.visual) {
+      const textVersion = element("details", "diagram-text-version");
+      textVersion.append(element("summary", "", "Diagram description and slide points"));
+      addParagraphs(textVersion, slide.visual.alt);
+      const list = element("ul");
+      (slide.items || []).forEach(item => list.append(element("li", "", `${item.label}: ${item.text}`)));
+      textVersion.append(list);
+      body.append(textVersion);
+    }
     if (plain(slide.notes).trim()) addParagraphs(body, slide.notes);
     else body.append(element("p", "no-notes", "No speaker notes have been supplied for this slide."));
     notes.append(body); section.append(notes);

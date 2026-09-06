@@ -2,6 +2,8 @@
 from pathlib import Path
 import json
 import re
+import runpy
+import hashlib
 
 ROOT = Path(__file__).resolve().parent
 SOURCES = [
@@ -33,6 +35,8 @@ def stamp(seconds):
     return f'{seconds // 60:02d}:{seconds % 60:02d}'
 
 slides = []
+visual_module = runpy.run_path(str(ROOT / 'build-visuals.py'))
+visuals = {visual['id']: visual for visual in visual_module['catalogue']()}
 script = (ROOT / 'EP01-script-en.md').read_text(encoding='utf-8')
 target = re.search(r'^Target: (\d+):(\d{2})\b', script, re.M)
 assert target and int(target[2]) < 60, 'Expected a Target: mm:ss header'
@@ -55,6 +59,16 @@ for block in re.split(r'^## ', script, flags=re.M)[1:]:
         name, label, url = field(block, 'Contact').split(' | ', 2)
         assert url.startswith('https://'), 'Contact website must use HTTPS'
         slides[-1]['contact'] = dict(name=name, label=label, url=url)
+    if re.search(r'^Visual: ', block, re.M):
+        visual_id = field(block, 'Visual')
+        assert visual_id in visuals, f'Unknown visual: {visual_id}'
+        visual = visuals[visual_id]
+        image_path = ROOT / 'assets' / 'visuals' / f'{visual_id}.svg'
+        assert image_path.is_file(), f'Build the SVG first: {image_path}'
+        assert set(visual['sourceIds']) <= set(slides[-1]['sourceIds']), f'Add visual sources to slide {number}'
+        image_digest = hashlib.sha256(image_path.read_bytes()).hexdigest()[:12]
+        slides[-1]['visual'] = dict(id=visual_id, src=f'assets/visuals/{visual_id}.svg?v={image_digest}',
+                                   alt=visual['alt'], caption=visual['caption'])
 
 assert slides and [s['id'] for s in slides] == list(range(1, len(slides) + 1)), 'Slide numbers must be consecutive from 1'
 assert all(s['seconds'] > 0 for s in slides), 'Slide durations must be positive'
@@ -65,7 +79,7 @@ data = dict(title='Where Secure Development Begins', subtitle='History, GOST and
             author='Vitaliy Pikov', date='2026-09-06', cover='assets/ep01-cover.png',
             sources=SOURCES, slides=slides)
 (ROOT / 'assets').mkdir(exist_ok=True)
-(ROOT / 'assets' / 'episode-data.js').write_text('window.EP01_DATA = ' + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8')
+(ROOT / 'assets' / 'episode-data.js').write_text('window.EP01_DATA = ' + json.dumps(data, ensure_ascii=False, indent=2) + ';\n', encoding='utf-8', newline='\n')
 rows = ['# EP01 — Timing and rehearsal model', '', f'Generated from [the full English script](EP01-script-en.md). Timing slots total **{stamp(target_seconds)}**. Count uses English word tokens, including contractions and hyphenated words; spoken dates/numbers are already expanded in the script.', '', '| Slide | Start–end | Slot | Speech words | Words/min in slot |', '|---|---|---|---|---|']
 elapsed = 0
 total = 0
@@ -80,5 +94,15 @@ for pace in [110, 115, 120, 125, 130]:
     remaining = target_seconds-speaking
     rows.append(f'| {pace} words/min | {stamp(speaking)} | {stamp(remaining) if remaining >= 0 else "exceeds slot by " + stamp(-remaining)} |')
 rows += ['', 'Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.', '', 'The deck has slide navigation and notes; it does not auto-advance or claim to measure speech. Final YouTube chapters must use the edited recording timestamps, not these planning slots.']
-(ROOT / 'EP01-timing.md').write_text('\n'.join(rows)+'\n', encoding='utf-8')
+(ROOT / 'EP01-timing.md').write_text('\n'.join(rows)+'\n', encoding='utf-8', newline='\n')
+# File timestamps can be cached by the local browser. Content hashes make a
+# rebuilt deck request its matching CSS, renderer and slide data together.
+index_path = ROOT / 'index.html'
+index_text = index_path.read_text(encoding='utf-8')
+for asset in ['assets/style.css', 'assets/diagrams.css', 'assets/episode-data.js', 'assets/presentation.js']:
+    digest = hashlib.sha256((ROOT / asset).read_bytes()).hexdigest()[:12]
+    index_text, replacements = re.subn(r'((?:src|href)=")' + re.escape(asset) + r'(?:\?[^"\s]*)?("?)',
+                                       lambda match: match[1] + asset + '?v=' + digest + match[2], index_text)
+    assert replacements == 1, f'Expected one HTML resource reference: {asset}'
+index_path.write_text(index_text, encoding='utf-8', newline='\n')
 print(json.dumps(dict(slides=len(slides), seconds=elapsed, spoken_words=total), ensure_ascii=False))

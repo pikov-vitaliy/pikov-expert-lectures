@@ -43,6 +43,8 @@ CSS = r"""
 @media print{.lecture-shell h2,.lecture-shell h3,.lecture-shell h4{break-after:avoid}.lecture-shell tr{break-inside:avoid}.lecture-shell thead{display:table-header-group}.lecture-shell .contents{background:transparent;border-left:0;padding:0}}
 @media(max-width:900px){.lecture-parts{grid-template-columns:minmax(0,1fr);gap:15px}.contents .toc-chapters{columns:1}.lecture-part{padding:18px 20px}.lecture-part h2{font-size:1.18rem}}
 @media print{.lecture-parts{display:block;margin:20px 0}.lecture-part{background:transparent;padding:12px 16px;margin-bottom:14px;break-inside:avoid}.lecture-part h2{font-size:14pt}.lecture-part p{font-size:11pt}.contents .toc-chapters{columns:1}.contents .toc-parts>li>a{break-after:avoid}}
+
+.lecture-figure{margin:30px 0 12px}.figure-scroll{overflow-x:auto;max-width:100%;border:1px solid var(--line);border-radius:8px;background:white}.lecture-diagram{display:block;width:100%;height:auto}.figure-scroll:focus-visible{outline:3px solid var(--blue);outline-offset:4px}@media(max-width:760px){.lecture-diagram{min-width:1000px}}@media print{.figure-scroll{overflow:visible;border:0}.lecture-diagram{min-width:0;max-width:100%}.lecture-figure{break-inside:avoid}}
 """
 
 JS = r"""
@@ -149,9 +151,20 @@ def rendered_markdown(text: str, prefix: str) -> tuple[str, list[tuple[str, str]
         if not parts.scheme:
             path = (ROOT / unquote(parts.path)).resolve()
             suffix = path.suffix.lower()
-            mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp"}.get(suffix)
+            mime = {".png": "image/png", ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".webp": "image/webp", ".svg": "image/svg+xml"}.get(suffix)
             if mime and path.is_file():
                 image["src"] = f"data:{mime};base64," + base64.b64encode(path.read_bytes()).decode("ascii")
+                if suffix == ".svg":
+                    image["class"] = "lecture-diagram"
+                    figure = soup.new_tag("figure", attrs={"class": "lecture-figure"})
+                    viewport = soup.new_tag("div", attrs={"class": "figure-scroll", "tabindex": "0", "role": "region", "aria-label": image.get("alt", "Учебная схема")})
+                    parent = image.parent
+                    if parent.name == "p" and len(parent.find_all(recursive=False)) == 1:
+                        parent.replace_with(figure)
+                    else:
+                        image.insert_before(figure)
+                    viewport.append(image.extract())
+                    figure.append(viewport)
             else:
                 image.replace_with(soup.new_string(image.get("alt", src)))
         elif parts.scheme != "data":
@@ -284,7 +297,7 @@ def lecture_content(text: str) -> tuple[str, str, str, list[dict]]:
 
 def build_lecture(date_label: str, text: str) -> str:
     title, title_id, rendered, headings = lecture_content(text)
-    markdown_download = base64.b64encode(text.encode("utf-8")).decode("ascii")
+    markdown_download = base64.b64encode(LECTURE_MD.read_bytes()).decode("ascii")
     body = f'''<div class="hero wrap"><span class="eyebrow">Безопасная разработка / история и практика</span>
 <h1 id="{esc(title_id)}">{esc(title)}</h1>
 <p class="deck">Как развивались методологии безопасной разработки, почему появились национальные стандарты и как связать требования с повседневной инженерной работой.</p>
@@ -397,7 +410,7 @@ def validate(review: str, lecture: str, data: dict, paths: list[Path]) -> None:
     if actual is None or actual.decode_contents() != expected or heading is None or heading.get_text() != title:
         raise ValueError("Standalone lecture content differs from rendered Markdown")
     download = lecture_soup.select_one('.hero-links a[download]')
-    if download is None or base64.b64decode(download["href"].split(",", 1)[1]).decode("utf-8") != LECTURE_MD.read_text(encoding="utf-8"):
+    if download is None or base64.b64decode(download["href"].split(",", 1)[1]) != LECTURE_MD.read_bytes():
         raise ValueError("The standalone Markdown download differs from its source")
     if lecture_soup.select(".metric-strip, .raw-source, #qa-status"):
         raise ValueError("Author-only report elements must not appear in the reader's lecture")

@@ -181,7 +181,13 @@ window.EP01_DATA = {
       "notes": "The standard gives us the structure of the series: twenty-five processes, and twenty-five core episodes. Episode one follows section five point one. Episode twenty-five follows section five point twenty-five.\n\nThe four groups on this slide are my teaching guide. They are not additional categories defined by the standard. They help us see how planning, engineering, verification, and continued support connect.\n\nFor example, a static analysis result is useful only when we know what code was analyzed, who reviews the findings, and how a correction reaches a release. A dependency inventory is useful only when somebody maintains it and acts on relevant changes.\n\nWe will keep returning to those connections. Some episodes will include a guest who can explain a specific practice from direct experience. Every core episode will still have its own practical result.\n\nYou can follow the complete series or choose an episode that matches a current problem. Today establishes the vocabulary and a planning example that later episodes can extend.",
       "sourceIds": [
         "G24"
-      ]
+      ],
+      "visual": {
+        "id": "slide-03",
+        "src": "assets/visuals/slide-03.svg?v=a5a77ebb680c",
+        "alt": "Four connected teaching groups: Organize, Engineer, Verify and Sustain. These are the author's guide to the series, not categories defined by GOST.",
+        "caption": "An author's teaching guide to the connections between the 25 processes."
+      }
     },
     {
       "id": 4,
@@ -209,7 +215,13 @@ window.EP01_DATA = {
       "notes": "Let us begin with a small fictional team. It develops a C++ tool that imports engineering files. The product also has a small service API, uses third-party components, and ships regular updates.\n\nOn Friday afternoon, an analysis tool reports a possible memory error in the file parser. The developer says the finding needs investigation. The security specialist asks whether the affected parser is part of the release. The release owner asks whether there is time to fix it.\n\nThe tool has produced information, but the team has not agreed how to use it. There is no clear scope, no allocated investigation time, and no recorded decision process.\n\nWe cannot solve that entire situation by buying another tool. We need people who understand their responsibilities, suitable tools, and a repeatable way of working. We also need evidence that connects those elements to the actual product version.\n\nAn organization may already use an analyzer, yet still need to examine its coverage, configuration, and follow-up. Before proposing another purchase, find out what the team already does and where the actual gap is.\n\nKeep this team in mind. At the end of the episode, we will return to Friday's release with a more useful set of questions.",
       "sourceIds": [
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-04",
+        "src": "assets/visuals/slide-04.svg?v=98f5ac268c97",
+        "alt": "A file reaches the C++ parser, analysis produces a finding, and the path toward investigation and a release decision is interrupted by unclear ownership and capacity.",
+        "caption": "Illustrative case: a finding is useful only when the team can act on it."
+      }
     },
     {
       "id": 5,
@@ -233,6 +245,10 @@ window.EP01_DATA = {
           "text": "Microsoft SDL guidance v5.2 / SDL-Agile"
         },
         {
+          "label": "2017",
+          "text": "Singapore Security-by-Design framework"
+        },
+        {
           "label": "2020",
           "text": "OWASP SAMM v2.0"
         },
@@ -242,13 +258,19 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The history of secure development contains several parallel approaches. A useful map is the twenty twenty-three review by Arina Kudriavtseva and Olga Gadyatskaya. It examines twenty-eight methodologies through publications from two thousand four to twenty twenty-two, drawn from industry, government, and academia.\n\nThis slide selects five publication milestones. Early lifecycle research is followed by the SDL, Touchpoints, and CLASP publications. Later examples include guidance for agile development, version two of OWASP SAMM, and NIST's SSDF version one point one.\n\nThese are dates of the publications or editions we are discussing. They are not all dates when the underlying ideas first appeared. Microsoft, for example, made SDL integral to its development process in two thousand four; the SDL book discussed in the review appeared in two thousand six.\n\nThe picture is a landscape of different ways to organize secure development. We should examine what each approach contributes, rather than assume that the newest publication replaces every earlier idea.",
+      "notes": "The history of secure development contains several parallel approaches. A useful map is the twenty twenty-three review by Arina Kudriavtseva and Olga Gadyatskaya. It examines twenty-eight methodologies through publications from two thousand four to twenty twenty-two, drawn from industry, government, and academia.\n\nFollow the timeline from left to right. This slide selects six publication and edition milestones. Early lifecycle research is followed by the SDL, Touchpoints, and CLASP publications. Later examples include guidance for agile development, Singapore's Security-by-Design framework, version two of OWASP SAMM, and NIST's SSDF version one point one.\n\nThese are dates of the publications or editions we are discussing. They are not all dates when the underlying ideas first appeared. Microsoft, for example, made SDL integral to its development process in two thousand four; the SDL book discussed in the review appeared in two thousand six.\n\nThe picture is a landscape of different ways to organize secure development. We should examine what each approach contributes, rather than assume that the newest publication replaces every earlier idea.",
       "sourceIds": [
         "MLR",
         "MSH",
         "SAMM20",
         "N11"
-      ]
+      ],
+      "visual": {
+        "id": "slide-05",
+        "src": "assets/visuals/slide-05.svg?v=f6592807876a",
+        "alt": "Selected publication and edition milestones: lifecycle research in 2004; SDL, Touchpoints and CLASP publications in 2006; SDL-Agile guidance v5.2 in 2012; Singapore Security-by-Design in 2017; SAMM v2.0 in 2020; SSDF v1.1 in 2022.",
+        "caption": "Selected publications and editions from the methodology landscape; the review covers 28 approaches."
+      }
     },
     {
       "id": 6,
@@ -343,7 +365,13 @@ window.EP01_DATA = {
         "TRANS",
         "GOSTH",
         "G16"
-      ]
+      ],
+      "visual": {
+        "id": "slide-08",
+        "src": "assets/visuals/slide-08.svg?v=53a0617542dd",
+        "alt": "GOST development milestones: research began in April 2013 and a first draft followed in August; review and revision continued in 2014–2015; Rosstandart approved the standard on 1 June 2016; it became effective on 1 June 2017. Project milestones come from Varenitsa's historical account, while the final two dates are formal publication facts.",
+        "caption": "From research to an effective standard: different events, different dates."
+      }
     },
     {
       "id": 9,
@@ -439,7 +467,13 @@ window.EP01_DATA = {
         "N19",
         "N20",
         "N11"
-      ]
+      ],
+      "visual": {
+        "id": "slide-11",
+        "src": "assets/visuals/slide-11.svg?v=0bfceb2c4127",
+        "alt": "On a common time axis, GOST R 56939 was approved in 2016; the first public SSDF draft appeared in 2019, final SSDF 1.0 in 2020, and final SSDF 1.1 in 2022. The timeline does not assert ancestry between the documents.",
+        "caption": "Chronology helps test an ancestry claim; similarity alone cannot establish one."
+      }
     },
     {
       "id": 12,
@@ -472,7 +506,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G16",
         "G24"
-      ]
+      ],
+      "visual": {
+        "id": "slide-12",
+        "src": "assets/visuals/slide-12.svg?v=14cfebeb4eda",
+        "alt": "The 2016 edition has nine groups of measures and defines sleduyet as a recommendation in clause 4.2. The 2024 edition has 25 named processes and defines the same word as a requirement in clause 4.7. Structural counts do not measure a change in security.",
+        "caption": "Read the structure and wording rules of the edition you actually use."
+      }
     },
     {
       "id": 13,
@@ -505,7 +545,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-13",
+        "src": "assets/visuals/slide-13.svg?v=8cd143d6833c",
+        "alt": "A repeating process connects a trigger, assigned work, a recorded decision and review. Product version and evidence remain at the centre of the cycle.",
+        "caption": "A teaching model of repeatable work: actions, decisions and feedback remain connected."
+      }
     },
     {
       "id": 14,
@@ -568,7 +614,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "N11"
-      ]
+      ],
+      "visual": {
+        "id": "slide-15",
+        "src": "assets/visuals/slide-15.svg?v=6fbba0ff8a5f",
+        "alt": "The comparison method proceeds from reading actors, actions and conditions, to examining differences, demonstrating an implementation, and stating a bounded conclusion.",
+        "caption": "Compare what the documents ask people to do and what would demonstrate the result."
+      }
     },
     {
       "id": 16,
@@ -604,7 +656,13 @@ window.EP01_DATA = {
       "notes": "We can now read the first process directly. Section five point one concerns planning secure software development processes.\n\nIt contains five requirements. Periodically analyze the current state of the processes. Periodically analyze resource needs. Develop a plan for improving the processes. Develop a plan for implementing them. And define their scope.\n\nThe two plans must take the analyses into account. That connection matters. A plan that ignores the team's current practices or available resources may be attractive on paper and impossible to execute.\n\nI use process improvement plan as a working English label for the plan of process development. We will distinguish it from the implementation plan in a moment.\n\nFor our small team, the first action is to describe what already happens and what does not. We then identify the most significant gaps, estimate the capacity needed to address them, and assign realistic work.\n\nThe standard requires periodic analysis, but it does not give us a universal ninety-day schedule. The schedule later in this episode is an illustrative choice for our example.",
       "sourceIds": [
         "G24"
-      ]
+      ],
+      "visual": {
+        "id": "slide-16",
+        "src": "assets/visuals/slide-16.svg?v=5b5fac26b044",
+        "alt": "Within the defined scope, current-state analysis and resource analysis support both the process improvement plan and the process implementation plan. The five nodes carry clauses 5.1.2.1 through 5.1.2.5.",
+        "caption": "Five planning requirements connected by their information dependencies."
+      }
     },
     {
       "id": 17,
@@ -637,7 +695,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-17",
+        "src": "assets/visuals/slide-17.svg?v=68649a0d4f1d",
+        "alt": "Importer 2.0 contains the parser, service API and shipped libraries. Repository, CI configuration and release workflow form connected development context. Excluding a retired prototype requires evidence that it has no code or dependency path into the release.",
+        "caption": "Illustrative scope: record what is included, what is connected and why an exclusion is justified."
+      }
     },
     {
       "id": 18,
@@ -703,7 +767,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-19",
+        "src": "assets/visuals/slide-19.svg?v=35d9ac1bb9fa",
+        "alt": "An illustrative 90-day effort allocates 60 person-hours to engineering, 24 to AppSec, and 12 to release coordination and sponsor decisions, for a total of 96 person-hours. Tools and infrastructure are assessed separately.",
+        "caption": "Illustrative total effort for the 90-day plan; validate the estimates with the people doing the work."
+      }
     },
     {
       "id": 20,
@@ -732,7 +802,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-20",
+        "src": "assets/visuals/slide-20.svg?v=bc24c06294e3",
+        "alt": "A process improvement goal, repeatable parser checks, is linked to an implementation task with an owner and milestone, and then to evidence of coverage and triage decisions. Current-state and resource analysis support the entire chain.",
+        "caption": "Connect the capability in the improvement plan to executable work and its evidence."
+      }
     },
     {
       "id": 21,
@@ -761,7 +837,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-21",
+        "src": "assets/visuals/slide-21.svg?v=aed543532f55",
+        "alt": "The illustrative plan has three equal 30-day periods: establish scope, baseline and ownership; integrate parser checks and record decisions; then review two release cycles, close gaps and update the next plan.",
+        "caption": "A 90-day example for the importer: each stage produces something the team can review."
+      }
     },
     {
       "id": 22,
@@ -798,7 +880,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "G24",
         "EX"
-      ]
+      ],
+      "visual": {
+        "id": "slide-22",
+        "src": "assets/visuals/slide-22.svg?v=8c66f578954a",
+        "alt": "Five evidence categories mirror the planning requirements: baseline checks and gaps, resource estimates and assumptions, improvement priorities, implementation owners and milestones, and the importer scope with its rationale.",
+        "caption": "The same planning structure, now expressed as records a reviewer can follow."
+      }
     },
     {
       "id": 23,
@@ -828,7 +916,13 @@ window.EP01_DATA = {
         "G24",
         "N11",
         "SAMM"
-      ]
+      ],
+      "visual": {
+        "id": "slide-23",
+        "src": "assets/visuals/slide-23.svg?v=f384435815f8",
+        "alt": "Two partial overlaps are shown: GOST 5.1.3.4 and NIST SSDF PO.2.1 share a concern with roles and responsibility; GOST 5.1.2.3 and SAMM Strategy and Metrics share a concern with an improvement roadmap. Scope and evidence expectations still differ.",
+        "caption": "Bounded comparison: a shared concern is useful, but does not establish full equivalence."
+      }
     },
     {
       "id": 24,
@@ -861,7 +955,13 @@ window.EP01_DATA = {
       "sourceIds": [
         "EX",
         "G24"
-      ]
+      ],
+      "visual": {
+        "id": "slide-24",
+        "src": "assets/visuals/slide-24.svg?v=0a3c1aff77c5",
+        "alt": "The importer scenario returns with a connected path: identify the input and covered parser, retain the finding evidence, assign time and ownership for investigation, and record a release decision under the team's policy. This is a review of the process, not proof that a release is safe.",
+        "caption": "Return to Friday's release: can the team follow the finding through an owned, evidenced decision?"
+      }
     },
     {
       "id": 25,

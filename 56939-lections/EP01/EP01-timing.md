@@ -8,7 +8,7 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 02. One process. One useful result. | 01:00–02:30 | 01:30 | 166 | 110.7 |
 | 03. Twenty-five processes, connected | 02:30–04:00 | 01:30 | 162 | 108.0 |
 | 04. Friday's release is blocked | 04:00–06:00 | 02:00 | 203 | 101.5 |
-| 05. A landscape of secure development methods | 06:00–07:30 | 01:30 | 157 | 104.7 |
+| 05. A landscape of secure development methods | 06:00–07:30 | 01:30 | 169 | 112.7 |
 | 06. Different ways to organize the work | 07:30–09:00 | 01:30 | 165 | 110.0 |
 | 07. Before the standard: a practical problem | 09:00–11:00 | 02:00 | 162 | 81.0 |
 | 08. The route from research to publication | 11:00–13:00 | 02:00 | 172 | 86.0 |
@@ -30,17 +30,17 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 24. Would this survive Friday's release? | 37:00–38:30 | 01:30 | 163 | 108.7 |
 | 25. Security Training That Changes Engineering Decisions | 38:30–40:00 | 01:30 | 175 | 116.7 |
 
-**Total: 4246 spoken words.**
+**Total: 4258 spoken words.**
 
 ## Speaking pace sensitivity
 
 | Articulation pace | Speech alone | Space left inside 40:00 for pauses/transitions |
 |---|---|---|
-| 110 words/min | 38:36 | 01:24 |
-| 115 words/min | 36:55 | 03:05 |
-| 120 words/min | 35:23 | 04:37 |
-| 125 words/min | 33:58 | 06:02 |
-| 130 words/min | 32:40 | 07:20 |
+| 110 words/min | 38:43 | 01:17 |
+| 115 words/min | 37:02 | 02:58 |
+| 120 words/min | 35:29 | 04:31 |
+| 125 words/min | 34:04 | 05:56 |
+| 130 words/min | 32:45 | 07:15 |
 
 Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.
 
