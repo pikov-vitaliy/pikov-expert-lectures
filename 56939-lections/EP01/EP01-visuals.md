@@ -120,12 +120,12 @@
 ```json
 {
   "id": "slide-12", "kind": "editions", "lang": "en",
-  "alt": "The 2016 edition has nine groups of measures and defines sleduyet as a recommendation in clause 4.2. The 2024 edition has 25 named processes and defines the same word as a requirement in clause 4.7. Structural counts do not measure a change in security.",
+  "alt": "The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.",
   "caption": "Read the structure and wording rules of the edition you actually use.",
   "sourceIds": ["G16", "G24"],
   "nodes": [
-    {"label": "2016", "title": "9 groups of measures", "detail": "«Следует»: recommendation · 4.2"},
-    {"label": "2024", "title": "25 named processes", "detail": "«Следует»: requirement · 4.7"}
+    {"label": "2016", "title": "9 groups of measures", "detail": "Recommendation · clause 4.2"},
+    {"label": "2024", "title": "25 named processes", "detail": "Requirement · clause 4.7"}
   ],
   "note": "Different structural units: 25 minus 9 is not a measure of improvement."
 }

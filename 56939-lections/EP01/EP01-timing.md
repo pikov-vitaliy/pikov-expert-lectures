@@ -15,10 +15,10 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 09. Who wrote it, and who was it for? | 13:00–14:30 | 01:30 | 181 | 120.7 |
 | 10. A wider plan than one published document | 14:30–16:00 | 01:30 | 163 | 108.7 |
 | 11. GOST in the international context | 16:00–18:00 | 02:00 | 217 | 108.5 |
-| 12. Two editions, different structures | 18:00–19:30 | 01:30 | 168 | 112.0 |
+| 12. Two editions, different structures | 18:00–19:30 | 01:30 | 173 | 115.3 |
 | 13. A process continues after the first tool run | 19:30–21:00 | 01:30 | 167 | 111.3 |
 | 14. Shared practices need evidence | 21:00–22:30 | 01:30 | 158 | 105.3 |
-| 15. Compare obligations, not labels | 22:30–24:00 | 01:30 | 163 | 108.7 |
+| 15. Compare obligations, not labels | 22:30–24:00 | 01:30 | 169 | 112.7 |
 | 16. What process 5.1 asks for | 24:00–25:30 | 01:30 | 173 | 115.3 |
 | 17. Start with a defensible scope | 25:30–27:00 | 01:30 | 174 | 116.0 |
 | 18. Assess reality and assign owners | 27:00–28:30 | 01:30 | 164 | 109.3 |
@@ -30,17 +30,17 @@ Generated from [the full English script](EP01-script-en.md). Timing slots total 
 | 24. Would this survive Friday's release? | 37:00–38:30 | 01:30 | 163 | 108.7 |
 | 25. Security Training That Changes Engineering Decisions | 38:30–40:00 | 01:30 | 175 | 116.7 |
 
-**Total: 4258 spoken words.**
+**Total: 4269 spoken words.**
 
 ## Speaking pace sensitivity
 
 | Articulation pace | Speech alone | Space left inside 40:00 for pauses/transitions |
 |---|---|---|
-| 110 words/min | 38:43 | 01:17 |
-| 115 words/min | 37:02 | 02:58 |
-| 120 words/min | 35:29 | 04:31 |
-| 125 words/min | 34:04 | 05:56 |
-| 130 words/min | 32:45 | 07:15 |
+| 110 words/min | 38:49 | 01:11 |
+| 115 words/min | 37:07 | 02:53 |
+| 120 words/min | 35:34 | 04:26 |
+| 125 words/min | 34:09 | 05:51 |
+| 130 words/min | 32:50 | 07:10 |
 
 Use a recorded rehearsal to select the pace. Slot rates include silence; actual articulation is faster. Do not speed up historical names or clause numbers to meet an arbitrary timestamp. If a slide overruns, trim its example or redistribute time, regenerate this file and check the complete run again.
 

@@ -14,6 +14,14 @@ NS = 'http://www.w3.org/2000/svg'
 ET.register_namespace('', NS)
 COLORS = {'navy': '#15334f', 'blue': '#245dba', 'teal': '#147b70', 'amber': '#996315', 'ink': '#17212b', 'muted': '#43566c', 'line': '#b8c9db', 'soft': '#edf3fa', 'white': '#ffffff'}
 
+def require_english(value, context):
+    """Reject Cyrillic leaking into the English audience-facing material."""
+    text = json.dumps(value, ensure_ascii=False)
+    found = re.search(r'[\u0400-\u052f]', text)
+    if found:
+        excerpt = text[max(0, found.start() - 25):found.end() + 45]
+        raise ValueError(f'Cyrillic text in {context}: {excerpt}')
+
 def catalogue():
     entries = [json.loads(block) for block in re.findall(r'```json\s*\n(.*?)\n```', CATALOGUE.read_text(encoding='utf-8'), re.S)]
     assert entries, 'Visual catalogue is empty'
@@ -21,6 +29,8 @@ def catalogue():
     for v in entries:
         assert re.fullmatch(r'[a-z0-9-]+', v['id']), 'Unsafe visual ID'
         assert v['alt'] and v['caption'] and v['sourceIds'], f'Missing description/source: {v["id"]}'
+        if v.get('lang', 'en') == 'en':
+            require_english(v, f'English visual {v["id"]}')
     return entries
 
 class Drawing:
@@ -274,6 +284,8 @@ def render(v):
     tree = ET.fromstring(result)
     assert not any(n.tag.rsplit('}', 1)[-1] in {'script', 'image', 'foreignObject', 'a'} for n in tree.iter())
     assert not any(k.lower().startswith('on') for n in tree.iter() for k in n.attrib)
+    if v.get('lang', 'en') == 'en':
+        require_english(result, f'rendered English SVG {v["id"]}')
     return result
 
 def main():

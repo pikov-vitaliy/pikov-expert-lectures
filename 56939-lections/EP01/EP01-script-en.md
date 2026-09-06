@@ -295,10 +295,10 @@ Lead: Re-read the final text before claiming equivalence
 Items:
 - 2016 edition | Nine groups of measures · clauses 5.1–5.9
 - 2024 edition | Twenty-five named processes · clauses 5.1–5.25
-- A wording change | «Следует»: recommendation in 2016 · requirement in 2024
+- A wording change | The same term: recommendation in 2016 · requirement in 2024
 - Migration | Map obligations and evidence; preserve practices that work
 Sources: G16, G24
-![The 2016 edition has nine groups of measures and defines sleduyet as a recommendation in clause 4.2. The 2024 edition has 25 named processes and defines the same word as a requirement in clause 4.7. Structural counts do not measure a change in security.](assets/visuals/slide-12.svg)
+![The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.](assets/visuals/slide-12.svg)
 
 *Read the structure and wording rules of the edition you actually use.*
 
@@ -307,12 +307,12 @@ The two editions organize related engineering work differently.
 
 Section five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.
 
-There is also a concrete wording change. The Russian word shown on the slide, sleduyet, expresses a recommendation under clause four point two of the twenty sixteen edition. Under clause four point seven of the twenty twenty-four edition, it expresses a requirement.
+There is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. An English translation must preserve the force assigned by the relevant edition.
 
 That is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.
 
 The twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.
-Cue: Оглавление и п.4.2 ГОСТ2016; оглавление и п.4.7 ГОСТ2024. В записи «14 мер» не совпадает с девятью группами финального оглавления. 2024: утверждён24.10, действует20.12. Английский перевод модальности пояснить по конкретной редакции. Визуальная опора: The 2016 edition has nine groups of measures and defines sleduyet as a recommendation in clause 4.2. The 2024 edition has 25 named processes and defines the same word as a requirement in clause 4.7. Structural counts do not measure a change in security.
+Cue: Оглавление и п.4.2 ГОСТ2016; оглавление и п.4.7 ГОСТ2024. В записи «14 мер» не совпадает с девятью группами финального оглавления. 2024: утверждён24.10, действует20.12. Английский перевод модальности пояснить по конкретной редакции. Визуальная опора: The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.
 
 ## 13 | A process continues after the first tool run
 Seconds: 90
@@ -385,7 +385,7 @@ Sources: G24, N11
 Speech:
 Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.
 
-We also preserve the strength of the original wording. In this GOST, both the Russian words dolzhen and sleduyet express a required condition. Translating every occurrence of sleduyet as an optional English should would lose that meaning.
+We also preserve the strength of the original wording. Clause four point seven of the twenty twenty-four GOST defines which wording expresses a required condition. When translating such a condition, we must convey a requirement rather than turn it into an optional recommendation.
 
 On the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.
 

@@ -15,7 +15,7 @@ window.EP01_DATA = {
       "id": "G16",
       "title": "GOST R 56939-2016 · final edition",
       "url": "https://protect.gost.ru/gost/details/286a588e-4a6a-4899-88f7-3c370dea1e1d",
-      "note": "Developed by NPO Echelon and submitted by TC 362. Nine groups of measures in 5.1–5.9; clause 4.2 treats sleduyet as a recommendation. Approved 1 June 2016; effective 1 June 2017; replaced by the 2024 edition."
+      "note": "Developed by NPO Echelon and submitted by TC 362. Nine groups of measures in 5.1–5.9; clause 4.2 defines recommendation wording. Approved 1 June 2016; effective 1 June 2017; replaced by the 2024 edition."
     },
     {
       "id": "WARE",
@@ -75,7 +75,7 @@ window.EP01_DATA = {
       "id": "GOSTH",
       "title": "Vitaliy Varenitsa · Retrospective on GOST R 56939",
       "url": "#history-source-note",
-      "note": "История создания и актуальное состояние РБПО в России. ГОСТ Р 56939-2016/24. Presentation, 2 July 2025. Pages 2–4 cover the context and drafting history; pages 3 and 22 cover international connections. Recollections describe the authors' intentions; adopted requirements are defined by the final standards."
+      "note": "History and current state of secure software development in Russia. GOST R 56939-2016/24. Title translated from Russian. Presentation, 2 July 2025. Pages 2–4 cover the context and drafting history; pages 3 and 22 cover international connections. Recollections describe the authors' intentions; adopted requirements are defined by the final standards."
     },
     {
       "id": "EX",
@@ -494,7 +494,7 @@ window.EP01_DATA = {
         },
         {
           "label": "A wording change",
-          "text": "«Следует»: recommendation in 2016 · requirement in 2024"
+          "text": "The same term: recommendation in 2016 · requirement in 2024"
         },
         {
           "label": "Migration",
@@ -502,15 +502,15 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "The two editions organize related engineering work differently.\n\nSection five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.\n\nThere is also a concrete wording change. The Russian word shown on the slide, sleduyet, expresses a recommendation under clause four point two of the twenty sixteen edition. Under clause four point seven of the twenty twenty-four edition, it expresses a requirement.\n\nThat is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.\n\nThe twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.",
+      "notes": "The two editions organize related engineering work differently.\n\nSection five of the twenty sixteen standard contains nine groups of measures. Section five of the twenty twenty-four edition contains twenty-five named processes. These are different units of organization. Subtracting the numbers does not tell us how many genuinely new practices appeared, or how much safer a product became.\n\nThere is also a concrete wording change. A term used for recommendations under clause four point two of the twenty sixteen edition expresses a requirement under clause four point seven of the twenty twenty-four edition. An English translation must preserve the force assigned by the relevant edition.\n\nThat is why reusing an old checklist without reading the new edition is risky. Familiar words can carry different force.\n\nThe twenty twenty-four edition was approved in October and became effective in December of that year. Moving to it calls for a gap analysis: which obligations and evidence are already covered, which need adjustment, and which need new work? Effective existing practices are a starting point for that analysis.",
       "sourceIds": [
         "G16",
         "G24"
       ],
       "visual": {
         "id": "slide-12",
-        "src": "assets/visuals/slide-12.svg?v=14cfebeb4eda",
-        "alt": "The 2016 edition has nine groups of measures and defines sleduyet as a recommendation in clause 4.2. The 2024 edition has 25 named processes and defines the same word as a requirement in clause 4.7. Structural counts do not measure a change in security.",
+        "src": "assets/visuals/slide-12.svg?v=244084dc6146",
+        "alt": "The 2016 edition has nine groups of measures; clause 4.2 assigns recommendation status to a term that expresses a requirement under clause 4.7 of the 2024 edition. The 2024 edition has 25 named processes. Structural counts do not measure a change in security.",
         "caption": "Read the structure and wording rules of the edition you actually use."
       }
     },
@@ -610,7 +610,7 @@ window.EP01_DATA = {
         }
       ],
       "quote": "",
-      "notes": "Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.\n\nWe also preserve the strength of the original wording. In this GOST, both the Russian words dolzhen and sleduyet express a required condition. Translating every occurrence of sleduyet as an optional English should would lose that meaning.\n\nOn the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.\n\nOur conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.\n\nThis lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.",
+      "notes": "Here is the method we will use. First, we identify a specific requirement or practice. We record who acts, what they do, the scope, and any conditions. Then we compare the actual work and the expected result.\n\nWe also preserve the strength of the original wording. Clause four point seven of the twenty twenty-four GOST defines which wording expresses a required condition. When translating such a condition, we must convey a requirement rather than turn it into an optional recommendation.\n\nOn the international side, we identify whether we are reading framework guidance, a requirement, or an example of implementation. Similar wording does not automatically give two documents the same authority.\n\nOur conclusion may be substantial overlap, partial overlap, or a complementary practice. If we have not found a counterpart, we will state which sources we reviewed.\n\nThis lets us investigate the series' central question without deciding the answer in advance. A useful comparison can reveal shared engineering ideas and still show important differences in scope, detail, and expected evidence.",
       "sourceIds": [
         "G24",
         "N11"
