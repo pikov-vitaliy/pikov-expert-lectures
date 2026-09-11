@@ -561,7 +561,11 @@ function Get-StaticResourceMarkup([string]$Html) {
 
 function Test-StaticRelease([string]$StageRoot, [string]$SiteName) {
   $issues = @()
-  $stageResolved = (Resolve-Path -LiteralPath $StageRoot).Path.TrimEnd('\') + '\'
+  # Resolve-Path preserves Windows 8.3 aliases (for example RUNNER~1), while
+  # Get-ChildItem expands them in FullName. Use the same filesystem spelling
+  # for the stage boundary and all candidates before comparing containment.
+  $StageRoot = (Get-Item -LiteralPath $StageRoot -Force).FullName
+  $stageResolved = [System.IO.Path]::GetFullPath($StageRoot).TrimEnd('\') + '\'
   $htmlFiles = @(
     Get-ChildItem -LiteralPath $StageRoot -Recurse -File -Force |
       Where-Object { $_.Extension.ToLowerInvariant() -in @('.html', '.htm') }

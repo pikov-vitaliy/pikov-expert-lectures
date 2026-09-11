@@ -136,5 +136,13 @@ ConvertTo-Json -InputObject @(Test-StaticRelease -StageRoot $Root -SiteName 'fix
     const literal = check(`<a href="${template}">Unresolved DOM link</a>`);
     assert.equal(literal.length, 1, 'template-like values in actual DOM attributes are still rejected');
     assert.match(literal[0].issue, /missing local resource/);
+
+    writeFileSync(join(root, 'outside.txt'), 'outside the release');
+    mkdirSync(join(root, 'site-sibling'));
+    writeFileSync(join(root, 'site-sibling', 'secret.svg'), 'outside the release');
+    const escapes = check('<a href="../outside.txt">Escape</a><a href="%2e%2e/outside.txt">Encoded escape</a><img src="../site-sibling/secret.svg">');
+    assert.equal(escapes.length, 3);
+    assert(escapes.every(issue => issue.issue.startsWith('path escapes release root:')),
+      'normalizing a Windows short-path root must not weaken traversal or sibling-prefix containment');
   } finally { rmSync(root, { recursive: true, force: true }); }
 });
