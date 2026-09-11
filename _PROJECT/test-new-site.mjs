@@ -85,8 +85,8 @@ test('all four routes have matching native locale, brand and alternate links', (
   for (const page of pages) assertLocaleLinks(page.html, page);
 });
 
-test('both catalogues contain all 34 original materials and descriptions without JavaScript', () => {
-  assert.equal(catalogue.lectures.length, 34);
+test('both catalogues contain all 35 materials and descriptions without JavaScript', () => {
+  assert.equal(catalogue.lectures.length, 35);
   for (const page of pages.filter(page => !page.about)) assertCatalogueIntegrity(page.html, page.lang);
 });
 
@@ -140,6 +140,7 @@ test('preview is noindex and structured data does not call every resource a cour
     assert.ok(entries.some(item => item['@type'] === 'Course'));
     assert.ok(entries.some(item => item['@type'] === 'LearningResource'));
     assert.equal(entries.find(item => item.url === 'https://spdx.pikov.expert/')['@type'], 'CreativeWork');
+    assert.equal(entries.find(item => item.url === 'https://threats.pikov.expert/')['@type'], 'CreativeWork');
     assert.equal(entries.find(item => item.url === 'https://main-rbpo.pikov.expert/')['@type'], 'LearningResource');
   }
 });

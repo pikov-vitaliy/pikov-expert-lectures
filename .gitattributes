@@ -22,3 +22,10 @@ _PROJECT/deploy-hosting.ps1 text eol=lf
 *.docx binary
 *.xlsx binary
 *.eps binary
+
+# Downloadable CSV uses UTF-8 BOM and CRLF, including quoted multiline fields.
+# Source descriptions intentionally retain their original line-end spaces in
+# CSV and generated HTML. Do not rewrite source wording to satisfy formatting.
+threats/*.csv -text whitespace=-blank-at-eol,cr-at-eol
+threats/index.html whitespace=-blank-at-eol
+threats/excluded.html whitespace=-blank-at-eol

@@ -97,6 +97,9 @@ jobs:
           node .\_PROJECT\build-new-site.mjs --check
           node --test .\_PROJECT\test-new-site-catalogue.mjs
           node --test .\_PROJECT\test-new-site.mjs
+          node .\threats\_build\build.mjs --check
+          node --test .\_PROJECT\test-threats-catalogue.mjs
+          node --test .\_PROJECT\test-threats-release-boundary.mjs
           node --test .\_PROJECT\test-public-affiliation-hygiene.mjs
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -PolicySelfTest
           node --test .\_PROJECT\test-tz-landing.mjs
@@ -140,6 +143,7 @@ jobs:
           node --test .\_PROJECT\qa-tz-navigation.mjs
           node .\_PROJECT\qa-pentest-ui.mjs
           node .\_PROJECT\qa-appsec-layout.mjs
+          node .\_PROJECT\qa-threats-catalogue.mjs
 
       - name: Build release archives
         shell: pwsh
