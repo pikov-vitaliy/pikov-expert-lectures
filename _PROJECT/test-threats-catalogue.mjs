@@ -140,7 +140,7 @@ test('all records and downloads are available in static HTML without JavaScript'
   assert.deepEqual([...markup.matchAll(/<details class="record" id="ubi-(\d+)"/g)].map(([,id])=>Number(id)),expected.map(row=>row.id));
   assert.match(markup,/<noscript>/);assert.match(markup,/href="thrlist\.xlsx" download/);
   assert.match(markup,/class="brand-back" href="https:\/\/pikov\.expert\/"/);
-  assert.match(markup,/актуальность интернет-версии банка не проверялась/);
+   assert.match(markup,/Построчная сверка с повторно загруженной официальной выгрузкой на эту дату не подтверждена/);
   for(const [,href] of markup.matchAll(/href="([^"]+)"/g)){
    if(href.startsWith('#')||href.startsWith('https://'))continue;
    assert(fs.existsSync(path.join(root,href.split(/[?#]/)[0])),`Missing local link ${href}`);
