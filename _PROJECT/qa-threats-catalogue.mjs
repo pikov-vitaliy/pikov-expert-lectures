@@ -8,12 +8,15 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const projectDir = dirname(fileURLToPath(import.meta.url));
-const siteDir = resolve(projectDir, '..', 'threats');
+const sourceDir = resolve(projectDir, '..', 'threats');
+// The same browser checks run against an unpacked release in CI. Keep the
+// canonical workbook/CSV bytes as independent expected values for that fixture.
+const siteDir = process.env.THREATS_SITE_DIR ? resolve(process.env.THREATS_SITE_DIR) : sourceDir;
 const require = createRequire(import.meta.url);
 const { chromium } = require(resolve(projectDir, '.browser-node', 'node_modules', 'playwright'));
 const screenshotDir = resolve(projectDir, '..', '.codex', 'threats-qa', new Date().toISOString().replace(/[:.]/g, '-'));
 const remoteBase = process.env.THREATS_BASE_URL || process.env.BASE_URL;
-const expectedXlsx = readFileSync(resolve(siteDir, 'thrlist.xlsx'));
+const expectedXlsx = readFileSync(resolve(sourceDir, 'thrlist.xlsx'));
 const sha256 = bytes => createHash('sha256').update(bytes).digest('hex');
 const analyticsPattern = /^https?:\/\/(?:[^/]+\.)?(?:yandex\.(?:ru|com)|google-analytics\.com|googletagmanager\.com)\//i;
 
@@ -76,7 +79,10 @@ async function downloadedBytes(page, selector) {
 }
 
 async function assertCount(page, count) {
-  await page.waitForFunction(expected => document.getElementById('result-count').textContent === `Найдено угроз: ${expected}`, count);
+  await page.locator('#result-count').waitFor({ state: 'attached' });
+  // A click may replace the document between polls. Wait for the exact expected
+  // count in the destination instead of dereferencing a disappearing element.
+  await page.waitForFunction(expected => document.getElementById('result-count')?.textContent === `Найдено угроз: ${expected}`, count);
 }
 
 async function assertReflow(page, label) {
@@ -115,6 +121,13 @@ test('threat catalogue works in the browser and retains its offline behaviour', 
       await page.goto('about:blank');
       const response = await page.goto(new URL(suffix, base).href, { waitUntil: 'networkidle' });
       assert.equal(response?.status(), 200, `${suffix}: HTTP status`);
+      await page.locator('html.js-ready').waitFor();
+    };
+    const navigate = async (selector, destination) => {
+      await Promise.all([
+        page.waitForURL(new URL(destination, base).href, { waitUntil: 'domcontentloaded' }),
+        page.locator(selector).click(),
+      ]);
       await page.locator('html.js-ready').waitFor();
     };
 
@@ -196,22 +209,21 @@ test('threat catalogue works in the browser and retains its offline behaviour', 
       assert.match(await page.locator('#ubi-218 .source-line').innerText(), /Статус: Архивная/);
       assert.match(await page.locator('#ubi-218 .detail').innerText(), /утратили свою актуальность[\s\S]+https:\/\/bdu\.fstec\.ru\/threat\/ai/);
       await goto('index.html#ubi-1');
-      await page.waitForURL(/\/excluded\.html#ubi-1$/);
+      await page.waitForURL(new URL('excluded.html#ubi-1', base).href, { waitUntil: 'domcontentloaded' });
       await assertCount(page, 1);
       assert.equal(await page.locator('#ubi-1').getAttribute('open'), '');
       assert.match(await page.locator('.list-head').innerText(), /Почему не подходит для ПО/);
       assert.match(await page.locator('#ubi-1 .exclusion-reason').innerText(), /не самостоятельным механизмом программного продукта/);
-      await page.locator('.catalog-switcher a[href="index.html"]').click();
+      await navigate('.catalog-switcher a[href="index.html"]', 'index.html');
       await assertCount(page, 177);
       await page.locator('#search').fill('1');
       await assertCount(page, 0);
       assert.equal(await page.locator('#other-results').isVisible(), true);
-      await page.locator('#other-results-link').click();
-      await page.waitForURL(/\/excluded\.html\?q=1$/);
+      await navigate('#other-results-link', 'excluded.html?q=1');
       await assertCount(page, 1);
       assert.equal(await page.locator('#records .record').getAttribute('id'), 'ubi-1');
-      await page.locator('.catalog-switcher a[href="index.html"]').click();
-      await page.locator('.catalog-switcher a[href="excluded.html"]').click();
+      await navigate('.catalog-switcher a[href="index.html"]', 'index.html');
+      await navigate('.catalog-switcher a[href="excluded.html"]', 'excluded.html');
       await assertCount(page, 50);
       assert.equal(await page.locator('#scope-filters').isVisible(), false);
       const excludedCsv = parseCsv((await downloadedBytes(page, '#export-top')).bytes);
@@ -252,8 +264,10 @@ test('threat catalogue works in the browser and retains its offline behaviour', 
           await first.locator('summary').click();
           assert.equal(await first.getAttribute('open'), '');
           await assertReflow(noJs, `${file} no JavaScript`);
-          const csv = parseCsv((await downloadedBytes(noJs, `noscript a[href="${csvFile}"]`)).bytes);
+          const downloaded = await downloadedBytes(noJs, `noscript a[href="${csvFile}"]`);
+          const csv = parseCsv(downloaded.bytes);
           assert.equal(csv.length, count + 1);
+          assert.equal(sha256(downloaded.bytes), sha256(readFileSync(resolve(sourceDir, csvFile))), `${csvFile}: published/static release bytes must match the canonical source`);
         }
         assert.equal(allIds.length, 227);
         assert.equal(new Set(allIds).size, 227, 'no omissions or duplicates between prerendered subsets');
@@ -283,7 +297,7 @@ test('threat catalogue works in the browser and retains its offline behaviour', 
     });
     assert.deepEqual(errors, [], 'browser JavaScript errors');
     await context.close();
-    process.stdout.write(`Threat catalogue browser evidence: ${base}\nScreenshots: ${screenshotDir}\n`);
+    process.stdout.write(`Threat catalogue browser evidence: ${base}\nSite fixture: ${siteDir}\nScreenshots: ${screenshotDir}\n`);
   } finally {
     await browser.close();
     await new Promise(done => server.close(done));

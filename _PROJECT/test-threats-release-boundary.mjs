@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
-import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { copyFileSync, cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,6 +16,77 @@ function run(script, args) {
   return spawnSync(shell, ['-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', script, ...args], { encoding: 'utf8' });
 }
 function resultText(result) { return `${result.stdout}\n${result.stderr}`; }
+
+test('real release archives preserve both canonical threat CSV downloads and normalize unrelated CSV files', () => {
+  const root = mkdtempSync(join(tmpdir(), 'pikov-threats-csv-release-'));
+  try {
+    const fixtureProject = join(root, '_PROJECT');
+    const site = join(root, 'threats');
+    const ordinarySite = join(root, 'fixture-course');
+    mkdirSync(fixtureProject);
+    mkdirSync(site);
+    mkdirSync(join(ordinarySite, 'nested'), { recursive: true });
+    for (const file of ['build-release.ps1', 'deterministic-archive.ps1']) {
+      copyFileSync(join(project, file), join(fixtureProject, file));
+    }
+    // Keep the real threats generator/checker, selection, staging, ZIP writer
+    // and manifests. Only the unrelated Astra prerequisite is a fixture.
+    cpSync(join(repository, 'threats', '_build'), join(site, '_build'), { recursive: true });
+    for (const file of publicFiles) copyFileSync(join(repository, 'threats', file), join(site, file));
+    writeFileSync(join(fixtureProject, 'build-astra-hardening-labs.ps1'), 'param([switch]$Check)\n');
+    writeFileSync(join(fixtureProject, 'lectures.json'), JSON.stringify({
+      updated: '2026-09-11',
+      lectures: ['threats', 'fixture-course'].map(folder => ({ folder, domain: folder, url: `https://${folder}.pikov.expert/`, title: folder })),
+    }));
+    for (const folder of [root, ordinarySite]) {
+      writeFileSync(join(folder, 'index.html'), '<!doctype html>\n<title>Release fixture</title>\n');
+    }
+    const csvNames = ['software-threats.csv', 'excluded-threats.csv'];
+    const canonical = new Map(csvNames.map(file => [file, readFileSync(join(repository, 'threats', file))]));
+    const ordinaryCsv = Buffer.from('\ufeff"Идентификатор";"Описание"\r\n"1";"две\nстроки"\r\n', 'utf8');
+    const ordinaryPaths = [...csvNames, 'other.csv', 'nested/software-threats.csv'];
+    for (const file of ordinaryPaths) writeFileSync(join(ordinarySite, file), ordinaryCsv);
+
+    const built = run(join(fixtureProject, 'build-release.ps1'), ['-Root', root, '-ReleaseDate', '2026-09-11', '-FailOnIssues']);
+    assert.equal(built.status, 0, resultText(built));
+    const indexPath = join(fixtureProject, 'RELEASE_INDEX_2026-09-11.json');
+    const entries = JSON.parse(readFileSync(indexPath, 'utf8'));
+    assert.equal(entries.length, 3, 'the fixture must exercise threats and another release target');
+    assert(entries.every(entry => entry.staticIssueCount === 0));
+    const unpack = join(root, 'unpack.ps1');
+    const unpacked = join(root, 'unpacked');
+    writeFileSync(unpack, `param([string]$Index,[string]$Destination)
+$ErrorActionPreference = 'Stop'
+foreach ($entry in (Get-Content -LiteralPath $Index -Raw | ConvertFrom-Json)) {
+  Expand-Archive -LiteralPath $entry.archivePath -DestinationPath (Join-Path $Destination $entry.domain)
+}
+`);
+    const expanded = run(unpack, [indexPath, unpacked]);
+    assert.equal(expanded.status, 0, resultText(expanded));
+
+    const digest = bytes => createHash('sha256').update(bytes).digest('hex');
+    const threatsEntry = entries.find(entry => entry.domain === 'threats.pikov.expert');
+    const manifest = JSON.parse(readFileSync(join(threatsEntry.releaseDir, 'MANIFEST.json'), 'utf8'));
+    assert.deepEqual(manifest.files.map(file => file.path).sort(), [...publicFiles].sort());
+    for (const file of csvNames) {
+      const expected = canonical.get(file);
+      assert.equal(expected.subarray(0, 3).toString('hex'), 'efbbbf', `${file}: canonical CSV needs its Excel-compatible UTF-8 BOM`);
+      assert(expected.includes(Buffer.from('\r\n')), `${file}: canonical CSV needs CRLF record separators`);
+      const actual = readFileSync(join(unpacked, threatsEntry.domain, file));
+      assert(actual.equals(expected), `${file}: archive changed canonical CSV bytes (${expected.length}/${digest(expected)} -> ${actual.length}/${digest(actual)})`);
+      const record = manifest.files.find(record => record.path === file);
+      assert.equal(record.size, actual.length, `${file}: manifest size must describe the archive entry`);
+      assert.equal(record.sha256, digest(actual), `${file}: manifest hash must describe the archive entry`);
+      assert(readFileSync(join(site, file)).equals(expected), `${file}: building must leave source bytes unchanged`);
+    }
+    const normalized = Buffer.from('"Идентификатор";"Описание"\n"1";"две\nстроки"\n', 'utf8');
+    for (const file of ordinaryPaths) {
+      const actual = readFileSync(join(unpacked, 'fixture-course.pikov.expert', file));
+      assert(actual.equals(normalized), `${file}: the threats exception must not affect another target or matching nested leaf names`);
+      assert(readFileSync(join(ordinarySite, file)).equals(ordinaryCsv), `${file}: normalization belongs to release staging, not source`);
+    }
+  } finally { rmSync(root, { recursive: true, force: true }); }
+});
 
 test('release selection is closed, requires all public files and rejects changed workbook bytes', () => {
   const root = mkdtempSync(join(tmpdir(), 'pikov-threats-boundary-'));

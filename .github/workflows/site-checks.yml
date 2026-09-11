@@ -189,6 +189,23 @@ jobs:
           $PSNativeCommandUseErrorActionPreference = $true
           node .\_PROJECT\browser-qa.mjs
 
+      - name: Verify threat downloads from the unpacked release
+        shell: pwsh
+        env:
+          THREATS_BASE_URL: ''
+          BASE_URL: ''
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $PSNativeCommandUseErrorActionPreference = $true
+          $releaseDate = (Get-Content -LiteralPath .\_PROJECT\lectures.json -Raw -Encoding UTF8 | ConvertFrom-Json).updated
+          $env:THREATS_SITE_DIR = (Resolve-Path -LiteralPath ".\_PROJECT\.browser-qa-$releaseDate\unpacked\threats.pikov.expert").Path
+          try {
+            node .\_PROJECT\qa-threats-catalogue.mjs
+          }
+          finally {
+            Remove-Item Env:THREATS_SITE_DIR -ErrorAction SilentlyContinue
+          }
+
       - name: Prepare deploy script
         shell: pwsh
         run: |
