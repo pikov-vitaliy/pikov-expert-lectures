@@ -20,7 +20,7 @@ const fixtureHtml = value => `<script>\nconst CATEGORIES = ${JSON.stringify(valu
 test('all source URLs match the independent registry, including course anchors', () => {
   const registry = JSON.parse(readFileSync(resolve(root, '_PROJECT', 'lectures.json'), 'utf8'));
   assert.equal(actual.lectures.length, registry.summary.cards);
-  assert.equal(actual.lectures.length, 34);
+  assert.equal(actual.lectures.length, 35);
   assert.deepEqual(actual.lectures.map(item => item.url).sort(), registry.lectures.map(item => item.url).sort());
   assert.equal(new Set(actual.lectures.map(item => item.url)).size, actual.lectures.length);
   assert.deepEqual(actual.categories.map(category => category.id), CATEGORY_ORDER);
@@ -46,7 +46,16 @@ test('real formats distinguish lectures, programmes, workshops and references', 
   assert.equal(kindAt('https://appsec-lections.pikov.expert/practice.html'), 'practice');
   assert.equal(kindAt('https://new-courses.pikov.expert/#fuzzing'), 'course');
   assert.equal(kindAt('https://spdx.pikov.expert/'), 'reference');
+  assert.equal(kindAt('https://threats.pikov.expert/'), 'reference');
   assert.ok(actual.lectures.every(item => MATERIAL_KINDS.includes(item.kind)));
+});
+
+test('the threat reference belongs to secure development and declares its Russian content', () => {
+  const reference = actual.lectures.find(item => item.url === 'https://threats.pikov.expert/');
+  assert.equal(reference.category, 'rbpo');
+  assert.equal(reference.title, 'Каталог угроз для анализа безопасности ПО');
+  assert.equal(reference.titleEn, 'Threat catalogue for software security analysis');
+  assert.match(reference.descriptionEn, /Content in Russian\./);
 });
 
 test('a missing translation fails before a mixed-language page can be generated', () => {

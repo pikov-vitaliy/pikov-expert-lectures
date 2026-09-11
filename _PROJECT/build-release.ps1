@@ -413,7 +413,26 @@ function Should-ExcludeNestedFile([string]$Name) {
   return $false
 }
 
+function Get-ThreatsReleaseFiles([string]$FolderPath) {
+  # The supplied catalogue has a closed public payload. Canonical build inputs,
+  # review notes, extra workbooks and future scratch files are never selected.
+  $publicFiles = @('.htaccess', 'excluded-threats.csv', 'excluded.html', 'favicon.svg', 'index.html', 'robots.txt', 'sitemap.xml', 'software-threats.csv', 'thrlist.xlsx')
+  foreach ($relative in $publicFiles) {
+    $source = Get-ValidatedReleaseSourcePath -SourceRoot $FolderPath -RelativePath $relative
+    if ($relative -eq 'thrlist.xlsx') {
+      $hash = (Get-FileHash -LiteralPath $source -Algorithm SHA256).Hash.ToLowerInvariant()
+      if ($hash -cne 'e412ac6a8a6f49f0e21d532d87d86665c8df95354fa71c9fc0e7201f34f0fa2b') {
+        Fail 'Threat snapshot differs from the reviewed public XLSX; review its data and metadata before updating the pinned hash'
+      }
+    }
+  }
+  return $publicFiles
+}
+
 function Get-DomainReleaseFiles([string]$FolderPath) {
+  if ((Split-Path -Leaf $FolderPath) -eq 'threats') {
+    return Get-ThreatsReleaseFiles -FolderPath $FolderPath
+  }
   $files = New-Object System.Collections.Generic.List[string]
 
   Get-ChildItem -LiteralPath $FolderPath -File -Force | ForEach-Object {
@@ -532,9 +551,21 @@ function Normalize-LocalUrl([string]$Url) {
   }
 }
 
+function Get-StaticResourceMarkup([string]$Html) {
+  # Script bodies are raw text in HTML, not rendered elements. Keep each
+  # opening tag so an external script src still participates in resource QA.
+  # Quoted attributes may contain >; the raw-text body ends at </script> or EOF.
+  $scriptElement = '(?is)(<script\b(?:[^''"<>]|"[^"]*"|''[^'']*'')*>).*?(?:</script\s*>|$)'
+  return [regex]::Replace($Html, $scriptElement, '$1</script>')
+}
+
 function Test-StaticRelease([string]$StageRoot, [string]$SiteName) {
   $issues = @()
-  $stageResolved = (Resolve-Path -LiteralPath $StageRoot).Path.TrimEnd('\') + '\'
+  # Resolve-Path preserves Windows 8.3 aliases (for example RUNNER~1), while
+  # Get-ChildItem expands them in FullName. Use the same filesystem spelling
+  # for the stage boundary and all candidates before comparing containment.
+  $StageRoot = (Get-Item -LiteralPath $StageRoot -Force).FullName
+  $stageResolved = [System.IO.Path]::GetFullPath($StageRoot).TrimEnd('\') + '\'
   $htmlFiles = @(
     Get-ChildItem -LiteralPath $StageRoot -Recurse -File -Force |
       Where-Object { $_.Extension.ToLowerInvariant() -in @('.html', '.htm') }
@@ -547,9 +578,10 @@ function Test-StaticRelease([string]$StageRoot, [string]$SiteName) {
   foreach ($htmlFile in $htmlFiles) {
     $relativeHtml = Get-RelativePathSafe -BasePath $StageRoot -Path $htmlFile.FullName
     $html = Get-Content -LiteralPath $htmlFile.FullName -Encoding UTF8 -Raw
+    $resourceMarkup = Get-StaticResourceMarkup $html
 
     foreach ($pattern in @('(?i)(?:href|src)\s*=\s*["'']([^"'']+)["'']', '(?i)url\(([^)]*\.(?:png|jpe?g|gif|svg|webp|ico|css|js|woff2?|ttf|eot|pdf)[^)]*)\)')) {
-      foreach ($match in [regex]::Matches($html, $pattern)) {
+      foreach ($match in [regex]::Matches($resourceMarkup, $pattern)) {
         $raw = $match.Groups[1].Value
         $local = Normalize-LocalUrl $raw
         if (-not $local) { continue }
@@ -704,6 +736,12 @@ foreach ($folder in $uniqueFolders) {
 # snapshot and have that file selected by the broad site-file enumerator.
 foreach ($target in @($targets | Where-Object { $_.kind -eq 'domain' })) {
   $sourceRoot = Join-Path $rootPath $target.folder
+
+  if ($target.folder -eq 'threats') {
+    Write-Output 'CHECK generated threats catalogue'
+    & node (Join-Path $sourceRoot '_build\build.mjs') --check
+    if ($LASTEXITCODE -ne 0) { Fail 'Threat catalogue generated files are stale or inconsistent' }
+  }
 
   if ($target.folder -eq 'scaner-vs') {
     $scanerBundleScript = Join-Path $projectPath 'build-scaner-vs-archives.ps1'

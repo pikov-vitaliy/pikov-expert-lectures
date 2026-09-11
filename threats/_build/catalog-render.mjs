@@ -1,0 +1,11 @@
+export function renderThreatRecord(t, options, open = false) {
+ const {excluded, pageFile, labels}=options;
+ const escapeHtml=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const uid=id=>'УБИ.'+String(id).padStart(3,'0');
+ const category=excluded?t.exclusionGroup:t.category;
+ const detailRow=(label,value)=>`<dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value||'Не указано в источнике')}</dd>`;
+ const effects=[['confidentiality','Конфиденциальность'],['integrity','Целостность'],['availability','Доступность']].map(([key,title])=>`${title}: ${t[key]===1?'да':t[key]===0?'нет':'не указано'}`).join(' · ');
+ const third=excluded?`<span class="exclusion-reason"><span class="mobile-label">Почему не подходит для ПО</span>${escapeHtml(t.rationale)}</span>`:`<span class="tag">${labels[t.decision]}</span>`;
+ const analysis=excluded?'':`<dl>${detailRow('Почему включена',t.rationale)}${detailRow('Программный объект',t.softwareObject)}${detailRow('Условие применимости',t.condition)}</dl>`;
+ return `<details class="record" id="ubi-${t.id}"${open?' open':''}><summary class="record-head" aria-label="${escapeHtml(uid(t.id)+' — '+t.name)}"><span><span class="record-meta"><span class="record-id">${uid(t.id)}</span><span class="category">${escapeHtml(category)}</span></span><span class="record-title">${escapeHtml(t.name)}</span></span><span class="object"><span class="mobile-label">Объект воздействия</span>${escapeHtml(t.object)}</span><span class="applicability">${third}<svg class="chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m5 9 7 7 7-7"/></svg></span></summary><div class="detail">${analysis}<dl class="original">${detailRow('Описание из источника',t.description)}${detailRow('Источник угрозы',t.actor)}${detailRow('Последствия в источнике',effects)}${t.notes?detailRow('Замечания в источнике',t.notes):''}</dl><div class="source-line"><span>thrlist.xlsx · Sheet · строка ${t.row} · объект: E${t.row}<br>Статус: ${escapeHtml(t.status)} · Изменено: ${escapeHtml(String(t.updated||'').slice(0,10)||'не указано')}</span><a class="permalink" href="${pageFile}#ubi-${t.id}">Ссылка на ${uid(t.id)}</a></div></div></details>`;
+}

@@ -172,6 +172,13 @@ function Test-Archive(
   if ($Depth -gt 4) { Fail "Nested archive depth exceeded at $DisplayPath" }
   $archive = [System.IO.Compression.ZipArchive]::new($InputStream, [System.IO.Compression.ZipArchiveMode]::Read, $true)
   try {
+    if ($Depth -eq 0 -and $DisplayPath -eq 'threats.pikov.expert') {
+      $required = @('.htaccess', 'excluded-threats.csv', 'excluded.html', 'favicon.svg', 'index.html', 'robots.txt', 'sitemap.xml', 'software-threats.csv', 'thrlist.xlsx')
+      $actual = @($archive.Entries | Where-Object { $_.Name } | ForEach-Object { $_.FullName.Replace('\', '/') })
+      if ($actual.Count -ne $required.Count -or @(Compare-Object $required $actual -CaseSensitive).Count -gt 0) {
+        Add-Failure "$DisplayPath does not contain exactly the reviewed nine public files"
+      }
+    }
     foreach ($entry in $archive.Entries) {
       if ([string]::IsNullOrWhiteSpace($entry.Name)) { continue }
       $entryPath = "$DisplayPath!$($entry.FullName.Replace('\','/'))"
@@ -209,6 +216,16 @@ function Test-Archive(
       if ($entry.FullName -match '(?i)\.pdf$') {
         if (-not $script:reviewedPdfHashes.Contains($hash)) {
           Add-Failure "$entryPath is a public PDF without an approved reviewed SHA-256"
+        }
+      }
+
+      if ($Depth -eq 0 -and $DisplayPath -eq 'threats.pikov.expert') {
+        $threatsPublicFiles = @('.htaccess', 'excluded-threats.csv', 'excluded.html', 'favicon.svg', 'index.html', 'robots.txt', 'sitemap.xml', 'software-threats.csv', 'thrlist.xlsx')
+        if ($normalizedEntryName -cnotin $threatsPublicFiles) {
+          Add-Failure "$entryPath is outside the reviewed threat catalogue payload"
+        }
+        if ($normalizedEntryName -ceq 'thrlist.xlsx' -and $hash -cne 'e412ac6a8a6f49f0e21d532d87d86665c8df95354fa71c9fc0e7201f34f0fa2b') {
+          Add-Failure "$entryPath differs from the reviewed public XLSX SHA-256"
         }
       }
 
