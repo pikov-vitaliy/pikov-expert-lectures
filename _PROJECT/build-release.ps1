@@ -846,7 +846,13 @@ foreach ($target in $targets) {
   foreach ($relativeFile in $relativeFiles) {
     Copy-ReleaseFile -SourceRoot $sourceRoot -StageRoot $stageDir -RelativePath $relativeFile
   }
-  ConvertTo-DeterministicArchiveTree -Root $stageDir
+  $preserveBytesPaths = @()
+  if ($target.kind -eq 'domain' -and $target.folder -eq 'threats') {
+    # These downloads intentionally retain the reviewed UTF-8 BOM and CRLF,
+    # matching both the supplied CSV files and the catalogue's browser export.
+    $preserveBytesPaths = @('software-threats.csv', 'excluded-threats.csv')
+  }
+  ConvertTo-DeterministicArchiveTree -Root $stageDir -PreserveBytesPaths $preserveBytesPaths
 
   $issues = @(Test-StaticRelease -StageRoot $stageDir -SiteName $target.domain)
   $archivePath = Join-Path $releaseDir $archiveName
@@ -855,7 +861,7 @@ foreach ($target in $targets) {
 
   $stageChildren = @(Get-ChildItem -LiteralPath $stageDir -Force)
   if ($stageChildren.Count -eq 0) { Fail "No files selected for $($target.domain)" }
-  New-DeterministicArchive -SourceRoot $stageDir -Destination $archivePath
+  New-DeterministicArchive -SourceRoot $stageDir -Destination $archivePath -PreserveBytesPaths $preserveBytesPaths
 
   $verifyDir = Join-Path $releaseDir 'verify-unpacked'
   Reset-Directory -Path $verifyDir -RequiredParent $releaseDir

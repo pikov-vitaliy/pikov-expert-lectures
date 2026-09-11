@@ -25,13 +25,17 @@ function Test-DeterministicArchiveTextFile {
 }
 
 function Get-DeterministicArchiveBytes {
-  param([Parameter(Mandatory = $true)][string]$Path)
+  param(
+    [Parameter(Mandatory = $true)][string]$Path,
+    [switch]$PreserveBytes
+  )
 
   if (-not (Test-Path -LiteralPath $Path -PathType Leaf)) {
     throw "Archive source file is missing: $Path"
   }
 
   $bytes = [System.IO.File]::ReadAllBytes($Path)
+  if ($PreserveBytes) { return ,$bytes }
   if (-not (Test-DeterministicArchiveTextFile -Path $Path)) { return ,$bytes }
 
   $utf8 = New-Object System.Text.UTF8Encoding($false, $true)
@@ -46,6 +50,26 @@ function Get-DeterministicArchiveBytes {
   }
   $text = $text.Replace("`r`n", "`n").Replace("`r", "`n")
   return ,$utf8.GetBytes($text)
+}
+
+function Get-DeterministicPreserveBytesPaths {
+  param([string[]]$Paths = @())
+
+  $normalizedPaths = @()
+  foreach ($path in $Paths) {
+    $relative = $path.Replace('\', '/')
+    if ([string]::IsNullOrWhiteSpace($relative) -or
+        [System.IO.Path]::IsPathRooted($relative) -or
+        $relative -match '(^|/)\.\.?(?:/|$)|//|[:*?<>|"]' -or
+        $relative.EndsWith('/')) {
+      throw "Byte-preservation path must be an exact relative file path: $path"
+    }
+    if ($normalizedPaths -ccontains $relative) {
+      throw "Duplicate byte-preservation path: $path"
+    }
+    $normalizedPaths += $relative
+  }
+  return $normalizedPaths
 }
 
 function Get-DeterministicSha256 {
@@ -87,7 +111,8 @@ function Write-DeterministicUtf8Text {
 function Get-DeterministicArchiveFileRecord {
   param(
     [Parameter(Mandatory = $true)][string]$Path,
-    [Parameter(Mandatory = $true)][string]$ArchivePath
+    [Parameter(Mandatory = $true)][string]$ArchivePath,
+    [string[]]$PreserveBytesPaths = @()
   )
 
   $normalizedArchivePath = $ArchivePath.Replace('\', '/')
@@ -95,7 +120,8 @@ function Get-DeterministicArchiveFileRecord {
       $normalizedArchivePath -match '(^|/)\.\.(/|$)') {
     throw "Unsafe archive path: $ArchivePath"
   }
-  $bytes = Get-DeterministicArchiveBytes -Path $Path
+  $preservePaths = @(Get-DeterministicPreserveBytesPaths -Paths $PreserveBytesPaths)
+  $bytes = Get-DeterministicArchiveBytes -Path $Path -PreserveBytes:($preservePaths -ccontains $normalizedArchivePath)
   return [pscustomobject]@{
     path = $normalizedArchivePath
     bytes = $bytes.Length
@@ -104,9 +130,30 @@ function Get-DeterministicArchiveFileRecord {
 }
 
 function ConvertTo-DeterministicArchiveTree {
-  param([Parameter(Mandatory = $true)][string]$Root)
+  param(
+    [Parameter(Mandatory = $true)][string]$Root,
+    [string[]]$PreserveBytesPaths = @()
+  )
 
-  foreach ($file in @(Get-ChildItem -LiteralPath $Root -Recurse -File -Force)) {
+  $preservePaths = @(Get-DeterministicPreserveBytesPaths -Paths $PreserveBytesPaths)
+  $rootPath = (Get-Item -LiteralPath $Root -Force).FullName
+  $prefix = [System.IO.Path]::GetFullPath($rootPath).TrimEnd('\', '/') + [System.IO.Path]::DirectorySeparatorChar
+  $files = @(Get-ChildItem -LiteralPath $rootPath -Recurse -File -Force)
+  $relativePaths = @($files | ForEach-Object {
+    $full = [System.IO.Path]::GetFullPath($_.FullName)
+    if (-not $full.StartsWith($prefix, [System.StringComparison]::OrdinalIgnoreCase)) {
+      throw "Archive source escaped the expected root: $full"
+    }
+    $full.Substring($prefix.Length).Replace('\', '/')
+  })
+  foreach ($preserved in $preservePaths) {
+    if ($relativePaths -cnotcontains $preserved) {
+      throw "Byte-preservation file is missing or its case differs: $preserved"
+    }
+  }
+  for ($index = 0; $index -lt $files.Count; $index++) {
+    $file = $files[$index]
+    if ($preservePaths -ccontains $relativePaths[$index]) { continue }
     if (-not (Test-DeterministicArchiveTextFile -Path $file.FullName)) { continue }
     $bytes = Get-DeterministicArchiveBytes -Path $file.FullName
     [System.IO.File]::WriteAllBytes($file.FullName, $bytes)
@@ -116,13 +163,17 @@ function ConvertTo-DeterministicArchiveTree {
 function New-DeterministicArchive {
   param(
     [Parameter(Mandatory = $true)][string]$SourceRoot,
-    [Parameter(Mandatory = $true)][string]$Destination
+    [Parameter(Mandatory = $true)][string]$Destination,
+    [string[]]$PreserveBytesPaths = @()
   )
 
+  $preservePaths = @(Get-DeterministicPreserveBytesPaths -Paths $PreserveBytesPaths)
   $root = [System.IO.Path]::GetFullPath($SourceRoot).TrimEnd('\', '/')
   if (-not (Test-Path -LiteralPath $root -PathType Container)) {
     throw "Archive source directory is missing: $SourceRoot"
   }
+  # Align Windows 8.3 input aliases with the FullName values used below.
+  $root = [System.IO.Path]::GetFullPath((Get-Item -LiteralPath $root -Force).FullName).TrimEnd('\', '/')
 
   $reparsePoint = @(Get-ChildItem -LiteralPath $root -Recurse -Force | Where-Object {
     ($_.Attributes -band [System.IO.FileAttributes]::ReparsePoint) -ne 0
@@ -147,6 +198,11 @@ function New-DeterministicArchive {
 
   [string[]]$relativePaths = @($sourcesByPath.Keys)
   [System.Array]::Sort($relativePaths, [System.StringComparer]::Ordinal)
+  foreach ($preserved in $preservePaths) {
+    if ($relativePaths -cnotcontains $preserved) {
+      throw "Byte-preservation file is missing or its case differs: $preserved"
+    }
+  }
   $destinationFull = [System.IO.Path]::GetFullPath($Destination)
   $destinationParent = [System.IO.Path]::GetDirectoryName($destinationFull)
   if (-not (Test-Path -LiteralPath $destinationParent -PathType Container)) {
@@ -182,7 +238,9 @@ function New-DeterministicArchive {
           $entry.ExternalAttributes = [int]-2119958528
           $entryStream = $entry.Open()
           try {
-            $bytes = Get-DeterministicArchiveBytes -Path ([string]$sourcesByPath[$relative])
+            $bytes = Get-DeterministicArchiveBytes `
+              -Path ([string]$sourcesByPath[$relative]) `
+              -PreserveBytes:($preservePaths -ccontains $relative)
             $entryStream.Write($bytes, 0, $bytes.Length)
           }
           finally {
