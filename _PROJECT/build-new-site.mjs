@@ -30,14 +30,14 @@ const copy = {
     topics:'Explore by subject', topicsIntro:'Different disciplines. One engineering perspective.', topicAction:'View materials',
     selected:'A few places to begin', selectedIntro:'An introduction to how I approach security, teaching and practical work.',
     catalogue:'The material library', catalogueIntro:'Lectures, courses, practical assignments and references, all in one place.',
-    languageNote:'The website is available in English and Russian. Lecture pages and teaching materials open in Russian.',
+    languageNote:'The website is available in English and Russian. Most teaching materials are in Russian; English resources are identified on their cards.',
     query:'Search materials', placeholder:'Try SBOM, Astra Linux or threat modelling', topic:'Subject', allTopics:'All subjects',
     format:'Format', allFormats:'All formats', reset:'Clear filters', empty:'No materials match these filters.', emptyHelp:'Try a broader search or clear the filters.',
     kinds:{lecture:'Lecture',course:'Course',practice:'Practical workshop',reference:'Reference'},
     opens:{lecture:'Read the lecture',course:'Explore the course',practice:'Open the workshop',reference:'Open the reference'},
-    description:'Full description', russian:'In Russian', resources:'materials', results:'{shown} of {total} materials',
+    description:'Full description', russian:'In Russian', bilingual:'Russian / English', resources:'materials', results:'{shown} of {total} materials',
     pathTitle:'Choose your starting point', pathIntro:'A suggested order for building knowledge and putting it to work.',
-    routeMore:'View the full teaching map', routeNotice:'The teaching map and linked materials are in Russian.',
+    routeMore:'View the full teaching map', routeNotice:'The teaching map is bilingual; most linked materials are in Russian.',
     routes:[['Getting started','Learn the language of security','Understand assets, threats and risk. Start by mapping the boundaries of a simple information system.','Start with information systems','https://is.pikov.expert/'],['Administrators & security engineers','Build a system you can verify','Work through configuration, hardening and monitoring. Check what changed and how to roll it back.','Start with Astra Linux','https://astra-intro.pikov.expert/'],['Developers & DevSecOps','Bring security into development','Connect architecture, threat modelling, code analysis and software composition with evidence of the result.','Start with secure development','https://main-rbpo.pikov.expert/']],
     shortAbout:'Engineering, research and teaching.', shortAboutText:'My work brings together secure software development, information security and education. I translate requirements into architecture, working processes and checks that teams can use.',
     background:'More about my background', expertise:['Secure C/C++','SCA & SBOM','AppSec & DevSecOps','Threat modelling'],
@@ -58,14 +58,14 @@ const copy = {
     topics:'Выберите направление', topicsIntro:'Разные дисциплины. Общий инженерный подход.', topicAction:'Смотреть материалы',
     selected:'С чего можно начать', selectedIntro:'Несколько материалов для знакомства с моим подходом к безопасности и преподаванию.',
     catalogue:'Библиотека материалов', catalogueIntro:'Лекции, курсы, практические задания и справочники в одном месте.',
-    languageNote:'Сайт доступен на английском и русском. Лекции и учебные материалы опубликованы на русском языке.',
+    languageNote:'Сайт доступен на английском и русском. Большинство учебных материалов — на русском; англоязычные выпуски отмечены в карточках.',
     query:'Поиск по материалам', placeholder:'Например, SBOM, Astra Linux или модель угроз', topic:'Направление', allTopics:'Все направления',
     format:'Формат', allFormats:'Все форматы', reset:'Сбросить фильтры', empty:'Материалов по этим условиям не найдено.', emptyHelp:'Попробуйте более общий запрос или сбросьте фильтры.',
     kinds:{lecture:'Лекция',course:'Курс',practice:'Практикум',reference:'Справочник'},
     opens:{lecture:'Открыть лекцию',course:'Перейти к курсу',practice:'Открыть практикум',reference:'Открыть справочник'},
-    description:'Полное описание', russian:'На русском', resources:'материалов', results:'Показано {shown} из {total}',
+    description:'Полное описание', russian:'На русском', bilingual:'Русский / English', resources:'материалов', results:'Показано {shown} из {total}',
     pathTitle:'Выберите точку входа', pathIntro:'Рекомендуемая последовательность, чтобы разобраться в теме и применить знания.',
-    routeMore:'Полная преподавательская карта', routeNotice:'Карта и материалы маршрутов доступны на русском языке.',
+    routeMore:'Полная преподавательская карта', routeNotice:'Преподавательская карта двуязычная; большинство материалов маршрутов — на русском.',
     routes:[['Начинающим','Разобраться в основах ИБ','Активы, угрозы и риски. Начните с определения границ простой информационной системы.','Начать с информационных систем','https://is.pikov.expert/'],['Администраторам и специалистам по ИБ','Проверить и защитить систему','Конфигурация, безопасная настройка и мониторинг. Проверяйте результат изменений и возможность отката.','Начать с Astra Linux','https://astra-intro.pikov.expert/'],['Разработчикам и DevSecOps','Встроить безопасность в разработку','Свяжите архитектуру, модель угроз, анализ кода и компонентов с проверяемым результатом.','Начать с безопасной разработки','https://main-rbpo.pikov.expert/']],
     shortAbout:'Инженерная практика, наука и преподавание.', shortAboutText:'Моя работа объединяет безопасную разработку ПО, информационную безопасность и образование. Перевожу требования в архитектурные решения, рабочие процессы и проверки, которыми может пользоваться команда.',
     background:'Подробнее о профессиональном пути', expertise:['Безопасность C/C++','SCA и SBOM','AppSec и DevSecOps','Моделирование угроз'],
@@ -116,7 +116,7 @@ function card(item, lang, featured = false) {
   const full = label(item, 'description', lang);
   const search = [item.title,item.titleEn,item.description,item.descriptionEn,item.url,item.format,item.formatEn].join(' ');
   return `<article class="material-card topic-${esc(item.category)}${featured ? ' featured-card' : ''}"${featured ? '' : ` data-material data-category="${esc(item.category)}" data-kind="${item.kind}" data-search="${esc(search)}"`}>
-<div class="material-meta"><span>${esc(t.kinds[item.kind])}</span><span>${esc(t.russian)}</span></div>
+<div class="material-meta"><span>${esc(t.kinds[item.kind])}</span><span>${esc(item.languages?.includes("en") ? t.bilingual : t.russian)}</span></div>
 <h3><a href="${esc(item.url)}">${esc(materialTitle(item, lang))}</a></h3><p>${esc(short)}</p>
 ${!featured && full !== short ? `<details><summary>${t.description}</summary><p>${esc(full)}</p></details>` : ''}
 <a class="material-action" href="${esc(item.url)}">${esc(t.opens[item.kind])} ${arrow}</a></article>`;
@@ -158,7 +158,7 @@ function page(lang,isAbout) {
   const url = `https://pikov.expert${route}`;
   const title = isAbout ? `${t.aboutTitle} — pikov.expert` : `${t.name} — ${lang === 'en' ? 'secure development & teaching' : 'безопасная разработка и преподавание'}`;
   const description = isAbout ? t.aboutMeta : t.meta;
-  const schema = { '@context':'https://schema.org','@type':isAbout?'ProfilePage':'CollectionPage',url,name:title,description,inLanguage:lang,mainEntity:isAbout?{'@type':'Person',name:t.name,url:`https://pikov.expert${about(lang)}`,image:'https://pikov.expert/photo.jpg',jobTitle:lang==='en'?'Secure software development expert and lecturer':'Эксперт по безопасной разработке ПО и преподаватель'}:{'@type':'ItemList',numberOfItems:lectures.length,itemListElement:lectures.map((item,i)=>({'@type':'ListItem',position:i+1,item:{'@type':item.kind==='reference'?'CreativeWork':item.kind==='course'?'Course':'LearningResource',name:materialTitle(item,lang),url:item.url,inLanguage:'ru'}}))}};
+  const schema = { '@context':'https://schema.org','@type':isAbout?'ProfilePage':'CollectionPage',url,name:title,description,inLanguage:lang,mainEntity:isAbout?{'@type':'Person',name:t.name,url:`https://pikov.expert${about(lang)}`,image:'https://pikov.expert/photo.jpg',jobTitle:lang==='en'?'Secure software development expert and lecturer':'Эксперт по безопасной разработке ПО и преподаватель'}:{'@type':'ItemList',numberOfItems:lectures.length,itemListElement:lectures.map((item,i)=>({'@type':'ListItem',position:i+1,item:{'@type':item.kind==='reference'?'CreativeWork':item.kind==='course'?'Course':'LearningResource',name:materialTitle(item,lang),url:item.url,inLanguage:item.languages || 'ru'}}))}};
   return `<!doctype html>
 <!-- Generated by _PROJECT/build-new-site.mjs. Edit the generator or shared source catalogue. -->
 <html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${esc(title)}</title><meta name="description" content="${esc(description)}"><meta name="robots" content="noindex,follow"><link rel="canonical" href="${url}">

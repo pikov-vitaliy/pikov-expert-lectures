@@ -122,9 +122,10 @@ test("head declares both languages for search engines", () => {
   assert.match(catalogue, /searchParams\.delete\("lang"\)/);
 });
 
-test("the English page warns that the courses themselves are in Russian", () => {
+test("the English page accurately distinguishes mostly Russian teaching and English EP01", () => {
   const notice = root.match(/<p class="lang-notice"[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? "";
-  assert.match(notice, /taught and published in Russian/i);
+  assert.match(notice, /Most courses are taught and published in Russian/i);
+  assert.match(notice, /English EP01/i);
   assert.match(notice, /vitaly@pikov\.expert/);
 });
 

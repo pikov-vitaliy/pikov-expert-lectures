@@ -173,6 +173,17 @@ test('additional sites publish only their reviewed payload and require tracked s
   assert.ok(entry);
   const manifest = JSON.parse(readFileSync(join(extra, 'release', 'MANIFEST.json'), 'utf8'));
   assert.deepEqual(manifest.files.map(x => x.path), ['index.html']);
+
+  // Adding an existing site to the visible catalogue must keep its closed payload.
+  registry.lectures.push({ ...registry.additionalSites[0], position: 2, status: 'published-snapshot' });
+  registry.additionalSites = [];
+  writeFileSync(registryPath, JSON.stringify(registry), 'utf8');
+  runGit(fixture.root, ['add', '_PROJECT/lectures.json', 'extra-site/draft.html']);
+  runGit(fixture.root, ['commit', '-m', 'Include the reviewed site in the catalogue']);
+  const promoted = runBuild(fixture);
+  assert.equal(promoted.status, 0, output(promoted));
+  const promotedManifest = JSON.parse(readFileSync(join(extra, 'release', 'MANIFEST.json'), 'utf8'));
+  assert.deepEqual(promotedManifest.files.map(x => x.path), ['index.html']);
 });
 
 test('dirty working tree builds a nondeployable candidate with a selected-source digest', (t) => {

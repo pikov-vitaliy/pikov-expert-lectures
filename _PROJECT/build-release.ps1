@@ -456,8 +456,9 @@ function Get-ThreatsReleaseFiles([string]$FolderPath) {
 
 function Get-DomainReleaseFiles([string]$FolderPath) {
   $folderName = Split-Path -Leaf $FolderPath
-  $additional = @($additionalSites | Where-Object { $_.folder -eq $folderName })
-  if ($additional.Count -gt 0) {
+  # A reviewed public payload stays closed when the site becomes a catalogue entry.
+  $additional = @($siteEntries | Where-Object { $_.folder -eq $folderName -and $_.PSObject.Properties.Name -contains 'publicFiles' })
+  if ($additional.Count -gt 0 -or @($additionalSites | Where-Object { $_.folder -eq $folderName }).Count -gt 0) {
     if ($additional.Count -ne 1 -or @($additional[0].publicFiles).Count -eq 0) { Fail "Invalid additional site allowlist: $folderName" }
     foreach ($relative in @($additional[0].publicFiles)) {
       [void](Get-ValidatedReleaseSourcePath -SourceRoot $FolderPath -RelativePath $relative)
