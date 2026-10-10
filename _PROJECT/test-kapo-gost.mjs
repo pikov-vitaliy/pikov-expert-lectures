@@ -49,3 +49,12 @@ test('Archify maps have real SVG nodes and course diagrams are present',()=>{
  }
  assert.equal(fs.readdirSync(path.join(root,'kapo/assets/course-diagrams')).filter(x=>x.endsWith('.svg')).length,29);
 });
+
+test('GOST materials catalogue has one link per destination across header, cards and footer',()=>{
+ const hub=read('gost56939/materials/index.html');
+ const destinations=[...hub.matchAll(/<a\b[^>]*\bhref="([^"]+)"/g)].map(m=>new URL(m[1],'https://gost56939.pikov.expert/materials/').href);
+ assert.equal(destinations.length,13);
+ assert.equal(new Set(destinations).size,destinations.length,'Duplicate navigation destination');
+ assert.equal(destinations.filter(url=>url.endsWith('/process-map/index.html')).length,1);
+ assert.ok(destinations.includes('https://gost56939.pikov.expert/index.html'));
+});
