@@ -24,7 +24,7 @@ test('KAPO publishes the complete course and original figures without the former
  assert.equal((html.match(/<tr>/g)||[]).length,7);
  for(const file of ['composition-analysis-national-standard-draft.pdf','composition-analysis-national-standard-draft.docx'])assert.ok(fs.statSync(path.join(root,'kapo/downloads',file)).size>100000);
 });
-test('GOST retains the exact eight original teaching screens and exposes all ten independent landings',()=>{
+test('GOST retains the exact eight original teaching screens and exposes nine current landings and preserves the original map privately',()=>{
  const html=read('gost56939/index.html');
  const screens=[...html.matchAll(/<section class="screen"[\s\S]*?<\/section>/g)].map(m=>hash(m[0].replace(/\r\n/g,'\n')));
  assert.equal(screens.length,8);assert.deepEqual(screens,JSON.parse(read('gost56939/_build/original-screen-hashes.json')));
@@ -33,7 +33,12 @@ test('GOST retains the exact eight original teaching screens and exposes all ten
  assert.equal(sources.length,10);
  for(const s of sources)assert.equal(hash(fs.readFileSync(path.join(root,'gost56939',s.public),'utf8').replace(/\r\n/g,'\n')),s.publishedSha256,s.public);
  const hub=read('gost56939/materials/index.html');
- assert.equal((hub.match(/<article class="card"(?:\s[^>]*)?>/g)||[]).length,10);
+ assert.equal((hub.match(/<article class="card"(?:\s[^>]*)?>/g)||[]).length,9);
+ assert.doesNotMatch(hub,/process-map-original/);
+ const archived=sources.find(s=>s.archived);
+ assert.equal(hash(read("gost56939/"+archived.archived).replace(/\r\n/g,"\n")),archived.archivedSha256);
+ assert.match(read("gost56939/"+archived.public),/http-equiv="refresh"/);
+ assert.doesNotMatch(read("gost56939/sitemap.xml"),/process-map-original/);
 });
 test('Archify maps have real SVG nodes and course diagrams are present',()=>{
  for(const name of ['component-decision','facts-and-decisions']){

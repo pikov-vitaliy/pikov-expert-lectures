@@ -380,6 +380,7 @@ foreach ($folder in $uniqueFolders) {
     Sort-Object FullName |
     ForEach-Object {
       $relative = Get-RelativePathSafe -BasePath $folderPath -Path $_.FullName
+      if ($folder -eq 'gost56939' -and $relative.Replace('\', '/') -eq 'materials/process-map-original/index.html') { return }
       if (-not (Should-SkipSitemapPath $relative)) {
         Add-UniqueUrl -List $urls -Url (HtmlPathToUrl -RelativePath $relative -BaseUrl $baseUrl)
       }
