@@ -216,11 +216,14 @@ function Get-CanonicalReleaseTargets([object]$LectureData, [string]$RepositoryRo
     archivePath = Join-Path $RepositoryRoot "release\pikov.expert-root-release-$Date.zip"
   })
 
-  $folders = @($LectureData.lectures | Select-Object -ExpandProperty folder -Unique)
+  $additionalSites = @()
+  if ($LectureData.PSObject.Properties.Name -contains 'additionalSites') { $additionalSites = @($LectureData.additionalSites) }
+  $siteEntries = @($LectureData.lectures) + $additionalSites
+  $folders = @($siteEntries | Select-Object -ExpandProperty folder -Unique)
   foreach ($folderValue in $folders) {
     $folder = [string]$folderValue
     Assert-SafeLeaf -Value $folder -FieldName 'lecture folder' -Pattern '^[A-Za-z0-9][A-Za-z0-9._-]*$'
-    $lecture = @($LectureData.lectures | Where-Object { ([string]$_.folder) -ceq $folder })[0]
+    $lecture = @($siteEntries | Where-Object { ([string]$_.folder) -ceq $folder })[0]
     $domain = "$([string]$lecture.domain).pikov.expert"
     Assert-SafeLeaf -Value $domain -FieldName 'canonical domain' -Pattern '^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*$'
     $archiveName = "$domain-release-$Date.zip"

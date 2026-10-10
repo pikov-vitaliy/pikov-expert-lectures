@@ -151,6 +151,30 @@ function readIndex(fixture) {
   return JSON.parse(readFileSync(join(fixture.project, `RELEASE_INDEX_${releaseDate}.json`), 'utf8'));
 }
 
+test('additional sites publish only their reviewed payload and require tracked sources', (t) => {
+  const fixture = makeFixture();
+  t.after(() => rmSync(fixture.root, { recursive: true, force: true }));
+  const extra = join(fixture.root, 'extra-site');
+  mkdirSync(extra);
+  writeFileSync(join(extra, 'index.html'), '<!doctype html><title>Extra</title><p>Published page</p>', 'utf8');
+  writeFileSync(join(extra, 'draft.html'), '<p>Unreviewed draft</p>', 'utf8');
+  const registryPath = join(fixture.project, 'lectures.json');
+  const registry = JSON.parse(readFileSync(registryPath, 'utf8'));
+  registry.additionalSites = [{folder:'extra-site',domain:'extra-site',url:'https://extra-site.pikov.expert/',title:'Extra site',publicFiles:['index.html']}];
+  writeFileSync(registryPath, JSON.stringify(registry), 'utf8');
+  const untracked = runBuild(fixture);
+  assert.notEqual(untracked.status, 0);
+  assert.match(output(untracked), /Untracked repository artifact/i);
+  runGit(fixture.root, ['add', '_PROJECT/lectures.json', 'extra-site/index.html']);
+  runGit(fixture.root, ['commit', '-m', 'Review extra site payload']);
+  const built = runBuild(fixture);
+  assert.equal(built.status, 0, output(built));
+  const entry = readIndex(fixture).find(x => x.domain === 'extra-site.pikov.expert');
+  assert.ok(entry);
+  const manifest = JSON.parse(readFileSync(join(extra, 'release', 'MANIFEST.json'), 'utf8'));
+  assert.deepEqual(manifest.files.map(x => x.path), ['index.html']);
+});
+
 test('dirty working tree builds a nondeployable candidate with a selected-source digest', (t) => {
   const fixture = makeFixture();
   t.after(() => rmSync(fixture.root, { recursive: true, force: true }));

@@ -140,8 +140,7 @@ def rendered_markdown(text: str, prefix: str) -> tuple[str, list[tuple[str, str]
             del link["href"]
         elif not urlsplit(href).scheme:
             parts = urlsplit(href)
-            target = (ROOT / unquote(parts.path)).resolve()
-            link["href"] = target.as_uri() + ("#" + parts.fragment if parts.fragment else "")
+            link["href"] = parts.geturl()
         if str(link.get("href", "")).startswith(("https://", "http://")):
             link["rel"] = "noopener noreferrer"
     for image in soup.find_all("img", src=True):
@@ -244,7 +243,7 @@ def source_file_cards() -> str:
     for path in candidates:
         label = "Полная транскрипция" if "Транскрипция" in path.name else "Краткий пересказ"
         detail = "Основа подробной тематической лекции; сверка рассказа и вопросов участников." if "Транскрипция" in path.name else "Вспомогательная навигация по темам; не заменяет полный текст."
-        cards.append(f'<article class="source-card"><span class="tag">{esc(label)}</span><h3>{esc(path.name)}</h3><p>{detail}</p><a href="{esc(path.as_uri())}">Открыть исходный текст</a><code class="path">{esc(path)}</code></article>')
+        cards.append(f'<article class="source-card"><span class="tag">{esc(label)}</span><h3>{esc(path.name)}</h3><p>{detail}</p><a href="{esc(path.name)}">Открыть исходный текст</a><code class="path">{esc(path.name)}</code></article>')
     return "".join(cards)
 
 
@@ -337,11 +336,11 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
         ("История и границы источников", ROOT / "EP01-history-research.md", "Сопоставление исторического рассказа, исследовательских публикаций и нормативных источников."),
         ("Хронометраж", ROOT / "EP01-timing.md", "Плановые интервалы слайдов и расчёт объёма речи."),
     ]
-    file_rows = "".join(f'<li><span class="file-number">{i:02d}</span><div><h3><a href="{esc(path.as_uri())}">{esc(label)}</a></h3><p>{esc(detail)}</p><code class="path">{esc(path)}</code></div></li>' for i, (label, path, detail) in enumerate(files, 1))
+    file_rows = "".join(f'<li><span class="file-number">{i:02d}</span><div><h3><a href="{esc(path.name)}">{esc(label)}</a></h3><p>{esc(detail)}</p><code class="path">{esc(path.name)}</code></div></li>' for i, (label, path, detail) in enumerate(files, 1))
     body = f'''<div class="hero wrap"><span class="eyebrow">Материалы автора / учебная лекция и выпуск EP01</span>
 <div class="hero-grid"><div><h1>Безопасная разработка.<br>Учебная лекция и материалы серии</h1><p class="deck">Самостоятельная лекция на русском языке объясняет историю методологий, создание национального стандарта и организацию безопасной разработки. Рядом сохранены англоязычный выпуск EP01 и материалы для подготовки к записи.</p></div>
 <aside class="edition"><strong>{duration(total_seconds)} · EP01</strong>{len(slides)} слайдов с полной английской речью.<br>Подробная русская лекция и {len(paths)} Markdown-документов в архиве.</aside></div>
-<div class="hero-links"><a class="button" href="#transcript">Самостоятельная учебная лекция</a><a class="button secondary" href="#speech">Речь для EP01</a><a class="button secondary" href="http://127.0.0.1:8765/">Открыть локальную презентацию</a></div></div>
+<div class="hero-links"><a class="button" href="#transcript">Самостоятельная учебная лекция</a><a class="button secondary" href="#speech">Речь для EP01</a><a class="button secondary" href="index.html">Открыть презентацию</a></div></div>
 <nav class="jump-nav" aria-label="Разделы отчёта"><div class="wrap"><a href="#result">Что подготовлено</a><a href="#transcript">Подробная лекция</a><a href="#schedule">План выпуска</a><a href="#sources">Источники</a><a href="#speech">Полная речь</a><a href="#archive">Все {len(paths)} документов</a><a href="#files">Файлы</a></div></nav>
 <main class="wrap" id="main">
 <section id="result"><span class="section-label">Результат работы</span><h2>Содержание сохранено в двух формах</h2>
@@ -358,7 +357,7 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
 <p class="notice" id="qa-status">{esc(qa_text)}</p></section>
 <section id="transcript"><span class="section-label">Учебные материалы / составитель Виталий Пиков</span><h2>История стандартов и организация безопасной разработки</h2>
 <p class="section-intro">В учебном материале сохранены два основных блока: исторический доклад и совместный практический разбор. Введение, практикум, вопросы и библиография помогают изучить материал последовательно и применить его в работе команды.</p>
-<div class="hero-links"><a class="button" href="http://127.0.0.1:8765/PVS-2025-07-02-lecture.html">Отдельная лекция в локальном браузере</a><a class="button secondary" href="{esc(LECTURE_MD.as_uri())}">Markdown лекции</a><a class="button secondary" href="#archive-01">Читать здесь без сети</a></div>
+<div class="hero-links"><a class="button" href="PVS-2025-07-02-lecture.html">Открыть отдельную лекцию</a><a class="button secondary" href="{esc(LECTURE_MD.name)}">Markdown лекции</a><a class="button secondary" href="#archive-01">Читать здесь без сети</a></div>
 <nav class="contents" aria-label="Темы учебной лекции"><h3 style="margin-top:0">Содержание лекции</h3><ol class="toc-parts">{lecture_topics}</ol></nav>
 <details class="raw-source" id="history-source-files"><summary>Первичные материалы для работы автора</summary><div class="source-grid">{source_file_cards()}</div></details></section>
 <section id="cover"><span class="section-label">Серия / единый визуальный стиль</span><h2 lang="en">{esc(data['title'])}</h2><p class="section-intro" lang="en">{esc(data['subtitle'])}</p><img class="cover" src="data:image/png;base64,{cover}" alt="Обложка EP01 с портретом Vitaliy Pikov"><p class="caption">Бренд серии сохранён. Содержание слайдов и речь обновляются из Markdown-источника.</p></section>
@@ -371,7 +370,7 @@ def build_review(data: dict, paths: list[Path], qa_text: str, date_label: str) -
 <div class="actions"><button class="action" data-toggle-group=".speech-entry" data-open-label="Раскрыть всю речь" data-close-label="Свернуть всю речь" aria-expanded="false">Раскрыть всю речь</button></div><div class="speech-list">{speech_block(data)}</div></section>
 <section id="archive"><span class="section-label">Полный автономный архив</span><h2>Все {len(paths)} Markdown-документов</h2><p class="section-intro">Каждый документ доступен в оформленном виде и как полный исходный Markdown. Контрольные суммы позволяют сопоставить эту версию с файлами проекта.</p>
 <div class="actions"><button class="action secondary" data-toggle-group=".archive-entry" data-open-label="Раскрыть все документы" data-close-label="Свернуть все документы" aria-expanded="false">Раскрыть все документы</button></div><div class="archive-list">{archive}</div></section>
-<section id="files"><span class="section-label">Материалы проекта</span><h2>Где лежат результаты</h2><p class="section-intro">Ссылки на файлы рассчитаны на локальный доступ. Полный текст речи и всех Markdown-документов уже включён в этот HTML; локальная презентация доступна при запущенном сервере на порту 8765.</p><ol class="document-list">{file_rows}</ol></section></main>'''
+<section id="files"><span class="section-label">Материалы проекта</span><h2>Где лежат результаты</h2><p class="section-intro">Материалы открываются по относительным ссылкам на сайте и в локальной копии. Полный текст речи и Markdown-документов также включён в эту страницу.</p><ol class="document-list">{file_rows}</ol></section></main>'''
     result = shell("Учебная лекция и материалы EP01 · pikov.expert", "Самостоятельная лекция по истории стандартов и организации безопасной разработки; англоязычный выпуск EP01 и материалы автора.", body, date_label)
     stats = {"slides": len(slides), "planned_seconds": total_seconds, "planned_duration": duration(total_seconds), "english_words": total_words, "markdown_documents": len(paths), "sources": len(data["sources"]), "manifest": manifest}
     return result, stats

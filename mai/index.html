@@ -1,0 +1,317 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Осенний семестр в МАИ</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Onest:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<style>
+:root{
+  --bg:#F4F6F8; --card:#FFFFFF; --ink:#14202B; --soft:#5B6B7A; --line:#DCE2E8;
+  --acc:#1E5AA8; --acc-soft:#E7EEF8; --amber:#B26E00; --amber-soft:#F7EEDC;
+  --lk:#1E5AA8; --lk-bg:#E7EEF8; --pz:#2E7D5B; --pz-bg:#E5F1EB; --lr:#8A4A9E; --lr-bg:#F1E8F5;
+  --board:#14202B; --board-ink:#FFD489;
+  --mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
+  --disp:'Unbounded',system-ui,sans-serif;
+  --body:'Onest','Segoe UI',system-ui,sans-serif;
+  --shadow:0 1px 3px rgba(20,32,43,.08),0 4px 16px rgba(20,32,43,.06);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1319; --card:#161D26; --ink:#E9EDF2; --soft:#8C9AA9; --line:#2A3440;
+    --acc:#6FA8E8; --acc-soft:#1D2A3C; --amber:#FFB454; --amber-soft:#33270F;
+    --lk:#6FA8E8; --lk-bg:#1D2A3C; --pz:#7CC7A2; --pz-bg:#16281F; --lr:#CE93DF; --lr-bg:#2C1E33;
+    --board:#0A0E13; --board-ink:#FFC46B;
+    --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1319; --card:#161D26; --ink:#E9EDF2; --soft:#8C9AA9; --line:#2A3440;
+  --acc:#6FA8E8; --acc-soft:#1D2A3C; --amber:#FFB454; --amber-soft:#33270F;
+  --lk:#6FA8E8; --lk-bg:#1D2A3C; --pz:#7CC7A2; --pz-bg:#16281F; --lr:#CE93DF; --lr-bg:#2C1E33;
+  --board:#0A0E13; --board-ink:#FFC46B;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 4px 16px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.55}
+.wrap{max-width:960px;margin:0 auto;padding:36px 20px 80px}
+h1{font-family:var(--disp);font-weight:800;font-size:clamp(24px,4.6vw,38px);line-height:1.15;margin:0;text-wrap:balance}
+.sub{color:var(--soft);margin-top:10px;max-width:70ch}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--acc);font-weight:500;margin-bottom:12px}
+.stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:20px}
+.stat b{font-family:var(--disp);font-weight:600;font-size:20px;display:block}
+.stat span{font-size:12.5px;color:var(--soft)}
+/* табло ближайшего */
+.board{margin-top:26px;background:var(--board);border-radius:10px;padding:18px 22px;color:var(--board-ink);font-family:var(--mono);box-shadow:var(--shadow);overflow-x:auto}
+.board .cap{font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.75;margin-bottom:8px}
+.board .line{display:flex;gap:20px;align-items:baseline;flex-wrap:wrap;white-space:nowrap}
+.board .big{font-size:clamp(18px,3.4vw,26px);font-weight:700}
+.board .dim{opacity:.8;font-size:14px}
+/* фильтры */
+.filters{position:sticky;top:0;z-index:5;background:var(--bg);padding:16px 0 12px;border-bottom:1px solid var(--line);margin-top:28px}
+.frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
+.frow .flabel{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);min-width:64px}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:100px;padding:5px 14px;font-size:13.5px;font-weight:500;cursor:pointer;font-family:var(--body);transition:background .12s,border-color .12s}
+.chip:hover{border-color:var(--acc)}
+.chip:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.chip.on{background:var(--acc);border-color:var(--acc);color:#fff}
+:root[data-theme="dark"] .chip.on,body .chip.on{color:#fff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .chip.on{color:#0E1319}}
+:root[data-theme="dark"] .chip.on{color:#0E1319}
+.search{flex:1;min-width:180px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:8px;padding:7px 12px;font-family:var(--body);font-size:14px}
+.search:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.fmeta{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px;color:var(--soft)}
+.reset{background:none;border:none;color:var(--acc);cursor:pointer;font-size:13px;font-family:var(--body);padding:2px 4px}
+.reset:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+/* дни и карточки */
+.day{margin-top:34px}
+.dayhead{display:flex;align-items:baseline;gap:14px;margin-bottom:14px}
+.dayhead .dn{font-family:var(--disp);font-weight:600;font-size:21px}
+.dayhead .dm{font-family:var(--mono);font-size:12px;color:var(--soft)}
+.cards{display:flex;flex-direction:column;gap:12px}
+.les{display:grid;grid-template-columns:118px 1fr;gap:0 18px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;box-shadow:var(--shadow)}
+.les.next-hl{border-color:var(--amber);box-shadow:0 0 0 2px var(--amber-soft),var(--shadow)}
+.les .tm{font-family:var(--mono);font-weight:700;font-size:17px;line-height:1.3}
+.les .tm small{display:block;font-weight:400;font-size:11.5px;color:var(--soft);margin-top:2px}
+.les h3{margin:0;font-size:16.5px;font-weight:600;line-height:1.35;font-family:var(--body)}
+.badges{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.b{border-radius:5px;padding:2px 9px;font-size:12px;font-weight:600;font-family:var(--mono)}
+.b.lk{background:var(--lk-bg);color:var(--lk)}
+.b.pz{background:var(--pz-bg);color:var(--pz)}
+.b.lr{background:var(--lr-bg);color:var(--lr)}
+.b.n{background:var(--acc-soft);color:var(--acc)}
+.b.w1{background:var(--pz-bg);color:var(--pz)}
+.b.w2{background:var(--amber-soft);color:var(--amber)}
+.les .meta{font-size:13px;color:var(--soft);margin-top:8px}
+.les details{margin-top:10px}
+.les summary{cursor:pointer;font-size:13px;color:var(--acc);user-select:none}
+.les summary:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.dates{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.d1{font-family:var(--mono);font-size:12.5px;border:1px solid var(--line);border-radius:5px;padding:2px 8px}
+.d1.past{opacity:.42;text-decoration:line-through}
+.d1.nxt{border-color:var(--amber);color:var(--amber);font-weight:700}
+.empty{display:none;text-align:center;color:var(--soft);padding:40px 0}
+footer{margin-top:52px;border-top:1px solid var(--line);padding-top:16px;font-size:13px;color:var(--soft)}
+footer p{max-width:76ch}
+/* переключатель темы */
+.theme-btn{position:fixed;top:14px;right:14px;z-index:20;display:flex;align-items:center;gap:7px;
+  background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:100px;
+  padding:7px 14px;font-family:var(--body);font-size:13px;font-weight:600;cursor:pointer;
+  box-shadow:var(--shadow);transition:border-color .12s}
+.theme-btn:hover{border-color:var(--acc)}
+.theme-btn:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.theme-btn .ico{font-size:15px;line-height:1}
+@media (max-width:700px){.theme-btn .txt{display:none}.theme-btn{padding:8px 11px}}
+@media (max-width:540px){.les{grid-template-columns:1fr}.les .tm{margin-bottom:6px}}
+@media (prefers-reduced-motion:no-preference){
+  .board{animation:fadein .5s ease-out}
+  @keyframes fadein{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+}
+</style><meta name="description" content="Осенний семестр в МАИ — учебные материалы Виталия Пикова.">
+<link rel="canonical" href="https://mai.pikov.expert/">
+<meta property="og:title" content="Осенний семестр в МАИ">
+<meta property="og:description" content="Осенний семестр в МАИ — учебные материалы Виталия Пикова.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://mai.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Осенний семестр в МАИ", "url": "https://mai.pikov.expert/", "author": {"@type": "Person", "name": "Виталий Пиков"}}</script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head><body>
+
+<script>
+/* применяем сохранённую тему до отрисовки, чтобы не мигало */
+try{
+  var savedTheme=localStorage.getItem('mai-theme');
+  if(savedTheme==='light'||savedTheme==='dark'){document.documentElement.dataset.theme=savedTheme;}
+}catch(e){}
+</script>
+
+<button class="theme-btn" id="themeBtn" title="Переключить тему">
+  <span class="ico" id="themeIco">◐</span><span class="txt" id="themeTxt">Тема: авто</span>
+</button>
+
+<div class="wrap">
+  <div class="kicker">МАИ · осенний семестр 2026/27 · преподаватель Пиков В. А.</div>
+  <h1>Осенний семестр в МАИ</h1>
+  <p class="sub">Шесть дисциплин в шести группах, четыре учебных дня в неделю. Сетка МАИ двухстрочная: занятия в слитых ячейках идут <b>каждую неделю</b>, в одиночных строках — <b>раз в две недели</b> (пн и вт чередуются, во вторник вечером лекция и лабораторная делят один слот).</p>
+  <div class="stats">
+    <div class="stat"><b class="mono">10</b><span>блоков в сетке</span></div>
+    <div class="stat"><b class="mono">6</b><span>дисциплин · 6 групп</span></div>
+    <div class="stat"><b class="mono">108</b><span>занятий за семестр</span></div>
+    <div class="stat"><b class="mono">04.09—22.12</b><span>первое и последнее</span></div>
+  </div>
+
+  <div class="board" id="board">
+    <div class="cap">Ближайшее занятие</div>
+    <div class="line" id="boardline">…</div>
+  </div>
+
+  <div class="filters">
+    <div class="frow"><span class="flabel">Вид</span>
+      <button class="chip" data-f="type" data-v="ЛК">ЛК — лекция</button>
+      <button class="chip" data-f="type" data-v="ПЗ">ПЗ — практика</button>
+      <button class="chip" data-f="type" data-v="ЛР">ЛР — лаба</button>
+      <span class="flabel" style="min-width:0">Ритм</span>
+      <button class="chip" data-f="rhythm" data-v="1">еженедельно</button>
+      <button class="chip" data-f="rhythm" data-v="2">раз в 2 недели</button>
+    </div>
+    <div class="frow"><span class="flabel">Группа</span>
+      <button class="chip" data-f="group" data-v="М3О-106СВ-26">106СВ</button>
+      <button class="chip" data-f="group" data-v="М3О-107СВ-26">107СВ</button>
+      <button class="chip" data-f="group" data-v="М3О-108СВ-26">108СВ</button>
+      <button class="chip" data-f="group" data-v="М3О-206СВ-25">206СВ</button>
+      <button class="chip" data-f="group" data-v="М3О-207СВ-25">207СВ</button>
+      <button class="chip" data-f="group" data-v="М3О-208СВ-25">208СВ</button>
+      <input class="search" id="q" type="search" placeholder="Поиск: дисциплина, аудитория…" aria-label="Поиск по расписанию">
+    </div>
+    <div class="fmeta"><span id="count"></span><button class="reset" id="reset">Сбросить фильтры</button></div>
+  </div>
+
+  <main id="list"></main>
+  <div class="empty" id="empty">Ничего не совпало — снимите часть фильтров.</div>
+
+  <footer>
+    <p>Источник: <span class="mono">расписание_Пиков_ВА.xlsx</span> (сетка «Расписание на осенний семестр 2026/27 года обучения»). Периодичность выведена из структуры сетки (слитые/одиночные строки дня) и арифметики диапазонов дат; чередование вторника (ЛК 540 ↔ ЛР 520) сходится только при шаге в две недели. Все 10 серий внесены в Google-календарь повторяющимися событиями с попапом за час.</p>
+    <p>ГУК — главный учебный корпус. Прошедшие даты в списках зачёркиваются автоматически.</p>
+  </footer>
+</div>
+
+<script>
+const COURSES=[
+ {day:'Пн',dow:1,t1:'18:15',t2:'21:30',start:'2026-09-07',end:'2026-12-14',iv:2,aud:'522',k:'ГУК А',
+  disc:'Организационно-правовые основы разработки программно-аппаратных комплексов',type:'ЛК',g:'М3О-106СВ-26',pairs:'6–7 пары, сдвоенная'},
+ {day:'Вт',dow:2,t1:'14:45',t2:'18:00',start:'2026-09-15',end:'2026-12-22',iv:2,aud:'522',k:'ГУК А',
+  disc:'Организационно-правовые основы разработки программного обеспечения',type:'ЛК',g:'М3О-107СВ-26',pairs:'4–5 пары, сдвоенная'},
+ {day:'Вт',dow:2,t1:'18:15',t2:'21:30',start:'2026-09-15',end:'2026-12-22',iv:2,aud:'540',k:'ГУК Б',
+  disc:'Организационно-правовые основы разработки программно-информационных систем',type:'ЛК',g:'М3О-108СВ-26',pairs:'6–7 пары, сдвоенная · чередуется с ЛР 208СВ'},
+ {day:'Вт',dow:2,t1:'18:15',t2:'21:30',start:'2026-10-06',end:'2026-12-15',iv:2,aud:'520',k:'ГУК А',
+  disc:'Анализ защищённости, аудит и управление уязвимостями программно-информационных систем',type:'ЛР',g:'М3О-208СВ-25',pairs:'6–7 пары, сдвоенная · чередуется с ЛК 108СВ'},
+ {day:'Пт',dow:5,t1:'16:30',t2:'18:00',start:'2026-09-04',end:'2026-12-11',iv:1,aud:'514',k:'ГУК А',
+  disc:'Анализ защищённости, аудит и управление уязвимостями программного обеспечения',type:'ЛК',g:'М3О-207СВ-25',pairs:'5 пара'},
+ {day:'Пт',dow:5,t1:'18:15',t2:'19:45',start:'2026-09-04',end:'2026-12-11',iv:1,aud:'514',k:'ГУК А',
+  disc:'Анализ защищённости, аудит и управление уязвимостями программно-информационных систем',type:'ЛК',g:'М3О-208СВ-25',pairs:'6 пара'},
+ {day:'Сб',dow:6,t1:'09:00',t2:'10:30',start:'2026-09-05',end:'2026-12-12',iv:1,aud:'522',k:'ГУК А',
+  disc:'Анализ защищённости, аудит и управление уязвимостями системного программного обеспечения',type:'ЛК',g:'М3О-206СВ-25',pairs:'1 пара'},
+ {day:'Сб',dow:6,t1:'10:45',t2:'12:15',start:'2026-10-03',end:'2026-12-12',iv:1,aud:'522',k:'ГУК А',
+  disc:'Организационно-правовые основы разработки программно-аппаратных комплексов',type:'ПЗ',g:'М3О-106СВ-26',pairs:'2 пара'},
+ {day:'Сб',dow:6,t1:'13:00',t2:'14:30',start:'2026-10-03',end:'2026-12-12',iv:1,aud:'522',k:'ГУК А',
+  disc:'Организационно-правовые основы разработки программного обеспечения',type:'ПЗ',g:'М3О-107СВ-26',pairs:'3 пара'},
+ {day:'Сб',dow:6,t1:'14:45',t2:'16:15',start:'2026-10-03',end:'2026-12-12',iv:1,aud:'522',k:'ГУК А',
+  disc:'Организационно-правовые основы разработки программно-информационных систем',type:'ПЗ',g:'М3О-108СВ-26',pairs:'4 пара'},
+];
+const DAY_ORDER=['Пн','Вт','Пт','Сб'];
+const DAY_FULL={'Пн':'Понедельник','Вт':'Вторник','Пт':'Пятница','Сб':'Суббота'};
+const fmt=d=>String(d.getDate()).padStart(2,'0')+'.'+String(d.getMonth()+1).padStart(2,'0');
+function sessions(c){
+  const out=[]; let d=new Date(c.start+'T00:00:00'); const end=new Date(c.end+'T00:00:00');
+  while(d<=end){ out.push(new Date(d)); d=new Date(d.getTime()+c.iv*7*86400000); }
+  return out;
+}
+COURSES.forEach(c=>{ c.dates=sessions(c); c.n=c.dates.length; });
+const now=new Date();
+COURSES.forEach(c=>{
+  c.next=c.dates.find(d=>{ const endDt=new Date(d); const[h,m]=c.t2.split(':'); endDt.setHours(+h,+m); return endDt>=now; })||null;
+});
+// ближайшее по всем
+let best=null;
+COURSES.forEach(c=>{ if(c.next){ const s=new Date(c.next); const[h,m]=c.t1.split(':'); s.setHours(+h,+m); if(!best||s<best.s){best={s,c};} }});
+if(best){
+  const c=best.c;
+  document.getElementById('boardline').innerHTML=
+   '<span class="big">'+fmt(best.s)+' · '+c.day+' · '+c.t1+'</span>'+
+   '<span>'+c.type+' · '+c.g+'</span>'+
+   '<span>ауд. '+c.aud+' ('+c.k+')</span>'+
+   '<span class="dim">'+c.disc.slice(0,60)+(c.disc.length>60?'…':'')+'</span>';
+}else{
+  document.getElementById('boardline').textContent='Семестр завершён.';
+}
+// рендер
+const list=document.getElementById('list');
+DAY_ORDER.forEach(day=>{
+  const cs=COURSES.filter(c=>c.day===day);
+  const sec=document.createElement('section'); sec.className='day'; sec.dataset.day=day;
+  sec.innerHTML='<div class="dayhead"><span class="dn">'+DAY_FULL[day]+'</span><span class="dm">'+cs.length+' блок(а)</span></div>';
+  const wrap=document.createElement('div'); wrap.className='cards';
+  cs.forEach(c=>{
+    const el=document.createElement('article'); el.className='les';
+    el.dataset.type=c.type; el.dataset.group=c.g; el.dataset.rhythm=c.iv;
+    el.dataset.text=(c.disc+' '+c.g+' '+c.aud+' '+c.k+' '+c.type+' '+c.day).toLowerCase();
+    if(best&&c===best.c) el.classList.add('next-hl');
+    const cls=c.type==='ЛК'?'lk':(c.type==='ПЗ'?'pz':'lr');
+    const rhythm=c.iv===1?'<span class="b w1">каждую неделю</span>':'<span class="b w2">раз в 2 недели</span>';
+    const dateChips=c.dates.map(d=>{
+      const endDt=new Date(d); const[h,m]=c.t2.split(':'); endDt.setHours(+h,+m);
+      const isPast=endDt<now; const isNext=c.next&&d.getTime()===c.next.getTime();
+      return '<span class="d1'+(isPast?' past':'')+(isNext?' nxt':'')+'">'+fmt(d)+'</span>';
+    }).join('');
+    el.innerHTML=
+      '<div class="tm">'+c.t1+'–'+c.t2+'<small>'+c.pairs+'</small></div>'+
+      '<div><h3>'+c.disc+'</h3>'+
+      '<div class="badges"><span class="b '+cls+'">'+c.type+'</span><span class="b n">'+c.g+'</span>'+rhythm+
+      '<span class="b n">ауд. '+c.aud+' · '+c.k+'</span></div>'+
+      '<div class="meta">'+fmt(new Date(c.start+'T00:00:00'))+' — '+fmt(new Date(c.end+'T00:00:00'))+'.2026 · '+c.n+' занятий'+
+      (c.next?' · следующее: <b class="mono">'+fmt(c.next)+'</b>':' · серия завершена')+'</div>'+
+      '<details><summary>Все даты ('+c.n+')</summary><div class="dates">'+dateChips+'</div></details></div>';
+    wrap.appendChild(el);
+  });
+  sec.appendChild(wrap); list.appendChild(sec);
+});
+// фильтры
+const state={type:new Set(),group:new Set(),rhythm:new Set(),q:''};
+function apply(){
+  let shown=0;
+  document.querySelectorAll('.les').forEach(el=>{
+    const ok=(!state.type.size||state.type.has(el.dataset.type))
+      &&(!state.group.size||state.group.has(el.dataset.group))
+      &&(!state.rhythm.size||state.rhythm.has(el.dataset.rhythm))
+      &&(!state.q||el.dataset.text.includes(state.q));
+    el.hidden=!ok; if(ok)shown++;
+  });
+  document.querySelectorAll('.day').forEach(sec=>{
+    sec.hidden=[...sec.querySelectorAll('.les')].every(el=>el.hidden);
+  });
+  document.getElementById('count').textContent='Показано блоков: '+shown+' из '+COURSES.length;
+  document.getElementById('empty').style.display=shown?'none':'block';
+}
+document.querySelectorAll('.chip').forEach(ch=>{
+  ch.addEventListener('click',()=>{
+    const s=state[ch.dataset.f], v=ch.dataset.v;
+    if(s.has(v)){s.delete(v);ch.classList.remove('on');}else{s.add(v);ch.classList.add('on');}
+    apply();
+  });
+});
+document.getElementById('q').addEventListener('input',e=>{state.q=e.target.value.trim().toLowerCase();apply();});
+document.getElementById('reset').addEventListener('click',()=>{
+  state.type.clear();state.group.clear();state.rhythm.clear();state.q='';
+  document.getElementById('q').value='';
+  document.querySelectorAll('.chip.on').forEach(c=>c.classList.remove('on'));
+  apply();
+});
+apply();
+// переключатель темы: авто → светлая → тёмная → авто
+(function(){
+  const btn=document.getElementById('themeBtn'), ico=document.getElementById('themeIco'), txt=document.getElementById('themeTxt');
+  const STATES=['auto','light','dark'];
+  const VIEW={auto:['◐','Тема: авто'],light:['☀','Тема: светлая'],dark:['☾','Тема: тёмная']};
+  let cur='auto';
+  try{const s=localStorage.getItem('mai-theme'); if(s==='light'||s==='dark')cur=s;}catch(e){}
+  function show(){
+    const v=VIEW[cur]; ico.textContent=v[0]; txt.textContent=v[1];
+    if(cur==='auto'){delete document.documentElement.dataset.theme;}
+    else{document.documentElement.dataset.theme=cur;}
+    try{ cur==='auto'?localStorage.removeItem('mai-theme'):localStorage.setItem('mai-theme',cur); }catch(e){}
+  }
+  btn.addEventListener('click',()=>{ cur=STATES[(STATES.indexOf(cur)+1)%3]; show(); });
+  show();
+})();
+</script>
+<a class="brand-back" href="https://pikov.expert/" style="position:fixed;right:12px;bottom:12px;z-index:1000;background:#fff;color:#164831;padding:7px 12px;border:1px solid #697d70;border-radius:6px;font:12px/1.4 system-ui,sans-serif;text-decoration:none">← Каталог pikov.expert</a></body></html>

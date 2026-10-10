@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot)
 )
 
@@ -176,6 +176,11 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
       throw 'SPDX .htaccess marker is missing from the common template'
     }
     [void]$lines.InsertRange($index, [object[]]@(
+      '# Preserve the upstream catalogue path used by license breadcrumbs.',
+      '<IfModule mod_alias.c>',
+      '  RedirectMatch 301 ^/licenses/?$ https://spdx.pikov.expert/',
+      '</IfModule>',
+      '',
       '# SPDX publishes each XHTML page both as <id> and <id>.html. Apache cannot',
       '# infer a MIME type for names such as 0BSD or Apache-2.0, while nosniff is set.',
       '# Known non-HTML formats are excluded; smoke-check verifies every remaining',
@@ -306,8 +311,11 @@ if (-not (Test-Path -LiteralPath $lecturesPath)) { Fail "Missing _PROJECT\lectur
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $lastMod = [string]$data.updated
 if ($lastMod -notmatch '^\d{4}-\d{2}-\d{2}$') { Fail "Invalid lectures.json updated date: $lastMod" }
-$uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
-foreach ($lectureEntry in @($data.lectures)) {
+$additionalSites = @()
+if ($data.PSObject.Properties.Name -contains 'additionalSites') { $additionalSites = @($data.additionalSites) }
+$siteEntries = @($data.lectures) + $additionalSites
+$uniqueFolders = @($siteEntries | Select-Object -ExpandProperty folder -Unique)
+foreach ($lectureEntry in @($siteEntries)) {
   Assert-SafeLectureDomain -Domain ([string]$lectureEntry.domain)
 }
 foreach ($folder in $uniqueFolders) {
@@ -331,7 +339,7 @@ Write-SitemapFile -Path (Join-Path $rootPath 'sitemap.xml') -Urls @($rootUrls) -
 # common template. The 27001 deck unpacks its runtime into blob: URLs and needs
 # 'unsafe-eval' plus blob: in script-src; the shared policy drops both and the
 # slide navigation stops working. robots.txt and sitemap.xml are still generated.
-$customHtaccessFolders = @('27001', '29-07-2026', 'main-rbpo', 'dast')
+$customHtaccessFolders = @('27001', '29-07-2026', 'main-rbpo', 'dast', 'p18', 'rbpo-audit-start-result')
 
 # Some sites intentionally curate all three controls. Scanner-VS publishes
 # selected Markdown materials in its sitemap, serves offline ZIP archives,
@@ -341,7 +349,7 @@ $customControlFolders = @('scaner-vs')
 foreach ($folder in $uniqueFolders) {
   $folderPath = Join-Path $rootPath $folder
   if (-not (Test-Path -LiteralPath $folderPath)) { Fail "Missing folder: $folder" }
-  $lecture = @($data.lectures | Where-Object { $_.folder -eq $folder } | Sort-Object position)[0]
+  $lecture = @($siteEntries | Where-Object { $_.folder -eq $folder } | Sort-Object position)[0]
   $domain = "$($lecture.domain).pikov.expert"
   $baseUrl = "https://$domain/"
 
@@ -363,7 +371,7 @@ foreach ($folder in $uniqueFolders) {
   }
 
   $urls = New-Object System.Collections.Generic.List[string]
-  foreach ($entry in @($data.lectures | Where-Object { $_.folder -eq $folder } | Sort-Object position)) {
+  foreach ($entry in @($siteEntries | Where-Object { $_.folder -eq $folder } | Sort-Object position)) {
     Add-UniqueUrl -List $urls -Url ([string]$entry.url)
   }
 

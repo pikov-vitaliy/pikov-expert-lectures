@@ -11,6 +11,7 @@ import { fileURLToPath } from "node:url";
 const projectDir = dirname(fileURLToPath(import.meta.url));
 const defaultRoot = resolve(projectDir, "..", "spdx");
 const siteOrigin = "https://spdx.pikov.expert";
+const sourceLinkStatus = JSON.parse(readFileSync(join(projectDir, "spdx-source-link-status.json"), "utf8"));
 
 function usage() {
   return "Usage: node _PROJECT/update-spdx-page-metadata.mjs [--root <spdx-dir>] (--check|--write)";
@@ -112,6 +113,27 @@ function setCanonical(html, url) {
 }
 
 function normalizePage(html, { language, includeXmlLanguage, canonicalUrl }) {
+  // Only the upstream seeAlso list is annotated. The legal text, RDF/JSON
+  // downloads and original source URL remain unchanged and inspectable.
+  const fileName = decodeURIComponent(new URL(canonicalUrl).pathname.slice(1));
+  const statuses = sourceLinkStatus[fileName] ?? [];
+  for (const entry of statuses.filter(x => x.mode !== "fallback")) {
+    const escape = value => value.replaceAll("&", "&amp;").replaceAll('"', "&quot;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    const legalTextStart = html.search(/<h2\b[^>]*\bid=["']license(?:Exception)?Text["'][^>]*>/iu);
+    if (legalTextStart < 0) throw new Error(`Missing legal-text boundary in ${fileName}`);
+    const prefix = html.slice(0, legalTextStart);
+    const suffix = html.slice(legalTextStart);
+    html = prefix.replace(/<a\b[^>]*>[\s\S]*?<\/a>/giu, anchor => {
+      const href = anchor.match(/\bhref="([^"]+)"/iu)?.[1]?.replaceAll("&amp;", "&");
+      if (href !== entry.original) return anchor;
+      const reason = entry.status === "DNS" ? "source domain did not resolve" : `source returned HTTP ${entry.status}`;
+      return `<span class="archived-source" data-original-url="${escape(entry.original)}"><code>${escape(entry.original)}</code> — ${reason} on ${entry.checked}. <a href="${escape(entry.fallback)}">Read this license on SPDX</a>.</span>`;
+    }) + suffix;
+  }
+  const fallback = statuses.find(x => x.mode === "fallback");
+  if (fallback && !html.includes('id="source-availability"')) {
+    html = html.replace(/<\/h1>/iu, `</h1><p id="source-availability">Some original source links could not be verified on ${fallback.checked}. <a href="${fallback.fallback}">Read the official SPDX copy of this license</a>. The license text below is preserved.</p>`);
+  }
   return setCanonical(
     setHtmlLanguage(html, language, includeXmlLanguage),
     canonicalUrl,

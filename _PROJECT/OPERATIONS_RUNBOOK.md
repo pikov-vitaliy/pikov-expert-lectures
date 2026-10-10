@@ -20,6 +20,12 @@ git status --short --branch
 - Проверить, затрагивается ли корневой каталог `index.html`.
 - Для опубликованных доменов проверять не только локальные файлы, но и живой URL.
 - Помнить, что часть материалов может иметь внешний источник, например соседний source-tree, а не только текущую папку.
+- `additionalSites` в `lectures.json` содержит действующие сайты без карточки
+  лекции. Их закрытые списки `publicFiles` входят в тот же accepted release.
+- Сверять полный список площадки командой `node .\_PROJECT\check-hosting-inventory.mjs`.
+  Неизвестный webroot или отсутствующая главная страница дают ошибку. Проверка
+  выполняется до работ и повторно после публикации; при добавлении нового сайта
+  ожидаемое отсутствие входной страницы устраняется текущим выпуском.
 
 ## 3. Технические инварианты страницы
 
@@ -51,6 +57,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\smoke-check.ps1
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\build-release.ps1 -ReleaseDate $releaseDate -FailOnIssues
 powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1 -ReleaseIndex $releaseIndex
 $env:RELEASE_DATE=$releaseDate; node .\_PROJECT\browser-qa.mjs
+python .\_PROJECT\check-release-links.py --index $releaseIndex
 ```
 
 Ожидаемые признаки успеха:
