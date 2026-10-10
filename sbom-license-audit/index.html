@@ -1,0 +1,1272 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Лицензионный аудит в сервисе «РБПО-аудит» — Совещание по лицензиям, 27 мая 2026 г.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Sans+Narrow:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="deck-stage.js"></script>
+<style>
+  /* ── Дополнения, специфичные для этой презентации ─────────── */
+  .flow-pipe {
+    font-family: var(--f-mono);
+    font-size: 15px;
+    line-height: 1.4;
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-border);
+    padding: 22px 28px;
+    white-space: pre;
+    overflow: hidden;
+    color: var(--c-text);
+  }
+  .flow-pipe b { color: var(--c-primary); }
+  .flow-pipe .ok   { color: var(--c-ok);   font-weight: 700; }
+  .flow-pipe .warn { color: var(--c-warn); font-weight: 700; }
+  .flow-pipe .bad  { color: var(--c-bad);  font-weight: 700; }
+
+  /* "Семейство" chips */
+  .fam-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .fam {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #EAF1F8; color: var(--c-primary);
+    border: 1px solid #D1DEEC;
+    padding: 8px 14px;
+    font-size: 18px;
+    font-family: var(--f-mono);
+    letter-spacing: 0.02em;
+    border-radius: 2px;
+  }
+  .fam .cnt { color: var(--c-secondary); font-weight: 700; }
+
+  /* Mock screen — licenses list */
+  .mock {
+    background: #fff;
+    border: 1px solid var(--c-border-2);
+    box-shadow: 0 1px 0 rgba(13,59,102,0.04);
+    overflow: hidden;
+  }
+  .mock-head {
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 18px;
+    background: var(--c-primary);
+    color: #fff;
+    padding: 12px 22px;
+    font-size: 17px;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+  .mock-head .breadcrumb { font-family: var(--f-mono); opacity: 0.8; }
+  .mock-toolbar {
+    display: flex; gap: 12px;
+    background: #F2F6FB; border-bottom: 1px solid var(--c-border);
+    padding: 14px 22px;
+    font-size: 16px;
+  }
+  .mock-toolbar .ctl {
+    background: #fff; border: 1px solid var(--c-border-2);
+    padding: 6px 12px; color: var(--c-text-mute);
+    font-family: var(--f-sans);
+  }
+  .mock-toolbar .ctl.search { flex: 1; color: var(--c-text-faint); font-family: var(--f-mono); }
+  .mock-toolbar .ctl.active { background: var(--c-secondary); color: #fff; border-color: var(--c-secondary); }
+
+  .mock-table { width: 100%; border-collapse: collapse; font-size: 17px; }
+  .mock-table th {
+    text-align: left; padding: 12px 18px;
+    background: #EAF1F8; color: var(--c-secondary);
+    font-size: 14px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .mock-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--c-border);
+    vertical-align: middle;
+    line-height: 1.3;
+  }
+  .mock-table tr.row-ok   td { background: rgba(47,133,90,0.06); }
+  .mock-table tr.row-warn td { background: rgba(221,107,32,0.07); }
+  .mock-table tr.row-bad  td { background: rgba(197,48,48,0.07); }
+  .mock-table tr.row-na   td { background: #F7F9FB; color: var(--c-text-mute); }
+  .mock-table td.spdx { font-family: var(--f-mono); color: var(--c-primary); font-weight: 700; }
+  .mock-table td.spdx .custom { color: var(--c-warn); font-weight: 700; }
+  .mock-table td.approved { color: var(--c-text-mute); font-family: var(--f-mono); font-size: 15px; }
+  .mock-table .verdict-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 4px 12px; border-radius: 999px;
+    font-size: 15px; font-weight: 700;
+  }
+  .vp-ok   { background: var(--c-ok-soft);   color: var(--c-ok); }
+  .vp-warn { background: var(--c-warn-soft); color: var(--c-warn); }
+  .vp-bad  { background: var(--c-bad-soft);  color: var(--c-bad); }
+  .vp-na   { background: #ECEFF3;            color: var(--c-text-mute); }
+  .mock-table .pdf-link { font-family: var(--f-mono); font-size: 14px; color: var(--c-secondary); }
+  .mock-table .pdf-link.missing { color: var(--c-text-faint); text-decoration: line-through; }
+
+  /* Reason table — slide 7 */
+  .reason-table { width: 100%; border-collapse: collapse; font-size: 22px; }
+  .reason-table td, .reason-table th {
+    border: 1px solid var(--c-border);
+    padding: 18px 22px; vertical-align: top;
+    line-height: 1.35;
+  }
+  .reason-table th {
+    background: var(--c-primary); color: #fff;
+    text-align: left; font-weight: 700; font-size: 18px;
+    letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .reason-table .why { width: 36%; font-weight: 700; color: var(--c-primary); }
+  .reason-table .ex code { display: inline-block; margin: 4px 8px 4px 0; font-size: 19px; }
+  .reason-table .ex .note { font-size: 17px; color: var(--c-text-mute); display: block; margin-top: 6px; }
+
+  /* Aggregate diagram — slide 8 */
+  .agg {
+    display: grid;
+    grid-template-columns: 1.1fr 60px 0.9fr 60px 1fr;
+    gap: 14px;
+    align-items: center;
+  }
+  .agg .col-strs { display: flex; flex-direction: column; gap: 8px; }
+  .agg .str {
+    font-family: var(--f-mono); font-size: 18px;
+    background: var(--c-bg-soft); border: 1px solid var(--c-border);
+    padding: 10px 14px; color: var(--c-text);
+  }
+  .agg .arrow {
+    font-family: var(--f-mono); font-size: 30px;
+    color: var(--c-secondary); text-align: center;
+    font-weight: 700;
+  }
+  .agg .one {
+    background: var(--c-primary); color: #fff;
+    text-align: center;
+    padding: 28px 16px;
+  }
+  .agg .one .id { font-family: var(--f-mono); font-size: 38px; font-weight: 700; letter-spacing: 0.02em; }
+  .agg .one .lbl { font-size: 16px; opacity: 0.75; margin-top: 6px; letter-spacing: 0.1em; text-transform: uppercase; }
+  .agg .comps { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .agg .comp {
+    background: #fff; border: 1px solid var(--c-border);
+    border-left: 3px solid var(--c-secondary);
+    padding: 8px 12px;
+    font-family: var(--f-mono); font-size: 15px;
+    color: var(--c-text);
+  }
+  .agg .comp .ver { color: var(--c-text-mute); }
+
+  /* Roles cards — slide 13 */
+  .roles { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 22px; }
+  .role-card {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-primary);
+    padding: 26px 24px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .role-card.lawyer { border-top-color: var(--c-secondary); background: #F5F8FB; }
+  .role-card .role-tag {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.18em;
+    text-transform: uppercase; color: var(--c-secondary);
+  }
+  .role-card.lawyer .role-tag { color: var(--c-primary); }
+  .role-card .role-name { font-size: 22px; font-weight: 700; color: var(--c-primary); line-height: 1.2; }
+  .role-card .sees { font-size: 16px; color: var(--c-text-mute); margin-top: 4px; }
+  .role-card ul.cust > li { font-size: 17px; padding-left: 22px; }
+  .role-card ul.cust > li::before { width: 8px; }
+
+  /* Lifecycle stepper — slide 11 */
+  .lifecycle { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 18px; align-items: stretch; }
+  .lc-step {
+    background: #fff; border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-secondary);
+    padding: 22px 22px;
+  }
+  .lc-step.active { border-top-color: var(--c-ok); background: var(--c-ok-soft); }
+  .lc-step.stale  { border-top-color: var(--c-text-faint); background: #F2F4F7; }
+  .lc-step .lc-tag {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.16em;
+    text-transform: uppercase; color: var(--c-secondary);
+  }
+  .lc-step.active .lc-tag { color: var(--c-ok); }
+  .lc-step.stale  .lc-tag { color: var(--c-text-faint); }
+  .lc-step .lc-name { font-size: 26px; font-weight: 700; color: var(--c-primary); margin-top: 8px; line-height: 1.1; }
+  .lc-step .lc-desc { font-size: 17px; color: var(--c-text-mute); margin-top: 10px; line-height: 1.35; }
+  .lc-arr { align-self: center; font-family: var(--f-mono); font-size: 32px; color: var(--c-text-faint); font-weight: 700; }
+
+  /* Verdict legend — slide 11 */
+  .verdict-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .vl {
+    background: #fff; border: 1px solid var(--c-border);
+    padding: 14px 18px; display: flex; align-items: center; gap: 12px;
+  }
+  .vl .ball { width: 18px; height: 18px; border-radius: 50%; }
+  .vl .ball.ok   { background: var(--c-ok); }
+  .vl .ball.warn { background: var(--c-warn); }
+  .vl .ball.bad  { background: var(--c-bad); }
+  .vl .ball.na   { background: #fff; border: 2px solid var(--c-border-2); width: 14px; height: 14px; }
+  .vl .name { font-weight: 700; color: var(--c-primary); font-size: 18px; }
+  .vl .meta { color: var(--c-text-mute); font-size: 15px; }
+
+  /* SPDX example pairs — slide 5 */
+  .pair-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .pair {
+    display: grid; grid-template-columns: 1fr 36px 1fr;
+    gap: 12px; align-items: center;
+    background: var(--c-bg-soft); border: 1px solid var(--c-border);
+    padding: 14px 18px;
+  }
+  .pair .human { font-family: var(--f-sans); color: var(--c-text); font-size: 18px; line-height: 1.3; }
+  .pair .arr { text-align: center; color: var(--c-secondary); font-family: var(--f-mono); font-weight: 700; }
+  .pair .spdx { font-family: var(--f-mono); font-weight: 700; color: var(--c-primary); font-size: 19px; letter-spacing: 0.02em; }
+
+  /* Compact list for "nothing lost" — slide 10 */
+  ul.checked { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 18px; }
+  ul.checked > li {
+    position: relative;
+    padding-left: 50px;
+    font-size: 24px;
+    line-height: 1.4;
+  }
+  ul.checked > li::before {
+    content: "✓";
+    position: absolute;
+    left: 0; top: -2px;
+    width: 34px; height: 34px;
+    display: grid; place-items: center;
+    background: var(--c-ok);
+    color: #fff;
+    font-weight: 800;
+    font-size: 20px;
+    border-radius: 2px;
+  }
+
+  /* Two-column source diagram — slide 4 */
+  .sources-flow {
+    display: grid;
+    grid-template-columns: 1fr 240px 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .src-box {
+    background: #fff; border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-primary);
+    padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .src-box.secondary { border-top-color: var(--c-secondary); }
+  .src-box .src-eyebrow { font-size: 14px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-secondary); }
+  .src-box .src-name { font-family: var(--f-mono); font-size: 24px; font-weight: 700; color: var(--c-primary); }
+  .src-box .src-note { font-size: 17px; color: var(--c-text-mute); line-height: 1.4; }
+  .src-box ul.cust > li { font-size: 18px; padding-left: 22px; }
+
+  .src-merge {
+    background: var(--c-primary); color: #fff;
+    text-align: center;
+    padding: 28px 22px;
+    font-family: var(--f-sans);
+    display: flex; flex-direction: column; justify-content: center; gap: 10px;
+  }
+  .src-merge .key { font-family: var(--f-mono); font-size: 16px; opacity: 0.8; line-height: 1.3; }
+  .src-merge .name { font-size: 26px; font-weight: 700; line-height: 1.15; }
+  .src-merge .meta { font-size: 14px; opacity: 0.65; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  /* TOC variant — slide 2 (6 blocks) */
+  .toc-6 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 36px; }
+  .toc-item {
+    display: grid;
+    grid-template-columns: 64px 1fr;
+    gap: 20px;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--c-border);
+  }
+  .toc-item .toc-num {
+    font-family: var(--f-mono);
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--c-secondary);
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .toc-item .toc-h { font-size: 22px; font-weight: 700; color: var(--c-primary); line-height: 1.25; }
+  .toc-item .toc-meta { font-size: 16px; color: var(--c-text-mute); margin-top: 4px; }
+
+  /* small inline tags */
+  .inline-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: #EAF1F8; color: var(--c-primary);
+    padding: 2px 10px; border-radius: 2px;
+    font-size: 16px; font-weight: 700;
+    font-family: var(--f-mono);
+    margin: 0 4px;
+  }
+
+  /* small notes/aside */
+  .aside-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .aside {
+    background: var(--c-bg-soft);
+    border-left: 4px solid var(--c-secondary);
+    padding: 18px 22px;
+    font-size: 19px; line-height: 1.45;
+    color: var(--c-text);
+  }
+  .aside .aside-tag {
+    display: block; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--c-secondary); margin-bottom: 8px;
+  }
+  .aside.warn { border-left-color: var(--c-warn); }
+  .aside.warn .aside-tag { color: var(--c-warn); }
+
+  /* Two-line wordmark on light slides reuses existing styling */
+  .slide-footer .ff-mark span, .slide-footer .slide-num { white-space: nowrap; }
+
+  /* Brand logo on title slide */
+  .brand-logo {
+    display: inline-flex; align-items: center; gap: 18px;
+  }
+  .brand-logo .logo-img {
+    height: 64px; width: auto; display: block;
+    /* invert dark-blue logo to white for dark title bg */
+    filter: brightness(0) invert(1);
+  }
+  .brand-logo .org-meta {
+    display: flex; flex-direction: column; gap: 4px;
+    border-left: 1px solid rgba(255,255,255,0.25);
+    padding-left: 18px;
+  }
+  .brand-logo .org-name { font-size: 18px; font-weight: 700; color: #fff; letter-spacing: 0.04em; white-space: nowrap; }
+  .brand-logo .org-sub  { font-size: 14px; color: rgba(255,255,255,0.7); letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; }
+</style>
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#0D3B66"/>
+  <rect x="40" y="58" width="120" height="84" fill="#fff"/>
+  <text x="100" y="106" font-family="PT Sans, Segoe UI, sans-serif" font-size="34" font-weight="700" fill="#0D3B66" text-anchor="middle">SPDX</text>
+  <rect x="40" y="148" width="120" height="14" fill="#2C5282"/>
+  <text x="100" y="180" font-family="PT Sans, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">ЛИЦЕНЗИОННЫЙ АУДИТ</text>
+</svg>
+</template>
+<meta name="description" content="Лицензионный аудит программных компонентов — учебные материалы Виталия Пикова.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://sbom-license-audit.pikov.expert/">
+<meta property="og:title" content="Лицензионный аудит программных компонентов">
+<meta property="og:description" content="Лицензионный аудит программных компонентов — учебные материалы Виталия Пикова.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://sbom-license-audit.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Лицензионный аудит программных компонентов", "url": "https://sbom-license-audit.pikov.expert/", "author": {"@type": "Person", "name": "Виталий Пиков"}}</script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+<deck-stage>
+
+<!-- ============================================================
+  СЛАЙД 1 — ТИТУЛЬНЫЙ
+============================================================ -->
+<section class="slide title-slide" data-screen-label="01 Титульный">
+  <div class="topbar">
+    <div class="brand-logo">
+      <img class="logo-img" src="assets/mntc-logo.png" alt="Логотип МНТЦ" />
+      <div class="org-meta">
+        <div class="org-name">АО МНТЦ МИЭТ</div>
+        <div class="org-sub">istc-miet.ru</div>
+      </div>
+    </div>
+    <div class="meta-tag">Совещание по лицензиям · 27.05.2026</div>
+  </div>
+
+  <h1>Лицензионный аудит<br/>в сервисе «РБПО-аудит»</h1>
+  <div class="sub">Откуда берутся лицензии, как мы их обобщаем по стандарту SPDX и почему они выглядят именно так. Доказательная база для юристов Общества и регулятора.</div>
+
+  <div class="signature">
+    <div class="who">
+      <div class="name">Виталий А. Пиков</div>
+      <div class="role">Специалист по безопасной разработке ПО · АО МНТЦ МИЭТ · vitaliy@pikov.com</div>
+    </div>
+    <div class="date">
+      <div class="d1">27 мая 2026 г.</div>
+      <div class="d2">Совещание по лицензиям</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 2 — СОДЕРЖАНИЕ
+============================================================ -->
+<section class="slide" data-screen-label="02 Содержание">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">О чём доклад</div>
+      <h2 class="slide-title">Содержание</h2>
+    </div>
+    <span class="gost-tag">6 блоков · 14 слайдов</span>
+  </header>
+
+  <div class="body">
+    <div class="toc-6">
+      <div class="toc-item">
+        <div class="toc-num">01</div>
+        <div>
+          <div class="toc-h">Зачем централизованный лицензионный аудит</div>
+          <div class="toc-meta">Слайд 3 · постановка задачи и доказательность</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">02</div>
+        <div>
+          <div class="toc-h">Откуда берутся лицензии</div>
+          <div class="toc-meta">Слайд 4 · bom.json и реестр sbom-reporter</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">03</div>
+        <div>
+          <div class="toc-h">Как строка становится записью каталога</div>
+          <div class="toc-meta">Слайды 5–6 · SPDX и нормализация</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">04</div>
+        <div>
+          <div class="toc-h">SPDX и «Custom»: три причины</div>
+          <div class="toc-meta">Слайд 7 · почему часть лицензий без SPDX-кода</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">05</div>
+        <div>
+          <div class="toc-h">Обобщение и «повторения»</div>
+          <div class="toc-meta">Слайды 8–10 · что склеиваем, а что нет</div>
+        </div>
+      </div>
+      <div class="toc-item">
+        <div class="toc-num">06</div>
+        <div>
+          <div class="toc-h">Юр. вердикт, заключение, роли</div>
+          <div class="toc-meta">Слайды 11–14 · итог и ограничения</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout" style="margin-top: 28px;">
+      <span class="label">Основная аудитория</span>
+      Юристы Общества: фокус доклада — почему каталог лицензий выглядит именно так, что в нём «Custom» и «повторения», как принимать по ним решения и где зафиксирован след вашего решения.
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>За 14 слайдов — путь одной строки лицензии от ZIP-выгрузки соисполнителя до подписанного юристом заключения.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 3 — ЗАЧЕМ ЦЕНТРАЛИЗОВАННЫЙ ЛИЦЕНЗИОННЫЙ АУДИТ
+============================================================ -->
+<section class="slide" data-screen-label="03 Зачем централизованный аудит">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 1 · Постановка задачи</div>
+      <h2 class="slide-title">Зачем централизованный лицензионный аудит</h2>
+    </div>
+    <span class="gost-tag">ГОСТ Р 56939-2024 §5.16 · контроль лицензионной чистоты</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <ol class="cust">
+          <li>В продукте проекта — <strong>тысячи заимствованных компонентов</strong> от головного исполнителя и 7 соисполнителей; у каждого своя лицензия (а иногда несколько).</li>
+          <li>Лицензия определяет, <strong>можно ли</strong> использовать компонент в поставке и на каких условиях: копилефт, патенты, атрибуция, исключения.</li>
+          <li>Нужен <strong>единый каталог</strong> лицензий + <strong>доказательная история</strong> решений юриста — кто, когда, на основании какого документа.</li>
+        </ol>
+
+        <div class="callout">
+          <span class="label">Цитата из ТЗ ОКР</span>
+          «Контролировать заимствованные компоненты, их версии, источники, лицензии и уязвимости, а также вести доказательную историю изменений».
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="kpi"><div class="v">1 839</div><div class="l">компонентов в едином SBOM проекта</div></div>
+          <div class="kpi"><div class="v">~130</div><div class="l">лицензий в каталоге Сервиса</div></div>
+          <div class="kpi"><div class="v">8</div><div class="l">организаций: 1 головной + 7 соисполнителей</div></div>
+          <div class="kpi"><div class="v">1</div><div class="l">общий каталог лицензий вместо разрозненных таблиц</div></div>
+        </div>
+
+        <div class="aside">
+          <span class="aside-tag">Альтернатива — то, чего мы избегаем</span>
+          Excel-таблица у каждого соисполнителя, версии расходятся, решения юриста не привязаны к компонентам, доказательность теряется при первой ротации кадров.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Без единого процесса лицензионный аудит распадается на разрозненные таблицы и теряет доказательность.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 4 — ОТКУДА БЕРУТСЯ ЛИЦЕНЗИИ (ИСТОЧНИКИ)
+============================================================ -->
+<section class="slide soft" data-screen-label="04 Откуда берутся лицензии">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 2 · Источники</div>
+      <h2 class="slide-title">Откуда сервис получает строки лицензий</h2>
+    </div>
+    <span class="gost-tag">ADR-0023 · bom.json — первичный источник</span>
+  </header>
+
+  <div class="body">
+    <div class="sources-flow">
+      <div class="src-box">
+        <div class="src-eyebrow">Первичный источник</div>
+        <div class="src-name">bom.json</div>
+        <div class="src-note">CycloneDX-SBOM от <code>cdxgen</code>, генерируется автоматически при сборке у соисполнителя.</div>
+        <ul class="cust">
+          <li>Машиночитаемый перечень всех зависимостей</li>
+          <li>Имя, версия, PURL, лицензии — «как есть»</li>
+          <li>Источник истины по составу</li>
+        </ul>
+      </div>
+
+      <div class="src-merge">
+        <div class="key">join по (имя, версия)</div>
+        <div class="name">Единый<br/>каталог</div>
+        <div class="meta">в сервисе</div>
+      </div>
+
+      <div class="src-box secondary">
+        <div class="src-eyebrow">Дополнение</div>
+        <div class="src-name">SBOM-Registry.xlsx</div>
+        <div class="src-note">Реестр <code>sbom-reporter</code> — заполняется специалистом РБПО соисполнителя.</div>
+        <ul class="cust">
+          <li>Лицензии, авторы, метод детектирования</li>
+          <li>Контекст, которого нет в <code>bom.json</code></li>
+          <li>Точки ручной верификации</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Что такое SBOM и CycloneDX</span>
+        <strong>SBOM</strong> — машиночитаемый перечень компонентов ПО, как «состав» на упаковке. <strong>CycloneDX</strong> — его открытый формат. <strong>cdxgen</strong> — инструмент генерации.
+      </div>
+      <div class="aside warn">
+        <span class="aside-tag">Что это значит для нас</span>
+        Сырая строка лицензии — <strong>не наш текст</strong>. Её записал сканер соисполнителя. Сервис получает её «как есть» и обязан корректно обработать любой вход — даже «<code>Лицензии не найдены.</code>».
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Строку лицензии записал сканер соисполнителя — мы получаем её «как есть» и обязаны корректно обработать любой вход.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 5 — ЧТО ТАКОЕ SPDX
+============================================================ -->
+<section class="slide" data-screen-label="05 Что такое SPDX">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 3 · Эталон сопоставления</div>
+      <h2 class="slide-title">SPDX — международный стандарт идентификации лицензий</h2>
+    </div>
+    <span class="gost-tag">Linux Foundation · ~600 идентификаторов</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <ul class="cust">
+          <li><strong>SPDX</strong> — список <strong>канонических коротких идентификаторов</strong> лицензий, поддерживаемый Linux Foundation: <code>MIT</code>, <code>Apache-2.0</code>, <code>GPL-3.0-only</code>, <code>BSD-3-Clause</code>.</li>
+          <li>Это «ИНН лицензии»: один код во всём мире = один и тот же текст лицензии, проверяемый по эталону.</li>
+          <li>«<strong>Нормальная</strong>» лицензия в нашем каталоге — та, чья строка <strong>совпала с SPDX-идентификатором</strong>.</li>
+          <li>Всё, что к SPDX не сводится, мы помечаем «<strong>Custom</strong>» — не выбрасываем, не угадываем.</li>
+        </ul>
+
+        <div class="callout">
+          <span class="label">Аналогия для юристов</span>
+          SPDX — это как ИНН организации. У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один. SPDX-id играет ту же роль для текста лицензии.
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="kicker">Примеры сопоставления</div>
+        <div class="pair-grid" style="grid-template-columns: 1fr;">
+          <div class="pair">
+            <div class="human">MIT License<br/><span class="faint">The MIT License · Expat · MIT/X11</span></div>
+            <div class="arr">→</div>
+            <div class="spdx">MIT</div>
+          </div>
+          <div class="pair">
+            <div class="human">Apache License, Version 2.0<br/><span class="faint">Apache 2 · ASLv2</span></div>
+            <div class="arr">→</div>
+            <div class="spdx">Apache-2.0</div>
+          </div>
+          <div class="pair">
+            <div class="human">GNU General Public License v3<br/><span class="faint">GPLv3 · GPL v3 only</span></div>
+            <div class="arr">→</div>
+            <div class="spdx">GPL-3.0-only</div>
+          </div>
+          <div class="pair">
+            <div class="human">BSD 3-Clause<br/><span class="faint">New BSD · Modified BSD</span></div>
+            <div class="arr">→</div>
+            <div class="spdx">BSD-3-Clause</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>SPDX — наш эталон сопоставления. Всё, что к нему не сводится, мы намеренно помечаем «Custom» и оставляем юристу для ручной проверки.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 6 — ПУТЬ СТРОКИ ЛИЦЕНЗИИ
+============================================================ -->
+<section class="slide soft" data-screen-label="06 Путь строки лицензии">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 3 · Нормализация</div>
+      <h2 class="slide-title">Путь строки лицензии: от текста до записи каталога</h2>
+    </div>
+    <span class="gost-tag">ADR-0004 · ключи лицензий</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <div class="flow-pipe">сырая строка из SBOM
+  │  очистка: URL-хвосты, скобки, пробелы
+  ▼
+поиск в <b>таблице синонимов</b>
+  │  «the mit license», «expat», «mit» → канон «MIT»
+  ▼
+канон найден?
+  ├─ нет ───────────────────────► <span class="warn">CUSTOM</span>
+  │     license_key = исходная строка, spdx_id = NULL
+  └─ да: канон — валидный SPDX?
+         ├─ да  ──────────────► <span class="ok">ОБЫЧНАЯ</span>
+         │     spdx_id присвоен, license_key = SPDX
+         └─ нет ─────────────► <span class="warn">CUSTOM</span>
+               license_key = канон, spdx_id = NULL</div>
+      </div>
+
+      <div class="col">
+        <div class="kicker">Что делает модуль</div>
+        <ul class="cust">
+          <li><strong>Таблица синонимов</strong> сводит сотни вариантов написания к одному канону: <code>mit</code>, <code>the mit license</code>, <code>expat</code> → канон <code>MIT</code>.</li>
+          <li>Канон <strong>проверяется по официальному списку SPDX</strong> — это и есть граница между «обычной» и «Custom»-лицензией.</li>
+          <li>Сервис <strong>не угадывает</strong>: если строка не свелась к SPDX — она становится Custom, исходный текст сохраняется.</li>
+        </ul>
+
+        <div class="callout">
+          <span class="label">Определение признака «Custom»</span>
+          <strong>Custom = у лицензии нет SPDX-идентификатора.</strong> Не «плохая» и не «незаконная» — просто требует ручной оценки юриста.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Признак «Custom» — это не дефект, а <strong>пометка «нужна ручная проверка юриста»</strong>: автоматика не нашла однозначного эталона.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 7 — SPDX vs CUSTOM: ТРИ ПРИЧИНЫ
+============================================================ -->
+<section class="slide" data-screen-label="07 Почему Custom">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 3 · Нормализация</div>
+      <h2 class="slide-title">Почему часть лицензий — «Custom»: три причины</h2>
+    </div>
+    <span class="gost-tag">Анализ каталога на 27.05.2026</span>
+  </header>
+
+  <div class="body">
+    <table class="reason-table">
+      <thead>
+        <tr><th class="why" style="width: 36%;">Причина</th><th>Примеры из нашего каталога</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="why">1. Составное SPDX-выражение<br/><span class="faint" style="font-weight:400; font-size:18px;">комбинация лицензий через <code>OR</code> / <code>AND</code> / <code>WITH</code></span></td>
+          <td class="ex">
+            <code>(MIT OR CC0-1.0)</code>
+            <code>(Apache-2.0 AND BSD-3-Clause)</code>
+            <code>(MPL-2.0 OR Apache-2.0)</code>
+            <span class="note">Каждая часть валидна по SPDX, но <strong>выражение в целом</strong> — нет; юрист решает, на каких условиях используем компонент.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="why">2. Вольное написание имени<br/><span class="faint" style="font-weight:400; font-size:18px;">человеческое название, не совпавшее с SPDX-эталоном</span></td>
+          <td class="ex">
+            <code>Apache License, 2.0</code>
+            <code>GPLv3</code>
+            <code>CC0</code>
+            <code>The Apache Software License, Version 2.0</code>
+            <span class="note">По смыслу — известная лицензия. Свести автоматически без риска ошибки нельзя — юрист подтверждает соответствие SPDX-канону.</span>
+          </td>
+        </tr>
+        <tr>
+          <td class="why">3. Вендорная или нестандартная метка<br/><span class="faint" style="font-weight:400; font-size:18px;">фирменные названия, кастомные тексты, пустые значения</span></td>
+          <td class="ex">
+            <code>BSD3_Google</code>
+            <code>Caramel</code>
+            <code>Лицензии не найдены.</code>
+            <span class="note">Это и есть случаи, ради которых «Custom» существует: <strong>требуется прочитать сам текст лицензии</strong> и принять юридическое решение.</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Сервис не угадывает и не выбрасывает непонятную лицензию — он сохраняет исходную строку как «Custom» для ручной проверки юристом.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 8 — ОБОБЩЕНИЕ
+============================================================ -->
+<section class="slide" data-screen-label="08 Обобщение">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 4 · Обобщение</div>
+      <h2 class="slide-title">Как сервис сводит лицензии в одну запись каталога</h2>
+    </div>
+    <span class="gost-tag">ADR-0004 · UPSERT по spdx_id → license_key</span>
+  </header>
+
+  <div class="body">
+    <div class="agg">
+      <div class="col-strs">
+        <div class="kicker" style="margin-bottom: 8px;">Сырые строки из 10 компонентов</div>
+        <div class="str">"MIT"</div>
+        <div class="str">"MIT License"</div>
+        <div class="str">"The MIT License"</div>
+        <div class="str">"Expat"</div>
+        <div class="str">"MIT/X11"</div>
+        <div class="str">"the mit license"</div>
+        <div class="str faint">… 4 ещё</div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div>
+        <div class="kicker" style="margin-bottom: 8px; text-align:center;">Одна запись каталога</div>
+        <div class="one">
+          <div class="id">MIT</div>
+          <div class="lbl">SPDX · ОБЫЧНАЯ</div>
+        </div>
+        <div class="faint" style="font-size: 16px; text-align: center; margin-top: 10px;">канон совпал с SPDX-эталоном</div>
+      </div>
+
+      <div class="arrow">→</div>
+
+      <div>
+        <div class="kicker" style="margin-bottom: 8px;">Связь с компонентами</div>
+        <div class="comps">
+          <div class="comp">lodash <span class="ver">4.17</span></div>
+          <div class="comp">express <span class="ver">4.19</span></div>
+          <div class="comp">react <span class="ver">18.3</span></div>
+          <div class="comp">axios <span class="ver">1.7</span></div>
+          <div class="comp">chalk <span class="ver">5.3</span></div>
+          <div class="comp">moment <span class="ver">2.30</span></div>
+          <div class="comp">+ 4 компонента</div>
+          <div class="comp faint">всего: 10</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Каталог общий</span>
+        Каталог лицензий <strong>не заводится заново</strong> на каждую выгрузку. Все строки, сошедшиеся к одному SPDX-id, становятся <strong>одной</strong> записью — независимо от того, какой соисполнитель её прислал.
+      </div>
+      <div class="aside">
+        <span class="aside-tag">Видимость для юриста</span>
+        По каждой лицензии видно, в каких компонентах она встречается и у каких соисполнителей — одно решение юриста <strong>покрывает все случаи</strong> этой лицензии в проекте.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Обобщение = объединение <strong>достоверно одинаковых</strong> лицензий, без потери связи с компонентами.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 9 — ПОЧЕМУ ВСТРЕЧАЮТСЯ «ПОВТОРЕНИЯ»
+============================================================ -->
+<section class="slide soft" data-screen-label="09 Повторения">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 4 · Обобщение</div>
+      <h2 class="slide-title">Почему встречаются «повторения» — и почему это правильно</h2>
+    </div>
+    <span class="gost-tag">Сознательная юридическая точность</span>
+  </header>
+
+  <div class="body">
+    <div class="row2">
+      <div class="card">
+        <div class="card-eyebrow">Причина 1 · строки не сошлись к SPDX</div>
+        <div class="card-title">Разные написания «про Apache»</div>
+        <ul class="cust" style="font-size: 19px;">
+          <li><code>Apache-2.0</code> — обычная (SPDX)</li>
+          <li><code>Apache License, 2.0</code> — Custom (вольная запись)</li>
+          <li><code>(MPL-2.0 OR Apache-2.0)</code> — Custom (выражение)</li>
+        </ul>
+        <div class="faint" style="font-size: 18px; line-height: 1.4; margin-top: 8px;">
+          Три разные строки. Сервис не сливает их «по догадке» — каждая остаётся отдельной записью до решения юриста.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-eyebrow">Причина 2 · лицензии с исключениями</div>
+        <div class="card-title">Намеренно держим отдельно</div>
+        <ul class="cust" style="font-size: 19px;">
+          <li><code>MIT</code> ≠ <code>MIT-with-embedded-exception</code></li>
+          <li><code>Apache-2.0</code> ≠ <code>Apache-2.0-with-LLVM-exception</code></li>
+          <li><code>GPL-2.0-only</code> ≠ <code>GPL-2.0-with-classpath-exception</code></li>
+        </ul>
+        <div class="faint" style="font-size: 18px; line-height: 1.4; margin-top: 8px;">
+          Исключение меняет юридические обязательства — это другая лицензия, даже если базовая та же.
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn">
+      <span class="label">Принципиальная позиция</span>
+      «Исключение или оговорка меняет юридические обязательства. Свести вариант с исключением в базовую лицензию — значит принять решение не по тому тексту, который действительно сопровождает компонент».
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Лишняя запись здесь — это <strong>сознательная юридическая точность</strong>, а не ошибка обобщения.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 10 — «А МЫ НИЧЕГО НЕ ПОТЕРЯЛИ?» — НЕТ
+============================================================ -->
+<section class="slide" data-screen-label="10 Ничего не теряется">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 4 · Обобщение</div>
+      <h2 class="slide-title">«А мы ничего не потеряли?» — нет</h2>
+    </div>
+    <span class="gost-tag">ADR-0022 · immutability выгрузок</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <ul class="checked">
+          <li><strong>Сырая строка лицензии всегда сохраняется</strong> — даже если опознать её автоматически не удалось, исходный текст остаётся на месте (как «Custom»).</li>
+          <li><strong>Ничего не сливается «по догадке»</strong> — только достоверно одинаковое (совпадение SPDX-id после нормализации).</li>
+          <li><strong>Каждая выгрузка — неизменяемый снимок</strong> (immutability, ADR-0022): история не переписывается; оценки юриста за прошлый период не затираются новой выгрузкой.</li>
+          <li><strong>Привязка лицензия ↔ компонент сохраняется полностью</strong>: видно, у каких соисполнителей и в каких версиях встречается каждая лицензия.</li>
+        </ul>
+      </div>
+
+      <div class="col">
+        <div class="callout">
+          <span class="label">Принцип</span>
+          <strong>Полнота важнее догадок.</strong> Лучше лишняя запись на проверку юристу, чем потерянная или неверно объединённая лицензия в поставке регулятору.
+        </div>
+
+        <div class="aside">
+          <span class="aside-tag">Иммутабельность на практике</span>
+          Если 27.05.2026 юрист утвердил вердикт по лицензии <code>(MPL-2.0 OR Apache-2.0)</code>, а соисполнитель потом перевыпускает SBOM с другой формулировкой — старая запись и старое заключение <strong>не исчезают и не «исправляются»</strong>. Это и есть доказательная история.
+        </div>
+
+        <div class="aside">
+          <span class="aside-tag">Если объединить нужно</span>
+          Сведение Custom-дублей, которые по сути одна лицензия, делается <strong>осознанно вручную</strong> через интерфейс — с фиксацией, кто и когда принял это решение.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Полнота важнее догадок: лучше лишняя запись на проверку, чем потерянная или неверно объединённая лицензия.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 11 — ЮРИДИЧЕСКИЙ ВЕРДИКТ И ЗАКЛЮЧЕНИЕ
+============================================================ -->
+<section class="slide" data-screen-label="11 Юридический вердикт">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 5 · Юридический контур</div>
+      <h2 class="slide-title">Юридический вердикт, заключение, история</h2>
+    </div>
+    <span class="gost-tag">ADR-0003 · lifecycle заключения</span>
+  </header>
+
+  <div class="body">
+    <div class="kicker">Четыре возможных вердикта юриста по лицензии</div>
+    <div class="verdict-legend">
+      <div class="vl"><span class="ball ok"></span><div><div class="name">🟢 Безопасно</div><div class="meta">можно использовать в поставке</div></div></div>
+      <div class="vl"><span class="ball warn"></span><div><div class="name">🟡 Риск</div><div class="meta">с условиями / атрибуцией</div></div></div>
+      <div class="vl"><span class="ball bad"></span><div><div class="name">🔴 Небезопасно</div><div class="meta">в поставку нельзя</div></div></div>
+      <div class="vl"><span class="ball na"></span><div><div class="name">⚪ Не оценено</div><div class="meta">ждёт решения юриста</div></div></div>
+    </div>
+
+    <div class="kicker" style="margin-top: 10px;">Жизненный цикл заключения по одной лицензии</div>
+    <div class="lifecycle">
+      <div class="lc-step">
+        <div class="lc-tag">Шаг 1</div>
+        <div class="lc-name">Черновик</div>
+        <div class="lc-desc">Юрист готовит оценку, заполняет комментарий, прикладывает материалы. В каталоге — предварительный вердикт.</div>
+      </div>
+      <div class="lc-arr">→</div>
+      <div class="lc-step active">
+        <div class="lc-tag">Шаг 2 · финальный</div>
+        <div class="lc-name">Утверждено</div>
+        <div class="lc-desc">Обязателен <strong>PDF подписанного заключения</strong>. С этого момента вердикт — финальный и используется в отчётах.</div>
+      </div>
+      <div class="lc-arr">→</div>
+      <div class="lc-step stale">
+        <div class="lc-tag">Шаг 3 · опц.</div>
+        <div class="lc-name">Устарело</div>
+        <div class="lc-desc">Используется, когда выходит новая версия лицензии или меняются обстоятельства. Старая запись и PDF <strong>не удаляются</strong> — остаются в истории.</div>
+      </div>
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Комментарий и история изменений</span>
+        Комментарий к вердикту — <strong>постоянное редактируемое поле</strong>. Каждая правка сохраняется отдельной записью истории: кто, когда, что было до. Это и есть доказательная база.
+      </div>
+      <div class="aside warn">
+        <span class="aside-tag">Worst-verdict-wins</span>
+        Вердикт компонента = <strong>худший из вердиктов его лицензий</strong>. Один 🔴 у любой из лицензий компонента делает 🔴 весь компонент — это страхует от ситуации «забыли посмотреть вторую лицензию».
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Решение юриста фиксируется <strong>с документом и историей</strong> — это и есть доказательная лицензионная чистота.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 12 — НАВИГАЦИЯ: СЕМЕЙСТВА, ФИЛЬТРЫ, ПОДСВЕТКА
+============================================================ -->
+<section class="slide soft" data-screen-label="12 Навигация по каталогу">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 5 · Юридический контур</div>
+      <h2 class="slide-title">Навигация: семейства, фильтры, подсветка по вердикту</h2>
+    </div>
+    <span class="gost-tag">Экран «Лицензии»</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <div class="mock">
+          <div class="mock-head">
+            <div><strong>РБПО-аудит</strong> · Каталог лицензий проекта</div>
+            <div class="breadcrumb">/licenses</div>
+          </div>
+          <div class="mock-toolbar">
+            <div class="ctl search">🔍 поиск: SPDX-id / название / синоним …</div>
+            <div class="ctl active">Семейство ▾</div>
+            <div class="ctl">Вердикт ▾</div>
+            <div class="ctl">Только без заключения</div>
+          </div>
+          <table class="mock-table">
+            <thead>
+              <tr>
+                <th style="width: 28%;">SPDX-ID / название</th>
+                <th style="width: 16%;">Вердикт</th>
+                <th style="width: 13%;">Утверждено</th>
+                <th style="width: 13%;">Семейство</th>
+                <th class="num" style="text-align:right; width: 9%;">Комп.</th>
+                <th>PDF</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="row-ok">
+                <td class="spdx">MIT</td>
+                <td><span class="verdict-pill vp-ok">🟢 Безопасно</span></td>
+                <td class="approved">2026-04-12</td>
+                <td>MIT</td>
+                <td class="num" style="text-align:right;">312</td>
+                <td><span class="pdf-link">📄 verdict-MIT.pdf</span></td>
+              </tr>
+              <tr class="row-ok">
+                <td class="spdx">Apache-2.0</td>
+                <td><span class="verdict-pill vp-ok">🟢 Безопасно</span></td>
+                <td class="approved">2026-04-12</td>
+                <td>Apache</td>
+                <td class="num" style="text-align:right;">248</td>
+                <td><span class="pdf-link">📄 verdict-Apache-2.pdf</span></td>
+              </tr>
+              <tr class="row-warn">
+                <td class="spdx">LGPL-2.1-only</td>
+                <td><span class="verdict-pill vp-warn">🟡 Риск</span></td>
+                <td class="approved">2026-05-08</td>
+                <td>LGPL</td>
+                <td class="num" style="text-align:right;">31</td>
+                <td><span class="pdf-link">📄 verdict-LGPL-21.pdf</span></td>
+              </tr>
+              <tr class="row-bad">
+                <td class="spdx">AGPL-3.0-only</td>
+                <td><span class="verdict-pill vp-bad">🔴 Небезопасно</span></td>
+                <td class="approved">2026-03-21</td>
+                <td>AGPL</td>
+                <td class="num" style="text-align:right;">2</td>
+                <td><span class="pdf-link">📄 verdict-AGPL-3.pdf</span></td>
+              </tr>
+              <tr class="row-warn">
+                <td class="spdx"><span class="custom">Custom</span> · (MPL-2.0 OR Apache-2.0)</td>
+                <td><span class="verdict-pill vp-warn">🟡 Риск</span></td>
+                <td class="approved">2026-05-19</td>
+                <td>Custom</td>
+                <td class="num" style="text-align:right;">7</td>
+                <td><span class="pdf-link">📄 verdict-MPL-Apache.pdf</span></td>
+              </tr>
+              <tr class="row-na">
+                <td class="spdx"><span class="custom">Custom</span> · BSD3_Google</td>
+                <td><span class="verdict-pill vp-na">⚪ Не оценено</span></td>
+                <td class="approved">—</td>
+                <td>Custom</td>
+                <td class="num" style="text-align:right;">3</td>
+                <td><span class="pdf-link missing">не приложен</span></td>
+              </tr>
+              <tr class="row-na">
+                <td class="spdx"><span class="custom">Custom</span> · Лицензии не найдены.</td>
+                <td><span class="verdict-pill vp-na">⚪ Не оценено</span></td>
+                <td class="approved">—</td>
+                <td>Custom</td>
+                <td class="num" style="text-align:right;">14</td>
+                <td><span class="pdf-link missing">не приложен</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="kicker">Что делает экран «Лицензии»</div>
+        <ul class="cust">
+          <li><strong>Семейство</strong> лицензии определяется автоматически — для группировки и фильтрации каталога.</li>
+          <li><strong>Подсветка строки по вердикту</strong> — опасные лицензии видны с одного взгляда.</li>
+          <li><strong>Фильтры:</strong> по вердикту, семейству, наличию заключения; поиск по SPDX-id и синонимам.</li>
+          <li><strong>PDF заключения</strong> скачивается прямо из списка — для регулятора и внутренних проверок.</li>
+        </ul>
+
+        <div class="kicker" style="margin-top: 6px;">Поддерживаемые семейства</div>
+        <div class="fam-row">
+          <span class="fam">MIT <span class="cnt">· 1</span></span>
+          <span class="fam">Apache <span class="cnt">· 1</span></span>
+          <span class="fam">BSD <span class="cnt">· 4</span></span>
+          <span class="fam">GPL <span class="cnt">· 3</span></span>
+          <span class="fam">LGPL <span class="cnt">· 3</span></span>
+          <span class="fam">MPL <span class="cnt">· 2</span></span>
+          <span class="fam">AGPL <span class="cnt">· 1</span></span>
+          <span class="fam">Proprietary</span>
+          <span class="fam">Custom</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Юрист быстро находит, <strong>что ждёт оценки</strong>, и видит, что финально утверждено и приложено.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 13 — РОЛИ
+============================================================ -->
+<section class="slide" data-screen-label="13 Роли">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 5 · Юридический контур</div>
+      <h2 class="slide-title">Кто что видит: четыре роли в Сервисе</h2>
+    </div>
+    <span class="gost-tag">RBAC + row-level изоляция</span>
+  </header>
+
+  <div class="body">
+    <div class="roles">
+      <div class="role-card lawyer">
+        <div class="role-tag">основная аудитория</div>
+        <div class="role-name">Юрист Общества</div>
+        <div class="sees">Работает <strong>только с лицензиями</strong>.</div>
+        <ul class="cust">
+          <li>Каталог лицензий — общий, видит все</li>
+          <li>Выносит вердикт, загружает PDF</li>
+          <li>Ведёт комментарии и историю</li>
+          <li>Не видит код и сборочные данные</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-tag">Общество</div>
+        <div class="role-name">Специалист РБПО Общества</div>
+        <div class="sees">Видит весь проект.</div>
+        <ul class="cust">
+          <li>Компоненты, лицензии, выгрузки</li>
+          <li>С админ-флагом — управление</li>
+          <li>Отвечает за единый SBOM проекта</li>
+          <li>Сводит данные соисполнителей</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-tag">Управление</div>
+        <div class="role-name">Руководитель проекта</div>
+        <div class="sees">Решения по рискам, эскалация.</div>
+        <ul class="cust">
+          <li>Светофор по компонентам и лицензиям</li>
+          <li>Решения <code>RiskDecision</code></li>
+          <li>Лицензии — только просмотр</li>
+          <li>Доступ к сводкам и трендам</li>
+        </ul>
+      </div>
+
+      <div class="role-card">
+        <div class="role-tag">соисполнитель</div>
+        <div class="role-name">Специалист РБПО соисполнителя</div>
+        <div class="sees">Только <strong>свои</strong> компоненты.</div>
+        <ul class="cust">
+          <li>Изоляция данных по организации</li>
+          <li>Каталог лицензий открыт всем</li>
+          <li>«Свои» лицензии подсвечены</li>
+          <li>Загружает SBOM своей организации</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">Принцип изоляции</span>
+      Компоненты и сборочные данные изолированы по организации (row-level). Каталог лицензий — <strong>общий проектный ресурс</strong>: лицензия одна на весь проект независимо от того, кто её принёс.
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Каждый видит ровно своё; <strong>каталог лицензий — общий и открытый</strong>, чтобы решение юриста работало на весь проект сразу.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 14 — ОГРАНИЧЕНИЯ, РАЗВИТИЕ И ИТОГ
+============================================================ -->
+<section class="slide" data-screen-label="14 Ограничения и итог">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Блок 6 · Итог</div>
+      <h2 class="slide-title">Ограничения, развитие и итог</h2>
+    </div>
+    <span class="gost-tag">Честно · на 27.05.2026</span>
+  </header>
+
+  <div class="body compact">
+    <div class="row2">
+      <div class="card" style="border-top-color: var(--c-warn);">
+        <div class="card-eyebrow" style="color: var(--c-warn);">⚠ Ограничения сейчас</div>
+        <ul class="cust" style="font-size: 21px;">
+          <li><strong>Custom-дубли</strong>, которые по сути одна лицензия, сводятся пока <strong>вручную</strong> юристом.</li>
+          <li>Версия лицензии иногда <strong>не указана в SBOM</strong> (<code>Apache</code> без версии) — запрашиваем у соисполнителя.</li>
+          <li>Для редких вендорных меток требуется <strong>чтение исходного текста</strong> лицензии вручную.</li>
+        </ul>
+      </div>
+
+      <div class="card" style="border-top-color: var(--c-secondary);">
+        <div class="card-eyebrow">→ Дорожная карта</div>
+        <ul class="cust" style="font-size: 21px;">
+          <li>Инструмент-<strong>алиас</strong> для безопасного объединения Custom-дублей (с фиксацией решения).</li>
+          <li>Обогащение <strong>уязвимостями</strong> (CVE / БДУ ФСТЭК) — отдельный контур Dependency Track.</li>
+          <li>Шаблоны заключений и <strong>массовая подпись</strong> однотипных вердиктов.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout" style="border-left-color: var(--c-ok); background: var(--c-ok-soft);">
+      <span class="label" style="color: var(--c-ok);">✅ Итог</span>
+      Лицензии собираются <strong>автоматически</strong>, обобщаются по стандарту <strong>SPDX</strong>, <strong>ничего не теряется</strong>, а решения юриста фиксируются <strong>с документом и историей</strong>.
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Контакт докладчика</span>
+        Виталий А. Пиков · специалист по безопасной разработке ПО · АО МНТЦ МИЭТ · <code>vitaliy@pikov.com</code>
+      </div>
+      <div class="aside">
+        <span class="aside-tag">Связанные документы</span>
+        <code>licenses-catalog-explained.md</code> · ADR-0023 (bom.json) · ADR-0004 (ключи лицензий) · ADR-0013 (модель лицензии) · ADR-0003 (lifecycle заключения) · ADR-0022 (immutability)
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Сервис превращает разрозненные строки лицензий в <strong>доказательную, проверяемую</strong> картину лицензионной чистоты проекта.</span>
+    </div>
+  </div>
+</section>
+
+</deck-stage>
+
+<!-- Auto-footer injector -->
+<script>
+(function(){
+  const slides = document.querySelectorAll('deck-stage > section.slide');
+  slides.forEach((s, i) => {
+    if (s.querySelector('.slide-footer')) return;
+    if (s.classList.contains('title-slide')) return;
+    const f = document.createElement('div');
+    f.className = 'slide-footer';
+    f.innerHTML =
+      '<div class="ff-mark"><span class="dot"></span><span>АО МНТЦ МИЭТ · Лицензионный аудит · 2026-05-27</span></div>' +
+      '<div class="slide-num">' + String(i+1).padStart(2,'0') + ' / ' + String(slides.length).padStart(2,'0') + '</div>';
+    s.appendChild(f);
+  });
+})();
+</script>
+
+<a class="brand-back" href="https://pikov.expert/" style="position:fixed;right:12px;bottom:12px;z-index:1000;background:#fff;color:#164831;padding:7px 12px;border:1px solid #697d70;border-radius:6px;font:12px/1.4 system-ui,sans-serif;text-decoration:none">← Каталог pikov.expert</a></body>
+</html>

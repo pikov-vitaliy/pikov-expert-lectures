@@ -157,6 +157,7 @@ if ($P19Only) {
 
 $data = Get-Content -LiteralPath $lecturesPath -Encoding UTF8 -Raw | ConvertFrom-Json
 $lectures = @($data.lectures)
+$additionalFolders = @($data.additionalSites | Where-Object { $null -ne $_ } | Select-Object -ExpandProperty folder)
 
 foreach ($htaccessPath in @(
   (Join-Path $rootPath '.htaccess'),
@@ -245,12 +246,8 @@ $localWorkspaceDirs = @(
 )
 # The parallel homepage belongs to the root website, not to a lecture domain.
 # Its exact pages and assets are allowlisted by Get-RootReleaseFiles.
-# 56939-lections — англоязычная серия вебинаров по ГОСТ Р 56939 в работе.
-# Пока это редакционный источник: в релиз он не входит и на pikov.expert не
-# публикуется. Материалы выложены вручную на 56939-lections.pikov.expert.
-# Когда серия получит оформление, её нужно завести в _PROJECT/lectures.json
-# как обычную площадку и убрать отсюда.
-$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests', 'new', '56939-lections') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders
+# Additional managed sites have explicit public payloads in lectures.json.
+$allowedRootDirs = $allowedLocalToolDirs + @('_PROJECT', 'release', 'docs', 'tests', 'new') + $rootLocaleDirs + $localWorkspaceDirs + $quarantineDirs + $domainFolders + $additionalFolders
 $unexpectedRootDirs = @(
   $actualRootDirObjects |
     Where-Object { $allowedRootDirs -notcontains $_.Name } |

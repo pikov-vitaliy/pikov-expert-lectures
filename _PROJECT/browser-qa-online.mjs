@@ -60,7 +60,7 @@ try {
   for (const target of targets) {
     const context = await browser.newContext({
       viewport: { width: 1366, height: 850 },
-      ignoreHTTPSErrors: true,
+      ignoreHTTPSErrors: false,
     });
     const page = await context.newPage();
     page.setDefaultTimeout(10000);

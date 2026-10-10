@@ -48,6 +48,29 @@ function snapshot(root) {
   return result;
 }
 
+test("source remediation preserves legal text and distinguishes archive errors from unverified access", (t) => {
+  const fixture = mkdtempSync(join(tmpdir(), "pikov-spdx-sources-"));
+  t.after(() => rmSync(fixture, { recursive: true, force: true }));
+  const status = JSON.parse(readFileSync(join(projectDir, 'spdx-source-link-status.json'), 'utf8'));
+  for (const mode of ['archived', 'fallback']) {
+    const [name, records] = Object.entries(status).find(([, records]) => records.some(r => r.mode === mode));
+    const record = records.find(r => r.mode === mode);
+    const sourceAnchor = `<a href="${record.original}" rel="rdfs:seeAlso">Original source</a>`;
+    const legalId = name.includes('exception') ? 'licenseExceptionText' : 'licenseText';
+    const legal = `<h2 id="${legalId}">Text</h2><p>Legal text is immutable. ${sourceAnchor}</p></body>\n</html>\n`;
+    writeFileSync(join(fixture, name), xhtml(name).replace('</body>\n</html>\n', `${sourceAnchor}${legal}`), 'utf8');
+    const result = runUpdater(fixture, '--write');
+    assert.equal(result.status, 0, commandOutput(result));
+    const after = readFileSync(join(fixture, name), 'utf8');
+    assert.equal(after.slice(after.indexOf(`<h2 id="${legalId}">`)), legal);
+    assert.ok(after.includes(record.fallback));
+    if (mode === 'archived') assert.ok(after.includes('class="archived-source"'));
+    else assert.ok(after.includes('id="source-availability"'));
+  }
+  const checked = runUpdater(fixture, '--check');
+  assert.equal(checked.status, 0, commandOutput(checked));
+});
+
 test("SPDX updater repairs XHTML metadata, detects drift and is byte-idempotent", (t) => {
   const fixture = mkdtempSync(join(tmpdir(), "pikov-spdx-metadata-"));
   t.after(() => rmSync(fixture, { recursive: true, force: true }));

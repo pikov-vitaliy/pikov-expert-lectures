@@ -1,0 +1,1116 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<title>Сервис SBOM-аудита — обзор проекта · 27 мая 2026 г.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@400;700&family=PT+Sans+Narrow:wght@400;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<script src="deck-stage.js"></script>
+<style>
+  /* ── Pipeline diagram (slide 5) ──────────────────────────── */
+  .pipeline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 30px minmax(0, 1.4fr) 30px minmax(0, 1fr) 30px minmax(0, 1fr);
+    gap: 0; align-items: stretch;
+  }
+  .pipeline > * { min-width: 0; }
+  .pipeline > .pl-arr { padding: 0 4px; }
+  .pl-merge > .pl-node { padding: 14px 16px; }
+  .pl-merge > .pl-node .pl-name { font-size: 18px; }
+  .pl-node {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-primary);
+    padding: 18px 18px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .pl-node.alt { border-top-color: var(--c-secondary); }
+  .pl-node .pl-eyebrow {
+    font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--c-secondary);
+  }
+  .pl-node .pl-name {
+    font-family: var(--f-mono);
+    font-size: 19px; font-weight: 700;
+    color: var(--c-primary); line-height: 1.2;
+    word-break: break-word;
+  }
+  .pl-node .pl-desc {
+    font-size: 14px; line-height: 1.4; color: var(--c-text-mute);
+  }
+  .pl-arr {
+    align-self: center; justify-self: center;
+    font-family: var(--f-mono); font-size: 30px;
+    color: var(--c-text-faint); font-weight: 700;
+  }
+  .pl-merge {
+    display: flex; flex-direction: column; gap: 12px;
+  }
+  .pl-merge .pl-node { flex: 1; }
+
+  /* ── Cards (slide 3) ─────────────────────────────────────── */
+  .q3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .q3 .qcard {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-primary);
+    padding: 28px 28px;
+    display: flex; flex-direction: column; gap: 14px;
+  }
+  .q3 .qcard.lic  { border-top-color: var(--c-secondary); }
+  .q3 .qcard.sec  { border-top-color: var(--c-warn); }
+  .q3 .qcard .q-num {
+    font-family: var(--f-mono); font-size: 14px;
+    font-weight: 700; letter-spacing: 0.18em;
+    color: var(--c-secondary); text-transform: uppercase;
+  }
+  .q3 .qcard.sec .q-num { color: var(--c-warn); }
+  .q3 .qcard .q-h {
+    font-size: 26px; font-weight: 700; color: var(--c-primary);
+    line-height: 1.2;
+  }
+  .q3 .qcard ul.cust > li { font-size: 17px; padding-left: 22px; line-height: 1.4; }
+
+  /* ── Features grid (slide 4) ─────────────────────────────── */
+  .feat-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  .feat {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    padding: 22px 24px;
+    display: flex; flex-direction: column; gap: 8px;
+  }
+  .feat .feat-num {
+    font-family: var(--f-mono); font-size: 13px; font-weight: 700;
+    letter-spacing: 0.18em; color: var(--c-secondary);
+  }
+  .feat .feat-h {
+    font-size: 20px; font-weight: 700; color: var(--c-primary);
+    line-height: 1.25;
+  }
+  .feat .feat-d {
+    font-size: 16px; color: var(--c-text-mute); line-height: 1.4;
+  }
+
+  /* ── Stack table (slide 7) ───────────────────────────────── */
+  .stack-table { width: 100%; border-collapse: collapse; font-size: 19px; }
+  .stack-table th {
+    text-align: left; background: var(--c-primary); color: #fff;
+    padding: 14px 22px; font-size: 16px; letter-spacing: 0.06em;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .stack-table td {
+    padding: 16px 22px; border-bottom: 1px solid var(--c-border);
+    vertical-align: top; line-height: 1.4;
+  }
+  .stack-table td.layer {
+    width: 26%;
+    font-weight: 700; color: var(--c-primary); font-size: 20px;
+  }
+  .stack-table td.tech code {
+    display: inline-block;
+    margin: 4px 8px 4px 0;
+    background: var(--c-bg-soft);
+    border: 1px solid var(--c-border);
+    padding: 3px 10px;
+    font-size: 16px;
+    color: var(--c-primary);
+  }
+
+  /* ── Cycle (slide 9) ─────────────────────────────────────── */
+  .cycle { display: grid; grid-template-columns: repeat(6, 1fr 24px); grid-template-columns: 1fr 24px 1fr 24px 1fr 24px 1fr 24px 1fr 24px 1fr; gap: 6px; align-items: stretch; }
+  .cy-step {
+    background: #fff;
+    border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-secondary);
+    padding: 16px 16px;
+    display: flex; flex-direction: column; gap: 8px;
+    min-height: 130px;
+  }
+  .cy-step .num {
+    font-family: var(--f-mono); font-size: 12px; font-weight: 700;
+    letter-spacing: 0.18em; color: var(--c-secondary);
+  }
+  .cy-step .lbl {
+    font-size: 17px; font-weight: 700; color: var(--c-primary);
+    line-height: 1.2;
+  }
+  .cy-step .sub {
+    font-size: 13px; color: var(--c-text-mute); line-height: 1.35;
+  }
+  .cy-arr {
+    align-self: center; justify-self: center;
+    color: var(--c-text-faint);
+    font-family: var(--f-mono); font-size: 22px; font-weight: 700;
+  }
+
+  /* ── Role table (slide 9) ────────────────────────────────── */
+  .role-table { width: 100%; border-collapse: collapse; font-size: 18px; }
+  .role-table th {
+    text-align: left; background: var(--c-primary); color: #fff;
+    padding: 12px 18px; font-size: 14px; letter-spacing: 0.08em;
+    text-transform: uppercase; font-weight: 700;
+  }
+  .role-table td {
+    padding: 14px 18px; border-bottom: 1px solid var(--c-border);
+    vertical-align: top; line-height: 1.4;
+  }
+  .role-table td.role-name {
+    width: 28%;
+    font-weight: 700; color: var(--c-primary);
+  }
+
+  /* ── Verdicts row (slide 6) ──────────────────────────────── */
+  .v-legend { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .v-card {
+    background: #fff; border: 1px solid var(--c-border);
+    padding: 16px 18px;
+    display: flex; align-items: center; gap: 12px;
+  }
+  .v-card .ball { width: 20px; height: 20px; border-radius: 50%; flex: 0 0 auto; }
+  .v-card .ball.ok   { background: var(--c-ok); }
+  .v-card .ball.warn { background: var(--c-warn); }
+  .v-card .ball.bad  { background: var(--c-bad); }
+  .v-card .ball.na   { background: #fff; border: 2px solid var(--c-border-2); width: 16px; height: 16px; }
+  .v-card .v-name { font-weight: 700; color: var(--c-primary); font-size: 19px; line-height: 1.1; }
+  .v-card .v-meta { color: var(--c-text-mute); font-size: 14px; }
+
+  /* ── Lifecycle (slide 6) ─────────────────────────────────── */
+  .lc-row { display: grid; grid-template-columns: 1fr 30px 1fr 30px 1fr; gap: 14px; align-items: stretch; }
+  .lc-step {
+    background: #fff; border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-secondary);
+    padding: 18px 20px;
+  }
+  .lc-step.active { border-top-color: var(--c-ok); background: var(--c-ok-soft); }
+  .lc-step.stale  { border-top-color: var(--c-text-faint); background: #F2F4F7; }
+  .lc-step .t { font-size: 13px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; color: var(--c-secondary); }
+  .lc-step.active .t { color: var(--c-ok); }
+  .lc-step.stale  .t { color: var(--c-text-faint); }
+  .lc-step .n { font-size: 22px; font-weight: 700; color: var(--c-primary); margin-top: 6px; line-height: 1.15; }
+  .lc-step .d { font-size: 15px; color: var(--c-text-mute); margin-top: 8px; line-height: 1.35; }
+  .lc-arr { align-self: center; justify-self: center; font-family: var(--f-mono); font-size: 26px; color: var(--c-text-faint); font-weight: 700; }
+
+  /* ── Big metrics (slides 10, 11) ─────────────────────────── */
+  .metric-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .metric-card {
+    background: #fff; border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-secondary);
+    padding: 22px 26px;
+  }
+  .metric-card .m-eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-secondary); }
+  .metric-card .m-rows { margin-top: 12px; display: flex; flex-direction: column; }
+  .metric-card .m-row {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 10px 0; border-bottom: 1px solid var(--c-border);
+    gap: 14px;
+  }
+  .metric-card .m-row:last-child { border-bottom: 0; }
+  .metric-card .m-row .k { font-size: 18px; color: var(--c-text-mute); flex: 1 1 auto; min-width: 0; }
+  .metric-card .m-row .v { font-size: 24px; font-weight: 700; color: var(--c-primary); font-variant-numeric: tabular-nums; white-space: nowrap; flex: 0 0 auto; }
+  .metric-card .m-row .v.big { font-size: 32px; }
+
+  /* ── Quality grid (slide 12) ─────────────────────────────── */
+  .qual-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .qual {
+    background: #fff; border: 1px solid var(--c-border);
+    border-left: 4px solid var(--c-secondary);
+    padding: 20px 24px;
+    display: flex; gap: 18px; align-items: flex-start;
+  }
+  .qual .qual-num {
+    font-family: var(--f-mono); font-weight: 800;
+    font-size: 30px; color: var(--c-secondary);
+    line-height: 1; flex: 0 0 auto;
+  }
+  .qual .qual-body { display: flex; flex-direction: column; gap: 6px; }
+  .qual .qual-h { font-size: 20px; font-weight: 700; color: var(--c-primary); }
+  .qual .qual-d { font-size: 16px; color: var(--c-text-mute); line-height: 1.4; }
+
+  /* ── Aside (already used in license-audit deck) ──────────── */
+  .aside-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+  .aside {
+    background: var(--c-bg-soft);
+    border-left: 4px solid var(--c-secondary);
+    padding: 18px 22px;
+    font-size: 18px; line-height: 1.45;
+    color: var(--c-text);
+  }
+  .aside .aside-tag {
+    display: block; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--c-secondary); margin-bottom: 8px;
+  }
+  .aside.warn { border-left-color: var(--c-warn); }
+  .aside.warn .aside-tag { color: var(--c-warn); }
+  .aside.ok { border-left-color: var(--c-ok); }
+  .aside.ok .aside-tag { color: var(--c-ok); }
+
+  /* footer text guard */
+  .slide-footer .ff-mark span, .slide-footer .slide-num { white-space: nowrap; }
+
+  /* small "what-it-means" definition */
+  .defn {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: #EAF1F8;
+    color: var(--c-primary);
+    padding: 6px 14px;
+    font-size: 16px;
+    font-family: var(--f-mono);
+    border: 1px solid #D1DEEC;
+  }
+  .defn b { font-family: var(--f-sans); font-size: 14px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--c-secondary); }
+
+  /* takeaway override for compact slides */
+  .body .takeaway { font-size: 22px; }
+
+  /* status section (slide 13) */
+  .status-flow {
+    display: grid; grid-template-columns: 1fr 40px 1fr; gap: 22px;
+    align-items: stretch;
+  }
+  .status-block {
+    background: #fff; border: 1px solid var(--c-border);
+    border-top: 4px solid var(--c-ok);
+    padding: 22px 26px;
+  }
+  .status-block.next { border-top-color: var(--c-warn); }
+  .status-block .s-eye { font-size: 13px; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: var(--c-ok); }
+  .status-block.next .s-eye { color: var(--c-warn); }
+  .status-block .s-h { font-size: 24px; font-weight: 700; color: var(--c-primary); margin-top: 4px; line-height: 1.2; }
+  .status-block ul.cust > li { font-size: 18px; padding-left: 22px; }
+  .status-arr { align-self: center; justify-self: center; font-family: var(--f-mono); font-size: 36px; color: var(--c-text-faint); font-weight: 700; }
+</style>
+<template id="__bundler_thumbnail">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <rect width="200" height="200" fill="#0D3B66"/>
+  <rect x="36" y="58" width="128" height="84" fill="#fff"/>
+  <text x="100" y="106" font-family="PT Sans, Segoe UI, sans-serif" font-size="32" font-weight="700" fill="#0D3B66" text-anchor="middle">SBOM</text>
+  <rect x="36" y="148" width="128" height="14" fill="#2C5282"/>
+  <text x="100" y="180" font-family="PT Sans, Segoe UI, sans-serif" font-size="12" font-weight="700" fill="#fff" text-anchor="middle" letter-spacing="2">ОБЗОР СЕРВИСА</text>
+</svg>
+</template>
+<meta name="description" content="Сервис SBOM-аудита: обзор проекта — учебные материалы Виталия Пикова.">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="canonical" href="https://rbpo-audit-start-result.pikov.expert/">
+<meta property="og:title" content="Сервис SBOM-аудита: обзор проекта">
+<meta property="og:description" content="Сервис SBOM-аудита: обзор проекта — учебные материалы Виталия Пикова.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://rbpo-audit-start-result.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "CreativeWork", "name": "Сервис SBOM-аудита: обзор проекта", "url": "https://rbpo-audit-start-result.pikov.expert/", "author": {"@type": "Person", "name": "Виталий Пиков"}}</script>
+<!-- Yandex.Metrika counter -->
+<script type="text/javascript">
+    (function(m,e,t,r,i,k,a){
+        m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+        m[i].l=1*new Date();
+        for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+        k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+    })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=109116119', 'ym');
+
+    ym(109116119, 'init', {ssr:true, webvisor:false, clickmap:false, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+</script>
+<noscript><div><img src="https://mc.yandex.ru/watch/109116119" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
+</head>
+<body>
+<deck-stage>
+
+<!-- ============================================================
+  СЛАЙД 1 — ТИТУЛЬНЫЙ
+============================================================ -->
+<section class="slide title-slide" data-screen-label="01 Титульный">
+  <div class="topbar">
+    <div class="brand-logo">
+      <img class="logo-img" src="assets/mntc-logo.png" alt="Логотип МНТЦ" />
+      <div class="org-meta">
+        <div class="org-name">АО МНТЦ МИЭТ</div>
+        <div class="org-sub">istc-miet.ru</div>
+      </div>
+    </div>
+    <div class="meta-tag">Обзор проекта · 27.05.2026</div>
+  </div>
+
+  <h1>Сервис<br/>SBOM-аудита</h1>
+  <div class="sub">Компонентный анализ и лицензионный аудит для процесса разработки безопасного ПО (РБПО): что умеет сервис, как он устроен и как он сделан.</div>
+
+  <div class="signature">
+    <div class="who">
+      <div class="name">Виталий А. Пиков</div>
+      <div class="role">Специалист по безопасной разработке ПО · АО МНТЦ МИЭТ · vitaly@pikov.expert</div>
+    </div>
+    <div class="date">
+      <div class="d1">27 мая 2026 г.</div>
+      <div class="d2">Доклад коллегам</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 2 — ЗАЧЕМ НУЖЕН СЕРВИС
+============================================================ -->
+<section class="slide" data-screen-label="02 Зачем нужен сервис">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Постановка задачи</div>
+      <h2 class="slide-title">Зачем нужен сервис</h2>
+    </div>
+    <span class="gost-tag">Процесс РБПО · ГОСТ Р 56939-2024</span>
+  </header>
+
+  <div class="body">
+    <div class="row2 weighted">
+      <div class="col">
+        <ol class="cust">
+          <li>Продукт собирается из <strong>вкладов нескольких организаций-соисполнителей</strong>; каждая привносит свой набор зависимостей.</li>
+          <li>Сторонних <strong>open-source компонентов</strong> — сотни; у каждого свои авторы, версии, лицензии и потенциальные уязвимости.</li>
+          <li>Свести их вручную по десяткам Excel-таблиц — <strong>трудоёмко и ненадёжно</strong>: данные расходятся, истории решений теряются.</li>
+        </ol>
+
+        <div class="callout">
+          <span class="label">Что мы хотим получить</span>
+          Единую прослеживаемую картину состава продукта, его лицензионной чистоты и базы для оценки безопасности — с историей и доказательствами по каждому решению.
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="kpi-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="kpi"><div class="v">сотни</div><div class="l">сторонних open-source компонентов в продукте</div></div>
+          <div class="kpi"><div class="v">8</div><div class="l">организаций: головной исполнитель + 7 соисполнителей</div></div>
+          <div class="kpi"><div class="v">1</div><div class="l">единый каталог компонентов и лицензий</div></div>
+          <div class="kpi"><div class="v">∞</div><div class="l">история и доказательная база решений</div></div>
+        </div>
+
+        <div class="aside">
+          <span class="aside-tag">Альтернатива, которой мы избегаем</span>
+          У каждого соисполнителя своя таблица. Версии расходятся. Лицензионные оценки не привязаны к компонентам. Доказательность теряется при первой ротации кадров.
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Сервис автоматизирует сбор состава, лицензий и базы для оценки безопасности — и даёт <strong>единую прослеживаемую картину</strong> по всему проекту.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 3 — ТРИ ВОПРОСА
+============================================================ -->
+<section class="slide soft" data-screen-label="03 Три вопроса">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Назначение</div>
+      <h2 class="slide-title">Что делает сервис: отвечает на три вопроса</h2>
+    </div>
+    <span class="gost-tag">§1 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <div class="q3">
+      <div class="qcard">
+        <div class="q-num">Вопрос 1 · состав</div>
+        <div class="q-h">Из чего собран продукт?</div>
+        <ul class="cust">
+          <li>Полный состав компонентов <strong>(SBOM)</strong> с версиями</li>
+          <li>Авторы, происхождение, путь в исходном архиве</li>
+          <li>Контрольная сумма (SHA-256) каждого артефакта</li>
+          <li>Связь компонент ↔ соисполнитель, кто прислал</li>
+        </ul>
+      </div>
+
+      <div class="qcard lic">
+        <div class="q-num">Вопрос 2 · лицензии</div>
+        <div class="q-h">Чисто ли с лицензиями?</div>
+        <ul class="cust">
+          <li>Какие открытые лицензии у компонентов</li>
+          <li>Нет ли запрещённых или конфликтующих</li>
+          <li>Юридическое заключение и <strong>вердикт</strong></li>
+          <li>PDF подписанных заключений в каталоге</li>
+        </ul>
+      </div>
+
+      <div class="qcard sec">
+        <div class="q-num">Вопрос 3 · безопасность</div>
+        <div class="q-h">Безопасно ли?</div>
+        <ul class="cust">
+          <li>Основа для сопоставления с известными <strong>уязвимостями</strong></li>
+          <li>Координаты компонентов в стандарте CPE</li>
+          <li>Совместимость с отечественными базами</li>
+          <li>Готовность к подключению БДУ ФСТЭК</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">SBOM — что это</span>
+      <strong>Software Bill of Materials</strong> — опись программных компонентов продукта; как «состав» на упаковке: что и какой версии входит в поставку.
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Один сервис закрывает три ключевых вопроса РБПО — <strong>состав, лицензии, безопасность</strong> — и связывает их между собой.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 4 — КЛЮЧЕВЫЕ ВОЗМОЖНОСТИ
+============================================================ -->
+<section class="slide" data-screen-label="04 Ключевые возможности">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Возможности</div>
+      <h2 class="slide-title">Что умеет сервис</h2>
+    </div>
+    <span class="gost-tag">§1 справки · обзор функций</span>
+  </header>
+
+  <div class="body">
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-num">01 · приём данных</div>
+        <div class="feat-h">Конвейер обработки загрузок</div>
+        <div class="feat-d">ZIP-выгрузка соисполнителя разбирается автоматически: <code>bom.json</code> + реестр компонентов → база данных.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">02 · история</div>
+        <div class="feat-h">Полная история и неизменяемость данных</div>
+        <div class="feat-d">Каждая выгрузка — отдельный неизменяемый снимок. Прошлые оценки и заключения не переписываются.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">03 · доступ</div>
+        <div class="feat-h">Ролевая модель и изоляция соисполнителей</div>
+        <div class="feat-d">Каждый соисполнитель видит только свои компоненты. Каталог лицензий — общий проектный ресурс.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">04 · юр. контур</div>
+        <div class="feat-h">Юридический процесс с вердиктами и PDF</div>
+        <div class="feat-d">Четыре вердикта, lifecycle заключения, обязательный PDF на «Утверждено», постоянная история комментариев.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">05 · риски</div>
+        <div class="feat-h">Управление рисками компонентов</div>
+        <div class="feat-d">Светофор по компонентам и лицензиям; решения <code>RiskDecision</code> с эскалацией к руководителю проекта.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">06 · динамика</div>
+        <div class="feat-h">Календарь и сравнение «день к дню»</div>
+        <div class="feat-d">Видно, что изменилось между выгрузками: новые компоненты, ушедшие версии, новые лицензии.</div>
+      </div>
+      <div class="feat" style="grid-column: span 3;">
+        <div class="feat-num">07 · совместимость</div>
+        <div class="feat-h">Единый отраслевой SBOM в формате CycloneDX</div>
+        <div class="feat-d">На выходе — машиночитаемый SBOM проекта в стандарте <strong>CycloneDX</strong>, который без доработок принимается внешними системами анализа уязвимостей (например, Dependency Track).</div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Каждая функция — отдельный закрытый блок: их можно использовать независимо, но они дают синергию <strong>через единый каталог компонентов</strong>.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 5 — КОНВЕЙЕР ОБРАБОТКИ
+============================================================ -->
+<section class="slide soft" data-screen-label="05 Конвейер обработки">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Как это устроено</div>
+      <h2 class="slide-title">Конвейер обработки загрузок</h2>
+    </div>
+    <span class="gost-tag">bom.json — первичный источник</span>
+  </header>
+
+  <div class="body">
+    <div class="pipeline">
+      <div class="pl-node">
+        <div class="pl-eyebrow">Шаг 1 · вход</div>
+        <div class="pl-name">Архив сборки</div>
+        <div class="pl-desc">ZIP-выгрузка от соисполнителя: исходники + артефакты сборки + два файла-описания.</div>
+      </div>
+      <div class="pl-arr">→</div>
+      <div class="pl-merge">
+        <div class="pl-node">
+          <div class="pl-eyebrow">Шаг 2 · первичный источник</div>
+          <div class="pl-name">bom.json</div>
+          <div class="pl-desc">SBOM (CycloneDX), генерируется инструментом <code>cdxgen</code>.</div>
+        </div>
+        <div class="pl-node alt">
+          <div class="pl-eyebrow">Шаг 2 · дополнение</div>
+          <div class="pl-name">SBOM-Registry.xlsx</div>
+          <div class="pl-desc">Реестр из Excel: лицензии, авторы, метод детектирования.</div>
+        </div>
+      </div>
+      <div class="pl-arr">→</div>
+      <div class="pl-node">
+        <div class="pl-eyebrow">Шаг 3 · хранение</div>
+        <div class="pl-name">База данных с историей</div>
+        <div class="pl-desc">PostgreSQL: журналы только на добавление, нельзя переписать задним числом.</div>
+      </div>
+      <div class="pl-arr">→</div>
+      <div class="pl-node">
+        <div class="pl-eyebrow">Шаг 4 · выход</div>
+        <div class="pl-name">Единый SBOM CycloneDX</div>
+        <div class="pl-desc">Машиночитаемый отчёт проекта, принимаемый внешними системами анализа уязвимостей.</div>
+      </div>
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Происхождение каждого артефакта</span>
+        Для каждой записи сохраняется <strong>путь в исходном архиве</strong> и <strong>контрольная сумма SHA-256</strong>. Любой компонент можно найти и проверить «откуда он взялся».
+      </div>
+      <div class="aside ok">
+        <span class="aside-tag">Неизменяемость</span>
+        Загруженная выгрузка — это снимок. <strong>Ничего нельзя переписать задним числом</strong>; новые данные становятся следующим снимком, прошлые остаются.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Конвейер из четырёх шагов: каждый шаг проверяем, каждый артефакт прослеживается.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 6 — ЮРИДИЧЕСКИЙ ПРОЦЕСС
+============================================================ -->
+<section class="slide" data-screen-label="06 Юридический процесс">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Юридический контур</div>
+      <h2 class="slide-title">Юридический процесс и вердикты</h2>
+    </div>
+    <span class="gost-tag">Lifecycle заключения · обязательный PDF</span>
+  </header>
+
+  <div class="body">
+    <div class="kicker">Четыре вердикта по лицензии</div>
+    <div class="v-legend">
+      <div class="v-card"><span class="ball ok"></span><div><div class="v-name">🟢 Безопасно</div><div class="v-meta">можно использовать в поставке</div></div></div>
+      <div class="v-card"><span class="ball warn"></span><div><div class="v-name">🟡 Риск</div><div class="v-meta">с условиями / атрибуцией</div></div></div>
+      <div class="v-card"><span class="ball bad"></span><div><div class="v-name">🔴 Небезопасно</div><div class="v-meta">в поставку нельзя</div></div></div>
+      <div class="v-card"><span class="ball na"></span><div><div class="v-name">⚪ Не оценено</div><div class="v-meta">ждёт решения юриста</div></div></div>
+    </div>
+
+    <div class="kicker" style="margin-top: 4px;">Жизненный цикл юридического заключения</div>
+    <div class="lc-row">
+      <div class="lc-step">
+        <div class="t">Шаг 1</div>
+        <div class="n">Черновик</div>
+        <div class="d">Юрист готовит оценку, комментарий, прикладывает материалы. В каталоге — предварительный вердикт.</div>
+      </div>
+      <div class="lc-arr">→</div>
+      <div class="lc-step active">
+        <div class="t">Шаг 2 · финальный</div>
+        <div class="n">Утверждено</div>
+        <div class="d">Обязательно <strong>приложение PDF</strong> юридического заключения. С этого момента вердикт — финальный.</div>
+      </div>
+      <div class="lc-arr">→</div>
+      <div class="lc-step stale">
+        <div class="t">Шаг 3 · опц.</div>
+        <div class="n">Заменено</div>
+        <div class="d">Когда выходит новая редакция лицензии или меняются обстоятельства. Старая запись и PDF не удаляются.</div>
+      </div>
+    </div>
+
+    <div class="aside-grid">
+      <div class="aside warn">
+        <span class="aside-tag">Worst-verdict-wins</span>
+        Вердикт компонента = <strong>худший из вердиктов его лицензий</strong>. Один 🔴 у любой из лицензий компонента делает 🔴 весь компонент.
+      </div>
+      <div class="aside">
+        <span class="aside-tag">Изоляция</span>
+        Каждый соисполнитель <strong>видит только свои компоненты</strong>. Каталог лицензий — общий проектный ресурс; одно решение юриста работает на весь проект.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Решение юриста фиксируется <strong>с документом и историей</strong> — это и есть доказательная лицензионная чистота.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 7 — ТЕХНОЛОГИЧЕСКИЙ СТЕК
+============================================================ -->
+<section class="slide" data-screen-label="07 Технологический стек">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Как сделан сервис</div>
+      <h2 class="slide-title">Технологический стек</h2>
+    </div>
+    <span class="gost-tag">§2 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <table class="stack-table">
+      <thead>
+        <tr><th>Слой</th><th>Технологии</th></tr>
+      </thead>
+      <tbody>
+        <tr><td class="layer">Бэкенд</td><td class="tech"><code>Python</code> <code>FastAPI</code> <code>SQLAlchemy</code> <code>Pydantic</code> <code>Alembic</code></td></tr>
+        <tr><td class="layer">База данных</td><td class="tech"><code>PostgreSQL</code></td></tr>
+        <tr><td class="layer">Фронтенд</td><td class="tech"><code>TypeScript</code> <code>Next.js</code> <code>React</code> <code>Tailwind CSS</code></td></tr>
+        <tr><td class="layer">Аутентификация</td><td class="tech"><code>JWT</code> <code>bcrypt</code> <code>защита от перебора</code></td></tr>
+        <tr><td class="layer">Работа с SBOM</td><td class="tech"><code>CycloneDX</code> <code>PURL</code> <code>CPE 2.3</code> <code>SPDX</code></td></tr>
+        <tr><td class="layer">Контроль качества</td><td class="tech"><code>pytest</code> <code>Vitest</code> <code>статический анализ</code> <code>типизированный клиент API</code></td></tr>
+        <tr><td class="layer">Инфраструктура</td><td class="tech"><code>Docker</code> <code>развёртывание на двух серверах</code></td></tr>
+      </tbody>
+    </table>
+
+    <div class="aside-grid">
+      <div class="aside">
+        <span class="aside-tag">Восемь языков в проекте</span>
+        <code>Python</code> · <code>TypeScript</code> · <code>JavaScript</code> · <code>SQL</code> · <code>HTML</code> · <code>CSS</code> · <code>Bash</code> · <code>PowerShell</code>
+      </div>
+      <div class="aside">
+        <span class="aside-tag">Что значат термины</span>
+        <strong>CycloneDX</strong> — открытый формат SBOM. <strong>PURL</strong> — единая координата пакета. <strong>CPE 2.3</strong> — стандарт идентификации продукта для уязвимостей. <strong>SPDX</strong> — стандарт идентификаторов лицензий.
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Стек из проверенных открытых технологий; на каждом слое — <strong>отраслевые стандарты</strong>, а не вендорные привязки.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 8 — ИНЖЕНЕРНЫЕ ПРИНЦИПЫ
+============================================================ -->
+<section class="slide soft" data-screen-label="08 Инженерные принципы">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Как строится сервис</div>
+      <h2 class="slide-title">Инженерные принципы</h2>
+    </div>
+    <span class="gost-tag">§3 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-num">Принцип 1</div>
+        <div class="feat-h">Документация-первой</div>
+        <div class="feat-d">Сначала <strong>ТЗ</strong> → схема БД и контракт API → только потом код. Никакой кодинг «вслепую».</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">Принцип 2</div>
+        <div class="feat-h">Архитектурные решения фиксируются</div>
+        <div class="feat-d">Каждое значимое решение — отдельный документ (<strong>ADR</strong>) с контекстом, альтернативами и последствиями.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">Принцип 3</div>
+        <div class="feat-h">Контрактная типизация</div>
+        <div class="feat-d">Бэкенд и фронтенд не расходятся: типы API генерируются автоматически, расхождения ловит компилятор.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">Принцип 4</div>
+        <div class="feat-h">Неизменяемость данных</div>
+        <div class="feat-d">Журналы только на добавление; снимки выгрузок не переписываются — история всегда полная.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">Принцип 5</div>
+        <div class="feat-h">Один коммит = одно изменение</div>
+        <div class="feat-d">Каждый коммит представляет ровно одно логическое изменение — историю легко читать и откатывать.</div>
+      </div>
+      <div class="feat">
+        <div class="feat-num">Принцип 6</div>
+        <div class="feat-h">Контракт API — источник истины</div>
+        <div class="feat-d">OpenAPI-описание — единственная официальная версия. И клиент, и тесты собираются из него.</div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">Главный эффект</span>
+      Сервис собирается <strong>воспроизводимо</strong>: новый разработчик читает ТЗ и ADR — и понимает не только «что делать», но и «почему именно так».
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Документация — это не побочный продукт, а <strong>несущая конструкция</strong> проекта.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 9 — ОРГАНИЗАЦИЯ РАБОТ
+============================================================ -->
+<section class="slide" data-screen-label="09 Организация работ">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Организация работ</div>
+      <h2 class="slide-title">Роли и цикл одного инкремента</h2>
+    </div>
+    <span class="gost-tag">§3 справки · разделение обязанностей</span>
+  </header>
+
+  <div class="body compact">
+    <table class="role-table">
+      <thead>
+        <tr><th>Роль</th><th>Чем занимается</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="role-name">Архитектор и руководитель<br/><span class="faint" style="font-size:15px; font-weight:400;">Виталий Пиков</span></td>
+          <td>Архитектура, ключевые решения (ADR), приоритеты, приёмка инкрементов.</td>
+        </tr>
+        <tr>
+          <td class="role-name">Разработчик</td>
+          <td>Код, ТЗ, миграции базы данных, автотесты по каждому инкременту.</td>
+        </tr>
+        <tr>
+          <td class="role-name">Независимый аудитор кода</td>
+          <td>Проверяет <strong>каждый инкремент</strong>; не правит код сам, выдаёт вердикт «готово / на доработку».</td>
+        </tr>
+        <tr>
+          <td class="role-name">Тестировщик E2E</td>
+          <td>Проверка готовых сценариев <strong>в реальном браузере</strong>: пользовательские пути, регрессии, граничные случаи.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="kicker" style="margin-top: 6px;">Цикл одного инкремента</div>
+    <div class="cycle">
+      <div class="cy-step"><div class="num">01</div><div class="lbl">Техзадание / ADR</div><div class="sub">формулируем, что и зачем делаем</div></div>
+      <div class="cy-arr">→</div>
+      <div class="cy-step"><div class="num">02</div><div class="lbl">Ревью замысла</div><div class="sub">проверяем подход до кода</div></div>
+      <div class="cy-arr">→</div>
+      <div class="cy-step"><div class="num">03</div><div class="lbl">Реализация + тесты</div><div class="sub">код, миграции, автотесты</div></div>
+      <div class="cy-arr">→</div>
+      <div class="cy-step"><div class="num">04</div><div class="lbl">Независимое ревью</div><div class="sub">аудитор: «готово / на доработку»</div></div>
+      <div class="cy-arr">→</div>
+      <div class="cy-step"><div class="num">05</div><div class="lbl">E2E в браузере</div><div class="sub">сценарии глазами пользователя</div></div>
+      <div class="cy-arr">→</div>
+      <div class="cy-step"><div class="num">06</div><div class="lbl">Развёртывание</div><div class="sub">обновление двух серверов</div></div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Тот, кто <strong>пишет</strong>, и тот, кто <strong>проверяет</strong>, — разделены. Это снимает «слепые пятна» и сохраняет качество на каждом инкременте.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 10 — МЕТРИКИ: ТЕМП И ОБЪЁМ
+============================================================ -->
+<section class="slide" data-screen-label="10 Темп и объём">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Метрики проекта</div>
+      <h2 class="slide-title">Темп разработки и объём кода</h2>
+    </div>
+    <span class="gost-tag">§4 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <div class="row2">
+      <div class="metric-card">
+        <div class="m-eyebrow">Темп разработки</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Всего коммитов</span><span class="v big">587</span></div>
+          <div class="m-row"><span class="k">Средняя скорость</span><span class="v">≈ 45 / день</span></div>
+          <div class="m-row"><span class="k">Пиковый день</span><span class="v" style="color: var(--c-ok);">92 коммита</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="m-eyebrow">Объём кода</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Исходный код, всего</span><span class="v big">≈ 79 500 строк</span></div>
+          <div class="m-row"><span class="k">— Python</span><span class="v">≈ 49 900</span></div>
+          <div class="m-row"><span class="k">— TypeScript / React</span><span class="v">≈ 19 400</span></div>
+          <div class="m-row"><span class="k">— Прочее</span><span class="v">≈ 10 000</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row2">
+      <div class="metric-card" style="border-top-color: var(--c-ok);">
+        <div class="m-eyebrow" style="color: var(--c-ok);">Автотесты</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Автотесты, всего</span><span class="v big">≈ 22 700 строк</span></div>
+          <div class="m-row"><span class="k">Соотношение к коду</span><span class="v">≈ 1 : 3,5</span></div>
+        </div>
+      </div>
+
+      <div class="metric-card" style="border-top-color: var(--c-primary);">
+        <div class="m-eyebrow" style="color: var(--c-primary);">Документация</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Документация, всего</span><span class="v big">≈ 108 600 строк</span></div>
+          <div class="m-row"><span class="k">Документации больше кода</span><span class="v">в ≈ 1,4 раза</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span><strong>Документации больше, чем кода</strong> — проект строился так, чтобы быть воспроизводимым, а не «понятным только автору».</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 11 — МЕТРИКИ: СТРУКТУРА ПРОДУКТА
+============================================================ -->
+<section class="slide soft" data-screen-label="11 Структура продукта">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Метрики проекта</div>
+      <h2 class="slide-title">Структура продукта в цифрах</h2>
+    </div>
+    <span class="gost-tag">§4 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <div class="metric-grid-3">
+      <div class="metric-card">
+        <div class="m-eyebrow">Тестирование</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Автотестов</span><span class="v big">1 023</span></div>
+          <div class="m-row"><span class="k">+ в CLI-ядре</span><span class="v">+ 91</span></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="m-eyebrow">API</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Эндпоинтов</span><span class="v big">79</span></div>
+          <div class="m-row"><span class="k">OpenAPI-контракт</span><span class="v" style="font-size: 18px; color: var(--c-ok);">✓ актуален</span></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="m-eyebrow">База данных</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Таблиц</span><span class="v big">19</span></div>
+          <div class="m-row"><span class="k">Миграций</span><span class="v">14</span></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="m-eyebrow">Интерфейс</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Страниц интерфейса</span><span class="v big">17</span></div>
+          <div class="m-row"><span class="k">UI-компонентов</span><span class="v">35</span></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="m-eyebrow">Архитектура</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Архитектурных решений (ADR)</span><span class="v big">25</span></div>
+          <div class="m-row"><span class="k">Разделов ТЗ</span><span class="v">16</span></div>
+        </div>
+      </div>
+      <div class="metric-card">
+        <div class="m-eyebrow">Документация</div>
+        <div class="m-rows">
+          <div class="m-row"><span class="k">Файлов документации</span><span class="v big">432</span></div>
+          <div class="m-row"><span class="k">Покрывают весь продукт</span><span class="v" style="font-size: 18px; color: var(--c-ok);">✓</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span><strong>Более тысячи автоматических проверок</strong>; каждый инкремент закрывается «зелёным» прогоном тестов.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 12 — КАЧЕСТВО И НАДЁЖНОСТЬ
+============================================================ -->
+<section class="slide" data-screen-label="12 Качество и надёжность">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Контроль качества</div>
+      <h2 class="slide-title">Качество и надёжность</h2>
+    </div>
+    <span class="gost-tag">§5 справки · многоконтурная проверка</span>
+  </header>
+
+  <div class="body">
+    <div class="qual-grid">
+      <div class="qual">
+        <div class="qual-num">01</div>
+        <div class="qual-body">
+          <div class="qual-h">Независимое ревью кода</div>
+          <div class="qual-d">На <strong>каждом инкременте</strong>: тот, кто проверяет, не пишет код. Вердикт — «готово / на доработку».</div>
+        </div>
+      </div>
+      <div class="qual">
+        <div class="qual-num">02</div>
+        <div class="qual-body">
+          <div class="qual-h">Полный прогон автотестов + статический анализ</div>
+          <div class="qual-d">Перед каждым развёртыванием прогоняются все 1 023+ тестов и статические анализаторы по бэку и фронту.</div>
+        </div>
+      </div>
+      <div class="qual">
+        <div class="qual-num">03</div>
+        <div class="qual-body">
+          <div class="qual-h">E2E в реальном браузере</div>
+          <div class="qual-d">Тестировщик прогоняет ключевые сценарии глазами пользователя — а не только «по контракту».</div>
+        </div>
+      </div>
+      <div class="qual">
+        <div class="qual-num">04</div>
+        <div class="qual-body">
+          <div class="qual-h">Изоляция данных проверяется отдельно</div>
+          <div class="qual-d">Специальные тесты убеждаются, что соисполнители не видят чужих компонентов; роли работают корректно.</div>
+        </div>
+      </div>
+      <div class="qual">
+        <div class="qual-num">05</div>
+        <div class="qual-body">
+          <div class="qual-h">Неизменяемость на уровне правил БД</div>
+          <div class="qual-d">Не «договорённость», а ограничение базы данных: <strong>переписать прошлый снимок физически нельзя</strong>.</div>
+        </div>
+      </div>
+      <div class="qual">
+        <div class="qual-num">06</div>
+        <div class="qual-body">
+          <div class="qual-h">Совместимость по стандартам</div>
+          <div class="qual-d">CycloneDX, выгружаемый сервисом, <strong>принимается внешними системами без доработок</strong> — это и есть критерий совместимости.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Качество — это <strong>несколько независимых контуров</strong>, а не один «общий взгляд» автора кода.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 13 — ТЕКУЩИЙ СТАТУС И РАЗВИТИЕ
+============================================================ -->
+<section class="slide" data-screen-label="13 Статус и развитие">
+  <header class="slide-head">
+    <div>
+      <div class="slide-eyebrow">Где мы сейчас</div>
+      <h2 class="slide-title">Текущий статус и направление развития</h2>
+    </div>
+    <span class="gost-tag">§6 справки по проекту</span>
+  </header>
+
+  <div class="body">
+    <div class="status-flow">
+      <div class="status-block">
+        <div class="s-eye">Готово · в эксплуатации</div>
+        <div class="s-h">Базовая функциональность реализована и развёрнута</div>
+        <ul class="cust" style="margin-top: 14px;">
+          <li>Конвейер обработки SBOM-выгрузок</li>
+          <li>Каталог компонентов и каталог лицензий</li>
+          <li>Юридический контур: вердикты + PDF + история</li>
+          <li>Ролевая модель и изоляция соисполнителей</li>
+          <li>Календарь выгрузок и сравнение «день к дню»</li>
+          <li>Экспорт единого SBOM в формате CycloneDX</li>
+        </ul>
+      </div>
+
+      <div class="status-arr">→</div>
+
+      <div class="status-block next">
+        <div class="s-eye">В активной разработке</div>
+        <div class="s-h">Направление по уязвимостям</div>
+        <ul class="cust" style="margin-top: 14px;">
+          <li>Обогащение координат компонентов в стандарте <strong>CPE</strong></li>
+          <li>Курирование справочника соответствий <strong>PURL ↔ CPE</strong></li>
+          <li>Подключение отечественной базы <strong>БДУ ФСТЭК</strong></li>
+          <li>Вкладка «Уязвимости» в интерфейсе сервиса</li>
+          <li>Та же модель работы — инкрементами с независимым ревью</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="label">Принцип развития</span>
+      Новое направление строится <strong>теми же инкрементами</strong> с тем же независимым ревью кода: качество не «снижается ради скорости».
+    </div>
+
+    <div class="takeaway">
+      <span class="pointer">👉</span>
+      <span>Базовый каркас закрыт; следующий шаг — превратить «список компонентов» в <strong>живую карту уязвимостей</strong> проекта.</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+  СЛАЙД 14 — ИТОГ И КОНТАКТЫ
+============================================================ -->
+<section class="slide title-slide" data-screen-label="14 Итог и контакты">
+  <div class="topbar">
+    <div class="brand-logo">
+      <img class="logo-img" src="assets/mntc-logo.png" alt="Логотип МНТЦ" />
+      <div class="org-meta">
+        <div class="org-name">АО МНТЦ МИЭТ</div>
+        <div class="org-sub">istc-miet.ru</div>
+      </div>
+    </div>
+    <div class="meta-tag">Спасибо за внимание</div>
+  </div>
+
+  <h1 style="font-size: 80px; margin-bottom: 60px;">Сервис SBOM-аудита:<br/>что мы получили</h1>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-bottom: 80px;">
+    <div style="background: rgba(255,255,255,0.06); border-left: 4px solid #fff; padding: 22px 26px;">
+      <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Вывод 1</div>
+      <div style="font-size: 22px; line-height: 1.4;">Единая прослеживаемая картина <strong style="color: #fff;">состава, лицензий и базы для оценки безопасности</strong> всего проекта.</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border-left: 4px solid #fff; padding: 22px 26px;">
+      <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Вывод 2</div>
+      <div style="font-size: 22px; line-height: 1.4;">Высокий темп разработки при <strong style="color: #fff;">строгом контроле качества</strong> — независимое ревью, тесты, E2E.</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border-left: 4px solid #fff; padding: 22px 26px;">
+      <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Вывод 3</div>
+      <div style="font-size: 22px; line-height: 1.4;">Совместимость по стандартам: SBOM <strong style="color: #fff;">принимается внешними системами без доработок</strong>.</div>
+    </div>
+    <div style="background: rgba(255,255,255,0.06); border-left: 4px solid #fff; padding: 22px 26px;">
+      <div style="font-size: 14px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: rgba(255,255,255,0.6); margin-bottom: 10px;">Вывод 4</div>
+      <div style="font-size: 22px; line-height: 1.4;">Готовность к развитию в сторону <strong style="color: #fff;">уязвимостей</strong>: координаты CPE, БДУ ФСТЭК, отдельная вкладка.</div>
+    </div>
+  </div>
+
+  <div class="signature">
+    <div class="who">
+      <div class="name">Виталий А. Пиков</div>
+      <div class="role">Специалист по безопасной разработке ПО · АО МНТЦ МИЭТ · vitaly@pikov.expert</div>
+    </div>
+    <div class="date">
+      <div class="d1">Вопросы?</div>
+      <div class="d2">27 мая 2026 г.</div>
+    </div>
+  </div>
+</section>
+
+</deck-stage>
+
+<!-- Auto-footer injector -->
+<script>
+(function(){
+  const slides = document.querySelectorAll('deck-stage > section.slide');
+  slides.forEach((s, i) => {
+    if (s.querySelector('.slide-footer')) return;
+    if (s.classList.contains('title-slide')) return;
+    const f = document.createElement('div');
+    f.className = 'slide-footer';
+    f.innerHTML =
+      '<div class="ff-mark"><span class="dot"></span><span>АО МНТЦ МИЭТ · Сервис SBOM-аудита · 2026-05-27</span></div>' +
+      '<div class="slide-num">' + String(i+1).padStart(2,'0') + ' / ' + String(slides.length).padStart(2,'0') + '</div>';
+    s.appendChild(f);
+  });
+})();
+</script>
+
+<a class="brand-back" href="https://pikov.expert/" style="position:fixed;right:12px;bottom:12px;z-index:1000;background:#fff;color:#164831;padding:7px 12px;border:1px solid #697d70;border-radius:6px;font:12px/1.4 system-ui,sans-serif;text-decoration:none">← Каталог pikov.expert</a></body>
+</html>

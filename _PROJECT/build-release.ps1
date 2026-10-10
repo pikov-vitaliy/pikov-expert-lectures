@@ -448,6 +448,15 @@ function Get-ThreatsReleaseFiles([string]$FolderPath) {
 }
 
 function Get-DomainReleaseFiles([string]$FolderPath) {
+  $folderName = Split-Path -Leaf $FolderPath
+  $additional = @($additionalSites | Where-Object { $_.folder -eq $folderName })
+  if ($additional.Count -gt 0) {
+    if ($additional.Count -ne 1 -or @($additional[0].publicFiles).Count -eq 0) { Fail "Invalid additional site allowlist: $folderName" }
+    foreach ($relative in @($additional[0].publicFiles)) {
+      [void](Get-ValidatedReleaseSourcePath -SourceRoot $FolderPath -RelativePath $relative)
+    }
+    return @($additional[0].publicFiles)
+  }
   if ((Split-Path -Leaf $FolderPath) -eq 'threats') {
     return Get-ThreatsReleaseFiles -FolderPath $FolderPath
   }
@@ -719,8 +728,11 @@ if ($ReleaseDate -notmatch '^\d{4}-\d{2}-\d{2}$') {
 }
 $script:ReleaseDateValue = $ReleaseDate
 
-$uniqueFolders = @($data.lectures | Select-Object -ExpandProperty folder -Unique)
-foreach ($lectureEntry in @($data.lectures)) {
+$additionalSites = @()
+if ($data.PSObject.Properties.Name -contains 'additionalSites') { $additionalSites = @($data.additionalSites) }
+$siteEntries = @($data.lectures) + $additionalSites
+$uniqueFolders = @($siteEntries | Select-Object -ExpandProperty folder -Unique)
+foreach ($lectureEntry in @($siteEntries)) {
   Assert-SafeLectureDomain -Domain ([string]$lectureEntry.domain)
 }
 foreach ($folder in $uniqueFolders) {
@@ -738,7 +750,7 @@ $targets.Add([pscustomobject]@{
 })
 
 foreach ($folder in $uniqueFolders) {
-  $lecture = @($data.lectures | Where-Object { $_.folder -eq $folder })[0]
+  $lecture = @($siteEntries | Where-Object { $_.folder -eq $folder })[0]
   $targets.Add([pscustomobject]@{
     kind = 'domain'
     folder = $folder

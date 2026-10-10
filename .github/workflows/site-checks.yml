@@ -87,6 +87,7 @@ jobs:
           node --test .\_PROJECT\test-evergreen-course-dates.mjs
           node --test .\_PROJECT\test-main-rbpo-publication.mjs
           node --test .\_PROJECT\test-dast-publication.mjs
+          python .\_PROJECT\test-release-links.py
           node --test .\_PROJECT\test-release-workflow-order.mjs
           node --test .\_PROJECT\test-release-provenance.mjs
           node --test .\_PROJECT\test-deploy-manifest-boundary.mjs
@@ -182,6 +183,10 @@ jobs:
         shell: pwsh
         run: |
           powershell -NoProfile -ExecutionPolicy Bypass -File .\_PROJECT\test-public-release-independence.ps1
+
+      - name: Check links across every packaged site
+        shell: pwsh
+        run: python .\_PROJECT\check-release-links.py
 
       - name: Run release browser QA
         shell: pwsh

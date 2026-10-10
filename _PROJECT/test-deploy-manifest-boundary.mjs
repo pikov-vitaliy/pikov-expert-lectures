@@ -39,7 +39,7 @@ function runGit(root, args) {
 
 function canonicalTargets(lectures) {
   const firstByFolder = new Map();
-  for (const lecture of lectures.lectures) {
+  for (const lecture of [...lectures.lectures, ...(lectures.additionalSites ?? [])]) {
     if (!firstByFolder.has(lecture.folder)) firstByFolder.set(lecture.folder, lecture);
   }
   return [
