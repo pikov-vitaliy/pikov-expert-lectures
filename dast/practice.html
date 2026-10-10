@@ -1,0 +1,265 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Практика динамического анализа: AFL++ и libFuzzer — Виталий Пиков</title><meta name="description" content="Методички, исходники и критерии отчёта для студенческих практикумов AFL++ и libFuzzer."><meta name="author" content="Пиков Виталий Александрович">
+<link rel="canonical" href="https://dast.pikov.expert/practice.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Практика динамического анализа: AFL++ и libFuzzer">
+<meta property="og:description" content="Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dast.pikov.expert/practice.html">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Практика динамического анализа: AFL++ и libFuzzer", "description": "Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.", "url": "https://dast.pikov.expert/practice.html", "inLanguage": "ru", "author": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}}</script><style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --ink:#0f1e2e; --ink2:#4a5c70; --ink3:#7286a0;
+  --line:#dde6f0; --line2:#eaf0f7;
+  --brand:#0f2f52; --brand2:#1b4f86; --accent:#2f80ed; --accent-soft:#eaf2fe;
+  --warn:#b45309; --warn-soft:#fff7ed; --ok:#15803d; --ok-soft:#f0fdf4;
+  --bad:#b42318; --bad-soft:#fef3f2; --radius:14px;
+  --shadow:0 1px 2px rgba(15,47,82,.06), 0 8px 24px rgba(15,47,82,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",Roboto,"Liberation Sans",Arial,sans-serif;
+  font-size:16px; line-height:1.62; -webkit-text-size-adjust:100%;
+}
+a{color:var(--brand2)}
+a:hover{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+/* ---------- верхняя панель ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar .wrap{display:flex; align-items:center; gap:14px; height:60px}
+.topbar .brand{font-weight:700; color:var(--brand); white-space:nowrap; letter-spacing:.2px; font-size:14px}
+.topbar .brand span{color:var(--ink3); font-weight:500}
+.topbar nav{
+  display:flex; gap:1px; overflow-x:auto; scrollbar-width:none; margin-left:auto;
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%);
+}
+.topbar nav::-webkit-scrollbar{display:none}
+.topbar nav a{
+  display:block; padding:7px 8px; border-radius:9px; color:var(--ink2);
+  text-decoration:none; font-size:13px; white-space:nowrap;
+}
+.topbar nav a:hover{background:var(--accent-soft); color:var(--brand2)}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    radial-gradient(900px 380px at 12% -10%, rgba(47,128,237,.38), transparent 60%),
+    radial-gradient(700px 320px at 90% 0%, rgba(27,79,134,.45), transparent 55%),
+    linear-gradient(160deg,#0d2846 0%, #123a63 55%, #0f2f52 100%);
+  color:#fff; padding:52px 0 46px; border-bottom:1px solid #0b2340;
+}
+.hero .eyebrow{
+  display:inline-flex; align-items:center; gap:9px; font-size:13px; letter-spacing:.08em;
+  text-transform:uppercase; color:#bcd6f5; font-weight:600;
+}
+.hero .eyebrow i{width:7px;height:7px;border-radius:50%;background:#57c2ff;display:inline-block}
+.hero h1{font-size:40px; line-height:1.15; margin:14px 0 10px; letter-spacing:-.5px}
+.hero h1 small{display:block; font-size:20px; font-weight:500; color:#cfe1f7; margin-top:10px; letter-spacing:0}
+.hero p.lead{font-size:17.5px; color:#dbe8f8; max-width:820px; margin:14px 0 22px}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px}
+.chip{
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22);
+  color:#eaf3ff; padding:6px 12px; border-radius:999px; font-size:13.5px;
+}
+.chip.ok{background:rgba(87,194,255,.16); border-color:rgba(87,194,255,.45)}
+.cta{display:flex; flex-wrap:wrap; gap:10px}
+.btn{
+  display:inline-block; padding:11px 18px; border-radius:11px; text-decoration:none;
+  font-weight:600; font-size:15px; border:1px solid transparent;
+}
+.btn.primary{background:#57c2ff; color:#06263f}
+.btn.primary:hover{background:#7ad2ff; color:#06263f}
+.btn.ghost{border-color:rgba(255,255,255,.35); color:#eaf3ff}
+.btn.ghost:hover{background:rgba(255,255,255,.1); color:#fff}
+
+/* ---------- секции ---------- */
+main{padding:8px 0 60px}
+section{padding:44px 0 8px; border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+h2{font-size:27px; line-height:1.25; margin:0 0 6px; color:var(--brand); letter-spacing:-.3px; display:flex; align-items:baseline; gap:12px}
+h2 .num{
+  flex:0 0 auto; font-size:14px; font-weight:700; color:#fff; background:var(--brand2);
+  border-radius:8px; padding:3px 9px; letter-spacing:.02em;
+}
+h3{font-size:19px; margin:26px 0 8px; color:var(--brand)}
+h4{font-size:16px; margin:18px 0 6px; color:var(--brand2)}
+p{margin:9px 0}
+.sub{color:var(--ink2); font-size:16.5px; margin:0 0 18px; max-width:900px}
+ul,ol{margin:9px 0 9px 22px; padding:0}
+li{margin:5px 0}
+code, .mono{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace; font-size:.92em;
+  background:#eef3f9; border:1px solid var(--line); border-radius:6px; padding:1px 5px;
+}
+pre{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace; font-size:13.5px;
+  background:#0f2f52; color:#e8f1fb; border-radius:12px; padding:14px 16px; overflow:auto;
+  line-height:1.5;
+}
+pre code{background:none;border:0;padding:0;color:inherit}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px}
+.grid{display:grid; gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.auto{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.stat{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow)}
+.stat b{display:block; font-size:32px; line-height:1.1; color:var(--brand2); letter-spacing:-1px}
+.stat span{display:block; color:var(--ink2); font-size:14px; margin-top:4px}
+
+table{width:100%; border-collapse:collapse; margin:12px 0; background:var(--card); font-size:14.8px}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+th{background:#eef4fb; color:var(--brand); font-weight:600}
+tbody tr:nth-child(even) td{background:#fafcfe}
+.tbl-wrap{overflow-x:auto; border-radius:12px}
+
+.callout{border-radius:12px; padding:13px 16px; margin:14px 0; border:1px solid var(--line); border-left-width:5px; background:var(--card)}
+.callout b{color:var(--ink)}
+.callout.must{border-left-color:var(--bad); background:var(--bad-soft)}
+.callout.rec{border-left-color:var(--warn); background:var(--warn-soft)}
+.callout.may{border-left-color:var(--accent); background:var(--accent-soft)}
+.callout.ok{border-left-color:var(--ok); background:var(--ok-soft)}
+.callout .lbl{font-size:12.5px; text-transform:uppercase; letter-spacing:.07em; font-weight:700; display:block; margin-bottom:3px}
+.callout.must .lbl{color:var(--bad)} .callout.rec .lbl{color:var(--warn)}
+.callout.may .lbl{color:var(--brand2)} .callout.ok .lbl{color:var(--ok)}
+
+.tech{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; display:flex; flex-direction:column; gap:6px}
+.tech .h{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.tech .h b{font-size:17px; color:var(--brand)}
+.tech .cl{font-size:12.5px; color:var(--ink3); font-family:"Cascadia Mono",Consolas,monospace}
+.tech p{margin:2px 0; font-size:14.8px; color:var(--ink2)}
+.tag{display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#f4f8fd; color:var(--ink2)}
+.tag.lvl{background:#eef4fb; color:var(--brand2); border-color:#cfe0f3}
+.tag.proc{background:#f2fbf5; color:var(--ok); border-color:#cdecd9}
+
+figure{margin:18px 0; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px; box-shadow:var(--shadow)}
+figure img{width:100%; height:auto; display:block; border-radius:8px}
+figcaption{color:var(--ink2); font-size:14px; margin-top:9px; padding:0 4px}
+
+details{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin:9px 0}
+details[open]{box-shadow:var(--shadow)}
+summary{cursor:pointer; font-weight:600; color:var(--brand); list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ "; color:var(--accent)}
+details[open] summary::before{content:"▾ "}
+details p, details ul{margin-top:8px}
+
+.dl{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.dl a{display:flex; gap:12px; align-items:flex-start; background:var(--card); border:1px solid var(--line);
+  border-radius:12px; padding:14px 16px; text-decoration:none; box-shadow:var(--shadow)}
+.dl a:hover{border-color:#bcd6f5; background:#fbfdff}
+.dl .ico{flex:0 0 auto; width:38px; height:38px; border-radius:10px; background:var(--accent-soft); color:var(--brand2);
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px}
+.dl b{display:block; color:var(--brand); font-size:15px}
+.dl span{display:block; color:var(--ink2); font-size:13.5px}
+
+.note{color:var(--ink2); font-size:14.5px}
+footer{border-top:1px solid var(--line); background:#fff; padding:26px 0 34px; color:var(--ink2); font-size:14.5px}
+footer .wrap{display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between}
+.kv{display:grid; grid-template-columns:180px 1fr; gap:2px 14px; font-size:15px}
+.kv dt{color:var(--ink3)} .kv dd{margin:0}
+@media(max-width:640px){
+  .hero h1{font-size:30px} .hero h1 small{font-size:17px}
+  h2{font-size:22px} .kv{grid-template-columns:1fr}
+}
+@media print{
+  .topbar,.cta{display:none} body{background:#fff; font-size:11pt}
+  section{page-break-inside:avoid; border-top:1px solid #ccc}
+  .hero{background:#0f2f52 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  .card,.tech,figure,details,table{box-shadow:none}
+  a{color:#0f2f52; text-decoration:none}
+}
+table.glossary td.gl-term{font-weight:600;color:var(--brand)}
+table.glossary td.gl-def{font-size:14.6px;color:var(--ink2)}
+table.glossary td.gl-num{color:var(--ink3);font-size:13px;white-space:nowrap;font-family:"Cascadia Mono",Consolas,monospace}
+.gl-count{font-size:13px;font-weight:600;color:var(--ink3)}
+
+/* интерактив */
+.imap{border:1px solid var(--line);border-radius:16px;background:#fdfefe;padding:14px 16px 4px;box-shadow:var(--shadow)}
+.imap-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.imap-stats .stat{box-shadow:none;border:0;background:transparent;padding:4px 0}
+.imap-stats .stat b{font-size:24px}
+.imap-canvas svg{width:100%;height:auto;display:block}
+.link{fill:none;stroke-width:1.4;opacity:.55}
+.link-proc{stroke:#15803d}
+.link-lvl{stroke:#b45309;stroke-dasharray:5 5}
+.link.hl{opacity:1;stroke-width:2.4;filter:drop-shadow(0 0 3px rgba(47,128,237,.55))}
+.node{cursor:pointer}
+.node circle{fill:#fff;stroke-width:1.8;transition:stroke-width .15s,filter .15s}
+.node-tech circle{stroke:var(--brand2)}
+.node-proc circle{stroke:#15803d;fill:#f0fdf4}
+.node-lvl circle{stroke:#b45309;fill:#fff7ed}
+.node .node-num{font:600 14px "Cascadia Mono",Consolas,monospace;text-anchor:middle;fill:var(--brand)}
+.node .node-title{font:600 12.5px var(--body);fill:var(--ink)}
+.node:hover circle,.node.hl circle{stroke-width:3;filter:drop-shadow(0 0 4px rgba(47,128,237,.5))}
+.node.dim{opacity:.35}
+.imap-dialog{position:fixed;inset:0;z-index:90;background:rgba(15,47,82,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.imap-dialog .dlg{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:22px 24px;box-shadow:0 24px 60px rgba(15,47,82,.35)}
+.imap-dialog .dlg h4{margin:0 0 4px;font-size:20px;color:var(--brand)}
+.imap-dialog .dlg .dlg-meta{color:var(--ink3);font-size:13px;margin-bottom:10px}
+.imap-dialog .dlg p{margin:6px 0;font-size:15px}
+.imap-dialog .dlg button{margin-top:12px;padding:9px 16px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-size:14px}
+.imap-dialog .dlg button:hover{background:var(--accent-soft)}
+.board{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:#fdfefe;box-shadow:var(--shadow)}
+.board-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.board-head h3{margin:0;font-size:18px}
+.board-controls{display:flex;gap:8px}
+.board-controls button{padding:8px 14px;border:1px solid #a8c0b4;border-radius:8px;background:#fff;color:var(--brand);font-size:13.5px;cursor:pointer}
+.board-controls button:hover{background:var(--accent-soft)}
+.board-controls button:disabled{opacity:.45;cursor:default}
+.board-progress{height:6px;border-radius:4px;background:var(--line2);margin:14px 0;overflow:hidden}
+.board-bar{height:100%;width:14%;background:linear-gradient(90deg,#2f80ed,#57c2ff);border-radius:4px;transition:width .45s ease}
+.board-steps .step{border-left:4px solid var(--accent);background:#fff;border-radius:10px;padding:12px 16px;margin:10px 0}
+.board-steps .step h4{margin:2px 0 4px;font-size:17px;color:var(--brand)}
+.board-steps .step p{margin:5px 0;font-size:14.6px}
+.board .step-num{font:600 11px "Cascadia Mono",Consolas,monospace;color:var(--accent);letter-spacing:.08em}
+.board-std b,.board-practice b{color:var(--brand)}
+.board-std{color:var(--ink2)} .board-practice{color:var(--ink2)}
+.board-branch{margin-top:8px;border:1px dashed #b45309;border-radius:10px;padding:10px 12px;background:#fffaf3}
+.board-branch button{border:0;background:none;color:#b45309;font-size:14px;cursor:pointer;padding:0;border-bottom:1px dashed #b45309}
+.board-branch p{margin:8px 0 0}
+.board-announce{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fig-interactive .fig-tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.fig-tools button,.fig-tools a.btn-mini{font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--brand2);cursor:pointer;text-decoration:none}
+.fig-tools button:hover,.fig-tools a.btn-mini:hover{background:var(--accent-soft)}
+.fig-frame{margin-top:10px}
+.fig-frame iframe{width:100%;height:72vh;min-height:520px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.board.board-running .step{display:none}
+.board.board-running .step.on{display:block}
+@media(max-width:760px){.imap-stats{grid-template-columns:repeat(2,1fr)}}
+@media print{
+  .board-controls,.board-progress,.board-branch button,.fig-tools,.fig-frame,.imap-dialog{display:none !important}
+  .board .step{display:block !important}
+  .imap-canvas svg{width:100%}
+}
+
+
+/* Publication navigation and learning resources; original lecture styling retained. */
+.grid>*{min-width:0}.auto{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}.dl{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+@media(max-width:500px){section ul[style*="columns"]{columns:1!important}h2,h3,p,li{overflow-wrap:anywhere}}
+:focus-visible{outline:3px solid #2f80ed;outline-offset:4px}
+.skip-link{position:fixed;top:-100px;left:16px;z-index:1000;background:#fff;color:#123a63;padding:12px}
+.skip-link:focus{top:8px}
+.publication-nav{background:#0d2846;color:#fff;padding:10px 0;font-size:14px}
+.publication-nav .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.publication-nav a{color:#eaf3ff;text-decoration:none}
+.resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}
+.resource-card{min-width:0;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);padding:22px;border-radius:10px}
+.resource-card h3{margin:0 0 10px;font-size:19px}.resource-card p{color:var(--ink2)}
+.resource-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.resource-links a{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;font-weight:600}
+.download-strip{background:var(--accent-soft);border-left:4px solid var(--accent);padding:20px;margin:20px 0}
+.download-strip a{overflow-wrap:anywhere}.reading-route{padding:28px 0 8px}.reading-route h2{font-size:23px}
+.table-scroll{overflow-x:auto;max-width:100%}pre{max-width:100%;overflow:auto}img,svg{max-width:100%}
+@media(max-width:700px){.resource-grid{grid-template-columns:1fr}.topbar .wrap{gap:8px}.topbar nav{min-width:0}.hero h1{font-size:30px}.wrap{padding:0 16px}.publication-nav{font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+@media print{.publication-nav,.skip-link,.resource-links,.cta{display:none!important}.resource-grid{display:block}.resource-card{break-inside:avoid;margin:12px 0}.download-strip{break-inside:avoid}.fig-interactive img[hidden]{display:block!important}.fig-frame{display:none!important}}
+</style></head><body><a class="skip-link" href="#main-content">Перейти к содержанию</a><div class="publication-nav"><div class="wrap"><a class="brand-back" href="https://pikov.expert/">← pikov.expert · каталог материалов</a><span>Авторские материалы · Виталий Пиков</span><a href="index.html">Лекция по динамическому анализу →</a></div></div><header class="hero"><div class="wrap"><div class="eyebrow">Учебная практика · C++ · фаззинг</div><h1>Найти. Объяснить. Исправить. Проверить.</h1><p class="lead">Практикумы по динамическому анализу с AFL++, libFuzzer и AddressSanitizer. Материалы для самостоятельной работы и занятий со студентами.</p><div class="cta"><a class="btn primary" href="downloads/my-first-python-project-v02.zip" download>Скачать учебный архив</a><a class="btn ghost" href="index.html#practice">Связь с проектом стандарта</a></div></div></header><main class="wrap" id="main-content"><section><h2>Маршрут работы</h2><p>Для студентов, начинающих разработчиков C/C++ и специалистов по безопасной разработке. Нужны базовые знания C++, терминала Linux, сборки и работы с файлами.</p><ol><li>Подготовьте локальный стенд и запустите AFL++ по первой методичке.</li><li>Повторите цикл с libFuzzer: harness, корпус, crash и минимизация.</li><li>Разберите первопричину, исправьте проверку границ и подтвердите результат повторным прогоном.</li></ol><p>Темп самостоятельный: подготовка → два практикума → отчёт. Продолжительность зависит от подготовки стенда и не измерялась при публикации.</p><div class="download-strip"><b>Учебная среда.</b> Работайте только с приложенными примерами в собственной WSL2/Ubuntu или Linux VM. Используйте отдельную рабочую папку и синтетические входные данные. При неожиданном изменении файлов за её пределами остановите работу. Внешние сервисы и рабочие данные не являются целями этих заданий.</div><p>В исходных методичках зафиксирована проверка на WSL2, Ubuntu 24.04.4 LTS, Clang 18.1.3, AFL++ 4.09c и g++ 13.3.0. Это сведения из подготовленного комплекта; на странице не заявляется новый прогон всех лабораторных команд.</p></section><section id="materials"><h2>Методички и примеры</h2><div class="resource-grid"><article class="resource-card"><h3>AFL++: от первого запуска до исправления</h3><p>Подготовка WSL2 и Ubuntu, сборка C++ цели, запуск фаззинга, диагностика ASan и повторная проверка.</p><div class="resource-links"><a href="practice/aflpp_fuzzing_windows10_student.html">Открыть методичку</a><a href="downloads/aflpp_fuzzing_windows10_student.pdf" download>PDF</a><a href="downloads/aflpp_fuzzing_windows10_student.md" download>Markdown</a></div></article><article class="resource-card"><h3>libFuzzer: исследование C++ приложения</h3><p>Harness, корпус, инструментированная сборка, воспроизведение и минимизация crash, исправление и регрессия.</p><div class="resource-links"><a href="practice/libfuzzer_main_cpp_student.html">Открыть методичку</a><a href="downloads/libfuzzer_main_cpp_student.pdf" download>PDF</a><a href="downloads/libfuzzer_main_cpp_student.md" download>Markdown</a></div></article><article class="resource-card"><h3>Разбор ошибки и её исправления</h3><p>Почему проверки размера входа недостаточно, как возникает переполнение и что меняет проверка границ.</p><div class="resource-links"><a href="practice/fuzzing_bug_fix_demo.html">Открыть методичку</a><a href="downloads/fuzzing_bug_fix_demo.pdf" download>PDF</a><a href="downloads/fuzzing_bug_fix_demo.md" download>Markdown</a></div></article></div><div class="download-strip"><h3 style="margin-top:0">Общий архив для практикумов</h3><p>Исходники C++, seed-данные, образцы результатов и все три методички. Распакуйте архив в своей учебной среде; программы собираются из исходников по шагам методичек.</p><div class="resource-links"><a href="downloads/my-first-python-project-v02.zip" download>Скачать примеры и методички · ZIP</a><a href="downloads/SHA256SUMS.txt">Контрольные суммы SHA-256</a></div></div></section><section id="assessment"><h2>Что должно остаться после практикума</h2><ul><li>Версии ОС, компилятора и фаззера, параметры сборки и запуска.</li><li>Минимальный вход, воспроизводящий сбой до исправления, и диагностический отчёт.</li><li>Объяснение первопричины и изменение исходного кода.</li><li>Результат повторного запуска старого crash и регрессионного прогона корпуса.</li></ul><p><b>Критерий завершения:</b> ошибка воспроизводится до исправления, причина объяснена, старый вход больше не вызывает прежний сбой после исправления; ограничения и параметры прогона явно записаны. Отсутствие находок за ограниченное время не доказывает отсутствие ошибок.</p><p>Учебный цикл соотнесён с <a href="index.html#practice">пунктами 8.3.11–8.3.23 первой редакции проекта</a>. Подробные задания и контрольные вопросы находятся в методичках.</p></section><section><h2>Текст проекта и конспект лекции</h2><div class="download-strip" id="standard-download"><h3 style="margin-top:0">Проект национального стандарта — полный текст</h3><p>ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа. Общие требования». Первая редакция, использованная в этом разборе. Не подлежит применению до утверждения.</p><div class="resource-links"><a href="downloads/dynamic-analysis-national-standard-draft.pdf" download>Скачать проект стандарта · PDF</a><a href="downloads/dynamic-analysis-explanatory-note.pdf" download>Пояснительная записка · PDF</a></div><p class="note">Нормативный первоисточник и пояснительная записка; авторский конспект лекции скачивается отдельно.</p></div><div class="resource-links"><a href="index.html">Читать полную лекцию</a><a href="downloads/pns-dynamic-analysis.pdf" download>Конспект лекции · PDF</a><a href="downloads/pns-dynamic-analysis.md" download>Конспект лекции · Markdown</a></div></section></main><footer><div class="wrap"><span>Автор: Пиков Виталий Александрович</span><a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a><a href="https://pikov.expert/">Каталог материалов</a></div></footer><script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(109116119,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});</script></body></html>

@@ -84,6 +84,14 @@ $textExtensions = [System.Collections.Generic.HashSet[string]]::new([System.Stri
 # closed until its text and visual provenance have been reviewed explicitly.
 $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 @(
+  '260b996af059c20744d6373482970aaede0a32cbdb11adf88a9fbc9fedf287c1', # DAST: aflpp_fuzzing_windows10_student.pdf
+  '5abb71c1b4b54fb4a8739d61aaa52e524a8ee68c2f1a7b0c8e195e80e16d6daa', # DAST: dynamic-analysis-explanatory-note.pdf
+  '3e8e815399898107f4f3d2694bff48ba2e9c5d245c599cde462d2516296906db', # DAST: dynamic-analysis-national-standard-draft.pdf
+  '55b6959124c4a50f557d0ca6bc3c7532b8834d0445420c2fcacae2956b9d9794', # DAST: fuzzing_bug_fix_demo.pdf
+  '964f43477085729e85e8d9f66d8aca70680e5f5c56f0cd11aba887336da3324b', # DAST: gost-r-56939-2024.pdf
+  '20221d577e40c2cac9deb60abac8f31e3817229261403069d3db12f1c6468369', # DAST: gost-r-71207-2024.pdf
+  '1a8d09e8a577fa5bd1891bee0d8aa9b20cc6748999dcf65b6845e07a80f4cc51', # DAST: libfuzzer_main_cpp_student.pdf
+  'dbaebf824745f31c2e1bb474807ade098ee9243cb5378fc20f20b270df5307ea', # DAST: pns-dynamic-analysis.pdf
   '5637fc29cb8f3c61ed22bd429e6cdbd7ac7f99cb31876f14b3edf2c6b394dde7',
   '251c5d734a73b94ac43577e2a7234bedd943f2b172461cdbd45ac043304e19ef',
   '2826c15b97cc7ffeada52f2000a4b0712a7cf4a81a38d7ba4087de350049c350',

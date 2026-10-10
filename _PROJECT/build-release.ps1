@@ -1,4 +1,4 @@
-param(
+﻿param(
   [string]$Root = (Split-Path -Parent $PSScriptRoot),
   [string]$ReleaseDate = '',
   [string]$AcceptedSourceCommit = '',
@@ -267,6 +267,7 @@ $script:MaterialsZipFolders = @('27-07-2026', '29-07-2026')
 # source allowlists immediately before release selection. They are the only
 # ignored source artifacts that the global release builder may publish.
 $script:ApprovedIgnoredReleaseArtifacts = @(
+  'dast/downloads/my-first-python-project-v02.zip',
   '27-07-2026/materials.zip',
   '29-07-2026/materials.zip',
   'appsec-lections/downloads/day-01-canonical-safe-package.zip',
@@ -356,6 +357,23 @@ function Should-ExcludeQuarantinedNestedDirectory([string]$FolderName, [string]$
 # from the published HTML. The global distributable rules still exclude every
 # other ZIP and README file from lecture releases.
 $script:ReviewedNestedDistributables = @{
+  'dast' = @(
+    'downloads\dynamic-analysis-national-standard-draft.pdf',
+    'downloads\dynamic-analysis-explanatory-note.pdf',
+    'downloads\gost-r-56939-2024.pdf',
+    'downloads\gost-r-71207-2024.pdf',
+    'downloads\pns-dynamic-analysis.pdf',
+    'downloads\pns-dynamic-analysis.md',
+    'downloads\my-first-python-project-v02.zip',
+    'downloads\SHA256SUMS.txt',
+    'downloads\aflpp_fuzzing_windows10_student.pdf',
+    'downloads\aflpp_fuzzing_windows10_student.md',
+    'downloads\libfuzzer_main_cpp_student.pdf',
+    'downloads\libfuzzer_main_cpp_student.md',
+    'downloads\fuzzing_bug_fix_demo.pdf',
+    'downloads\fuzzing_bug_fix_demo.md'
+  )
+
   'main-rbpo' = @(
     'downloads\mantra-brpo-rbpo-v03.pdf',
     'downloads\konspekt-rbpo-ot-processa-k-dokumentam.md',

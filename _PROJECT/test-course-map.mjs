@@ -50,17 +50,17 @@ function cardsFrom(html) {
     .map(match => ({ target: match[1], body: match[2] }));
 }
 
-test('course map covers exactly the 32 release targets', () => {
-  assert.equal(expectedTargets.length, 32, 'release contract must stay at root + 31 unique folders');
+test('course map covers every registered release target', () => {
+  assert.equal(expectedTargets.length, registry.summary.thirdLevelDomains + 1);
   const cards = cardsFrom(page);
-  assert.equal(cards.length, 32);
+  assert.equal(cards.length, expectedTargets.length);
   assert.deepEqual(cards.map(card => card.target).sort(), [...expectedTargets].sort());
-  assert.equal(new Set(cards.map(card => card.target)).size, 32);
+  assert.equal(new Set(cards.map(card => card.target)).size, expectedTargets.length);
 });
 
 test('every target has the complete measurable teaching contract', () => {
   const cards = cardsFrom(page);
-  assert.equal(cards.length, 32);
+  assert.equal(cards.length, expectedTargets.length);
   for (const card of cards) {
     for (const [ru, en] of CONTRACT_LABELS) {
       // Обе языковые версии едут в разметке, поэтому проверяется вся пара:
@@ -192,7 +192,7 @@ test('course map reflows cleanly in Chromium at three teaching viewports', async
       assert.deepEqual(errors, [], `${viewport.width}: console/page errors`);
       assert.equal(metrics.main, 1, `${viewport.width}: main`);
       assert.equal(metrics.h1, 1, `${viewport.width}: h1`);
-      assert.equal(metrics.cards, 32, `${viewport.width}: cards`);
+      assert.equal(metrics.cards, expectedTargets.length, `${viewport.width}: cards`);
       assert.ok(metrics.overflow <= 1, `${viewport.width}: horizontal overflow ${metrics.overflow}px`);
       assert.ok(metrics.cardsInsideViewport, `${viewport.width}: card outside viewport`);
       assert.ok(metrics.anchorsResolve, `${viewport.width}: broken local anchor`);
@@ -315,14 +315,14 @@ test('the language switch is defined in every theme state', () => {
 
 test('every course card is deep-linkable with a CSS-safe id', () => {
   const ids = [...page.matchAll(/<article class="course-card" data-target="[^"]+" id="([^"]+)">/g)].map(m => m[1]);
-  assert.equal(ids.length, 32, 'every card must carry an id');
-  assert.equal(new Set(ids).size, 32, 'card ids must be unique');
+  assert.equal(ids.length, expectedTargets.length, 'every card must carry an id');
+  assert.equal(new Set(ids).size, expectedTargets.length, 'card ids must be unique');
   for (const id of ids) {
     // Идентификатор, начинающийся с цифры, — валидный HTML, но невалидный
     // CSS-селектор: querySelector('#27-07-2026') выбрасывает SyntaxError.
     assert.match(id, /^[A-Za-z][A-Za-z0-9-]*$/, `id ${id} is not a valid CSS identifier`);
   }
-  assert.equal((page.match(/ id="course-/g) || []).length, 32);
+  assert.equal((page.match(/ id="course-/g) || []).length, expectedTargets.length);
 });
 
 test('the English reader is told the courses themselves are in Russian', () => {

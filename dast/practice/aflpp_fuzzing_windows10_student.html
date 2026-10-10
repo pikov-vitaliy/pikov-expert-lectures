@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Практикум: фаззинг C++ программы с AFL++ на Windows 10</title>
+  <style>
+    @page { size: A4; margin: 16mm 15mm; }
+    body {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      color: #1f2933;
+      font-size: 10.5pt;
+      line-height: 1.38;
+    }
+    h1 { font-size: 21pt; margin: 0 0 8mm; color: #12355b; }
+    h2 { font-size: 15pt; margin: 7mm 0 2mm; color: #12355b; border-bottom: 1px solid #9fb3c8; padding-bottom: 1mm; }
+    h3 { font-size: 12pt; margin: 5mm 0 1mm; color: #334e68; }
+    p { margin: 2mm 0; }
+    ul, ol { margin-top: 2mm; margin-bottom: 2mm; }
+    li { margin: 1mm 0; }
+    code {
+      font-family: "Liberation Mono", Consolas, monospace;
+      background: #f2f4f7;
+      padding: 0.2mm 0.8mm;
+      border-radius: 2px;
+    }
+    pre {
+      font-family: "Liberation Mono", Consolas, monospace;
+      font-size: 8.5pt;
+      line-height: 1.25;
+      background: #f2f4f7;
+      border: 1px solid #d9e2ec;
+      border-left: 4px solid #2f80ed;
+      padding: 3mm;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      page-break-inside: avoid;
+    }
+    .note {
+      border-left: 4px solid #f2994a;
+      background: #fff8ed;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+    }
+    .check {
+      border-left: 4px solid #27ae60;
+      background: #f0fff4;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+    }
+    .small { font-size: 9pt; color: #52606d; }
+    table { width: 100%; border-collapse: collapse; margin: 3mm 0; }
+    th, td { border: 1px solid #d9e2ec; padding: 2mm; vertical-align: top; }
+    th { background: #eef4fb; text-align: left; }
+  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Пиков Виталий Александрович">
+<link rel="canonical" href="https://dast.pikov.expert/practice/aflpp_fuzzing_windows10_student.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="AFL++: от первого запуска до исправления">
+<meta property="og:description" content="Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dast.pikov.expert/practice/aflpp_fuzzing_windows10_student.html">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "AFL++: от первого запуска до исправления", "description": "Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.", "url": "https://dast.pikov.expert/practice/aflpp_fuzzing_windows10_student.html", "inLanguage": "ru", "author": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}}</script><style>@media screen{:not(pre)>code{overflow-wrap:anywhere;white-space:normal}p,li{overflow-wrap:anywhere}body{font-size:17px;line-height:1.65;max-width:1000px;margin:0 auto;padding:24px;background:#f5f7fb}pre{overflow:auto;max-width:100%;font-size:14px}table{display:block;overflow:auto;max-width:100%}img{max-width:100%}.lab-nav{display:flex;flex-wrap:wrap;gap:14px;padding:16px 0;border-bottom:1px solid #cbd5e1;margin-bottom:24px}.lab-nav a{color:#184b80;min-height:44px;display:inline-flex;align-items:center}h1{font-size:30px;line-height:1.2;overflow-wrap:anywhere}:focus-visible{outline:3px solid #2f80ed;outline-offset:4px}}@media print{.lab-nav{display:none}}@media(max-width:600px){body{padding:16px}h1{font-size:25px}}</style></head>
+<body><nav class="lab-nav" aria-label="Материалы практикума"><a class="brand-back" href="https://pikov.expert/">Каталог</a><a href="../index.html#student-materials">Лекция DAST</a><a href="../practice.html">Все практикумы</a><a href="../downloads/aflpp_fuzzing_windows10_student.pdf" download>PDF</a><a href="../downloads/aflpp_fuzzing_windows10_student.md" download>Markdown</a><a href="../downloads/my-first-python-project-v02.zip" download>Исходники · ZIP</a></nav><main>
+<h1>Практикум: фаззинг C++ программы с AFL++ на Windows 10</h1>
+
+<p><strong>Цель занятия:</strong> показать полный цикл фаззинг-тестирования: подготовка среды, написание простой уязвимой программы, инструментированная сборка, запуск AFL++, анализ найденного падения и минимальное исправление.</p>
+
+<div class="note">
+  <strong>Границы применения.</strong> Материал предназначен для учебного стенда и собственного кода. Не запускайте фаззинг на чужих продуктах, сетевых сервисах или рабочих системах без разрешения владельца и изоляции среды.
+</div>
+
+<div class="check">
+  <strong>Проверено на стенде.</strong> Все команды методички прогнаны на WSL2 с Ubuntu 24.04.4 LTS (afl-fuzz++4.09c, clang 18.1.3, g++ 13.3.0). Учебный проект <code>my-first-python-project</code> в архиве уже содержит <code>src/main.cpp</code>, seed-файлы в <code>in/</code> и примеры каталогов результатов <code>out*/</code>. В публичный архив включены исходники; бинарники необходимо собрать командами из разделов 6 и 7.
+</div>
+
+<h2>1. Что понадобится на ПК слушателя</h2>
+
+<ul>
+  <li>Windows 10 версии 2004 или новее, сборка 19041 или новее.</li>
+  <li>Права администратора для первичной установки WSL.</li>
+  <li>Включенная виртуализация в BIOS/UEFI, если WSL2 не стартует.</li>
+  <li>Visual Studio Code для Windows.</li>
+  <li>Интернет для загрузки Ubuntu, пакетов и расширений VS Code.</li>
+</ul>
+
+<p>AFL++ ориентирован на Unix/Linux-среду. На Windows 10 самый простой учебный вариант - использовать WSL2 с Ubuntu, а VS Code подключить к проекту внутри Linux через расширение WSL.</p>
+
+<h2>2. Установка WSL2 и Ubuntu</h2>
+
+<h3>2.1. Установка из PowerShell</h3>
+
+<p>Откройте <strong>PowerShell от имени администратора</strong> и выполните:</p>
+
+<pre>wsl --install -d Ubuntu</pre>
+
+<p>Перезагрузите компьютер, если установщик попросит это сделать. После первого запуска Ubuntu создайте Linux-пользователя и пароль.</p>
+
+<p>Проверьте версию WSL:</p>
+
+<pre>wsl -l -v</pre>
+
+<p>В строке Ubuntu желательно видеть <code>VERSION 2</code>. Если указана версия 1:</p>
+
+<pre>wsl --set-version Ubuntu 2</pre>
+
+<h3>2.2. Базовое обновление Ubuntu</h3>
+
+<p>Откройте приложение Ubuntu из меню Пуск и выполните:</p>
+
+<pre>sudo apt update
+sudo apt upgrade -y</pre>
+
+<h2>3. Настройка VS Code для WSL</h2>
+
+<ol>
+  <li>Установите Visual Studio Code для Windows.</li>
+  <li>В VS Code откройте Extensions и установите расширение <strong>WSL</strong> или пакет <strong>Remote Development</strong>.</li>
+  <li>В терминале Ubuntu создайте папку проекта:</li>
+</ol>
+
+<pre>mkdir -p ~/fuzzing-lab/aflpp-demo
+cd ~/fuzzing-lab/aflpp-demo
+code .</pre>
+
+<p>После команды <code>code .</code> VS Code откроет папку уже внутри WSL. В левом нижнем углу окна должен быть индикатор вида <code>WSL: Ubuntu</code>.</p>
+
+<div class="note">
+  Храните учебный проект в файловой системе WSL, например в <code>~/fuzzing-lab</code>, а не в <code>/mnt/c/...</code>. Так сборка и фаззинг обычно работают заметно быстрее.
+</div>
+
+<h2>4. Установка AFL++</h2>
+
+<h3>Вариант A: быстрый вариант для занятия</h3>
+
+<p>Для демонстрации обычно достаточно пакета из репозитория Ubuntu:</p>
+
+<pre>sudo apt update
+sudo apt install -y afl++ clang make g++ build-essential unzip</pre>
+
+<p>Проверьте установку:</p>
+
+<pre>afl-fuzz --version
+which afl-clang-fast++</pre>
+
+<div class="note">
+  Используйте именно <code>--version</code>. Короткий ключ <code>-V</code> в AFL++ означает «фаззить заданное число секунд» и требует аргумента: команда <code>afl-fuzz -V</code> без числа выдаст <code>option requires an argument -- 'V'</code> и напечатает справку — это не ошибка установки.
+</div>
+
+<p>Пакет <code>unzip</code> нужен, чтобы распаковать архив с примером. Если архив распаковывается на стороне Windows (проводник, 7-Zip, WinRAR), этот пакет не требуется.</p>
+
+<h3>Вариант B: сборка AFL++ из исходников</h3>
+
+<p>Этот способ ближе к официальной документации AFL++ и полезен, если пакет Ubuntu отсутствует или сильно устарел:</p>
+
+<pre>sudo apt update
+sudo apt install -y build-essential python3-dev automake cmake git flex bison \
+  libglib2.0-dev libpixman-1-dev python3-setuptools cargo libgtk-3-dev \
+  lld llvm llvm-dev clang ninja-build cpio libcapstone-dev wget curl python3-pip
+
+git clone https://github.com/AFLplusplus/AFLplusplus.git
+cd AFLplusplus
+make source-only
+sudo make install</pre>
+
+<p>Проверка:</p>
+
+<pre>afl-fuzz -V
+afl-cc -hh</pre>
+
+<h2>5. Создание простой C++ программы</h2>
+
+<p>В VS Code создайте папку и файл <code>src/main.cpp</code>:</p>
+
+<pre>mkdir -p src in out build
+code src/main.cpp</pre>
+
+<p>Вставьте код:</p>
+
+<pre>#include &lt;cstdint&gt;
+#include &lt;fstream&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+
+static std::vector&lt;uint8_t&gt; read_file(const std::string&amp; path) {
+    std::ifstream file(path, std::ios::binary);
+    return std::vector&lt;uint8_t&gt;(
+        std::istreambuf_iterator&lt;char&gt;(file),
+        std::istreambuf_iterator&lt;char&gt;()
+    );
+}
+
+static int parse_demo_format(const std::vector&lt;uint8_t&gt;&amp; data) {
+    if (data.size() &lt; 5) {
+        return 0;
+    }
+
+    if (data[0] != 'F' || data[1] != 'U' || data[2] != 'Z' || data[3] != '1') {
+        return 0;
+    }
+
+    uint8_t declared_size = data[4];
+    char name[16] = {};
+
+    // Учебная ошибка: declared_size не проверяется относительно размера name.
+    for (uint8_t i = 0; i &lt; declared_size &amp;&amp; 5 + i &lt; data.size(); ++i) {
+        name[i] = static_cast&lt;char&gt;(data[5 + i]);
+    }
+
+    if (name[0] == 'A' &amp;&amp; name[1] == 'F' &amp;&amp; name[2] == 'L') {
+        std::cout &lt;&lt; "interesting input\n";
+    }
+
+    return 0;
+}
+
+int main(int argc, char** argv) {
+    if (argc != 2) {
+        std::cerr &lt;&lt; "usage: " &lt;&lt; argv[0] &lt;&lt; " &lt;file&gt;\n";
+        return 1;
+    }
+
+    auto data = read_file(argv[1]);
+    return parse_demo_format(data);
+}</pre>
+
+<p>Программа читает файл, проверяет простую сигнатуру <code>FUZ1</code>, затем копирует указанное в файле количество байт в буфер на 16 байт. Ошибка сделана специально: если поле длины больше 16, возможна запись за границы массива.</p>
+
+<h2>6. Первичная сборка и ручная проверка</h2>
+
+<p>Соберите обычным компилятором, чтобы убедиться, что код компилируется:</p>
+
+<pre>g++ -std=c++17 -g -O1 src/main.cpp -o build/demo
+printf 'FUZ1\x03ABC' &gt; in/seed1
+./build/demo in/seed1</pre>
+
+<p>Ожидаемый результат: программа завершается без ошибки. Сообщение <code>interesting input</code> может появиться, если первые символы имени равны <code>AFL</code>.</p>
+
+<h2>7. Инструментированная сборка для AFL++</h2>
+
+<p>Для надежной демонстрации ошибки используем AddressSanitizer вместе с инструментированным компилятором AFL++:</p>
+
+<pre>AFL_USE_ASAN=1 afl-clang-fast++ -std=c++17 -g -O1 -fno-omit-frame-pointer \
+  src/main.cpp -o build/fuzz_target</pre>
+
+<p>Ручная проверка аварийного входа:</p>
+
+<pre>printf 'FUZ1\x20AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' &gt; /tmp/crash.bin
+./build/fuzz_target /tmp/crash.bin</pre>
+
+<p>С большой вероятностью AddressSanitizer покажет ошибку записи за границы стека. Это подтверждает, что дефект достижим.</p>
+
+<h2>8. Запуск AFL++</h2>
+
+<p>Создайте начальный корпус. Для AFL++ достаточно одного-двух маленьких валидных примеров:</p>
+
+<pre>printf 'FUZ1\x01A' &gt; in/seed1
+printf 'hello' &gt; in/seed2</pre>
+
+<p>Запустите фаззинг:</p>
+
+<pre>ASAN_OPTIONS=abort_on_error=1:symbolize=0 AFL_SKIP_CPUFREQ=1 \
+  AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 \
+  afl-fuzz -i in -o out -m none -- ./build/fuzz_target @@</pre>
+
+<div class="note">
+  <strong>Про WSL2 и <code>core_pattern</code>.</strong> Проверьте значение:
+  <pre>cat /proc/sys/kernel/core_pattern</pre>
+  В части сборок WSL там стоит <code>|/wsl-capture-crash %t %E %p %s</code> — ядро направляет core dump во внешнюю утилиту. Увидев символ <code>|</code> в начале шаблона, AFL++ прерывает работу:
+  <code>[-] PROGRAM ABORT : Pipe at the beginning of 'core_pattern'</code>. В этом случае добавьте в команду запуска <code>AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1</code> (в примере выше она уже есть). Если в файле стоит <code>core</code>, переменная не требуется — но и не мешает: AFL++ лишь отметит, что она включена.
+  <br>Альтернатива (нужны права root, сбрасывается после перезапуска WSL):
+  <pre>sudo sh -c 'echo core &gt; /proc/sys/kernel/core_pattern'</pre>
+</div>
+
+<table>
+  <tr><th>Параметр</th><th>Назначение</th></tr>
+  <tr><td><code>-i in</code></td><td>Каталог с начальными входными файлами.</td></tr>
+  <tr><td><code>-o out</code></td><td>Каталог, куда AFL++ пишет очередь, статистику и найденные падения.</td></tr>
+  <tr><td><code>-m none</code></td><td>Отключает лимит памяти AFL++; удобно при запуске с ASAN.</td></tr>
+  <tr><td><code>@@</code></td><td>Место, куда AFL++ подставляет путь к текущему тестовому файлу.</td></tr>
+  <tr><td><code>AFL_SKIP_CPUFREQ=1</code></td><td>Для учебного стенда пропускает предупреждение о governor CPU.</td></tr>
+  <tr><td><code>AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1</code></td><td>Нужна, если <code>/proc/sys/kernel/core_pattern</code> в WSL начинается с <code>|</code>: обходит проверку, из-за которой AFL++ прерывается с сообщением <code>Pipe at the beginning of 'core_pattern'</code>.</td></tr>
+</table>
+
+<p>Остановить фаззинг можно сочетанием <code>Ctrl+C</code>. Для демонстрационной программы падение обычно находится быстро.</p>
+
+<h2>9. Где смотреть результат</h2>
+
+<p>Основные артефакты AFL++ находятся в каталоге <code>out/default</code>:</p>
+
+<pre>ls out/default
+ls out/default/crashes
+cat out/default/fuzzer_stats</pre>
+
+<p>Если найдено падение, имя файла будет начинаться с <code>id:</code>. Воспроизведите его:</p>
+
+<pre>./build/fuzz_target out/default/crashes/id:000000*</pre>
+
+<p>Если shell не подставляет имя из-за специальных символов, скопируйте точное имя файла из вывода <code>ls out/default/crashes</code> и передайте его программе в кавычках.</p>
+
+<h2>10. Исправление ошибки</h2>
+
+<p>В учебной программе ошибка находится в цикле копирования. Минимальное исправление - ограничить копирование размером буфера:</p>
+
+<pre>#include &lt;algorithm&gt;   // для std::min
+
+uint8_t declared_size = data[4];
+char name[16] = {};
+size_t copy_size = std::min&lt;size_t&gt;(declared_size, sizeof(name));
+
+for (size_t i = 0; i &lt; copy_size &amp;&amp; 5 + i &lt; data.size(); ++i) {
+    name[i] = static_cast&lt;char&gt;(data[5 + i]);
+}</pre>
+
+<p>Директиву <code>#include &lt;algorithm&gt;</code> следует добавить в начало файла: <code>std::min</code> объявлена именно там. На практике код собирается и без неё за счёт транзитивных включений, но полагаться на это не нужно.</p>
+
+<p>После исправления пересоберите цель и снова запустите найденный crash-файл. Падение должно исчезнуть:</p>
+
+<pre>AFL_USE_ASAN=1 afl-clang-fast++ -std=c++17 -g -O1 -fno-omit-frame-pointer \
+  src/main.cpp -o build/fuzz_target
+
+./build/fuzz_target out/default/crashes/id:000000*</pre>
+
+<h2>11. Мини-сценарий для преподавателя</h2>
+
+<ol>
+  <li>Показать, что программа принимает нормальный seed-файл.</li>
+  <li>Пояснить идею покрытия: AFL++ сохраняет мутации, которые открывают новые ветки исполнения.</li>
+  <li>Собрать цель через <code>afl-clang-fast++</code>, чтобы вставить instrumentation.</li>
+  <li>Запустить <code>afl-fuzz</code> и обратить внимание на поля <code>cycles done</code>, <code>total paths</code>, <code>unique crashes</code>.</li>
+  <li>Воспроизвести crash-файл как обычный входной файл программы.</li>
+  <li>Исправить проверку границ и показать, что crash больше не воспроизводится.</li>
+</ol>
+
+<h2>12. Типовые проблемы</h2>
+
+<table>
+  <tr><th>Симптом</th><th>Что проверить</th></tr>
+  <tr><td><code>wsl --install</code> не работает</td><td>Версию Windows 10: нужна 2004 / build 19041 или новее. На старых версиях используйте ручную установку WSL из документации Microsoft.</td></tr>
+  <tr><td>Команда <code>code .</code> не найдена</td><td>Переустановить VS Code с опцией добавления в PATH или запустить VS Code и открыть папку через Remote - WSL.</td></tr>
+  <tr><td><code>afl-clang-fast++</code> не найден</td><td>Проверить установку <code>afl++</code> или выполнить сборку из исходников. Команда <code>which afl-clang-fast++</code> должна вернуть путь.</td></tr>
+  <tr><td>AFL++ ругается на лимит памяти при ASAN</td><td>Запускать с <code>-m none</code>.</td></tr>
+  <tr><td>Фаззинг идет очень медленно</td><td>Проект должен лежать внутри WSL, например в <code>~/fuzzing-lab</code>, а не на Windows-диске <code>/mnt/c</code>.</td></tr>
+  <tr><td>Нет падений</td><td>Проверить, что цель собрана с <code>AFL_USE_ASAN=1</code>, seed начинается с <code>FUZ1</code>, а запуск использует <code>@@</code>.</td></tr>
+  <tr><td><code>PROGRAM ABORT: Pipe at the beginning of 'core_pattern'</code></td><td>Проверьте <code>cat /proc/sys/kernel/core_pattern</code>: в WSL шаблон может начинаться с <code>|</code> (передача core dump внешней утилите). Добавьте <code>AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1</code> в команду запуска (см. раздел 8).</td></tr>
+  <tr><td><code>unzip: command not found</code></td><td>Установите пакет: <code>sudo apt install -y unzip</code>. Либо распакуйте архив средствами Windows.</td></tr>
+  <tr><td><code>option requires an argument -- 'V'</code> при проверке установки</td><td>Так ведёт себя <code>afl-fuzz -V</code> без аргумента. Для проверки версии используйте <code>afl-fuzz --version</code>.</td></tr>
+  <tr><td><code>Permission denied</code> при запуске <code>./build/fuzz_target</code></td><td>Файл потерял бит исполнения (например, при распаковке архива сторонним распаковщиком). Выполните <code>chmod +x build/fuzz_target</code> или соберите цель заново — бинарники в архиве собраны на другой машине и всё равно подлежат пересборке.</td></tr>
+</table>
+
+<h2>13. Контрольные вопросы</h2>
+
+<ol>
+  <li>Зачем AFL++ нужна инструментированная сборка?</li>
+  <li>Чем seed corpus отличается от найденной очереди <code>queue</code>?</li>
+  <li>Почему <code>@@</code> нужен программам, которые читают вход из файла?</li>
+  <li>Почему ASAN полезен при демонстрации ошибок памяти?</li>
+  <li>Почему crash-файл нужно воспроизводить отдельно от AFL++?</li>
+</ol>
+
+<h2>14. Источники</h2>
+
+<ul class="small">
+  <li>AFL++ Install: https://aflplus.plus/docs/install/</li>
+  <li>AFL++ Fuzzing in Depth: https://aflplus.plus/docs/fuzzing_in_depth/</li>
+  <li>AFL++ Quick Start Guide: https://aflplus.plus/docs/quickstartguide/</li>
+  <li>Microsoft Learn, Install WSL: https://learn.microsoft.com/windows/wsl/install</li>
+  <li>Microsoft Learn, VS Code with WSL: https://learn.microsoft.com/windows/wsl/tutorials/wsl-vscode</li>
+</ul>
+
+</main><script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(109116119,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});</script></body>
+</html>

@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Демонстрация: ошибка, найденная фаззером AFL++</title>
+  <style>
+    @page { size: A4; margin: 16mm 15mm; }
+    body {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      color: #1f2933;
+      font-size: 10.5pt;
+      line-height: 1.42;
+      margin: 0;
+      padding: 18mm;
+      background: #ffffff;
+    }
+    h1 {
+      font-size: 22pt;
+      margin: 0 0 5mm;
+      color: #12355b;
+    }
+    h2 {
+      font-size: 15pt;
+      margin: 8mm 0 3mm;
+      color: #12355b;
+      border-bottom: 1px solid #9fb3c8;
+      padding-bottom: 1mm;
+    }
+    p { margin: 2mm 0; }
+    code {
+      font-family: "Liberation Mono", Consolas, monospace;
+      background: #f2f4f7;
+      padding: 0.2mm 0.8mm;
+      border-radius: 2px;
+    }
+    pre {
+      font-family: "Liberation Mono", Consolas, monospace;
+      font-size: 8.5pt;
+      line-height: 1.28;
+      background: #f2f4f7;
+      border: 1px solid #d9e2ec;
+      border-left: 4px solid #2f80ed;
+      padding: 3mm;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      page-break-inside: avoid;
+      margin: 2mm 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 4mm 0;
+      table-layout: fixed;
+    }
+    th, td {
+      border: 1px solid #d9e2ec;
+      padding: 3mm;
+      vertical-align: top;
+    }
+    th {
+      background: #eef4fb;
+      text-align: left;
+      color: #12355b;
+    }
+    .bad {
+      background: #fff1f2;
+      border-left: 4px solid #d64545;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+    }
+    .good {
+      background: #f0fff4;
+      border-left: 4px solid #27ae60;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+    }
+    .note {
+      background: #fff8ed;
+      border-left: 4px solid #f2994a;
+      padding: 2mm 3mm;
+      margin: 3mm 0;
+    }
+    .mark {
+      background: #ffe3e3;
+      color: #8a1f1f;
+      font-weight: 700;
+      padding: 0 1mm;
+      border-radius: 2px;
+    }
+    .small {
+      font-size: 9pt;
+      color: #52606d;
+    }
+  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Пиков Виталий Александрович">
+<link rel="canonical" href="https://dast.pikov.expert/practice/fuzzing_bug_fix_demo.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Разбор ошибки и её исправления">
+<meta property="og:description" content="Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dast.pikov.expert/practice/fuzzing_bug_fix_demo.html">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Разбор ошибки и её исправления", "description": "Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.", "url": "https://dast.pikov.expert/practice/fuzzing_bug_fix_demo.html", "inLanguage": "ru", "author": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}}</script><style>@media screen{:not(pre)>code{overflow-wrap:anywhere;white-space:normal}p,li{overflow-wrap:anywhere}body{font-size:17px;line-height:1.65;max-width:1000px;margin:0 auto;padding:24px;background:#f5f7fb}pre{overflow:auto;max-width:100%;font-size:14px}table{display:block;overflow:auto;max-width:100%}img{max-width:100%}.lab-nav{display:flex;flex-wrap:wrap;gap:14px;padding:16px 0;border-bottom:1px solid #cbd5e1;margin-bottom:24px}.lab-nav a{color:#184b80;min-height:44px;display:inline-flex;align-items:center}h1{font-size:30px;line-height:1.2;overflow-wrap:anywhere}:focus-visible{outline:3px solid #2f80ed;outline-offset:4px}}@media print{.lab-nav{display:none}}@media(max-width:600px){body{padding:16px}h1{font-size:25px}}</style></head>
+<body><nav class="lab-nav" aria-label="Материалы практикума"><a class="brand-back" href="https://pikov.expert/">Каталог</a><a href="../index.html#student-materials">Лекция DAST</a><a href="../practice.html">Все практикумы</a><a href="../downloads/fuzzing_bug_fix_demo.pdf" download>PDF</a><a href="../downloads/fuzzing_bug_fix_demo.md" download>Markdown</a><a href="../downloads/my-first-python-project-v02.zip" download>Исходники · ZIP</a></nav><main>
+  <h1>Демонстрация: ошибка, найденная фаззером AFL++</h1>
+
+  <p><strong>Цель:</strong> показать студенту, как фаззер находит ошибку записи за пределы буфера в простой C++ программе и как программист исправляет такую ошибку.</p>
+
+  <div class="note">
+    Формат входного файла в примере: первые 4 байта должны быть <code>FUZ1</code>, пятый байт задает длину имени, дальше идут байты имени.
+  </div>
+
+  <h2>1. В чем ошибка</h2>
+
+  <p>Программа читает размер имени из файла:</p>
+
+  <pre>uint8_t declared_size = data[4];</pre>
+
+  <p>Но затем использует это значение как лимит записи в массив фиксированного размера:</p>
+
+  <pre>char name[16] = {};</pre>
+
+  <div class="bad">
+    <strong>Ошибка:</strong> файл может указать длину больше 16, например 90. Тогда цикл начинает писать в <code>name[16]</code>, <code>name[17]</code> и дальше, хотя допустимые индексы массива только <code>0..15</code>.
+  </div>
+
+  <h2>2. Исходный и исправленный код</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Исходный вариант с ошибкой</th>
+        <th>Исправленный вариант</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>
+<pre>uint8_t declared_size = data[4];
+char name[16] = {};
+
+// ОШИБКА: declared_size взят из файла
+// и не ограничен размером name.
+for (uint8_t i = 0;
+     i &lt; declared_size &amp;&amp; 5 + i &lt; data.size();
+     ++i) {
+    <span class="mark">name[i]</span> = static_cast&lt;char&gt;(data[5 + i]);
+}</pre>
+        </td>
+        <td>
+<pre>uint8_t declared_size = data[4];
+char name[16] = {};
+
+size_t available_size = data.size() - 5;
+size_t copy_size = std::min&lt;size_t&gt;({
+    declared_size,
+    sizeof(name),
+    available_size
+});
+
+for (size_t i = 0; i &lt; copy_size; ++i) {
+    name[i] = static_cast&lt;char&gt;(data[5 + i]);
+}</pre>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>3. Почему проверка была неполной</h2>
+
+  <p>В исходном коде условие цикла проверяло только чтение из входного файла:</p>
+
+  <pre>5 + i &lt; data.size()</pre>
+
+  <p>Эта проверка отвечает на вопрос: "Есть ли еще байт во входных данных?"</p>
+
+  <p>Но она не отвечает на другой важный вопрос: "Есть ли еще место в массиве <code>name</code>?"</p>
+
+  <div class="bad">
+    Поэтому программа могла безопасно читать байты из файла, но небезопасно записывать их в маленький стековый массив.
+  </div>
+
+  <h2>4. Что делает исправление</h2>
+
+  <p>Исправленный код считает безопасный размер копирования:</p>
+
+  <pre>size_t copy_size = std::min&lt;size_t&gt;({
+    declared_size,
+    sizeof(name),
+    available_size
+});</pre>
+
+  <p>Берется минимум из трех значений:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Значение</th>
+        <th>Что означает</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>declared_size</code></td>
+        <td>Сколько байт просит сам входной файл.</td>
+      </tr>
+      <tr>
+        <td><code>sizeof(name)</code></td>
+        <td>Сколько байт реально помещается в буфер назначения.</td>
+      </tr>
+      <tr>
+        <td><code>available_size</code></td>
+        <td>Сколько байт реально есть во входных данных после заголовка.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="good">
+    После исправления файл все еще может указать длину 90 или 255, но программа скопирует максимум 16 байт, потому что размер записи ограничен размером <code>name</code>.
+  </div>
+
+  <h2>5. Как фаззер показывает проблему</h2>
+
+  <p>Сборка с AFL++ и AddressSanitizer:</p>
+
+  <pre>AFL_USE_ASAN=1 afl-clang-fast++ -g -O1 src/main.cpp -o build/demo_afl_asan</pre>
+
+  <p>Запуск фаззера:</p>
+
+  <pre>AFL_I_DONT_CARE_ABOUT_MISSING_CRASHES=1 AFL_SKIP_CPUFREQ=1 \
+afl-fuzz -i in -o out_afl_asan_demo -- build/demo_afl_asan @@</pre>
+
+  <p>Воспроизведение найденного падения:</p>
+
+  <pre>build/demo_afl_asan out_afl_asan_demo/default/crashes/id*</pre>
+
+  <p>Типичный результат:</p>
+
+  <pre>ERROR: AddressSanitizer: stack-buffer-overflow
+WRITE of size 1
+src/main.cpp:29:17 in parse_demo_format</pre>
+
+  <h2>6. Главный вывод</h2>
+
+  <div class="good">
+    Данные из файла, сети или пользователя нельзя использовать как размер записи без проверки. При копировании всегда надо учитывать оба ограничения: сколько данных есть в источнике и сколько места есть в буфере назначения.
+  </div>
+
+  <p class="small">Учебный пример предназначен для демонстрации фаззинга собственного кода в изолированной среде.</p>
+</main><script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(109116119,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});</script></body>
+</html>
