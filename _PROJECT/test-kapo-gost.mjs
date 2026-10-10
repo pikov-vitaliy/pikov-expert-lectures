@@ -33,7 +33,7 @@ test('GOST retains the exact eight original teaching screens and exposes all ten
  assert.equal(sources.length,10);
  for(const s of sources)assert.equal(hash(fs.readFileSync(path.join(root,'gost56939',s.public),'utf8').replace(/\r\n/g,'\n')),s.publishedSha256,s.public);
  const hub=read('gost56939/materials/index.html');
- assert.equal((hub.match(/<article class="card">/g)||[]).length,10);
+ assert.equal((hub.match(/<article class="card"(?:\s[^>]*)?>/g)||[]).length,10);
 });
 test('Archify maps have real SVG nodes and course diagrams are present',()=>{
  for(const name of ['component-decision','facts-and-decisions']){
