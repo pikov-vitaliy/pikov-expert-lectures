@@ -1,0 +1,2140 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Технологии динамического анализа ПО — проект национального стандарта (ТК 362)</title>
+<meta name="description" content="Разбор проекта национального стандарта ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа. Общие требования»: область применения, три уровня тестирования, восемь технологий динамического анализа, требования к инструментам и специалистам.">
+<style>
+:root{
+  --bg:#f5f7fb; --card:#ffffff; --ink:#0f1e2e; --ink2:#4a5c70; --ink3:#7286a0;
+  --line:#dde6f0; --line2:#eaf0f7;
+  --brand:#0f2f52; --brand2:#1b4f86; --accent:#2f80ed; --accent-soft:#eaf2fe;
+  --warn:#b45309; --warn-soft:#fff7ed; --ok:#15803d; --ok-soft:#f0fdf4;
+  --bad:#b42318; --bad-soft:#fef3f2; --radius:14px;
+  --shadow:0 1px 2px rgba(15,47,82,.06), 0 8px 24px rgba(15,47,82,.06);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:76px}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Segoe UI",Roboto,"Liberation Sans",Arial,sans-serif;
+  font-size:16px; line-height:1.62; -webkit-text-size-adjust:100%;
+}
+a{color:var(--brand2)}
+a:hover{color:var(--accent)}
+.wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+
+/* ---------- верхняя панель ---------- */
+.topbar{
+  position:sticky; top:0; z-index:50; background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(180%) blur(10px); border-bottom:1px solid var(--line);
+}
+.topbar .wrap{display:flex; align-items:center; gap:14px; height:60px}
+.topbar .brand{font-weight:700; color:var(--brand); white-space:nowrap; letter-spacing:.2px; font-size:14px}
+.topbar .brand span{color:var(--ink3); font-weight:500}
+.topbar nav{
+  display:flex; gap:1px; overflow-x:auto; scrollbar-width:none; margin-left:auto;
+  -webkit-mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%);
+  mask-image:linear-gradient(90deg,#000 0,#000 calc(100% - 26px),transparent 100%);
+}
+.topbar nav::-webkit-scrollbar{display:none}
+.topbar nav a{
+  display:block; padding:7px 8px; border-radius:9px; color:var(--ink2);
+  text-decoration:none; font-size:13px; white-space:nowrap;
+}
+.topbar nav a:hover{background:var(--accent-soft); color:var(--brand2)}
+
+/* ---------- hero ---------- */
+.hero{
+  background:
+    radial-gradient(900px 380px at 12% -10%, rgba(47,128,237,.38), transparent 60%),
+    radial-gradient(700px 320px at 90% 0%, rgba(27,79,134,.45), transparent 55%),
+    linear-gradient(160deg,#0d2846 0%, #123a63 55%, #0f2f52 100%);
+  color:#fff; padding:52px 0 46px; border-bottom:1px solid #0b2340;
+}
+.hero .eyebrow{
+  display:inline-flex; align-items:center; gap:9px; font-size:13px; letter-spacing:.08em;
+  text-transform:uppercase; color:#bcd6f5; font-weight:600;
+}
+.hero .eyebrow i{width:7px;height:7px;border-radius:50%;background:#57c2ff;display:inline-block}
+.hero h1{font-size:40px; line-height:1.15; margin:14px 0 10px; letter-spacing:-.5px}
+.hero h1 small{display:block; font-size:20px; font-weight:500; color:#cfe1f7; margin-top:10px; letter-spacing:0}
+.hero p.lead{font-size:17.5px; color:#dbe8f8; max-width:820px; margin:14px 0 22px}
+.chips{display:flex; flex-wrap:wrap; gap:8px; margin:0 0 24px}
+.chip{
+  background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.22);
+  color:#eaf3ff; padding:6px 12px; border-radius:999px; font-size:13.5px;
+}
+.chip.ok{background:rgba(87,194,255,.16); border-color:rgba(87,194,255,.45)}
+.cta{display:flex; flex-wrap:wrap; gap:10px}
+.btn{
+  display:inline-block; padding:11px 18px; border-radius:11px; text-decoration:none;
+  font-weight:600; font-size:15px; border:1px solid transparent;
+}
+.btn.primary{background:#57c2ff; color:#06263f}
+.btn.primary:hover{background:#7ad2ff; color:#06263f}
+.btn.ghost{border-color:rgba(255,255,255,.35); color:#eaf3ff}
+.btn.ghost:hover{background:rgba(255,255,255,.1); color:#fff}
+
+/* ---------- секции ---------- */
+main{padding:8px 0 60px}
+section{padding:44px 0 8px; border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+h2{font-size:27px; line-height:1.25; margin:0 0 6px; color:var(--brand); letter-spacing:-.3px; display:flex; align-items:baseline; gap:12px}
+h2 .num{
+  flex:0 0 auto; font-size:14px; font-weight:700; color:#fff; background:var(--brand2);
+  border-radius:8px; padding:3px 9px; letter-spacing:.02em;
+}
+h3{font-size:19px; margin:26px 0 8px; color:var(--brand)}
+h4{font-size:16px; margin:18px 0 6px; color:var(--brand2)}
+p{margin:9px 0}
+.sub{color:var(--ink2); font-size:16.5px; margin:0 0 18px; max-width:900px}
+ul,ol{margin:9px 0 9px 22px; padding:0}
+li{margin:5px 0}
+code, .mono{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace; font-size:.92em;
+  background:#eef3f9; border:1px solid var(--line); border-radius:6px; padding:1px 5px;
+}
+pre{
+  font-family:"Cascadia Mono",Consolas,"Liberation Mono",monospace; font-size:13.5px;
+  background:#0f2f52; color:#e8f1fb; border-radius:12px; padding:14px 16px; overflow:auto;
+  line-height:1.5;
+}
+pre code{background:none;border:0;padding:0;color:inherit}
+
+.card{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px}
+.grid{display:grid; gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.auto{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+@media(max-width:900px){.g2,.g3,.g4{grid-template-columns:1fr}}
+
+.stat{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:16px 18px; box-shadow:var(--shadow)}
+.stat b{display:block; font-size:32px; line-height:1.1; color:var(--brand2); letter-spacing:-1px}
+.stat span{display:block; color:var(--ink2); font-size:14px; margin-top:4px}
+
+table{width:100%; border-collapse:collapse; margin:12px 0; background:var(--card); font-size:14.8px}
+th,td{border:1px solid var(--line); padding:9px 11px; text-align:left; vertical-align:top}
+th{background:#eef4fb; color:var(--brand); font-weight:600}
+tbody tr:nth-child(even) td{background:#fafcfe}
+.tbl-wrap{overflow-x:auto; border-radius:12px}
+
+.callout{border-radius:12px; padding:13px 16px; margin:14px 0; border:1px solid var(--line); border-left-width:5px; background:var(--card)}
+.callout b{color:var(--ink)}
+.callout.must{border-left-color:var(--bad); background:var(--bad-soft)}
+.callout.rec{border-left-color:var(--warn); background:var(--warn-soft)}
+.callout.may{border-left-color:var(--accent); background:var(--accent-soft)}
+.callout.ok{border-left-color:var(--ok); background:var(--ok-soft)}
+.callout .lbl{font-size:12.5px; text-transform:uppercase; letter-spacing:.07em; font-weight:700; display:block; margin-bottom:3px}
+.callout.must .lbl{color:var(--bad)} .callout.rec .lbl{color:var(--warn)}
+.callout.may .lbl{color:var(--brand2)} .callout.ok .lbl{color:var(--ok)}
+
+.tech{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:18px 20px; display:flex; flex-direction:column; gap:6px}
+.tech .h{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+.tech .h b{font-size:17px; color:var(--brand)}
+.tech .cl{font-size:12.5px; color:var(--ink3); font-family:"Cascadia Mono",Consolas,monospace}
+.tech p{margin:2px 0; font-size:14.8px; color:var(--ink2)}
+.tag{display:inline-block; font-size:12px; padding:2px 8px; border-radius:999px; border:1px solid var(--line); background:#f4f8fd; color:var(--ink2)}
+.tag.lvl{background:#eef4fb; color:var(--brand2); border-color:#cfe0f3}
+.tag.proc{background:#f2fbf5; color:var(--ok); border-color:#cdecd9}
+
+figure{margin:18px 0; background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:12px; box-shadow:var(--shadow)}
+figure img{width:100%; height:auto; display:block; border-radius:8px}
+figcaption{color:var(--ink2); font-size:14px; margin-top:9px; padding:0 4px}
+
+details{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px 16px; margin:9px 0}
+details[open]{box-shadow:var(--shadow)}
+summary{cursor:pointer; font-weight:600; color:var(--brand); list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸ "; color:var(--accent)}
+details[open] summary::before{content:"▾ "}
+details p, details ul{margin-top:8px}
+
+.dl{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.dl a{display:flex; gap:12px; align-items:flex-start; background:var(--card); border:1px solid var(--line);
+  border-radius:12px; padding:14px 16px; text-decoration:none; box-shadow:var(--shadow)}
+.dl a:hover{border-color:#bcd6f5; background:#fbfdff}
+.dl .ico{flex:0 0 auto; width:38px; height:38px; border-radius:10px; background:var(--accent-soft); color:var(--brand2);
+  display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px}
+.dl b{display:block; color:var(--brand); font-size:15px}
+.dl span{display:block; color:var(--ink2); font-size:13.5px}
+
+.note{color:var(--ink2); font-size:14.5px}
+footer{border-top:1px solid var(--line); background:#fff; padding:26px 0 34px; color:var(--ink2); font-size:14.5px}
+footer .wrap{display:flex; flex-wrap:wrap; gap:14px; justify-content:space-between}
+.kv{display:grid; grid-template-columns:180px 1fr; gap:2px 14px; font-size:15px}
+.kv dt{color:var(--ink3)} .kv dd{margin:0}
+@media(max-width:640px){
+  .hero h1{font-size:30px} .hero h1 small{font-size:17px}
+  h2{font-size:22px} .kv{grid-template-columns:1fr}
+}
+@media print{
+  .topbar,.cta{display:none} body{background:#fff; font-size:11pt}
+  section{page-break-inside:avoid; border-top:1px solid #ccc}
+  .hero{background:#0f2f52 !important; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+  .card,.tech,figure,details,table{box-shadow:none}
+  a{color:#0f2f52; text-decoration:none}
+}
+table.glossary td.gl-term{font-weight:600;color:var(--brand)}
+table.glossary td.gl-def{font-size:14.6px;color:var(--ink2)}
+table.glossary td.gl-num{color:var(--ink3);font-size:13px;white-space:nowrap;font-family:"Cascadia Mono",Consolas,monospace}
+.gl-count{font-size:13px;font-weight:600;color:var(--ink3)}
+
+/* интерактив */
+.imap{border:1px solid var(--line);border-radius:16px;background:#fdfefe;padding:14px 16px 4px;box-shadow:var(--shadow)}
+.imap-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:10px}
+.imap-stats .stat{box-shadow:none;border:0;background:transparent;padding:4px 0}
+.imap-stats .stat b{font-size:24px}
+.imap-canvas svg{width:100%;height:auto;display:block}
+.link{fill:none;stroke-width:1.4;opacity:.55}
+.link-proc{stroke:#15803d}
+.link-lvl{stroke:#b45309;stroke-dasharray:5 5}
+.link.hl{opacity:1;stroke-width:2.4;filter:drop-shadow(0 0 3px rgba(47,128,237,.55))}
+.node{cursor:pointer}
+.node circle{fill:#fff;stroke-width:1.8;transition:stroke-width .15s,filter .15s}
+.node-tech circle{stroke:var(--brand2)}
+.node-proc circle{stroke:#15803d;fill:#f0fdf4}
+.node-lvl circle{stroke:#b45309;fill:#fff7ed}
+.node .node-num{font:600 14px "Cascadia Mono",Consolas,monospace;text-anchor:middle;fill:var(--brand)}
+.node .node-title{font:600 12.5px var(--body);fill:var(--ink)}
+.node:hover circle,.node.hl circle{stroke-width:3;filter:drop-shadow(0 0 4px rgba(47,128,237,.5))}
+.node.dim{opacity:.35}
+.imap-dialog{position:fixed;inset:0;z-index:90;background:rgba(15,47,82,.45);display:flex;align-items:center;justify-content:center;padding:20px}
+.imap-dialog .dlg{background:#fff;border-radius:16px;max-width:640px;width:100%;padding:22px 24px;box-shadow:0 24px 60px rgba(15,47,82,.35)}
+.imap-dialog .dlg h4{margin:0 0 4px;font-size:20px;color:var(--brand)}
+.imap-dialog .dlg .dlg-meta{color:var(--ink3);font-size:13px;margin-bottom:10px}
+.imap-dialog .dlg p{margin:6px 0;font-size:15px}
+.imap-dialog .dlg button{margin-top:12px;padding:9px 16px;border:1px solid var(--line);border-radius:9px;background:#fff;cursor:pointer;font-size:14px}
+.imap-dialog .dlg button:hover{background:var(--accent-soft)}
+.board{border:1px solid var(--line);border-radius:16px;padding:18px 20px;background:#fdfefe;box-shadow:var(--shadow)}
+.board-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap}
+.board-head h3{margin:0;font-size:18px}
+.board-controls{display:flex;gap:8px}
+.board-controls button{padding:8px 14px;border:1px solid #a8c0b4;border-radius:8px;background:#fff;color:var(--brand);font-size:13.5px;cursor:pointer}
+.board-controls button:hover{background:var(--accent-soft)}
+.board-controls button:disabled{opacity:.45;cursor:default}
+.board-progress{height:6px;border-radius:4px;background:var(--line2);margin:14px 0;overflow:hidden}
+.board-bar{height:100%;width:14%;background:linear-gradient(90deg,#2f80ed,#57c2ff);border-radius:4px;transition:width .45s ease}
+.board-steps .step{border-left:4px solid var(--accent);background:#fff;border-radius:10px;padding:12px 16px;margin:10px 0}
+.board-steps .step h4{margin:2px 0 4px;font-size:17px;color:var(--brand)}
+.board-steps .step p{margin:5px 0;font-size:14.6px}
+.board .step-num{font:600 11px "Cascadia Mono",Consolas,monospace;color:var(--accent);letter-spacing:.08em}
+.board-std b,.board-practice b{color:var(--brand)}
+.board-std{color:var(--ink2)} .board-practice{color:var(--ink2)}
+.board-branch{margin-top:8px;border:1px dashed #b45309;border-radius:10px;padding:10px 12px;background:#fffaf3}
+.board-branch button{border:0;background:none;color:#b45309;font-size:14px;cursor:pointer;padding:0;border-bottom:1px dashed #b45309}
+.board-branch p{margin:8px 0 0}
+.board-announce{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.fig-interactive .fig-tools{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.fig-tools button,.fig-tools a.btn-mini{font-size:13px;padding:7px 12px;border-radius:8px;border:1px solid var(--line);background:#fff;color:var(--brand2);cursor:pointer;text-decoration:none}
+.fig-tools button:hover,.fig-tools a.btn-mini:hover{background:var(--accent-soft)}
+.fig-frame{margin-top:10px}
+.fig-frame iframe{width:100%;height:72vh;min-height:520px;border:1px solid var(--line);border-radius:12px;background:#fff}
+.board.board-running .step{display:none}
+.board.board-running .step.on{display:block}
+@media(max-width:760px){.imap-stats{grid-template-columns:repeat(2,1fr)}}
+@media print{
+  .board-controls,.board-progress,.board-branch button,.fig-tools,.fig-frame,.imap-dialog{display:none !important}
+  .board .step{display:block !important}
+  .imap-canvas svg{width:100%}
+}
+
+
+/* Publication navigation and learning resources; original lecture styling retained. */
+.grid>*{min-width:0}.auto{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}.dl{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))}
+@media(max-width:500px){section ul[style*="columns"]{columns:1!important}h2,h3,p,li{overflow-wrap:anywhere}}
+:focus-visible{outline:3px solid #2f80ed;outline-offset:4px}
+.skip-link{position:fixed;top:-100px;left:16px;z-index:1000;background:#fff;color:#123a63;padding:12px}
+.skip-link:focus{top:8px}
+.publication-nav{background:#0d2846;color:#fff;padding:10px 0;font-size:14px}
+.publication-nav .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px}
+.publication-nav a{color:#eaf3ff;text-decoration:none}
+.resource-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:20px 0}
+.resource-card{min-width:0;background:var(--card);border:1px solid var(--line);border-top:3px solid var(--accent);padding:22px;border-radius:10px}
+.resource-card h3{margin:0 0 10px;font-size:19px}.resource-card p{color:var(--ink2)}
+.resource-links{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.resource-links a{display:inline-flex;align-items:center;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:7px;font-weight:600}
+.download-strip{background:var(--accent-soft);border-left:4px solid var(--accent);padding:20px;margin:20px 0}
+.download-strip a{overflow-wrap:anywhere}.reading-route{padding:28px 0 8px}.reading-route h2{font-size:23px}
+.table-scroll{overflow-x:auto;max-width:100%}pre{max-width:100%;overflow:auto}img,svg{max-width:100%}
+@media(max-width:700px){.resource-grid{grid-template-columns:1fr}.topbar .wrap{gap:8px}.topbar nav{min-width:0}.hero h1{font-size:30px}.wrap{padding:0 16px}.publication-nav{font-size:13px}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{animation:none!important;transition:none!important}}
+@media print{.publication-nav,.skip-link,.resource-links,.cta{display:none!important}.resource-grid{display:block}.resource-card{break-inside:avoid;margin:12px 0}.download-strip{break-inside:avoid}.fig-interactive img[hidden]{display:block!important}.fig-frame{display:none!important}}
+</style>
+<meta name="author" content="Пиков Виталий Александрович">
+<link rel="canonical" href="https://dast.pikov.expert/">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="Динамический анализ ПО: проект стандарта и практика">
+<meta property="og:description" content="Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dast.pikov.expert/">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Динамический анализ ПО: проект стандарта и практика", "description": "Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.", "url": "https://dast.pikov.expert/", "inLanguage": "ru", "author": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}}</script></head>
+<body>
+<a class="skip-link" href="#main-content">Перейти к содержанию</a><div class="publication-nav"><div class="wrap"><a class="brand-back" href="https://pikov.expert/">← pikov.expert · каталог материалов</a><span>Авторские материалы · Виталий Пиков</span><a href="practice.html">Практика для студентов →</a></div></div>
+
+<div class="topbar">
+  <div class="wrap">
+    <div class="brand" title="Проект национального стандарта по динамическому анализу">ПНС&nbsp;· ТК&nbsp;362</div>
+    <nav aria-label="Разделы лекции">
+      <a href="#glossary">Термины</a>
+      <a href="#about">О стандарте</a>
+      <a href="#why">Зачем</a>
+      <a href="#standards">Место в системе</a>
+      <a href="#structure">Структура</a>
+      <a href="#levels">Уровни</a>
+      <a href="#tech">Технологии</a>
+      <a href="#fuzz">Фаззинг</a>
+      <a href="#deploy">Внедрение</a>
+      <a href="#matrix">Матрица</a>
+      <a href="#tools">Инструменты</a>
+      <a href="#people">Специалисты</a>
+      <a href="#board">Интерактив</a>
+      <a href="#practice">Практикум</a>
+      <a href="#remarks">Замечания</a>
+      <a href="#sources">Источники</a>
+    </nav>
+  </div>
+</div>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow"><i></i> Проект национального стандарта · первая редакция</div>
+    <h1>
+      Технологии динамического анализа программного обеспечения
+      <small>ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа. Общие требования»</small>
+    </h1>
+    <p class="lead">
+      Документ устанавливает общие требования к технологиям динамического анализа, к внедрению и регулярному
+      выполнению процессов разработки безопасного ПО, в которых эти технологии применяются, а также требования
+      к инструментам и специалистам. Стандарт дополняет и уточняет ГОСТ Р 56939-2024 в части тестирования ПО
+      в режиме функционирования — то есть в динамике.
+    </p>
+    <div class="chips">
+      <span class="chip">Разработан: ФСТЭК России · ИСП РАН</span>
+      <span class="chip">Внесён: ТК 362 «Защита информации»</span>
+      <span class="chip">Введён впервые</span>
+      <span class="chip ok">Не подлежит применению до утверждения</span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#student-materials">Практика для студентов</a>
+<a class="btn ghost" href="downloads/dynamic-analysis-national-standard-draft.pdf" download>Проект стандарта · PDF</a>
+<a class="btn ghost" href="downloads/pns-dynamic-analysis.pdf" download>Конспект лекции · PDF</a>
+      <a class="btn ghost" href="#sources">Официальные источники</a>
+      <a class="btn ghost" href="#remarks">Замечания к редакции</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" id="main-content">
+<div class="reading-route"><h2>От требований к воспроизводимому результату</h2><p>Изучите технологии и требования проекта, затем пройдите практикум: найдите сбой, объясните причину, исправьте код и сохраните результаты повторной проверки.</p><p><a href="#glossary">Начать с терминов</a> · <a href="#student-materials">Методички и примеры</a> · <a href="#standard-download">Полный текст проекта стандарта</a></p></div>
+
+<!-- ============ ТЕРМИНЫ (расширенный глоссарий) ============ -->
+<section id="glossary">
+  <h2><span class="num">01</span> Термины и определения</h2>
+  <p class="sub">Занятие начинаем с терминологии: три стандарта используют близкие слова в разных значениях.
+  Ниже — определения по текстам документов, дословно, с указанием пункта.</p>
+
+  <div class="grid g3" style="margin-bottom:14px">
+    <div class="stat"><b>37</b><span>терминов в проекте по динамическому анализу</span></div>
+    <div class="stat"><b>23</b><span>термина в ГОСТ Р 56939-2024</span></div>
+    <div class="stat"><b>36</b><span>терминов в ГОСТ Р 71207-2024</span></div>
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Как читать</span>
+    «Динамический анализ» и «статический анализ» — это <b>виды работ</b> по исследованию программы: первый
+    опирается на исполнение кода, второй — на исходный код без запуска. Одно и то же слово в разных стандартах
+    может означать разное: например, «программный компонент» в ГОСТ Р 56939-2024 и в проекте по динамическому
+    анализу определён по-разному, поэтому ниже у каждого термина указан источник и пункт.
+  </div>
+
+  <h3 id="dynamic">Динамический анализ <span class="gl-count">37 терминов</span></h3>
+  <p class="note">проект ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа. Общие требования»</p>
+  <div class="tbl-wrap">
+  <table class="glossary">
+    <thead><tr><th style="width:26%">Термин</th><th>Определение</th><th style="width:80px">Пункт</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="gl-term">автоматизированное тестирование</td>
+        <td class="gl-def">Способ тестирования (анализа), реализуемый с использованием инструментальных средств для запуска тестирования, позволяющий минимизировать участие человека в процессе тестирования. Примечание - Тестовые примеры частично или полностью выполняются специальными инструментальными средствами, однако разработку тестовых примеров и сценариев тестирования, подготовку данных, анализ результатов выполнения может выполнять человек.</td>
+        <td class="gl-num">3.1.1</td>
+      </tr>
+      <tr>
+        <td class="gl-term">автоматическое тестирование</td>
+        <td class="gl-def">Способ тестирования (анализа), реализуемый с использованием инструментальных средств при наступлении определенных событий (условий), заданных человеком, но не требующий непосредственного участия человека в процессе тестирования. Примечание - Примером является автоматический запуск анализа при обновлении программного кода путем интеграции инструментальных средств с системой непрерывной интеграции.</td>
+        <td class="gl-num">3.1.2</td>
+      </tr>
+      <tr>
+        <td class="gl-term">датчик срабатывания ошибок</td>
+        <td class="gl-def">Конструкция исходного или бинарного кода, которая вставляется в программу при ее сборке из исходного кода, интерпретации или двоичной трансляции и которая при обнаружении определенной ошибки в ходе выполнения программы вызывает ее аварийное завершение и (или) выдачу диагностической информации.</td>
+        <td class="gl-num">3.1.3</td>
+      </tr>
+      <tr>
+        <td class="gl-term">динамический анализ</td>
+        <td class="gl-def">Вид работ по исследованию программы (объекта анализа), основанный на анализе поведения и кода программы в режиме непосредственного исполнения (функционирования).</td>
+        <td class="gl-num">3.1.4</td>
+      </tr>
+      <tr>
+        <td class="gl-term">инструмент динамического анализа</td>
+        <td class="gl-def">Инструментальное средство, которое выполняет динамический анализ автоматическим или автоматизированным способом.</td>
+        <td class="gl-num">3.1.5</td>
+      </tr>
+      <tr>
+        <td class="gl-term">исполняемый файл</td>
+        <td class="gl-def">Бинарный файл, содержащий исполняемый модуль программы, который может быть запущен в среде выполнения программы.</td>
+        <td class="gl-num">3.1.6</td>
+      </tr>
+      <tr>
+        <td class="gl-term">компилятор</td>
+        <td class="gl-def">Инструментальное средство, выполняющее компиляцию.</td>
+        <td class="gl-num">3.1.7</td>
+      </tr>
+      <tr>
+        <td class="gl-term">компиляция (сборка программы)</td>
+        <td class="gl-def">Трансляция программы из ее исходного кода на языке программирования высокого уровня в бинарный код машинного языка.</td>
+        <td class="gl-num">3.1.8</td>
+      </tr>
+      <tr>
+        <td class="gl-term">критерий полноты тестового покрытия</td>
+        <td class="gl-def">Значение тестового покрытия, достижение которого достаточно для завершения динамического анализа объекта анализа.</td>
+        <td class="gl-num">3.1.9</td>
+      </tr>
+      <tr>
+        <td class="gl-term">наблюдаемое поведение</td>
+        <td class="gl-def">Поведение программы или иного объекта анализа, связанное с взаимодействием с внешними по отношению к объекту процессами, другими объектами, устройствами, включая ввод и вывод данных, работу с внешними областями памяти, обработку или генерацию событий или прерываний. Примечание - Для одного и того же объекта анализа наблюдаемое поведение может меняться в зависимости от того, какие средства используются для контроля за поведением программы. В частности, средства контроля за состоянием внутренних переменных или выполнения отдельных инструкций внутри программы могут сделать выполнение таких инструкций или чтение (запись) некоторых внутренних областей памяти доступным для наблюдения извне программы.</td>
+        <td class="gl-num">3.1.10</td>
+      </tr>
+      <tr>
+        <td class="gl-term">объект анализа</td>
+        <td class="gl-def">Программное обеспечение, программа, программные компоненты или программные модули, отдельные функции (фрагменты программы), подлежащих динамическому анализу. Примечание - Объект анализа является эквивалентным термином по отношению к терминам «объект тестирования» и «элемент тестирования», используемых в других стандартах, принятых для применения в Российской Федерации.</td>
+        <td class="gl-num">3.1.11</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ожидаемый результат</td>
+        <td class="gl-def">Предсказанное характерное поведение программы или иного объекта анализа при определенных тестовых условиях.</td>
+        <td class="gl-num">3.1.12</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ошибка в поведении</td>
+        <td class="gl-def">Несоответствие наблюдаемого поведения программы или иного объекта анализа требованиям или ожиданиям пользователей, которое может являться причиной невозможности выполнения требуемых функций или нарушения информационной безопасности. Примечание — Ошибка в поведении может проявляться как отказ, некорректный результат вычислений, чрезмерное снижение производительности или увеличение времени ответа, недопустимый расход ресурсов процессора или памяти, снижение пропускной способности каналов передачи данных и иным способом.</td>
+        <td class="gl-num">3.1.13</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ошибка в программе</td>
+        <td class="gl-def">Конструкция или набор конструкций в исходном или бинарном коде программы, наличие которой указывает на возможность реализации угроз безопасности информации и (или) на ошибку реализованного в программе алгоритма.</td>
+        <td class="gl-num">3.1.14</td>
+      </tr>
+      <tr>
+        <td class="gl-term">поведение программы</td>
+        <td class="gl-def">Совокупность действий, выполняемых программой (или иным объектом анализа), включающая в себя получение входных данных и внешних воздействий, чтение и запись данных в ходе их обработки, взаимодействие с внешними устройствами и программами, вывод полученных результатов. Примечание - Поведение программы зависит как собственно от программы, алгоритма и описаний структур данных, так и от компиляторов и других средств программно-аппаратной платформы, включая операционную систему, на которой программа выполняется, а также от действий внешних по отношению к программе, например, от ввода данных от пользователя, обмена данными по телекоммуникационным протоколам, переключения процессов и потоков программы операционной системой.</td>
+        <td class="gl-num">3.1.15</td>
+      </tr>
+      <tr>
+        <td class="gl-term">поверхность атаки</td>
+        <td class="gl-def">Множество подпрограмм (функций) программы, обрабатывающих данные, поступающие посредством интерфейсов, непосредственно или косвенно подверженных риску атаки.</td>
+        <td class="gl-num">3.1.16</td>
+      </tr>
+      <tr>
+        <td class="gl-term">повторное тестирование</td>
+        <td class="gl-def">Подтверждающее тестирование объекта анализа, проводимое для проверки успешности устранения ошибки внесенными изменениями.</td>
+        <td class="gl-num">3.1.17</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программа</td>
+        <td class="gl-def">Данные, предназначенные для управления конкретными компонентами системы обработки информации в целях реализации определенного алгоритма.</td>
+        <td class="gl-num">3.1.18</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программное обеспечение</td>
+        <td class="gl-def">Совокупность программ системы обработки информации и программных документов, необходимых для эксплуатации этих программ.</td>
+        <td class="gl-num">3.1.19</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программный модуль</td>
+        <td class="gl-def">Программа или функционально завершенный фрагмент программы, предназначенный для хранения, трансляции, объединения с другими программными модулями и загрузки в оперативную память.</td>
+        <td class="gl-num">3.1.20</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программный компонент</td>
+        <td class="gl-def">Программа или совокупность программ, рассматриваемая как единое целое, выполняющая законченную функцию.</td>
+        <td class="gl-num">3.1.21</td>
+      </tr>
+      <tr>
+        <td class="gl-term">разработчик программного обеспечения</td>
+        <td class="gl-def">Организация, выполняющая работы на всех стадиях разработки программного обеспечения или ответственная, как минимум, за такие процессы жизненного цикла, как процессы реализации и процессы поддержки программного обеспечения. Примечания 1 Стадии разработки — по ГОСТ 19.102-77, процессы жизненного цикла — по ГОСТ Р ИСО/МЭК 12207-2010. 2 Согласно ГОСТ Р ИСО/МЭК 27000-2021 пункт 3.50 под «организацией» понимают, помимо прочего, индивидуальных предпринимателей, компании, корпорации, фирмы, партнерства, благотворительные организации, учреждения, любые составные части и сочетания названных объектов вне зависимости от того, зарегистрирована ли организация в качестве юридического лица, является ли она государственной или частной. 3 По тексту стандарта в том же значении применяется также понятие «организация» для улучшения восприятия текста.</td>
+        <td class="gl-num">3.1.22</td>
+      </tr>
+      <tr>
+        <td class="gl-term">регрессионное тестирование</td>
+        <td class="gl-def">Тестирование, проводимое после внесения изменений в объект анализа или в его среду функционирования, с целью определения влияния или подтверждения невлияния внесенных изменений на ранее протестированные функции (свойства) объекта.</td>
+        <td class="gl-num">3.1.23</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ручное тестирование</td>
+        <td class="gl-def">Способ тестирования, при котором тестирование объекта анализа выполняется людьми на основе задокументированного сценария с проверкой результатов путем сравнения фактических и ожидаемых результатов.</td>
+        <td class="gl-num">3.1.24</td>
+      </tr>
+      <tr>
+        <td class="gl-term">санитайзер</td>
+        <td class="gl-def">Компонент компилятора, встраивающий датчики срабатывания ошибок в генерируемый код во время компиляции программы.</td>
+        <td class="gl-num">3.1.25</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сборочная среда</td>
+        <td class="gl-def">Совокупность программных и аппаратных средств, служб связи, интерфейсов, форматов данных, протоколов, стандартов, обеспечивающих преобразование исходного кода программ в программные модули в соответствии с представленными метаданными и с учетом зависимостей программного модуля.</td>
+        <td class="gl-num">3.1.26</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сценарий тестирования</td>
+        <td class="gl-def">спецификация ручного или автоматизированного тестирования, содержащая сведения о тестовых примерах (тест-кейсах) и последовательности выполнения.</td>
+        <td class="gl-num">3.1.27</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тестирование</td>
+        <td class="gl-def">Комплекс мероприятий, проводимых для выявления и оценки функций и свойств объекта анализа.</td>
+        <td class="gl-num">3.1.28</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тест-кейс</td>
+        <td class="gl-def">Набор предварительных условий, входных данных, пошаговых инструкций и ожидаемых результатов, разработанный для наблюдения за поведением программы или иного объекта анализа для достижения целей тестирования. Примечания 1 Тест-кейс является синонимом термина «тестовый пример» (ГОСТ Р 56920-2025, пункт 3.20), а также термина «контрольный пример» (ГОСТ Р 56921-2016/ISO/IEC/IEEE 29119-2:2013, ГОСТ Р 56922-2016/ISO/IEC/IEEE 29119-2:2013). 2 Тест-кейс может быть представлен как набор инструкций в виде документа для человека в случае ручного тестирования, и в виде программы в случае автоматизированного (автоматического) тестирования.</td>
+        <td class="gl-num">3.1.29</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тестовое покрытие</td>
+        <td class="gl-def">Мера полноты набора тест-кейсов, которая может выражаться тестовым покрытием программного кода, тестовым покрытием требований, тестовым покрытием формальных моделей объекта анализа или иным способом.</td>
+        <td class="gl-num">3.1.30</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тестовое покрытие программного кода</td>
+        <td class="gl-def">Отношение, выраженное в процентах, между количеством участков кода программы (программного модуля) определенного вида, задействованных в ходе динамического анализа, и всем совокупным количеством достижимых участков кода этого вида. Примечание — Покрытие кода может вычисляться для инструкций, базовых блоков, ветвлений в коде, функций.</td>
+        <td class="gl-num">3.1.31</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тестовое покрытие требований</td>
+        <td class="gl-def">Отношение, выраженное в процентах, между количеством требований, предъявляемых к программе (программному модулю или компоненту) и тестируемых в ходе динамического анализа, и количеством всех предъявляемых к ней требований.</td>
+        <td class="gl-num">3.1.32</td>
+      </tr>
+      <tr>
+        <td class="gl-term">технологии динамического анализа</td>
+        <td class="gl-def">Совокупность видов, уровней, методов, способов и процессов динамического анализа, инструментальных средств и правил их применения.</td>
+        <td class="gl-num">3.1.33</td>
+      </tr>
+      <tr>
+        <td class="gl-term">уровень тестирования</td>
+        <td class="gl-def">реализация процесса тестирования (динамического анализа), которая зависит от уровня грануляции объекта анализа и цели тестирования и в рамках которой используются группы тест-кейсов, объединенные общим назначением. Примечание - В контексте настоящего стандарта рассматриваются три уровня тестирования: модульное тестирование, интеграционное тестирование и системное тестирование. Указанные уровни тестирования предусмотрены ГОСТ Р 56920-2024, при этом комплексное тестирование в настоящем стандарте определено как интеграционное.</td>
+        <td class="gl-num">3.1.34</td>
+      </tr>
+      <tr>
+        <td class="gl-term">фаззер</td>
+        <td class="gl-def">Инструментальное средство динамического анализа, которое выполняет фаззинг-тестирование.</td>
+        <td class="gl-num">3.1.35</td>
+      </tr>
+      <tr>
+        <td class="gl-term">фактические результаты</td>
+        <td class="gl-def">Совокупность поведения программы или совокупность условий, связанных данных или тестовой среды, полученные в результате выполнения тест-кейса.</td>
+        <td class="gl-num">3.1.36</td>
+      </tr>
+      <tr>
+        <td class="gl-term">юнит-тест</td>
+        <td class="gl-def">Тест-кейс, который проверяет программу или отдельные программные модули в изоляции от других модулей и программ. 3.2 В настоящем стандарте применены следующие обозначения и сокращения:</td>
+        <td class="gl-num">3.1.37</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 id="rbpo">Разработка безопасного ПО <span class="gl-count">23 термина</span></h3>
+  <p class="note">ГОСТ Р 56939-2024 «Защита информации. Разработка безопасного программного обеспечения. Общие требования»</p>
+  <div class="tbl-wrap">
+  <table class="glossary">
+    <thead><tr><th style="width:26%">Термин</th><th>Определение</th><th style="width:80px">Пункт</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="gl-term">безопасное программное обеспечение</td>
+        <td class="gl-def">Программное обеспечение, разработанное в ходе реализации совокупности процессов (мер), направленных на предотвращение появления и устранение 1 недостатков программы.</td>
+        <td class="gl-num">3.1</td>
+      </tr>
+      <tr>
+        <td class="gl-term">динамический анализ кода программы</td>
+        <td class="gl-def">Вид работ по инструментальному исследованию программы, основанный на анализе кода программы в режиме непосредственного исполнения (функционирования) кода.</td>
+        <td class="gl-num">3.2</td>
+      </tr>
+      <tr>
+        <td class="gl-term">документация разработчика программного обеспечения</td>
+        <td class="gl-def">Совокупность программных и иных документов, предназначенных для организации и проведения работ по созданию программного обеспечения и/или подтверждения соответствия требованиям настоящего стандарта. Примечание - К программным относятся документы, содержащие сведения, необходимые для разработки, изготовления, сопровождения и эксплуатации программ. К иным документам относятся документы, не относящиеся к программным и содержащие сведения, подтверждающие соответствие требованиям настоящего стандарта.</td>
+        <td class="gl-num">3.3</td>
+      </tr>
+      <tr>
+        <td class="gl-term">инструментальное средство</td>
+        <td class="gl-def">Компьютерная программа, используемая как средство разработки, тестирования, анализа, производства или модификации других программ или документов на них. [ГОСТ Р 51904-2002, пункт</td>
+        <td class="gl-num">3.4</td>
+      </tr>
+      <tr>
+        <td class="gl-term">интерфейс программного обеспечения</td>
+        <td class="gl-def">Способ взаимодействия между программами или между программами и пользователями.</td>
+        <td class="gl-num">3.5</td>
+      </tr>
+      <tr>
+        <td class="gl-term">компонент программного обеспечения</td>
+        <td class="gl-def">Составная часть (программный модуль) программного обеспечения, выполняющая определенную функцию.</td>
+        <td class="gl-num">3.6</td>
+      </tr>
+      <tr>
+        <td class="gl-term">компьютерная атака</td>
+        <td class="gl-def">Целенаправленное несанкционированное воздействие на информацию, на ресурс автоматизированной информационной системы или получение несанкционированного доступа к ним с применением программных или программно - аппаратных средств. [ГОСТ Р 51275-2006, пункт</td>
+        <td class="gl-num">3.7</td>
+      </tr>
+      <tr>
+        <td class="gl-term">недостаток программы</td>
+        <td class="gl-def">Любое несоответствие программы заданным требованиям или любая ошибка, допущенная в ходе проектирования или реализации программы, которая в случае ее неисправления может являться причиной невозможности выполнения требуемых функциональных возможностей или уязвимости программы.</td>
+        <td class="gl-num">3.8</td>
+      </tr>
+      <tr>
+        <td class="gl-term">поверхность атаки</td>
+        <td class="gl-def">Множество подпрограмм (функций, модулей) программного обеспечения, обрабатывающих данные, поступающие посредством интерфейсов, напрямую или косвенно подверженных риску атаки. [адаптировано из ГОСТ Р 56498-2015, пункт</td>
+        <td class="gl-num">3.9</td>
+      </tr>
+      <tr>
+        <td class="gl-term">пользователь (программного обеспечения)</td>
+        <td class="gl-def">Лицо, применяющее программное обеспечение.</td>
+        <td class="gl-num">3.10</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программа</td>
+        <td class="gl-def">Данные, предназначенные для управления конкретными компонентами системы обработки информации в целях реализации определенного алгоритма. 1</td>
+        <td class="gl-num">3.11</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программное обеспечение</td>
+        <td class="gl-def">Совокупность программ системы обработки информации и программных документов, необходимых для эксплуатации этих программ.</td>
+        <td class="gl-num">3.12</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программный модуль (модуль программного обеспечения)</td>
+        <td class="gl-def">Программа или функционально завершенный фрагмент программы, предназначенный для хранения, трансляции, объединения с другими программными модулями и загрузки в оперативную память.</td>
+        <td class="gl-num">3.13</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сборка программного обеспечения</td>
+        <td class="gl-def">Процесс построения из исходного кода программ программных модулей, готовых к выполнению или интерпретации, и/или библиотек.</td>
+        <td class="gl-num">3.14</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сборочная среда</td>
+        <td class="gl-def">Совокупность программных и аппаратных средств, служб связи, интерфейсов, форматов данных, протоколов, стандартов, обеспечивающих преобразование исходного кода программ в программные модули в соответствии с представленными метаданными и с учетом зависимостей программного модуля. [Адаптировано из ГОСТ Р 54593-2011, пункт</td>
+        <td class="gl-num">3.15</td>
+      </tr>
+      <tr>
+        <td class="gl-term">система сборки программного обеспечения</td>
+        <td class="gl-def">Совокупность программных средств и конфигурационных файлов, которая позволяет выполнить сборку конкретного экземпляра конкретной программы.</td>
+        <td class="gl-num">3.16</td>
+      </tr>
+      <tr>
+        <td class="gl-term">среда разработки программного обеспечения</td>
+        <td class="gl-def">Интегрированная система, включающая в себя аппаратные средства, программное обеспечение, программно-аппаратные средства, процедуры и документы, необходимые для разработки программного обеспечения. [ГОСТ Р 51904-2002, пункт</td>
+        <td class="gl-num">3.17</td>
+      </tr>
+      <tr>
+        <td class="gl-term">статический анализ исходного кода программы</td>
+        <td class="gl-def">Вид работ по инструментальному исследованию программы, основанный на анализе исходных текстов программы с использованием специализированных инструментальных средств (статических анализаторов) в режиме, не предусматривающем исполнения кода, и выполняемый для определения свойств программы; в частности, статический анализ применяется для выявления потенциальных ошибок в программе. Примечание - Термины &quot;анализ исходных текстов&quot; и &quot;анализ исходного кода&quot; взаимозаменяемы в силу устоявшейся профессиональной терминологии.</td>
+        <td class="gl-num">3.18</td>
+      </tr>
+      <tr>
+        <td class="gl-term">управление конфигурацией программного обеспечения</td>
+        <td class="gl-def">Скоординированные действия, направленные на формирование и контроль конфигурации программного обеспечения.</td>
+        <td class="gl-num">3.19</td>
+      </tr>
+      <tr>
+        <td class="gl-term">уязвимость программы</td>
+        <td class="gl-def">Недостаток программы, который может быть использован для реализации угроз безопасности информации. 1 Примечание - Уязвимость программы может быть результатом ее разработки без учета требований по обеспечению безопасности информации, вследствие наличия ошибок проектирования или реализации или в результате применения небезопасных инструментальных средств и языков программирования, имеющих ошибки проектирования, реализации или конфигурирования.</td>
+        <td class="gl-num">3.20</td>
+      </tr>
+      <tr>
+        <td class="gl-term">функциональное тестирование программы</td>
+        <td class="gl-def">Вид работ по исследованию программы, направленный на выявление отличий между ее реально существующими и требуемыми свойствами.</td>
+        <td class="gl-num">3.21</td>
+      </tr>
+      <tr>
+        <td class="gl-term">фаззинг-тестирование программы</td>
+        <td class="gl-def">Вид работ по исследованию программы, основанный на передаче программе случайных или специально сформированных входных данных, отличных от данных, предусмотренных алгоритмом работы программы.</td>
+        <td class="gl-num">3.22</td>
+      </tr>
+      <tr>
+        <td class="gl-term">экспертиза исходного кода программы</td>
+        <td class="gl-def">Вид работ по выявлению недостатков программы в исходном коде программы, направленный на оценку ее свойств и основанный на анализе исходного кода программы в режиме, не предусматривающем реального выполнения кода.</td>
+        <td class="gl-num">3.23</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3 id="sast">Статический анализ ПО <span class="gl-count">36 терминов</span></h3>
+  <p class="note">ГОСТ Р 71207-2024 «Защита информации. Разработка безопасного программного обеспечения. Статический анализ программного обеспечения. Общие требования»</p>
+  <div class="tbl-wrap">
+  <table class="glossary">
+    <thead><tr><th style="width:26%">Термин</th><th>Определение</th><th style="width:80px">Пункт</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="gl-term">анализ иерархии классов</td>
+        <td class="gl-def">Статический анализ, позволяющий выявить в программах на объектноориентированных языках список классов, реализованных в программе, а также отношения наследования между этими классами.</td>
+        <td class="gl-num">3.1.1</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ косвенных вызовов</td>
+        <td class="gl-def">Статический анализ, позволяющий в программе, использующей вызовы по указателю или вызовы виртуальных методов, установить множество процедур, которые могут вызываться при выполнении заданного косвенного вызова. Примечание Анализ потока управления, анализ потока данных, анализ помеченных данных, анализ псевдонимов и анализ косвенных вызовов в общем случае дают приближенные результаты.</td>
+        <td class="gl-num">3.1.2</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ помеченных данных</td>
+        <td class="gl-def">Статический анализ, при котором анализируется течение потока данных от источников до стоков. Примечания 1 Под источниками понимаются точки программы, в которых данные начинают иметь пометку некоторое заданное свойство. Под стоками понимаются точки программы, в которых данные перестают иметь пометку. 2 Распространенная цель анализа помеченных данных показать, что помеченные данные не могут попасть из источников точек ввода пользователя в стоки процедуры записи на диск или в сеть. Факт такого попадания означает утечку конфиденциальных данных.</td>
+        <td class="gl-num">3.1.3</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ потока данных</td>
+        <td class="gl-def">Статический анализ, при котором определяются свойства обрабатываемых программой данных. Примечание Могут определяться возможные значения переменных и констант, точки программы, в которых используются определенные переменные и пр.</td>
+        <td class="gl-num">3.1.4</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ потока управления</td>
+        <td class="gl-def">Статический анализ, при котором выделяются процедуры программы, линейные участки кода процедур и условия переходов между этими участками.</td>
+        <td class="gl-num">3.1.5</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ программы на синтаксическом уровне</td>
+        <td class="gl-def">Статический анализ, при котором обрабатывается представление программы, полностью отражающее ее синтаксическую структуру, например абстрактное синтаксическое дерево.</td>
+        <td class="gl-num">3.1.6</td>
+      </tr>
+      <tr>
+        <td class="gl-term">анализ псевдонимов</td>
+        <td class="gl-def">Статический анализ, позволяющий установить наличие в программе доступа к одной и той же переменной или функции с помощью различных ссылок (указателей).</td>
+        <td class="gl-num">3.1.7</td>
+      </tr>
+      <tr>
+        <td class="gl-term">внутреннее представление</td>
+        <td class="gl-def">Структуры данных или служебный язык, которые используются статическим анализатором для представления исходного кода программы в ходе анализа. Примечание Внутреннее представление может строиться как перед выполнением основного анализа в ходе отдельного, настраиваемого пользователем этапа контролируемой сборки ПО, так и вместе с выполнением статического анализа (например, когда используемый язык программирования не требует выполнения сборки).</td>
+        <td class="gl-num">3.1.8</td>
+      </tr>
+      <tr>
+        <td class="gl-term">императивный язык программирования</td>
+        <td class="gl-def">Язык программирования, в котором используется парадигма программирования, описывающая действия над данными в терминах последовательности команд.</td>
+        <td class="gl-num">3.1.9</td>
+      </tr>
+      <tr>
+        <td class="gl-term">индуктивная переменная</td>
+        <td class="gl-def">Переменная цикла программы, значение которой может быть выражено в виде функции от счетчика цикла или других индуктивных переменных. Примечание Индуктивные переменные, как правило, выражаются линейными функциями от счетчика цикла, изменяясь на каждой итерации цикла на фиксированное целое значение.</td>
+        <td class="gl-num">3.1.10</td>
+      </tr>
+      <tr>
+        <td class="gl-term">инструментальное средство</td>
+        <td class="gl-def">Компьютерная программа, используемая как средство разработки, тестирования, анализа, производства или модификации других программ или документов на них. [ТОСТ P 51904—2002, пункт 3.17]</td>
+        <td class="gl-num">3.1.11</td>
+      </tr>
+      <tr>
+        <td class="gl-term">контролируемая сборка ПО</td>
+        <td class="gl-def">Сборка MO, при выполнении которой статическим анализатором фиксируются порядок запуска программных средств, их настройки и используемые конфигурации. 2 ГОСТ Р 71207—2024</td>
+        <td class="gl-num">3.1.12</td>
+      </tr>
+      <tr>
+        <td class="gl-term">критическая ошибка в программе</td>
+        <td class="gl-def">Ошибка, которая может привести к нарушению безопасности обрабатываемой информации.</td>
+        <td class="gl-num">3.1.13</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ложноотрицательное срабатывание (ошибка второго рода)</td>
+        <td class="gl-def">Отсутствие предупреждения об ошибке со стороны статического анализатора в ситуации наличия заведомо известной ошибки в программе, которая способна реализоваться в ходе выполнения программы.</td>
+        <td class="gl-num">3.1.14</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ложноположительное срабатывание (ошибка первого рода)</td>
+        <td class="gl-def">Выданное статическим анализатором предупреждение, которое указывает на конструкцию или несколько конструкций в программе (возможно, в совокупности с некоторым множеством возможных значений переменных программы), не содержащих ошибку, которая может реализоваться в ходе выполнения программы.</td>
+        <td class="gl-num">3.1.15</td>
+      </tr>
+      <tr>
+        <td class="gl-term">межмодульные связи</td>
+        <td class="gl-def">Совокупность связей по управлению, когда код одного программного модуля передает управление другому модулю, и связей по данным, когда программные модули совместно используют какиелибо данные.</td>
+        <td class="gl-num">3.1.16</td>
+      </tr>
+      <tr>
+        <td class="gl-term">межмодульный анализ</td>
+        <td class="gl-def">Статический анализ, при котором выполняется совместный анализ программы или нескольких программ, состоящих из нескольких программных модулей, и выявляемые свойства программы затрагивают процедуры или переменные из различных модулей.</td>
+        <td class="gl-num">3.1.17</td>
+      </tr>
+      <tr>
+        <td class="gl-term">межпроцедурный контекстночувствительный анализ</td>
+        <td class="gl-def">Статический анализ, при котором выявляемые свойства программы учитывают взаимодействие нескольких процедур, в том числе возникающее в результате выполнения нескольких процедур или вызовов процедурами друг друга, а также контексты их вызова. Примечания 1 В ходе анализа учитывается контекст вызова процедуры при обработке ее вызова, т. е. сопоставляется информация из вызывающей и вызываемой процедур применительно к каждому месту вызова и его окружению: фактическим параметрам, состоянию глобальных переменных ит. п. 2 Термины</td>
+        <td class="gl-num">3.1.18</td>
+      </tr>
+      <tr>
+        <td class="gl-term">модельный вариант (ошибки)</td>
+        <td class="gl-def">Подтип некоторого типа ошибки в программе, отнесение к которому осуществляется исходя из особенностей реализации ошибки данного типа и особенностей языка программирования. Примечание Разбиение типа ошибки на модельные варианты применяется изза технологических ограничений статического анализа в целях эффективной работы статических анализаторов, сводя задачу поиска ошибки более общего типа к задаче поиска ошибок множества подтипов.</td>
+        <td class="gl-num">3.1.19</td>
+      </tr>
+      <tr>
+        <td class="gl-term">ошибка в программе</td>
+        <td class="gl-def">Конструкция или набор конструкций в исходном коде программы, наличие которой указывает на возможность реализации угроз безопасности информации и/или на ошибку реализованного в программе алгоритма. Примечания 1 Ошибка в программе может быть уязвимостью программы, программной закладкой, ошибкой реализованного алгоритма, приводить к утечке конфиденциальных данных, отказу программного обеспечения и пр. В настоящем стандарте в задачи статического анализа не входит разграничение ошибок в части последствий, необходимо найти потенциальные места ошибок. 2 При анализе части программы (процедур) с неизвестным контекстом вызова ошибка может реализоваться в контексте, не содержащемся в известной анализатору части. В этом случае судить о ложности срабатывания можно лишь с учетом всей программы.</td>
+        <td class="gl-num">3.1.20</td>
+      </tr>
+      <tr>
+        <td class="gl-term">поточный вариант (ошибки)</td>
+        <td class="gl-def">Способ выражения ошибки в исходном коде программы через конкретную структуру потоков управления и данных. Примечание Поточные варианты являются общими для всех типов ошибок, так как характеризуют не саму ошибку, а способ ее выражения в исходном коде программы (характерный вид потоков управления и данных).</td>
+        <td class="gl-num">3.1.21</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программа</td>
+        <td class="gl-def">Данные, предназначенные для управления конкретными компонентами системы обработки информации в целях реализации определенного алгоритма. ГОСТ Р 71207—2024</td>
+        <td class="gl-num">3.1.22</td>
+      </tr>
+      <tr>
+        <td class="gl-term">программное обеспечение</td>
+        <td class="gl-def">Совокупность программ системы обработки информации и программных документов, необходимых для эксплуатации этих программ.</td>
+        <td class="gl-num">3.1.23</td>
+      </tr>
+      <tr>
+        <td class="gl-term">путь выполнения</td>
+        <td class="gl-def">Последовательность операторов программы или процедуры, которая выполняется при заданных входных данных или параметрах процедуры.</td>
+        <td class="gl-num">3.1.24</td>
+      </tr>
+      <tr>
+        <td class="gl-term">разработчик программного обеспечения</td>
+        <td class="gl-def">Организация, выполняющая работы на всех стадиях разработки программы или ответственная, как минимум, за такие процессы жизненного цикла, как процессы реализации и процессы поддержки программных средств. Примечание Стадии разработки по ГОСТ 19.102, процессы жизненного цикла по ГОСТ Р ИСО/ МЭК 12207.</td>
+        <td class="gl-num">3.1.25</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сборка ПО</td>
+        <td class="gl-def">Процесс построения из исходных модулей ПО программных модулей, готовых к выполнению или интерпретации, и/или библиотек.</td>
+        <td class="gl-num">3.1.26</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сборочная среда</td>
+        <td class="gl-def">Совокупность программных и аппаратных средств, служб связи, интерфейсов, форматов данных, протоколов, стандартов, обеспечивающих преобразование исходного кода программ в программные пакеты в соответствии с представленными метаданными и с учетом зависимостей программного пакета.</td>
+        <td class="gl-num">3.1.27</td>
+      </tr>
+      <tr>
+        <td class="gl-term">сигнатурный анализ</td>
+        <td class="gl-def">Статический анализ, определяющий наличие свойства программы при помощи поиска строк в исходном коде программы по некоторому образцу, в том числе заданному с помощью формального языка поиска, например при помощи регулярных выражений.</td>
+        <td class="gl-num">3.1.28</td>
+      </tr>
+      <tr>
+        <td class="gl-term">система непрерывной интеграции</td>
+        <td class="gl-def">Система, обеспечивающая автоматизированную сборку и тестирование ПО. Примечание Частые автоматизированные сборки ПО применяются для скорейшего выявления ошибок и решения проблем, возникающих при объединении изменений кода.</td>
+        <td class="gl-num">3.1.29</td>
+      </tr>
+      <tr>
+        <td class="gl-term">система сборки ПО</td>
+        <td class="gl-def">Совокупность программных средств и конфигурационных файлов, которая позволяет выполнить сборку ПО.</td>
+        <td class="gl-num">3.1.30</td>
+      </tr>
+      <tr>
+        <td class="gl-term">среда анализа ПО</td>
+        <td class="gl-def">Совокупность программных и аппаратных средств, служб связи, интерфейсов, форматов данных, протоколов, стандартов, обеспечивающих статический анализ программы.</td>
+        <td class="gl-num">3.1.31</td>
+      </tr>
+      <tr>
+        <td class="gl-term">статистический анализ</td>
+        <td class="gl-def">Статический анализ, определяющий статистику для некоторого свойства программы, например: насколько часто в программе проверяется возвращаемое значение некоторой функции.</td>
+        <td class="gl-num">3.1.32</td>
+      </tr>
+      <tr>
+        <td class="gl-term">статический анализ</td>
+        <td class="gl-def">Вид работ по инструментальному исследованию программы, основанный на анализе исходных кодов в режиме, не предусматривающем реального выполнения кода, и выполняемый для определения свойств программы. Примечания 1 В профессиональной терминологии устоялось взаимозаменяемое применение терминов «анализ исходных текстов» и «анализ исходного кода». 2 В частности, статический анализ применяется для выявления ошибок в программе.</td>
+        <td class="gl-num">3.1.33</td>
+      </tr>
+      <tr>
+        <td class="gl-term">статический анализатор</td>
+        <td class="gl-def">Программное инструментальное средство, которое выполняет статический анализ в автоматическом режиме.</td>
+        <td class="gl-num">3.1.34</td>
+      </tr>
+      <tr>
+        <td class="gl-term">тип ошибки</td>
+        <td class="gl-def">Категория ошибок в программе, отражающая их общность в свойствах или характеристиках. Примечание Статические анализаторы снабжают предупреждения об ошибке диагностической информацией, в состав которой входит тип ошибки. Применяемая в статических анализаторах типизация разнится, что затрудняет соотнесение предупреждений, полученных от разных анализаторов. Для облегчения работы с предупреждениями в диагностическую информацию добавляют соотнесение ошибки с одной из популярных систем классификации дефектов безопасности, например с перечнем угроз BAY ФСТЭК России или MITRE CWE. 4 ГОСТ Р 71207—2024</td>
+        <td class="gl-num">3.1.35</td>
+      </tr>
+      <tr>
+        <td class="gl-term">чувствительный к путям выполнения анализ</td>
+        <td class="gl-def">Статический анализ программы, при котором могут быть определены ее свойства, проявляющиеся лишь на некоторых путях выполнения программы, и условия (или часть условий), при обращении которых в истину выполнение программы пойдет по указанному анализатором пути. 3.2 В настоящем стандарте применены следующие сокращения: БДУ банк данных угроз; ЭВМ электронная вычислительная машина; CWE общий перечень дефектов (недостатков) безопасности (Common Weakness Enumeration); POSIX набор стандартов, описывающих интерфейсы между операционной системой и прикладной программой (Portable Operating System Interface); SARIF формат обмена результатами статического анализа на основе JSON для вывода инструментов статического анализа (Static Analysis Results Interchange Format).</td>
+        <td class="gl-num">3.1.36</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+</section>
+
+
+
+
+
+
+<!-- ============ 1. О СТАНДАРТЕ ============ -->
+<section id="about">
+  <h2><span class="num">02</span> Паспорт проекта</h2>
+  <p class="sub">Кратко о том, что именно стандартизируется и для кого документ написан.</p>
+
+  <div class="grid g4" style="margin-bottom:18px">
+    <div class="stat"><b>8</b><span>технологий динамического анализа (раздел 8)</span></div>
+    <div class="stat"><b>3</b><span>уровня тестирования: модульный, интеграционный, системный</span></div>
+    <div class="stat"><b>4</b><span>этапа внедрения каждой технологии</span></div>
+    <div class="stat"><b>37</b><span>терминов и 3 сокращения в разделе 3</span></div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-top:0">Объект стандартизации</h3>
+      <p>Технологии динамического анализа ПО, используемые в процессах разработки безопасного ПО
+      согласно ГОСТ Р 56939-2024 «Защита информации. Разработка безопасного программного обеспечения.
+      Общие требования».</p>
+      <h4>Аспект стандартизации</h4>
+      <p>Общие требования к содержанию работ по внедрению и регулярному выполнению процессов разработки
+      безопасного ПО, в которых применяются технологии динамического анализа; требования к методам анализа,
+      инструментальным средствам и специалистам, задействованным в этих процессах.</p>
+      <h4>Цель применения</h4>
+      <p>Повышение безопасности ПО путём его тестирования в режиме функционирования (исполнения кода),
+      то есть в динамике.</p>
+    </div>
+
+    <div class="card">
+      <h3 style="margin-top:0">Паспорт</h3>
+      <dl class="kv">
+        <dt>Обозначение</dt><dd>ГОСТ Р (проект, первая редакция), обозначение и дата введения не определены</dd>
+        <dt>Наименование</dt><dd>Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа программного обеспечения. Общие требования</dd>
+        <dt>Разработчики</dt><dd>ФСТЭК России; ФГБУН «Институт системного программирования им. В.П. Иванникова» РАН (ИСП РАН)</dd>
+        <dt>Внесён</dt><dd>ТК 362 «Защита информации»</dd>
+        <dt>Основание</dt><dd>План работы ТК 362 на 2026 год</dd>
+        <dt>Статус</dt><dd>Проект, первая редакция; введён впервые; не подлежит применению до утверждения</dd>
+        <dt>Взаимосвязь</dt><dd>Дополняет и уточняет ГОСТ Р 56939-2024; часть комплекса стандартов по разработке безопасного ПО</dd>
+        <dt>УДК / ОКС</dt><dd>004.056.053 / 35.030:35.080</dd>
+        <dt>Ключевые слова</dt><dd>безопасное программное обеспечение, динамический анализ, фаззинг-тестирование, функциональное тестирование, модульное тестирование, системное тестирование, регрессионное тестирование, тестирование на отказ</dd>
+      </dl>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h3 style="margin-top:0">Кому адресован стандарт</h3>
+    <div class="grid g3">
+      <div>
+        <h4>Организациям-разработчикам ПО</h4>
+        <p class="note">Выбор технологий, планирование и выполнение динамического анализа, документирование
+        процессов, отчётность, метрики.</p>
+      </div>
+      <div>
+        <h4>Разработчикам инструментов</h4>
+        <p class="note">Требования к функциональным возможностям инструментов динамического анализа,
+        в том числе фаззеров и средств работы с тест-кейсами.</p>
+      </div>
+      <div>
+        <h4>Организациям, оценивающим соответствие</h4>
+        <p class="note">Требования к процессам разработки безопасного ПО, в рамках которых применяются
+        технологии динамического анализа, как к объекту оценки.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 2. ЗАЧЕМ ============ -->
+<section id="why">
+  <h2><span class="num">03</span> Зачем нужен стандарт</h2>
+  <p class="sub">Обоснование из введения и пояснительной записки к проекту.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Почему это стало критично</h4>
+      <p>Вероятность реализации угроз растёт из-за применения технологий искусственного интеллекта:
+      ИИ ускоряет автоматизированный сбор и интеллектуальный анализ сведений о ПО — его функциональных
+      возможностях, логике реализации, интерфейсах, входных данных, трассах выполнения, сбоях, —
+      а затем и автоматизированную разработку и непрерывную модификацию вредоносных программ.</p>
+      <p>Противодействием служат процессы динамического анализа: они позволяют выявлять ошибки и уязвимости
+      на ранних этапах разработки, до того как они будут использованы на этапе эксплуатации.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Что даёт применение</h4>
+      <ul>
+        <li>соответствие ПО предъявляемым требованиям, включая требования безопасности;</li>
+        <li>повышение надёжности ПО;</li>
+        <li>снижение рисков реализации угроз безопасности и некорректного функционирования;</li>
+        <li>рост защищённости ПО в целом.</li>
+      </ul>
+      <p class="note">Стандарт не требует применять всю совокупность описанных технологий: разработчик
+      выбирает технологии, уровни и методы на основании собственных критериев и лучших практик.
+      При этом функциональное тестирование на модульном и системном уровнях и фаззинг-тестирование
+      названы базовыми технологиями, составляющими основу тестирования ПО в динамике.</p>
+    </div>
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Три формы требований</span>
+    Положения стандарта выражены вспомогательными глаголами: <b>«должен»</b> — обязательное требование,
+    <b>«рекомендуется»</b> — рекомендованное к реализации, <b>«может»</b> — возможное направление реализации.
+    Это важно при оценке соответствия: обязательны только формулировки со словом «должен».
+  </div>
+</section>
+
+<!-- ============ 3. МЕСТО В СИСТЕМЕ ============ -->
+<section id="standards">
+  <h2><span class="num">04</span> Место в комплексе стандартов</h2>
+  <p class="sub">Проект позиционируется как составная часть комплекса стандартов по разработке безопасного ПО
+  и опирается на 15 ссылочных документов.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Связь с ГОСТ Р 56939-2024</h4>
+      <p>ГОСТ Р 56939-2024 задаёт процессы разработки безопасного ПО и общие требования к ним.
+      Новый стандарт уточняет требования к тем процессам, где ПО исследуется в динамике:</p>
+      <ul>
+        <li>динамический анализ и фаззинг-тестирование (п. 5.11 ГОСТ Р 56939-2024);</li>
+        <li>функциональное тестирование (п. 5.18);</li>
+        <li>нефункциональное тестирование (п. 5.19).</li>
+      </ul>
+      <p class="note">Пересмотр, изменение или отмена действующих документов при этом не требуются.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Смежные документы, на которые опирается проект</h4>
+      <ul style="columns:2; column-gap:26px">
+        <li>ГОСТ Р 56920-2024 — тестирование ПО, общие положения;</li>
+        <li>ГОСТ Р 56921-2016 (ISO/IEC/IEEE 29119-2) — процессы тестирования;</li>
+        <li>ГОСТ Р 56922-2016 (ISO/IEC/IEEE 29119-3) — документация тестирования;</li>
+        <li>ГОСТ Р ИСО/МЭК 29119-4-2021 — проектирование тестов;</li>
+        <li>ГОСТ Р ИСО/МЭК 12207-2010 — процессы жизненного цикла;</li>
+        <li>ГОСТ Р 71206-2024 — безопасный компилятор C/C++;</li>
+        <li>ГОСТ Р 58143-2018 — тестирование проникновения;</li>
+        <li>ГОСТ Р 59453.1-2021, 59453.3-2025, 59453.4-2025 — формальная модель управления доступом;</li>
+        <li>ГОСТ 19.101-2024, ГОСТ 19.102-77, ГОСТ 19781-90 — программная документация и терминология;</li>
+        <li>ГОСТ Р ИСО/МЭК 27000-2021 — СУИБ, терминология.</li>
+      </ul>
+      <p class="note">Из проекта следует, что международные и региональные стандарты в качестве основы
+      не использовались; научно-исследовательские работы для разработки не выполнялись — основой стали
+      результаты деятельности в рамках сертификации процессов разработки безопасного ПО.</p>
+    </div>
+  </div>
+
+  <div class="callout ok">
+    <span class="lbl">Важное разграничение</span>
+    Термин «динамический анализ» в стандарте не тождествен процессу динамического анализа из
+    ГОСТ Р 56939-2024 — кроме случаев, когда соответствие указано явно. Технологии динамического анализа
+    применимы как в рамках этого процесса, так и в любом другом процессе, где уместно исследовать поведение
+    и код программы в динамике.
+  </div>
+</section>
+
+<!-- ============ 4. СТРУКТУРА ============ -->
+<section id="structure">
+  <h2><span class="num">05</span> Структура документа</h2>
+  <p class="sub">Десять разделов и три приложения: два справочных (диаграммы процессов) и одно рекомендуемое
+  (матрица применимости технологий).</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:90px">Раздел</th><th>Название</th><th>Что внутри</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>Область применения</td><td>Объект стандартизации, процессы ГОСТ Р 56939-2024, адресаты.</td></tr>
+      <tr><td>2</td><td>Нормативные ссылки</td><td>15 документов, включая смежные стандарты по тестированию и защите информации.</td></tr>
+      <tr><td>3</td><td>Термины, определения и сокращения</td><td>37 терминов (динамический анализ, объект анализа, уровень тестирования, санитайзер, фаззер и др.), сокращения СЗИ, ПО, API.</td></tr>
+      <tr><td>4</td><td>Общие положения</td><td>Формы требований, уровни тестирования, свобода выбора технологий.</td></tr>
+      <tr><td>5</td><td>Общие требования к организации динамического анализа</td><td>Общие требования к тестированию на уровне организации и их обязательный состав.</td></tr>
+      <tr><td>6</td><td>Общие требования к внедрению технологий</td><td>Четыре этапа внедрения: начальный, подготовительный, первичный анализ, организация регулярного анализа.</td></tr>
+      <tr><td>7</td><td>Общие требования к регулярному выполнению</td><td>План тестирования, анализ изменений, регистрация и анализ результатов.</td></tr>
+      <tr><td>8</td><td>Описание и требования к технологиям</td><td>Восемь технологий с требованиями к объектам анализа, тестовой среде, тест-кейсам, покрытию и анализу результатов.</td></tr>
+      <tr><td>9</td><td>Требования к инструментам</td><td>Общие функциональные требования, отдельно — к фаззерам и к средствам работы с тест-кейсами.</td></tr>
+      <tr><td>10</td><td>Требования к специалистам</td><td>Четыре профиля компетенций, включая фаззинг и автоматизацию.</td></tr>
+      <tr><td>А</td><td>Приложение А (рекомендуемое)</td><td>Матрица: технологии × процессы ГОСТ Р 56939-2024 × уровни тестирования.</td></tr>
+      <tr><td>Б</td><td>Приложение Б (справочное)</td><td>Диаграмма процесса внедрения технологий динамического анализа.</td></tr>
+      <tr><td>В</td><td>Приложение В (справочное)</td><td>Диаграмма процесса выполнения регулярного динамического анализа.</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 5. УРОВНИ ============ -->
+<section id="levels">
+  <h2><span class="num">06</span> Три уровня тестирования</h2>
+  <p class="sub">Уровень определяется грануляцией объекта анализа и целью тестирования. Комплексное тестирование
+  в стандарте отнесено к интеграционному.</p>
+
+  <figure class="fig-interactive" data-frame="diagrams/testing-levels.html">
+    <img src="assets/testing-levels.svg" alt="Три уровня тестирования: модульный, интеграционный и системный — объекты анализа и собираемое покрытие">
+    <figcaption><b>Три уровня тестирования.</b> Один и тот же динамический анализ применяется к объектам разной
+    грануляции. На модульном уровне обязателен сбор покрытия программного кода, на системном — покрытие требований
+    по спецификации. Номера процессов приведены по ГОСТ Р 56939-2024.</figcaption>
+
+  <div class="fig-tools">
+    <button type="button" class="fig-open" aria-expanded="false">Открыть интерактивную схему</button>
+    <a class="btn-mini" href="diagrams/testing-levels.html" download>Скачать HTML</a>
+  </div>
+  <div class="fig-frame" hidden></div>
+</figure>
+
+  <div class="grid g3">
+    <div class="tech">
+      <div class="h"><b>Модульное</b><span class="tag lvl">модули и фрагменты</span></div>
+      <p>Анализ программных модулей или отдельных фрагментов программ изолированно от других модулей,
+      компонентов и программ. Используются API-интерфейсы модулей.</p>
+      <p class="cl">Покрытие: программный код — обязательно. Применяются тестовые дублёры, «заглушки», имитации.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Интеграционное</b><span class="tag lvl">взаимодействие частей</span></div>
+      <p>Анализ нескольких взаимосвязанных составных частей ПО: подсистем, компонентов, программ, модулей.
+      Цель — корректность взаимодействия и выявление ошибок в поведении.</p>
+      <p class="cl">Покрытие: требования и код в зависимости от технологии.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Системное</b><span class="tag lvl">ПО в целом</span></div>
+      <p>Анализ ПО в целом: соответствие заданным требованиям и выявление ошибок в поведении. Проверяется
+      взаимодействие ПО с аппаратными средствами, внешним ПО, информационными системами и пользователями.</p>
+      <p class="cl">Покрытие: требования (по спецификации) — обязательно.</p>
+    </div>
+  </div>
+
+  <div class="callout must">
+    <span class="lbl">Обязательный минимум</span>
+    На модульном уровне при применении любой технологии разработчик <b>должен</b> обеспечить сбор тестового
+    покрытия программного кода — по исходному или бинарному коду. Минимально измеряется покрытие инструкций
+    или базовых блоков; более детально — ветвления, последовательности базовых блоков, комбинации условий.
+    Сбор покрытия только по бинарному коду требует обоснования.
+  </div>
+
+  <h3>Какая технология на каком уровне применяется</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th>Технология</th><th>Уровень тестирования</th><th>Процесс по ГОСТ Р 56939-2024</th></tr></thead>
+    <tbody>
+      <tr><td>Функциональное тестирование</td><td>модульный → интеграционный → системный</td><td>5.11; 5.11 или 5.18; 5.18</td></tr>
+      <tr><td>Нефункциональное тестирование</td><td>системный</td><td>5.19</td></tr>
+      <tr><td>Фаззинг-тестирование</td><td>модульный и системный</td><td>5.11</td></tr>
+      <tr><td>Динамический анализ помеченных данных</td><td>системный</td><td>5.11</td></tr>
+      <tr><td>Тестирование на отказ</td><td>системный</td><td>5.19</td></tr>
+      <tr><td>Тестирование на проникновение</td><td>системный</td><td>5.19</td></tr>
+      <tr><td>Динамическая верификация</td><td>системный</td><td>5.18</td></tr>
+      <tr><td>Вспомогательные методы</td><td>зависит от основной технологии</td><td>применяются внутри других технологий</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 6. ТЕХНОЛОГИИ ============ -->
+<section id="tech">
+  <h2><span class="num">07</span> Восемь технологий динамического анализа</h2>
+  <p class="sub">Раздел 8 — ядро документа: для каждой технологии определены назначение, уровень тестирования,
+  требования к объекту анализа, тестовой среде, тест-кейсам и данным, а также к сбору покрытия и анализу
+  результатов.</p>
+
+  <div class="imap">
+    <div class="imap-stats">
+      <div class="stat"><b>8</b><span>технологий динамического анализа</span></div>
+      <div class="stat"><b>3</b><span>процесса ГОСТ Р 56939-2024</span></div>
+      <div class="stat"><b>3</b><span>уровня тестирования</span></div>
+      <div class="stat"><b>21</b><span>связей на карте</span></div>
+    </div>
+    <div class="imap-canvas" id="imap">
+<svg viewBox="0 0 1000 560" role="img" aria-label="Карта технологий динамического анализа">
+<path class="link link-proc" data-from="t81" data-to="p511" d="M 157 78 C 290 78, 670 96, 822 96"/>
+<path class="link link-proc" data-from="t81" data-to="p518" d="M 157 78 C 290 78, 670 244, 822 244"/>
+<path class="link link-lvl" data-from="t81" data-to="lМ" d="M 157 78 C 300 78, 470 100, 606 100"/>
+<path class="link link-lvl" data-from="t81" data-to="lИ" d="M 157 78 C 300 78, 470 250, 606 250"/>
+<path class="link link-lvl" data-from="t81" data-to="lС" d="M 157 78 C 300 78, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t82" data-to="p519" d="M 397 78 C 530 78, 670 392, 822 392"/>
+<path class="link link-lvl" data-from="t82" data-to="lС" d="M 397 78 C 540 78, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t83" data-to="p511" d="M 157 196 C 290 196, 670 96, 822 96"/>
+<path class="link link-lvl" data-from="t83" data-to="lМ" d="M 157 196 C 300 196, 470 100, 606 100"/>
+<path class="link link-lvl" data-from="t83" data-to="lС" d="M 157 196 C 300 196, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t84" data-to="p511" d="M 397 196 C 530 196, 670 96, 822 96"/>
+<path class="link link-lvl" data-from="t84" data-to="lС" d="M 397 196 C 540 196, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t85" data-to="p519" d="M 157 314 C 290 314, 670 392, 822 392"/>
+<path class="link link-lvl" data-from="t85" data-to="lС" d="M 157 314 C 300 314, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t86" data-to="p519" d="M 397 314 C 530 314, 670 392, 822 392"/>
+<path class="link link-lvl" data-from="t86" data-to="lС" d="M 397 314 C 540 314, 470 400, 606 400"/>
+<path class="link link-proc" data-from="t87" data-to="p518" d="M 157 432 C 290 432, 670 244, 822 244"/>
+<path class="link link-lvl" data-from="t87" data-to="lС" d="M 157 432 C 300 432, 470 400, 606 400"/>
+<path class="link link-lvl" data-from="t88" data-to="lМ" d="M 397 432 C 540 432, 470 100, 606 100"/>
+<path class="link link-lvl" data-from="t88" data-to="lИ" d="M 397 432 C 540 432, 470 250, 606 250"/>
+<path class="link link-lvl" data-from="t88" data-to="lС" d="M 397 432 C 540 432, 470 400, 606 400"/>
+<g class="node node-tech" id="t81" data-kind="tech"><circle cx="130" cy="78" r="27"/><text class="node-num" x="130" y="82">8.1</text><text class="node-title" x="130" y="124" text-anchor="middle">Функциональное тестирование</text></g>
+<g class="node node-tech" id="t82" data-kind="tech"><circle cx="370" cy="78" r="27"/><text class="node-num" x="370" y="82">8.2</text><text class="node-title" x="370" y="124" text-anchor="middle">Нефункциональное тестирование</text></g>
+<g class="node node-tech" id="t83" data-kind="tech"><circle cx="130" cy="196" r="27"/><text class="node-num" x="130" y="200">8.3</text><text class="node-title" x="130" y="242" text-anchor="middle">Фаззинг-тестирование</text></g>
+<g class="node node-tech" id="t84" data-kind="tech"><circle cx="370" cy="196" r="27"/><text class="node-num" x="370" y="200">8.4</text><text class="node-title" x="370" y="242" text-anchor="middle">Динамический анализ помеченных данных</text></g>
+<g class="node node-tech" id="t85" data-kind="tech"><circle cx="130" cy="314" r="27"/><text class="node-num" x="130" y="318">8.5</text><text class="node-title" x="130" y="360" text-anchor="middle">Тестирование на отказ</text></g>
+<g class="node node-tech" id="t86" data-kind="tech"><circle cx="370" cy="314" r="27"/><text class="node-num" x="370" y="318">8.6</text><text class="node-title" x="370" y="360" text-anchor="middle">Тестирование на проникновение</text></g>
+<g class="node node-tech" id="t87" data-kind="tech"><circle cx="130" cy="432" r="27"/><text class="node-num" x="130" y="436">8.7</text><text class="node-title" x="130" y="478" text-anchor="middle">Динамическая верификация</text></g>
+<g class="node node-tech" id="t88" data-kind="tech"><circle cx="370" cy="432" r="27"/><text class="node-num" x="370" y="436">8.8</text><text class="node-title" x="370" y="478" text-anchor="middle">Вспомогательные методы</text></g>
+<g class="node node-lvl" id="lМ" data-kind="lvl"><circle cx="640" cy="100" r="30"/><text class="node-num" x="640" y="104">М</text><text class="node-title" x="640" y="150" text-anchor="middle">Модульный уровень</text></g>
+<g class="node node-lvl" id="lИ" data-kind="lvl"><circle cx="640" cy="250" r="30"/><text class="node-num" x="640" y="254">И</text><text class="node-title" x="640" y="300" text-anchor="middle">Интеграционный уровень</text></g>
+<g class="node node-lvl" id="lС" data-kind="lvl"><circle cx="640" cy="400" r="30"/><text class="node-num" x="640" y="404">С</text><text class="node-title" x="640" y="450" text-anchor="middle">Системный уровень</text></g>
+<g class="node node-proc" id="p511" data-kind="proc"><circle cx="860" cy="96" r="34"/><text class="node-num" x="860" y="100">5.11</text><text class="node-title" x="860" y="150" text-anchor="middle">Динамический анализ</text></g>
+<g class="node node-proc" id="p518" data-kind="proc"><circle cx="860" cy="244" r="34"/><text class="node-num" x="860" y="248">5.18</text><text class="node-title" x="860" y="298" text-anchor="middle">Функц. тестирование</text></g>
+<g class="node node-proc" id="p519" data-kind="proc"><circle cx="860" cy="392" r="34"/><text class="node-num" x="860" y="396">5.19</text><text class="node-title" x="860" y="446" text-anchor="middle">Нефункц. тестирование</text></g>
+</svg>
+    </div>
+    <p class="note">Наведите курсор на узел, чтобы подсветить его связи; клик — карточка технологии, процесса
+    или уровня. Сплошные линии — процессы, пунктирные — уровни тестирования.
+    <a href="#board"><b>Анимированный цикл дефекта с кнопками — ниже, в разделе «Как это связано с практикумом» →</b></a></p>
+  </div>
+
+
+  <div class="grid auto">
+    <div class="tech">
+      <div class="h"><b>8.1. Функциональное тестирование</b></div>
+      <p>Проверка соответствия объекта анализа функциональным требованиям, включая требования безопасности,
+      и выявление расхождений между реальными и требуемыми функциями.</p>
+      <p class="cl">Методы: на основе моделей, по сценариям, на основе опыта, с тестовыми оракулами.
+      Каждый тест-кейс должен давать один вердикт.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.2. Нефункциональное тестирование</b></div>
+      <p>Проверка нефункциональных требований: отказоустойчивость, нагрузка, надёжность, стресс.
+      Выполняется на системном уровне с принципом независимости тестировщиков от разработчиков.</p>
+      <p class="cl">Покрытие: требования по спецификации нефункциональных требований.</p>
+    </div>
+    <div class="tech" style="border-color:#bcd6f5; background:#fbfdff">
+      <div class="h"><b>8.3. Фаззинг-тестирование</b><span class="tag">тема практикума</span></div>
+      <p>Подача случайных или специально сформированных входных данных с отслеживанием сбоев: аварийных
+      завершений, утечек памяти. Выполняется на модульном и системном уровнях.</p>
+      <p class="cl">Подробный разбор — <a href="#fuzz">ниже</a>.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.4. Анализ помеченных данных</b></div>
+      <p>Выявление поведения, приводящего к утечке конфиденциальных сведений: контролируемый нарушителем ввод
+      достигает защищённых операторов либо защищаемые данные попадают в открытые каналы.</p>
+      <p class="cl">Только системный уровень; пометки на уровне байт или битов — не машинных слов.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.5. Тестирование на отказ</b></div>
+      <p>Проверка возможности привести объект в аварийное состояние искусственным внедрением ошибок или
+      имитацией сбоев взаимодействующих компонентов, устройств, сервисов.</p>
+      <p class="cl">Требуется матрица тестовых сценариев: тип сбоя, условия, ожидаемый результат, критерии прохождения.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.6. Тестирование на проникновение</b></div>
+      <p>Выявление и подтверждение актуальности уязвимостей имитацией действий потенциального нарушителя.</p>
+      <p class="cl">Выполняется по ГОСТ Р 58143-2018; в область стандартизации самого проекта не входит.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.7. Динамическая верификация</b></div>
+      <p>Проверка соответствия поведения программы поведению, предусмотренному её формальной моделью: входы и
+      выходы отображаются в интерфейсы модели, модель анализируется с фактическими воздействиями.</p>
+      <p class="cl">Для ПО СЗИ с управлением доступом — по ГОСТ Р 59453.4-2025; в область проекта не входит.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>8.8. Вспомогательные методы</b></div>
+      <p>Снятие трасс, инструментирование кода, динамическая бинарная трансляция, динамическое символьное
+      выполнение, динамическое профилирование, перехват потоков выполнения.</p>
+      <p class="cl">Применяются внутри других технологий и влияют на поведение программы — это надо учитывать.</p>
+    </div>
+  </div>
+
+  <h3>Что требуется от разработчика по каждой технологии</h3>
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:150px">Технология</th><th>Объект анализа</th><th>Особые требования</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>Функциональное</td>
+        <td>Системный уровень — ПО или подсистемы; интеграционный — компоненты и модули; модульный — как минимум модули требований назначения и функций безопасности.</td>
+        <td>Юнит-тесты: атомарность, изолированность, читаемость, повторяемость. Тест-кейсы, проверяющие критичные функции и требования безопасности, должны быть автоматизированы. Модульное тестирование рекомендуется выполнять самим разработчикам кода, системное — тестировщикам.</td>
+      </tr>
+      <tr>
+        <td>Нефункциональное</td>
+        <td>ПО в целом или подсистемы.</td>
+        <td>Тестовая среда должна соответствовать среде функционирования ПО и настраиваться по эксплуатационной документации.</td>
+      </tr>
+      <tr>
+        <td>Фаззинг</td>
+        <td>Системный — ПО или компоненты; модульный — как минимум модули, составляющие поверхность атаки и реализующие функции безопасности.</td>
+        <td>Фаззинг-цели, приоритеты, коллекции входных данных или правила порождения, словари лексем, функции-обёртки, синтетические бинарные модули, критерии завершения.</td>
+      </tr>
+      <tr>
+        <td>Помеченные данные</td>
+        <td>Системный уровень.</td>
+        <td>Реализация только через динамическое бинарное инструментирование, полносистемную эмуляцию или инструментирование компилятором. Инструментирование исходного кода на уровне языка не допускается. Требуется контроль сетевой активности.</td>
+      </tr>
+      <tr>
+        <td>Тестирование на отказ</td>
+        <td>Системный уровень.</td>
+        <td>Определение потенциальных точек отказа по архитектуре и зависимостям между сервисами; допускаются некорректные входные данные.</td>
+      </tr>
+      <tr>
+        <td>Динамическая верификация</td>
+        <td>Системный уровень.</td>
+        <td>Нужна формальная модель поведения; для ПО СЗИ — модель управления доступом.</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<!-- ============ 7. ФАЗЗИНГ ============ -->
+<section id="fuzz">
+  <h2><span class="num">08</span> Фаззинг-тестирование: требования раздела 8.3</h2>
+  <p class="sub">Самая подробная часть стандарта и одновременно тема сегодняшнего практикума — от выбора цели
+  до анализа результатов.</p>
+
+  <figure class="fig-interactive" data-frame="diagrams/fuzzing-pipeline.html">
+    <img src="assets/fuzzing-pipeline.svg" alt="Конвейер фаззинг-тестирования по разделу 8.3: объект анализа, фаззинг-цели, входные данные, стенд и сборка, фаззер, разбор ошибок и два возврата в цикл">
+    <figcaption><b>Конвейер фаззинг-тестирования.</b> Схема собрана по пунктам 8.3.6–8.3.24: от объекта анализа
+    и фаззинг-целей через корпус входных данных, обёртку и тестовую сборку с датчиками срабатывания ошибок —
+    к прогону фаззера и разбору результатов. Пунктирные связи показывают два возврата в цикл: пополнение корпуса
+    по ходу прогона и повторный прогон после исправления.</figcaption>
+
+  <div class="fig-tools">
+    <button type="button" class="fig-open" aria-expanded="false">Открыть интерактивную схему</button>
+    <a class="btn-mini" href="diagrams/fuzzing-pipeline.html" download>Скачать HTML</a>
+  </div>
+  <div class="fig-frame" hidden></div>
+</figure>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Методы (8.3.3)</h4>
+      <ul>
+        <li><b>По способу генерации данных:</b> мутационное (изменение участков входных данных — инвертирование
+        битов, перестановка блоков и др.) и генерационное (по заданному формату).</li>
+        <li><b>По полноте сведений об объекте:</b> «чёрный ящик», «серый ящик», «белый ящик».</li>
+      </ul>
+      <p class="note">Выполнять рекомендуется автоматизированным или автоматическим способом.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Фаззинг-цели (8.3.7–8.3.9)</h4>
+      <p>Для каждого объекта анализа определяются конкретные участки кода (функции) и интерфейсы, подлежащие
+      фаззингу. Приоритет отдаётся обработке входных данных (парсеры, анализаторы), функциям идентификации
+      и аутентификации, управлению доступом.</p>
+      <ul>
+        <li>сведения о языках программирования;</li>
+        <li>сведения об API: назначение, способы и протоколы взаимодействия, типы данных, доступность нарушителю;</li>
+        <li>точки входных воздействий и наблюдения поведения;</li>
+        <li>среда функционирования для проведения фаззинга;</li>
+        <li>сигнатура функции, формат данных, классы эквивалентности ввода и граничные значения, ограничения по числу и частоте вызовов.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Наборы входных данных (8.3.11)</h4>
+      <p>Требования к формируемым наборам:</p>
+      <ul>
+        <li>валидность — данные не должны приводить к аварийному завершению;</li>
+        <li>покрытие различных ветвей программного кода;</li>
+        <li>исключение дубликатов;</li>
+        <li>минимальность размера файлов данных;</li>
+        <li>представительность: версии, режимы и опции формата, граничные значения.</li>
+      </ul>
+      <p>Начальный корпус необходимо минимизировать средствами фаззера. Источники: тест-документация и
+      тест-кейсы функционального тестирования, автотесты и юнит-тесты, сценарии применения по документации,
+      открытые наборы данных, ранее сформированные, сгенерированные и синтетические данные.</p>
+      <p>Для фаззеров с коллекциями — сформировать коллекции под каждую цель; для фаззеров без коллекций —
+      правила порождения входных данных; для фаззеров со словарями — словари лексем.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Функции-обёртки (8.3.12)</h4>
+      <p>Обёртки вызывают целевой код, конвертируя данные фаззера в аргументы тестируемых функций в соответствии
+      со спецификациями интерфейсов, типов и контекста.</p>
+      <ul>
+        <li>приём входных данных от фаззера и преобразование в аргументы целевой функции;</li>
+        <li>унифицированный формат ответа;</li>
+        <li>перенаправление или закрытие потоков вывода, не влияющих на результат;</li>
+        <li>перехват ожидаемых исключений и аварийное завершение при сбоях;</li>
+        <li>минимум логики и операций;</li>
+        <li>возможность многократного последовательного вызова в одном процессе с независимыми итерациями;</li>
+        <li>воспроизводимость при одинаковых условиях и данных.</li>
+      </ul>
+      <p class="note">Разработку обёрток рекомендуется поручать разработчикам тестируемых модулей; возможна
+      автоматизированная генерация обёрток по исходному коду.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h4 style="margin-top:0">Синтетические цели (8.3.13)</h4>
+    <p>Допускается фаззинг специально подготовленных синтетических целей: из исходного кода выделяются участки
+    обработки входных данных, изолируются тестовыми дублёрами и собираются в синтетический бинарный модуль.
+    Требования к таким модулям: изоляция mock-объектами, взаимодействие с фаззером, вызов целевой функции,
+    корректное освобождение ресурсов, сборка с санитайзерами, отсутствие посторонних тестовых функций
+    и исполняемых автотестов.</p>
+  </div>
+
+  <h3>Критерии завершения фаззинг-тестирования (8.3.20)</h3>
+  <p>Стандарт требует обеспечить сбор покрытия программного кода и определить критерии завершения. Возможные
+  критерии из примечания к пункту:</p>
+  <div class="grid g4">
+    <div class="stat"><b>×2</b><span>число найденных уникальных путей превышает число стартовых образцов как минимум вдвое</span></div>
+    <div class="stat"><b>×2</b><span>процент достигнутого покрытия вдвое превышает покрытие от стартовых образцов</span></div>
+    <div class="stat"><b>%</b><span>покрытие по строкам или базовым блокам не ниже установленного значения</span></div>
+    <div class="stat"><b>N ч</b><span>фаззер не находит новые пути и покрытие не растёт при подаче уникальных мутаций</span></div>
+  </div>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <h4 style="margin-top:0">Что должно быть в результатах (8.3.22)</h4>
+      <ul>
+        <li>данные о работе инструментов: длительность, количество аварийных завершений, число найденных путей выполнения;</li>
+        <li>сведения о срабатываниях инструментальных средств;</li>
+        <li>диагностика: дампы аварийных завершений, информация датчиков срабатывания ошибок, ошибки в поведении;</li>
+        <li>наборы данных, подача которых приводит к ошибкам или аварийному завершению;</li>
+        <li>достигнутое структурное покрытие по строкам или базовым блокам.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Что включает анализ результатов (8.3.23)</h4>
+      <ul>
+        <li>определение достигнутого покрытия для каждого тестируемого модуля;</li>
+        <li>анализ обнаруженных ошибок поведения (аварийных завершений, «зависаний») и их актуальности;</li>
+        <li>определение типа актуальных ошибок и их критичности;</li>
+        <li>проверку непокрытых участков кода — в том числе для обнаружения программных закладок и оценки
+        необходимости новых тест-кейсов.</li>
+      </ul>
+      <p class="note">Найденные аварийные завершения могут указывать как на ошибку в исходной программе,
+      так и на некорректно подготовленную синтетическую цель или обёртку.</p>
+    </div>
+  </div>
+
+  <div class="callout rec">
+    <span class="lbl">Отдельно о защите от анализа</span>
+    Если при фаззинге выявлены механизмы, препятствующие исследованию, соответствующие модули и участки кода
+    рекомендуется подвергнуть дополнительному анализу, например в ходе экспертизы исходного кода (8.3.24).
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Повторное и регрессионное тестирование</span>
+    Разработанные тест-кейсы и наборы данных должны использоваться при повторном и регрессионном
+    фаззинг-тестировании (8.3.17); для повышения эффективности рекомендуется брать новые наборы данных
+    или адаптировать имеющиеся (8.3.18).
+  </div>
+</section>
+
+<!-- ============ 8. ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ============ -->
+<section id="aux">
+  <h2><span class="num">09</span> Вспомогательные методы (8.8)</h2>
+  <p class="sub">Шесть методов, которые применяются внутри других технологий: они дают информацию о ходе
+  выполнения программы, но могут искажать её поведение.</p>
+
+  <div class="grid auto">
+    <div class="tech">
+      <div class="h"><b>Снятие трасс</b></div>
+      <p>Последовательность выполнения на уровне машинных команд или конструкций языка плюс события.
+      При критическом замедлении рекомендуется двухэтапная схема: сначала запись внешних недетерминированных
+      событий, затем детерминированное воспроизведение со снятием трассы.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Инструментирование кода</b></div>
+      <p>Внесение инструментального кода: по исходным текстам или по бинарному (в том числе промежуточному)
+      представлению, статически при сборке или динамически во время исполнения. Внесённые изменения сами
+      могут влиять на поведение программы.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Динамическая бинарная трансляция</b></div>
+      <p>Трансформация кода выполняющейся программы; вход и выход — исполняемый код. Трансляция
+      с одновременным инструментированием — основа для других технологий, например анализа помеченных данных.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Динамическое символьное выполнение</b></div>
+      <p>Значения переменных заменяются символьными величинами, накапливается система ограничений, которая
+      передаётся решателю (SMT). Даёт рост покрытия, но число путей растёт экспоненциально — есть ограничение
+      по объёму кода.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Динамическое профилирование</b></div>
+      <p>Сбор количественных характеристик: время работы функций, число вызовов, память, загрузка процессора,
+      частота ввода-вывода. Результат — профиль выполнения для оценки производительности и поиска узких мест.</p>
+    </div>
+    <div class="tech">
+      <div class="h"><b>Перехват потоков выполнения</b></div>
+      <p>Наблюдение, фильтрация, модификация или подмена поведения: выбор точки перехвата, замещение кода или
+      таблицы адресов, выполнение перехватчика. Вариант — имитация отказов библиотечных функций («fault injection»).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 9. ВНЕДРЕНИЕ ============ -->
+<section id="deploy">
+  <h2><span class="num">10</span> Внедрение технологии: четыре этапа (раздел 6)</h2>
+  <p class="sub">Последовательность одинакова для всех технологий; особенности конкретной технологии
+  добавляются требованиями раздела 8.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">1. Начальный этап (6.2)</h4>
+      <ul>
+        <li>определить ПО и технологию динамического анализа, включая уровень тестирования;</li>
+        <li>собрать и проанализировать сведения о ПО: назначение, архитектура, системные требования, среды
+        функционирования, функциональные и нефункциональные требования, сценарии применения, протоколы и
+        интерфейсы, языки программирования, поверхность атаки;</li>
+        <li>сформировать спецификацию требований с выделением высокого и низкого уровней, с уникальными
+        идентификаторами и прослеживаемостью.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">2. Подготовительный этап (6.3)</h4>
+      <ul>
+        <li>определить объект анализа и уровень тестирования;</li>
+        <li>собрать дополнительные сведения, предусмотренные требованиями технологии;</li>
+        <li>подготовить тестовую сборку с датчиками срабатывания ошибок, определить флаги компиляции и
+        возможность применения санитайзеров;</li>
+        <li>определить критерии полноты и способы сбора тестового покрытия;</li>
+        <li>сформировать требования к тестовой среде, изолированной от среды разработки и эксплуатации;</li>
+        <li>выбрать инструменты, разработать тест-кейсы, сценарии и тестовые данные, обеспечить их хранение
+        и версионирование;</li>
+        <li>подготовить тестовую среду и среду сборки, сохранить конфигурации инструментов.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">3. Первичный динамический анализ (6.4)</h4>
+      <ul>
+        <li>определить критерии и стартовые события начала, критерии завершения, требования к результатам
+        и их хранению;</li>
+        <li>выполнить тестовую сборку, если это предусмотрено технологией;</li>
+        <li>выполнить анализ в подготовленной среде, обеспечить сбор покрытия;</li>
+        <li>сохранить результаты и оценить качество анализа по трём критериям: корректная работа инструментов,
+        достижение требуемого покрытия или критериев завершения, регистрация хода анализа и отчётность.</li>
+      </ul>
+      <p class="note">Если хотя бы один критерий не достигнут, разработчик должен принимать меры — уточнять
+      выбор инструментов, конфигурацию среды, состав тест-кейсов и данных — и повторять анализ.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">4. Организация регулярного анализа (6.5)</h4>
+      <ul>
+        <li>критерии приоритета при выполнении анализа и устранении недостатков;</li>
+        <li>порядок классификации недостатков и определения критичности ошибок;</li>
+        <li>периодичность анализа, критерии повторного и регрессионного тестирования, события запуска;</li>
+        <li>требования к отчётности;</li>
+        <li>метрики и целевые показатели качества процесса (рекомендуется);</li>
+        <li>перечень автоматизируемых функций и план работ по автоматизации.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>События, при которых анализ выполняется обязательно (6.5.1)</h3>
+  <ul>
+    <li>изменение архитектуры ПО в целом или отдельного объекта анализа;</li>
+    <li>изменение состава функциональных и нефункциональных требований и возможностей ПО либо способа их реализации;</li>
+    <li>изменение среды и условий функционирования ПО или объекта анализа;</li>
+    <li>обновление или изменение конфигураций используемых инструментов динамического анализа.</li>
+  </ul>
+
+  <h3>Обязательный состав отчёта (6.5.1)</h3>
+  <p>Наименование и версия ПО; наименование и версия объекта анализа; сведения об инструментах; описание
+  среды функционирования; перечень и последовательность выполненных тест-кейсов; описание ограничений и
+  непроверявшихся аспектов; полученные результаты, перечень обнаруженных ошибок и результаты их анализа;
+  выводы. Для фаззинга перечень дополняется сведениями о данных, подача которых привела к ошибкам в поведении
+  или аварийному завершению.</p>
+
+  <figure>
+    <img src="assets/prilozhenie-b.png" alt="Диаграмма процесса внедрения технологий динамического анализа (Приложение Б)">
+    <figcaption><b>Приложение Б.</b> Диаграмма процесса внедрения технологий динамического анализа: начальный
+    и подготовительный этапы, первичный анализ, организация регулярного анализа.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 10. РЕГУЛЯРНЫЙ АНАЛИЗ ============ -->
+<section id="regular">
+  <h2><span class="num">11</span> Регулярное выполнение (раздел 7) и организация (раздел 5)</h2>
+  <p class="sub">Что должно быть определено на уровне организации и как выглядит повторяющийся цикл анализа.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Общие требования на уровне организации (5.2)</h4>
+      <p>Разработчик должен определить и задокументировать требования к тестированию, не специфичные для
+      конкретного ПО. Обязательный минимум:</p>
+      <ul>
+        <li>цели тестирования;</li>
+        <li>область применения процессов динамического анализа;</li>
+        <li>перечень применяемых процессов и технологий;</li>
+        <li>критерии выбора технологий, уровня и способов тестирования;</li>
+        <li>критерии выбора объектов анализа для каждой технологии с учётом уровня.</li>
+      </ul>
+      <p>По каждой технологии с учётом уровня дополнительно указываются: этапы жизненного цикла, на которых
+      выполняется тестирование; требования к автоматизации; требуемая степень участия или независимости
+      участников — кто именно выполняет анализ (разработчики кода, тестировщики, специалисты по ИБ)
+      и кто верифицирует результаты.</p>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">План тестирования (7.3)</h4>
+      <p>Перед регулярным анализом рекомендуется формировать план, содержащий:</p>
+      <ul>
+        <li>наименование ПО и цель тестирования;</li>
+        <li>технологию, уровень, методы и способы тестирования;</li>
+        <li>документацию, которой нужно руководствоваться;</li>
+        <li>критерии начала, критерии полноты покрытия и завершения;</li>
+        <li>объём тестирования, описание тестовой среды, ожидаемые результаты;</li>
+        <li>сведения о тест-кейсах и сценариях; технические и временные ограничения; исполнителей и сроки.</li>
+      </ul>
+      <p class="note">Отдельный план рекомендуется формировать для каждой технологии. Если тестирование
+      автоматическое и запускается при изменении кода, план может быть нецелесообразен.</p>
+    </div>
+  </div>
+
+  <h3>Анализ изменений перед прогоном (7.4)</h3>
+  <ol>
+    <li>уточнить сведения о ПО, включая спецификацию требований;</li>
+    <li>уточнить состав объектов анализа, подлежащих тестированию;</li>
+    <li>собрать или уточнить сведения об объектах анализа;</li>
+    <li>проверить достаточность и актуальность сценариев и тест-кейсов, при необходимости доработать их;</li>
+    <li>выполнить дополнительную настройку или создать новую тестовую среду.</li>
+  </ol>
+
+  <h3>Обработка результатов (7.6)</h3>
+  <p>Оценивается полнота покрытия или достижение условий успешного завершения; затем выполняется обработка
+  срабатываний инструментов с разделением на два класса: ошибки, связанные с некорректными тест-кейсами,
+  данными, конфигурацией запуска или настройкой среды, устраняются непосредственно после выявления;
+  ошибки в поведении анализируются — определяются причина, критичность и действия по принятому в организации
+  порядку управления недостатками.</p>
+
+  <figure>
+    <img src="assets/prilozhenie-v.png" alt="Диаграмма процесса выполнения регулярного динамического анализа (Приложение В)">
+    <figcaption><b>Приложение В.</b> Диаграмма процесса выполнения регулярного динамического анализа.</figcaption>
+  </figure>
+</section>
+
+<!-- ============ 11. МАТРИЦА ============ -->
+<section id="matrix">
+  <h2><span class="num">12</span> Матрица применимости (Приложение А)</h2>
+  <p class="sub">Какие технологии применяются в каких процессах ГОСТ Р 56939-2024 и на каких уровнях
+  тестирования.</p>
+
+  <figure>
+    <img src="assets/prilozhenie-a.png" alt="Матрица применения технологий динамического анализа по процессам ГОСТ Р 56939-2024 и уровням тестирования">
+    <figcaption><b>Приложение А (рекомендуемое).</b> Применение технологий динамического анализа в процессах
+    разработки безопасного ПО по ГОСТ Р 56939-2024 с учётом уровней тестирования.</figcaption>
+  </figure>
+
+  <div class="callout ok">
+    <span class="lbl">Как читать матрицу</span>
+    Строки — процессы ГОСТ Р 56939-2024: динамический анализ кода программы (п. 5.11), функциональное
+    тестирование (п. 5.18), нефункциональное тестирование (п. 5.19). Столбцы — восемь технологий.
+    В пересечениях указаны уровни тестирования, на которых технология применяется в рамках процесса.
+    Например, фаззинг-тестирование применяется на модульном и системном уровнях в рамках процесса
+    динамического анализа; динамическая верификация — на системном уровне в рамках функционального тестирования.
+  </div>
+</section>
+
+<!-- ============ 12. ИНСТРУМЕНТЫ ============ -->
+<section id="tools">
+  <h2><span class="num">13</span> Требования к инструментам (раздел 9)</h2>
+  <p class="sub">Стандарт не называет конкретные продукты, а задаёт функциональные требования — их удобно
+  использовать как чек-лист при выборе инструмента.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Общие требования (9.1)</h4>
+      <ul>
+        <li>возможность адаптации и доработки под среду разработки: техническая поддержка и обновления,
+        свободное распространение в исходных кодах, собственная разработка;</li>
+        <li>детектирование ошибок: срабатывания датчиков, непредусмотренное аварийное завершение, ошибки
+        тестовых оракулов, непроверенное использование пользовательского и сетевого ввода, ошибки работы
+        с памятью, использование неинициализированной памяти, целочисленные переполнения;</li>
+        <li>возможность анализа в среде функционирования ПО;</li>
+        <li>хранение результатов запуска;</li>
+        <li>присвоение каждому предупреждению идентификатора для однозначного поиска в результатах;</li>
+        <li>интеграция с системами управления требованиями, отслеживания ошибок, непрерывной интеграции;</li>
+        <li>тестирование объектов, функционирующих в привилегированном режиме (например, ядра ОС).</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Требования к фаззерам (9.2)</h4>
+      <ul>
+        <li>реализация методов: мутационный фаззинг с мутациями на генетических алгоритмах, генерационный
+        фаззинг, фаззинг с применением динамического символьного выполнения;</li>
+        <li>обнаружение нештатного функционирования (аварийных завершений, «зависаний») и, при критической
+        ошибке, определение её конкретного типа;</li>
+        <li>поддержка режима параллельного исследования различных входных данных.</li>
+      </ul>
+      <p class="cl">Допускается несоответствие требованию о работе в среде функционирования ПО: фаззинг
+      может выполняться в другой среде.</p>
+
+      <h4>Требования к средствам работы с тест-кейсами (9.3)</h4>
+      <ul>
+        <li>сбор результатов тестирования;</li>
+        <li>детерминированное выполнение тестов и воспроизведение наблюдаемых эффектов;</li>
+        <li>мониторинг и отладка тестов совместно с объектом анализа при ручном создании тестов.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout rec">
+    <span class="lbl">Дополнительные ориентиры выбора (6.3.7)</span>
+    При выборе фаззера разработчик должен учитывать результаты сравнительной оценки фаззеров по динамике роста
+    тестового покрытия — из открытых источников, от производителя или полученные самостоятельно; в качестве
+    примера публичного сервиса указан FuzzBench. При выборе проприетарных инструментов рекомендуется отдавать
+    предпочтение средствам российских разработчиков. Для сбора покрытия по исходному коду в примечании названы
+    <code>gcov</code>, <code>lcov</code>, <code>llvm-cov</code>, по бинарному коду — <code>drcov</code>.
+  </div>
+</section>
+
+<!-- ============ 13. СПЕЦИАЛИСТЫ ============ -->
+<section id="people">
+  <h2><span class="num">14</span> Требования к специалистам (раздел 10)</h2>
+  <p class="sub">Четыре профиля: базовая подготовка плюс специализированные умения.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">База для всех участников (10.1)</h4>
+      <ul>
+        <li>языки программирования анализируемого ПО;</li>
+        <li>основы программной инженерии и жизненного цикла ПО;</li>
+        <li>базовые принципы устройства операционных систем и положения POSIX;</li>
+        <li>основные сетевые протоколы и сервисы;</li>
+        <li>назначение и архитектура ПО, инструменты разработки и отладки;</li>
+        <li>умение работать с документацией на ПО и определять функциональные возможности.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Дополнительно по направлениям</h4>
+      <ul>
+        <li><b>Функциональное тестирование (10.2):</b> анализ данных от инструментов и поиск ошибок поведения;
+        разработка ручных тестов и подготовка данных для автогенерации; работа со средствами сбора покрытия.</li>
+        <li><b>Фаззинг-тестирование (10.3):</b> компетенции разработчика ПО плюс ИБ; алгоритмы и структуры
+        данных, теория сложности; основы безопасности ПО; определение фаззинг-целей; оценка влияния ошибок
+        на безопасность и выделение критичных; разработка обёрток; формирование наборов и коллекций данных,
+        создание синтетических модулей.</li>
+        <li><b>Автоматизация (10.4):</b> компетенции разработчика плюс системное администрирование; оценка
+        временных и вычислительных ресурсов; создание инфраструктуры анализа.</li>
+      </ul>
+      <p class="note">Рекомендуется привлекать специалистов с опытом динамического анализа или прошедших
+      программы повышения квалификации по этим технологиям (10.5).</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 15. ПРАКТИКУМ ============ -->
+<section id="practice">
+  <h2><span class="num">15</span> Как это связано с практикумом по фаззингу</h2>
+<div id="student-materials"><p>Практика для студентов: три методички и общий архив исходных примеров.</p><div class="resource-grid"><article class="resource-card"><h3>AFL++: от первого запуска до исправления</h3><p>Подготовка WSL2 и Ubuntu, сборка C++ цели, запуск фаззинга, диагностика ASan и повторная проверка.</p><div class="resource-links"><a href="practice/aflpp_fuzzing_windows10_student.html">Открыть методичку</a><a href="downloads/aflpp_fuzzing_windows10_student.pdf" download>PDF</a><a href="downloads/aflpp_fuzzing_windows10_student.md" download>Markdown</a></div></article><article class="resource-card"><h3>libFuzzer: исследование C++ приложения</h3><p>Harness, корпус, инструментированная сборка, воспроизведение и минимизация crash, исправление и регрессия.</p><div class="resource-links"><a href="practice/libfuzzer_main_cpp_student.html">Открыть методичку</a><a href="downloads/libfuzzer_main_cpp_student.pdf" download>PDF</a><a href="downloads/libfuzzer_main_cpp_student.md" download>Markdown</a></div></article><article class="resource-card"><h3>Разбор ошибки и её исправления</h3><p>Почему проверки размера входа недостаточно, как возникает переполнение и что меняет проверка границ.</p><div class="resource-links"><a href="practice/fuzzing_bug_fix_demo.html">Открыть методичку</a><a href="downloads/fuzzing_bug_fix_demo.pdf" download>PDF</a><a href="downloads/fuzzing_bug_fix_demo.md" download>Markdown</a></div></article></div><div class="download-strip"><h3 style="margin-top:0">Общий архив для практикумов</h3><p>Исходники C++, seed-данные, образцы результатов и все три методички. Распакуйте архив в своей учебной среде; программы собираются из исходников по шагам методичек.</p><div class="resource-links"><a href="downloads/my-first-python-project-v02.zip" download>Скачать примеры и методички · ZIP</a><a href="downloads/SHA256SUMS.txt">Контрольные суммы SHA-256</a></div></div><p><a href="practice.html">Маршрут практикума, требования к стенду и критерии отчёта →</a></p></div>
+  <p class="sub">Каждый шаг лабораторной работы соответствует конкретному пункту проекта стандарта —
+  это удобно использовать при защите отчёта.</p>
+
+  <figure class="fig-interactive" data-frame="diagrams/defect-lifecycle.html">
+    <img src="assets/defect-lifecycle.svg" alt="Жизненный цикл дефекта, найденного фаззером: обнаружен, воспроизведён, минимизирован, разобран, исправлен, подтверждён, регрессия">
+    <figcaption><b>Жизненный цикл дефекта, найденного фаззером.</b> Слева направо — путь от сохранённого фаззером
+    входа до исправления; ниже — подтверждение повторным прогоном входа и регрессионный прогон корпуса.
+    Отдельная ветка: находка, которая не воспроизводится, возвращает к проверке стенда и обёртки,
+    а не превращается в дефект.</figcaption>
+
+  <div class="fig-tools">
+    <button type="button" class="fig-open" aria-expanded="false">Открыть интерактивную схему</button>
+    <a class="btn-mini" href="diagrams/defect-lifecycle.html" download>Скачать HTML</a>
+  </div>
+  <div class="fig-frame" hidden></div>
+</figure>
+
+  <span id="board"></span>
+  <div class="board" id="defect-board">
+    <div class="board-head">
+      <h3>Интерактив: цикл дефекта из фаззинга</h3>
+      <div class="board-controls">
+        <button type="button" id="board-prev">Назад</button>
+        <button type="button" id="board-next">Далее</button>
+        <button type="button" id="board-reset">Сначала</button>
+      </div>
+    </div>
+    <div class="board-progress"><div class="board-bar" id="board-bar"></div></div>
+    <div class="board-steps" id="board-steps">
+      <article class="step" data-step="0"><b class="step-num">1 / 7</b><h4>Обнаружен</h4>
+        <p>Фаззер сохранил вход, вызвавший сбой. Результат должен содержать вход, дампы и диагностику датчиков.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.22 — состав результатов фаззинг-тестирования.</p>
+        <p class="board-practice"><b>На практике:</b> <code>out/default/crashes/id:*</code>, <code>findings/crash-*</code></p></article>
+      <article class="step" data-step="1"><b class="step-num">2 / 7</b><h4>Воспроизведён</h4>
+        <p>Повторный запуск цели с тем же входом даёт ту же ошибку. Если нет — это не дефект, а вопрос к стенду и обёртке.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.23 — анализ результатов; аварийное завершение может указывать на некорректную обёртку или синтетическую цель.</p>
+        <p class="board-practice"><b>На практике:</b> <code>./build/fuzz_target out/default/crashes/id:*</code> (AFL++) или <code>./build/main_libfuzzer findings/crash-*</code> (libFuzzer)</p>
+        <div class="board-branch" id="board-branch">
+          <button type="button" id="board-branch-btn">Не воспроизводится — что тогда?</button>
+          <p id="board-branch-text" hidden>Вернитесь к стенду: параметры сборки, обёртка, версия цели. Пункт 8.3.23 прямо предупреждает, что падение может быть не в программе, а в синтетической цели или обёртке.</p>
+        </div></article>
+      <article class="step" data-step="2"><b class="step-num">3 / 7</b><h4>Минимизирован</h4>
+        <p>Вход сокращён до минимального воспроизводимого — так дефект проще разбирать и хранить в корпусе.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.11 — минимизация наборов входных данных средствами фаззера.</p>
+        <p class="board-practice"><b>На практике:</b> <code>./build/main_libfuzzer -minimize_crash=1 -runs=10000 findings/crash-*</code></p></article>
+      <article class="step" data-step="3"><b class="step-num">4 / 7</b><h4>Разобран</h4>
+        <p>Определены тип и критичность ошибки; проверяются непокрытые участки кода.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.23 — тип и критичность, покрытие по каждому модулю, непокрытые участки.</p>
+        <p class="board-practice"><b>На практике:</b> ASan: <code>stack-buffer-overflow</code>, <code>src/main.cpp:29</code></p></article>
+      <article class="step" data-step="4"><b class="step-num">5 / 7</b><h4>Исправлен</h4>
+        <p>Правка ограничивает копирование размером буфера. Действия — по порядку управления недостатками организации.</p>
+        <p class="board-std"><b>Стандарт:</b> 7.6 проекта (обработка результатов) и регламент управления недостатками по ГОСТ Р 56939-2024.</p>
+        <p class="board-practice"><b>На практике:</b> <code>std::min(declared_size, sizeof(name))</code></p></article>
+      <article class="step" data-step="5"><b class="step-num">6 / 7</b><h4>Подтверждён</h4>
+        <p>Старый вход больше не падает — исправление работает.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.17 — разработанные тест-кейсы и наборы данных используются при повторном тестировании.</p>
+        <p class="board-practice"><b>На практике:</b> <code>./build/fuzz_target_fixed out/default/crashes/id:*</code> → выход 0</p></article>
+      <article class="step" data-step="6"><b class="step-num">7 / 7</b><h4>Регрессия</h4>
+        <p>Полный прогон корпуса и новых наборов данных: новых падений нет — цикл закрыт.</p>
+        <p class="board-std"><b>Стандарт:</b> 8.3.18 — регрессионное фаззинг-тестирование с новыми или адаптированными наборами данных.</p>
+        <p class="board-practice"><b>На практике:</b> повторный <code>afl-fuzz -i in -o out2</code> — без находок</p></article>
+    </div>
+    <p class="board-announce" id="board-announce" role="status" aria-live="polite"></p>
+  </div>
+
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:300px">Шаг практикума</th><th>Требование проекта</th></tr></thead>
+    <tbody>
+      <tr><td>Выбор цели фаззинга: функция разбора входного формата</td><td>Фаззинг-цели — участки кода и интерфейсы, обрабатывающие входные данные (парсеры, анализаторы) — 8.3.7; объекты анализа на модульном уровне — 8.3.6.</td></tr>
+      <tr><td>Сборка с санитайзером (<code>AFL_USE_ASAN=1</code>, <code>-fsanitize=address,undefined</code>)</td><td>Тестовая сборка с датчиками срабатывания ошибок, определение флагов компиляции и возможностей санитайзеров — 6.3.3; сборка синтетического модуля с санитайзерами — 8.3.13.</td></tr>
+      <tr><td>Seed-файлы <code>FUZ1\x01A</code>, <code>hello</code>; каталог <code>in/</code> или <code>corpus/</code></td><td>Формирование наборов входных данных: валидность, покрытие ветвей, отсутствие дубликатов, минимальность, представительность — 8.3.11.</td></tr>
+      <tr><td>Harness <code>LLVMFuzzerTestOneInput</code> и запуск через <code>@@</code></td><td>Функции-обёртки: приём данных от фаззера, преобразование в аргументы, минимум логики, повторные вызовы в одном процессе — 8.3.12.</td></tr>
+      <tr><td>Запуск <code>afl-fuzz</code> / <code>libFuzzer</code>, наблюдение за покрытием и числом путей</td><td>Сбор тестового покрытия программного кода и определение критериев завершения фаззинг-тестирования — 8.3.20.</td></tr>
+      <tr><td>Каталоги <code>out/default/crashes/</code> и <code>findings/</code>, дампы, <code>fuzzer_stats</code></td><td>Состав результатов: длительность, число аварийных завершений, найденные пути, диагностика, наборы данных, приведшие к сбою, достигнутое покрытие — 8.3.22.</td></tr>
+      <tr><td>Разбор ASan-отчёта, поиск первопричины в коде</td><td>Анализ результатов: покрытие по каждому модулю, актуальность ошибок, их тип и критичность, проверка непокрытых участков — 8.3.23.</td></tr>
+      <tr><td>Исправление проверки границ и повторный прогон</td><td>Повторное и регрессионное фаззинг-тестирование с использованием разработанных тест-кейсов и наборов данных — 8.3.17–8.3.18.</td></tr>
+      <tr><td>Минимизация входного файла</td><td>Минимизация начального корпуса средствами фаззера — 8.3.11.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Что стоит добавить в отчёт по стандарту</span>
+    Если оформлять отчёт как артефакт процесса, понадобятся: сведения об объекте анализа и уровне тестирования,
+    перечень инструментов с конфигурациями запуска, описание тестовой среды, состав и версионирование
+    тест-кейсов и наборов данных, зафиксированные параметры сборки, достигнутое покрытие, перечень ошибок
+    с оценкой критичности и выводы (6.3.15, 6.5.1, 8.3.16).
+  </div>
+</section>
+
+<!-- ============ 16. ЗАМЕЧАНИЯ ============ -->
+<section id="remarks">
+  <h2><span class="num">16</span> Замечания к первой редакции</h2>
+  <p class="sub">Технические и редакционные наблюдения по тексту проекта — могут быть направлены в рамках
+  публичного обсуждения. Все ссылки на пункты приведены по файлу проекта.</p>
+
+  <div class="callout must">
+    <span class="lbl">Нумерация</span>
+    <b>Раздел 8.3:</b> нарушена последовательность пунктов — после 8.3.13 следует 8.3.16 (отсутствуют 8.3.14,
+    8.3.15), после 8.3.20 следует 8.3.22 (отсутствует 8.3.21). Пропуски влияют на перекрёстные ссылки
+    и на восприятие документа при оценке соответствия.
+  </div>
+
+  <div class="callout must">
+    <span class="lbl">Ошибка в тексте требования</span>
+    <b>Пункт 8.6.2</b> (раздел «Тестирование на проникновение») начинается словами «Тестирование на отказ
+    реализуется на системном уровне…» — очевидная копия пункта 8.5.2. Требование должно относиться
+    к тестированию на проникновение.
+  </div>
+
+  <div class="callout rec">
+    <span class="lbl">Ссылки на стандарты</span>
+    <b>Пункт 3.1.29, примечание 1</b> ссылается на «ГОСТ Р 56920-2025», тогда как в разделе 2 и в остальном
+    тексте используется ГОСТ Р 56920-2024.
+    <br><b>Пункт 8.7.1</b> ссылается на <a href="https://protect.gost.ru/gost/details/9d86f094-8b1f-4527-b944-a60572d52c41" target="_blank" rel="noopener">ГОСТ Р 59453.2-2021</a>, который отсутствует в перечне нормативных ссылок
+    (там указаны 59453.1-2021, 59453.3-2025, 59453.4-2025).
+  </div>
+
+  <div class="callout rec">
+    <span class="lbl">Перекрёстная ссылка требует проверки</span>
+    <b>Пункт 8.3.19</b> предписывает настраивать тестовую среду, среду сборки и среду выполнения «с учётом
+    требований, указанных в 8.3.6», однако пункт 8.3.6 определяет объекты анализа, а требования к тестовой
+    среде для фаззинга изложены в 8.3.10. Похоже на устаревшую ссылку после правки нумерации.
+  </div>
+
+  <div class="callout rec">
+    <span class="lbl">Редакционные опечатки</span>
+    <b>8.8.4</b> — «в перовое множество»; <b>8.3.20, примечание</b> — «в течении которых»; <b>9.1.2</b> —
+    «ошибки, выявляемыми тестовыми оракулами»; <b>8.3.13</b> — «синтетические бинарных модулей».
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Расхождение с пояснительной запиской</span>
+    В ПЗ при перечислении разделов проекта пропущен раздел «Общие требования к организации динамического
+    анализа» (в самом стандарте это раздел 5). Также в ПЗ разделы названы без номеров — стоит синхронизировать
+    перечень с окончательной структурой документа.
+  </div>
+
+  <div class="callout may">
+    <span class="lbl">Наблюдение по существу</span>
+    Критерии завершения фаззинг-тестирования приведены в примечании к пункту 8.3.20, то есть как пример,
+    а не как требование. Формально разработчик обязан лишь «определить критерии завершения» — без минимальных
+    ориентиров. Если цель — сопоставимость результатов между организациями, критерии (например, двукратный рост
+    покрытия или N часов без новых путей) логичнее вынести в основное требование либо в рекомендуемое приложение.
+  </div>
+
+  <p class="note">Замечания носят технический характер и не затрагивают конструкцию документа:
+  структура «организация → внедрение → регулярное выполнение → технологии → инструменты → специалисты»
+  выглядит целостной и хорошо сочетается с процессами ГОСТ Р 56939-2024.</p>
+</section>
+
+<!-- ============ 17. ИСТОЧНИКИ ============ -->
+<section id="sources">
+  <h2><span class="num">17</span> Нормативная база и официальные источники</h2><div class="download-strip" id="standard-download"><h3 style="margin-top:0">Проект национального стандарта — полный текст</h3><p>ГОСТ Р «Защита информации. Разработка безопасного программного обеспечения. Технологии динамического анализа. Общие требования». Первая редакция, использованная в этом разборе. Не подлежит применению до утверждения.</p><div class="resource-links"><a href="downloads/dynamic-analysis-national-standard-draft.pdf" download>Скачать проект стандарта · PDF</a><a href="downloads/dynamic-analysis-explanatory-note.pdf" download>Пояснительная записка · PDF</a></div><p class="note">Нормативный первоисточник и пояснительная записка; авторский конспект лекции скачивается отдельно.</p></div><p>Сопутствующие документы: <a href="downloads/gost-r-56939-2024.pdf" download>ГОСТ Р 56939-2024 · PDF</a> · <a href="downloads/gost-r-71207-2024.pdf" download>ГОСТ Р 71207-2024 · PDF</a>.</p>
+  <p class="sub">Ссылки ведут только на официальные ресурсы: портал Росстандарта, сайты разработчиков проекта и регулятора.</p>
+
+  <div class="grid g2">
+    <div class="card">
+      <h4 style="margin-top:0">Разработчики и регулятор</h4>
+      <ul>
+        <li><a href="https://fstec.ru/" target="_blank" rel="noopener">ФСТЭК России</a> — разработчик проекта, регулятор в области защиты информации.</li>
+        <li><a href="https://fstec.ru/tk-362" target="_blank" rel="noopener">ТК 362 «Защита информации»</a> — технический комитет, внёсший проект; план работы комитета.</li>
+        <li><a href="https://www.ispras.ru/" target="_blank" rel="noopener">ИСП РАН им. В.П. Иванникова РАН</a> — соразработчик проекта, исследования по динамическому анализу и фаззингу.</li>
+        <li><a href="https://secure-software.ru/" target="_blank" rel="noopener">РБПО.рф</a> — совместный проект ФСТЭК России и ИСП РАН по разработке безопасного ПО.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h4 style="margin-top:0">Документы и материалы по теме</h4>
+      <ul>
+        <li><a href="https://secure-software.ru/npa-and-gost/" target="_blank" rel="noopener">НПА и ГОСТы</a> — нормативные документы, стандарты и методики по безопасной разработке ПО.</li>
+        <li><a href="https://secure-software.ru/science/dinamicheskiy-analiz/" target="_blank" rel="noopener">Динамический анализ</a> — публикации по фаззингу, гибридному фаззингу, динамической символьной интерпретации, анализу бинарного кода.</li>
+        <li><a href="https://protect.gost.ru/gost/" target="_blank" rel="noopener">Опубликование ГОСТ на портале Росстандарта</a> — федеральный информационный фонд стандартов.</li>
+        <li><a href="https://www.rst.gov.ru/" target="_blank" rel="noopener">Росстандарт</a> — национальный орган по стандартизации.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h3>Нормативные ссылки проекта</h3>
+  <p class="note">Все документы — из раздела 2 первой редакции проекта. Где у документа есть карточка в федеральном
+  информационном фонде стандартов, дана прямая ссылка; в остальных случаях — поиск по обозначению в том же фонде.</p>
+
+  <div class="tbl-wrap">
+  <table>
+    <thead><tr><th style="width:230px">Документ</th><th>Наименование</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/f3818925-a96f-4f55-96e9-46b44720ee64" target="_blank" rel="noopener">ГОСТ Р 56939-2024</a></td>
+        <td>Защита информации. Разработка безопасного программного обеспечения. Общие требования — базовый стандарт комплекса.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/69c88ad4-65e4-41b5-a9dd-f43131dfb249" target="_blank" rel="noopener">ГОСТ Р 71206-2024</a></td>
+        <td>Защита информации. Разработка безопасного программного обеспечения. Безопасный компилятор языков С/С++. Общие требования — источник терминов «датчик срабатывания ошибок», «санитайзер».</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=56920" target="_blank" rel="noopener">ГОСТ Р 56920-2024</a></td>
+        <td>Системная и программная инженерия. Тестирование программного обеспечения. Общие положения.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=56921" target="_blank" rel="noopener">ГОСТ Р 56921-2016</a></td>
+        <td>Системная и программная инженерия. Тестирование программного обеспечения. Часть 2. Процессы тестирования (ISO/IEC/IEEE 29119-2).</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=56922" target="_blank" rel="noopener">ГОСТ Р 56922-2016</a></td>
+        <td>Системная и программная инженерия. Тестирование программного обеспечения. Часть 3. Документация тестирования (ISO/IEC/IEEE 29119-3).</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=29119" target="_blank" rel="noopener">ГОСТ Р ИСО/МЭК 29119-4-2021</a></td>
+        <td>Информационные технологии. Методы и средства обеспечения качества. Процессы тестирования. Часть 4. Проектирование тестов.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=12207" target="_blank" rel="noopener">ГОСТ Р ИСО/МЭК 12207-2010</a></td>
+        <td>Информационная технология. Системная и программная инженерия. Процессы жизненного цикла программных средств.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=27000" target="_blank" rel="noopener">ГОСТ Р ИСО/МЭК 27000-2021</a></td>
+        <td>Информационные технологии. Методы и средства обеспечения безопасности. Системы менеджмента информационной безопасности. Общий обзор и терминология.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=58143" target="_blank" rel="noopener">ГОСТ Р 58143-2018</a></td>
+        <td>Информационная технология. Детализация анализа уязвимостей программного обеспечения. Часть 2. Тестирование проникновения — на него опирается раздел 8.6.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/3fa98ad7-e0ac-4f80-8fe2-5eebace2b3f7" target="_blank" rel="noopener">ГОСТ Р 59453.1-2021</a></td>
+        <td>Защита информации. Формальная модель управления доступом. Часть 1. Общие положения.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/8ffe1cc6-fb09-4bc4-b58c-0b2bde326126" target="_blank" rel="noopener">ГОСТ Р 59453.3-2025</a></td>
+        <td>Защита информации. Формальная модель управления доступом. Часть 3. Рекомендации по разработке.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/94033865-427e-41ca-bcbc-b6174d4a659e" target="_blank" rel="noopener">ГОСТ Р 59453.4-2025</a></td>
+        <td>Защита информации. Формальная модель управления доступом. Часть 4. Рекомендации по верификации средства защиты информации, реализующего политики управления доступом.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost/details/5cee0533-a1f4-41fe-bcb3-bc79e7e74490" target="_blank" rel="noopener">ГОСТ 19.101-2024</a></td>
+        <td>Единая система программной документации. Виды программ и программных документов.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=19.102" target="_blank" rel="noopener">ГОСТ 19.102-77</a></td>
+        <td>Единая система программной документации. Стадии разработки.</td>
+      </tr>
+      <tr>
+        <td><a href="https://protect.gost.ru/gost?search=19781" target="_blank" rel="noopener">ГОСТ 19781-90</a></td>
+        <td>Обеспечение систем обработки информации программное. Термины и определения — источник определений «программа», «программное обеспечение», «программный модуль».</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p class="note">Отдельно в тексте проекта упоминается <a href="https://protect.gost.ru/gost/details/9dd6f064-6014-4416-a3ca-ef72ce0a6c3a" target="_blank" rel="noopener">ГОСТ Р 71207-2024</a>
+  «Статический анализ программного обеспечения. Общие требования» — из него адаптированы отдельные термины
+  («ошибка в программе», «разработчик программного обеспечения»), хотя в перечень нормативных ссылок он не включён.</p>
+</section>
+
+<!-- ============ 18. FAQ ============ -->
+<section id="faq">
+  <h2><span class="num">18</span> Частые вопросы</h2>
+
+  <details>
+    <summary>Стандарт обязателен к применению?</summary>
+    <p>Это проект: в первой редакции указано, что он не подлежит применению до утверждения. После утверждения
+    требования со словом «должен» становятся обязательными для организаций, применяющих стандарт добровольно
+    или в рамках оценки соответствия процессов разработки безопасного ПО.</p>
+  </details>
+
+  <details>
+    <summary>Нужно ли внедрять все восемь технологий?</summary>
+    <p>Нет. Стандарт прямо указывает, что не устанавливает требования о применении всей совокупности технологий.
+    Разработчик выбирает технологии, уровни и методы по своим критериям. Базовыми названы функциональное
+    тестирование на модульном и системном уровнях и фаззинг-тестирование.</p>
+  </details>
+
+  <details>
+    <summary>Чем этот стандарт отличается от ГОСТ Р 71207-2024?</summary>
+    <p>ГОСТ Р 71207-2024 посвящён статическому анализу: код исследуется без исполнения. Новый проект описывает
+    технологии, которые исследуют поведение и код программы в режиме исполнения. Формально оба дополняют
+    ГОСТ Р 56939-2024 в разных частях.</p>
+  </details>
+
+  <details>
+    <summary>Фаззинг можно проводить на тестовой сборке, а не на реальном продукте?</summary>
+    <p>Да, и стандарт это прямо предусматривает: допускается тестовая сборка с датчиками срабатывания ошибок
+    (6.3.3, 8.3.19), а также синтетические бинарные модули, собранные из выделенных участков кода с тестовыми
+    дублёрами (8.3.13). При этом наборы данных, приведшие к сбоям, должны сохраняться как результаты (8.3.22).</p>
+  </details>
+
+  <details>
+    <summary>Что считается завершением фаззинг-тестирования?</summary>
+    <p>Разработчик обязан определить критерии завершения сам. В примечании к 8.3.20 приведены ориентиры:
+    двукратное превышение числа найденных путей или процента покрытия относительно стартовых образцов,
+    достижение установленного процента покрытия по строкам или базовым блокам, либо заданное число часов
+    без новых путей и прироста покрытия.</p>
+  </details>
+
+  <details>
+    <summary>Относятся ли инструменты вроде AFL++ и libFuzzer к «инструментам динамического анализа»?</summary>
+    <p>Да. Раздел 9 задаёт требования к инструментам по назначению, а не по конкретным продуктам: общие
+    функциональные требования, отдельно — к фаззерам (методы, обнаружение нештатного функционирования,
+    параллельный режим) и к средствам разработки, генерации и исполнения тест-кейсов.</p>
+  </details>
+
+  <details>
+    <summary>Почему в стандарте много отсылок к тестовой документации?</summary>
+    <p>Потому что динамический анализ встроен в процессы тестирования ПО: раздел 7 опирается на план
+    тестирования, а требования к сценариям и тест-кейсам согласованы с ГОСТ Р 56939-2024 (п. 5.11.3.4)
+    и серией ГОСТ Р 56920–56922 / 29119.</p>
+  </details>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <b>Технологии динамического анализа ПО</b> — разбор проекта национального стандарта.<br>
+      Автор учебного разбора: <b>Пиков Виталий Александрович</b>.<br><a href="https://pikov.expert/">pikov.expert</a> · <a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a> · <a href="https://t.me/UnderLineSecurity">Telegram</a>
+    </div>
+    <div>
+      Разработчики проекта: ФСТЭК России, ИСП РАН · Внесён ТК 362 «Защита информации»<br>
+      <span class="note">Страница не является официальной публикацией стандарта.</span>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+(function(){
+  /* ---------- карта ---------- */
+  var TECH = [{"id": "t81", "num": "8.1", "title": "Функциональное тестирование", "procs": ["5.11", "5.18"], "levels": ["М", "И", "С"], "desc": "Соответствие функциональным требованиям и требованиям безопасности. Юнит-тесты атомарны, изолированы, читаемы и повторяемы; тест-кейсы на критические функции и функции безопасности автоматизируются."}, {"id": "t82", "num": "8.2", "title": "Нефункциональное тестирование", "procs": ["5.19"], "levels": ["С"], "desc": "Отказоустойчивость, нагрузка, надёжность, стресс. Тестовая среда должна соответствовать среде функционирования и настраиваться по эксплуатационной документации."}, {"id": "t83", "num": "8.3", "title": "Фаззинг-тестирование", "procs": ["5.11"], "levels": ["М", "С"], "desc": "Цели выбираются из поверхности атаки и функций безопасности. Корпус покрывает ветви без дубликатов; обёртки и синтетические модули собираются с санитайзерами; критерии завершения определены заранее."}, {"id": "t84", "num": "8.4", "title": "Динамический анализ помеченных данных", "procs": ["5.11"], "levels": ["С"], "desc": "Выявление утечек конфиденциальных данных. Реализация — динамическое бинарное инструментирование, полносистемная эмуляция или инструментирование компилятором; инструментирование исходного кода не допускается."}, {"id": "t85", "num": "8.5", "title": "Тестирование на отказ", "procs": ["5.19"], "levels": ["С"], "desc": "Внедрение ошибок и имитация сбоев взаимодействующих компонентов. Требуется матрица тестовых сценариев: тип сбоя, условия, ожидаемый результат, критерии прохождения."}, {"id": "t86", "num": "8.6", "title": "Тестирование на проникновение", "procs": ["5.19"], "levels": ["С"], "desc": "Имитация действий потенциального нарушителя. Выполняется по ГОСТ Р 58143-2018; в область стандартизации проекта не входит."}, {"id": "t87", "num": "8.7", "title": "Динамическая верификация", "procs": ["5.18"], "levels": ["С"], "desc": "Проверка соответствия поведения программы её формальной модели. Для ПО СЗИ с управлением доступом — по ГОСТ Р 59453.4-2025."}, {"id": "t88", "num": "8.8", "title": "Вспомогательные методы", "procs": [], "levels": ["М", "И", "С"], "desc": "Трассы, инструментирование, бинарная трансляция, символьное выполнение, профилирование, перехват потоков. Применяются внутри других технологий и могут искажать поведение программы."}];
+  var PROC = [{"id": "p511", "num": "5.11", "title": "Динамический анализ", "desc": "процесс ГОСТ Р 56939-2024, включая фаззинг-тестирование"}, {"id": "p518", "num": "5.18", "title": "Функциональное тестирование", "desc": "процесс ГОСТ Р 56939-2024"}, {"id": "p519", "num": "5.19", "title": "Нефункциональное тестирование", "desc": "процесс ГОСТ Р 56939-2024"}];
+  var LVL = [{"id": "lМ", "label": "М", "title": "Модульный уровень", "desc": "объект — модули и функции; покрытие кода обязательно"}, {"id": "lИ", "label": "И", "title": "Интеграционный уровень", "desc": "объект — компоненты и подсистемы; взаимодействие частей"}, {"id": "lС", "label": "С", "title": "Системный уровень", "desc": "объект — ПО в целом; покрытие требований по спецификации"}];
+  var map = document.getElementById('imap');
+  if (map) {
+    var dialog = null;
+    function openDialog(d){
+      if (dialog) dialog.remove();
+      dialog = document.createElement('div');
+      dialog.className = 'imap-dialog';
+      dialog.innerHTML = '<div class="dlg" role="dialog" aria-modal="true"><h4>' + d.title + '</h4>' +
+        '<div class="dlg-meta">' + d.meta + '</div><p>' + d.desc + '</p>' +
+        '<button type="button">Закрыть</button></div>';
+      dialog.querySelector('button').addEventListener('click', function(){ dialog.remove(); dialog = null; });
+      dialog.addEventListener('click', function(e){ if (e.target === dialog) { dialog.remove(); dialog = null; } });
+      document.body.appendChild(dialog);
+    }
+    function data(id){
+      if (id.charAt(0) === 't') return TECH.filter(function(t){ return t.id === id; })[0];
+      if (id.charAt(0) === 'p') return PROC.filter(function(t){ return t.id === id; })[0];
+      if (id.charAt(0) === 'l') return LVL.filter(function(t){ return t.id === id; })[0];
+    }
+    function clickNode(id){
+      var d = data(id);
+      if (!d) return;
+      if (d.num) openDialog({title: d.num + ' · ' + d.title, meta: d.kind, desc: d.desc});
+      else if (d.label) openDialog({title: d.title, meta: 'Уровень тестирования', desc: d.desc});
+      else openDialog({title: d.num + ' · ' + d.title, meta: 'Процесс ГОСТ Р 56939-2024', desc: d.desc});
+    }
+    Array.prototype.forEach.call(map.querySelectorAll('.node'), function(node){
+      node.addEventListener('click', function(){ clickNode(node.id); });
+      node.addEventListener('mouseenter', function(){
+        var id = node.id, others = {};
+        Array.prototype.forEach.call(map.querySelectorAll('.link'), function(l){
+          var f = l.getAttribute('data-from'), t = l.getAttribute('data-to');
+          if (f === id || t === id) { l.classList.add('hl'); others[f] = others[t] = 1; }
+        });
+        Array.prototype.forEach.call(map.querySelectorAll('.node'), function(n){
+          if (n.id !== id && !others[n.id]) n.classList.add('dim');
+          else n.classList.add('hl');
+        });
+      });
+      node.addEventListener('mouseleave', function(){
+        Array.prototype.forEach.call(map.querySelectorAll('.link,.node'), function(n){ n.classList.remove('hl', 'dim'); });
+      });
+    });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && dialog) { dialog.remove(); dialog = null; } });
+  }
+  /* ---------- цикл дефекта ---------- */
+  var board = document.getElementById('defect-board');
+  if (board) {
+    var steps = board.querySelectorAll('.step');
+    var bar = document.getElementById('board-bar');
+    var announce = document.getElementById('board-announce');
+    var idx = 0;
+    function render(){
+      Array.prototype.forEach.call(steps, function(s, i){ s.classList.toggle('on', i === idx); });
+      bar.style.width = (Math.round((idx + 1) / steps.length * 100)) + '%';
+      var h = steps[idx].querySelector('h4');
+      if (announce) announce.textContent = 'Шаг ' + (idx + 1) + ' из ' + steps.length + ': ' + h.textContent;
+      board.querySelectorAll('.board-controls button').forEach(function(b){
+        b.disabled = false;
+      });
+      document.getElementById('board-prev').disabled = (idx === 0);
+      document.getElementById('board-next').disabled = (idx === steps.length - 1);
+    }
+    board.classList.add('board-running');
+    document.getElementById('board-next').addEventListener('click', function(){ idx = Math.min(idx + 1, steps.length - 1); render(); });
+    document.getElementById('board-prev').addEventListener('click', function(){ idx = Math.max(idx - 1, 0); render(); });
+    document.getElementById('board-reset').addEventListener('click', function(){ idx = 0; render(); });
+    var branchBtn = document.getElementById('board-branch-btn');
+    if (branchBtn) branchBtn.addEventListener('click', function(){
+      var p = document.getElementById('board-branch-text');
+      p.hidden = !p.hidden;
+    });
+    render();
+  }
+  /* ---------- интерактивные фигуры (archify-фреймы) ---------- */
+  Array.prototype.forEach.call(document.querySelectorAll('.fig-interactive'), function(fig){
+    var btn = fig.querySelector('.fig-open');
+    var frame = fig.querySelector('.fig-frame');
+    var img = fig.querySelector('img');
+    var src = fig.getAttribute('data-frame');
+    if (!btn || !frame || !img || !src) return;
+    btn.addEventListener('click', function(){
+      var open = btn.getAttribute('aria-expanded') === 'true';
+      if (!open) {
+        if (!frame.querySelector('iframe')) {
+          var f = document.createElement('iframe');
+          f.setAttribute('src', src);
+          f.setAttribute('title', 'Интерактивная схема');
+          f.setAttribute('loading', 'lazy');
+          frame.appendChild(f);
+        }
+        frame.hidden = false;
+        img.hidden = true;
+        btn.textContent = 'Свернуть интерактивную схему';
+        btn.setAttribute('aria-expanded', 'true');
+      } else {
+        frame.hidden = true;
+        img.hidden = false;
+        btn.textContent = 'Открыть интерактивную схему';
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  });
+})();
+</script>
+
+<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(109116119,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});</script>
+</body>
+</html>

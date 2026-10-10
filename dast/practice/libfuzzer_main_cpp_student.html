@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <title>Практикум: исследование C++ приложения с помощью libFuzzer</title>
+  <style>
+    @page { size: A4; margin: 15mm 14mm; }
+    * { box-sizing: border-box; }
+    body {
+      font-family: "Liberation Sans", Arial, sans-serif;
+      color: #1f2933;
+      font-size: 10.5pt;
+      line-height: 1.4;
+      margin: 0;
+      background: #ffffff;
+    }
+    h1 {
+      font-size: 22pt;
+      margin: 0 0 4mm;
+      color: #12355b;
+      line-height: 1.15;
+    }
+    h2 {
+      font-size: 15pt;
+      margin: 7mm 0 2.5mm;
+      color: #12355b;
+      border-bottom: 1px solid #9fb3c8;
+      padding-bottom: 1mm;
+    }
+    h3 {
+      font-size: 12pt;
+      margin: 5mm 0 1.5mm;
+      color: #334e68;
+    }
+    p { margin: 2mm 0; }
+    ul, ol { margin-top: 2mm; margin-bottom: 2mm; padding-left: 7mm; }
+    li { margin: 1mm 0; }
+    code {
+      font-family: "Liberation Mono", Consolas, monospace;
+      background: #f2f4f7;
+      padding: 0.2mm 0.8mm;
+      border-radius: 2px;
+    }
+    pre {
+      font-family: "Liberation Mono", Consolas, monospace;
+      font-size: 8.4pt;
+      line-height: 1.25;
+      background: #f2f4f7;
+      border: 1px solid #d9e2ec;
+      border-left: 4px solid #2f80ed;
+      padding: 3mm;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      page-break-inside: avoid;
+      margin: 2.5mm 0;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 3mm 0;
+      table-layout: fixed;
+      page-break-inside: avoid;
+    }
+    th, td {
+      border: 1px solid #d9e2ec;
+      padding: 2.5mm;
+      vertical-align: top;
+    }
+    th {
+      background: #eef4fb;
+      color: #12355b;
+      text-align: left;
+    }
+    .meta {
+      color: #52606d;
+      font-size: 9.5pt;
+      margin-bottom: 5mm;
+    }
+    .note, .task, .check, .warn {
+      padding: 2.5mm 3mm;
+      margin: 3mm 0;
+      page-break-inside: avoid;
+    }
+    .note {
+      background: #fff8ed;
+      border-left: 4px solid #f2994a;
+    }
+    .task {
+      background: #eef8ff;
+      border-left: 4px solid #2f80ed;
+    }
+    .check {
+      background: #f0fff4;
+      border-left: 4px solid #27ae60;
+    }
+    .warn {
+      background: #fff1f2;
+      border-left: 4px solid #d64545;
+    }
+    .small { font-size: 9pt; color: #52606d; }
+    .page-break { break-before: page; }
+  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="Пиков Виталий Александрович">
+<link rel="canonical" href="https://dast.pikov.expert/practice/libfuzzer_main_cpp_student.html">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<meta property="og:title" content="libFuzzer: исследование C++ приложения">
+<meta property="og:description" content="Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://dast.pikov.expert/practice/libfuzzer_main_cpp_student.html">
+<meta property="og:image" content="https://pikov.expert/photo.jpg">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "libFuzzer: исследование C++ приложения", "description": "Авторские материалы Виталия Пикова: технологии динамического анализа ПО, разбор первой редакции проекта национального стандарта, практикумы AFL++ и libFuzzer, исправление дефекта и повторная проверка.", "url": "https://dast.pikov.expert/practice/libfuzzer_main_cpp_student.html", "inLanguage": "ru", "author": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}}</script><style>@media screen{:not(pre)>code{overflow-wrap:anywhere;white-space:normal}p,li{overflow-wrap:anywhere}body{font-size:17px;line-height:1.65;max-width:1000px;margin:0 auto;padding:24px;background:#f5f7fb}pre{overflow:auto;max-width:100%;font-size:14px}table{display:block;overflow:auto;max-width:100%}img{max-width:100%}.lab-nav{display:flex;flex-wrap:wrap;gap:14px;padding:16px 0;border-bottom:1px solid #cbd5e1;margin-bottom:24px}.lab-nav a{color:#184b80;min-height:44px;display:inline-flex;align-items:center}h1{font-size:30px;line-height:1.2;overflow-wrap:anywhere}:focus-visible{outline:3px solid #2f80ed;outline-offset:4px}}@media print{.lab-nav{display:none}}@media(max-width:600px){body{padding:16px}h1{font-size:25px}}</style></head>
+<body><nav class="lab-nav" aria-label="Материалы практикума"><a class="brand-back" href="https://pikov.expert/">Каталог</a><a href="../index.html#student-materials">Лекция DAST</a><a href="../practice.html">Все практикумы</a><a href="../downloads/libfuzzer_main_cpp_student.pdf" download>PDF</a><a href="../downloads/libfuzzer_main_cpp_student.md" download>Markdown</a><a href="../downloads/my-first-python-project-v02.zip" download>Исходники · ZIP</a></nav><main>
+  <h1>Практикум: исследование C++ приложения с помощью libFuzzer</h1>
+  <p class="meta">Учебное задание для слушателя курса по безопасной разработке ПО</p>
+
+  <p><strong>Цель работы:</strong> освоить базовый цикл in-process фаззинга на примере простой C++ функции: подготовить harness для libFuzzer, собрать цель с санитайзерами, запустить фаззинг, воспроизвести найденное падение, понять первопричину и предложить исправление.</p>
+
+  <div class="note">
+    Материал предназначен только для учебного стенда и собственного кода. Не запускайте фаззинг на чужом ПО, продуктах заказчика или сетевых сервисах без разрешения владельца и изоляции среды.
+  </div>
+
+  <h2>1. Что изучается в работе</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Тема</th>
+        <th>Практический результат</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>libFuzzer</td>
+        <td>Слушатель запускает фаззер через функцию <code>LLVMFuzzerTestOneInput</code>.</td>
+      </tr>
+      <tr>
+        <td>AddressSanitizer и UndefinedBehaviorSanitizer</td>
+        <td>Слушатель получает диагностический отчет о выходе за пределы стекового массива.</td>
+      </tr>
+      <tr>
+        <td>Корпус входных данных</td>
+        <td>Слушатель создает минимальные seed-файлы и наблюдает рост покрытия.</td>
+      </tr>
+      <tr>
+        <td>Root cause analysis</td>
+        <td>Слушатель связывает crash-файл с конкретной ошибкой в проверке длины.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>2. Требования к окружению</h2>
+  <p>Рекомендуемая среда: Ubuntu Linux, WSL2 с Ubuntu или другая Linux-среда с Clang. В проекте уже есть файл <code>src/main_libfuzzer.cpp</code>.</p>
+
+  <pre>sudo apt update
+sudo apt install -y clang build-essential</pre>
+
+  <p>Проверьте компилятор:</p>
+
+  <pre>clang++ --version</pre>
+
+  <div class="check">
+    Успешная проверка: команда выводит версию Clang. Для libFuzzer отдельный пакет обычно не нужен: runtime подключается через флаг <code>-fsanitize=fuzzer</code>.
+  </div>
+
+  <div class="note">
+    Исходный файл <code>src/main_libfuzzer.cpp</code> поставляется в архиве с примером, поэтому его нужно распаковать: <code>sudo apt install -y unzip</code>, затем <code>unzip my-first-python-project-v02.zip</code>. На Ubuntu 24.04 LTS штатный Clang — версии 18, этого достаточно.
+  </div>
+
+  <h2>3. Исходный учебный код</h2>
+  <p>Файл задания: <code>src/main_libfuzzer.cpp</code>. Он содержит функцию разбора простого бинарного формата и harness для libFuzzer.</p>
+
+  <pre>#include &lt;cstdint&gt;
+#include &lt;cstddef&gt;
+#include &lt;iostream&gt;
+
+static int parse_demo_format(const uint8_t* data, size_t size) {
+    if (size &lt; 5) {
+        return 0;
+    }
+
+    if (data[0] != 'F' || data[1] != 'U' || data[2] != 'Z' || data[3] != '1') {
+        return 0;
+    }
+
+    uint8_t declared_size = data[4];
+    char name[16] = {};
+
+    for (uint8_t i = 0; i &lt; declared_size &amp;&amp; 5 + i &lt; size; ++i) {
+        name[i] = static_cast&lt;char&gt;(data[5 + i]);
+    }
+
+    if (name[0] == 'L' &amp;&amp; name[1] == 'I' &amp;&amp; name[2] == 'B') {
+        std::cout &lt;&lt; "interesting libFuzzer input\n";
+    }
+
+    return 0;
+}
+
+extern "C" int LLVMFuzzerTestOneInput(const uint8_t* data, size_t size) {
+    parse_demo_format(data, size);
+    return 0;
+}</pre>
+
+  <h3>3.1. Формат входных данных</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>Смещение</th>
+        <th>Поле</th>
+        <th>Назначение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>0..3</code></td>
+        <td><code>FUZ1</code></td>
+        <td>Magic-значение, по которому программа понимает, что файл относится к ожидаемому формату.</td>
+      </tr>
+      <tr>
+        <td><code>4</code></td>
+        <td><code>declared_size</code></td>
+        <td>Заявленная длина имени. Значение полностью контролируется входным файлом.</td>
+      </tr>
+      <tr>
+        <td><code>5..N</code></td>
+        <td><code>name</code></td>
+        <td>Данные, которые программа копирует в локальный буфер <code>char name[16]</code>.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="warn">
+    В коде намеренно оставлена ошибка: значение <code>declared_size</code> ограничивает цикл копирования, но не ограничивается размером массива <code>name</code>.
+  </div>
+
+  <h2>4. Подготовка корпуса</h2>
+  <p>Создайте директории для сборки, корпуса и результатов:</p>
+
+  <pre>mkdir -p build corpus findings</pre>
+
+  <p>Создайте два начальных seed-файла. Первый проходит проверку magic, второй показывает фаззеру альтернативный короткий вход:</p>
+
+  <pre>printf 'FUZ1\x01A' &gt; corpus/seed1
+printf 'hello' &gt; corpus/seed2</pre>
+
+  <p>Проверьте содержимое:</p>
+
+  <pre>xxd -g 1 corpus/seed1
+xxd -g 1 corpus/seed2</pre>
+
+  <div class="task">
+    Задание: объясните, почему seed с <code>FUZ1</code> полезнее случайной строки для быстрого поиска глубокой ветки кода.
+  </div>
+
+  <h2>5. Сборка цели для libFuzzer</h2>
+  <p>Соберите fuzz target с libFuzzer, AddressSanitizer и UndefinedBehaviorSanitizer:</p>
+
+  <pre>clang++ -std=c++17 -g -O1 \
+  -fsanitize=fuzzer,address,undefined \
+  src/main_libfuzzer.cpp \
+  -o build/main_libfuzzer</pre>
+
+  <p>Пояснение ключевых флагов:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Флаг</th>
+        <th>Что делает</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>-fsanitize=fuzzer</code></td>
+        <td>Подключает libFuzzer runtime и добавляет собственный <code>main</code> фаззера.</td>
+      </tr>
+      <tr>
+        <td><code>-fsanitize=address</code></td>
+        <td>Находит ошибки памяти: выход за границы буфера, use-after-free и похожие дефекты.</td>
+      </tr>
+      <tr>
+        <td><code>-fsanitize=undefined</code></td>
+        <td>Находит часть случаев неопределенного поведения C/C++.</td>
+      </tr>
+      <tr>
+        <td><code>-g -O1</code></td>
+        <td>Сохраняет отладочную информацию и оставляет оптимизацию, приемлемую для fuzzing-сборки.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    В файле для libFuzzer не должно быть обычного <code>main()</code>, если используется <code>-fsanitize=fuzzer</code>. Точкой входа является <code>LLVMFuzzerTestOneInput</code>.
+  </div>
+
+  <h2>6. Запуск фаззинга</h2>
+  <p>Запустите короткую fuzz-сессию:</p>
+
+  <pre>./build/main_libfuzzer \
+  -max_total_time=30 \
+  -artifact_prefix=findings/ \
+  corpus/</pre>
+
+  <p>Что означают параметры:</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Параметр</th>
+        <th>Назначение</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><code>-max_total_time=30</code></td>
+        <td>Остановить запуск через 30 секунд. Для занятия удобно ограничивать время.</td>
+      </tr>
+      <tr>
+        <td><code>-artifact_prefix=findings/</code></td>
+        <td>Сохранять crash-файлы и другие артефакты в отдельную директорию.</td>
+      </tr>
+      <tr>
+        <td><code>corpus/</code></td>
+        <td>Директория с начальными seed-файлами и расширяющимся корпусом.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="note">
+    Директория из <code>-artifact_prefix</code> должна существовать до запуска. Если её нет, libFuzzer не начинает работу и печатает <code>ERROR: The required directory "findings/" does not exist</code>. Поэтому в разделе 4 создаётся <code>findings</code>, а перед повторным прогоном в разделе 11 — <code>findings_after_fix</code>.
+  </div>
+
+  <p>Типичный фрагмент вывода при обнаружении ошибки:</p>
+
+  <pre>runtime error: index 16 out of bounds for type 'char[16]'
+ERROR: AddressSanitizer: stack-buffer-overflow
+WRITE of size 1
+    #0 ... parse_demo_format ... src/main_libfuzzer.cpp
+    #1 ... LLVMFuzzerTestOneInput ... src/main_libfuzzer.cpp
+Test unit written to findings/crash-&lt;hash&gt;</pre>
+
+  <div class="check">
+    Успешный результат этапа: libFuzzer сохранил crash-файл в директории <code>findings/</code>, а отчет ASan указывает на строку записи в <code>name[i]</code>.
+  </div>
+
+  <h2>7. Воспроизведение crash</h2>
+  <p>После нахождения ошибки libFuzzer сохраняет конкретный входной файл. Запустите fuzz target на этом файле напрямую:</p>
+
+  <pre>ls -l findings/
+./build/main_libfuzzer findings/crash-*</pre>
+
+  <p>Ожидаемый результат: программа снова падает с тем же типом ошибки. Это важный этап: найденный фаззером дефект должен быть воспроизводимым.</p>
+
+  <p>Посмотрите байты crash-файла:</p>
+
+  <pre>xxd -g 1 findings/crash-*</pre>
+
+  <div class="task">
+    Задание: найдите в crash-файле первые четыре байта <code>46 55 5a 31</code>. Это ASCII-строка <code>FUZ1</code>. Затем определите значение пятого байта и объясните, почему оно приводит к переполнению.
+  </div>
+
+  <h2>8. Минимизация входа</h2>
+  <p>libFuzzer умеет уменьшать crash-вход, сохраняя воспроизведение ошибки. Это упрощает анализ.</p>
+
+  <pre>mkdir -p minimized
+./build/main_libfuzzer \
+  -minimize_crash=1 \
+  -runs=10000 \
+  findings/crash-* \
+  -artifact_prefix=minimized/</pre>
+
+  <p>Если минимизация завершилась успешно, сравните размер исходного и минимизированного файла:</p>
+
+  <pre>ls -lh findings/ minimized/
+xxd -g 1 minimized/crash-*</pre>
+
+  <div class="note">
+    Минимизированный вход не обязан быть человекочитаемым. Его ценность в том, что он короче и все еще воспроизводит тот же дефект.
+  </div>
+
+  <h2>9. Анализ первопричины</h2>
+  <p>Проблемный участок:</p>
+
+  <pre>uint8_t declared_size = data[4];
+char name[16] = {};
+
+for (uint8_t i = 0; i &lt; declared_size &amp;&amp; 5 + i &lt; size; ++i) {
+    name[i] = static_cast&lt;char&gt;(data[5 + i]);
+}</pre>
+
+  <p>Условие <code>5 + i &lt; size</code> проверяет только безопасность чтения из входного буфера. Оно отвечает на вопрос: есть ли еще байт во входных данных?</p>
+
+  <p>Но в условии нет проверки безопасности записи в <code>name</code>. Для массива <code>char name[16]</code> допустимы индексы <code>0..15</code>. Когда <code>i == 16</code>, запись <code>name[i]</code> выходит за пределы массива.</p>
+
+  <div class="warn">
+    Корневая причина: длина из недоверенного входа используется как граница записи в фиксированный стековый буфер без ограничения размером буфера назначения.
+  </div>
+
+  <h2>10. Исправление</h2>
+  <p>Исправление должно учитывать три ограничения: заявленную длину, доступные байты входа и размер буфера назначения.</p>
+
+  <pre>#include &lt;algorithm&gt;
+
+uint8_t declared_size = data[4];
+char name[16] = {};
+
+size_t available_size = size - 5;
+size_t copy_size = std::min&lt;size_t&gt;(
+    static_cast&lt;size_t&gt;(declared_size),
+    std::min(sizeof(name), available_size)
+);
+
+for (size_t i = 0; i &lt; copy_size; ++i) {
+    name[i] = static_cast&lt;char&gt;(data[5 + i]);
+}</pre>
+
+  <p>После исправления пересоберите target и проверьте старый crash-файл:</p>
+
+  <pre>clang++ -std=c++17 -g -O1 \
+  -fsanitize=fuzzer,address,undefined \
+  src/main_libfuzzer.cpp \
+  -o build/main_libfuzzer
+
+./build/main_libfuzzer findings/crash-*</pre>
+
+  <div class="check">
+    Ожидаемый результат после исправления: старый crash-файл больше не вызывает падение. Затем нужно повторно запустить фаззинг, чтобы проверить, не осталось ли похожих дефектов.
+  </div>
+
+  <h2>11. Повторная проверка после исправления</h2>
+  <p>Создайте директорию для артефактов повторного прогона (libFuzzer требует, чтобы она уже существовала) и запустите фаззинг на более длительное время:</p>
+
+  <pre>mkdir -p findings_after_fix
+./build/main_libfuzzer \
+  -max_total_time=60 \
+  -artifact_prefix=findings_after_fix/ \
+  corpus/</pre>
+
+  <p>Для учебной работы достаточно зафиксировать результат: падений нет в течение заданного времени или найден новый дефект, который требует отдельного анализа.</p>
+
+  <h2>12. Что нужно сдать преподавателю</h2>
+  <ol>
+    <li>Команду сборки fuzz target.</li>
+    <li>Команду запуска libFuzzer.</li>
+    <li>Фрагмент отчета ASan с типом ошибки и строкой исходного кода.</li>
+    <li>Hexdump crash-файла.</li>
+    <li>Краткое объяснение первопричины дефекта.</li>
+    <li>Исправленный фрагмент кода.</li>
+    <li>Результат повторной проверки после исправления.</li>
+  </ol>
+
+  <h2>13. Контрольные вопросы</h2>
+  <ol>
+    <li>Почему libFuzzer требует функцию <code>LLVMFuzzerTestOneInput</code>?</li>
+    <li>Чем in-process fuzzing отличается от запуска программы через файлы и аргументы командной строки?</li>
+    <li>Почему seed <code>FUZ1\x01A</code> помогает быстрее пройти проверку magic?</li>
+    <li>Какую ошибку показывает AddressSanitizer в этом задании?</li>
+    <li>Почему проверка <code>5 + i &lt; size</code> не защищает массив <code>name</code>?</li>
+    <li>Какие три ограничения нужно учитывать при безопасном копировании?</li>
+    <li>Зачем воспроизводить crash отдельно от основной fuzz-сессии?</li>
+    <li>Для чего нужна минимизация crash-файла?</li>
+  </ol>
+
+  <h2>14. Краткая памятка команд</h2>
+  <pre>sudo apt install -y clang build-essential unzip
+
+mkdir -p build corpus findings
+printf 'FUZ1\x01A' &gt; corpus/seed1
+printf 'hello' &gt; corpus/seed2
+
+clang++ -std=c++17 -g -O1 \
+  -fsanitize=fuzzer,address,undefined \
+  src/main_libfuzzer.cpp \
+  -o build/main_libfuzzer
+
+./build/main_libfuzzer -max_total_time=30 -artifact_prefix=findings/ corpus/
+./build/main_libfuzzer findings/crash-*
+xxd -g 1 findings/crash-*
+
+mkdir -p minimized
+./build/main_libfuzzer -minimize_crash=1 -runs=10000 findings/crash-* -artifact_prefix=minimized/
+
+mkdir -p findings_after_fix
+./build/main_libfuzzer -max_total_time=60 -artifact_prefix=findings_after_fix/ corpus/</pre>
+
+  <p class="small">Версия методички: 2026-10-09. Учебный проект: <code>main_libfuzzer.cpp</code>. Команды проверены на WSL2 с Ubuntu 24.04.4 LTS, clang 18.1.3: цель собирается, падение находится в пределах 30 секунд, старый crash-файл перестаёт воспроизводиться после исправления.</p>
+</main><script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(109116119,"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:false});</script></body>
+</html>

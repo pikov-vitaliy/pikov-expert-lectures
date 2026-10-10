@@ -20,7 +20,7 @@ const fixtureHtml = value => `<script>\nconst CATEGORIES = ${JSON.stringify(valu
 test('all source URLs match the independent registry, including course anchors', () => {
   const registry = JSON.parse(readFileSync(resolve(root, '_PROJECT', 'lectures.json'), 'utf8'));
   assert.equal(actual.lectures.length, registry.summary.cards);
-  assert.equal(actual.lectures.length, 35);
+  assert.equal(actual.lectures.length, registry.lectures.length);
   assert.deepEqual(actual.lectures.map(item => item.url).sort(), registry.lectures.map(item => item.url).sort());
   assert.equal(new Set(actual.lectures.map(item => item.url)).size, actual.lectures.length);
   assert.deepEqual(actual.categories.map(category => category.id), CATEGORY_ORDER);

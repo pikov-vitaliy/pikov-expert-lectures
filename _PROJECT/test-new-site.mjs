@@ -85,8 +85,8 @@ test('all four routes have matching native locale, brand and alternate links', (
   for (const page of pages) assertLocaleLinks(page.html, page);
 });
 
-test('both catalogues contain all 35 materials and descriptions without JavaScript', () => {
-  assert.equal(catalogue.lectures.length, 35);
+test('both catalogues contain all registered materials and descriptions without JavaScript', () => {
+  assert.equal(catalogue.lectures.length, JSON.parse(readFileSync(join(root, '_PROJECT/lectures.json'), 'utf8')).summary.cards);
   for (const page of pages.filter(page => !page.about)) assertCatalogueIntegrity(page.html, page.lang);
 });
 

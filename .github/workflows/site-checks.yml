@@ -86,6 +86,7 @@ jobs:
           node .\_PROJECT\test-platform-content-currentness.mjs
           node --test .\_PROJECT\test-evergreen-course-dates.mjs
           node --test .\_PROJECT\test-main-rbpo-publication.mjs
+          node --test .\_PROJECT\test-dast-publication.mjs
           node --test .\_PROJECT\test-release-workflow-order.mjs
           node --test .\_PROJECT\test-release-provenance.mjs
           node --test .\_PROJECT\test-deploy-manifest-boundary.mjs
@@ -188,6 +189,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $true
           node .\_PROJECT\browser-qa.mjs
+          node .\_PROJECT\qa-dast.mjs
 
       - name: Verify threat downloads from the unpacked release
         shell: pwsh
