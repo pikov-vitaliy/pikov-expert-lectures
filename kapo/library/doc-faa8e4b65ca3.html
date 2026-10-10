@@ -1,0 +1,112 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П29. Readiness dashboard — КАПО · Пиков</title><meta name="description" content="П29. Readiness dashboard. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-faa8e4b65ca3.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п29-readiness-dashboard">П29. Readiness dashboard</h1>
+<p>После приёмки поставок (<a href="doc-fd2abd912efa.html">П28</a>) у вас в портфеле Dependency-Track лежат проекты по подсистемам соисполнителей. Эта практика — про следующий шаг: свести лицензионные и уязвимостные метрики проекта в <strong>один бинарный вердикт готовности</strong> к релизу и обосновать его машинными числами, а не «на глаз».</p>
+<h2 id="цель">Цель</h2>
+<p>По проекту в Dependency-Track получить через REST API текущие метрики (critical/high/medium/low, policy violations) и вычислить бинарный verdict: <code>ready</code> тогда и только тогда, когда нет блокирующих уязвимостей (critical = 0, high = 0) и нет нарушений лицензионной политики. Результат — JSON метрик плюс однозначный <code>ready</code> / <code>not ready</code> с перечислением, что именно блокирует.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>UUID проекта берём из его карточки в UI или из <code>GET /api/v1/project?name=...</code>. Метрики возвращает endpoint <code>current</code>; аутентификация — заголовком <code>X-Api-Key</code>.</p>
+<pre><code class="language-bash">DT=https://dtrack.internal           # адрес инстанса Dependency-Track
+KEY=odt_xxxxxxxxxxxxxxxxxxxx         # API-ключ команды (X-Api-Key)
+UUID=8b9e...                         # UUID проекта подсистемы
+
+# 1. Текущие метрики проекта
+curl -s -H "X-Api-Key: $KEY" \
+  "$DT/api/v1/metrics/project/$UUID/current" | tee metrics.json | jq .
+
+# 2. Бинарный вердикт готовности из метрик
+jq -r '
+  if (.critical == 0 and .high == 0 and (.policyViolationsFail // 0) == 0)
+  then "READY"
+  else "NOT READY: critical=\(.critical) high=\(.high) policyFail=\(.policyViolationsFail // 0)"
+  end' metrics.json
+</code></pre>
+<blockquote>
+<p>Если метрики пустые или нулевые сразу после загрузки SBOM
+Dependency-Track считает метрики асинхронно после BOM-анализа. Перед чтением запросите пересчёт — <code>curl -s -H "X-Api-Key: $KEY" "$DT/api/v1/metrics/project/$UUID/refresh"</code> — и опросите <code>current</code> через несколько секунд. «Нули по всем осям» сразу после импорта обычно означают «ещё не посчитано», а не «чисто».</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Шаг 1 — объект метрик проекта (приведён скелет ключевых полей; реальный ответ шире):</p>
+<pre><code class="language-json">{
+  "critical": 0,
+  "high": 0,
+  "medium": 4,
+  "low": 11,
+  "unassigned": 2,
+  "vulnerabilities": 15,
+  "vulnerableComponents": 9,
+  "components": 142,
+  "policyViolationsFail": 0,
+  "policyViolationsWarn": 3,
+  "policyViolationsLicenseTotal": 1,
+  "firstOccurrence": 1718000000000,
+  "lastOccurrence": 1718600000000
+}
+</code></pre>
+<p>Шаг 2 — итоговый вердикт. Для приведённого объекта (critical = 0, high = 0, нет fail-нарушений политики):</p>
+<pre><code>READY
+</code></pre>
+<p>Если бы был один high и одно блокирующее нарушение лицензии:</p>
+<pre><code>NOT READY: critical=0 high=1 policyFail=1
+</code></pre>
+<p>Сводная управленческая таблица готовности по продукту (строка на подсистему/соисполнителя) собирается из тех же чисел:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Подсистема</th>
+<th>critical</th>
+<th>high</th>
+<th>policy fail</th>
+<th>Вердикт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ready</td>
+</tr>
+<tr>
+<td>B</td>
+<td>1</td>
+<td>2</td>
+<td>1</td>
+<td>not ready</td>
+</tr>
+<tr>
+<td>N</td>
+<td>0</td>
+<td>0</td>
+<td>0</td>
+<td>ready</td>
+</tr>
+</tbody>
+</table></div>
+<p>Продукт готов к релизу только если готовы <strong>все</strong> строки; одна <code>not ready</code> опускает вердикт по всему изделию.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong>HTTP 401 / <code>{"...":"unauthorized"}</code></strong> — нет или неверный заголовок <code>X-Api-Key</code>, либо у ключа нет permission <code>VIEW_PORTFOLIO</code>. Проверьте права команды-владельца ключа.
+- <strong>HTTP 404 на <code>/metrics/project/$UUID/current</code></strong> — неверный UUID (взяли ID компонента вместо проекта) или метрики ещё ни разу не считались. Сначала вызовите <code>.../refresh</code>, затем <code>current</code>.
+- <strong><code>jq: null (null) and number ... cannot be ...</code></strong> — поле <code>policyViolationsFail</code> отсутствует в этой версии DT; именно для этого в выражении стоит <code>// 0</code>. Если падает на <code>.critical</code> — вы скормили jq не объект метрик, а сообщение об ошибке; проверьте <code>metrics.json</code>.
+- <strong>Вердикт <code>READY</code>, но релиз явно «грязный»</strong> — пороги считаете только по severity и игнорируете policy violations (лицензии, устаревшие компоненты). Лицензионный блокер не отражается в critical/high — он в <code>policyViolationsFail</code>.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: сырой JSON метрик из <code>current</code> по проекту, команду вычисления вердикта и её вывод (<code>READY</code> либо <code>NOT READY</code> с перечнем блокеров), а также заполненную строку сводной таблицы готовности по подсистеме. Бонус — продемонстрировать, как <code>policyViolationsFail &gt; 0</code> переводит подсистему в <code>not ready</code> при нулевых critical/high.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-3235e84d3a49.html">М10. Много исполнителей</a> — родительский модуль.</li>
+<li>Смежные практики: <a href="doc-fd2abd912efa.html">П28</a> (откуда берутся проекты в портфеле), <a href="doc-ebb5b655a8d2.html">П08</a> (загрузка SBOM и выгрузка VDR), <a href="doc-adce46441199.html">П30</a> (как блокирующее finding превращается в управляемое исключение).</li>
+<li><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — управляемость и документируемость решения о выпуске; <a href="doc-0e548f119316.html">NIST SSDF</a> — RV.1 как реакция на уязвимости; <a href="doc-47ec0c98fe05.html">OWASP SCVS</a> — зрелость управления составом.</li>
+<li>Шаблоны: <a href="doc-be65de548d56.html">Управленческая сводка готовности</a> · <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a> · <a href="doc-620bbc0766f4.html">Порядок загрузки VDR</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

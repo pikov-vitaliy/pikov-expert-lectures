@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>BSI TR-03183-2 v2.1.0 — КАПО · Пиков</title><meta name="description" content="BSI TR-03183-2 v2.1.0. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-3c212b09f984.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="bsi-tr-03183-2-v210">BSI TR-03183-2 v2.1.0</h1>
+<h2 id="о-документе">О документе</h2>
+<p>Техническое руководство BSI (Федеральное ведомство по информационной безопасности Германии) — часть 2 серии TR-03183 «Cyber Resilience Requirements for Manufacturers and Products», посвящённая SBOM. Германия входит в ЕС, поэтому юрисдикционно документ относится к ЕС; по сути это национальная детализация требований SBOM под <a href="doc-ce92680089dc.html">EU CRA</a>. Версия 2.1.0 — самый строгий из распространённых SBOM-профилей: она не ограничивается перечнем полей, а жёстко фиксирует допустимые форматы, версии, набор обязательных полей на уровне документа и компонента и вводит понятия виртуальных и referenced-компонентов с собственной CycloneDX-таксономией.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Допустимые форматы строго версионированы</strong>: CycloneDX версии 1.6 или выше, либо SPDX версии 3.0.1 или выше; другие/более старые версии не считаются соответствующими.</li>
+<li><strong>Обязательные поля документа</strong>: контактные данные создателя SBOM (Creator) и временная метка генерации (Timestamp).</li>
+<li><strong>Обязательные поля компонента</strong>: Component Creator (контакт), Component Name, Component Version, Filename и связи зависимостей с другими компонентами.</li>
+<li><strong>Лицензии — только по SPDX</strong>: лицензия указывается валидным SPDX license identifier или выражением на их основе; произвольный текст не допускается.</li>
+<li><strong>Виртуальные и referenced компоненты</strong>: введены для случаев, когда компонент не поставляется напрямую, но влияет на состав; для CycloneDX BSI ведёт собственный namespace и опубликованную property-таксономию.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<ul>
+<li>SBOM, прошедший проверку на соответствие версии формата: CycloneDX <code>specVersion</code> ≥ 1.6 либо SPDX версии ≥ 3.0.1 (отчёт валидатора).</li>
+<li>Отчёт о покрытии обязательных полей компонента (Creator/Name/Version/Filename) и наличии document-level Creator и Timestamp.</li>
+<li>Отчёт о лицензиях: доля компонентов с валидным SPDX-идентификатором; список компонентов с невалидным/произвольным license-полем как worklist.</li>
+<li>Корректные <code>purl</code> и нормализованные идентификаторы; обработка виртуальных/referenced-компонентов по BSI-таксономии.</li>
+<li>Результат прогона чек-листов качества CycloneDX/SPDX по требованиям TR-03183-2 как сводный evidence соответствия.</li>
+</ul>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li><a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> — где в документе лежат обязательные поля и <code>specVersion</code>.</li>
+<li><a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>, <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> — корректность идентификаторов компонентов.</li>
+<li><a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a>, <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> — приведение лицензий к SPDX-идентификаторам.</li>
+<li><a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>, <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>, <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a> — проверка версий и полей.</li>
+<li>Модули: <a href="doc-1648d69d5029.html">Модуль М03</a> (форматы SBOM), <a href="doc-778f51173f56.html">Модуль М13</a> (трассировка и evidence).</li>
+<li>Контекст: <a href="doc-ce92680089dc.html">EU Cyber Resilience Act</a>, форматы <a href="doc-9a74303c4069.html">CycloneDX</a> и <a href="doc-cf001a40d806.html">SPDX</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<p>Это учебная карточка, а не официальный текст. Точные версии форматов, перечень обязательных полей и определения виртуальных/referenced-компонентов сверяйте с официальным BSI TR-03183-2 v2.1.0 и опубликованной BSI CycloneDX-таксономией.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>LIEF как программный анализ ELF — КАПО · Пиков</title><meta name="description" content="LIEF как программный анализ ELF. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7770d940686f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="lief-как-программный-анализ-elf">LIEF как программный анализ ELF</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Ручные <code>readelf</code>/<code>objdump</code> хороши для одного бинаря, но конвейер SCA разбирает десятки и сотни артефактов: все исполняемые файлы образа, каждую <code>.so</code> в <code>/usr/lib</code>, бинарники из нескольких сборок. Парсить их через grep по текстовому выводу утилит — хрупко: формат вывода меняется между версиями binutils, поля приходится вытаскивать регулярками, а нестандартные или слегка повреждённые ELF ломают разбор. LIEF — библиотека (Python/C++), которая читает ELF (а также PE/Mach-O) как объект: секции, <code>DT_NEEDED</code>, символы, <code>RPATH</code> становятся полями, а не строками для парсинга.</p>
+<p>Для SCA это даёт повторяемость и масштаб: один скрипт извлекает динамические зависимости из всего дерева бинарей и сразу складывает их в структуру для маппинга на пакеты. Это превращает разовый ручной анализ в воспроизводимый шаг пайплайна.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Та же информация, что даёт <code>readelf -d</code>, но как программные поля — и сразу по множеству файлов:</p>
+<pre><code class="language-python">import lief
+
+binary = lief.parse("./app")
+
+# DT_NEEDED как список строк, без парсинга текста
+needed = [e.name for e in binary.dynamic_entries
+          if e.tag == lief.ELF.DynamicEntry.TAG.NEEDED]
+# RPATH/RUNPATH — отдельными тегами
+runpath = [e.runpath for e in binary.dynamic_entries
+           if e.tag == lief.ELF.DynamicEntry.TAG.RUNPATH]
+
+print(needed)    # ['libssl.so.3', 'libcrypto.so.3', 'libc.so.6']
+print(runpath)   # ['$ORIGIN/../lib']
+
+# признак stripped: пустая таблица символов .symtab при наличии .dynsym
+has_symtab = any(s.name == ".symtab" for s in binary.sections)
+</code></pre>
+<p>Дальше этот список напрямую идёт в маппинг <code>.so → пакет</code> без промежуточного текста. Прогон по дереву (<code>os.walk</code> + <code>lief.parse</code>) даёт инвентаризацию всех бинарей образа за один запуск.</p>
+<blockquote>
+<p>Когда LIEF, а когда <code>readelf</code>
+Один-два бинаря, интерактивно — <code>readelf</code>/<code>objdump</code> быстрее (см. <a href="doc-19fd6dae6997.html">ldd readelf objdump</a>). Пачка артефактов, повторяемый шаг CI, нестандартные/частично битые ELF, нужно складывать результат в JSON/SBOM — LIEF: он не зависит от формата вывода утилит и устойчивее к краевым случаям.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Важная граница: LIEF — это парсинг, а не резолвинг. Он прочитает <code>DT_NEEDED = libssl.so.3</code> из файла, но не скажет, какой именно файл и версия подставятся в рантайме на конкретном хосте — это задача загрузчика (<code>ldd</code>) и пакетного менеджера. Поэтому LIEF закрывает извлечение фактов из бинаря, но не отменяет шаг «soname → файл → пакет → версия» (см. <a href="doc-16ebed4577b9.html">динамическая линковка</a>).</p>
+<p>Приём — использовать LIEF как сборщик evidence в масштабе: пройти все ELF, вытащить <code>NEEDED</code>/<code>RPATH</code>/<code>RUNPATH</code>/признак stripped, нормализовать в таблицу и только потом маппить на пакеты и версии. И помнить, что статически вшитый код LIEF тоже не видит как зависимость — для него остаётся анализ символов/строк и build-scan (<a href="doc-ae9d449dcb2c.html">статическая линковка</a>).</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Для массового разбора (образ, дерево <code>/usr/lib</code>, набор сборок) использовать программный парсер, а не grep по <code>readelf</code>.</li>
+<li>Извлекать единым проходом: <code>DT_NEEDED</code>, <code>DT_SONAME</code>, <code>RPATH</code>/<code>RUNPATH</code>, наличие <code>.symtab</code> (признак stripped) — и складывать в структуру.</li>
+<li>Результат парсинга не считать финальным составом: добавлять отдельный шаг резолвинга <code>.so → пакет → версия</code>.</li>
+<li>Обрабатывать ошибки парсинга как сигнал, а не как сбой: нераспознанный ELF — кандидат в реестр неопознанных, а не «пропустить молча».</li>
+<li>Встраивать скрипт в CI как воспроизводимый шаг и сохранять его вывод как аудиторский артефакт (см. <a href="doc-9902fd4ce26c.html">build logs как аудиторский артефакт</a>).</li>
+<li>Не пытаться через LIEF восстановить статику — для неё уходить в build-scan и анализ символов.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1) · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a></li>
+<li>Внешний источник: проект LIEF — https://lief.re/</li>
+<li>Смежные заметки 06: <a href="doc-28706d741e92.html">ELF и разделы dynamic</a> · <a href="doc-19fd6dae6997.html">ldd readelf objdump</a> · <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-44ca67214176.html">stripped binaries</a> · <a href="doc-dc314b2d790a.html">hash-based identification</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,110 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Паспорт риска компонента — КАПО · Пиков</title><meta name="description" content="Паспорт риска компонента. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-51fdcb300d4b.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#карточка-риска">Карточка риска</a></li>
+<li><a href="#правила">Правила</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="паспорт-риска-компонента">Паспорт риска компонента</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Паспорт риска — карточка одной уязвимости в одном компоненте: что нашли, насколько это опасно в продукте, какое решение принято, кто issuer/владелец и когда пересматривать. Это первичный артефакт, на который ссылаются <a href="doc-f0ded133ff51.html">реестр исключений</a> и <a href="doc-3449932010c8.html">решение о принятии риска</a>.</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<ul>
+<li>Уязвимость получила VEX-статус <code>affected</code> и не закрывается немедленным обновлением.</li>
+<li>Требуется обосновать принятие риска или отклонение severity по применимости (VEX).</li>
+<li>При переоценке открытого риска на дату пересмотра.</li>
+</ul>
+<h2 id="карточка-риска">Карточка риска</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Компонент</td>
+<td>имя библиотеки/пакета</td>
+</tr>
+<tr>
+<td>Версия (PURL)</td>
+<td><code>pkg:&lt;eco&gt;/&lt;name&gt;@&lt;version&gt;</code></td>
+</tr>
+<tr>
+<td>CVE / БДУ</td>
+<td>идентификатор(ы) уязвимости</td>
+</tr>
+<tr>
+<td>CVSS</td>
+<td>базовый вектор и оценка (v3.1/v4.0)</td>
+</tr>
+<tr>
+<td>Severity</td>
+<td>Critical / High / Medium / Low</td>
+</tr>
+<tr>
+<td>EPSS / KEV</td>
+<td>вероятность эксплуатации / наличие в <a href="doc-d18b969b4915.html">CISA KEV</a></td>
+</tr>
+<tr>
+<td>Применимость (VEX)</td>
+<td>affected / not_affected / under_investigation + обоснование</td>
+</tr>
+<tr>
+<td>Issuer VEX</td>
+<td>роль/подразделение, выпустившее решение для версии продукта</td>
+</tr>
+<tr>
+<td>Сценарий эксплуатации</td>
+<td>как достижима в продуктовой конфигурации</td>
+</tr>
+<tr>
+<td>Решение</td>
+<td>устранить / митигировать / риск принят / заменить</td>
+</tr>
+<tr>
+<td>Компенсирующие меры</td>
+<td>контроль, снижающий вероятность/ущерб + evidence</td>
+</tr>
+<tr>
+<td>Владелец</td>
+<td>роль/ответственный (без конкретных ФИО)</td>
+</tr>
+<tr>
+<td>Срок устранения / пересмотра</td>
+<td>дата по SLA или по <a href="doc-3449932010c8.html">принятию риска</a></td>
+</tr>
+<tr>
+<td>Статус</td>
+<td>открыт / митигирован / принят риск / закрыт</td>
+</tr>
+<tr>
+<td>Evidence</td>
+<td>ссылки на VDR/VEX из сервиса аудита/вердиктов, SBOM/ППК, build/reachability evidence, upstream advisory/VEX, протокол ретеста</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Заполненный фрагмент
+Компонент: <code>lib-foo</code>; Версия: <code>pkg:npm/lib-foo@1.4.2</code>; CVE: CVE-2025-12345 (БДУ:2025-XXXXX); CVSS: 7.5 (AV:N/AC:L/PR:N/UI:N); Severity: High; Применимость: <code>affected</code> — уязвимый парсер вызывается из публичного endpoint; Issuer VEX: Product Security + владелец сервиса; Решение: обновить до 1.4.3; Срок: 2026-07-15; Владелец: дежурный аналитик SCA (роль).</p>
+<p>Severity ≠ риск для продукта
+Базовый CVSS считает «в вакууме». Реальный риск корректируется применимостью (VEX), достижимостью кода и эксплуатируемостью (EPSS/KEV). Паспорт обязан показывать оба значения: базовое и контекстное.</p>
+</blockquote>
+<h2 id="правила">Правила</h2>
+<ul>
+<li>Каждое поле либо заполнено, либо явно помечено <code>unknown</code> — пустых клеток нет.</li>
+<li>Статус <code>закрыт</code> ставится только при наличии evidence ретеста (<a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a>).</li>
+<li>При принятии риска паспорт связывается с записью в <a href="doc-f0ded133ff51.html">Реестр исключений</a> и имеет дату пересмотра.</li>
+<li>Upstream advisory/VEX не переносится автоматически: он прикладывается как evidence, а продуктовый статус утверждается issuer продукта.</li>
+</ul>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-e29be6710c8d.html">М14. Политики и принятие риска</a></li>
+<li>Справка: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a></li>
+<li>Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-adce46441199.html">П30. Исключения и принятие риска</a></li>
+<li>Нормативка/инструменты: <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-d18b969b4915.html">CISA KEV</a> · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a></li>
+<li>Связанные шаблоны: <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-3449932010c8.html">Порядок принятия риска</a> · <a href="doc-f0ded133ff51.html">Реестр исключений</a> · <a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

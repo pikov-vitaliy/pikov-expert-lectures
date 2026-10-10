@@ -1,0 +1,58 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П20. CMake dependency graph — КАПО · Пиков</title><meta name="description" content="П20. CMake dependency graph. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a47c43e70b05.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п20-cmake-dependency-graph">П20. CMake dependency graph</h1>
+<h2 id="цель">Цель</h2>
+<p>Получить из CMake-проекта два машинных артефакта состава: <code>compile_commands.json</code> (что и с какими <code>-I</code> компилировалось) и граф целей (<code>--graphviz</code>), показывающий, какие библиотеки линкуются к исполняемому файлу. Проверяемый результат: оба файла на диске и осознанный ответ, какие узлы графа — внешние зависимости, а какие — собственные цели проекта.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># 1. сконфигурировать проект и попросить CMake выгрузить базу компиляции
+cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+# 2. выгрузить граф зависимостей целей (target dependency graph)
+cmake --graphviz=build/deps.dot -S . -B build
+
+# 3. посмотреть, какие библиотеки реально подключаются к таргету app
+grep -E 'target_link|-&gt;' build/deps.dot
+# при наличии graphviz — отрисовать в PNG
+dot -Tpng build/deps.dot -o build/deps.png
+</code></pre>
+<blockquote>
+<p>Что именно отдаёт CMake
+<code>compile_commands.json</code> — это массив записей вида «директория + команда компиляции + файл». Из него видны все <code>-I</code> и <code>-D</code>, но <strong>не</strong> линковка. Линковку показывает граф <code>--graphviz</code>: рёбра соответствуют <code>target_link_libraries(...)</code>. Вместе они дают то, чего нет в <code>#include</code>: какая внешняя цель действительно прицеплена к бинарю.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p><code>build/compile_commands.json</code> — массив записей (фрагмент):</p>
+<pre><code class="language-json">[
+  {
+    "directory": "/proj/build",
+    "command": "/usr/bin/g++ -I/proj/include -I/usr/include/openssl -o main.o -c /proj/src/main.cpp",
+    "file": "/proj/src/main.cpp"
+  }
+]
+</code></pre>
+<p>В <code>build/deps.dot</code> — узлы и рёбра целей; внешние библиотеки выглядят как листовые узлы без исходников:</p>
+<pre><code class="language-text">"node0" [ label = "app", shape = egg ];
+"node1" [ label = "OpenSSL::SSL", shape = septagon ];
+"node0" -&gt; "node1"   // app линкуется с OpenSSL::SSL
+"node0" -&gt; "node2"   // app -&gt; z (zlib)
+</code></pre>
+<p>Ориентир: число рёбер <code>app -&gt; ...</code> примерно равно числу аргументов <code>target_link_libraries</code> в <code>CMakeLists.txt</code>. Если в графе библиотек меньше, чем <code>#include</code> сторонних заголовков, — часть зависимостей подтянута транзитивно или вшита, проверяйте через <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>compile_commands.json</code> не создаётся.</strong> Флаг <code>CMAKE_EXPORT_COMPILE_COMMANDS</code> работает только для генераторов Makefiles и Ninja. Если используете генератор Visual Studio или Xcode — переключитесь: <code>cmake -G Ninja ...</code> или <code>cmake -G "Unix Makefiles" ...</code>.</li>
+<li><strong>Граф <code>deps.dot</code> почти пустой.</strong> Зависимости подключены не как CMake-таргеты, а «сырыми» флагами (<code>target_link_libraries(app -lssl)</code> или прямой <code>link_libraries</code>). Такие связи в graphviz не всегда попадают — для них опирайтесь на verbose-лог сборки (<a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>).</li>
+<li><strong><code>dot: command not found</code>.</strong> Утилита <code>dot</code> (пакет <code>graphviz</code>) не установлена. Картинка необязательна — содержимое <code>.dot</code> можно читать как текст; установить при необходимости: <code>apt-get install graphviz</code>.</li>
+<li><strong>Цель <code>find_package(OpenSSL)</code> не нашлась.</strong> Конфигурация падает на <code>find_package</code>. Это уже сигнал, что зависимость не задекларирована управляемо (нет Conan/vcpkg) — отметьте её как кандидата в unresolved и переходите к <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: <code>compile_commands.json</code> и <code>deps.dot</code> (или <code>deps.png</code>), а также короткий разбор графа — какие узлы являются внешними зависимостями (OpenSSL, zlib и т.п.), какие — собственными целями проекта, и совпадает ли число внешних рёбер с числом сторонних <code>#include</code>. Расхождение нужно объяснить.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Декларативный граф целей CMake — это управляемая фиксация состава по <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> и практика PS.3.2 (<a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>): зависимости описаны в сборочной конфигурации, а не угадываются. Полнота и связность (dependency relationship) — критерии качества SBOM по <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>.
+Смежные практики модуля <a href="doc-fa808e147d8e.html">М09</a>: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>, <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>. Шаблон: <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SWID — КАПО · Пиков</title><meta name="description" content="SWID. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9bce61f41d9c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="swid">SWID</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>SWID (Software Identification Tag, ISO/IEC 19770-2) — XML-тег идентификации установленного ПО, который вендор кладёт в дистрибутив, чтобы инвентаризация и средства управления активами могли однозначно опознать продукт и его версию. В контексте SBOM SWID — это <strong>один из идентификаторов компонента</strong>, а не контейнер всего SBOM: в <a href="doc-dbc1ace95cba.html">CycloneDX</a> он записывается полем <code>swid</code> / <code>swid.tagId</code>, в <a href="doc-4074ab5340cf.html">SPDX</a> — как <code>externalIdentifierType: swid</code>.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>SWID-тег — XML-документ корня <code>&lt;SoftwareIdentity&gt;</code> с атрибутами <code>name</code>, <code>version</code>, <code>tagId</code> и вложенным <code>&lt;Entity&gt;</code> (издатель):</p>
+<pre><code class="language-xml">&lt;SoftwareIdentity name="OpenSSL" version="3.0.13"
+    tagId="org.openssl-openssl-3.0.13"
+    xmlns="http://standards.iso.org/iso/19770/-2/2015/schema.xsd"&gt;
+  &lt;Entity name="OpenSSL Project" role="softwareCreator tagCreator"/&gt;
+&lt;/SoftwareIdentity&gt;
+</code></pre>
+<p>В SBOM ссылаются не на весь тег, а на его <code>tagId</code>. Так SWID дополняет <a href="doc-41eb01248f66.html">Package URL</a> (координаты в реестре) и <a href="doc-17e9049e2a17.html">CPE</a> (ключ к NVD) там, где у продукта есть официально выпущенный тег идентификации — обычно у проприетарного и коробочного ПО.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Тег выпускает сам издатель ПО — авторитетный, доверенный идентификатор, в отличие от угадываемого CPE.</li>
+<li>Стандарт ISO/IEC 19770-2 встроен в практики управления ИТ-активами (SAM).</li>
+<li>Несёт издателя и роли (<code>tagCreator</code>, <code>softwareCreator</code>) — полезно для происхождения.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Это идентификатор компонента, а не контейнерный формат SBOM: пытаться хранить в SWID весь состав ПО — ошибка моделирования.</li>
+<li>Покрытие низкое: большинство open-source пакетов SWID-тегов не выпускает, для них работают purl/CPE.</li>
+<li>Многословный XML, на практике в SBOM попадает лишь <code>tagId</code>, а не полный тег.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью офлайновый: тег физически лежит внутри дистрибутива, его чтение и сопоставление с записью SBOM сети не требуют. Сетевой доступ не нужен ни для выпуска, ни для проверки тега.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-4a0b7bceee7b.html">М04 Идентификаторы компонентов и уязвимостей</a>
+Практики: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>
+Смежные карточки: <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-17e9049e2a17.html">CPE</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

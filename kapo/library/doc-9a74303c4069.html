@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CycloneDX ECMA-424 — КАПО · Пиков</title><meta name="description" content="CycloneDX ECMA-424. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9a74303c4069.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="cyclonedx-ecma-424">CycloneDX ECMA-424</h1>
+<h2 id="о-документе">О документе</h2>
+<blockquote>
+<p>Что это
+ECMA-424 — стандарт Ecma International, закрепляющий спецификацию <strong>CycloneDX</strong> как формат Bill of Materials. Издан техническим комитетом TC54; развитие самого формата ведёт проект OWASP CycloneDX. Это не методичка по управлению уязвимостями, а <strong>схема данных</strong>: как машинно описать состав продукта и связанные с ним факты безопасности.</p>
+</blockquote>
+<p>CycloneDX покрывает не только классический SBOM (компоненты), но и связанные типы BOM: <strong>VEX</strong> (статус эксплуатируемости уязвимости), <strong>VDR</strong> (раскрытие найденных уязвимостей), <strong>CBOM</strong> (криптография), а также блоки <code>compositions</code> (полнота описания) и <code>evidence</code> (откуда инструмент узнал о компоненте). Сериализация — JSON, XML или Protocol Buffers; в курсе рабочий вариант — JSON.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Идентификация документа.</strong> Корень содержит <code>bomFormat: "CycloneDX"</code>, <code>specVersion</code>, <code>serialNumber</code> (URN-uuid) и <code>version</code> (ревизия самого BOM) — без них документ не самоописателен.</li>
+<li><strong>Идентификация компонентов через <code>purl</code>.</strong> Каждый <code>component</code> несёт <code>type</code>, <code>name</code>, <code>version</code>; для матчинга на уязвимости — <code>purl</code> в формате <code>pkg:type/namespace/name@version</code>, при наличии — <code>cpe</code>.</li>
+<li><strong>Прослеживаемость до субъекта поставки.</strong> Секция <code>metadata</code> фиксирует <code>timestamp</code>, <code>tools</code> (чем сгенерирован BOM) и <code>metadata.component</code> (что именно описывается).</li>
+<li><strong>Честность охвата.</strong> Блок <code>compositions</code> с <code>aggregate</code> (<code>complete</code> / <code>incomplete</code> / <code>unknown</code>) обязателен, когда состав описан не полностью — иначе SBOM молча выдаёт частичную картину за полную.</li>
+<li><strong>Разделение факта и решения.</strong> Уязвимость как факт живёт в <code>vulnerabilities</code>; решение «эксплуатируема ли она в продукте» — это VEX-<code>analysis.state</code> (<code>exploitable</code>, <code>not_affected</code>, <code>in_triage</code>…), а не свойство компонента.</li>
+<li><strong>Доказуемость происхождения данных.</strong> Блок <code>evidence</code> (identity, occurrences, call-stack) показывает, на каком основании инструмент приписал компонент продукту.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<blockquote>
+<p>Артефакты соответствия
+- Валидный CycloneDX JSON с заполненными <code>metadata.timestamp</code>, <code>metadata.tools</code>, <code>serialNumber</code>, <code>version</code> — основной ППК продукта.
+- Отчёт проверки против официальной JSON-схемы CycloneDX соответствующей <code>specVersion</code> (gate в CI).
+- Заполненный <code>compositions.aggregate</code> для C/C++-сборок, где статическая линковка делает охват <code>incomplete</code>.
+- VEX-документ CycloneDX с <code>analysis.state</code>/<code>justification</code> по каждой значимой уязвимости.
+- Метрика качества: доля компонентов с валидным <code>purl</code> и непустой <code>version</code>.</p>
+</blockquote>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li>Чтение и ручной разбор структуры: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a>.</li>
+<li>Генерация для C/C++, где формат проявляет слепые зоны: <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a>.</li>
+<li>Разделение VDR/VEX как разных типов BOM: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>, триаж — <a href="doc-c01924770ece.html">П35. VEX triage</a>.</li>
+<li>Контроль качества документа: <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>; минимальный набор полей ППК — <a href="doc-0cc54b9609f7.html">Минимальный набор полей ППК</a>.</li>
+<li>Контекст модуля: <a href="doc-1648d69d5029.html">М03. Форматы SBOM: CycloneDX, SPDX, SWID</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<blockquote>
+<p>Это учебная карточка
+Карточка пересказывает структуру формата под задачи курса и не воспроизводит официальный текст ECMA-424. Конкретные имена полей и допустимые значения для аудита сверять с актуальной спецификацией CycloneDX выбранной <code>specVersion</code> и с регламентами Организации.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

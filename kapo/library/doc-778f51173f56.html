@@ -1,0 +1,73 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М13. М13. Нормативная трассировка и доказательная база — КАПО · Пиков</title><meta name="description" content="М13. М13. Нормативная трассировка и доказательная база. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-778f51173f56.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#главная-идея-модуля">Главная идея модуля</a></li>
+<li><a href="#материалы-модуля">Материалы модуля</a></li>
+<li><a href="#сжатая-матрица-полная-в-конспекте">Сжатая матрица (полная — в конспекте)</a></li>
+<li><a href="#связи">Связи</a></li>
+</ul>
+</div>
+<h1 id="м13-нормативная-трассировка-и-доказательная-база">М13. Нормативная трассировка и доказательная база</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>Предыдущие модули учили <em>получать</em> артефакты: SBOM, VDR, license scan, build inventory. М13 отвечает на другой вопрос — <strong>чем доказать аудитору, что процесс композиционного анализа действительно выполняется</strong>. Здесь мы строим мост от формулировки требования (ГОСТ Р 56939-2024, NIST SSDF, BSI TR-03183-2) к конкретной практике и к машинному артефакту, который этот контроль подтверждает. Результат — матрица <code>требование → практика → артефакт (evidence)</code>, по которой можно пройти аудит, а не пересказывать намерения.</p>
+<h2 id="главная-идея-модуля">Главная идея модуля</h2>
+<p>Доказательная база держится на разделении <strong>статики и динамики</strong>: SBOM по BSI TR-03183-2 статичен и НЕ содержит сведений об уязвимостях (§3, §8.1.14), а сведения об уязвимостях динамичны и живут в отдельном артефакте (VEX/CSAF/VDR). Поэтому одной строки «у нас есть SBOM» для аудита недостаточно: каждый контроль требует <em>своего</em> типа evidence с фиксированными атрибутами (дата, версия продукта, инструмент, владелец).</p>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-778f51173f56-0.svg" rel="noopener" target="_blank"><img alt="Схема: М13. М13. Нормативная трассировка и доказательная база" loading="lazy" src="../assets/course-diagrams/course-778f51173f56-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="материалы-модуля">Материалы модуля</h2>
+<ul>
+<li><a href="doc-6a3215ed3765.html">01 Конспект</a> — связь требование→практика→артефакт, полная матрица маппинга трёх стандартов.</li>
+<li><a href="doc-dfbca55c7ca9.html">02 План занятия</a> — тайминг занятия 90 минут.</li>
+<li><a href="doc-dbfeea0b3ef5.html">03 Практическая работа</a> — собрать одну строку матрицы end-to-end и проверить её на воспроизводимость.</li>
+<li><a href="doc-4917071395e7.html">04 Контрольные вопросы</a> — вопросы и кейсы по трассировке.</li>
+<li><a href="doc-84d448d200c1.html">05 Что проверять на проекте</a> — чек-лист аудитора.</li>
+</ul>
+<h2 id="сжатая-матрица-полная-в-конспекте">Сжатая матрица (полная — в конспекте)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Требование КАПО (ГОСТ Р 56939-2024)</th>
+<th>NIST SSDF</th>
+<th>BSI TR-03183-2</th>
+<th>Артефакт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Регламент КА</td>
+<td>PW.4</td>
+<td>—</td>
+<td>Регламент КАПО (роли, периодичность)</td>
+</tr>
+<tr>
+<td>Формирование ППК/SBOM</td>
+<td>PS.3.2</td>
+<td>§4, §5.2.1–5.2.2</td>
+<td>CycloneDX 1.6 JSON</td>
+</tr>
+<tr>
+<td>Контроль и актуализация ППК</td>
+<td>RV.1</td>
+<td>§8.1.14</td>
+<td>VDR + журнал анализа</td>
+</tr>
+<tr>
+<td>Анализ на поверхности атаки</td>
+<td>RV.2</td>
+<td>§8.1.14</td>
+<td>VEX/CSAF</td>
+</tr>
+<tr>
+<td>Корректирующие воздействия</td>
+<td>RV.2</td>
+<td>—</td>
+<td>Реестр исключений, протокол ретеста</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="связи">Связи</h2>
+<ul>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-9ed897f12463.html">Проект ГОСТ Р КАПО</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-b5856ada3679.html">ISO IEC 27001</a></li>
+<li>Шаблоны: <a href="doc-91e9697aff8e.html">Матрица evidence для аудита</a> · <a href="doc-e65a39cb2dfa.html">Журналирование и audit trail</a> · <a href="doc-e6347f4cd6c7.html">Матрица соответствия требованиям</a></li>
+<li>Смежные модули: <a href="doc-97c8afb5a218.html">М02 SBOM как источник фактов</a> · <a href="doc-cd2bdeca5d64.html">М06 VDR/VEX</a> · <a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-e29be6710c8d.html">М14 Политики и исключения</a></li>
+<li>Практики: <a href="doc-4a0d55cda965.html">П03</a> · <a href="doc-ebb5b655a8d2.html">П08</a> · <a href="doc-8e64f240b13c.html">П09</a> · <a href="doc-c01924770ece.html">П35</a> · <a href="doc-adce46441199.html">П30</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

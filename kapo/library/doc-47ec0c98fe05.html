@@ -1,0 +1,83 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OWASP SCVS — КАПО · Пиков</title><meta name="description" content="OWASP SCVS. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-47ec0c98fe05.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="owasp-scvs">OWASP SCVS</h1>
+<h2 id="о-документе">О документе</h2>
+<blockquote>
+<p>Что это
+<strong>OWASP SCVS</strong> (Software Component Verification Standard) — открытый стандарт OWASP, формулирующий <strong>проверяемые требования к управлению компонентами цепочки поставки ПО</strong>. Это самый «прицельный» под SCA/OSA документ группы: он напрямую про инвентаризацию, SBOM, идентификацию компонентов и контроль происхождения. По духу — чек-лист требований с тремя уровнями строгости (L1–L3).</p>
+</blockquote>
+<p>SCVS структурирован по доменам: инвентаризация (V1), SBOM (V2), сборка и среда (V3), управление пакетами (V4), идентификация компонентов (V5), pedigree/provenance (V6). Уровни L1/L2/L3 позволяют наращивать строгость, не переписывая требования.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Полная инвентаризация (V1).</strong> Все first-party и third-party компоненты, включая транзитивные зависимости, должны быть известны и учтены.</li>
+<li><strong>Машиночитаемый SBOM (V2).</strong> SBOM формируется автоматически, в стандартном формате (CycloneDX/SPDX), на каждый релиз, с точностью до версии.</li>
+<li><strong>Целостность среды сборки (V3).</strong> Сборка воспроизводима, артефакты собираются из контролируемых источников, build-pipeline защищён.</li>
+<li><strong>Контролируемое управление пакетами (V4).</strong> Зависимости подтягиваются из доверенного репозитория, версии зафиксированы (lockfiles), отсутствует «слепой» подтяг latest.</li>
+<li><strong>Однозначная идентификация (V5).</strong> Каждый компонент имеет корректный <code>purl</code>/<code>cpe</code> и проверяемую целостность (хэш/подпись).</li>
+<li><strong>Происхождение и pedigree (V6).</strong> Известно, откуда компонент получен, и есть подтверждение, что он не был подменён.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<blockquote>
+<p>Артефакты соответствия
+- SBOM на каждый релиз с метрикой покрытия транзитивных зависимостей (домен V1–V2).
+- CI-gate качества SBOM: процент компонентов с валидным <code>purl</code>, наличие версий и хэшей (V5).
+- Конфигурация controlled repository / proxy и lockfiles как доказательство V4.
+- Подпись SBOM/артефактов и проверка целостности — доказательство V3/V6.</p>
+</blockquote>
+<p>Матрица трассировки доменов SCVS на контроли и артефакты:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Домен SCVS</th>
+<th>Контроль SCA/OSA</th>
+<th>Подтверждающий артефакт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V1 Инвентаризация</td>
+<td>Портфельный учёт всех зависимостей</td>
+<td>SBOM с покрытием транзитивных зависимостей</td>
+</tr>
+<tr>
+<td>V2 SBOM</td>
+<td>Автогенерация SBOM на релиз</td>
+<td>CycloneDX/SPDX-документ + лог CI</td>
+</tr>
+<tr>
+<td>V4 Управление пакетами</td>
+<td>Controlled repository, lockfiles</td>
+<td>Конфигурация proxy, зафиксированные версии</td>
+</tr>
+<tr>
+<td>V5 Идентификация</td>
+<td><code>purl</code>/<code>cpe</code> + хэши</td>
+<td>Отчёт качества SBOM (доля валидных <code>purl</code>)</td>
+</tr>
+<tr>
+<td>V6 Provenance</td>
+<td>Подпись артефактов/SBOM</td>
+<td>Provenance-attestation, проверка подписи</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li>Качество SBOM как gate (V2/V5): <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>.</li>
+<li>Портфель SBOM и контроль покрытия (V1): <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a>.</li>
+<li>Целостность и происхождение (V3/V6): <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a>.</li>
+<li>Шаблоны: <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a>, <a href="doc-7b38c1b6c34b.html">Паспорт open source библиотеки</a>, <a href="doc-7001d4a35f2f.html">Политика приемки сторонних компонентов</a>.</li>
+<li>Контекст модулей: <a href="doc-97c8afb5a218.html">М02. SBOM как источник фактов</a> и <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<blockquote>
+<p>Это учебная карточка
+Карточка пересказывает структуру SCVS под курс и не воспроизводит официальный текст. Точные формулировки требований и привязку к уровням L1–L3 для аудита сверять с актуальной редакцией OWASP SCVS и регламентами Организации.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

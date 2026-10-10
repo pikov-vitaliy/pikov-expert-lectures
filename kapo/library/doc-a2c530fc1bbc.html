@@ -1,0 +1,49 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>honest SBOM — КАПО · Пиков</title><meta name="description" content="honest SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a2c530fc1bbc.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="honest-sbom">honest SBOM</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>«Честный SBOM» — это про разрыв между тем, что <strong>декларируется</strong> в поставляемом <code>bom.json</code>, и тем, что <strong>реально лежит</strong> в артефакте. Поставщик может приложить аккуратный CycloneDX, сгенерированный на чистой dev-машине, тогда как образ, который реально едет заказчику, собран иначе: с другими версиями <code>.so</code>, с забытым vendored-кодом, с лишними слоями. SBOM в этом случае формально валиден, но не соответствует поставке. Задача composition analysis — не доверять декларации, а проверять её сходимость с независимо извлечёнными фактами.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Честность проверяется дифом: сгенерировать SBOM независимо из самого артефакта (с полным охватом слоёв) и сравнить множества компонентов с тем, что прислал поставщик.</p>
+<pre><code class="language-bash"># что прислал поставщик
+jq -r '.components[] | "\(.name)@\(.version)"' supplier-bom.json | sort &gt; declared.txt
+
+# что реально в образе (все слои, не верхняя проекция)
+syft myapp:1.4 --scope all-layers -o cyclonedx-json &gt; actual-bom.json
+jq -r '.components[] | "\(.name)@\(.version)"' actual-bom.json | sort &gt; actual.txt
+
+diff declared.txt actual.txt
+# &lt; openssl@3.0.2        &lt;-- объявлено, но в образе 3.0.13 (расхождение версии)
+# &gt; zlib@1.2.11          &lt;-- реально присутствует, но в декларации нет
+# &gt; libcurl@7.68.0       &lt;-- vendored, не попал в декларацию
+</code></pre>
+<p>Любая строка <code>&gt;</code> (есть в образе, нет в декларации) — недекларированный компонент; любая <code>&lt;</code> — призрак, заявленный, но отсутствующий. Расхождение версий по одному имени — отдельный класс дефектов.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Честность = сходимость двух независимых источников
+SBOM считается честным, когда декларация воспроизводится из артефакта при независимой генерации. Один источник (только поставщикский файл или только верхняя ФС) доказательством не является — нужны оба и их совпадение в пределах объявленного допуска.</p>
+</blockquote>
+<p>Слепая зона: генерация SBOM по dev-окружению вместо релизного артефакта. Тогда декларация описывает «как собирали у себя», а не «что отгрузили».</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Принимать SBOM только вместе с артефактом, к которому он относится, и сверять хеш артефакта.</li>
+<li>Независимо генерировать SBOM из самого артефакта с <code>--scope all-layers</code> и делать diff множеств компонентов.</li>
+<li>Расхождения раскладывать на классы: недекларированный компонент, призрак, расхождение версии — и для каждого требовать объяснение.</li>
+<li>Проверять покрытие минимальных элементов (имя, версия, поставщик, идентификатор, отношения, автор SBOM, timestamp) по CISA/BSI.</li>
+<li>Недоказанные записи помечать пониженным confidence и отправлять в worklist доразметки, а не молча принимать.</li>
+<li>Закрепить «критерий честности» в quality gate: поставка проходит, только если diff в пределах объявленных исключений.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a>.</li>
+<li>Практики: <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>, <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>.</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements</a>, <a href="doc-f8e87801f278.html">NTIA Minimum Elements</a>, <a href="doc-3c212b09f984.html">BSI TR-03183-2</a>.</li>
+<li>Смежные заметки: <a href="doc-659dc2ec481f.html">container image layers</a>, <a href="doc-e4a620b9b139.html">container image obfuscation</a>, <a href="doc-91fc18825af4.html">SBOM evidence occurrences</a>, <a href="doc-9fa864f09c7c.html">detection accuracy</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

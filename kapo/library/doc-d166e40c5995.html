@@ -1,0 +1,38 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М06. Что проверять на проекте: VDR/VEX — КАПО · Пиков</title><meta name="description" content="М06. Что проверять на проекте: VDR/VEX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-d166e40c5995.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#vdr-получение-фактов">VDR — получение фактов</a></li>
+<li><a href="#vex-решения">VEX — решения</a></li>
+<li><a href="#управляемость">Управляемость</a></li>
+</ul>
+</div>
+<h1 id="что-проверять-на-проекте-vdrvex">Что проверять на проекте: VDR/VEX</h1>
+<p>Чек-лист аудитора по управлению уязвимостями поверх SBOM. Проверяется не «есть ли сканер», а замкнут ли цикл «факт → решение → действие → ретест». Подробный порядок выпуска решения: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+<h2 id="vdr-получение-фактов">VDR — получение фактов</h2>
+<ul>
+<li>[ ] <strong>Сканирование от SBOM, а не вслепую.</strong> VDR строится поверх SBOM релиза (Grype/Dependency-Track) или поверх lockfile (OSV-Scanner) — есть воспроизводимая команда и зафиксирована версия сканера и дата баз.</li>
+<li>[ ] <strong>Несколько источников.</strong> Находки сверяются минимум по двум базам (NVD/OSV/GHSA) и обязательно с <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> для проектов под регулятора; расхождения не теряются.</li>
+<li>[ ] <strong>Свежесть баз.</strong> Есть процедура обновления уязвимостных БД сканера; для офлайн-контура — порядок доставки обновлений (<a href="doc-c74101c1bf88.html">Порядок обновления БДУ</a>).</li>
+<li>[ ] <strong>Покрытие.</strong> VDR строится по прямым и транзитивным зависимостям; «0 находок» расследуется как возможный дефект координат (PURL/CPE), а не как «чисто».</li>
+</ul>
+<h2 id="vex-решения">VEX — решения</h2>
+<ul>
+<li>[ ] <strong>VDR и VEX разделены.</strong> Факт (что нашли) и решение (применимо ли) — разные сущности в артефактах, а не «отметка прочитано» в сканере.</li>
+<li>[ ] <strong>Issuer определён.</strong> VEX выпущен от имени ответственной за продукт стороны (Product Security / PSIRT / AppSec / РБПО + владелец продукта), а не от имени NVD/БДУ/OSV или сканера.</li>
+<li>[ ] <strong>Состояния используются по назначению.</strong> Каждая обработанная находка имеет одно из: <code>not_affected</code> / <code>affected</code> / <code>fixed</code> / <code>under_investigation</code>.</li>
+<li>[ ] <strong>Обоснования из разрешённого списка.</strong> Все <code>not_affected</code> несут <code>justification</code> (например, <code>code_not_reachable</code>, <code>vulnerable_code_not_present</code>); пустых и свободных формулировок нет.</li>
+<li>[ ] <strong>Evidence привязан к продукту.</strong> Для <code>not_affected</code> есть доказательства применимости именно к версии продукта: SBOM/ППК, build log, reachability/call graph, конфигурация, тест или triage issue. Upstream VEX/advisory используется как evidence, но не заменяет решение производителя продукта.</li>
+<li>[ ] <strong>Действие для affected.</strong> Для <code>affected</code> указан <code>response</code> (<code>update</code>, <code>rollback</code>, <code>workaround_available</code>) и привязка к задаче/релизу.</li>
+<li>[ ] <strong><code>fixed</code> замыкает цикл.</strong> Исправленные находки помечены <code>fixed</code>, на следующем скане не «загораются» заново.</li>
+</ul>
+<h2 id="управляемость">Управляемость</h2>
+<ul>
+<li>[ ] <strong>Владелец.</strong> У каждой находки/группы есть владелец (роль, не сканер и не «команда вообще»).</li>
+<li>[ ] <strong>SLA по severity.</strong> Заданы сроки реакции по уровням (например, Critical / High / Medium) и они соблюдаются; есть отчёт по просрочкам (<a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a>).</li>
+<li>[ ] <strong>Ретест и срок жизни решения.</strong> <code>under_investigation</code> и <code>affected</code> пересматриваются регулярно; <code>not_affected</code> имеет триггер пересмотра (новая версия компонента, новый релиз) (<a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a>).</li>
+<li>[ ] <strong>Исключения и принятие риска.</strong> Долгоживущие <code>affected</code>/<code>not_affected</code> без фикса оформлены как осознанный риск с датой пересмотра (<a href="doc-3449932010c8.html">Порядок принятия риска</a>).</li>
+<li>[ ] <strong>Трассируемость и обмен.</strong> VDR/VEX выгружаются в стандартном формате (CycloneDX/OpenVEX), привязаны к версии продукта и могут быть переданы заказчику/получены от соисполнителя (<a href="doc-620bbc0766f4.html">Порядок загрузки VDR из Dependency-Track</a>).</li>
+</ul>
+<blockquote>
+<p>Стоп-сигналы аудита
+Массовый <code>not_affected</code> без обоснований; VEX «выпущен» базой уязвимостей или сканером; upstream advisory автоматически перенесён на ваш продукт без анализа сборки; единственный источник (только NVD, без БДУ); находки без владельца и SLA; <code>not_affected</code>, оформленный для давно сменившейся версии продукта; «0 находок» при богатом составе зависимостей. Любой из них означает имитацию триажа, а не управление уязвимостями.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

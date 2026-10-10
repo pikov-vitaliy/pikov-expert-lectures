@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет 15 — КАПО · Пиков</title><meta name="description" content="Билет 15. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-80b195179765.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>10 Оценивание</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#теоретический-вопрос">Теоретический вопрос</a></li>
+<li><a href="#практический-вопрос">Практический вопрос</a></li>
+<li><a href="#что-должен-показать-ответ">Что должен показать ответ</a></li>
+<li><a href="#опорные-материалы">Опорные материалы</a></li>
+</ul>
+</div>
+<h1 id="билет-15">Билет 15</h1>
+<h2 id="теоретический-вопрос">Теоретический вопрос</h2>
+<p>Раскройте архитектурное разделение двух контуров: <strong>генератор фактов</strong> (enrichment-утилита, строит максимально полный CycloneDX из SBOM, ELF-анализа, apt/Conan-метаданных и build evidence) и <strong>сервис аудита/вердиктов</strong> (принимает артефакты, хранит immutable uploads, ведёт лицензии, уязвимости, мост BDU/VDR, роли и readiness). Почему генератор не должен выносить вердиктов, а сервис — доопределять состав «из воздуха»? Что служит контрактом между контурами и почему это именно machine-readable артефакт, а не общий код или общая БД?</p>
+<h2 id="практический-вопрос">Практический вопрос</h2>
+<blockquote>
+<p>Мини-кейс
+Генератор фактов отдал записи с пониженным confidence (спорные unresolved-библиотеки) в worklist доразметки, не удаляя их. Менеджер предлагает «чтобы readiness был зелёный, пусть генератор просто убирает сомнительное». Объясните, почему это разрушает свойство «факты остаются фактами», и опишите, кто и по какому контуру принимает решение о судьбе спорной записи.</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Аспект</th>
+<th>Генератор фактов</th>
+<th>Сервис аудита/вердиктов</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Вопрос</td>
+<td>«что входит в поставку?»</td>
+<td>«можно ли это принять?»</td>
+</tr>
+<tr>
+<td>Выход</td>
+<td>обогащённый CycloneDX</td>
+<td>вердикт, исключения, readiness</td>
+</tr>
+<tr>
+<td>Чего НЕ делает</td>
+<td>не выносит вердиктов</td>
+<td>не доопределяет состав</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="что-должен-показать-ответ">Что должен показать ответ</h2>
+<ul>
+<li><strong>Источник факта</strong>: обогащённый CycloneDX <code>bom.json</code> от генератора фактов; immutable upload в сервисе вердиктов.</li>
+<li><strong>Инструмент</strong>: enrichment (ELF/LIEF, apt/Conan, build evidence) на стороне генератора; портфель SBOM и мост BDU/VDR на стороне сервиса.</li>
+<li><strong>Владелец решения</strong>: судьба спорной записи, VEX-статус и итоговый readiness — сервис аудита/вердиктов с ответственным issuer продукта, не генератор и не менеджер «ради зелёного статуса».</li>
+<li><strong>Нормативная опора</strong>: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>, <a href="doc-a6189f5ab42c.html">NIST SP 800-161 Rev.1</a>.</li>
+<li><strong>Evidence</strong>: worklist доразметки с confidence; журнал вердиктов и исключений; для VEX — issuer, justification и evidence по версии продукта.</li>
+</ul>
+<h2 id="опорные-материалы">Опорные материалы</h2>
+<ul>
+<li><a href="doc-457364f50285.html">М11. Корпоративный кейс: генератор фактов и сервис вердиктов</a></li>
+<li><a href="doc-eb96e051c415.html">архитектурный кейс</a></li>
+<li><a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a></li>
+<li><a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-faa8e4b65ca3.html">П29. Readiness dashboard</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

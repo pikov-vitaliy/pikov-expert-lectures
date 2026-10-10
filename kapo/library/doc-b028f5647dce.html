@@ -1,0 +1,120 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П39. SBOM for AI: minimum elements — КАПО · Пиков</title><meta name="description" content="П39. SBOM for AI: minimum elements. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-b028f5647dce.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п39-sbom-for-ai-minimum-elements">П39. SBOM for AI: minimum elements</h1>
+<h2 id="цель">Цель</h2>
+<p>Взять одну реальную AI-поставку (например, локально развёрнутую открытую LLM в составе сервиса) и заполнить <strong>семь кластеров</strong> минимальных элементов SBOM for AI из совместного руководства G7 (2026). Проверяемый результат — заполненная карточка, где для каждого обязательного элемента указано либо значение, либо явное <code>unknown</code> с причиной. Главный навык — отличить то, что добавляет AI-SBOM, от обычного SBOM приложения.</p>
+<blockquote>
+<p>AI-система — это тоже ПО, но обычного SBOM мало
+Руководство G7 прямо говорит: SBOM for AI <strong>дополняет</strong>, а не заменяет классический SBOM. Дерево <code>package-lock.json</code> не описывает происхождение обучающего датасета, лицензию весов, lineage дистилляции и контекстную длину модели. Семь кластеров закрывают именно эти разрывы. См. <a href="doc-3850f36a7630.html">G7 SBOM for AI Minimum Elements</a>.</p>
+</blockquote>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Это аналитическая практика без сканера. Заполните карточку по семи кластерам для выбранной модели/сервиса. Минимальный машиночитаемый каркас (YAML) — заполнять по элементам руководства:</p>
+<pre><code class="language-yaml">metadata:                # информация о самом SBOM, не о компонентах
+  sbom_author: "Организация, роль (не ФИО)"
+  sbom_version: "1.0.0"            # G7: major = 1 для этих min-элементов
+  data_format: "CycloneDX"
+  data_format_version: "1.6"
+  author_signature: "cosign / unknown"
+  tool_name: "..."
+  tool_version: "..."
+  generation_context: "after build"   # before build | build | after build
+  timestamp: "2026-06-17T12:00:00+03:00"  # RFC 9557
+  dependency_relationships: "includes / derived-from"
+
+system_level_properties:
+  name: "..."
+  components: ["LLM", "vector-db", "orchestrator"]
+  producer: "..."
+  version: "..."
+  data_flow: "источник -&gt; назначение, внешние API, web grounding"
+  data_usage: "ссылка на док: логируется ли ввод, дообучается ли модель"
+  io_properties: "модальность (text/audio/image), токенизатор"
+  intended_application_area: "напр. финансы / healthcare"
+
+models:
+  - name: "..."
+    identifier: "pkg:... / CPE / SWHID / commit-hash"
+    version: "..."
+    producer: "кто делал pre-/post-/fine-tuning"
+    hash_value: "..."
+    hash_algorithm: "SHA-256"   # имя по IANA, алгоритм по NIST
+    properties: "архитектура (decoder-only transformer), число параметров"
+    training_properties: "ссылка на model card: SFT/RLHF/DPO..."
+    license: "open weight / open data — ссылка на лицензию"
+    external_references: "model card, research paper"
+
+datasets:
+  - name: "..."
+    description: "pre-train / fine-tune / eval; private|public"
+    content: "тип данных, формат"
+    identifier: "URL/URI"
+    hash: "..."
+    provenance: "origin, метод сбора (web crawl/контракт), labeling"
+    sensitivity: "PII / copyright / financial / public"
+    dependency_relationship: "derived-from &lt;dataset&gt;"
+    license: "ссылка на лицензию датасета"
+
+infrastructure:
+  software: ["runtime", "frameworks", "package managers", "firmware"]
+  hardware: "ссылка на HBOM (если есть)"
+
+security_properties:
+  controls: ["access control", "I/O filters", "prompt-injection controls"]
+  compliance: "сертификации / стандарты"
+  policy_information: "ссылка на security.txt"
+  vulnerability_referencing: "ссылка на БД уязвимостей модели/системы"
+
+kpi:
+  security_metrics: "robustness benchmark"
+  operational_performance: "uptime, latency, throughput"
+</code></pre>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Заполненная карточка, где <strong>нет молчаливых пропусков</strong>: каждый обязательный элемент либо имеет значение, либо помечен <code>unknown</code> с однострочной причиной (руководство G7 прямо требует помечать неизвестное, а не опускать). Контрольная характеристика хорошей работы:</p>
+<ul>
+<li>В кластере <code>models</code> есть <code>hash_value</code> + <code>hash_algorithm</code> (имя алгоритма по IANA Hash Function Textual Names, сам алгоритм одобрен NIST), либо явное <code>unknown: нет доступа к файлу весов</code>.</li>
+<li>Разведены три разные лицензии: <code>models[].license</code> (веса), <code>datasets[].license</code> (данные) и лицензии runtime-компонентов в <code>infrastructure.software</code> — это типичная ловушка, где всё сваливают в одну строку.</li>
+<li><code>system_level_properties.data_flow</code> описывает внешние API и web grounding, а не только внутренние вызовы.</li>
+<li>В <code>metadata</code> заполнены <code>generation_context</code> и <code>dependency_relationships</code> — поля, которых нет в «обычном» SBOM.</li>
+</ul>
+<blockquote>
+<p>Минимальная заполненная модель</p>
+</blockquote>
+<pre><code class="language-yaml">models:
+  - name: "qwen2.5-7b-instruct"
+    identifier: "pkg:huggingface/Qwen/Qwen2.5-7B-Instruct"
+    version: "snapshot 2026-02"
+    producer: "Qwen team (pre-training); Организация (fine-tuning)"
+    hash_value: "unknown: веса подгружаются рантаймом, локального файла нет"
+    hash_algorithm: "SHA-256"
+    properties: "decoder-only transformer, ~7.6B параметров, ctx 32k"
+    training_properties: "model card: SFT + DPO"
+    license: "Apache-2.0 (open weight) — ссылка на LICENSE"
+    external_references: "model card на Hugging Face"</code></pre>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Карточка получилась как обычный SBOM приложения.</strong> Признак — заполнены только <code>infrastructure.software</code> и зависимости, а <code>models</code>/<code>datasets</code>/<code>system_level_properties</code> пустые. Это и есть тот разрыв, который закрывает практика: вернитесь и заполните минимум по моделям и датасетам.</li>
+<li><strong>Везде проставлено <code>unknown</code> без причины.</strong> <code>unknown</code> допустим, но руководство требует <em>указывать</em>, что значение неизвестно, и почему. «Молчаливый пропуск» элемента и осознанный <code>unknown</code> — разные вещи на приёмке.</li>
+<li><strong>Слиты разные лицензии.</strong> Если <code>license</code> одна на всю систему — почти наверняка ошибка: лицензия весов, лицензия датасета и лицензии библиотек обычно разные и имеют разные ограничения на использование.</li>
+<li><strong>Перепутаны <code>metadata.producer</code> и <code>system.producer</code>.</strong> <code>SBOM author</code> — кто <em>сгенерировал</em> документ; <code>producer</code> (system/model) — кто <em>создал</em> саму систему/модель. Они совпадают, только если вы и автор системы — одно лицо.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Покажите преподавателю заполненную карточку для одной AI-поставки по всем семи кластерам и устно объясните на 3 примерах, какие именно элементы AI-SBOM добавляет поверх обычного SBOM (provenance датасета, лицензия весов, training properties, data flow с внешними API, sensitivity данных). Каждый <code>unknown</code> должен быть обоснован.</p>
+<blockquote>
+<p>SBOM for AI сам по себе не повышает безопасность
+Руководство G7 подчёркивает: документ полезен только в связке с инструментами — сканированием уязвимостей, бюллетенями и triage. Заполненная карточка без процесса реагирования — это инвентарь, а не защита. Свяжите <code>vulnerability_referencing</code> с реальным triage-процессом.</p>
+</blockquote>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-ef214c81e577.html">Модуль М16</a> — AI-поставка и семь кластеров.</li>
+<li>Смежные практики: <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-220e6273310a.html">П36. Итоговый мини-проект</a>.</li>
+<li>Шаблон: <a href="doc-e6205d386762.html">Чек-лист SBOM for AI</a>.</li>
+<li>Нормативка: <a href="doc-3850f36a7630.html">G7 SBOM for AI Minimum Elements (2026)</a>, <a href="doc-9a74303c4069.html">CycloneDX</a> / <a href="doc-cf001a40d806.html">SPDX</a> как форматы-носители, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

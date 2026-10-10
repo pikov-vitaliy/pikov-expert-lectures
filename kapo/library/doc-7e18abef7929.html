@@ -1,0 +1,85 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М09. План занятия (90 минут) — КАПО · Пиков</title><meta name="description" content="М09. План занятия (90 минут). Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7e18abef7929.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цели">Цели</a></li>
+<li><a href="#материалы-и-подготовка">Материалы и подготовка</a></li>
+<li><a href="#ход-занятия">Ход занятия</a></li>
+<li><a href="#демонстрация-опорные-команды">Демонстрация (опорные команды)</a></li>
+<li><a href="#контрольная-точка">Контрольная точка</a></li>
+</ul>
+</div>
+<h1 id="план-занятия-90-минут">План занятия (90 минут)</h1>
+<h2 id="цели">Цели</h2>
+<p>К концу занятия слушатель умеет:
+1. объяснить, почему <code>#include</code> не равен зависимости и где между исходником и бинарём теряется информация о компоненте;
+2. отличить динамическую линковку (<code>.so</code>, <code>DT_NEEDED</code>) от статической (<code>.a</code>, слепая зона) и снять обе картины инструментами <code>ldd</code>/<code>readelf</code>;
+3. смаппить динамические библиотеки на DEB-пакеты через <code>apt</code>/<code>dpkg -S</code> и получить координаты (PURL);
+4. оценить, чего не хватает в сыром <code>cdxgen</code> SBOM для C/C++, и сформулировать, что должен дозаполнить build-scan и ручная разметка.</p>
+<h2 id="материалы-и-подготовка">Материалы и подготовка</h2>
+<ul>
+<li>Стенд: Debian-based окружение (см. <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a>), установленные <code>gcc</code>, <code>binutils</code> (<code>readelf</code>, <code>objdump</code>), <code>cmake</code>, <code>cdxgen</code>; по возможности <code>conan</code>.</li>
+<li>Тестовый C++ проект, линкующийся с OpenSSL/zlib двумя способами: динамически и статически.</li>
+<li>Заметки справочника: <a href="doc-28706d741e92.html">ELF и DT_NEEDED</a>, <a href="doc-ae9d449dcb2c.html">статическая линковка</a>, <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a>.</li>
+<li>Шаблон: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a>.</li>
+</ul>
+<h2 id="ход-занятия">Ход занятия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Время</th>
+<th>Блок</th>
+<th>Формат</th>
+<th>Содержание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0–10</td>
+<td>Вводный кейс</td>
+<td>лекция</td>
+<td>C/C++ проект без Conan: <code>cdxgen</code> нашёл 3 компонента, реально их десятки. Где делась истина? Тезисы Census III о риске C/C++ и слабой идентичности.</td>
+</tr>
+<tr>
+<td style="text-align: right;">10–30</td>
+<td>Три слоя состава</td>
+<td>лекция + доска</td>
+<td><code>#include</code> → исходная зависимость → динамика (<code>.so</code>) → статика (<code>.a</code>). Почему статика и stripped — слепые зоны. Роль build-scan и Conan.</td>
+</tr>
+<tr>
+<td style="text-align: right;">30–50</td>
+<td>Демо «бинарь не врёт»</td>
+<td>демо</td>
+<td>Сборка проекта дважды; <code>readelf -d ./app</code> (видим <code>DT_NEEDED</code>); <code>ldd ./app</code>; <code>dpkg -S</code> → DEB-координаты; затем статический бинарь — в <code>DT_NEEDED</code> пусто, ищем символы <code>readelf -s</code>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">50–55</td>
+<td>Перерыв</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td style="text-align: right;">55–80</td>
+<td>Практика в парах</td>
+<td>ПЗ</td>
+<td><code>cdxgen -t cpp</code> на проекте; сравнить с фактом из <code>readelf</code>/<code>ldd</code>; выписать unresolved <code>.so</code>; показать, как обогащение мапит ELF→DEB. См. <a href="doc-183968486ec7.html">03 Практическая работа</a>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">80–90</td>
+<td>Рефлексия и регламент</td>
+<td>обсуждение</td>
+<td>Что заносим в реестр unresolved; какой gate в CI безопасен; что закрепить в регламенте Организации по приёмке C/C++ компонентов.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="демонстрация-опорные-команды">Демонстрация (опорные команды)</h2>
+<pre><code class="language-bash">make VERBOSE=1            # видим строки линковки (-lssl -lcrypto / -l:libssl.a)
+readelf -d ./app | grep NEEDED
+ldd ./app
+dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.3
+cdxgen -t cpp -o cdxgen-bom.json .
+</code></pre>
+<h2 id="контрольная-точка">Контрольная точка</h2>
+<p>Слушатель на своём бинаре показывает: какие зависимости видны через <code>DT_NEEDED</code>, какие смаппились на DEB-пакеты, и какие компоненты остаются слепой зоной (статика/vendored/unresolved) — то есть отделяет доказанный факт от того, что требует build-scan или ручной разметки.</p>
+<blockquote>
+<p>Темп
+Если группа слабее в Linux-инструментах, сократите Conan и расширьте блок <code>readelf</code>/<code>dpkg</code>: главное — чтобы каждый своими руками увидел разницу между динамикой и статикой на одном и том же проекте.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

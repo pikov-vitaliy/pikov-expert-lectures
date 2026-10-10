@@ -1,0 +1,63 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>debug symbols как evidence — КАПО · Пиков</title><meta name="description" content="debug symbols как evidence. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c74d93ffd65c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="debug-symbols-как-evidence">debug symbols как evidence</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Когда библиотека вшита статически или бинарь не имеет deb/conan-происхождения, отладочная информация становится сильнейшим доказательством состава. Debug-символы (таблица символов <code>.symtab</code>, секции DWARF <code>.debug_*</code>, строки в <code>.comment</code>/<code>.rodata</code>, GNU <code>build-id</code>) несут имена функций, пути к исходникам, версию компилятора и иногда саму строку версии библиотеки. Из <code>EVP_DecryptUpdate</code> и пути <code>.../openssl-3.0.11/crypto/evp/evp_enc.c</code> восстанавливается и компонент, и его версия — там, где <code>ldd</code> и манифест молчат.</p>
+<p>Это превращает «догадку по имени файла» в подтверждаемый факт: символ из конкретной библиотеки внутри вашего бинаря — прямое evidence того, что код этой библиотеки реально присутствует, даже если отдельного <code>.so</code> нет. В терминах SBOM это метод <code>identity</code> с техникой <code>binary-analysis</code> и осмысленным <code>confidence</code>.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Символы и строки версий читаются стандартными утилитами:</p>
+<pre><code class="language-bash">$ nm -D --defined-only ./service | grep -i ssl | head
+                 U EVP_DecryptUpdate
+                 U SSL_CTX_new          # импортируемые символы OpenSSL
+$ strings -a ./service | grep -iE 'openssl [0-9]'
+OpenSSL 3.0.11 19 Sep 2023             # строка версии прямо в бинаре
+$ readelf -p .comment ./service
+  [     0]  GCC: (Debian 12.2.0-14) 12.2.0    # компилятор сборки
+$ file ./service
+... with debug_info, not stripped         # есть DWARF → исходные пути доступны
+$ objdump --dwarf=info ./service | grep -m1 DW_AT_comp_dir
+    DW_AT_comp_dir : /build/openssl-3.0.11   # путь сборки → имя и версия компонента
+</code></pre>
+<p>В SBOM этот вывод оформляется как identity-evidence:</p>
+<pre><code class="language-json">{
+  "evidence": {
+    "identity": [
+      {
+        "field": "version",
+        "confidence": 0.7,
+        "methods": [
+          {
+            "technique": "binary-analysis",
+            "value": "OpenSSL 3.0.11 19 Sep 2023"
+          }
+        ]
+      }
+    ]
+  }
+}
+</code></pre>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — релизные бинари обычно собирают <code>strip</code>-нутыми: <code>.symtab</code> и <code>.debug_*</code> вырезаны, и этот канал доказательств пропадает (см. <code>stripped binaries</code>). Тогда остаются только динамическая таблица <code>.dynsym</code>, строки в <code>.rodata</code> и <code>build-id</code>. Приём: сохранять отделённые debug-символы (<code>.debug</code>-файлы, debuginfo-пакеты) как отдельный аудиторский артефакт и связывать их с релизным бинарём по <code>build-id</code> — так доказательная база остаётся, даже если поставляется stripped-сборка.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>До strip снимать с бинаря символы и строки: <code>nm -D</code>, <code>strings -a</code>, <code>readelf -p .comment</code>, <code>objdump --dwarf=info</code>.</li>
+<li>Искать строки версий (<code>OpenSSL 3.0.11</code>, <code>zlib 1.2.13</code>) и пути сборки (<code>DW_AT_comp_dir</code>) — из них восстанавливать имя и версию компонента.</li>
+<li>Оформлять найденное как identity-evidence в SBOM с техникой <code>binary-analysis</code> и честным <code>confidence</code> (строка версии — выше, косвенный символ — ниже).</li>
+<li>Сохранять отделённые debug-символы/debuginfo как артефакт и связывать с релизом по GNU <code>build-id</code> (<code>readelf -n</code>).</li>
+<li>Для stripped-поставки заранее договариваться о доступе к debug-символам — иначе доказательная база теряется безвозвратно.</li>
+<li>Не путать наличие импортируемого символа с фактом версии: символ доказывает присутствие кода, версию подтверждает отдельная строка/путь.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> (бинарный анализ как источник состава), <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> (на чём основан присвоенный идентификатор).</li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> (чтение символов и секций ELF), <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> (когда символы — почти единственная зацепка).</li>
+<li>Нормативка: <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> (поле <code>evidence.identity</code>), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (достоверность данных), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (доказательность РБПО).</li>
+<li>Смежные заметки: <a href="doc-44ca67214176.html">stripped binaries</a> (когда этот канал отрезан), <a href="doc-91fc18825af4.html">SBOM evidence occurrences</a> (символы как метод identity), <a href="doc-dc314b2d790a.html">hash-based identification</a> (хеш как дополняющее доказательство), <a href="doc-19fd6dae6997.html">ldd readelf objdump</a> (инструменты чтения ELF).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

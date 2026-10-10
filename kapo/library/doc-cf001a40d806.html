@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPDX ISO IEC 5962 — КАПО · Пиков</title><meta name="description" content="SPDX ISO IEC 5962. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-cf001a40d806.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="spdx-iso-iec-5962">SPDX ISO IEC 5962</h1>
+<h2 id="о-документе">О документе</h2>
+<blockquote>
+<p>Что это
+<strong>ISO/IEC 5962:2021</strong> — международный стандарт, придавший статус ISO формату <strong>SPDX</strong> (Software Package Data Exchange) версии 2.2.1. Формат развивает рабочая группа SPDX под эгидой Linux Foundation. Исторически SPDX вырос из задачи <strong>лицензионного учёта</strong> open source, поэтому его сильная сторона — точное и машиночитаемое описание лицензий, а не только перечень компонентов.</p>
+</blockquote>
+<p>Ключевой вклад SPDX в индустрию — список <strong>SPDX License Identifiers</strong> (<code>Apache-2.0</code>, <code>GPL-2.0-only</code>, <code>MIT</code>…) и грамматика <strong>SPDX License Expressions</strong> (<code>MIT OR Apache-2.0</code>, <code>GPL-2.0-or-later WITH Classpath-exception-2.0</code>). Профиль SPDX 3.x расширяет модель на безопасность и происхождение, но ISO-редакция фиксирует именно 2.2.1.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Обязательная секция документа.</strong> <code>SPDXVersion</code>, <code>DataLicense: CC0-1.0</code>, <code>SPDXID: SPDXRef-DOCUMENT</code>, <code>DocumentName</code> и уникальный <code>DocumentNamespace</code> (URI) — паспорт самого SBOM.</li>
+<li><strong>Описание пакетов.</strong> Каждый <code>PackageName</code> несёт <code>SPDXID</code>, <code>PackageVersion</code>, <code>PackageDownloadLocation</code>; для целостности — <code>PackageVerificationCode</code> или <code>PackageChecksum</code>.</li>
+<li><strong>Двойной учёт лицензий.</strong> Различаются <code>PackageLicenseConcluded</code> (вывод аналитика) и <code>PackageLicenseDeclared</code> (что заявил автор); расхождение между ними — сигнал для юридического разбора.</li>
+<li><strong>Канонические идентификаторы лицензий.</strong> Лицензии указываются через SPDX License List или License Expression; произвольный текст допускается только как <code>LicenseRef-</code> с приложенным текстом.</li>
+<li><strong>Связи и происхождение.</strong> <code>Relationship</code> (<code>CONTAINS</code>, <code>DEPENDS_ON</code>, <code>GENERATED_FROM</code>) выражают структуру поставки, а не плоский список.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<blockquote>
+<p>Артефакты соответствия
+- Валидный SPDX-документ (<code>.spdx</code> tag-value или <code>.spdx.json</code>) с заполненными <code>DocumentNamespace</code>, <code>Creator</code>, <code>Created</code>.
+- Заполненная пара <code>LicenseConcluded</code>/<code>LicenseDeclared</code> по каждому пакету — основа реестра лицензий.
+- Отчёт инструмента (например, license scanner) с привязкой найденной лицензии к SPDX-идентификатору.
+- Журнал разбора <code>LicenseRef-</code> и нестандартных выражений — что и почему отнесено к нестандартному.
+- Проверка <code>PackageVerificationCode</code>/checksum как доказательство целостности описанного пакета.</p>
+</blockquote>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li>Извлечение лицензий и их сопоставление с SPDX-идентификаторами: <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a>.</li>
+<li>Политика на лицензионных выражениях: <a href="doc-1e5ce9414ca8.html">П12. ORT и license policy</a>; классификация результата — <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a>.</li>
+<li>Контроль качества документа: <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a>; правила приемлемости — <a href="doc-ab31bcfd34fb.html">Политика лицензионной чистоты</a>.</li>
+<li>Контекст модулей: <a href="doc-1648d69d5029.html">М03. Форматы SBOM</a> и <a href="doc-2db02216b0fa.html">М07. Лицензионная чистота</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<blockquote>
+<p>Это учебная карточка
+Карточка описывает формат под задачи лицензионного учёта в курсе и не воспроизводит текст ISO/IEC 5962. Точные имена тегов, обязательность полей и состав License List для аудита сверять с официальной спецификацией SPDX соответствующей версии и регламентами Организации.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

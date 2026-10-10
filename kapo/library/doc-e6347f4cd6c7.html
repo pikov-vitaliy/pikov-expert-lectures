@@ -1,0 +1,147 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Матрица соответствия требованиям — КАПО · Пиков</title><meta name="description" content="Матрица соответствия требованиям. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e6347f4cd6c7.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#легенда-статусов">Легенда статусов</a></li>
+<li><a href="#матрица">Матрица</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="матрица-соответствия-требованиям">Матрица соответствия требованиям</h1>
+<blockquote>
+<p>Назначение
+Переиспользуемая (vendor-agnostic) матрица «требование → контроль → evidence → статус»: связывает требования нормативки и ТЗ с конкретными контролями SCA/OSA-процесса и доказательствами их выполнения. Это generic-шаблон для любого продукта; пример заполненной по конкретному инструменту матрицы — <a href="doc-765d7f069356.html">матрица CodeScoring</a> (не копировать сюда — это образец заполнения).</p>
+</blockquote>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>При подготовке к аудиту/сертификации, при сопоставлении ТЗ с возможностями процесса, при отчёте о готовности к РБПО. Заполняется по требованиям конкретного стандарта или ТЗ; одна строка — одно атомарное требование.</p>
+<h2 id="легенда-статусов">Легенда статусов</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Статус</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>✅</td>
+<td>Соответствует — контроль внедрён, evidence есть</td>
+</tr>
+<tr>
+<td>🟡</td>
+<td>Частично — контроль есть, evidence неполное / нужна проверка</td>
+</tr>
+<tr>
+<td>🔴</td>
+<td>Не соответствует — контроля или evidence нет</td>
+</tr>
+<tr>
+<td>⚪</td>
+<td>Управленческое решение — не техническая проблема</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="матрица">Матрица</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Требование (источник, пункт)</th>
+<th>Контроль процесса</th>
+<th>Evidence (артефакт/ссылка)</th>
+<th style="text-align: center;">Ответственный</th>
+<th style="text-align: center;">Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Инвентаризация компонентов с уникальными идентификаторами (CISA Min Elements)</td>
+<td>Генерация SBOM с PURL/CPE на каждый компонент</td>
+<td>SBOM CycloneDX/SPDX, отчёт coverage</td>
+<td style="text-align: center;">SCA</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Полнота dependency graph, транзитивные зависимости (OWASP SCVS)</td>
+<td>Build/manifest scan, проверка графа</td>
+<td>dependency graph, <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a></td>
+<td style="text-align: center;">SCA</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Управление уязвимостями компонентов (NIST SSDF RV.1)</td>
+<td>VDR + триаж + VEX</td>
+<td>VDR, VEX, тикеты триажа</td>
+<td style="text-align: center;">SEC</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Лицензионная чистота и совместимость (OpenChain ISO/IEC 5230)</td>
+<td>Лицензионная классификация, заключение</td>
+<td>license scan, <a href="doc-70e65566b066.html">Шаблон юридического заключения по лицензии</a></td>
+<td style="text-align: center;">LEG</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Защита цепочки поставки (NIST SP 800-161)</td>
+<td>Controlled repository, контроль источников</td>
+<td>политика репозитория, логи блокировок</td>
+<td style="text-align: center;">SEC</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Документация разработчика по РБПО (ГОСТ Р 56939-2024)</td>
+<td>Регламент + журналирование процесса</td>
+<td><a href="doc-e8c524b20a2a.html">Регламент композиционного анализа ПО</a>, audit trail</td>
+<td style="text-align: center;">OWN</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Регулярность применения композиционного анализа (проект ГОСТ КАПО)</td>
+<td>Периодический пересмотр в продуктиве</td>
+<td>расписание пересканов, отчёты</td>
+<td style="text-align: center;">SCA</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Целостность и подпись артефактов поставки (SLSA / in-toto)</td>
+<td>Подпись SBOM, проверка provenance</td>
+<td>подписи, attestation</td>
+<td style="text-align: center;">REL</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Управление риском и evidence (ISO/IEC 27001)</td>
+<td>Реестр исключений со сроками</td>
+<td><a href="doc-f0ded133ff51.html">Реестр исключений</a>, <a href="doc-51fdcb300d4b.html">Паспорт риска компонента</a></td>
+<td style="text-align: center;">AUD</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Минимальные элементы SBOM for AI (G7 2026)</td>
+<td>Расширенный SBOM для AI-компонентов</td>
+<td><a href="doc-e6205d386762.html">Чек-лист SBOM for AI</a></td>
+<td style="text-align: center;">SCA</td>
+<td style="text-align: center;">🟡</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Правило заполнения
+Статус «✅» ставится только при наличии evidence в колонке. Требование без ссылки на артефакт остаётся 🟡, даже если контроль фактически работает — иначе матрица не проходит аудит.</p>
+</blockquote>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модули: <a href="doc-778f51173f56.html">М13 Нормативная трассировка и доказательная база</a>, <a href="doc-ceda782bcd8c.html">М01 Термины, угрозы и границы SCA OSA</a>.</li>
+<li>Смежные шаблоны: <a href="doc-91e9697aff8e.html">Матрица evidence для аудита</a> (каталог самих артефактов), <a href="doc-e8c524b20a2a.html">Регламент композиционного анализа ПО</a>.</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>, <a href="doc-b5856ada3679.html">ISO IEC 27001</a>, <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a>, <a href="doc-47ec0c98fe05.html">OWASP SCVS</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

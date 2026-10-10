@@ -1,0 +1,54 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OWASP Dependency-Check — КАПО · Пиков</title><meta name="description" content="OWASP Dependency-Check. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-56e1c2ed4ba7.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="owasp-dependency-check">OWASP Dependency-Check</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Dependency-Check — ветеран SCA, который работает не по lockfile, а через эвристику: анализаторы извлекают «улики» (Evidence) из артефактов — имена пакетов, версии, теги манифестов, метаданные JAR/DLL — и строят из них CPE, после чего матчат собранную локально копию NVD. Поэтому он умеет находить уязвимости даже там, где явного манифеста зависимостей нет, ценой более шумного результата.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запускается как CLI, плагин Maven/Gradle или образ. Ключевой нюанс — первичная загрузка NVD требует API-ключа NVD (иначе крайне медленно):</p>
+<blockquote>
+<p>Команда</p>
+</blockquote>
+<pre><code class="language-bash">dependency-check.sh \
+  --project "my-service" \
+  --scan ./ \
+  --nvdApiKey "$NVD_API_KEY" \
+  --format SARIF --format JSON \
+  --failOnCVSS 7</code></pre>
+<p>Подавление FP — отдельный XML-файл, который подключают флагом <code>--suppression suppress.xml</code>:</p>
+<blockquote>
+<p>Фрагмент suppression.xml</p>
+</blockquote>
+<pre><code class="language-xml">&lt;suppress&gt;
+  &lt;notes&gt;FP: vendored copy, not exploitable&lt;/notes&gt;
+  &lt;packageUrl regex="true"&gt;^pkg:maven/com\.example/.*$&lt;/packageUrl&gt;
+  &lt;cve&gt;CVE-2021-12345&lt;/cve&gt;
+&lt;/suppress&gt;</code></pre>
+<p>Матчит компонент через CPE вида <code>cpe:2.3:a:apache:log4j:2.14.1:*:*:*:*:*:*:*</code>; на входе — Java, .NET, JS/npm, Python, Ruby и ряд других через соответствующие анализаторы.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Evidence-based подход находит зависимости без манифеста (вложенные JAR, упакованные DLL) — там, где lockfile-сканеры слепы.</li>
+<li>Глубокая интеграция в Java-экосистему: зрелые плагины Maven/Gradle/Ant, привычный отчёт в CI.</li>
+<li>Локальная копия NVD: после первичной синхронизации матчинг идёт офлайн и воспроизводимо.</li>
+<li>Гибкое подавление через suppression-XML с regex по PURL/CPE/CVE и пороговый гейт <code>--failOnCVSS</code>.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Высокий уровень FP/FN из-за эвристического построения CPE: «угаданный» вендор/продукт может дать как ложное срабатывание, так и пропуск.</li>
+<li>Привязан к NVD как почти единственному источнику; с ростом задержек и реформой NVD актуальность данных страдает, БДУ ФСТЭК и EPSS не учитываются.</li>
+<li>Первичная синхронизация NVD тяжёлая и без API-ключа практически непригодна для CI.</li>
+<li>Для нативного C/C++ покрытие ограничено: без распознаваемых метаданных артефакта улик для CPE недостаточно.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Данные NVD кэшируются локально (каталог <code>data/</code>), и его можно наполнять из внутреннего зеркала через <code>--nvdDatafeed</code> (офлайн-фиды) или общий каталог БД, после чего сканирование идёт без интернета. Полностью автономен только после первичного наполнения кэша; в закрытом контуре нужен регламент обновления фидов и host-/CPE-словарей.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04 Идентификаторы компонентов и уязвимостей</a>
+Практика: <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>
+Смежные карточки: <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-0678004e9f55.html">OWASP Dependency-Track</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

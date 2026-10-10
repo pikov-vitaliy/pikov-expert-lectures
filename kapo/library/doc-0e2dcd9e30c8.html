@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CodeScoring — КАПО · Пиков</title><meta name="description" content="CodeScoring. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0e2dcd9e30c8.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="codescoring">CodeScoring</h1>
+<blockquote>
+<p>Контекст
+Коммерческая отечественная платформа OSA/SCA с дополнительным контуром TQI (оценка качества и авторства кода). В курсе это <strong>основной кандидат на пилот</strong> под ТЗ Организации, где преобладают C/C++ legacy-сборки без дисциплины пакетного менеджера — то есть там, где обычный манифест-скан не находит состав. Публичный сайт — codescoring.ru.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Извлекает состав ПО, ищет уязвимости и оценивает лицензионную чистоту, а на входе работает как OSA (firewall пакетных менеджеров). Главная ценность под задачу курса — <strong>build-level анализ C/C++</strong> через агент/eBPF: состав восстанавливается из реальной сборки (GCC/Clang), а не из манифеста, которого у legacy-проектов нет.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Три режима подключения под разные задачи:
+- <strong>OSA Proxy</strong> — блокирующий контур на входе пакетных менеджеров (подтверждён для Maven, NPM, PyPI, NuGet V3, Go, Debian, Alpine/APK, RPM, Docker Registry).
+- <strong>Сборочный анализ (агент/eBPF)</strong> — снимает фактические вызовы компилятора и линковщика во время сборки; так покрываются make/CMake-проекты без манифеста.
+- <strong>CLI/agent в pipeline</strong> — gate в CI с импортом/экспортом SBOM в CycloneDX/SPDX и графом зависимостей.</p>
+<p>В пилоте каждое спорное требование закрывается демонстрацией на реальном проекте, а не обещанием: qmake, статическая линковка, права на eBPF, офлайн-обновления и перечень экосистем OSA Proxy подтверждаются приёмочными сценариями.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Build-level анализ C/C++ — закрывает основную боль Организации (состав там, где нет Conan/манифеста); make/CMake заявлены и проверяемы пилотом.</li>
+<li>Совмещает OSA-вход (блокирующий proxy) и SCA-разбор состава в одном продукте — единый контур допуска и инвентаризации.</li>
+<li>Дополнительный контур TQI (качество/авторство) расширяет покрытие ТЗ за пределы классического SCA.</li>
+<li>Импорт/экспорт CycloneDX и SPDX — встраивается в конвейер Организации рядом с «генератором фактов».</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li><strong>qmake прямо не подтверждён</strong> — требует демо на реальном Qt-проекте (зона риска несоответствия пилота).</li>
+<li>OSA Proxy подтверждён не для всех менеджеров: Conan, Conda, RubyGems в режиме proxy не подтверждены.</li>
+<li>Готовые бинарники без сборочного контекста (native stripped, <code>.a</code>/<code>.so</code>) распознаются ненадёжно — заявлено поставщиком прямо.</li>
+<li>Reachability только для Java/Python/Go; из IDE-плагинов Qt Creator не покрыт.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Платформа разворачивается on-premise и работает в закрытом контуре, но регулярность и механизм <strong>офлайн-обновления баз</strong> (уязвимости, лицензии, malware-фид OSA) — приёмочный пункт пилота, а не данность: способ доставки обновлений в изолированный контур нужно подтвердить отдельно.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-a69d6f30f09c.html">М12. CodeScoring и подготовка пилота</a> · <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> · <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-c440241de897.html">П32. CodeScoring offline architecture</a> · <a href="doc-ea3b2e743d82.html">П33. AppSec и CodeScoring сравнение по задаче</a></li>
+<li>Смежные карточки: <a href="doc-2a95b657217e.html">AppSec.Track</a> · <a href="doc-65de256b44b5.html">AppSec.Hub</a> · <a href="doc-6df02436591e.html">Conan</a> · <a href="doc-143d4440b290.html">qmake</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

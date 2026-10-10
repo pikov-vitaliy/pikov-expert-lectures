@@ -1,0 +1,32 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М16. Контрольные вопросы — КАПО · Пиков</title><meta name="description" content="М16. Контрольные вопросы. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-ac2424b43624.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#кейс-задачи">Кейс-задачи</a></li>
+</ul>
+</div>
+<h1 id="контрольные-вопросы">Контрольные вопросы</h1>
+<blockquote>
+<p>Базовый уровень
+1. Перечислите семь кластеров SBOM for AI по документу G7. Какой из них описывает сам SBOM, а не AI-систему?
+2. Почему документ G7 подчёркивает, что элементы SBOM for AI идут <strong>в дополнение</strong> к обычным минимальным элементам SBOM, а не заменяют их?
+3. Как сканер образов (Trivy, Grype) технически собирает состав: по каким путям он ищет пакетные БД для apk/dpkg/rpm?
+4. Что физически происходит с файлом при инструкции <code>RUN rm secret</code> в Dockerfile? Исчезает ли он из образа?</p>
+<p>Средний уровень
+5. Чем <code>Model hash value</code> принципиально отличается от хэша обычной библиотеки в SBOM? Что именно хэшируется?
+6. Что означают четыре градации в <code>Model license</code>: open weight, open architecture, open data, open training? Почему open weight ≠ open data?
+7. Какую информацию несёт <code>Dataset provenance</code> и почему её отсутствие — это legal-риск, а не только технический?
+8. Почему результат <code>grype</code> «0 vulnerability matches» может быть признаком проблемы, а не чистого образа?
+9. Как UPX-упаковка и флаг <code>go build -ldflags "-X runtime.modinfo="</code> влияют на полноту SBOM?</p>
+<p>Продвинутый уровень
+10. Какие техники нечестности образа считаются «неисправимыми статикой» и почему (multi-stage, внешние загрузки в рантайме, обфускация)?
+11. Почему перевыпуск SBOM после компрометации реестра (имитация коммитов, tag poisoning) не спасает без attestations? Какую роль здесь играют in-toto/SLSA?
+12. G7 сознательно не вынес «уровень автономности AI-агента» в отдельный элемент SBOM for AI. Какой пробел в оценке риска это оставляет?</p>
+</blockquote>
+<h2 id="кейс-задачи">Кейс-задачи</h2>
+<blockquote>
+<p>Кейс 1. «Чистый образ»
+Поставщик прислал образ и SBOM, <code>grype</code> показал 0 уязвимостей. При разборе слоёв вы видите, что в образе нет ни <code>/var/lib/dpkg/status</code>, ни <code>/lib/apk/db/installed</code>, но есть рабочее ПО. Что произошло, как это назвать в отчёте и какой вердикт по приёмке?</p>
+<p>Кейс 2. Секрет в истории слоёв
+В финальной ФС образа секретов нет, <code>trivy --scanners secret</code> молчит. Опишите процедуру (команды), которой вы докажете или опровергнете наличие приватного ключа в более ранних слоях. Какой артефакт предъявите как доказательство?</p>
+<p>Кейс 3. Открытая модель без датасета
+Команда хочет включить в продукт модель с лицензией «open weight». В карточке заполнены <code>Model hash</code>, <code>Model training properties</code>, но кластер Datasets пуст (<code>Dataset provenance</code> и <code>Dataset license</code> отсутствуют). Какие риски вы поднимаете и что требуете дозаполнить перед приёмкой?</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

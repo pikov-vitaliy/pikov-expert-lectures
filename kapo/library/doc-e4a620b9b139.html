@@ -1,0 +1,48 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>container image obfuscation — КАПО · Пиков</title><meta name="description" content="container image obfuscation. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e4a620b9b139.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="container-image-obfuscation">container image obfuscation</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Сканер контейнерного образа делает выводы по косвенным признакам: базе пакетного менеджера (<code>/var/lib/dpkg/status</code>, <code>/var/lib/rpm</code>), метаданным в бинарниках, расширениям файлов. Если эти признаки убрать или испортить — намеренно или «для уменьшения размера», — образ для сканера превращается в пустой. Для C/C++-поставки это удобный способ показать «0 уязвимостей»: достаточно стереть базу dpkg, упаковать бинарь UPX и собрать всё <code>FROM scratch</code>. Composition analysis обязан различать «образ действительно чистый» и «образ ослепил сканер», иначе «0 findings» становится не доказательством, а артефактом обфускации.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Самая частая «обфускация» — удаление базы пакетного менеджера ради экономии места. После этого <code>syft</code>/<code>trivy</code> не находят ни одного системного пакета, хотя <code>libssl</code>, <code>zlib</code> и прочее физически на месте.</p>
+<pre><code class="language-bash"># в Dockerfile «оптимизировали» размер:
+RUN rm -rf /var/lib/dpkg /var/lib/apt/lists /var/lib/rpm
+
+# результат для сканера:
+syft myapp:slim -o table
+#   No packages discovered    &lt;-- не «чисто», а «ослеплено»
+
+# но бинарь линкует системные .so:
+ldd /usr/bin/myapp
+#   libssl.so.3 =&gt; /usr/lib/x86_64-linux-gnu/libssl.so.3
+</code></pre>
+<p>Другие приёмы: UPX-упаковка (<code>upx --best myapp</code> — сжатый бинарь теряет читаемые строки и секции, сканер не достаёт версию), стрип <code>.note</code>/build-id, сборка <code>FROM scratch</code> без какого-либо пакетного слоя, переименование <code>.so</code> так, чтобы не сработали сигнатуры.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>«0 findings» неоднозначно
+Пустой отчёт сканера означает одно из двух: образ действительно не содержит известных компонентов, либо признаки, по которым сканер их опознаёт, удалены. Принимать «0» как «безопасно» без проверки — типичная ошибка приёмки.</p>
+</blockquote>
+<p>Приём-индикаторы ослепления: наличие исполняемых ELF при нулевом списке пакетов; <code>ldd</code> показывает <code>.so</code>, которых нет в SBOM; энтропия секций бинаря близка к максимуму (признак UPX/упаковки); отсутствие <code>/var/lib/dpkg/status</code> при наличии <code>dpkg</code>-симлинков.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Считать «0 пакетов» красным флагом: если в образе есть ELF, а SBOM пуст — требовать объяснение, а не принимать отчёт.</li>
+<li>Проверять наличие базы пакетного менеджера; её отсутствие при наличии бинарей фиксировать как обфускацию.</li>
+<li>Распаковывать UPX (<code>upx -d</code>) перед анализом; высокую энтропию секций (<code>readelf -S</code>, <code>ent</code>) трактовать как сигнал упаковки.</li>
+<li>Сверять <code>ldd</code>/<code>readelf -d</code> динамические зависимости бинаря со списком компонентов SBOM — расхождение и есть скрытое.</li>
+<li>Запретить в политике сборки удаление баз пакетного менеджера и упаковщики в production-образах; держать факты сборки в отдельном артефакте.</li>
+<li>Сопоставлять заявленный SBOM с независимо собранным по слоям (см. honest SBOM): обфускация всплывает как разница множеств компонентов.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a>.</li>
+<li>Практики: <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>.</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements</a>, <a href="doc-3c212b09f984.html">BSI TR-03183-2</a>.</li>
+<li>Смежные заметки: <a href="doc-659dc2ec481f.html">container image layers</a>, <a href="doc-a2c530fc1bbc.html">honest SBOM</a>, <a href="doc-44ca67214176.html">stripped binaries</a>, <a href="doc-9fa864f09c7c.html">detection accuracy</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

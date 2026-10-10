@@ -1,0 +1,63 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П01. Стенд WSL2 Docker и базовая гигиена — КАПО · Пиков</title><meta name="description" content="П01. Стенд WSL2 Docker и базовая гигиена. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-85ddbe5bccd7.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п01-стенд-wsl2-docker-и-базовая-гигиена">П01. Стенд WSL2 Docker и базовая гигиена</h1>
+<h2 id="цель">Цель</h2>
+<p>Получить рабочую изолированную среду для всех последующих практик курса: WSL2 на ядре v2, работающий Docker, установленный git. Проверяемый результат — три зафиксированных факта: <code>wsl -l -v</code> показывает дистрибутив с <code>VERSION 2</code>, <code>docker run hello-world</code> печатает приветствие, версии git и Docker записаны в журнал стенда. После этой практики у вас есть «песочница», в которой анализ запускается не на рабочем хосте, а в контейнере или WSL.</p>
+<blockquote>
+<p>Почему отдельная практика про стенд
+SCA/OSA-инструменты распаковывают чужие архивы, читают чужие lockfile и иногда исполняют чужие build-скрипты. Делать это прямо на рабочей машине — значит смешивать доверенный и недоверенный код. WSL2 + Docker дают дешёвую изоляцию и, что важнее для курса, <strong>воспроизводимость</strong>: один и тот же образ даёт один и тот же набор findings у преподавателя и у студента.</p>
+</blockquote>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># 1. Версия WSL и режим ядра дистрибутива (выполнять в PowerShell)
+wsl -l -v
+
+# 2. Внутри WSL — зафиксировать версии инструментов стенда
+docker --version
+git --version
+
+# 3. Проверить, что Docker реально запускает контейнеры
+docker run --rm hello-world
+
+# 4. Гигиена: завести каталог под тестовый проект, не трогая хост
+mkdir -p ~/sca-lab/sample &amp;&amp; cd ~/sca-lab
+git init sample
+</code></pre>
+<blockquote>
+<p>Гигиена стенда — четыре правила, а не лозунг
+1. Анализ запускаем внутри WSL/контейнера, а не в Windows-окружении хоста.
+2. Версии инструментов фиксируем (<code>--version</code> в журнал): findings без версии генератора невоспроизводимы.
+3. Работаем на выделенном тестовом проекте (<code>~/sca-lab/sample</code>), а не на боевом репозитории.
+4. Никогда не запускаем неизвестные build-скрипты из чужого архива напрямую — только в одноразовом контейнере (<code>--rm</code>).</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p><code>wsl -l -v</code> — дистрибутив в состоянии <code>Running</code> и именно <code>VERSION 2</code> (не 1):</p>
+<pre><code>  NAME              STATE           VERSION
+* Ubuntu            Running         2
+</code></pre>
+<p><code>docker run --rm hello-world</code> — приветствие, означающее, что демон жив и образ скачался:</p>
+<pre><code>Hello from Docker!
+This message shows that your installation appears to be working correctly.
+</code></pre>
+<p>Версии — конкретные строки вида (числа у вас будут свои, важно, что команда не падает):</p>
+<pre><code>Docker version 27.5.1, build 9f9e405
+git version 2.43.0
+</code></pre>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>wsl -l -v</code> показывает <code>VERSION 1</code></strong> — дистрибутив на старом ядре, многие тома и сеть Docker будут вести себя иначе. Конвертируйте: <code>wsl --set-version &lt;Имя&gt; 2</code>, при необходимости <code>wsl --set-default-version 2</code>.</li>
+<li><strong><code>docker run hello-world</code>: <code>Cannot connect to the Docker daemon</code></strong> — демон не запущен или нет прав. Для Docker Desktop проверьте, что в его настройках включена интеграция с вашим WSL-дистрибутивом; для нативного движка — <code>sudo service docker start</code> и членство в группе <code>docker</code>.</li>
+<li><strong><code>wsl</code> не распознаётся как команда</strong> — компонент WSL не установлен. Поставьте: <code>wsl --install</code> (PowerShell от администратора), перезагрузитесь.</li>
+<li><strong><code>hello-world</code> тянется бесконечно / timeout</strong> — нет доступа к реестру образов. На закрытом контуре Организации укажите внутреннее зеркало в <code>daemon.json</code> или подгрузите образ из <code>docker load</code>.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю терминал WSL2, где подряд проходят: <code>wsl -l -v</code> с <code>VERSION 2</code>, <code>docker run --rm hello-world</code> с приветствием, <code>docker --version</code> и <code>git --version</code>. Версии записаны в журнал стенда (любой текстовый файл) — это базовая дисциплина воспроизводимости, на которую опираются все дальнейшие практики.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Стенд — это «безопасная среда разработки», а не SBOM-практика: соответствующий пласт требований — поддержание изолированного и управляемого toolchain. См. <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (практики PO.3 «Support toolchains» и PO.5 «Implement and maintain secure environments for software development»; формулировки уточняйте по официальному источнику) и общий принцип управляемости работ из <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>. Дальше на этом стенде запускаются <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> и смежные сканеры; ручное чтение результата — в <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a>. Навигация по курсу: <a href="doc-76e731c850ef.html">М00. Ориентация в курсе и карта решений</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

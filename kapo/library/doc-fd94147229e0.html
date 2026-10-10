@@ -1,0 +1,49 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>vcpkg — КАПО · Пиков</title><meta name="description" content="vcpkg. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-fd94147229e0.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="vcpkg">vcpkg</h1>
+<blockquote>
+<p>Контекст
+vcpkg — пакетный менеджер для C/C++ от Microsoft. В manifest‑режиме состав зависимостей объявлен в <code>vcpkg.json</code>, а версии пинуются через baseline и overrides в <code>vcpkg-configuration.json</code>. Ключевая для SCA особенность: vcpkg сам генерирует SPDX‑SBOM на каждый установленный порт — редкая ситуация, когда C/C++ зависимость приходит вместе с готовым машиночитаемым описанием.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>vcpkg собирает и устанавливает C/C++ библиотеки из «портов», интегрируется с CMake через toolchain‑файл и выдаёт цели для линковки. Для инвентаризации он ценен тем, что фиксирует версии (baseline) и кладёт рядом с каждым пакетом SPDX‑документ, описывающий компонент и его происхождение.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Manifest‑режим с воспроизводимыми версиями:</p>
+<pre><code class="language-jsonc">// vcpkg.json
+{
+  "dependencies": ["openssl", "zlib", { "name": "boost-asio", "version&gt;=": "1.84.0" }],
+  "builtin-baseline": "a1b2c3d4e5f6..."
+}
+</code></pre>
+<p>Установка и интеграция со сборкой:</p>
+<pre><code class="language-bash">vcpkg install --triplet x64-linux
+cmake -B build -DCMAKE_TOOLCHAIN_FILE=$VCPKG_ROOT/scripts/buildsystems/vcpkg.cmake
+</code></pre>
+<p>После установки SBOM каждого порта лежит здесь:</p>
+<pre><code class="language-text">vcpkg_installed/&lt;triplet&gt;/share/openssl/vcpkg.spdx.json
+</code></pre>
+<p>Эти per‑package SPDX‑документы агрегируются в общий SBOM проекта.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Per‑package SPDX «из коробки»: для каждого порта есть <code>vcpkg.spdx.json</code> с версией, лицензией и хешами — готовый машинный факт без отдельного генератора.</li>
+<li><code>builtin-baseline</code> + <code>version&gt;=</code>/<code>overrides</code> дают воспроизводимый и пинуемый состав, эквивалент lockfile.</li>
+<li>Триплет (<code>x64-linux</code>, <code>x64-windows-static</code>) явно фиксирует платформу и модель линковки — видно, статическая сборка или динамическая.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Покрывает только то, что объявлено в <code>vcpkg.json</code>. Системные <code>apt</code>‑библиотеки, ручной <code>third_party/</code> и <code>FetchContent</code> вне vcpkg не учитываются.</li>
+<li>SPDX порта описывает сам компонент, но факт его линковки в итоговый бинарь подтверждается только анализом артефакта (<code>ldd</code>/<code>readelf</code>) или build‑scan.</li>
+<li>Привязка к реестру портов: нестандартная или внутренняя библиотека требует своего overlay‑порта, иначе её в манифесте не будет.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. vcpkg поддерживает asset caching (<code>X_VCPKG_ASSET_SOURCES</code>) и binary caching (<code>VCPKG_BINARY_SOURCES</code>) — исходники и собранные бинарные пакеты кладутся во внутреннее хранилище/прокси, после чего установка идёт без выхода в интернет. Реестр портов хранится как git‑репозиторий и зеркалируется во внутренний контур.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-1bca905af1a7.html">М05 Генерация SBOM</a> · <a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-6df02436591e.html">Conan</a> · <a href="doc-c6a99c0dee86.html">CMake</a> · <a href="doc-4074ab5340cf.html">SPDX</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

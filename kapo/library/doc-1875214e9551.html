@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OSV.dev — КАПО · Пиков</title><meta name="description" content="OSV.dev. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1875214e9551.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="osvdev">OSV.dev</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>OSV.dev (Open Source Vulnerabilities, проект Google) — это <strong>агрегатор уязвимостей OSS в едином формате OSV</strong>, собирающий записи из множества баз (GHSA, PyPA, Go, RustSec, БД дистрибутивов Linux и др.) и приводящий их к одной схеме. Главная особенность — описание затронутости через PURL и точные диапазоны версий с привязкой к коммитам, что даёт матчинг по координатам без CPE.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>OSV.dev отдаёт данные через REST API (запрос по PURL или по коммиту) и является источником для OSV-Scanner. Запрос уязвимостей по PURL:</p>
+<pre><code class="language-bash">curl -s -X POST https://api.osv.dev/v1/query \
+  -d '{"package":{"purl":"pkg:npm/semver@7.3.7"}}' \
+  | jq '.vulns[] | {id, aliases, summary}'
+</code></pre>
+<p>Запись OSV описывает затронутые версии через события <code>introduced</code>/<code>fixed</code> в диапазонах:</p>
+<pre><code class="language-json">{ "id": "GHSA-c2qf-rxjj-qqgw", "aliases": ["CVE-2022-25883"],
+  "affected": [{ "package": { "ecosystem": "npm", "name": "semver", "purl": "pkg:npm/semver" },
+    "ranges": [{ "type": "SEMVER", "events": [{ "introduced": "0" }, { "fixed": "7.5.2" }] }] }] }
+</code></pre>
+<p>На практике OSV.dev чаще используют не напрямую, а через <a href="doc-866090cf44a0.html">OSV-Scanner</a>, который читает lock-файлы или SBOM и матчит компоненты с базой OSV — онлайн (API) или офлайн (локальная база).</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Единая машинная схема OSV для разнородных источников — один парсер вместо десятка.</li>
+<li>Матчинг по PURL и диапазонам версий/коммитам — точнее CPE для OSS.</li>
+<li><code>aliases</code> явно связывают записи между собой (GHSA ↔ CVE ↔ DSA и т. д.).</li>
+<li>Открытые данные и поддержка офлайн-режима в OSV-Scanner (локальная БД).</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Фокус на open source: проприетарное ПО и многие системные C/C++-библиотеки без реестра вне охвата.</li>
+<li>Качество записи наследуется от исходной базы — ошибки диапазонов «переезжают» в OSV.</li>
+<li>Не содержит EPSS и признака эксплуатации (KEV) — их добавляют отдельно.</li>
+<li>Не заменяет национальный источник (БДУ ФСТЭК) для требований РФ-регулятора.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично/да. OSV.dev публикует полные дампы базы по экосистемам (zip-архивы JSON-записей), которые можно зеркалировать в закрытый контур; OSV-Scanner умеет работать офлайн против локальной базы (<code>--offline</code>/локальная БД). Прямые запросы к <code>api.osv.dev</code> из изолированной сети недоступны — в ней матчат по реплицированному дампу.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a></p>
+<p>Смежные карточки: <a href="doc-866090cf44a0.html">OSV-Scanner</a> · <a href="doc-14258e036a86.html">GitHub Security Advisory</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-b869bb94c8bb.html">OSS Index</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a></p>
+<p>Практики: <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

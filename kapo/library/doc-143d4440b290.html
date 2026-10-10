@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>qmake — КАПО · Пиков</title><meta name="description" content="qmake. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-143d4440b290.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="qmake">qmake</h1>
+<blockquote>
+<p>Контекст
+qmake — исторический сборочный инструмент Qt, управляемый файлами проекта <code>*.pro</code>. В Qt6 он считается унаследованным и вытеснен CMake, но огромный объём legacy‑кода на C++ всё ещё собирается именно qmake. Для SCA это типичный «слепой» случай: декларации зависимостей минимальны, а список реально слинкованных библиотек выводится из переменных <code>LIBS</code>/<code>QT</code>, а не из манифеста с версиями.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>qmake генерирует Makefile (или проекты для IDE) из <code>*.pro</code>: определяет, какие модули Qt (<code>QT += core gui network</code>) и какие внешние библиотеки (<code>LIBS += -lssl -lcrypto</code>) подключаются к цели, какие пути к заголовкам используются. Это даёт <em>декларацию</em> подключаемых библиотек, но без версий и без устойчивого ключа компонента.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Сгенерировать сборочные файлы и затем перехватить реальные вызовы компилятора:</p>
+<pre><code class="language-bash">qmake project.pro
+make                       # либо: qmake -d для дампа разбора .pro
+</code></pre>
+<p>Прочитать декларации зависимостей прямо из <code>*.pro</code>:</p>
+<pre><code class="language-text">QT       += core network sql
+LIBS     += -L/usr/local/lib -lssl -lcrypto -lz
+INCLUDEPATH += /opt/thirdparty/include
+</code></pre>
+<p>Здесь видно «что подключают» (<code>-lssl</code>, <code>-lcrypto</code>, <code>-lz</code>, модули Qt), но не «какой версии» — версию приходится снимать с готового бинаря (<code>ldd</code>/<code>readelf -d</code>) или сопоставлять с системными пакетами.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li><code>*.pro</code> компактен и читается напрямую: переменные <code>LIBS</code>, <code>QT</code>, <code>INCLUDEPATH</code> сразу показывают набор подключаемых библиотек.</li>
+<li>Жёстко связан с экосистемой Qt — модули Qt из <code>QT += ...</code> маппятся на конкретные пакеты Qt детерминированно.</li>
+<li>Сгенерированный Makefile позволяет применить ту же технику build‑scan (перехват <code>g++</code>), что и для обычного make‑проекта.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Нет версий и нет lockfile: <code>-lssl</code> не говорит ни о версии OpenSSL, ни о том, динамика это или статика.</li>
+<li>Унаследованный статус в Qt6 — новые возможности и инструментарий идут в CMake; qmake‑проекты часто плохо документированы и содержат ручные хаки в <code>*.pri</code>.</li>
+<li>Условная логика (<code>unix:</code>, <code>win32:</code>, <code>CONFIG(debug)</code>) ветвит набор зависимостей по платформе/конфигурации — статический разбор <code>*.pro</code> без знания профиля сборки даёт неполную картину.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. qmake — локальный инструмент, не обращается в сеть и не имеет менеджера пакетов, который что‑то скачивает. Зависимости берутся из уже установленного Qt SDK и системных библиотек; в закрытом контуре достаточно офлайн‑дистрибутива Qt.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-c6a99c0dee86.html">CMake</a> · <a href="doc-50df475ac430.html">ldd readelf LIEF</a> · <a href="doc-e4184a38ebbe.html">pkg-config</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

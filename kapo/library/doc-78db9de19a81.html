@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>qmake и legacy Qt — КАПО · Пиков</title><meta name="description" content="qmake и legacy Qt. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-78db9de19a81.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="qmake-и-legacy-qt">qmake и legacy Qt</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>qmake — сборочная система старых Qt-проектов (<code>.pro</code>-файлы). Она прячет зависимости лучше, чем любая другая система в этом модуле: строка <code>QT += network sql</code> подтягивает целые библиотеки (<code>libQt5Network</code>, <code>libQt5Sql</code>) без единого упоминания версии, а <code>LIBS += -lfoo</code> — это просто сырые флаги линковщика. Ни версии, ни источника в <code>.pro</code>-файле нет в принципе. Какая версия Qt реально слинкуется, определяет не проект, а тот <code>qmake</code>, что стоит на сборочной машине: <code>qmake -query QT_VERSION</code>.</p>
+<p>Для SCA это критично сразу по двум причинам. Во-первых, Qt — крупная библиотека с собственной историей CVE, и «невидимая» версия означает невидимую поверхность уязвимостей. Во-вторых, legacy Qt — это часто Qt 4 или ранние Qt 5, у которых истёк срок поддержки; такой компонент рискован сам по себе, независимо от конкретных CVE.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p><code>.pro</code>-файл декларирует модули, но не версии:</p>
+<pre><code class="language-pro">QT += core gui network          # тянет libQt5Core/Gui/Network транзитивно, без версии
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+LIBS += -L/opt/lib -lcrypto     # сырые флаги: ни имени пакета, ни версии
+INCLUDEPATH += /opt/include
+</code></pre>
+<blockquote>
+<p>Версию знает хост, а не проект</p>
+</blockquote>
+<pre><code class="language-bash">qmake -query QT_VERSION        # 5.15.2  — фактическая версия на этой машине
+qmake -query QT_INSTALL_LIBS   # где лежат libQt5*.so
+ldd ./app | grep -i qt         # что реально слинковано в артефакт</code></pre>
+<blockquote>
+<p>Один и тот же <code>.pro</code> на двух машинах с разными Qt даст бинари с разной версией Qt и разным набором CVE. Источник истины — <code>ldd</code> готового артефакта плюс <code>qmake -query</code>, а не <code>.pro</code>.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона двойная. Первая — <code>QT += ...</code> не несёт версии, поэтому генератор SBOM по исходникам в лучшем случае запишет «зависит от Qt» без координаты. Вторая — <code>LIBS += -l...</code> вообще не парсится большинством анализаторов как зависимость: это выглядит как произвольная опция. Плюс legacy-риск: Qt 4 и Qt 5.x за пределами LTS не получают исправлений, и это нужно отмечать явно.</p>
+<blockquote>
+<p>EOL важнее, чем кажется
+Зафиксируйте major.minor Qt (<code>qmake -query QT_VERSION</code>) и сверьтесь со статусом поддержки ветки. Qt 4 и не-LTS ветки Qt 5 — кандидаты в риск-реестр независимо от наличия конкретных CVE: для них исправлений не выпускают.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Снимите <code>qmake -query QT_VERSION</code> и <code>QT_INSTALL_LIBS</code> на сборочной машине — это фактическая версия Qt.</li>
+<li>Распарсите <code>.pro</code>: соберите модули из <code>QT += ...</code> и сырые библиотеки из <code>LIBS += -l...</code> — последние легко теряются.</li>
+<li>Прогоните <code>ldd</code> по артефакту и смаппьте <code>libQt5*.so</code>/прочие <code>.so</code> на пакеты дистрибутива (<code>dpkg -S</code>).</li>
+<li>Проверьте мажор Qt и статус поддержки ветки; EOL-версии Qt вносите в риск-реестр явно.</li>
+<li>Сырые <code>-l</code>-зависимости, по которым нет координаты, отправьте в worklist ручной доразметки.</li>
+<li>Если проект мигрируем — рассмотрите перевод на CMake (Qt 6 уже на CMake), это сразу делает зависимости видимее для анализа.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-189e151e1830.html">CMake target_link_libraries</a> · <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-19fd6dae6997.html">ldd/readelf/objdump</a> · <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

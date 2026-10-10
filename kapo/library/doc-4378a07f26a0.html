@@ -1,0 +1,52 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П19. C/C++ make build inventory — КАПО · Пиков</title><meta name="description" content="П19. C/C++ make build inventory. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4378a07f26a0.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п19-cc-make-build-inventory">П19. C/C++ make build inventory</h1>
+<h2 id="цель">Цель</h2>
+<p>По многословному (verbose) логу сборки <code>make</code> восстановить, какие библиотеки реально передаются линкеру (флаги <code>-l</code> и <code>-L</code>), и сравнить этот список с тем, что подсказывают <code>#include</code> в исходниках. Проверяемый результат: текстовый файл со списком линкуемых библиотек, где для каждой явно отмечено, динамическая она (<code>-lssl</code>) или статическая (<code>-l:libssl.a</code>, <code>-static</code>).</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Перехватываем команды линковки из verbose-сборки. У GNU Make флаг — <code>V=1</code> или цель, печатающая команды (<code>make</code> сам не скрывает их, скрывает обычно сгенерированный Makefile через <code>@</code>):</p>
+<pre><code class="language-bash"># 1. чистая пересборка с печатью реальных команд компилятора и линкера
+make clean
+make V=1 2&gt;&amp;1 | tee build.log     # для autotools-проектов; в CMake-Makefile: make VERBOSE=1
+
+# 2. вытащить из лога строки линковки и показать только -l / -L / -static
+grep -E '\-l|\-L|\-static' build.log | grep -E 'gcc|g\+\+|c\+\+|ld' &gt; link-lines.txt
+
+# 3. отдельно выписать имена библиотек
+grep -oE '\-l[:]?[A-Za-z0-9._+-]+' build.log | sort -u &gt; linked-libs.txt
+</code></pre>
+<blockquote>
+<p>Почему именно verbose-лог, а не <code>readelf</code> готового бинаря
+<code>readelf -d</code> (см. <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>) покажет только то, что осталось в <strong>динамической</strong> секции. Флаг <code>-l:libfoo.a</code> или <code>-Wl,-Bstatic</code> в логе линковки — единственное место, где статически вшитая библиотека ещё видна по имени. Поздний скан бинаря её уже не вернёт.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>В <code>build.log</code> — реальные вызовы линкера, например:</p>
+<pre><code class="language-text">g++ -o app main.o net.o -L/usr/lib/x86_64-linux-gnu -lssl -lcrypto -lz -l:libcustom.a
+</code></pre>
+<p>В <code>linked-libs.txt</code> — короткий нормализованный список (для среднего тестового проекта обычно 3–8 строк):</p>
+<pre><code class="language-text">-l:libcustom.a
+-lcrypto
+-lssl
+-lz
+</code></pre>
+<p>Ориентир по результату: количество строк <code>-l</code> в логе должно быть <strong>больше или равно</strong> числу уникальных <code>#include</code> сторонних заголовков. Если библиотек по <code>-l</code> заметно меньше, чем заголовков, — часть зависимостей либо header-only, либо вшита статически без отдельного <code>-l</code> (через объектные файлы), и это уже зацепка для <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Лог пустой или команды скрыты <code>@</code>.</strong> Многие сгенерированные Makefile (CMake, KBuild) глушат вывод. Для CMake-сборки используйте <code>make VERBOSE=1</code>, для autotools — <code>make V=1</code>; если не помогло, пересоберите через <code>make SHELL='sh -x'</code> или подключите перехватчик (<code>bear -- make</code>, <code>compiledb make</code>).</li>
+<li><strong><code>make: Nothing to be done for 'all'</code>.</strong> Сборка инкрементальная и линковка не выполнялась повторно. Обязательно сделайте <code>make clean</code> (или соберите в чистом дереве) — иначе строки линковки в лог не попадут.</li>
+<li><strong>В логе видны только <code>-I</code> (include), но нет <code>-l</code>.</strong> Вы поймали стадию компиляции, но не линковки. Проверьте, что сборка дошла до конца и создала исполняемый файл; ищите строку с <code>-o &lt;имя_бинаря&gt;</code>.</li>
+<li><strong>Библиотека приходит через <code>pkg-config</code>.</strong> В логе будет развёрнутый набор флагов из <code>$(pkg-config --libs ...)</code>; имя пакета <code>pkg-config</code> (например <code>openssl</code>) не всегда совпадает с именем <code>.so</code> — это нормально, сверяйте по <code>-l</code>, а не по имени модуля pkg-config.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: <code>build.log</code>, полученный из чистой пересборки; <code>linked-libs.txt</code>; и устную (или письменную) разметку каждой библиотеки на «динамическая / статическая / header-only», подкреплённую конкретной строкой из лога. Зачёт не ставится, если список собран из <code>#include</code>, а не из реальных команд линковки.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Build-scan по логу сборки — это управляемость работ по <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> и практики PS.3.2 / PW.4 из <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>: состав ПО фиксируется на этапе сборки, а не реконструируется задним числом. Полнота перечня компонентов — критерий качества SBOM по <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>.
+Смежные практики модуля <a href="doc-fa808e147d8e.html">М09</a>: <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a>, <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>, <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>. Шаблон: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М09. М09. C и C++ legacy без дисциплины пакетного менеджера — КАПО · Пиков</title><meta name="description" content="М09. М09. C и C++ legacy без дисциплины пакетного менеджера. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-fa808e147d8e.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#ключевые-понятия">Ключевые понятия</a></li>
+<li><a href="#миникарта-модуля">Миникарта модуля</a></li>
+<li><a href="#нормативная-опора">Нормативная опора</a></li>
+<li><a href="#материалы-модуля">Материалы модуля</a></li>
+<li><a href="#связанные-практики">Связанные практики</a></li>
+<li><a href="#связь-с-другими-модулями">Связь с другими модулями</a></li>
+<li><a href="#практический-результат">Практический результат</a></li>
+</ul>
+</div>
+<h1 id="м09-c-и-c-legacy-без-дисциплины-пакетного-менеджера">М09. C и C++ legacy без дисциплины пакетного менеджера</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>В экосистемах npm, PyPI, Go, Cargo состав ПО декларирован: есть lock-файл, есть устойчивый ключ компонента (PURL), и SBOM почти полностью восстанавливается из манифеста. В C/C++ без Conan или vcpkg ничего этого нет. <code>#include &lt;openssl/ssl.h&gt;</code> не говорит, какая версия OpenSSL слинкована и слинкована ли вообще; зависимость может прийти из системного <code>apt</code>-пакета, из ручного каталога <code>third_party/</code>, из внутреннего форка с собственными патчами или быть «вшита» статически в бинарь. Этот модуль учит восстанавливать состав там, где сборочный процесс не отдаёт метаданных, и честно отмечать слепые зоны вместо того, чтобы выдавать неполный SBOM за полный.</p>
+<p>Это самый сложный модуль курса: здесь сходятся бинарный анализ ELF, маппинг на DEB-пакеты, граф линковки и роль build-scan. Модуль опирается на инструменты из <a href="doc-1bca905af1a7.html">М05</a> и готовит к корпоративному кейсу обогащения фактов в <a href="doc-457364f50285.html">М11</a>.</p>
+<h2 id="ключевые-понятия">Ключевые понятия</h2>
+<ul>
+<li><code>#include</code> ≠ зависимость: заголовок виден компилятору, но не задаёт версию и факт линковки.</li>
+<li>Три разных слоя: исходная зависимость → <strong>динамическая</strong> линковка (<code>.so</code>, видна через <code>ldd</code>/<code>readelf -d</code>/<code>DT_NEEDED</code>) → <strong>статическая</strong> линковка (<code>.a</code>, слепая зона: компонент исчезает из SBOM).</li>
+<li>Маппинг ELF → DEB через <code>apt</code>/<code>dpkg -S</code>: системная библиотека получает координаты (имя пакета, версия, дистрибутив).</li>
+<li>Полнота достигается на этапе <strong>сборки</strong> (build scan, перехват вызовов компилятора), а не поздним сканом готового бинаря.</li>
+<li>Роль Conan/vcpkg, когда они есть: <code>conan graph info</code> даёт идентичность пакета и устойчивый PURL.</li>
+</ul>
+<p>Опорные заметки справочника: <a href="doc-e0d7e2832f34.html">include ≠ зависимость</a> · <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-28706d741e92.html">ELF и DT_NEEDED</a> · <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a> · <a href="doc-44ca67214176.html">stripped binaries</a> · <a href="doc-0655587ecc4d.html">vendored source</a> · <a href="doc-06c6cc985f59.html">unresolved libraries</a> · <a href="doc-eb96e051c415.html">кейс генератора фактов</a></p>
+<h2 id="миникарта-модуля">Миникарта модуля</h2>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-fa808e147d8e-0.svg" rel="noopener" target="_blank"><img alt="Схема: М09. М09. C и C++ legacy без дисциплины пакетного менеджера" loading="lazy" src="../assets/course-diagrams/course-fa808e147d8e-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="нормативная-опора">Нормативная опора</h2>
+<p><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2, PW.4, RV.1) · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-d90628b348e5.html">CERT C C++</a> · <a href="doc-c1e10b3dd003.html">MISRA C C++</a></p>
+<h2 id="материалы-модуля">Материалы модуля</h2>
+<ul>
+<li><a href="doc-0487a02db2f1.html">01 Конспект</a> — почему SCA ломается в C/C++ и как обогащать SBOM бинарным анализом.</li>
+<li><a href="doc-7e18abef7929.html">02 План занятия</a> — 90 минут: теория, демо, практика.</li>
+<li><a href="doc-183968486ec7.html">03 Практическая работа</a> — собрать проект, снять <code>ldd</code>/<code>readelf</code>, сравнить динамику и статику.</li>
+<li><a href="doc-eca38c3b1286.html">04 Контрольные вопросы</a> — вопросы и кейс-задачи.</li>
+<li><a href="doc-6ea06bb75d3e.html">05 Что проверять на проекте</a> — чек-лист аудитора по C/C++.</li>
+</ul>
+<h2 id="связанные-практики">Связанные практики</h2>
+<p><a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a></p>
+<h2 id="связь-с-другими-модулями">Связь с другими модулями</h2>
+<ul>
+<li>Назад: <a href="doc-1bca905af1a7.html">М05</a> — генераторы SBOM (cdxgen, syft), которые здесь упираются в C/C++.</li>
+<li>Вперёд: <a href="doc-3235e84d3a49.html">М10</a> — приёмка C/C++ компонентов от соисполнителей; <a href="doc-457364f50285.html">М11</a> — обогащение фактов и сервис вердиктов как сквозной кейс.</li>
+</ul>
+<h2 id="практический-результат">Практический результат</h2>
+<p>Слушатель умеет: собрать тестовый C/C++ проект; снять <code>ldd</code>/<code>readelf -d</code> и отличить динамическую зависимость от статической; сгенерировать <code>cdxgen</code> SBOM и увидеть, чего в нём не хватает; смаппить <code>.so</code> на DEB-пакеты через <code>apt</code>; оформить список unresolved libraries для ручной доразметки.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

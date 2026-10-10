@@ -1,0 +1,90 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П25. CPE alias worklist — КАПО · Пиков</title><meta name="description" content="П25. CPE alias worklist. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-2c6bb1831ead.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п25-cpe-alias-worklist">П25. CPE alias worklist</h1>
+<h2 id="цель">Цель</h2>
+<p>Составить рабочий список C/C++ зависимостей, у которых нет CPE (а значит, нет матчинга на NVD), и для каждой подобрать корректный CPE с учётом alias-проблемы (один продукт — несколько разных <code>vendor:product</code>). Проверяемый результат: таблица-worklist «компонент → найденный CPE → альтернативные написания vendor/product → статус», отсортированная по приоритету.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Это аналитическая практика без инструмента: вы вручную сверяете компоненты с форматом <a href="https://nvd.nist.gov/products/cpe" rel="noopener noreferrer" target="_blank">CPE 2.3</a> и ищете совпадения в NVD CPE Dictionary. Алгоритм worklist:</p>
+<pre><code class="language-text">1. Выгрузить из SBOM C/C++ компоненты, у которых cpe == пусто (но есть purl/имя).
+2. Для каждого — найти в NVD CPE Dictionary кандидатов по имени продукта.
+3. Зафиксировать ВСЕ варианты vendor:product (alias!), а не первый попавшийся.
+4. Проставить приоритет: критичные/сетевые библиотеки (openssl, libcurl) — выше.
+5. Собрать рабочий CPE-шаблон cpe:2.3:a:&lt;vendor&gt;:&lt;product&gt;:&lt;version&gt;:*:*:*:*:*:*:*
+</code></pre>
+<blockquote>
+<p>Alias-проблема CPE
+У одного продукта в NVD исторически бывает несколько <code>vendor:product</code>. OpenSSL встречается и как <code>openssl:openssl</code>, и как <code>openssl_project:openssl</code>; для других библиотек vendor мог меняться при смене мейнтейнера. Если в SBOM записан один alias, а CVE привязан к другому — находка теряется. Поэтому в worklist фиксируют не один CPE, а все известные написания.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Worklist в виде таблицы:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Компонент</th>
+<th>Версия</th>
+<th>Подобранный CPE</th>
+<th>Alias / альт. написания</th>
+<th>Приоритет</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenSSL</td>
+<td>3.0.11</td>
+<td><code>cpe:2.3:a:openssl:openssl:3.0.11:*:*:*:*:*:*:*</code></td>
+<td><code>openssl_project:openssl</code></td>
+<td>высокий</td>
+<td>подтверждён</td>
+</tr>
+<tr>
+<td>libcurl</td>
+<td>7.88.1</td>
+<td><code>cpe:2.3:a:haxx:curl:7.88.1:*:*:*:*:*:*:*</code></td>
+<td><code>curl:curl</code></td>
+<td>высокий</td>
+<td>проверить vendor</td>
+</tr>
+<tr>
+<td>zlib</td>
+<td>1.2.13</td>
+<td><code>cpe:2.3:a:zlib:zlib:1.2.13:*:*:*:*:*:*:*</code></td>
+<td><code>gnu:zlib</code> (ошибочный)</td>
+<td>средний</td>
+<td>подтверждён</td>
+</tr>
+<tr>
+<td>внутренняя libcustom</td>
+<td>1.0</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>CPE отсутствует (internal)</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ориентир: worklist охватывает все C/C++ компоненты без CPE из вашего SBOM; для публичных OSS у каждого должен появиться хотя бы один CPE-кандидат, для внутренних — пометка «CPE отсутствует, internal». Строки с несколькими alias — самые ценные: именно они закрывают потенциальные false negative.</p>
+<blockquote>
+<p>Зачем worklist, а не разовая правка
+CPE проставляется руками и устаревает: NVD добавляет/депрекейтит записи. Worklist с приоритетом и статусом — это передаваемый артефакт для сервиса аудита/вердиктов, а не разовое действие. Критичные сетевые библиотеки размечаются первыми.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>В NVD нашлось несколько <code>vendor:product</code> для одного продукта — не знаю, какой брать.</strong> Это и есть alias-проблема: берите все и проверяйте, к какому из них привязаны нужные CVE. В worklist оставляйте основной + альтернативные, а не выбирайте один наугад.</li>
+<li><strong>Для библиотеки вообще нет CPE в NVD.</strong> Бывает для нишевых OSS и почти всегда для внутренних форков. Помечайте <code>CPE отсутствует</code>; для матчинга на уязвимости остаётся PURL→OSV (<a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>) и ручное наблюдение.</li>
+<li><strong>Версия в CPE не матчится, хотя vendor/product верные.</strong> CPE-матчинг чувствителен к формату версии и к диапазонам в CVE (<code>versionStartIncluding</code>/<code>versionEndExcluding</code>). Сверяйте не точную строку, а попадание версии в уязвимый диапазон.</li>
+<li><strong>CPE взят для другого продукта с похожим именем.</strong> Частая ошибка: <code>zlib</code> против постороннего <code>*zlib*</code>-пакета. Проверяйте по описанию записи в CPE Dictionary, а не только по имени.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: worklist по всем C/C++ компонентам без CPE из учебного SBOM, где для публичных библиотек заполнены CPE и альтернативные alias, проставлен приоритет и статус, а внутренние помечены <code>CPE отсутствует</code>. Отдельно объяснить на примере OpenSSL, как два разных alias могли бы привести к пропуску CVE.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Полнота и корректность CPE — условие матчинга на NVD и <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a>; без них RV.1 <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (поиск уязвимостей в компонентах) даёт false negative. Качество идентификаторов SBOM — критерий <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>; alias-проблема CPE — ядро модуля <a href="doc-4a0b7bceee7b.html">М04</a>.
+Смежные практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> (вторая координата — PURL), <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> и <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> (откуда берутся безымянные C/C++ компоненты). Шаблон: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

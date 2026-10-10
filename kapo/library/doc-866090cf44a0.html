@@ -1,0 +1,53 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OSV-Scanner — КАПО · Пиков</title><meta name="description" content="OSV-Scanner. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-866090cf44a0.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="osv-scanner">OSV-Scanner</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>OSV-Scanner — официальный клиент базы OSV.dev. Он читает не SBOM, а сами lockfiles проекта (<code>package-lock.json</code>, <code>poetry.lock</code>, <code>go.mod</code>, <code>Cargo.lock</code>, <code>pom.xml</code> и др.), извлекает точные версии и опрашивает OSV по каждой паре «экосистема + версия». Сила в том, что OSV хранит уязвимые диапазоны в виде машинных событий <code>introduced/fixed</code>, поэтому совпадение по версии точное, а не по эвристике CPE.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Базовый прогон — по дереву проекта или конкретному lockfile; для гейтов используют машинный вывод и call-graph анализ (Go), отсекающий недостижимый код:</p>
+<blockquote>
+<p>Команда</p>
+</blockquote>
+<pre><code class="language-bash"># рекурсивно найти и просканировать все lockfiles
+osv-scanner scan --recursive ./
+# конкретный lockfile + анализ достижимости (Go) + JSON для гейта
+osv-scanner scan --lockfile=go.mod --call-analysis=all --format=json ./ &gt; osv.json
+# просканировать готовый SBOM
+osv-scanner scan --sbom=sbom.cdx.json</code></pre>
+<p>Запрос к API можно сделать и руками — это полезно показать студентам:</p>
+<blockquote>
+<p>Прямой запрос к OSV API</p>
+</blockquote>
+<pre><code class="language-bash">curl -s https://api.osv.dev/v1/query -d \
+  '{"package":{"ecosystem":"PyPI","name":"requests"},"version":"2.19.0"}'</code></pre>
+<blockquote>
+<p>В ответ — массив записей с <code>id</code> (например <code>GHSA-...</code>, <code>PYSEC-...</code>), полем <code>affected.ranges</code> и ссылками. Подавление FP делается файлом конфигурации с записями <code>[[02 Справочник/Глоссарий/IgnoredVulns|IgnoredVulns]]</code> по <code>id</code> и сроком.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Точный матчинг по версии через машинные диапазоны OSV (<code>introduced</code>/<code>fixed</code>) — заметно меньше FP, чем у CPE-эвристик.</li>
+<li>Работает прямо с lockfiles десятков экосистем без предварительной генерации SBOM; покрывает npm, PyPI, Go, Maven, crates, RubyGems и др.</li>
+<li>Call-graph анализ для Go: отсекает уязвимости в коде, который фактически не вызывается, — снижает шум в гейте.</li>
+<li>Единый идентификатор и схема записи (OSV schema) — удобно агрегировать advisories из разных источников (GHSA, PYSEC, RUSTSEC, дистрибутивы).</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Покрытие держится на наличии экосистемы в OSV: для C/C++ без пакетного менеджера и для приватных пакетов данных почти нет.</li>
+<li>Идентификаторы — преимущественно GHSA/экосистемные; маппинг на классический CVE и на БДУ ФСТЭК не гарантирован и требует отдельной сверки.</li>
+<li>Call-analysis достижимости из коробки полноценно работает только для части языков (Go); для остальных это обычный матчинг по версии.</li>
+<li>Не оценивает эксплуатируемость (нет EPSS/KEV в выводе) — приоритизация остаётся на стороне процесса.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. По умолчанию сканер ходит в <code>api.osv.dev</code>. Для закрытого контура существует офлайн-режим: предварительно выгружается локальная копия БД (<code>osv-scanner --offline --download-offline-databases</code> или зеркало zip-дампов экосистем из бакета OSV), после чего матчинг идёт без сети. Минус — данные актуальны на момент выгрузки, нужен регламент регулярного обновления зеркала.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04 Идентификаторы компонентов и уязвимостей</a>
+Практика: <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX</a>
+Смежные карточки: <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-41eb01248f66.html">Package URL (PURL)</a> · <a href="doc-14258e036a86.html">GitHub Security Advisory</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

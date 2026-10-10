@@ -1,0 +1,42 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CMake — КАПО · Пиков</title><meta name="description" content="CMake. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c6a99c0dee86.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cmake">CMake</h1>
+<blockquote>
+<p>Контекст
+CMake — не пакетный менеджер, а генератор сборочных систем: из <code>CMakeLists.txt</code> он создаёт нативные сборочные файлы (Ninja, Make, проекты Visual Studio). Для SCA это означает, что CMake описывает <em>намерение</em> слинковать цели и найти библиотеки, но сам по себе не гарантирует ни версию, ни факт линковки.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>CMake разрешает, какие библиотеки нужны цели (<code>find_package</code>, <code>target_link_libraries</code>), куда смотреть за заголовками, и каким компилятором собирать. В контексте инвентаризации C/C++ он ценен как источник <em>декларации</em> зависимостей и как точка, где можно снять граф целей и перехватить реальные вызовы компилятора (через <code>compile_commands.json</code>).</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Граф зависимостей целей в формате Graphviz:</p>
+<pre><code class="language-bash">cmake -S . -B build --graphviz=deps.dot
+dot -Tsvg deps.dot -o deps.svg
+</code></pre>
+<p>База реальных команд компиляции (вход для build‑scan и cdxgen):</p>
+<pre><code class="language-bash">cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON   # → build/compile_commands.json
+</code></pre>
+<p>Машинная модель проекта через CMake File API (каталог‑запрос <code>.cmake/api/v1/query/</code>) отдаёт JSON с целями, ссылками и путями к библиотекам — это надёжнее, чем парсить <code>CMakeLists.txt</code> глазами.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li><code>compile_commands.json</code> — точный список того, что и с какими <code>-I/-L/-l</code> компилируется; основа для перехвата реальных, а не задекларированных зависимостей.</li>
+<li>File API и <code>--graphviz</code> дают машинную модель графа целей без запуска самой сборки до конца.</li>
+<li><code>find_package</code> помечает, какие компоненты ищутся как внешние, — отправная точка для разметки.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li><code>find_package(OpenSSL)</code> находит то, что лежит в системе, и не фиксирует версию — на другой машине подтянется другая. Lockfile отсутствует как класс.</li>
+<li><code>FetchContent</code>/<code>ExternalProject</code> затягивают исходники по URL/commit в обход любого пакетного менеджера — их легко упустить при инвентаризации.</li>
+<li>Декларация ≠ факт: цель может быть объявлена, но статически вшита или, наоборот, не слинкована. Реальный состав даёт только анализ артефакта.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. CMake — локальный инструмент без сетевых зависимостей. Сетевые риски вносят не сам CMake, а вызовы <code>FetchContent_Declare(... GIT_REPOSITORY ...)</code>/<code>ExternalProject</code>, тянущие код из интернета во время конфигурации; в закрытом контуре их перенаправляют на внутренние зеркала или заменяют vendored‑исходниками.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-1bca905af1a7.html">М05 Генерация SBOM</a> · <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-6df02436591e.html">Conan</a> · <a href="doc-fd94147229e0.html">vcpkg</a> · <a href="doc-e4184a38ebbe.html">pkg-config</a> · <a href="doc-35e5f81f86fe.html">cdxgen</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

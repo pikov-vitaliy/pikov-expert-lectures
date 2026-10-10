@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OpenSSF Scorecard — КАПО · Пиков</title><meta name="description" content="OpenSSF Scorecard. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6445f24aa231.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="openssf-scorecard">OpenSSF Scorecard</h1>
+<h2 id="о-документе">О документе</h2>
+<blockquote>
+<p>Что это
+<strong>OpenSSF Scorecard</strong> — открытый проект и инструмент OpenSSF (Linux Foundation), автоматически вычисляющий <strong>сигналы безопасности и зрелости open source-проекта</strong>. Это не нормативный документ с требованиями, а <strong>метрика приёмки</strong>: набор автоматизированных проверок, дающих оценку 0–10 по каждой и агрегированный балл. В курсе Scorecard используется на шаге «брать или не брать компонент», то есть на стороне OSA-приёмки.</p>
+</blockquote>
+<p>Каждая проверка (check) оценивает наблюдаемый сигнал риска: есть ли pinned-зависимости, подписанные релизы, ревью кода, защищённые ветки, отсутствие бинарных артефактов в репозитории и т.п. Результат — машиночитаемый и пригоден для порога в политике приёмки.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<blockquote>
+<p>Scorecard не «требует», он измеряет. Значимые для OSA сигналы:
+- <strong>Сопровождаемость.</strong> <code>Maintained</code> — активность сопровождения; заброшенный проект — отдельный риск.
+- <strong>Целостность релизов.</strong> <code>Signed-Releases</code>, <code>Pinned-Dependencies</code> — подписаны ли релизы и зафиксированы ли версии зависимостей.
+- <strong>Дисциплина изменений.</strong> <code>Code-Review</code>, <code>Branch-Protection</code> — проходят ли изменения ревью и защищены ли ветки.
+- <strong>Чистота артефактов.</strong> <code>Binary-Artifacts</code> — нет ли непрозрачных бинарей в репозитории.
+- <strong>Реакция на уязвимости.</strong> <code>Vulnerabilities</code>, <code>Security-Policy</code> — наличие открытых уязвимостей и политики раскрытия.
+- <strong>Агрегатный балл</strong> как пороговое значение для решения о приёмке (например, не ниже N для критичных компонентов).</p>
+</blockquote>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<blockquote>
+<p>Артефакты соответствия
+- JSON-вывод Scorecard по каждому внешнему компоненту с баллами по чекам.
+- Запись решения о приёмке/отклонении со ссылкой на агрегатный балл и пороги политики.
+- Паспорт open source-библиотеки с зафиксированными сигналами зрелости на дату приёмки.
+- Конфигурация controlled repository, отражающая, что приёмка проходит через эти проверки.
+- Журнал пересмотра балла при обновлении версии компонента.</p>
+</blockquote>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li>Приёмка через контролируемый репозиторий: <a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a>, <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a>.</li>
+<li>Решение о приёмке и паспорт компонента: <a href="doc-7001d4a35f2f.html">Политика приемки сторонних компонентов</a>, <a href="doc-7b38c1b6c34b.html">Паспорт open source библиотеки</a>.</li>
+<li>Контекст модуля: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<blockquote>
+<p>Это учебная карточка
+Карточка описывает Scorecard как метрику приёмки под курс и не воспроизводит официальную документацию проверок. Точный состав чеков, их веса и шкалу для аудита сверять с актуальной версией OpenSSF Scorecard и регламентами Организации.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

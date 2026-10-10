@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OSS Index — КАПО · Пиков</title><meta name="description" content="OSS Index. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-b869bb94c8bb.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="oss-index">OSS Index</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>OSS Index (Sonatype) — это <strong>онлайн-сервис, который по координатам компонента возвращает известные уязвимости</strong>. Запрос строится прямо на PURL: вы отправляете список <code>pkg:...</code>-координат и получаете для каждого список уязвимостей с CVSS и ссылками. Это источник запрос-ориентированный (по компоненту), а не дамп для локального матчинга, и он лежит в основе OWASP Dependency-Check (анализатор OSS Index) и ряда плагинов сборки.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Основной режим — REST API <code>/component-report</code>: на вход массив PURL, на выходе — отчёт по каждому. Пример запроса:</p>
+<pre><code class="language-bash">curl -s -X POST https://ossindex.sonatype.org/api/v3/component-report \
+  -H 'Content-Type: application/json' \
+  -d '{"coordinates":["pkg:npm/semver@7.3.7","pkg:pypi/django@3.2.0"]}' \
+  | jq '.[] | {coordinates, vulnerabilities:[.vulnerabilities[].cve]}'
+</code></pre>
+<p>Для больших объёмов и CI используйте авторизацию по Sonatype Guide PAT/OSS Index token через HTTP Basic Auth; иначе возможны ограничения и <code>401/403</code>.</p>
+<p>Фрагмент ответа (координата → найденные уязвимости):</p>
+<pre><code class="language-json">{ "coordinates": "pkg:npm/semver@7.3.7",
+  "vulnerabilities": ["CVE-2022-25883"] }
+</code></pre>
+<p>В пайплайне OSS Index обычно вызывается не напрямую, а через сканер: Dependency-Check добавляет находки OSS Index к результатам матчинга по NVD, расширяя покрытие за счёт экосистемных данных Sonatype.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Запрос строго по PURL — не нужно тянуть и хранить полную базу, ответ компактный и адресный.</li>
+<li>Покрывает множество экосистем (npm, PyPI, Maven, RubyGems, NuGet, Go, RPM/DEB и др.).</li>
+<li>Интегрирован «из коробки» в OWASP Dependency-Check и популярные плагины сборки.</li>
+<li>Бесплатный доступ для базовых объёмов; авторизация повышает лимиты.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Принципиально онлайновый сервис: без доступа к <code>ossindex.sonatype.org</code> источник не работает.</li>
+<li>Лимиты частоты запросов (особенно анонимно) мешают сканировать большие портфели.</li>
+<li>Не отдаёт полный дамп для офлайн-репликации — это API «по требованию», а не фид.</li>
+<li>Данные курируются вендором; глубина и оперативность различаются по экосистемам, для регулятора не заменяет БДУ ФСТЭК.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Нет. OSS Index — это размещённый онлайн-сервис без публичного полного дампа для локального зеркала: каждый запрос идёт к API Sonatype. В закрытом контуре он недоступен; вместо него используют источники с офлайн-репликацией (<a href="doc-1875214e9551.html">OSV.dev</a>, <a href="doc-a4c337643b65.html">NVD</a>, <a href="doc-14258e036a86.html">GitHub Security Advisory</a>) либо коммерческие on-prem-продукты Sonatype.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a></p>
+<p>Смежные карточки: <a href="doc-56e1c2ed4ba7.html">OWASP Dependency-Check</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-14258e036a86.html">GitHub Security Advisory</a></p>
+<p>Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

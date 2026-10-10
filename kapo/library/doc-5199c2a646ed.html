@@ -1,0 +1,49 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>AI model dependencies — КАПО · Пиков</title><meta name="description" content="AI model dependencies. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-5199c2a646ed.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="ai-model-dependencies">AI model dependencies</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>AI-система — это не только код. Кроме обычного дерева пакетов у неё есть веса модели, базовая модель, от которой она дообучена, обучающие датасеты и нативный рантайм инференса. Классический SBOM по <code>package-lock.json</code> или ELF этих сущностей не видит, а риски у них собственные: происхождение и лицензия весов, lineage дистилляции, совместимость лицензии датасета. Для C/C++-инженера здесь есть и прямой стык: рантаймы инференса (<code>llama.cpp</code>, <code>onnxruntime</code>, <code>ggml</code>) — это нативные C/C++-зависимости со своими <code>.so</code> и уязвимостями, которые попадают в обычный composition analysis, тогда как сама модель требует отдельного описания (ML-BOM).</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Модель приезжает как бинарный файл весов, рядом — нативный рантайм, который её исполняет. Первый требует ML-BOM-записи, второй ловится обычным анализом ELF.</p>
+<pre><code class="language-bash"># артефакты модели — это не пакеты, а веса в специфичных форматах
+file model.safetensors model.gguf model.onnx
+#   model.gguf: data        &lt;-- веса; версия/происхождение не вычитываются из файла
+
+# рантайм инференса — обычная C/C++ зависимость
+ldd ./llama-server
+#   libggml.so =&gt; ...        &lt;-- нативный .so, идёт в обычный SCA
+#   libgomp.so.1 =&gt; ...
+
+# в CycloneDX модель описывается отдельным типом компонента
+jq '.components[] | select(.type=="machine-learning-model")' ml-bom.json
+</code></pre>
+<p>G7 «SBOM for AI: Minimum Elements» формализует это как семь кластеров (модель, веса, датасеты, происхождение, и т.д.), дополняющих обычный SBOM, а не заменяющих его. В CycloneDX модель — это компонент <code>type: machine-learning-model</code> со ссылками на базовую модель и датасеты.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Веса не имеют DT_NEEDED
+Файл <code>.gguf</code>/<code>.safetensors</code>/<code>.onnx</code> не объявляет своих «зависимостей» так, как ELF объявляет <code>.so</code>. Базовая модель, метод квантизации и датасет не вычитываются из бинаря весов — их нужно декларировать вручную в ML-BOM. Сканер ELF честно опишет рантайм и промолчит про саму модель.</p>
+</blockquote>
+<p>Приём: разделить два слоя описания — нативный рантайм идёт в обычный SBOM через анализ <code>.so</code>, а модель и её lineage — в ML-BOM по кластерам G7, связанные ссылками.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Инвентаризировать нативный рантайм инференса как обычные C/C++-компоненты: <code>ldd</code>/<code>readelf -d</code> по <code>llama.cpp</code>/<code>onnxruntime</code>/<code>ggml</code>, версии и уязвимости в общий SBOM.</li>
+<li>Завести для модели отдельный компонент <code>type: machine-learning-model</code> в CycloneDX и заполнить семь кластеров G7.</li>
+<li>Зафиксировать lineage: базовая модель, метод дообучения/квантизации, происхождение весов — это не выводится из файла, требуется декларация поставщика.</li>
+<li>Связать модель с датасетами и базовой моделью ссылками (<code>dependencies</code>/<code>properties</code>), а не оставлять их разрозненными.</li>
+<li>Проверить лицензию весов и датасета отдельно от лицензии кода (см. dataset license) — они не совпадают.</li>
+<li>Включить ML-BOM в quality gate наравне с обычным SBOM: непокрытые кластеры G7 — это пробел в поставке.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a>.</li>
+<li>Практики: <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a>, <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>.</li>
+<li>Нормативка: <a href="doc-3850f36a7630.html">G7 SBOM for AI Minimum Elements</a>, <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>.</li>
+<li>Смежные заметки: <a href="doc-0c004a15c812.html">dataset license</a>, <a href="doc-a2c530fc1bbc.html">honest SBOM</a>, <a href="doc-16ebed4577b9.html">динамическая линковка</a>, <a href="doc-19fd6dae6997.html">ldd readelf objdump</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

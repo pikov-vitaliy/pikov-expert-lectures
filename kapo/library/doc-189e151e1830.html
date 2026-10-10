@@ -1,0 +1,68 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CMake target_link_libraries — КАПО · Пиков</title><meta name="description" content="CMake target_link_libraries. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-189e151e1830.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="cmake-target_link_libraries">CMake target_link_libraries</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p><code>target_link_libraries</code> — это место, где в CMake-проекте фиксируется факт линковки, но почти никогда не фиксируется версия и источник библиотеки. Команда <code>target_link_libraries(app PRIVATE ssl crypto z)</code> говорит линковщику «подключи <code>-lssl -lcrypto -lz</code>», а откуда возьмутся эти <code>.so</code> — решает уже поисковый путь линковщика на конкретной сборочной машине. Для SCA это значит, что текст <code>CMakeLists.txt</code> сам по себе не отвечает на главный вопрос композиционного анализа: какая именно версия OpenSSL и zlib попала в артефакт. Имя в <code>target_link_libraries</code> — это evidence-«identity по имени», но не координата компонента.</p>
+<p>Вторая причина — ключевые слова видимости <code>PRIVATE</code> / <code>PUBLIC</code> / <code>INTERFACE</code>. Они управляют тем, протекает ли зависимость дальше по графу к потребителям таргета. Неверно поставленная видимость либо прячет реальную транзитивную зависимость от анализа, либо, наоборот, раздувает граф фантомными связями, которых нет в бинаре.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Сравните две формы записи — для SCA это разные миры:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Запись</th>
+<th>Что несёт</th>
+<th>Видно ли версию</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>target_link_libraries(app PRIVATE ssl z)</code></td>
+<td>сырые флаги <code>-lssl -lz</code>, резолв по <code>find_library</code>/пути линковщика</td>
+<td>нет</td>
+</tr>
+<tr>
+<td><code>target_link_libraries(app PRIVATE OpenSSL::SSL ZLIB::ZLIB)</code></td>
+<td>imported targets от <code>find_package(OpenSSL)</code></td>
+<td>косвенно, через <code>OpenSSL_VERSION</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Стандартный приём «снять граф CMake» вскрывает ровно ту самую слепую зону:</p>
+<blockquote>
+<p>Граф CMake показывает таргеты, а не <code>.so</code></p>
+</blockquote>
+<pre><code class="language-bash">cmake -S . -B build
+cmake --build build --target app -- VERBOSE=1   # увидеть реальную команду линковки
+cmake --graphviz=deps.dot build                  # граф CMake-таргетов</code></pre>
+<blockquote>
+<p><code>deps.dot</code> нарисует связи между CMake-таргетами (<code>app -&gt; OpenSSL::SSL</code>), но он не знает, что <code>OpenSSL::SSL</code> на этой машине разрешился в <code>/usr/lib/x86_64-linux-gnu/libssl.so.3</code> из пакета <code>libssl3</code>. Эту последнюю связь даёт только <code>ldd build/app</code> плюс <code>dpkg -S</code>, а не граф CMake.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Граф CMake обрывается на границе imported target. Если зависимость подключена «сырым» именем (<code>ssl</code>, <code>z</code>), CMake вообще не считает её узлом графа — это просто строка флагов, которую увидит только разбор команды линковки (<code>VERBOSE=1</code>) или <code>ldd</code> готового бинаря. Поэтому опираться на <code>cmake --graphviz</code> как на источник состава нельзя: он отражает намерение разработчика, а не разрешённые версии.</p>
+<blockquote>
+<p>Перехват вызовов компилятора надёжнее графа
+Сгенерируйте <code>compile_commands.json</code> (<code>-DCMAKE_EXPORT_COMPILE_COMMANDS=ON</code>) и снимите реальные команды сборки через build-scan-обёртку. Так фиксируются фактические <code>-l</code>, <code>-L</code>, <code>-I</code> и абсолютные пути к <code>.a</code>/<code>.so</code>, а не декларации из <code>CMakeLists.txt</code>.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Соберите проект с <code>VERBOSE=1</code> и сохраните команду линковки таргета — это первичное evidence по линковке.</li>
+<li>Включите <code>-DCMAKE_EXPORT_COMPILE_COMMANDS=ON</code>, заберите <code>compile_commands.json</code> как артефакт сборки.</li>
+<li>Снимите <code>cmake --graphviz=deps.dot</code> — но трактуйте его как карту намерений, а не как состав.</li>
+<li>Для каждого imported target (<code>Foo::Bar</code>) найдите, из какого <code>find_package</code>/<code>.cmake</code>-модуля он пришёл и какую версию подтянул (<code>message(STATUS "${OPENSSL_VERSION}")</code>).</li>
+<li>Прогоните <code>ldd</code> по готовому артефакту и смаппьте <code>.so</code> на DEB/RPM-пакеты — это закрывает разрыв между CMake-таргетом и реальной библиотекой.</li>
+<li>Отдельно отметьте «сырые» имена в <code>target_link_libraries</code> (без <code>::</code>) — по ним версия не доказана, запись идёт в worklist доразметки.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-e70b62e31bd7.html">компиляция и линковка</a> · <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-19fd6dae6997.html">ldd/readelf/objdump</a> · <a href="doc-f5b27d7d4408.html">Conan package id graph</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

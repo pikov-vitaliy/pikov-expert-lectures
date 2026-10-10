@@ -1,0 +1,91 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П34. SBOM quality gate — КАПО · Пиков</title><meta name="description" content="П34. SBOM quality gate. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1aa79ca94146.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п34-sbom-quality-gate">П34. SBOM quality gate</h1>
+<blockquote>
+<p>Контекст практики
+Мусорный SBOM ломает всё, что идёт после него: сканер не сопоставит компонент без PURL/CPE, юрист не оценит лицензию без поля <code>licenses</code>, аудитор не докажет полноту без графа зависимостей. Quality gate ставится <strong>перед</strong> загрузкой SBOM в анализатор и считает измеримые показатели покрытия. Опора — обязательные поля компонента по BSI TR-03183-2 v2.1.0 (раздел 5.2.2). Контролируемый результат — gate, который валит CI, если покрытие ниже порога, ещё до того как SBOM попадёт в сервис аудита.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Получить скрипт + CI-шаг, который по CycloneDX-файлу считает:
+- <strong>PURL coverage</strong> — доля компонентов с непустым <code>purl</code>;
+- <strong>license coverage</strong> — доля компонентов с заполненным <code>licenses</code> (id / name / expression);
+- наличие <strong>dependency graph</strong> (секция <code>dependencies</code> непуста);
+- число компонентов без версии и без идентификатора (worklist).</p>
+<p>Gate падает, если PURL coverage &lt; 90% или license coverage &lt; 80% (пороги настраиваются). Проверяемый результат: на «хорошем» SBOM gate зелёный, на намеренно урезанном — красный с числами.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Скрипт <code>sbom-quality.sh</code> (нужен только <code>jq</code>):</p>
+<pre><code class="language-bash">#!/usr/bin/env bash
+set -euo pipefail
+SBOM="${1:-sbom.cdx.json}"
+MIN_PURL=90
+MIN_LIC=80
+
+total=$(jq '.components | length' "$SBOM")
+with_purl=$(jq '[.components[] | select(.purl and .purl != "")] | length' "$SBOM")
+with_lic=$(jq '[.components[] | select((.licenses|length)&gt;0)] | length' "$SBOM")
+with_ver=$(jq '[.components[] | select(.version and .version != "")] | length' "$SBOM")
+deps=$(jq '.dependencies | length' "$SBOM")
+
+purl_pct=$(( with_purl * 100 / total ))
+lic_pct=$(( with_lic * 100 / total ))
+
+printf 'components=%s purl=%s versioned=%s deps_nodes=%s\n' \
+  "$total" "$purl_pct" "$lic_pct" "$with_ver" "$deps"
+
+# worklist: компоненты без PURL
+jq -r '.components[] | select((.purl // "")=="") | "  no-purl: \(.name) \(.version // "?")"' "$SBOM"
+
+fail=0
+[ "$purl_pct" -lt "$MIN_PURL" ] &amp;&amp; { echo "FAIL: purl coverage &lt; ${MIN_PURL}%"; fail=1; }
+[ "$lic_pct"  -lt "$MIN_LIC"  ] &amp;&amp; { echo "FAIL: license coverage &lt; ${MIN_LIC}%"; fail=1; }
+[ "$deps" -eq 0 ] &amp;&amp; { echo "FAIL: no dependency graph"; fail=1; }
+exit $fail
+</code></pre>
+<p>CI-шаг (GitLab):</p>
+<pre><code class="language-yaml">sbom_quality:
+  stage: test
+  image: alpine:3.20
+  before_script: [ "apk add --no-cache jq bash" ]
+  script: [ "bash sbom-quality.sh sbom.cdx.json" ]
+</code></pre>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>На качественном SBOM — строка метрик и exit 0:</p>
+<pre><code>components=147 purl=98% license=91% versioned=145 deps_nodes=147
+</code></pre>
+<p>На урезанном (часть компонентов без <code>purl</code>, типичный симптом C/C++ SBOM, где нет пакетного менеджера) — worklist и exit 1:</p>
+<pre><code>components=63 purl=71% license=44% versioned=58 deps_nodes=0
+  no-purl: libfoo 2.3.1
+  no-purl: vendored-zlib ?
+FAIL: purl coverage &lt; 90%
+FAIL: license coverage &lt; 80%
+FAIL: no dependency graph
+</code></pre>
+<p>Признак готовности: gate отделяет «годен к загрузке в анализатор» от «сначала дозаполнить координаты». Числа <code>purl%</code>/<code>license%</code> совпадают с тем, что вы посчитаете вручную на маленьком SBOM из 5 компонентов.</p>
+<blockquote>
+<p>Для C/C++ legacy низкий PURL coverage — это норма и сигнал
+Без пакетного менеджера у статически слинкованных и вендоренных библиотек PURL часто пуст. Не «подгоняйте» порог под такой SBOM — gate должен вывести worklist (что дораспознать через CPE/build evidence), а не молча пропустить. Это вход в <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>jq: error: Cannot iterate over null</code>.</strong> В SBOM нет секции <code>components</code> или <code>dependencies</code>, либо это не CycloneDX (а, например, SPDX). Проверьте <code>jq '.bomFormat, .specVersion' sbom.cdx.json</code> — должно быть <code>"CycloneDX"</code>.</li>
+<li><strong>License coverage = 0%, хотя лицензии видны глазами.</strong> Лицензия лежит не там, где ищет скрипт: в CycloneDX это <code>licenses[].license.id</code>, <code>licenses[].license.name</code> или <code>licenses[].expression</code>. Скрипт считает по <code>length</code>, но если структура другая — проверьте <code>jq '.components[0].licenses'</code>.</li>
+<li><strong>Деление на ноль / пустой вывод.</strong> <code>total = 0</code> — SBOM без компонентов (сгенерировался по пустой директории или не той цели). Это сам по себе fail полноты.</li>
+<li><strong>Gate зелёный на явно плохом SBOM.</strong> Пороги слишком низкие или сравнение в bash идёт как со строкой. Убедитесь, что <code>$purl_pct</code> — целое число и сравнение <code>-lt</code> числовое.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) скрипт + CI-шаг; (2) зелёный прогон на качественном SBOM с метриками; (3) красный прогон на урезанном SBOM с worklist <code>no-purl</code> и exit 1; (4) совпадение посчитанных метрик с ручным подсчётом на маленьком примере. Устно — почему quality gate ставится <em>до</em> загрузки в анализатор и какие обязательные поля BSI TR-03183-2 (раздел 5.2.2) он проверяет.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-1648d69d5029.html">М03. Форматы SBOM: CycloneDX, SPDX, SWID</a> — родительский модуль (критерии качества BSI).</li>
+<li><a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a></li>
+<li><a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a> · <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a></li>
+<li><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> — обязательные поля компонента (раздел 5.2.2); <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-47ec0c98fe05.html">OWASP SCVS</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

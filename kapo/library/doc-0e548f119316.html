@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NIST SP 800-218 SSDF — КАПО · Пиков</title><meta name="description" content="NIST SP 800-218 SSDF. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0e548f119316.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="nist-sp-800-218-ssdf">NIST SP 800-218 SSDF</h1>
+<h2 id="о-документе">О документе</h2>
+<p>Secure Software Development Framework (SSDF) v1.1 — фреймворк безопасной разработки от NIST (США), выпущен в феврале 2022 года. Не привязан к языку или методологии; описывает практики как пары «что делать / как доказать» в четырёх группах: PO (Prepare the Organization), PS (Protect the Software), PW (Produce Well-Secured Software), RV (Respond to Vulnerabilities). Для федеральных поставщиков SSDF стал основой самоаттестации (CISA Secure Software Development Attestation) во исполнение <a href="doc-e10d22d24de3.html">EO 14028</a>. Для курса SCA/OSA ключевы практики, связывающие сторонние компоненты, SBOM и реакцию на уязвимости.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>PW.4 — повторное использование готового ПО</strong>: использовать только проверенные сторонние компоненты, вести их инвентаризацию (фактически — SBOM) и отслеживать на протяжении жизни продукта.</li>
+<li><strong>PS.3.1 / PS.3.2 — архивирование и происхождение релиза</strong>: сохранять каждый релиз и предоставлять данные о его составе (provenance, SBOM) потребителям.</li>
+<li><strong>RV.1 — выявление уязвимостей</strong>: непрерывно собирать сведения об уязвимостях компонентов из внешних источников.</li>
+<li><strong>RV.2 — оценка, приоритизация и устранение</strong>: триаж найденных уязвимостей с приоритетом и сроками, фиксация решений (включая «не затрагивает» через VEX).</li>
+<li><strong>RV.3 — анализ первопричин</strong> и предотвращение повторения класса дефектов.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<ul>
+<li>SBOM/ППК на каждый релиз с историей версий (PW.4, PS.3.2) — доказательство инвентаризации и provenance.</li>
+<li>Результаты SCA-сканирования (Grype/Trivy/OSV-Scanner поверх SBOM) и поток уязвимостей из внешних источников (RV.1).</li>
+<li>VDR (документ результатов анализа уязвимостей) и VEX (статусы affected/not_affected/fixed) с обоснованием — evidence триажа по RV.2.</li>
+<li>CI security gate с порогами и журналом срабатываний — доказательство, что устранение встроено в пайплайн.</li>
+<li>Реестр исключений и принятых рисков со сроком пересмотра; запись об анализе первопричин по RV.3.</li>
+</ul>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li><a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a>, <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> — инвентаризация компонентов (PW.4).</li>
+<li><a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a>, <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> — выявление уязвимостей (RV.1).</li>
+<li><a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>, <a href="doc-c01924770ece.html">П35. VEX triage</a> — оценка и решения (RV.2).</li>
+<li><a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a>, <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a> — встраивание контроля в сборку.</li>
+<li><a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a>, <a href="doc-e8c524b20a2a.html">Регламент композиционного анализа ПО</a> — операционализация RV/PW.</li>
+<li>Модули: <a href="doc-0c23b1ba214a.html">Модуль М08</a> (цепочка поставки и OSA), <a href="doc-778f51173f56.html">Модуль М13</a> (трассировка и evidence).</li>
+<li>Смежно: <a href="doc-a6189f5ab42c.html">NIST SP 800-161 Rev.1</a>, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (аналог практик РБПО).</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<p>Это учебная карточка, а не официальный текст. Точные идентификаторы практик (PO/PS/PW/RV), формулировки задач и примеров сверяйте с оригиналом NIST SP 800-218 v1.1 и с регламентами Организации.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

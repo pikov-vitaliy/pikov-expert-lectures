@@ -1,0 +1,96 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П11. ScanCode для лицензий — КАПО · Пиков</title><meta name="description" content="П11. ScanCode для лицензий. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7bd470f91d5a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п11-scancode-для-лицензий">П11. ScanCode для лицензий</h1>
+<blockquote>
+<p>Зачем эта практика
+Метаданные пакета говорят «лицензия проекта MIT», а внутри дерева может лежать файл под GPL — посборочный детектор находит лицензию по тексту в файлах, а не по заявлению в <code>package.json</code>. ScanCode даёт два разных слоя: <code>detected_license_expression</code> (что распознал движок) и место, где это найдено. Задача практики — отделить <strong>detected</strong> (машинная находка с уровнем уверенности) от <strong>concluded</strong> (вердикт, который выносит человек), и научиться читать spurious-совпадения.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Запустить ScanCode по согласованному дереву исходников и получить машинный JSON, в котором по каждому файлу видны: распознанное SPDX-выражение, уровень уверенности (<code>score</code>), координаты совпадения (<code>start_line</code>/<code>end_line</code>) и фрагмент текста-улики. Проверяемый результат — выгрузка, где найдено минимум одно <code>GPL</code>/<code>LGPL</code>-совпадение <strong>внутри</strong> проекта, заявленного как permissive, либо обоснованный вывод, что таких нет.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># Версия движка фиксируется в отчёте (нужно для воспроизводимости).
+# Практика рассчитана на ScanCode 32.x: с этой версии поле называется
+# detected_license_expression. На 31.x JSON-ключи другие (licenses[]),
+# и jq-срез ниже придётся править.
+scancode --version
+
+# Полное сканирование лицензий с текстом-уликой и классификацией файлов
+scancode \
+  --license \
+  --license-text \
+  --classify \
+  --info \
+  --processes 4 \
+  --json-pp scancode-licenses.json \
+  ./vendor
+
+# Быстрый срез: какие выражения и с какой уверенностью нашлись
+jq -r '.files[]
+  | select(.detected_license_expression != null)
+  | "\(.detected_license_expression_spdx)\t\(.path)"' \
+  scancode-licenses.json | sort | uniq -c | sort -rn
+</code></pre>
+<blockquote>
+<p>Низкий <code>score</code> — не мусор, а очередь на ручной просмотр
+Совпадения с <code>score</code> ниже ~80 часто это упоминание лицензии в README или changelog, а не сам лицензионный текст. Не отбрасывайте их автоматически: именно там прячется «в одном файле GPL-хедер» при общем MIT. Фильтруйте через <code>--license-score 80</code> только когда сознательно сокращаете шум для отчёта.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Структура <code>--json-pp</code> (сокращённый скелет одного файла):</p>
+<pre><code class="language-json">{
+  "headers": [{ "tool_name": "scancode-toolkit", "tool_version": "32.x" }],
+  "files": [
+    {
+      "path": "vendor/somelib/parser.c",
+      "type": "file",
+      "detected_license_expression": "gpl-2.0",
+      "detected_license_expression_spdx": "GPL-2.0-only",
+      "license_detections": [
+        {
+          "license_expression_spdx": "GPL-2.0-only",
+          "matches": [
+            {
+              "score": 99.0,
+              "start_line": 3,
+              "end_line": 18,
+              "matched_text": "This program is free software; you can redistribute..."
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>Ориентир по объёму: на среднем <code>vendor</code>-дереве из 30–50 пакетов это сотни файлов, из которых лицензионные совпадения дают десятки уникальных выражений. Срез через <code>jq</code> должен показать таблицу вида:</p>
+<pre><code>  142 MIT   vendor/...
+   17 Apache-2.0    vendor/...
+    3 GPL-2.0-only  vendor/somelib/...
+    1 LGPL-3.0-or-later vendor/otherlib/...
+</code></pre>
+<p>Ключевой момент: строки <code>GPL-2.0-only</code> / <code>LGPL-3.0-or-later</code> в проекте, который в <code>package.json</code> объявлен как <code>MIT</code>, — это и есть та самая находка «лицензия файла ≠ лицензия проекта». ScanCode выдал <strong>detected</strong>; перевод в <strong>concluded</strong> (блокер / условно / ложное срабатывание) делается уже руками и не живёт в этом JSON.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>scancode: command not found</code></strong> — Toolkit не в PATH. Ставится через <code>pip install scancode-toolkit</code> в venv (Python 3.9+); проверьте <code>which scancode</code>. Не путать с лёгким <code>scancode-toolkit-mini</code> без полного индекса лицензий.
+- <strong>JSON пустой / <code>"files": []</code></strong> — указали несуществующий путь или каталог без прав чтения. ScanCode не падает, а молча сканирует пустоту; сверьте путь в конце команды и наличие файлов.
+- <strong>Сканирование висит/упало по памяти</strong> — натравили на <code>node_modules</code> целиком или на бинарные артефакты. Сканируйте согласованный фрагмент (<code>./vendor</code>, конкретный пакет), исключайте мусор через <code>--ignore "*.min.js" --ignore "node_modules/.cache/*"</code>.
+- <strong>Везде <code>score</code> около 100, но выражения подозрительно однообразны</strong> — сканировали уже собранный дистрибутив с вырезанными хедерами вместо исходников. Лицензионные улики живут в исходном дереве, не в минифицированном бандле.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) <code>scancode-licenses.json</code> с зафиксированной версией движка в <code>headers</code>; (2) <code>jq</code>-срез с таблицей выражений; (3) минимум один разобранный кейс «detected ≠ concluded» — файл с copyleft-находкой внутри permissive-проекта, с вашим устным выводом, блокер это, ложное срабатывание или требует заключения. Голое число findings без интерпретации не засчитывается.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a></li>
+<li>Смежные практики: <a href="doc-1e5ce9414ca8.html">П12. ORT и license policy</a> · <a href="doc-7995e3acdb2a.html">П13. FOSSology как юридический workflow</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></li>
+<li>Нормативка: <a href="doc-cf001a40d806.html">SPDX ISO/IEC 5962</a> · <a href="doc-348bb0ac58ac.html">OpenChain ISO/IEC 5230</a></li>
+<li>Шаблоны: <a href="doc-6ac4279797cf.html">Порядок работы с неизвестной лицензией</a> · <a href="doc-91e9697aff8e.html">Матрица evidence для аудита</a></li>
+<li>Инструмент: <a href="doc-bddae25ab5db.html">ScanCode Toolkit</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

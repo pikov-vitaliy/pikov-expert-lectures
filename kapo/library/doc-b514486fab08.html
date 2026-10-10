@@ -1,0 +1,49 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OSA Proxy и поддержанные экосистемы — КАПО · Пиков</title><meta name="description" content="OSA Proxy и поддержанные экосистемы. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-b514486fab08.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>07 CodeScoring</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-чём">О чём</a></li>
+<li><a href="#что-подтверждено">Что подтверждено</a></li>
+<li><a href="#что-не-подтверждено-или-ограничено">Что не подтверждено или ограничено</a></li>
+<li><a href="#что-проверить-на-пилоте">Что проверить на пилоте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="osa-proxy-и-поддержанные-экосистемы">OSA Proxy и поддержанные экосистемы</h1>
+<h2 id="о-чём">О чём</h2>
+<p>Предмет проверки — <strong>покрытие OSA Proxy (Firewall) по пакетным менеджерам</strong>: для каких экосистем работает именно перехват запросов, проксирование, анализ и блокировка на лету, а где это покрывается только плагинами repository manager (Nexus/JFrog) или режимом CLI/агента. ТЗ смешивает эти режимы, поэтому ключевой риск — потребовать от Proxy того, что подтверждено лишь для plugin/agent.</p>
+<h2 id="что-подтверждено">Что подтверждено</h2>
+<ul>
+<li>Документация OSA Proxy явно подтверждает Firewall-перехват для: <strong>Maven, NPM, PyPI, NuGet (V3), Go, Debian, Alpine/APK, RPM</strong> и <strong>Docker Registry</strong>.</li>
+<li>OSA-механизм блокирует небезопасные пакеты по политике при попытке загрузки в контур разработки — для поддерживаемых режимов.</li>
+<li>Для <strong>Nexus / JFrog Artifactory</strong> доступны плагины repository manager, которые покрывают часть сценариев репозиториев, включая дополнительные типы (Conan/Conda/RubyGems) — но через плагин, а не через универсальный Proxy Firewall.</li>
+<li>Источники уязвимостей (NVD, GitHub Security Advisory, OSS Index, OSV, БДУ ФСТЭК), экспорт CSV и классификация уязвимостей подтверждены.</li>
+</ul>
+<blockquote>
+<p>Три разных режима — не путать
+<strong>OSA Proxy (Firewall)</strong> — перехват трафика пакетного менеджера. <strong>Nexus/JFrog plugin</strong> — контроль внутри repository manager. <strong>CLI/agent</strong> — сканирование без artifact repository. Один и тот же пакетный менеджер может быть закрыт одним режимом и не закрыт другим.</p>
+</blockquote>
+<h2 id="что-не-подтверждено-или-ограничено">Что не подтверждено или ограничено</h2>
+<ul>
+<li>ТЗ (п. 3.4) требует Firewall, в том числе для <strong>Conan, Conda, Ruby Gems</strong>. Публичная документация OSA Proxy <strong>не подтверждает</strong> эти три экосистемы в proxy-firewall режиме — они доступны лишь через плагины Nexus/JFrog, если такой repository manager используется.</li>
+<li>Работа с <strong>нестандартными/специфическими хранилищами и без хранилищ</strong> заявлена, но требует проверки по фактической архитектуре контура Организации.</li>
+<li><strong>Отложенная блокировка</strong> на заданный интервал (требование п. 3.4) — прямого подтверждения функции в материалах не найдено.</li>
+</ul>
+<blockquote>
+<p>Риск несоответствия
+Если ТЗ требует именно <strong>Proxy Firewall</strong> для Conan, Conda и Ruby Gems (без опоры на Nexus/JFrog), это <strong>не подтверждено</strong> и квалифицируется как риск несоответствия. Развилка: либо в контуре есть Nexus/JFrog и эти экосистемы закрываются плагином, либо требование к Proxy надо переформулировать.</p>
+</blockquote>
+<h2 id="что-проверить-на-пилоте">Что проверить на пилоте</h2>
+<blockquote>
+<p>Вопросы и приёмочные проверки
+- Для каких экосистем работает <strong>именно Proxy Firewall</strong>, а для каких только плагин Nexus/JFrog? Получить актуальный перечень письменно.
+- Есть ли в контуре Организации <strong>Nexus или JFrog</strong>? Если да — Conan/Conda/RubyGems закрываются плагином; если нет — чем?
+- Проверить блокировку в фактическом режиме: отдельно Maven, NPM, NuGet, PyPI, Go, APT/RPM, Conan, Conda, RubyGems.
+- Подтвердить или опровергнуть <strong>отложенную блокировку</strong> на заданный интервал — демонстрация в UI.
+- Проверить сценарий <strong>без artifact repository</strong> (CLI/agent) для экосистем, не закрытых Proxy.</p>
+</blockquote>
+<h2 id="связь">Связь</h2>
+<ul>
+<li><a href="doc-765d7f069356.html">Матрица соответствия требованиям OSA SCA</a> — разрыв № 2 (OSA Firewall по всем пакетным менеджерам) и строки OSA про перехват и Firewall-список.</li>
+<li><a href="doc-a9daaa0657cc.html">Offline и on-premise архитектура</a> — где разворачивается Proxy и как обновляется база в offline.</li>
+<li><a href="doc-dd4ac51e3d11.html">Приемочные сценарии пилота</a> · <a href="doc-c88d413f95e0.html">Вопросы для пилота CodeScoring</a></li>
+<li>Документация: https://docs.codescoring.ru/user-guide/osa-proxy/</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

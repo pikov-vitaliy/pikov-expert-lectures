@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М04. М04. Идентификаторы компонентов и уязвимостей — КАПО · Пиков</title><meta name="description" content="М04. М04. Идентификаторы компонентов и уязвимостей. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4a0b7bceee7b.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#что-внутри">Что внутри</a></li>
+<li><a href="#ключевые-понятия">Ключевые понятия</a></li>
+<li><a href="#карта-связей">Карта связей</a></li>
+<li><a href="#соседние-модули">Соседние модули</a></li>
+<li><a href="#практики">Практики</a></li>
+<li><a href="#нормативная-опора">Нормативная опора</a></li>
+<li><a href="#практический-результат">Практический результат</a></li>
+</ul>
+</div>
+<h1 id="м04-идентификаторы-компонентов-и-уязвимостей">М04. Идентификаторы компонентов и уязвимостей</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>Анализатор не «понимает» компонент — он сопоставляет строки-координаты. У компонента это <strong>PURL</strong> (для экосистемных сканеров) и <strong>CPE</strong> (для NVD); у уязвимости — <strong>CVE</strong>, <strong>GHSA</strong>, идентификаторы <strong>OSV</strong> и <strong>BDU</strong> ФСТЭК. Если координата отсутствует или записана неточно, сопоставление просто не происходит — и не как ошибка, а как тишина: findings приходит подозрительно мало. Модуль учит читать, нормализовать и сверять координаты так, чтобы «ноль уязвимостей» означал «их нет», а не «мы не туда смотрели».</p>
+<blockquote>
+<p>Центральный механизм модуля
+Нет координаты → нет соединения → нет находки. Это не сбой инструмента, а штатное поведение матчинга. Самый опасный результат в SCA — не false positive (его видно), а false negative из-за битого PURL/CPE (его не видно).</p>
+</blockquote>
+<h2 id="что-внутри">Что внутри</h2>
+<ul>
+<li><a href="doc-74da0a8aedc3.html">01 Конспект</a> — два мира матчинга (PURL→OSV, CPE→NVD), разбор log4j, alias-проблема CPE.</li>
+<li><a href="doc-df9c68470b3a.html">02 План занятия</a> — тайминг 90 минут: теория, демо матчинга, ПЗ.</li>
+<li><a href="doc-3517dff6d094.html">03 Практическая работа</a> — таблица координат и эксперимент «битый PURL → потеря находок».</li>
+<li><a href="doc-c6f52fa0fad9.html">04 Контрольные вопросы</a> — вопросы и кейсы на чтение и сверку координат.</li>
+<li><a href="doc-5ee92be8feb6.html">05 Что проверять на проекте</a> — чек-лист аудитора по качеству координат.</li>
+</ul>
+<h2 id="ключевые-понятия">Ключевые понятия</h2>
+<p><a href="doc-32cb8ae4a4b5.html">PURL</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-3a787da98e3d.html">GHSA</a> · <a href="doc-681ad6162ee5.html">OSV</a> · <a href="doc-d0a623a0cbe7.html">BDU</a> · <a href="doc-d85f78927400.html">CWE</a></p>
+<h2 id="карта-связей">Карта связей</h2>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-4a0b7bceee7b-0.svg" rel="noopener" target="_blank"><img alt="Схема: М04. М04. Идентификаторы компонентов и уязвимостей" loading="lazy" src="../assets/course-diagrams/course-4a0b7bceee7b-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="соседние-модули">Соседние модули</h2>
+<ul>
+<li><a href="doc-1648d69d5029.html">М03. Форматы SBOM</a> — где в SBOM физически лежат <code>purl</code> и <code>cpe</code>.</li>
+<li><a href="doc-1bca905af1a7.html">М05. Генерация SBOM</a> — кто и насколько точно проставляет координаты.</li>
+<li><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и VDR/VEX</a> — что делать с находками после матчинга (severity, EPSS, KEV — там).</li>
+<li><a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> — где координат нет в принципе и alias-проблема бьёт сильнее всего.</li>
+</ul>
+<h2 id="практики">Практики</h2>
+<ul>
+<li><a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> — чистка PURL от приватных qualifiers перед публичным матчингом.</li>
+<li><a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> — список C/C++ зависимостей без CPE и их ручная разметка.</li>
+</ul>
+<h2 id="нормативная-опора">Нормативная опора</h2>
+<p><a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1 — поиск уязвимостей в компонентах) · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (качество SBOM, в т.ч. полнота идентификаторов)</p>
+<h2 id="практический-результат">Практический результат</h2>
+<p>Таблица PURL/CPE/CVE/GHSA/BDU для OpenSSL, zlib, libcurl и внутренней библиотеки + воспроизведённый эффект «битый PURL → пропавшие находки».</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

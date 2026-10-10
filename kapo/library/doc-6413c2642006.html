@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Witness — КАПО · Пиков</title><meta name="description" content="Witness. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6413c2642006.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="witness">Witness</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Witness <strong>оборачивает шаг сборки и автоматически собирает evidence</strong> о том, как он выполнялся. Команда <code>witness run</code> запускает любой процесс (например, <code>make</code>), а пока он идёт — фиксирует материалы и продукты, git-состояние, окружение, запущенные команды, и упаковывает всё это в подписанный <a href="doc-fca70f6c6e3d.html">in-toto</a> attestation через набор подключаемых attestor'ов. Затем <code>witness verify</code> проверяет собранные attestations против политики: были ли пройдены нужные шаги, теми ли исполнителями, с ожидаемым набором evidence. По сути это «runtime-сборщик provenance», избавляющий от ручного написания link-метаданных.</p>
+<blockquote>
+<p>Чем Witness отличается от голого in-toto
+in-toto задаёт <em>формат</em> и требует, чтобы вы сами сгенерировали link-метаданные. Witness <em>автоматизирует</em> их сбор: подключаемые attestor'ы (git, environment, command-run, products) наполняют attestation за вас, а policy-движок задаёт правила приёмки. Это уровень оркестрации поверх in-toto.</p>
+</blockquote>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запись attestation вокруг шага сборки и его проверка по политике:</p>
+<pre><code class="language-bash"># Обернуть сборку: собрать evidence и подписать attestation
+witness run \
+  --step build \
+  --key signer.key \
+  --outfile build.attestation.json \
+  -- make release
+
+# Проверить артефакт против политики (какие шаги/исполнители обязательны)
+witness verify \
+  --policy policy.signed.json \
+  --publickey policy-ca.pub \
+  --artifactfile app-0.1.tar.gz \
+  --attestations build.attestation.json
+</code></pre>
+<p>Опционально attestations выгружаются и ищутся через сервис Archivista (<code>--enable-archivista</code>, <code>--archivista-server &lt;url&gt;</code>), а подпись может идти keyless через Sigstore.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Снимает ручную работу: evidence (git, окружение, команды, продукты) собирается attestor'ами автоматически во время реального запуска шага.</li>
+<li>Policy-движок переводит требования в проверяемое правило приёмки — «шаг build обязан быть подписан этим ключом и содержать git-attestor».</li>
+<li>Совместим с экосистемой in-toto/SLSA: на выходе стандартный attestation, который потребляют те же verifier'ы и графы.</li>
+<li>Гибкость за счёт подключаемых attestor'ов — можно добавлять источники evidence под конкретный pipeline.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Полнота доказательства определяется набором подключённых attestor'ов: чего не собрали, того в attestation нет — легко получить «зелёную», но неинформативную проверку.</li>
+<li>Политику и ключи исполнителей нужно проектировать и сопровождать — мощность policy-движка оборачивается сложностью сопровождения.</li>
+<li>Evidence фиксирует, что происходило во время запуска, но не выносит суждения о намерении: компрометация внутри обёрнутой команды попадёт в attestation как «штатный» продукт и пройдёт policy-проверку.</li>
+<li>Менее распространён и более «нишев», чем Cosign; зрелость интеграций (особенно вокруг Archivista) стоит проверять под свою задачу.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Ядро (<code>witness run</code> и <code>witness verify</code> с ключевой подписью и локальной политикой) работает полностью офлайн — никаких внешних сервисов. Сетевые зависимости — опциональны: keyless-подпись через Fulcio/Rekor, доверенные метки времени (TSA) и хранение/поиск attestations в публичной Archivista. В закрытом контуре всё это заменяется собственным PKI и self-hosted Archivista либо обычным файловым хранилищем.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li><a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> — сбор evidence о сборке как часть контура доверия.</li>
+<li><a href="doc-6b4e039ebebe.html">П15. SLSA и in-toto provenance</a> — практика по provenance, к которой Witness даёт автоматический способ генерации attestations.</li>
+<li><a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> — где <code>witness verify</code> встраивается обязательным шагом gate.</li>
+<li>Смежные карточки: <a href="doc-fca70f6c6e3d.html">in-toto</a> (формат и модель, которые Witness автоматизирует), <a href="doc-c9b80f761f41.html">SLSA</a> (уровни provenance, под которые собирается evidence), <a href="doc-f4e02b87ce6c.html">Cosign</a> (альтернативный путь подписи attestations), <a href="doc-0546fb0877a9.html">GUAC</a> (граф, в который складываются собранные attestations).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

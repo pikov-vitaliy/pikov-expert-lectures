@@ -1,0 +1,30 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Контейнерные образы и честность SBOM — КАПО · Пиков</title><meta name="description" content="Контейнерные образы и честность SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4b99581bc64d.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>02 Справочник</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#главный-тезис">Главный тезис</a></li>
+<li><a href="#почему-сканеры-расходятся">Почему сканеры расходятся</a></li>
+<li><a href="#типовые-слепые-зоны">Типовые слепые зоны</a></li>
+<li><a href="#что-считать-честным-sbom-образа">Что считать честным SBOM образа</a></li>
+<li><a href="#рабочее-правило">Рабочее правило</a></li>
+<li><a href="#связанные-материалы">Связанные материалы</a></li>
+</ul>
+</div>
+<h1 id="контейнерные-образы-и-честность-sbom">Контейнерные образы и честность SBOM</h1>
+<h2 id="главный-тезис">Главный тезис</h2>
+<p>Контейнерный SBOM легко сделать формально корректным и фактически слабым. Сканер часто смотрит на filesystem, package metadata и известные manifests, но образ может сохранять удаленные секреты в слоях, содержать ПО без пакетного менеджера, иметь очищенные metadata, packed binaries, multi-stage следы или зависимости, загруженные внешними командами во время сборки.</p>
+<h2 id="почему-сканеры-расходятся">Почему сканеры расходятся</h2>
+<p>Разные инструменты берут факты из разных мест: <code>/etc/os-release</code>, <code>dpkg</code>/<code>apk</code>/<code>rpm</code> базы, lockfiles, бинарные metadata, URL загрузок, Dockerfile, layer diffs, build logs и embedded version info. Поэтому сравнение Syft, Trivy, Grype, blint и ручного анализа слоев должно быть частью обучения: количество найденных packages и vulnerabilities — не абсолютная истина, а функция источников фактов.</p>
+<h2 id="типовые-слепые-зоны">Типовые слепые зоны</h2>
+<ul>
+<li>Секрет был скопирован в раннем слое и удален позже, но остался в layer tar.</li>
+<li><code>go build -ldflags "-X runtime.modinfo="</code> или упаковка бинаря скрывает dependency metadata.</li>
+<li>UPX/stripped/packed binaries мешают извлечению embedded metadata.</li>
+<li>Оптимизатор образа удаляет package manager traces.</li>
+<li>Multi-stage build и внешние загрузки оставляют мало evidence в финальном образе.</li>
+<li>Обфускация metadata может превратить отчет с десятками findings в "0 vulnerabilities".</li>
+</ul>
+<h2 id="что-считать-честным-sbom-образа">Что считать честным SBOM образа</h2>
+<p>Честный SBOM образа должен сопровождаться списком использованных источников фактов, указанием неизвестных зон, layer hash, build provenance, версией инструмента, политикой обработки unknown packages и evidence для секретов. Для критичных поставок полезно связывать SBOM с attestation: Witness/in-toto/SLSA, cosign, SBOMit или аналогичный механизм.</p>
+<h2 id="рабочее-правило">Рабочее правило</h2>
+<p>Статический анализ образа защищает от добросовестной ошибки лучше, чем от активного обхода. Поэтому для supply chain security статический SBOM нужно дополнять build-time evidence, provenance, секрет-сканированием, runtime/registry policy и ручной проверкой подозрительно "чистых" образов.</p>
+<h2 id="связанные-материалы">Связанные материалы</h2>
+<p><a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-c07a2034e54b.html">Чек-лист честного SBOM контейнерного образа</a> · <a href="doc-a04051331fb7.html">TruffleHog</a> · <a href="doc-39cbce1c8684.html">SBOMit</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

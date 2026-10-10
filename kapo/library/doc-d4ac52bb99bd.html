@@ -1,0 +1,29 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет 16 — КАПО · Пиков</title><meta name="description" content="Билет 16. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-d4ac52bb99bd.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>10 Оценивание</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#теоретический-вопрос">Теоретический вопрос</a></li>
+<li><a href="#практический-вопрос">Практический вопрос</a></li>
+<li><a href="#что-должен-показать-ответ">Что должен показать ответ</a></li>
+<li><a href="#опорные-материалы">Опорные материалы</a></li>
+</ul>
+</div>
+<h1 id="билет-16">Билет 16</h1>
+<h2 id="теоретический-вопрос">Теоретический вопрос</h2>
+<p>Как объективно оценить SCA-инструмент перед внедрением, не сводя оценку к маркетинговым обещаниям? Сформулируйте критерии пилота: точность распознавания состава на реальных C/C++ проектах (<code>make</code>/CMake/qmake), поддержка офлайн-режима в закрытом контуре, источники уязвимостей (включая БДУ), форматы экспорта SBOM, интеграция в CI. Почему «инструмент нашёл много компонентов» — не критерий, а критерий — это доля верно распознанных и пропусков на эталонном наборе?</p>
+<h2 id="практический-вопрос">Практический вопрос</h2>
+<blockquote>
+<p>Мини-кейс
+Нужно провести пилот CodeScoring на трёх проектах: <code>make</code>, CMake и legacy <code>qmake</code>. Составьте протокол: какой эталонный состав взять как «правильный ответ», как измерить detection accuracy (точность/полнота), как проверить работу без доступа в интернет и как зафиксировать результат, чтобы решение о закупке опиралось на цифры, а не на впечатление.</p>
+</blockquote>
+<h2 id="что-должен-показать-ответ">Что должен показать ответ</h2>
+<ul>
+<li><strong>Источник факта</strong>: эталонный состав проектов (ground truth) для измерения точности; протокол пилота, а не демонстрация вендора.</li>
+<li><strong>Инструмент</strong>: CodeScoring в офлайн-режиме; сравнение detection accuracy на <code>make</code>/CMake/qmake.</li>
+<li><strong>Владелец решения</strong>: вывод о пригодности и решение о закупке — за владельцем процесса SCA по результатам протокола.</li>
+<li><strong>Нормативная опора</strong>: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-47ec0c98fe05.html">OWASP SCVS</a>, <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> (как требуемый источник).</li>
+<li><strong>Evidence</strong>: <a href="doc-f09f288cf2a1.html">протокол пилота</a> с цифрами точности и проверкой офлайна.</li>
+</ul>
+<h2 id="опорные-материалы">Опорные материалы</h2>
+<ul>
+<li><a href="doc-a69d6f30f09c.html">М12. CodeScoring и подготовка пилота</a></li>
+<li><a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-c440241de897.html">П32. CodeScoring offline architecture</a> · <a href="doc-ea3b2e743d82.html">П33. AppSec и CodeScoring сравнение по задаче</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

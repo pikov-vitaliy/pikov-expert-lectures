@@ -1,0 +1,92 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. Конспект: форматы SBOM — CycloneDX, SPDX, SWID — КАПО · Пиков</title><meta name="description" content="М03. Конспект: форматы SBOM — CycloneDX, SPDX, SWID. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e84ddfeeb864.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-модуль">Зачем модуль</a></li>
+<li><a href="#ключевые-идеи">Ключевые идеи</a></li>
+<li><a href="#как-выглядит-на-практике">Как выглядит на практике</a></li>
+<li><a href="#связь-с-нормативкой">Связь с нормативкой</a></li>
+<li><a href="#что-уносим-в-работу">Что уносим в работу</a></li>
+</ul>
+</div>
+<h1 id="конспект-форматы-sbom-cyclonedx-spdx-swid">Конспект: форматы SBOM — CycloneDX, SPDX, SWID</h1>
+<h2 id="зачем-модуль">Зачем модуль</h2>
+<p>Заголовок «CycloneDX, SPDX, SWID» провоцирует ошибку: считать это тремя взаимозаменяемыми форматами SBOM и выбирать «по вкусу». На практике задачи у них разные. CycloneDX вырос из AppSec-сообщества OWASP и заточен под безопасность и обмен данными об уязвимостях. SPDX вырос из Linux Foundation и исторически заточен под лицензионный комплаенс. SWID (ISO/IEC 19770-2) вообще не контейнер для SBOM — это тег идентификации установленного продукта, который в SBOM играет роль одного из ключей компонента. Если этого не различать, легко принять решение «генерируем SWID-теги» и обнаружить, что ни один регулятор не примет это как SBOM.</p>
+<h2 id="ключевые-идеи">Ключевые идеи</h2>
+<p><strong>1. Что считается форматом SBOM по BSI.</strong> <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (раздел 4) допускает только два формата: CycloneDX версии 1.6 и выше и SPDX версии 3.0.1 и выше, в JSON или XML. SWID в стандарте упоминается лишь как тип значения поля «Other unique identifiers». То есть SWID-тег живёт <em>внутри</em> компонента CycloneDX/SPDX, а не заменяет SBOM.</p>
+<p><strong>2. Назначение и сильные стороны.</strong> CycloneDX компактен, имеет нативные блоки <code>vulnerabilities</code>, <code>compositions</code>, поддержку VEX и подпись через <code>signature</code>; его сериализуют в JSON, XML и Protobuf, и он удобен для портфельных инструментов (например, Dependency-Track принимает именно CycloneDX). SPDX 3.0 — это граф элементов и связей (<code>Relationship</code> с <code>relationshipType</code> вроде <code>contains</code>, <code>dependsOn</code>, <code>hasDeclaredLicense</code>), он точнее описывает происхождение, разделяет пакеты и файлы и сильнее в лицензионном комплаенсе; сериализуется в JSON, XML, RDF, YAML. SWID отвечает на вопрос «что установлено на машине», это XML-тег продукта по ISO/IEC 19770-2, и он хорошо ложится на инвентаризацию активов, но не описывает дерево зависимостей. Выбор формата — это выбор задачи: безопасность и обмен — CycloneDX, лицензии и provenance — SPDX, инвентарь активов — SWID как идентификатор.</p>
+<p><strong>3. Три категории лицензий BSI.</strong> Стандарт намеренно вводит свои термины поверх форматных: <em>original licence</em> (что назначил автор), <em>distribution licence</em> (под чем компонент можно использовать получателю) и <em>effective licence</em> (под чем его использует создатель данного SBOM). В CycloneDX это <code>licenses[].acknowledgement</code> со значениями <code>declared</code> / <code>concluded</code> плюс свойство <code>bsi:component:effectiveLicense</code>; в SPDX — отношения <code>hasDeclaredLicense</code> / <code>hasConcludedLicense</code>. См. <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a>.</p>
+<p><strong>4. Машиночитаемость и потери при конвертации.</strong> Структуры форматов не изоморфны: SPDX разделяет <code>software_Package</code> и <code>software_File</code> и связывает их через <code>Relationship</code>, CycloneDX использует единый <code>component</code> с полем <code>type</code> и отдельный блок <code>dependencies</code>. Из-за этого одно и то же утверждение «файл X входит в пакет Y» кодируется по-разному, а часть полей BSI ни один формат не имеет нативно — executable / archive / structured property приходится кодировать через property-taxonomy <code>bsi:component:*</code> (CycloneDX) или <code>software_additionalPurpose</code> (SPDX). Поэтому автоматическая конвертация CycloneDX↔SPDX почти всегда теряет данные: чаще всего исчезают hash deployable-компонента, различие declared/concluded и пользовательские свойства. Отдельно BSI требует не смешивать в одном файле SBOM и информацию об уязвимостях: SBOM статичен, а уязвимости динамичны, и их распространение внутри SBOM засоряет всю цепочку поставки — для уязвимостей предусмотрен CSAF/VEX (см. <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и управление VDR VEX</a>).</p>
+<h2 id="как-выглядит-на-практике">Как выглядит на практике</h2>
+<p>Один и тот же компонент в трёх «языках» (для SWID — как идентификатор, а не как SBOM):</p>
+<pre><code class="language-jsonc">// CycloneDX 1.6 — компонент
+{ "type": "library", "name": "zlib", "version": "1.3.1",
+  "purl": "pkg:generic/zlib@1.3.1",
+  "swid": { "tagId": "zlib-1.3.1", "name": "zlib" },
+  "licenses": [{ "expression": "Zlib", "acknowledgement": "concluded" }],
+  "hashes": [{ "alg": "SHA-512", "content": "..." }] }
+</code></pre>
+<pre><code class="language-jsonc">// SPDX 3.0.1 — пакет + идентификатор SWID
+{ "type": "software_Package", "name": "zlib",
+  "software_packageVersion": "1.3.1",
+  "externalIdentifiers": [
+    { "externalIdentifierType": "packageURL", "identifier": "pkg:generic/zlib@1.3.1" },
+    { "externalIdentifierType": "swid", "identifier": "zlib-1.3.1" } ] }
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Критерий</th>
+<th>CycloneDX 1.6+</th>
+<th>SPDX 3.0.1+</th>
+<th>SWID (19770-2)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Это формат SBOM по BSI</td>
+<td>да</td>
+<td>да</td>
+<td>нет (только идентификатор)</td>
+</tr>
+<tr>
+<td>Профиль задачи</td>
+<td>безопасность, VEX</td>
+<td>лицензии, provenance</td>
+<td>инвентаризация активов</td>
+</tr>
+<tr>
+<td>Модель</td>
+<td>один <code>component</code> + <code>type</code></td>
+<td>граф <code>Package</code>/<code>File</code> + <code>Relationship</code></td>
+<td>XML-тег продукта</td>
+</tr>
+<tr>
+<td>Уязвимости нативно</td>
+<td>да (<code>vulnerabilities</code>)</td>
+<td>нет</td>
+<td>нет</td>
+</tr>
+<tr>
+<td>Сериализация</td>
+<td>JSON, XML, Protobuf</td>
+<td>JSON, XML, RDF, YAML</td>
+<td>XML</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Слепые зоны именно этой темы
+- «Сгенерировали SWID — значит, есть SBOM» — нет, SWID не SBOM по BSI.
+- SBOM в CycloneDX 1.4/1.5 или SPDX 2.x формально не проходит BSI v2.1.0 (нужны 1.6 / 3.0.1).
+- Поля executable/archive/structured нет в форматах — без <code>bsi:component:*</code> SBOM «формально валиден, но не полон по BSI».
+- Конвертация «на автомате» теряет различие declared/concluded/effective licence.</p>
+</blockquote>
+<h2 id="связь-с-нормативкой">Связь с нормативкой</h2>
+<p><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (разделы 4, 5.2, 6.1, 8.2) — версии, обязательные поля, лицензии, маппинг. <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> и <a href="doc-cf001a40d806.html">SPDX ISO IEC 5962</a> — сами спецификации. <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> и <a href="doc-f8e87801f278.html">NTIA Minimum Elements for SBOM</a> — минимальный набор для рынка США; <a href="doc-ce92680089dc.html">EU Cyber Resilience Act</a> делает SBOM обязательным.</p>
+<h2 id="что-уносим-в-работу">Что уносим в работу</h2>
+<ul>
+<li>Закрепить в Организации, что «SBOM» = CycloneDX ≥ 1.6 или SPDX ≥ 3.0.1 (см. <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a>).</li>
+<li>Выбирать формат по задаче, а не по привычке инструмента; SWID использовать только как идентификатор.</li>
+<li>Проверять обязательные поля компонента по BSI (раздел 5.2.2) — <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a>, <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>.</li>
+<li>Не смешивать SBOM и уязвимости в одном файле.</li>
+</ul>
+<p>Практики: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

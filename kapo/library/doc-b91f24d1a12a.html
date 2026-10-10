@@ -1,0 +1,58 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OpenSSF Scorecard — КАПО · Пиков</title><meta name="description" content="OpenSSF Scorecard. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-b91f24d1a12a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="openssf-scorecard">OpenSSF Scorecard</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Scorecard <strong>автоматически оценивает практики безопасности репозитория</strong> open-source проекта и выставляет числовые баллы (0–10) по набору эвристик: есть ли code review, защищён ли branch, подписаны ли релизы, нет ли бинарных артефактов в дереве, как быстро чинятся уязвимости, используются ли pinned-зависимости, fuzzing, SAST и т.д. Это не сканер уязвимостей и не SBOM-генератор — это оценка <em>гигиены и зрелости</em> апстрима, помогающая решить, можно ли вообще доверять зависимости как поставщику.</p>
+<blockquote>
+<p>Сигнал риска поставщика, а не уязвимости в коде
+SCA говорит «в этой версии есть CVE». Scorecard отвечает на смежный вопрос — «насколько ответственно сопровождается проект, от которого мы зависим». Низкий балл по <code>Maintained</code>, <code>Branch-Protection</code> или <code>Dangerous-Workflow</code> — это ранний индикатор риска цепочки поставки до того, как из проекта прилетит инцидент.</p>
+</blockquote>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Оценка конкретного репозитория с машиночитаемым выводом:</p>
+<pre><code class="language-bash">export GITHUB_AUTH_TOKEN=&lt;token&gt;
+scorecard --repo=github.com/&lt;github-owner&gt;/&lt;repository&gt; --format=json --show-details
+</code></pre>
+<p>Фрагмент вывода — баллы по отдельным проверкам, которые можно завести в policy:</p>
+<pre><code class="language-json">{
+  "score": 6.7,
+  "checks": [
+    { "name": "Branch-Protection", "score": 8, "reason": "branch protection on default branch" },
+    { "name": "Maintained",        "score": 10, "reason": "30 commits in last 90 days" },
+    { "name": "Signed-Releases",   "score": 0, "reason": "no signed releases found" },
+    { "name": "Dangerous-Workflow","score": 10, "reason": "no dangerous patterns detected" }
+  ]
+}
+</code></pre>
+<p>Также доступен публичный API/датасет (<code>api.securityscorecards.dev</code>) для уже посчитанных популярных проектов и запуск отдельных проверок через <code>--checks=Branch-Protection,Signed-Releases</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Переводит «качество апстрима» из субъективного впечатления в воспроизводимые числовые сигналы, пригодные для policy и приоритизации.</li>
+<li>Покрывает практики, которые SCA и SBOM не видят в принципе: защита веток, опасные workflow, подпись релизов, наличие бинарей в репозитории.</li>
+<li>Машиночитаемый JSON и публичный датасет позволяют массово оценивать дерево зависимостей, а не один проект.</li>
+<li>Часть экосистемы OpenSSF — проверки и трактовки развиваются открыто и согласованно со смежными практиками.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Это <strong>прокси-метрика, а не гарантия</strong>: высокий балл не означает отсутствия уязвимостей, низкий — не означает компрометации; цифры легко переинтерпретировать.</li>
+<li>Большинство проверок завязано на платформу (преимущественно GitHub) и требует API-токена и сетевого доступа; вне GitHub покрытие неполное.</li>
+<li>Часть эвристик чувствительна к структуре проекта и даёт ложные сигналы (монорепо, форки, проекты без релизов).</li>
+<li>Оценивает процесс вокруг кода, но не сам код — это вход в анализ риска поставщика, а не вывод о безопасности конкретной версии.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Нет (в общем случае). Основные проверки обращаются к GitHub API и внешним источникам (deps.dev и др.), что требует сети и токена. Локальный режим (<code>--local &lt;path&gt;</code> для уже клонированного репозитория) покрывает лишь подмножество проверок, не зависящих от API платформы, и не заменяет полный прогон. Для закрытого контура реалистично использовать только эти локальные проверки либо заранее выгруженный публичный датасет оценок.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li><a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> — оценка зрелости апстрима как сигнал риска на входе.</li>
+<li><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и VDR/VEX</a> — Scorecard дополняет CVE-картину контекстом сопровождаемости.</li>
+<li><a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a> — где балл проекта может стать критерием допуска/карантина зависимости.</li>
+<li><a href="doc-6445f24aa231.html">OpenSSF Scorecard (нормативная карточка)</a> — роль сигналов зрелости в evidence-базе курса.</li>
+<li>Смежные карточки: <a href="doc-c9b80f761f41.html">SLSA</a> (зрелость сборки, тогда как Scorecard — зрелость проекта), <a href="doc-fca70f6c6e3d.html">in-toto</a> и <a href="doc-f4e02b87ce6c.html">Cosign</a> (доверие к артефакту, тогда как Scorecard — доверие к поставщику), <a href="doc-14258e036a86.html">GitHub Security Advisory</a> (источник advisory для тех же проектов).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

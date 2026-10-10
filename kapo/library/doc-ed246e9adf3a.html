@@ -1,0 +1,23 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Критерии Go No-Go после пилота — КАПО · Пиков</title><meta name="description" content="Критерии Go No-Go после пилота. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-ed246e9adf3a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>07 CodeScoring</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#контекст">Контекст</a></li>
+<li><a href="#критерии-приемки">Критерии приемки</a></li>
+<li><a href="#риск-формулировка">Риск-формулировка</a></li>
+</ul>
+</div>
+<h1 id="критерии-go-no-go-после-пилота">Критерии Go No-Go после пилота</h1>
+<h2 id="контекст">Контекст</h2>
+<p>CodeScoring рассматривается как кандидат для OSA/SCA/TQI в контуре Организации. Главный предмет проверки — не общая способность показывать отчеты, а достоверная инвентаризация C/C++ legacy-сборок, где не везде внедрен Conan и часть зависимостей проявляется только на этапе сборки.</p>
+<h2 id="критерии-приемки">Критерии приемки</h2>
+<ul>
+<li>установка в тестовом контуре Организации без неучтенных внешних соединений;</li>
+<li>подключение GitLab и хотя бы одного CI/CD pipeline;</li>
+<li>успешный build scan на make, CMake и qmake или письменное подтверждение ограничений;</li>
+<li>список распознанных и unresolved C/C++ библиотек;</li>
+<li>экспорт CycloneDX/SPDX и проверка импорта в Dependency-Track;</li>
+<li>policy gate с контролируемым блокированием;</li>
+<li>отчет по лицензиям, уязвимостям, malware/protestware и TQI;</li>
+<li>протокол ограничений: статическая линковка, stripped binaries, внутренние форки.</li>
+</ul>
+<h2 id="риск-формулировка">Риск-формулировка</h2>
+<p>Нельзя считать продукт полностью соответствующим требованиям до пилота на реальных сборках. Особенно проверяются qmake, статическая линковка, stripped binaries, внутренние форки, offline обновление базы знаний, OSA Proxy по нужным пакетным менеджерам и экспорт данных в существующий процесс.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

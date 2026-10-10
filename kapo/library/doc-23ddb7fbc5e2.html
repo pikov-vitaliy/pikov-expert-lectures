@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>containerized build — КАПО · Пиков</title><meta name="description" content="containerized build. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-23ddb7fbc5e2.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="containerized-build">containerized build</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Сборка C/C++ в контейнере с multi-stage Dockerfile создаёт характерную ловушку для SCA: то, что формировало бинарь, и то, что попадает в финальный образ, — это разные множества. В стадии сборки ставятся <code>-dev</code>-пакеты (<code>libssl-dev</code>, <code>zlib1g-dev</code>, заголовки, статические <code>.a</code>), компилятор, кодогенераторы. В рантайм-образ через <code>COPY --from=build</code> переезжает только готовый бинарь и, может быть, рантайм-<code>.so</code>. Если генерировать SBOM по финальному образу, всё, что было в build-стадии, исчезает — а именно оно определило версии слинкованного кода.</p>
+<p>Особенно остро это со статической линковкой: <code>libfoo-dev</code> дал <code>.a</code>, код вкомпилировался в бинарь, а сам пакет в финальном образе отсутствует. Скан рантайм-образа покажет «чистый» бинарь без зависимости, которая физически в нём есть.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Классический multi-stage Dockerfile прячет состав на стыке стадий:</p>
+<pre><code class="language-dockerfile">FROM debian:12 AS build
+RUN apt-get update &amp;&amp; apt-get install -y libssl-dev zlib1g-dev g++ cmake   # сформировали бинарь
+COPY . /src
+RUN cmake -S /src -B /b &amp;&amp; cmake --build /b
+
+FROM debian:12-slim                      # чистый рантайм
+COPY --from=build /b/app /usr/bin/app    # переехал только бинарь
+# libssl-dev/zlib1g-dev здесь НЕТ — но их код в app
+</code></pre>
+<blockquote>
+<p>Снимите состав в build-стадии, а не в финале</p>
+</blockquote>
+<pre><code class="language-bash"># внутри build-стадии (target):
+docker build --target build -t app:build .
+docker run --rm app:build dpkg -l &gt; build-stage-packages.txt   # полный список -dev пакетов
+# сравните с финалом:
+docker run --rm app:final dpkg -l &gt; runtime-packages.txt</code></pre>
+<blockquote>
+<p><code>build-stage-packages.txt</code> содержит <code>libssl-dev 3.0.13</code>, которого нет в <code>runtime-packages.txt</code>, — это и есть пропавшая зависимость.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — SBOM рантайм-образа выдают за SBOM продукта. Build-стадия с её <code>-dev</code>-пакетами и статическими библиотеками не отражается в финальном образе, и поздний скан её не восстановит. Дополнительный риск — образ может содержать удалённые на вид артефакты (секреты, исходники) в нижних слоях, но для состава главное именно потеря build-стадии.</p>
+<blockquote>
+<p>SBOM продукта собирается из build-стадии
+Снимайте инвентарь пакетов и команды компилятора в той стадии, где формировался бинарь (<code>--target build</code>), и объединяйте с инвентарём рантайм-образа. SBOM только финального образа систематически недосчитывает того, что слинковано статически.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Стройте build-стадию отдельно (<code>docker build --target build</code>) и снимайте в ней <code>dpkg -l</code>/<code>rpm -qa</code> — это состав сборочного окружения.</li>
+<li>Снимите реальные команды компиляции/линковки внутри build-стадии (build-scan, <code>VERBOSE=1</code>), чтобы поймать статические <code>.a</code>.</li>
+<li>Сгенерируйте SBOM отдельно для build-стадии и для рантайм-образа; объедините, отметив, что слинковано статически.</li>
+<li>Зафиксируйте базовые образы с дайджестом (<code>debian:12@sha256:...</code>), а не по тегу — иначе состав плывёт.</li>
+<li>Прогоните <code>ldd</code> по бинарю внутри финального образа: динамические зависимости видны, статические — нет, их добирайте из build-стадии.</li>
+<li>Проверьте нижние слои образа на лишние артефакты сборки (см. смежные заметки про слои и обфускацию).</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a></li>
+<li>Смежные заметки: <a href="doc-659dc2ec481f.html">container image layers</a> · <a href="doc-e4a620b9b139.html">container image obfuscation</a> · <a href="doc-a2c530fc1bbc.html">honest SBOM</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

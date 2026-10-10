@@ -1,0 +1,69 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П32. CodeScoring offline architecture — КАПО · Пиков</title><meta name="description" content="П32. CodeScoring offline architecture. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c440241de897.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п32-codescoring-offline-architecture">П32. CodeScoring offline architecture</h1>
+<h2 id="цель">Цель</h2>
+<p>Зафиксировать <strong>фактическую</strong> архитектуру offline/on-premise-инсталляции CodeScoring в контуре Организации и доказать одно главное свойство: при работе в изолированном сегменте инсталляция не делает неучтённых внешних соединений, а база знаний об уязвимостях обновляется через контролируемый offline-пакет, а не «само из интернета». Проверяемый результат — карта компонентов развёртывания (приложение, PostgreSQL, Redis, том анализа), список сетевых потоков и подтверждённый способ доставки обновлений БДУ/NVD/OSV без выхода в сеть.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Это не сканер-практика, а <strong>инфраструктурная приёмка</strong>. Действия — наблюдаемые и воспроизводимые:</p>
+<pre><code class="language-bash"># 1) Какие контейнеры подняты и какие порты они слушают (Docker Compose-вариант)
+docker compose ps
+docker compose config --services
+
+# 2) PostgreSQL и Redis как сервисы данных (версии из требований: PG &gt;= 15.x, Redis &gt;= 7.0)
+docker compose exec db psql -U postgres -c "select version();"
+
+# 3) Том анализа — где хранятся исходники/артефакты проектов
+docker volume ls
+docker volume inspect &lt;analysis-root-volume&gt;
+
+# 4) Главная проверка изоляции: реальные внешние соединения инсталляции
+sudo ss -tunp | grep -vE '127\.0\.0\.1|::1|&lt;внутренние-подсети&gt;'
+# или непрерывно во время одного полного скана:
+sudo tcpdump -ni any 'not net &lt;внутренние-подсети&gt; and not port 22' -c 200
+</code></pre>
+<p>Для Kubernetes-варианта аналогично: <code>kubectl get pods,svc -n codescoring</code>, а изоляцию проверяют через <code>NetworkPolicy</code> и egress-логи.</p>
+<blockquote>
+<p>Что именно считается «offline»
+Offline-режим CodeScoring подразумевает локальную базу-индекс (CodeScoring Index) с резервом диска <strong>от 300 ГБ</strong> под неё и дальнейшие обновления. Обновления знаний об уязвимостях приходят не из публичного интернета продакшен-сервера, а отдельным бандлом, который заносят в контур руками или через контролируемый шлюз. Задача практики — увидеть это в трафике, а не поверить документации на слово.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p><code>docker compose ps</code> показывает связку сервисов — ориентир по составу:</p>
+<pre><code>NAME                    SERVICE     STATUS      PORTS
+codescoring-app-1       app         running     0.0.0.0:443-&gt;8443/tcp
+codescoring-db-1        db          running     5432/tcp
+codescoring-redis-1     redis       running     6379/tcp
+codescoring-worker-1    worker      running
+</code></pre>
+<p>Главный критерий — <strong>пустой или объяснимый</strong> список внешних соединений. На <code>ss</code>/<code>tcpdump</code> во время полного скана не должно быть исходящих сессий на публичные адреса обогащения (никаких обращений к внешним vuln-фидам в реальном времени). Допустимый ориентир:</p>
+<pre><code># Хорошо: только внутренние адреса контура и зеркало обновлений
+ESTAB  app -&gt; db:5432
+ESTAB  app -&gt; redis:6379
+# Подозрительно: исходящее на публичный IP во время скана
+ESTAB  app -&gt; 140.82.x.x:443   &lt;-- разобрать: что это и почему
+</code></pre>
+<p>База знаний после загрузки offline-бандла должна показывать <strong>свежую дату обновления</strong> в интерфейсе/служебном эндпоинте, а скан реального проекта — находить уязвимости из локальной базы, а не возвращать пусто.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Во время скана видно исходящий трафик на публичные адреса.</strong> Это прямой блокер offline-приёмки. Признак: строки <code>ESTAB ... -&gt; &lt;публичный IP&gt;:443</code> в <code>ss</code>/<code>tcpdump</code>, не относящиеся к вашему зеркалу обновлений. Лечение: выяснить сервис-источник (обогащение? телеметрия? проверка лицензии?) и потребовать у поставщика письменного описания — занести в <a href="doc-949dbb3b3637.html">Данные которые покидают контур</a>.</li>
+<li><strong>БД-индекс не помещается / диск переполнился.</strong> Под offline-индекс нужно от 300 ГБ плюс запас под тома анализа (для VCS-проектов объём считают как размер репозитория × 3). Признак: падение воркера, ошибки записи. Лечение: пересчитать диск по фактическим репозиториям, см. <a href="doc-a9daaa0657cc.html">Offline и on-premise архитектура</a>.</li>
+<li><strong>PostgreSQL/Redis не той версии.</strong> Требования: PostgreSQL не ниже 15.x, Redis не ниже 7.0.0, shared memory PG от 4 ГБ. Признак: контейнер <code>db</code>/<code>redis</code> в <code>Restarting</code>. Лечение: привести версии и ресурсы (минимум приложения — 16 CPU / 32 ГБ RAM).</li>
+<li><strong>Обновления уязвимостей «протухли».</strong> В интерфейсе дата базы знаний старая, новых CVE/БДУ нет. Признак: известная уязвимость не находится. Лечение: проверить процедуру заноса offline-бандла — это управляемый ручной процесс, см. <a href="doc-3a36fbac7518.html">Требования к offline обновлениям</a> и <a href="doc-c74101c1bf88.html">Порядок обновления БДУ</a>.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Предъявить преподавателю: (1) схему развёртывания — какие сервисы, порты, том анализа, БД (<code>docker compose ps</code> / <code>kubectl get</code>); (2) <strong>доказательство изоляции</strong> — фрагмент <code>ss</code>/<code>tcpdump</code>, снятый во время полного скана, с пометкой, что внешних соединений к публичным фидам нет либо они объяснены; (3) подтверждённый способ обновления базы знаний offline-бандлом с зафиксированной датой. Гейт — <strong>none</strong>: практика готовит исходные данные для управленческого решения on-premise vs Offline, а не блокирует сборку.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-a69d6f30f09c.html">М12. CodeScoring и подготовка пилота</a></li>
+<li>Смежные практики: <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-ea3b2e743d82.html">П33. AppSec и CodeScoring сравнение по задаче</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a></li>
+<li>Источники пилота: <a href="doc-a9daaa0657cc.html">Offline и on-premise архитектура</a> · <a href="doc-949dbb3b3637.html">Данные которые покидают контур</a> · <a href="doc-52554dc4889b.html">eBPF права агента и ограничения</a></li>
+<li>Шаблоны: <a href="doc-3a36fbac7518.html">Требования к offline обновлениям</a> · <a href="doc-c74101c1bf88.html">Порядок обновления БДУ</a> · <a href="doc-956aadabef7b.html">Требования к controlled repository</a> · <a href="doc-f09f288cf2a1.html">Шаблон протокола пилота SCA инструмента</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (РБПО) · <a href="doc-a6189f5ab42c.html">NIST SP 800-161</a> (управление рисками цепочки поставки) · <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> (offline-источник уязвимостей)</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

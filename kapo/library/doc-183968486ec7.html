@@ -1,0 +1,69 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М09. Практическая работа: динамическая vs статическая линковка и полнота SBOM — КАПО · Пиков</title><meta name="description" content="М09. Практическая работа: динамическая vs статическая линковка и полнота SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-183968486ec7.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#входные-данные-зафиксировать">Входные данные (зафиксировать)</a></li>
+<li><a href="#порядок-выполнения">Порядок выполнения</a><ul>
+<li><a href="#шаг-1-собрать-проект-динамически">Шаг 1. Собрать проект динамически</a></li>
+<li><a href="#шаг-2-снять-динамические-зависимости-из-elf">Шаг 2. Снять динамические зависимости из ELF</a></li>
+<li><a href="#шаг-3-смаппить-so-на-deb-пакеты">Шаг 3. Смаппить .so на DEB-пакеты</a></li>
+<li><a href="#шаг-4-пересобрать-статически-и-сравнить">Шаг 4. Пересобрать статически и сравнить</a></li>
+<li><a href="#шаг-5-сгенерировать-cdxgen-sbom-и-сравнить-с-фактом">Шаг 5. Сгенерировать cdxgen SBOM и сравнить с фактом</a></li>
+<li><a href="#шаг-6-оформить-реестр-unresolved-и-вывод">Шаг 6. Оформить реестр unresolved и вывод</a></li>
+</ul>
+</li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-динамическая-vs-статическая-линковка-и-полнота-sbom">Практическая работа: динамическая vs статическая линковка и полнота SBOM</h1>
+<h2 id="цель">Цель</h2>
+<p>На одном и том же C/C++ проекте увидеть, как состав ПО меняется в зависимости от способа линковки, и почему сырой <code>cdxgen</code> SBOM неполон без бинарного анализа. Результат — таблица «факт против SBOM» и заполненный реестр unresolved libraries.</p>
+<h2 id="входные-данные-зафиксировать">Входные данные (зафиксировать)</h2>
+<p>Перед началом запишите: путь к тестовому проекту, commit/tag, версии <code>gcc</code>, <code>cdxgen</code>, <code>readelf</code> (<code>--version</code>), дистрибутив (<code>cat /etc/os-release</code>), дату анализа. Без этого результат невоспроизводим.</p>
+<h2 id="порядок-выполнения">Порядок выполнения</h2>
+<h3 id="шаг-1-собрать-проект-динамически">Шаг 1. Собрать проект динамически</h3>
+<p>Тестовый проект линкуется с OpenSSL и zlib. Соберите с verbose-выводом линковки:</p>
+<pre><code class="language-bash">make VERBOSE=1            # или: cmake --build build --verbose
+</code></pre>
+<p>В строке линковки должны быть видны <code>-lssl -lcrypto -lz</code>. См. <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a>.</p>
+<h3 id="шаг-2-снять-динамические-зависимости-из-elf">Шаг 2. Снять динамические зависимости из ELF</h3>
+<pre><code class="language-bash">readelf -d ./app | grep NEEDED
+ldd ./app
+</code></pre>
+<p>Выпишите все <code>.so</code> из <code>DT_NEEDED</code>. См. <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>.</p>
+<h3 id="шаг-3-смаппить-so-на-deb-пакеты">Шаг 3. Смаппить .so на DEB-пакеты</h3>
+<pre><code class="language-bash">dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.3
+apt-cache policy libssl3        # версия пакета для PURL
+</code></pre>
+<p>Для каждой <code>.so</code> получите пакет и версию → координата <code>pkg:deb/&lt;distro&gt;/&lt;pkg&gt;@&lt;version&gt;</code>.</p>
+<h3 id="шаг-4-пересобрать-статически-и-сравнить">Шаг 4. Пересобрать статически и сравнить</h3>
+<p>Соберите тот же проект со статической линковкой (например <code>-static</code> или <code>-l:libssl.a -l:libcrypto.a</code>), затем:</p>
+<pre><code class="language-bash">readelf -d ./app-static | grep NEEDED     # OpenSSL/zlib здесь НЕ появятся
+readelf -s ./app-static | grep -i SSL     # символы остаются, если не stripped
+</code></pre>
+<p>Зафиксируйте: что пропало из <code>DT_NEEDED</code> по сравнению с шагом 2. См. <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>.</p>
+<h3 id="шаг-5-сгенерировать-cdxgen-sbom-и-сравнить-с-фактом">Шаг 5. Сгенерировать cdxgen SBOM и сравнить с фактом</h3>
+<pre><code class="language-bash">cdxgen -t cpp -o cdxgen-bom.json .
+</code></pre>
+<p>Сравните список компонентов из <code>cdxgen-bom.json</code> с фактом из шагов 2–4. См. <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a>. Если есть Conan — добавьте <code>conan graph info . --format=json</code> (<a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>).</p>
+<h3 id="шаг-6-оформить-реестр-unresolved-и-вывод">Шаг 6. Оформить реестр unresolved и вывод</h3>
+<p>Каждую <code>.so</code> без DEB-координаты и каждый статически вшитый/vendored компонент занесите в <a href="doc-bf3827cc407c.html">реестр unresolved libraries</a> с ответственным.</p>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<ul>
+<li>Динамический бинарь: <code>DT_NEEDED</code> содержит <code>libssl.so.3</code>, <code>libcrypto.so.3</code>, <code>libz.so.1</code>; каждая маппится на DEB-пакет с версией.</li>
+<li>Статический бинарь: тех же записей в <code>DT_NEEDED</code> <strong>нет</strong> — OpenSSL/zlib «исчезли», хотя код в бинаре присутствует.</li>
+<li><code>cdxgen-bom.json</code>: компонентов меньше, чем фактических зависимостей; у части нет версии/PURL — это и есть пробел, который закрывает обогащение (бинарный анализ ELF + маппинг на DEB).</li>
+</ul>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><code>ldd</code> пишет <code>not a dynamic executable</code> → собрали статически (это ожидаемо на шаге 4) либо перепутали бинарь.</li>
+<li><code>dpkg -S</code> отвечает <code>no path found</code> → библиотека не из системного пакета (vendored или ручная сборка) — это кандидат в unresolved, а не ошибка.</li>
+<li><code>cdxgen</code> нашёл 0 компонентов → нет <code>conanfile</code>/<code>CMakeLists</code> с зависимостями; именно поэтому и нужен бинарный анализ.</li>
+<li><code>readelf -s</code> пуст на статическом бинаре → бинарь stripped, символы вырезаны (слепая зона усилилась).</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) таблицу «динамика vs статика» с <code>DT_NEEDED</code> для обоих бинарей; (2) минимум одну <code>.so</code>, смапленную на DEB-пакет с версией; (3) заполненный реестр unresolved libraries с ответственным; (4) одно предложение, почему сырой <code>cdxgen</code> SBOM здесь неполон и что должен дать build-scan.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (управляемость работ), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2, PW.4, RV.1), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (качество SBOM).</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,34 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет 10 — КАПО · Пиков</title><meta name="description" content="Билет 10. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-864c056bb94a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>10 Оценивание</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#теоретический-вопрос">Теоретический вопрос</a></li>
+<li><a href="#практический-вопрос">Практический вопрос</a></li>
+<li><a href="#что-должен-показать-ответ">Что должен показать ответ</a></li>
+<li><a href="#опорные-материалы">Опорные материалы</a></li>
+</ul>
+</div>
+<h1 id="билет-10">Билет 10</h1>
+<h2 id="теоретический-вопрос">Теоретический вопрос</h2>
+<p>Почему в C/C++ строка <code>#include &lt;openssl/ssl.h&gt;</code> <strong>не является</strong> доказательством зависимости от OpenSSL? Объясните разрыв между тем, что видит препроцессор (заголовок в include-путях), и тем, что реально попадает в продукт (слинкованная библиотека с конкретной версией). Перечислите случаи, когда <code>#include</code> есть, а зависимости нет (header-only, неиспользуемый код, заглушка) и когда зависимость есть, а явного <code>#include</code> не видно (транзитивная линковка, вшитый статический код). Почему полнота состава достигается на этапе <strong>сборки</strong>, а не чтением исходников?</p>
+<h2 id="практический-вопрос">Практический вопрос</h2>
+<blockquote>
+<p>Мини-кейс
+Аудитор видит в исходниках 12 разных <code>#include</code> сторонних библиотек и предлагает занести все 12 в SBOM. Объясните, почему это породит и ложные записи, и пропуски. Опишите, какой артефакт сборки (build evidence — лог компиляции/линковки, перехват вызовов компилятора) превращает «видимый заголовок» в доказанный факт зависимости с версией.
+</p>
+</blockquote>
+<pre><code class="language-bash"># заголовок виден — но это ещё не факт линковки:
+grep -r "#include &lt;openssl" src/
+# факт даёт только сборка с перехватом вызовов компилятора/линкера</code></pre>
+<h2 id="что-должен-показать-ответ">Что должен показать ответ</h2>
+<ul>
+<li><strong>Источник факта</strong>: build evidence (лог компиляции/линковки, occurrences), а не перечень <code>#include</code>.</li>
+<li><strong>Инструмент</strong>: build-scan / перехват вызовов компилятора; фиксация occurrences в CycloneDX.</li>
+<li><strong>Владелец решения</strong>: трактовка «заголовок без линковки» и пометка слепой зоны — за специалистом композиционного анализа.</li>
+<li><strong>Нормативная опора</strong>: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PW.4, PS.3.2), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>.</li>
+<li><strong>Evidence</strong>: build log как аудиторский артефакт; occurrences, связывающие компонент с местом сборки.</li>
+</ul>
+<h2 id="опорные-материалы">Опорные материалы</h2>
+<ul>
+<li><a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a></li>
+<li><a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a></li>
+<li><a href="doc-e0d7e2832f34.html">include ≠ зависимость</a> · <a href="doc-9902fd4ce26c.html">build logs как evidence</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

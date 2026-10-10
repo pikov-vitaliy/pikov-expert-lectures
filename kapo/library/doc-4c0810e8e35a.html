@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CVE — КАПО · Пиков</title><meta name="description" content="CVE. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4c0810e8e35a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cve">CVE</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>CVE (Common Vulnerabilities and Exposures) — это система <strong>единых идентификаторов</strong> публично известных уязвимостей вида <code>CVE-2022-25883</code>. Один CVE-идентификатор присваивается одной уязвимости в конкретном продукте/компоненте и служит общим ключом, по которому разные источники (NVD, OSV, GHSA, БДУ ФСТЭК) ссылаются на одну и ту же проблему. Сам по себе CVE — это не база с оценками, а реестр записей CVE List, поддерживаемый программой MITRE и сетью CNA (CVE Numbering Authorities).</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>В SCA CVE-идентификатор — это <strong>точка сшивки</strong> между находкой сканера и любым справочником обогащения. Каноничная запись доступна по REST API CVE Services (формат CVE Record v5.1, JSON):</p>
+<pre><code class="language-bash">curl -s https://cveawg.mitre.org/api/cve/CVE-2022-25883 | jq '.containers.cna.descriptions[0].value, .containers.cna.affected[0].versions'
+</code></pre>
+<p>Фрагмент CVE Record v5.x с привязкой к компоненту через PURL и диапазон версий:</p>
+<pre><code class="language-json">{ "cveMetadata": { "cveId": "CVE-2022-25883", "state": "PUBLISHED" },
+  "containers": { "cna": { "affected": [
+    { "collectionURL": "https://www.npmjs.com", "packageName": "semver",
+      "versions": [{ "version": "0", "lessThan": "7.5.2", "status": "affected" }] }
+  ]}}}
+</code></pre>
+<p>В VDR (CycloneDX) тот же CVE появляется как <code>vulnerabilities[].id</code>, привязанный к <code>affects[].ref</code> (PURL компонента) — именно так находка <code>pkg:npm/semver@7.3.7 → CVE-2022-25883</code> становится трассируемой.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Универсальный ключ: один идентификатор связывает NVD, OSV, GHSA, EPSS, KEV и БДУ ФСТЭК между собой.</li>
+<li>Формат CVE Record v5 машиночитаем (JSON), включает структурированные <code>affected</code>-блоки с диапазонами версий и CPE/PURL.</li>
+<li>Записи ведут аккредитованные CNA (в т.ч. сами вендоры), что повышает достоверность для своих продуктов.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>CVE List — это только описания и метаданные; оценок CVSS, EPSS, признака «эксплуатируется» в самой записи может не быть (обогащение — у NVD/EPSS/KEV).</li>
+<li>Не каждая уязвимость получает CVE: часть проблем в OSS живёт только в GHSA/OSV без CVE-идентификатора.</li>
+<li>Задержки и споры по <code>RESERVED</code>/<code>REJECTED</code>-статусам; диапазоны версий в <code>affected</code> исторически заполнены неравномерно.</li>
+<li>Покрытие смещено в сторону западной экосистемы; для требований регулятора нужен национальный источник (БДУ ФСТЭК).</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Полный дамп CVE List v5 публикуется в открытом Git-репозитории <code>cvelistV5</code> (по одному JSON-файлу на запись) и официальными bulk-архивами CVE Program — их можно зеркалировать в закрытый контур и обновлять по расписанию. Онлайн-обращение к <code>cveawg.mitre.org</code> в изолированном контуре недоступно, поэтому работают с локальной копией дампа.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> · <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a></p>
+<p>Смежные карточки: <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-d85f78927400.html">CWE</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-d18b969b4915.html">CISA KEV</a> · <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-14258e036a86.html">GitHub Security Advisory</a> · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-41eb01248f66.html">Package URL</a></p>
+<p>Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

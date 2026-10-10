@@ -1,0 +1,49 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CERT MISRA рядом с SCA — КАПО · Пиков</title><meta name="description" content="CERT MISRA рядом с SCA. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-afe63a32f59f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="cert-misra-рядом-с-sca">CERT MISRA рядом с SCA</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>CERT C/C++ и MISRA — это стандарты того, <strong>как написан</strong> ваш собственный код: какие конструкции языка запрещены, как обращаться с памятью, целочисленными переполнениями, указателями. SCA отвечает на ортогональный вопрос — <strong>какие чужие компоненты</strong> в сборке. Эти два среза не заменяют, а дополняют друг друга, и их легко спутать: «у нас чистый MISRA-отчёт» не означает «у нас нет уязвимой <code>zlib</code> в зависимостях», а полный SBOM ничего не говорит о том, нарушает ли ваш код CERT-правила работы с буферами. Понимать границу важно, чтобы в досье РБПО не выдавать один контроль за другой.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Инструменты разные, входы разные, выводы про разное. Статический анализатор правил смотрит исходники вашего кода; SCA смотрит граф компонентов.</p>
+<pre><code class="language-bash"># CERT: проверка правил написания кода
+clang-tidy -checks='cert-*' src/parser.c --
+#   warning: calling 'system' is insecure [cert-env33-c]
+#   warning: do not use 'strcpy' [cert-str31-c]
+
+# MISRA: проверка по своду правил
+cppcheck --addon=misra --enable=all src/
+#   [misra-c2012-21.3] dynamic memory allocation shall not be used
+
+# SCA: это про состав, а не про правила — другой инструмент:
+syft dir:. -o cyclonedx-json   # перечислит компоненты, но не нарушения CERT/MISRA
+</code></pre>
+<p>Показательно: clang-tidy с профилем <code>cert-*</code> найдёт небезопасный <code>strcpy</code> в <strong>вашем</strong> <code>parser.c</code>, но не заметит, что в сборку вкомпилирована уязвимая версия стороннего парсера — это зона SCA. И наоборот.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Чистый MISRA ≠ безопасный состав
+Отчёт «0 нарушений MISRA» относится только к проверенному собственному коду. Vendored-библиотеки обычно исключают из MISRA-анализа (чужой код, тонны нарушений), и именно там живёт уязвимая <code>zlib</code>/<code>libpng</code>, которую ловит только SCA. Принимать конформанс правилам за безопасность поставки — ошибка.</p>
+</blockquote>
+<p>Приём: вести два независимых контроля в досье — конформанс CERT/MISRA по собственному коду и инвентаризацию + уязвимости по всем компонентам через SCA, и не закрывать пробел одного отчётом другого.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Развести зоны ответственности: CERT/MISRA — собственный код, SCA — состав и чужие компоненты; в досье это два отдельных раздела.</li>
+<li>Запускать <code>clang-tidy -checks=cert-*</code> и <code>cppcheck --addon=misra</code> по своему коду как отдельный gate, не смешивая с генерацией SBOM.</li>
+<li>Явно фиксировать, что vendored/<code>third_party</code> выведены из MISRA-анализа, и закрывать их SCA + санитайзерами.</li>
+<li>Не засчитывать чистый CERT/MISRA-отчёт как доказательство отсутствия уязвимых зависимостей — это разные метрики.</li>
+<li>Сводить оба контроля в нормативную трассировку РБПО: правила написания и композиционный анализ — обязательные, но разные требования.</li>
+<li>Спорные нарушения CERT/MISRA документировать с обоснованием (deviation), как и исключения по уязвимостям в SCA.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-00d2962ed78f.html">П40. Огнестойкость РБПО и SCA процесс</a>.</li>
+<li>Нормативка: <a href="doc-d90628b348e5.html">CERT C/C++</a>, <a href="doc-c1e10b3dd003.html">MISRA C/C++</a>, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+<li>Смежные заметки: <a href="doc-2108962f12f7.html">secure compiler flags</a>, <a href="doc-3cefc67b2b95.html">sanitizers in CI</a>, <a href="doc-7cac09e1dec1.html">копипаста кода</a>, <a href="doc-fd56cb075f09.html">форки open source библиотек</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

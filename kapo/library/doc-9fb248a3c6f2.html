@@ -1,0 +1,88 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М06. Конспект: поиск уязвимостей и управление VDR/VEX — КАПО · Пиков</title><meta name="description" content="М06. Конспект: поиск уязвимостей и управление VDR/VEX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9fb248a3c6f2.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-модуль">Зачем модуль</a></li>
+<li><a href="#ключевые-идеи">Ключевые идеи</a></li>
+<li><a href="#как-выглядит-на-практике">Как выглядит на практике</a></li>
+<li><a href="#слепые-зоны-этой-темы">Слепые зоны этой темы</a></li>
+<li><a href="#связь-с-нормативкой">Связь с нормативкой</a></li>
+<li><a href="#что-уносим-в-работу">Что уносим в работу</a></li>
+</ul>
+</div>
+<h1 id="конспект-поиск-уязвимостей-и-управление-vdrvex">Конспект: поиск уязвимостей и управление VDR/VEX</h1>
+<h2 id="зачем-модуль">Зачем модуль</h2>
+<p>SBOM — это инвентарь, а не отчёт о безопасности. Сам файл <code>cyclonedx.json</code> не знает ни про одну CVE: уязвимости возникают, когда координаты компонента (<code>pkg:npm/lodash@4.17.19</code>) встречаются с базой известных дефектов. Проблема не в том, чтобы «найти CVE» — сканер делает это за секунды. Проблема в том, что для типового сервиса находок будет 50–300, и почти все придут с пометкой High/Critical, но реально эксплуатируема меньшая часть. Если команда патчит всё подряд, она тратит спринты на недостижимый код; если игнорирует — пропускает то, что висит на периметре. Этот модуль ставит между сканером и решением дисциплину триажа: каждая находка получает состояние, владельца, срок и обоснование.</p>
+<h2 id="ключевые-идеи">Ключевые идеи</h2>
+<p><strong>VDR — это факт, VEX — это решение.</strong> VDR (Vulnerability Disclosure Report) фиксирует машинную связь «компонент ↔ CVE». VEX (Vulnerability Exploitability eXchange) отвечает на вопрос «а нас это реально касается?». Один и тот же VDR-факт «CVE-2021-44228 в <code>log4j-core 2.14.1</code>» превращается в разные VEX: для сервиса, где этот класс не на classpath в рантайме, — <code>not_affected</code> с обоснованием <code>vulnerable_code_not_in_execute_path</code>; для сервиса, где он на периметре, — <code>affected</code>, а после обновления — <code>fixed</code>.</p>
+<p><strong>VEX выдает тот, кто отвечает за продукт.</strong> NVD, БДУ, OSV и GHSA не выпускают VEX для вашего продукта: они дают внешние факты об уязвимостях. Если Организация производит ПО, VEX для конкретной версии продукта выпускает сама Организация через РБПО / Product Security / PSIRT / AppSec, владельца продукта и разработчиков. Подробный порядок: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+<p><strong>Четыре состояния VEX</strong> (по CycloneDX/OpenVEX):
+- <code>not_affected</code> — продукт содержит компонент, но не эксплуатируем; обязателен <code>justification</code> (например, <code>vulnerable_code_not_present</code>, <code>inline_mitigations_already_exist</code>);
+- <code>affected</code> — уязвим, нужно действие (<code>response</code>: <code>update</code>, <code>rollback</code>, <code>workaround_available</code>);
+- <code>fixed</code> — исправлено в этой версии продукта;
+- <code>under_investigation</code> — триаж не завершён, это легитимное промежуточное состояние, а не «забыли».</p>
+<p><strong>Источники не равнозначны.</strong> <a href="https://nvd.nist.gov/" rel="noopener noreferrer" target="_blank">NVD</a> даёт CVE с CPE и CVSS, но запаздывает с обогащением. <a href="https://osv.dev/" rel="noopener noreferrer" target="_blank">OSV.dev</a> ориентирован на экосистемы пакетов (точные диапазоны версий по PURL). GHSA быстрее всех для GitHub-экосистемы. <a href="https://bdu.fstec.ru/" rel="noopener noreferrer" target="_blank">БДУ ФСТЭК</a> — национальный источник: содержит уязвимости, которых может не быть в NVD, и обязателен для проектов под требования регулятора. Серьёзная программа сверяет находки по нескольким источникам — расхождение «есть в БДУ, нет в NVD» само по себе сигнал.</p>
+<h2 id="как-выглядит-на-практике">Как выглядит на практике</h2>
+<p>Три инструмента под разные входы:</p>
+<pre><code class="language-bash"># Grype: сканирует готовый SBOM (вход из М05)
+grype sbom:./sbom.cdx.json -o cyclonedx-json &gt; vdr.cdx.json
+
+# OSV-Scanner: точен по lockfile (package-lock.json, go.sum, poetry.lock)
+osv-scanner --lockfile=package-lock.json --format=json
+
+# Dependency-Track: портфель SBOM, непрерывный мониторинг, API для VEX
+</code></pre>
+<p>VDR-фрагмент (CycloneDX) — это факт:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>Компонент</th>
+<th>Версия</th>
+<th>Источник</th>
+<th>CVSS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CVE-2022-25883</td>
+<td>semver</td>
+<td>7.3.7</td>
+<td>OSV/GHSA</td>
+<td>7.5</td>
+</tr>
+</tbody>
+</table></div>
+<p>VEX-запись — это решение поверх факта:</p>
+<pre><code class="language-json">{
+  "vulnerability": { "id": "CVE-2022-25883" },
+  "affects": [{ "ref": "pkg:npm/semver@7.3.7" }],
+  "analysis": {
+    "state": "not_affected",
+    "justification": "code_not_reachable",
+    "detail": "semver вызывается только на доверенном вводе в build-time",
+    "response": ["will_not_fix"]
+  }
+}
+</code></pre>
+<blockquote>
+<p>Владелец, SLA, ретест
+VEX-запись без трёх полей нежизнеспособна: <strong>владелец</strong> (роль, не сканер), <strong>SLA</strong> (срок по severity — например, Critical 7 дней, High 30), <strong>ретест</strong> (<code>under_investigation</code> и <code>affected</code> пересматриваются при каждом обновлении базы или релизе). Состояние <code>not_affected</code> тоже имеет срок жизни: новая версия компонента, смена сборочного варианта или новая evidence может сделать обоснование неверным.</p>
+</blockquote>
+<h2 id="слепые-зоны-этой-темы">Слепые зоны этой темы</h2>
+<ul>
+<li><strong>VEX-как-отписка</strong>: массовый <code>not_affected</code> без <code>justification</code> из разрешённого списка — это не триаж, а сокрытие.</li>
+<li><strong>Просроченный VEX</strong>: решение приняли для версии 1.2, продукт уехал на 2.0, обоснование протухло, но запись осталась <code>not_affected</code>.</li>
+<li><strong>Только NVD</strong>: пропуск БДУ ФСТЭК как источника на проектах под регулятора.</li>
+<li><strong>Доверие к severity сканера</strong>: CVSS Base ≠ риск в вашем контексте; именно для этого существует VEX.</li>
+<li><strong>Findings без <code>fixed</code>-замыкания</strong>: исправили, но не зафиксировали <code>fixed</code> — на следующем скане та же CVE снова «горит».</li>
+</ul>
+<h2 id="связь-с-нормативкой">Связь с нормативкой</h2>
+<p><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> требует выявлять (RV.1) и оценивать/реагировать (RV.2) на уязвимости — VDR/VEX это и реализуют. <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> — обязательный национальный источник. <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> нормирует VEX-расширение. <a href="doc-47ec0c98fe05.html">OWASP SCVS</a> описывает зрелость управления уязвимостями. Регламент закрепляем через <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> и <a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a>.</p>
+<h2 id="что-уносим-в-работу">Что уносим в работу</h2>
+<ol>
+<li>Сканировать готовый SBOM, а не код заново — <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a>.</li>
+<li>Для lockfile-экосистем точнее OSV-Scanner — <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a>.</li>
+<li>Непрерывный мониторинг портфеля держать в Dependency-Track — <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a>.</li>
+<li>Разделять VDR (факт) и VEX (решение) в артефактах и в головах — <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>, <a href="doc-c01924770ece.html">П35. VEX triage</a>.</li>
+<li>Сверять находки с национальным источником — <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a>.</li>
+<li>Использовать <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a> как методический критерий: кто имеет право выпускать VEX, какие evidence обязательны и когда решение нужно пересматривать.</li>
+</ol></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

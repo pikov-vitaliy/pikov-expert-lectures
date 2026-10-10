@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М08. М08. Защита цепочки поставки и OSA — КАПО · Пиков</title><meta name="description" content="М08. М08. Защита цепочки поставки и OSA. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0c23b1ba214a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#ключевые-понятия">Ключевые понятия</a></li>
+<li><a href="#что-внутри-модуля">Что внутри модуля</a></li>
+<li><a href="#связи-с-другими-модулями">Связи с другими модулями</a></li>
+<li><a href="#практики-и-нормативка">Практики и нормативка</a></li>
+<li><a href="#практический-результат">Практический результат</a></li>
+</ul>
+</div>
+<h1 id="м08-защита-цепочки-поставки-и-osa">М08. Защита цепочки поставки и OSA</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>SCA отвечает на вопрос «что у нас уже стоит и чем это опасно». Но к моменту, когда компонент попал в <code>node_modules</code> или в локальный кэш сборки, вредоносный <code>postinstall</code>-скрипт уже мог выполниться. Этот модуль про <strong>превентивный контур</strong>: как не пустить опасный пакет в периметр разработки до того, как SCA его найдёт.</p>
+<p>Тема узкая и практичная: атаки на цепочку поставки (typosquatting, dependency confusion, protestware, компрометация апстрима), и архитектура защиты — <strong>OSA</strong> (Open Source Analysis на входе): firewall/proxy пакетных менеджеров, controlled repository, политики блокировки и карантина.</p>
+<blockquote>
+<p>Ключевой водораздел модуля
+<strong>OSA</strong> работает «на входе» — проверяет каждый запрашиваемый пакет до его попадания в контур и может отказать в скачивании. <strong>SCA</strong> работает «по составу» — анализирует то, что уже собрано (SBOM, lockfile, артефакт). Это разные контуры с разными точками контроля, а не синонимы.</p>
+</blockquote>
+<h2 id="ключевые-понятия">Ключевые понятия</h2>
+<p><a href="doc-f5fed75b9d52.html">controlled repository</a> · <a href="doc-d7af98f49f86.html">OSA Proxy</a> · карантин (quarantine) · политика блокировки · typosquatting · dependency confusion · protestware · slopsquatting · provenance апстрима</p>
+<h2 id="что-внутри-модуля">Что внутри модуля</h2>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-0c23b1ba214a-0.svg" rel="noopener" target="_blank"><img alt="Схема: М08. М08. Защита цепочки поставки и OSA" loading="lazy" src="../assets/course-diagrams/course-0c23b1ba214a-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<ul>
+<li><a href="doc-2290a17a3932.html">01 Конспект</a> — таксономия атак, OSA как firewall, режимы proxy, отличие OSA от SCA.</li>
+<li><a href="doc-52b66416aa18.html">02 План занятия</a> — тайминг занятия на 90 минут.</li>
+<li><a href="doc-6197acc0fa2c.html">03 Практическая работа</a> — проектирование политики controlled repository.</li>
+<li><a href="doc-4a0e44d76868.html">04 Контрольные вопросы</a> — вопросы и кейс-задачи.</li>
+<li><a href="doc-1c8c3a336bf1.html">05 Что проверять на проекте</a> — чек-лист аудитора OSA-контура.</li>
+</ul>
+<h2 id="связи-с-другими-модулями">Связи с другими модулями</h2>
+<ul>
+<li><a href="doc-ceda782bcd8c.html">М01. Термины, угрозы и границы</a> — базовое разграничение SCA/OSA задаётся там, здесь раскрывается на атаках.</li>
+<li><a href="doc-1bca905af1a7.html">М05. Инструменты генерации SBOM</a> — OSA умеет строить SBOM на проверяемые пакеты и образы.</li>
+<li><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и VDR/VEX</a> — вердикт OSA опирается на те же фиды угроз.</li>
+<li><a href="doc-a69d6f30f09c.html">М12. CodeScoring и подготовка пилота</a> — где OSA-контур разворачивается в Организации.</li>
+<li><a href="doc-e29be6710c8d.html">М14. Политики и исключения</a> — игноры и принятие риска для заблокированных пакетов.</li>
+</ul>
+<h2 id="практики-и-нормативка">Практики и нормативка</h2>
+<ul>
+<li><a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a> — политика controlled repo: warmup, monitoring, blocking, exception, audit trail.</li>
+<li><a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a> — режимы proxy и их пределы применимости.</li>
+<li><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — требования к контролю элементов, полученных от сторонних поставщиков, и анализу кода из цепочек поставок на ВПО.</li>
+</ul>
+<h2 id="практический-результат">Практический результат</h2>
+<p>Слушатель проектирует политику controlled repository для одной экосистемы (npm или PyPI): этапы warmup → monitoring → blocking, правила карантина, процедуру исключений и audit trail — и умеет объяснить, почему OSA-контур ловит то, что SCA пропускает.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

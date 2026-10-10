@@ -1,0 +1,92 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М10. Практическая работа: приёмочный контроль ZIP-поставки соисполнителя — КАПО · Пиков</title><meta name="description" content="М10. Практическая работа: приёмочный контроль ZIP-поставки соисполнителя. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-dc363b33cf9e.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#что-делаем">Что делаем</a></li>
+<li><a href="#порядок-выполнения">Порядок выполнения</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-приёмочный-контроль-zip-поставки-соисполнителя">Практическая работа: приёмочный контроль ZIP-поставки соисполнителя</h1>
+<h2 id="что-делаем">Что делаем</h2>
+<p>Вы — приёмщик состава на стороне Организации. Соисполнитель положил в артефакт-репозиторий ZIP-поставку своей подсистемы. Нужно проверить её против контракта поставки, измерить качество данных и принять решение: принять / принять с замечаниями / вернуть worklist. Это рабочая половина <a href="doc-fd2abd912efa.html">П28. Поставка от нескольких исполнителей</a>.</p>
+<blockquote>
+<p>Исходные данные
+Учебная ZIP-поставка с координатами <code>contractor-B-1.4.0.zip</code>, внутри: <code>bom.json</code> (сырой CycloneDX от соисполнителя), <code>build/*.log</code>, <code>unresolved.json</code>. Запускать только на учебном артефакте.</p>
+</blockquote>
+<h2 id="порядок-выполнения">Порядок выполнения</h2>
+<ol>
+<li><strong>Зафиксируйте provenance поставки.</strong> Координаты в артефакт-репозитории (имя:версия), commit/tag, дата, кто поставил. Если в <code>bom.json</code> (<code>metadata.component.version</code> / <code>metadata.timestamp</code>) версия не совпадает с координатами ZIP — это первый дефект.</li>
+<li><strong>Проверьте комплектность ZIP</strong> по <a href="doc-d964f98ca155.html">чек-листу ZIP поставки</a>: есть ли <code>bom.json</code>, логи сборки, список unresolved, license evidence.</li>
+<li><strong>Обогатите SBOM генератором фактов:</strong>
+<code>bash
+   unzip contractor-B-1.4.0.zip -d intake/B
+   # генератор фактов (enrichment-утилита)
+   enrich-sbom intake/B/bom.json enriched/B-bom.json</code></li>
+<li><strong>Измерьте качество данных</strong> на обогащённом <code>B-bom.json</code>:
+   <code>bash
+   # всего компонентов
+   jq '.components | length' enriched/B-bom.json
+   # компонентов с PURL
+   jq '[.components[] | select(.purl)] | length' enriched/B-bom.json
+   # компонентов без распознанной лицензии
+   jq '[.components[] | select((.licenses // []) | length == 0)] | length' enriched/B-bom.json</code>
+   Посчитайте PURL coverage (с PURL / всего), долю с лицензией, число unresolved.</li>
+<li><strong>Сформируйте worklist</strong> по <a href="doc-6975e3770695.html">соглашению о качестве</a>: какие компоненты вернуть соисполнителю на доразметку (нет PURL/CPE, лицензия как сырая строка, unresolved).</li>
+<li><strong>Примите решение</strong> и зафиксируйте его в <a href="doc-c0bb41adb645.html">контракте поставки</a>: принято / принято с замечаниями / возврат; кто владеет составом этой подсистемы.</li>
+</ol>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Заполненную приёмочную таблицу, например:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Метрика</th>
+<th>Значение</th>
+<th>Порог контракта</th>
+<th>Статус</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Компонентов</td>
+<td>88</td>
+<td>—</td>
+<td>—</td>
+</tr>
+<tr>
+<td>PURL coverage</td>
+<td>61%</td>
+<td>≥ 85%</td>
+<td>не прошёл</td>
+</tr>
+<tr>
+<td>Лицензия распознана</td>
+<td>70%</td>
+<td>≥ 90%</td>
+<td>не прошёл</td>
+</tr>
+<tr>
+<td>unresolved</td>
+<td>27</td>
+<td>≤ 5</td>
+<td>не прошёл</td>
+</tr>
+<tr>
+<td>Логи сборки в ZIP</td>
+<td>да</td>
+<td>обязательно</td>
+<td>прошёл</td>
+</tr>
+</tbody>
+</table></div>
+<p>И вывод: «Поставка возвращена соисполнителю; worklist на 27 unresolved + нормализацию лицензий; владелец состава — роль X».</p>
+<blockquote>
+<p>Если не получилось
+- <code>jq: error</code> — <code>bom.json</code> не валидный JSON: поставка повреждена в ZIP, верните соисполнителю.
+- PURL coverage = 100%, но 0 CVE на следующем шаге — проверьте, не пустые ли версии у компонентов.
+- <code>enrich-sbom</code> не дополнил библиотеки C/C++ — нет ELF/логов сборки в ZIP, значит build evidence не поставлен (нарушение контракта).</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) зафиксированный provenance поставки, (2) посчитанные метрики качества с порогами контракта, (3) worklist на возврат, (4) явно названного владельца состава подсистемы. Результаты агрегируются в <a href="doc-faa8e4b65ca3.html">П29. Readiness dashboard</a>.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (управляемость и документация разработчика), <a href="doc-9ed897f12463.html">проект ГОСТ КАПО</a> (регулярный КАПО по сторонним поставкам), <a href="doc-b5856ada3679.html">ISO/IEC 27001</a> (supplier relationships), <a href="doc-a6189f5ab42c.html">NIST SP 800-161</a> (provenance в цепочке поставки).</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

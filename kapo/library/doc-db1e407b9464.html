@@ -1,0 +1,80 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П06. Grype поверх готового SBOM — КАПО · Пиков</title><meta name="description" content="П06. Grype поверх готового SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-db1e407b9464.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п06-grype-поверх-готового-sbom">П06. Grype поверх готового SBOM</h1>
+<blockquote>
+<p>Контекст
+Grype не обязан заново разбирать исходники: он умеет принимать на вход готовый SBOM (<code>sbom:&lt;файл&gt;</code>). Это и есть паттерн <strong>SBOM-first</strong> — состав фиксируется один раз (в М05), а сканер только сопоставляет координаты компонентов с базой уязвимостей. Так VDR воспроизводим: тот же SBOM + та же база дают тот же результат.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Получить VDR (список фактов «CVE затрагивает компонент») из заранее сгенерированного CycloneDX-SBOM, <strong>не пересканируя файловую систему</strong>, и сохранить его в машиночитаемом виде для последующего триажа.</p>
+<p>Проверяемый результат: файл <code>vdr.cdx.json</code> в формате CycloneDX, где раздел <code>vulnerabilities[]</code> непустой, а каждая находка связана через <code>affects[].ref</code> с <code>bom-ref</code> компонента из входного SBOM.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Вход — SBOM из практики <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> или <a href="doc-33711e2633c5.html">П05. Trivy как генератор и сканер</a> (файл <code>sbom.cdx.json</code>).</p>
+<pre><code class="language-bash"># 1. Зафиксировать версию инструмента и базы (это часть evidence)
+grype version
+grype db status
+
+# 2. Скан готового SBOM, человекочитаемый вид
+grype sbom:./sbom.cdx.json -o table
+
+# 3. Тот же скан в VDR (CycloneDX JSON) — это артефакт для триажа
+grype sbom:./sbom.cdx.json -o cyclonedx-json --file vdr.cdx.json
+
+# 4. (опционально) включить gate по severity для CI
+grype sbom:./sbom.cdx.json --fail-on high
+</code></pre>
+<blockquote>
+<p>Где взять базу без интернета
+<code>grype db status</code> показывает дату и путь к локальной БД. Для offline-стенда базу выкачивают один раз (<code>grype db update</code>) и переносят; переменная <code>GRYPE_DB_AUTO_UPDATE=false</code> отключает попытки автообновления при каждом запуске.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Табличный вывод (<code>-o table</code>) выглядит так:</p>
+<pre><code>NAME       INSTALLED  FIXED-IN  TYPE  VULNERABILITY        SEVERITY
+log4j-core 2.14.1     2.16.0    java  CVE-2021-44228       Critical
+semver     7.3.7      7.5.2     npm   CVE-2022-25883       High
+lodash     4.17.19    4.17.21   npm   GHSA-35jh-r3h4-6jhm  High
+</code></pre>
+<p>Скелет VDR-фрагмента в <code>vdr.cdx.json</code>:</p>
+<pre><code class="language-json">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "vulnerabilities": [
+    {
+      "id": "CVE-2022-25883",
+      "source": { "name": "github:language:javascript" },
+      "ratings": [{ "severity": "high", "method": "CVSSv31", "score": 7.5 }],
+      "affects": [{ "ref": "pkg:npm/semver@7.3.7" }]
+    }
+  ]
+}
+</code></pre>
+<p>Ориентир по числу находок: для типового сервиса со 100–300 компонентами Grype выдаёт <strong>десятки</strong> строк (нередко 50+), большинство — High/Critical по CVSS Base. Это нормально: цель практики — получить факты, а не сразу их закрыть. Пустой <code>vulnerabilities[]</code> при заведомо «грязном» SBOM — сигнал, что что-то пошло не так (см. ниже).</p>
+<blockquote>
+<p>Быстрая проверка артефакта
+<code>jq '.vulnerabilities | length' vdr.cdx.json</code> — число находок; <code>jq '[.vulnerabilities[].ratings[0].severity] | group_by(.) | map({(.[0]): length})' vdr.cdx.json</code> — распределение по severity.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>0 vulnerabilities found</code> на заведомо уязвимом SBOM.</strong> Чаще всего у компонентов в SBOM нет качественных PURL/CPE — сопоставлять не с чем. Проверьте вход: <code>jq '.components[] | select(.purl==null) | .name' sbom.cdx.json</code>. Корень — генерация SBOM, а не Grype (см. <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a>).
+- <strong><code>could not determine source</code> / Grype сканирует не то.</strong> Забыли префикс <code>sbom:</code>. Без него <code>grype ./sbom.cdx.json</code> воспринимается как путь к каталогу/образу, а не как SBOM.
+- <strong><code>database is too old</code> или скан падает на обновлении.</strong> На offline-стенде не перенесена БД либо включён автоапдейт без сети. Зафиксируйте <code>GRYPE_DB_AUTO_UPDATE=false</code> и проверьте <code>grype db status</code>.
+- <strong>CI всегда «зелёный», хотя находки есть.</strong> Не задан <code>--fail-on</code>. Сам по себе скан возвращает 0; gate включается явным порогом severity.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю:
+1. вывод <code>grype version</code> и <code>grype db status</code> (версия инструмента и дата базы — это evidence);
+2. файл <code>vdr.cdx.json</code> с непустым <code>vulnerabilities[]</code>;
+3. число находок и распределение по severity (через <code>jq</code>);
+4. одно предложение: какой <code>--fail-on</code> уместен как CI-gate именно для этого проекта и почему.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1 — выявление уязвимостей) · <a href="doc-47ec0c98fe05.html">OWASP SCVS</a> · <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a></p>
+<p>Смежные практики: <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

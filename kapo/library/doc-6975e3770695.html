@@ -1,0 +1,115 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Соглашение о качестве данных SBOM — КАПО · Пиков</title><meta name="description" content="Соглашение о качестве данных SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6975e3770695.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#раздел-1-метрики-и-пороги">Раздел 1. Метрики и пороги</a></li>
+<li><a href="#раздел-2-severity-нарушений">Раздел 2. Severity нарушений</a></li>
+<li><a href="#раздел-3-sla-доработки">Раздел 3. SLA доработки</a></li>
+<li><a href="#раздел-4-доказуемость-измерений">Раздел 4. Доказуемость измерений</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="соглашение-о-качестве-данных-sbom">Соглашение о качестве данных SBOM</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Data Quality Agreement (DQA): измеримые требования к качеству поставляемого SBOM — пороги покрытия координат и лицензий, связность графа, допустимая доля unresolved, точность версий. Превращает «SBOM должен быть хорошим» в проверяемые числа и SLA.</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>Подписывается вместе с <a href="doc-c0bb41adb645.html">контрактом поставки</a> и применяется при каждой приёмке как набор приёмочных порогов для форматных чек-листов.</p>
+<blockquote>
+<p>Что измеряем
+Соглашение касается <strong>качества данных</strong>, а не наличия артефактов (наличие — в контракте). Метрики измеряются автоматически и сверяются с порогами ниже.</p>
+</blockquote>
+<h2 id="раздел-1-метрики-и-пороги">Раздел 1. Метрики и пороги</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Метрика</th>
+<th>Определение</th>
+<th>Порог</th>
+<th>Как измеряется</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>purl coverage</td>
+<td>доля компонентов с валидным <code>purl</code></td>
+<td>≥ 95 %</td>
+<td>парсер SBOM</td>
+</tr>
+<tr>
+<td>license coverage</td>
+<td>доля компонентов с лицензией</td>
+<td>≥ 90 %</td>
+<td>license scan</td>
+</tr>
+<tr>
+<td>graph completeness</td>
+<td>доля компонентов в связном графе зависимостей</td>
+<td>≥ 98 %</td>
+<td>анализ <code>dependencies</code>/<code>relationships</code></td>
+</tr>
+<tr>
+<td>version precision</td>
+<td>доля компонентов с точной версией (не диапазон/<code>NOASSERTION</code>)</td>
+<td>≥ 95 %</td>
+<td>парсер SBOM</td>
+</tr>
+<tr>
+<td>unresolved share</td>
+<td>доля нераспознанных компонентов</td>
+<td>≤ 5 %</td>
+<td>сверка с реестром</td>
+</tr>
+<tr>
+<td>hash coverage (бинарные)</td>
+<td>доля бинарных артефактов с <code>hashes</code>/VerificationCode</td>
+<td>≥ 90 %</td>
+<td>парсер SBOM</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="раздел-2-severity-нарушений">Раздел 2. Severity нарушений</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Уровень</th>
+<th>Что считается</th>
+<th>Реакция</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Блокирующее</td>
+<td>purl &lt; 90 % ИЛИ невалидная схема</td>
+<td>возврат поставки</td>
+</tr>
+<tr>
+<td>Существенное</td>
+<td>покрытие ниже порога, но ≥ critical-минимума</td>
+<td>доработка по SLA</td>
+</tr>
+<tr>
+<td>Незначительное</td>
+<td>единичные unresolved, вынесенные в реестр</td>
+<td>принимается с worklist</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="раздел-3-sla-доработки">Раздел 3. SLA доработки</h2>
+<ul>
+<li>Блокирующее нарушение устраняется до повторной приёмки (поставка не засчитана).</li>
+<li>Существенное — в согласованный срок (например, N рабочих дней), фиксируется в договоре.</li>
+<li>Повторяющиеся нарушения эскалируются через <a href="doc-8e9fc48d965c.html">отчёт по соисполнителю</a>.</li>
+</ul>
+<h2 id="раздел-4-доказуемость-измерений">Раздел 4. Доказуемость измерений</h2>
+<ul>
+<li>[ ] Метрики измеряются воспроизводимым инструментом с фиксированной версией.</li>
+<li>[ ] Результаты измерений сохраняются как evidence (см. <a href="doc-cbf5cec693a9.html">Схема хранения исходных артефактов</a>).</li>
+<li>[ ] Порог и факт по каждой метрике переносятся в отчёт приёмки.</li>
+</ul>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-97c8afb5a218.html">М02. SBOM и ППК</a> · <a href="doc-778f51173f56.html">М13. Нормативная трассировка</a></li>
+<li>Практики: <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-fd2abd912efa.html">П28. Поставка от нескольких исполнителей</a></li>
+<li>Нормативка: <a href="doc-47ec0c98fe05.html">OWASP SCVS</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a></li>
+<li>Связанные шаблоны: <a href="doc-c0bb41adb645.html">Контракт поставки SBOM от соисполнителя</a> · <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a> · <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

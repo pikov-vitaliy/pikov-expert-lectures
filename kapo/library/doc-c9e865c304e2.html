@@ -1,0 +1,34 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Билет 13 — КАПО · Пиков</title><meta name="description" content="Билет 13. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c9e865c304e2.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>10 Оценивание</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#теоретический-вопрос">Теоретический вопрос</a></li>
+<li><a href="#практический-вопрос">Практический вопрос</a></li>
+<li><a href="#что-должен-показать-ответ">Что должен показать ответ</a></li>
+<li><a href="#опорные-материалы">Опорные материалы</a></li>
+</ul>
+</div>
+<h1 id="билет-13">Билет 13</h1>
+<h2 id="теоретический-вопрос">Теоретический вопрос</h2>
+<p>Что меняется в восстановлении состава C/C++, когда у проекта есть менеджер сборки — <strong>Conan</strong>, <strong>vcpkg</strong> — против голого <code>make</code>/<code>qmake</code>? Объясните, почему <code>conan graph info</code> даёт идентичность пакета (имя, версия, package_id, устойчивый PURL) и разрешённый граф, тогда как legacy <code>qmake</code>-проект с ручными <code>third_party/</code> каталогами идентичности не даёт. Почему наличие манифеста (<code>conanfile</code>, <code>vcpkg.json</code>) — это переход от «угадывания» к декларации, но private-qualifiers и внутренние remote всё ещё требуют аккуратной нормализации PURL?</p>
+<h2 id="практический-вопрос">Практический вопрос</h2>
+<blockquote>
+<p>Мини-кейс
+Два модуля одного продукта: один на Conan с <code>conanfile.txt</code>, другой — legacy на <code>qmake</code> с библиотеками, скопированными в <code>third_party/</code>. Опишите, как для первого получить идентичность и граф пакетов, а для второго — почему придётся опираться на ELF-анализ и ручную доразметку. Что сделать с private-qualifier в PURL, чтобы не утёк внутренний remote?
+</p>
+</blockquote>
+<pre><code class="language-bash">conan graph info . --format=json     # идентичность + граф (package_id, версии)
+# qmake-проект: манифеста нет → состав восстанавливаем из сборки и ELF
+qmake -query QT_INSTALL_LIBS</code></pre>
+<h2 id="что-должен-показать-ответ">Что должен показать ответ</h2>
+<ul>
+<li><strong>Источник факта</strong>: <code>conan graph info</code> / <code>vcpkg</code> манифест как декларация состава; для qmake-legacy — сборка + ELF, не манифест.</li>
+<li><strong>Инструмент</strong>: Conan/vcpkg для идентичности пакета; нормализация PURL с очисткой private-qualifiers.</li>
+<li><strong>Владелец решения</strong>: трактовка legacy-модуля без манифеста и допуск private-remote — за специалистом композиционного анализа и сервисом вердиктов.</li>
+<li><strong>Нормативная опора</strong>: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-47ec0c98fe05.html">OWASP SCVS</a>, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>.</li>
+<li><strong>Evidence</strong>: граф пакетов из <code>conan graph info</code>; нормализованные PURL без утечки внутренних remote.</li>
+</ul>
+<h2 id="опорные-материалы">Опорные материалы</h2>
+<ul>
+<li><a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a></li>
+<li><a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a></li>
+<li><a href="doc-f5b27d7d4408.html">Conan recipe и package_id</a> · <a href="doc-78db9de19a81.html">qmake и legacy Qt</a> · <a href="doc-ca5f6bcbec0e.html">vcpkg manifests</a> · <a href="doc-59d2d8170564.html">private Conan qualifiers</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

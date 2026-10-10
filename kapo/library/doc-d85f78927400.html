@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CWE — КАПО · Пиков</title><meta name="description" content="CWE. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-d85f78927400.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cwe">CWE</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>CWE (Common Weakness Enumeration) — это <strong>иерархический каталог типов слабостей</strong> ПО (например, <code>CWE-79</code> — XSS, <code>CWE-89</code> — SQL-инъекция, <code>CWE-787</code> — запись за границей буфера). CWE отвечает на вопрос «какого рода ошибка», тогда как CVE отвечает «какая конкретная уязвимость в каком продукте». В SCA/OSA CWE используется для классификации причины находки и для группировки рисков по типам, а не для сопоставления компонентов по версиям.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>CWE-идентификатор приходит вместе с обогащением CVE: NVD проставляет <code>weaknesses[].description[].value = "CWE-787"</code> в записи уязвимости. В VDR (CycloneDX) тот же тип фиксируется в <code>vulnerabilities[].cwes</code>:</p>
+<pre><code class="language-json">{
+  "cwes": [787],
+  "ratings": [
+    { "method": "CVSSv31", "score": 9.8, "severity": "critical" }
+  ]
+}
+</code></pre>
+<p>Сам каталог распространяется как единый XML/CSV-дамп (CWE List), который можно разобрать локально:</p>
+<pre><code class="language-bash"># из официального XML-дампа CWE вытащить имя слабости по ID
+xmllint --xpath "string(//*[local-name()='Weakness'][@ID='787']/@Name)" cwec_latest.xml
+# Out-of-bounds Write
+</code></pre>
+<p>Практическое применение в отчётности — агрегировать находки по CWE, чтобы увидеть системные дефекты (например, преобладание <code>CWE-787</code>/<code>CWE-125</code> в C/C++ legacy указывает на проблемы с памятью).</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Единая таксономия причин: позволяет считать статистику дефектов по типам, а не по разрозненным CVE.</li>
+<li>Иерархия (Pillar → Class → Base → Variant) и связи <code>ChildOf</code>/<code>PeerOf</code> дают агрегацию на нужном уровне детализации.</li>
+<li>Лежит в основе отраслевых списков приоритетов (CWE Top 25) и требований к покрытию тестами.</li>
+<li>Полностью открытый, версионируемый, офлайн-пригодный дамп.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>CWE классифицирует тип слабости, но не говорит об эксплуатируемости и не сопоставляет уязвимость с версией компонента — это задача CVE/CPE/PURL.</li>
+<li>Одной CVE могут приписать несколько CWE или <code>NVD-CWE-noinfo</code>/<code>NVD-CWE-Other</code> — классификация неполна и иногда субъективна.</li>
+<li>Разные источники (NVD vs CNA) могут проставить разные CWE одной и той же уязвимости.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. CWE List публикуется как самодостаточный XML/CSV/PDF-дамп и не требует онлайн-сервиса для работы: каталог скачивается один раз и разбирается локально. Обновляется редко (несколько релизов в год), поэтому в закрытом контуре достаточно периодически подменять версию дампа.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> · <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></p>
+<p>Смежные карточки: <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-c55232b61d5d.html">CWE Top 25</a> · <a href="doc-d90628b348e5.html">CERT C C++</a></p>
+<p>Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

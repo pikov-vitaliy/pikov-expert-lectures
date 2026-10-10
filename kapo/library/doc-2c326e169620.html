@@ -1,0 +1,70 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Trivy — КАПО · Пиков</title><meta name="description" content="Trivy. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-2c326e169620.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="trivy">Trivy</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Trivy — комбайн «два в одном»: он и генерирует SBOM (инвентаризация пакетов образа, ФС, git-репозитория), и сам сканирует найденное на уязвимости, лицензии, секреты и ошибки конфигурации. В контексте генерации SBOM важно именно то, что один проход даёт и список компонентов в CycloneDX/SPDX, и привязку находок к нему.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Генерация SBOM и отдельный прогон сканера поверх уже готового SBOM:</p>
+<pre><code class="language-bash">trivy image --format cyclonedx --output sbom.cdx.json registry.example.org/app:1.4.2
+trivy sbom --format json --output findings.json sbom.cdx.json
+</code></pre>
+<p>В режиме <code>image</code> Trivy раскладывает образ по слоям и определяет ОС-пакеты (apk/deb/rpm) и пакеты приложений; в режиме <code>sbom</code> он не пересканирует артефакт, а берёт координаты прямо из переданного документа.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Режим</th>
+<th>Команда</th>
+<th>Что делает</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Генерация SBOM</td>
+<td><code>trivy image --format cyclonedx ...</code></td>
+<td>инвентаризация образа → CycloneDX/SPDX</td>
+</tr>
+<tr>
+<td>Сканирование артефакта</td>
+<td><code>trivy image registry.example.org/app:1.4.2</code></td>
+<td>сам инвентаризирует и сразу ищет уязвимости</td>
+</tr>
+<tr>
+<td>Сканирование готового SBOM</td>
+<td><code>trivy sbom sbom.cdx.json</code></td>
+<td>берёт координаты из документа, не пересканирует</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Два инструмента в одном
+Trivy совмещает роли генератора и сканера. В схеме «генератор отдельно, сканер отдельно» используйте <code>trivy sbom</code> поверх документа от <a href="doc-e0e63f957dcf.html">Syft</a>/cdxgen, чтобы не смешивать инвентаризацию и поиск уязвимостей в одном непрозрачном проходе.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Единый бинарь закрывает и инвентаризацию, и сканирование — меньше склейки в пайплайне.</li>
+<li>Хорошее покрытие ОС-дистрибутивов и точная привязка уязвимостей к версиям ОС-пакетов через собственную БД advisory.</li>
+<li>Умеет сканировать ранее сгенерированный SBOM (<code>trivy sbom</code>), то есть встраивается в схему «генератор отдельно, сканер отдельно».</li>
+<li>Экспорт в CycloneDX и SPDX, интеграция в CI с управляемым кодом выхода.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Для C/C++ и статически слинкованных бинарей видимость ограничена, как и у других генераторов по образу.</li>
+<li>Качество находок зависит от свежести БД advisory; в закрытом контуре её нужно регулярно обновлять вручную.</li>
+<li>SBOM от Trivy менее детален по графу зависимостей, чем у cdxgen — это скорее плоский список с уязвимостями.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<blockquote>
+<p>Свежесть БД — отдельная задача
+В закрытом контуре база advisory не обновляется сама. Устаревшая БД даёт ложное «чисто»: новые CVE просто не появятся в выводе. Нужен регламент регулярной выгрузки vuln DB во внутреннее OCI-зеркало (<code>TRIVY_DB_REPOSITORY</code>).</p>
+</blockquote>
+<p>Работает в закрытом контуре с оговоркой: базы данных (vuln DB, java-index) скачиваются заранее командой и подкладываются локально, дальше сканирование идёт без сети (<code>--offline-scan</code>, переменные <code>TRIVY_DB_REPOSITORY</code> на внутреннее зеркало OCI). Сама генерация SBOM сети не требует.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей</a> · <a href="doc-33711e2633c5.html">П05. Trivy как генератор и сканер</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-e0e63f957dcf.html">Syft</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

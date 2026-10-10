@@ -1,0 +1,107 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Требования к CI security gate — КАПО · Пиков</title><meta name="description" content="Требования к CI security gate. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9d81f3d4e106.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#условия-gate-и-реакция">Условия gate и реакция</a></li>
+<li><a href="#требования-к-реализации-gate">Требования к реализации gate</a></li>
+<li><a href="#путь-исключения">Путь исключения</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="требования-к-ci-security-gate">Требования к CI security gate</h1>
+<blockquote>
+<p>Назначение
+Задаёт условия и пороги, при которых CI security gate блокирует сборку, и единый путь исключений. Превращает решения SCA/OSA в автоматическую проверку пайплайна: сборка не проходит дальше, пока не выполнены пороги по уязвимостям, лицензиям и качеству SBOM.</p>
+</blockquote>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>В каждом пайплайне сборки релиз-кандидата (шаг 9 <a href="doc-e8c524b20a2a.html">регламента</a>). Срабатывает на каждый коммит в релизную ветку и на каждую сборку артефакта поставки.</p>
+<h2 id="условия-gate-и-реакция">Условия gate и реакция</h2>
+<blockquote>
+<p>Break-build (сборка падает)
+Эти условия останавливают пайплайн без обхода кроме формального исключения.</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>#</th>
+<th>Условие</th>
+<th>Порог</th>
+<th>Реакция</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Критическая уязвимость в компоненте</td>
+<td>CVSS ≥ 9.0 без VEX «not affected»</td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Высокая уязвимость с known exploit (CISA KEV)</td>
+<td>любая в KEV</td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Запрещённая лицензия (blacklist)</td>
+<td>AGPL/«copyleft» в проприетарном продукте и т.п.</td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>4</td>
+<td>malware / protestware в зависимостях</td>
+<td>любое срабатывание</td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Неопознанные компоненты выше лимита</td>
+<td>&gt; 5% компонентов без PURL/CPE</td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>6</td>
+<td>SBOM не проходит quality gate</td>
+<td>см. <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a></td>
+<td>break-build</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Высокая уязвимость без триажа</td>
+<td>CVSS 7.0–8.9, нет VEX-решения</td>
+<td>warn → break после SLA триажа</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Неизвестная лицензия</td>
+<td>лицензия не классифицирована</td>
+<td>warn, задача юристу</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Отсутствует подпись/attestation артефакта</td>
+<td>нет подписи SBOM</td>
+<td>warn (для controlled-контура — break)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="требования-к-реализации-gate">Требования к реализации gate</h2>
+<ul>
+<li>[ ] Gate выполняется как обязательный шаг пайплайна, отключение запрещено правами.</li>
+<li>[ ] Результат gate сохраняется как evidence (gate-отчёт в <a href="doc-91e9697aff8e.html">Матрица evidence для аудита</a>).</li>
+<li>[ ] Пороги вынесены в политику как код, изменение порогов проходит ревью.</li>
+<li>[ ] Gate работает offline-совместимо (см. <a href="doc-3a36fbac7518.html">Требования к offline обновлениям</a>).</li>
+<li>[ ] Источник фактов — «генератор фактов (enrichment)», вердикт — «сервис аудита/вердиктов».</li>
+</ul>
+<h2 id="путь-исключения">Путь исключения</h2>
+<ol>
+<li>Исключение оформляется только через <a href="doc-f0ded133ff51.html">Реестр исключений</a> и <a href="doc-3449932010c8.html">Порядок принятия риска</a> (обоснование, владелец, срок).</li>
+<li>Override блокировки доступен только роли «Утверждающий вердикт» (см. <a href="doc-915741bcb430.html">Модель ролей в сервисе аудита</a>).</li>
+<li>Каждый override пишется в <a href="doc-e65a39cb2dfa.html">audit trail</a> с reason и сроком.</li>
+</ol>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модули: <a href="doc-0c23b1ba214a.html">М08 Защита цепочки поставки и OSA</a>, <a href="doc-e29be6710c8d.html">М14 Политики, исключения и принятие риска</a>, <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и управление VDR VEX</a>.</li>
+<li>Практики: <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a>, <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>, <a href="doc-c01924770ece.html">П35. VEX triage</a>.</li>
+<li>Нормативка: <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PW.4/RV.1), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

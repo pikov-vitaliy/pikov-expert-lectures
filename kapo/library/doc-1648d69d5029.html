@@ -1,0 +1,41 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. М03. Форматы SBOM: CycloneDX, SPDX, SWID — КАПО · Пиков</title><meta name="description" content="М03. М03. Форматы SBOM: CycloneDX, SPDX, SWID. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1648d69d5029.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#ключевые-понятия">Ключевые понятия</a></li>
+<li><a href="#что-внутри-модуля">Что внутри модуля</a></li>
+<li><a href="#карта-связей">Карта связей</a></li>
+<li><a href="#смежные-модули">Смежные модули</a></li>
+<li><a href="#нормативная-и-шаблонная-опора">Нормативная и шаблонная опора</a></li>
+<li><a href="#практический-результат">Практический результат</a></li>
+</ul>
+</div>
+<h1 id="м03-форматы-sbom-cyclonedx-spdx-swid">М03. Форматы SBOM: CycloneDX, SPDX, SWID</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>Три названия в заголовке — это не три равноправных формата SBOM. CycloneDX и SPDX — полноценные форматы спецификации состава ПО; SWID (ISO/IEC 19770-2) — формат тегов идентификации установленного ПО, который в современных SBOM используется лишь как <strong>один из идентификаторов компонента</strong>, а не как контейнер всего SBOM. Модуль учит видеть это различие, выбирать формат под задачу (безопасность / лицензии / обмен / регуляторика) и оценивать качество SBOM по измеримым критериям BSI TR-03183-2.</p>
+<blockquote>
+<p>Ключевой тезис модуля
+BSI TR-03183-2 v2.1.0 принимает SBOM только в <strong>CycloneDX ≥ 1.6</strong> или <strong>SPDX ≥ 3.0.1</strong> (JSON или XML). SWID в этом стандарте — это значение поля «Other unique identifiers» (<code>swid.tagId</code> в CycloneDX, <code>externalIdentifierType: swid</code> в SPDX), а не формат самого SBOM.</p>
+</blockquote>
+<h2 id="ключевые-понятия">Ключевые понятия</h2>
+<p><a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-9bce61f41d9c.html">SWID</a> · <a href="doc-32cb8ae4a4b5.html">purl</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-7e41fe479faf.html">Эффективная лицензия</a> · <a href="doc-d10a5c88145c.html">Distribution licence</a> · <a href="doc-1e2852289e79.html">BSI property taxonomy</a></p>
+<h2 id="что-внутри-модуля">Что внутри модуля</h2>
+<ul>
+<li><a href="doc-e84ddfeeb864.html">01 Конспект</a> — назначение и модель данных трёх форматов, сравнительная таблица, фрагменты JSON, критерии качества BSI.</li>
+<li><a href="doc-56a30b9cf17c.html">02 План занятия</a> — тайминг занятия на 90 минут.</li>
+<li><a href="doc-9a2fe0e73a66.html">03 Практическая работа</a> — проверка одного компонента на обязательные поля BSI (раздел 5.2.2) в CycloneDX и SPDX.</li>
+<li><a href="doc-262684eaab32.html">04 Контрольные вопросы</a> — вопросы и кейс-задачи.</li>
+<li><a href="doc-f577eb7f9ccf.html">05 Что проверять на проекте</a> — чек-лист аудитора по форматам и качеству SBOM.</li>
+</ul>
+<h2 id="карта-связей">Карта связей</h2>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-1648d69d5029-0.svg" rel="noopener" target="_blank"><img alt="Схема: М03. М03. Форматы SBOM: CycloneDX, SPDX, SWID" loading="lazy" src="../assets/course-diagrams/course-1648d69d5029-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="смежные-модули">Смежные модули</h2>
+<ul>
+<li><a href="doc-97c8afb5a218.html">М02. SBOM и ППК как машинный источник фактов</a> — что вообще такое SBOM как доказательство.</li>
+<li><a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> — purl / CPE / SWID как ключи.</li>
+<li><a href="doc-1bca905af1a7.html">М05. Инструменты генерации SBOM</a> — кто и в каком формате генерирует.</li>
+<li><a href="doc-2db02216b0fa.html">М07. Лицензионная чистота и юридический workflow</a> — три категории лицензий из BSI.</li>
+</ul>
+<h2 id="нормативная-и-шаблонная-опора">Нормативная и шаблонная опора</h2>
+<p><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> · <a href="doc-cf001a40d806.html">SPDX ISO IEC 5962</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a> · <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a></p>
+<h2 id="практический-результат">Практический результат</h2>
+<p>Слушатель умеет отличить CycloneDX от SPDX от SWID по структуре файла, найти в обоих форматах обязательные по BSI (раздел 5.2.2) поля компонента и обосновать выбор формата под конкретную задачу Организации.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,81 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П37. Контейнерный образ: слои, секреты, удалённые файлы — КАПО · Пиков</title><meta name="description" content="П37. Контейнерный образ: слои, секреты, удалённые файлы. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-43129979e613.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п37-контейнерный-образ-слои-секреты-удалённые-файлы">П37. Контейнерный образ: слои, секреты, удалённые файлы</h1>
+<h2 id="цель">Цель</h2>
+<p>Доказать на собственноручно собранном образе, что файл, <strong>удалённый</strong> инструкцией <code>RUN rm</code>, физически остаётся в нижнем слое и извлекается из tar-архива. Проверяемый результат — извлечённое из слоя содержимое файла, которого нет в финальной файловой системе контейнера.</p>
+<blockquote>
+<p>Почему так происходит
+Каждая инструкция Dockerfile создаёт отдельный слой (overlay). <code>RUN rm key.api</code> не стирает байты из предыдущего слоя — он лишь добавляет в <strong>новый</strong> слой whiteout-маркер <code>.wh.key.api</code>, который прячет файл при сборке union-FS. Исходные байты остаются в blob нижнего слоя и видны любому, кто распакует образ. Multi-stage build с <code>COPY --from</code> — единственный надёжный способ не тащить секрет дальше.</p>
+</blockquote>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Соберите учебный образ с «секретом», который потом якобы удаляется:</p>
+<pre><code class="language-bash">mkdir layers-demo &amp;&amp; cd layers-demo
+
+# 1. фейковый секрет (НЕ настоящий ключ)
+printf -- '-----BEGIN OPENSSH PRIVATE KEY-----\nFAKEKEYdoNotUse123456789\n-----END OPENSSH PRIVATE KEY-----\n' &gt; key.api
+
+# 2. Dockerfile, который «прячет» секрет в нижнем слое
+cat &gt; Dockerfile &lt;&lt;'EOF'
+FROM busybox:latest
+COPY key.api .
+RUN rm key.api
+EOF
+
+docker build -t secrets-test .
+
+# 3. в финальной ФС файла нет — RUN rm «сработал»
+docker run --rm secrets-test ls -la /key.api   # No such file or directory
+
+# 4. но он лежит в слое: распаковываем образ и ищем секрет
+docker save secrets-test:latest | tar -x -C .
+find blobs/sha256/ -type f -exec sh -c 'tar -tf "$1" 2&gt;/dev/null | grep -q "^key.api$" &amp;&amp; echo "FOUND in $1"' _ {} \;
+</code></pre>
+<p>Дополнительно — два инструмента, которые делают это автоматически:</p>
+<pre><code class="language-bash"># послойный аудит: dive показывает, что добавил/удалил каждый слой
+dive secrets-test:latest
+
+# поиск секретов сразу по всем слоям образа
+trivy image --scanners secret secrets-test:latest
+</code></pre>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>В пункте 4 <code>find</code> выводит blob, внутри которого лежит «удалённый» файл, а распаковка показывает реальный секрет:</p>
+<pre><code>FOUND in blobs/sha256/b00389...f17b98
+$ tar xvf blobs/sha256/b00389...f17b98 key.api &amp;&amp; cat key.api
+-----BEGIN OPENSSH PRIVATE KEY-----
+FAKEKEYdoNotUse123456789
+-----END OPENSSH PRIVATE KEY-----
+</code></pre>
+<p><code>trivy image --scanners secret</code> находит не меньше <strong>1</strong> секрета и помечает слой, в котором он лежит:</p>
+<pre><code>secrets-test (busybox 1.x)
+Total: 1 (HIGH: 1)
+key.api  AsymmetricPrivateKey  HIGH  AsymmetricPrivateKey
+</code></pre>
+<p>В <code>dive</code> слой с <code>RUN rm key.api</code> отображается с положительным «вкладом» (добавлен whiteout), а не как удаление байтов — на левой панели видно, что размер образа от удаления не уменьшился.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>find</code> ничего не находит, секрета «нет».</strong> Скорее всего, BuildKit включён и собрал образ в новом формате — <code>docker save</code> даёт OCI-layout, blob'ы лежат в <code>blobs/sha256/</code>, но имена не совпадают с тем, что в <code>manifest.json</code>. Откройте <code>manifest.json</code> / <code>index.json</code> и идите по ссылкам на слои; либо соберите с <code>DOCKER_BUILDKIT=0 docker build ...</code> для классического формата.</li>
+<li><strong><code>dive: command not found</code>.</strong> Это отдельный инструмент (<a href="https://github.com/wagoodman/dive" rel="noopener noreferrer" target="_blank">github.com/wagoodman/dive</a>), его нет в составе Docker. Поставьте бинарь и запускайте <code>dive &lt;image&gt;</code>; на CI используйте <code>CI=true dive &lt;image&gt;</code>.</li>
+<li><strong><code>trivy</code> не видит секрет.</strong> Проверьте версию (<code>trivy --version</code>): флаг <code>--scanners secret</code> — текущее написание (в старых версиях было <code>--security-checks secret</code>). Без явного указания сканера секретов trivy сканирует только уязвимости и секреты не ищет. Учтите, что trivy фильтрует часть тестовых паттернов — для учебного OpenSSH-ключа он срабатывает.</li>
+<li><strong>Файл удалён «по-настоящему».</strong> Если вы собрали образ так, что <code>COPY</code> и <code>rm</code> оказались в одном <code>RUN</code> (<code>RUN ... &amp;&amp; rm ...</code>), секрет не попадёт в отдельный слой и в финальную ФС, но всё равно останется в build-кэше. Для демонстрации слоёв инструкции должны быть раздельными.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Покажите преподавателю: (1) вывод <code>docker run ... ls</code>, подтверждающий, что в финальной ФС файла нет; (2) содержимое <code>key.api</code>, извлечённое из blob'а слоя; (3) находку <code>trivy --scanners secret</code> с указанием слоя. Сформулируйте письменно, почему <code>RUN rm</code> не является способом удалить секрет и какой приём (multi-stage / <code>--mount=type=secret</code>) решает задачу.</p>
+<blockquote>
+<p>Не превращайте демо в реальную утечку
+Используйте только фейковый ключ. Реальный секрет, попавший в слой и уехавший в реестр, считается скомпрометированным с момента push — ротация обязательна, «удаление тега» не помогает.</p>
+</blockquote>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-ef214c81e577.html">Модуль М16</a> — честный состав образа.</li>
+<li>Смежные практики: <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-00d2962ed78f.html">П40. Огнестойкость РБПО и SCA процесс</a>.</li>
+<li>Шаблон: <a href="doc-c07a2034e54b.html">Чек-лист честного SBOM контейнерного образа</a> (зоны «Слои» и «Секреты»).</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (управление секретами и конфигурацией сборки), <a href="doc-9ed897f12463.html">проект ГОСТ Р по КАПО</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

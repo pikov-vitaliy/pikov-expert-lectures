@@ -1,0 +1,30 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М04. Что проверять на проекте: качество координат — КАПО · Пиков</title><meta name="description" content="М04. Что проверять на проекте: качество координат. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-5ee92be8feb6.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#связанные-практики-и-нормативка">Связанные практики и нормативка</a></li>
+</ul>
+</div>
+<h1 id="что-проверять-на-проекте-качество-координат">Что проверять на проекте: качество координат</h1>
+<p>Чек-лист аудитора. Тема узкая: не «есть ли SBOM вообще», а <strong>можно ли по нему вообще что-то найти</strong> — то есть достаточно ли точны и полны идентификаторы компонентов и уязвимостей.</p>
+<ul>
+<li>[ ] <strong>Покрытие PURL.</strong> Какая доля компонентов в SBOM имеет непустой <code>purl</code>? Пустой <code>purl</code> = компонент невидим для экосистемных сканеров. Особое внимание — C/C++ части.</li>
+<li>[ ] <strong>Покрытие CPE.</strong> Какая доля компонентов имеет <code>cpe</code>? Для C/C++ и системных библиотек CPE критичен, потому что PURL у них часто синтетический (<code>pkg:generic/...</code>).</li>
+<li>[ ] <strong>Нормализация PURL.</strong> Нет ли в <code>purl</code> приватных qualifiers (<code>?repository_url=...</code>, <code>?user=...</code>, внутренние registry)? Они уводят матчинг мимо публичных баз — проверяется через <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>.</li>
+<li>[ ] <strong>Корректность версий.</strong> Версии нормализованы (нет лишнего <code>v</code>, учтены эпохи deb, нет «latest»/диапазонов в поле точной версии)? Иначе ломается попадание в диапазон затронутых версий.</li>
+<li>[ ] <strong>CPE-alias проверен.</strong> Для ключевых продуктов сверены vendor по словарю NVD (классический пример — curl: <code>haxx:curl</code> vs <code>curl:curl</code>). Есть ли worklist расхождений — <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>?</li>
+<li>[ ] <strong>Имя продукта в CPE ≠ имя пакета.</strong> Не подставлен ли в CPE <code>product</code> пакетный artifactId вместо словарного имени NVD (например, <code>log4j-core</code> вместо <code>log4j</code>)?</li>
+<li>[ ] <strong>Подключён БДУ ФСТЭК.</strong> Поиск ведётся не только по NVD/OSV, но и по <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a>; учтено, что часть <code>BDU:YYYY-NNNNN</code> не имеет CVE и сроки публикации расходятся.</li>
+<li>[ ] <strong>«0 уязвимостей» проверено на ложный ноль.</strong> Есть ли процедура, подтверждающая, что нулевой результат означает «уязвимостей нет», а не «компоненты не попали в матчинг»? Хотя бы выборочная проверка координат.</li>
+<li>[ ] <strong>Список unresolved/unknown.</strong> Ведётся ли реестр компонентов без надёжной координаты (внутренние форки, статически слинкованные, vendored-исходники) с назначенным ответственным за доразметку?</li>
+<li>[ ] <strong>Связь уязвимость↔версия.</strong> Каждая находка привязана к конкретной версии компонента (а не к продукту в целом) и имеет идентификатор (CVE/GHSA/OSV/BDU)?</li>
+<li>[ ] <strong>Воспроизводимость координат.</strong> Зафиксированы инструмент, его версия, дата анализа и источник, по которому проставлена координата (чтобы расхождение можно было перепроверить)?</li>
+<li>[ ] <strong>Внутренние форки не приравнены к upstream.</strong> Форк с собственными патчами учтён как отдельная сущность, а не матчится автоматически по координате upstream.</li>
+</ul>
+<blockquote>
+<p>Красный флаг аудита
+Отчёт «уязвимостей не найдено» при заметной доле компонентов с пустым <code>purl</code>/<code>cpe</code>. Это почти всегда не безопасность, а пробел в координатах — false negative по построению. Требуйте измерить покрытие PURL/CPE прежде, чем доверять нулю.</p>
+</blockquote>
+<h2 id="связанные-практики-и-нормативка">Связанные практики и нормативка</h2>
+<ul>
+<li><a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a></li>
+<li><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1) · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

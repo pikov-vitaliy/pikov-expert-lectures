@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cdxgen — КАПО · Пиков</title><meta name="description" content="cdxgen. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-35e5f81f86fe.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cdxgen">cdxgen</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>cdxgen — генератор CycloneDX-SBOM, ориентированный на исходный код и манифесты сборки. Он разбирает файлы зависимостей десятков языков (package-lock.json, requirements.txt, pom.xml, go.mod, Cargo.toml, conan.lock, CMake-кэш) и строит граф зависимостей с прямыми и транзитивными связями. Для C/C++ это один из немногих генераторов, который пытается восстановить состав из артефактов сборки, а не только из пакетного менеджера.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запуск по каталогу проекта с явным указанием типа и evidence-режимом:</p>
+<pre><code class="language-bash">cdxgen -t c -o bom.cdx.json --spec-version 1.6 .
+cdxgen -t python --required-only -o bom.cdx.json .
+</code></pre>
+<p>В выводе компоненты несут <code>bom-ref</code>, PURL и блок <code>evidence</code> с указанием, из какого файла извлечён факт. Для C/C++ полезен флаг <code>--deep</code> и переменная <code>CDXGEN_DEBUG</code>, чтобы видеть, какие манифесты и заголовки распознаны.</p>
+<blockquote>
+<p>Блок evidence — главный аргумент доверия
+В отличие от плоского списка, cdxgen помечает каждый компонент полем <code>evidence</code> с указанием файла-источника. На приёмке SBOM это позволяет отличить факт («извлечено из <code>conan.lock</code>») от догадки, а не верить генератору на слово.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Самое широкое покрытие языков среди генераторов, включая «трудные» C/C++, Conan и системные пакеты.</li>
+<li>Строит именно граф зависимостей (<code>dependencies</code>), а не плоский список — видны прямые и транзитивные рёбра.</li>
+<li>Блок <code>evidence</code> повышает доверие к SBOM: видно происхождение каждого компонента.</li>
+<li>Гибкая настройка глубины и фильтров (<code>--required-only</code>, <code>--deep</code>, типы проектов).</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Для C/C++ без чёткого пакетного менеджера результат сильно зависит от наличия Conan/vcpkg-манифестов; вендоренные исходники легко пропустить.</li>
+<li>Часть продвинутых анализов (atom/SAST-slicing) тянет дополнительные среды выполнения и память.</li>
+<li>Возможны ложные включения тулчейн-зависимостей, если не отфильтровать dev-ветку графа.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<blockquote>
+<p>Утечка в закрытом контуре
+По умолчанию обогащение лицензий ходит в публичные реестры. В изолированном контуре это и недопустимая утечка, и источник «зависающих» сборок. Перед запуском выставляйте <code>FETCH_LICENSE=false</code> и направляйте менеджеры на внутренние зеркала.</p>
+</blockquote>
+<p>Базовая генерация SBOM работает офлайн. Опциональное обогащение (запросы к публичным реестрам для метаданных и лицензий) требует сети — в закрытом контуре его отключают (<code>FETCH_LICENSE=false</code>) и поднимают локальное зеркало менеджеров. Контейнерный образ cdxgen разворачивается во внутреннем реестре.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a> · <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-6df02436591e.html">Conan</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-41eb01248f66.html">Package URL</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

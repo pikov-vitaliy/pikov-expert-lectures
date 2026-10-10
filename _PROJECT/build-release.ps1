@@ -268,6 +268,7 @@ $script:MaterialsZipFolders = @('27-07-2026', '29-07-2026')
 # ignored source artifacts that the global release builder may publish.
 $script:ApprovedIgnoredReleaseArtifacts = @(
   'dast/downloads/my-first-python-project-v02.zip',
+  'kapo/downloads/sca-osa-course.zip',
   '27-07-2026/materials.zip',
   '29-07-2026/materials.zip',
   'appsec-lections/downloads/day-01-canonical-safe-package.zip',
@@ -357,6 +358,12 @@ function Should-ExcludeQuarantinedNestedDirectory([string]$FolderName, [string]$
 # from the published HTML. The global distributable rules still exclude every
 # other ZIP and README file from lecture releases.
 $script:ReviewedNestedDistributables = @{
+  'kapo' = @(
+    'downloads\composition-analysis-national-standard-draft.pdf',
+    'downloads\composition-analysis-national-standard-draft.docx',
+    'downloads\sca-osa-course.zip',
+    'downloads\SHA256SUMS.txt'
+  )
   'dast' = @(
     'downloads\dynamic-analysis-national-standard-draft.pdf',
     'downloads\dynamic-analysis-explanatory-note.pdf',

@@ -1,0 +1,56 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М09. Конспект: C и C++ legacy без дисциплины пакетного менеджера — КАПО · Пиков</title><meta name="description" content="М09. Конспект: C и C++ legacy без дисциплины пакетного менеджера. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0487a02db2f1.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-модуль">Зачем модуль</a></li>
+<li><a href="#ключевые-идеи">Ключевые идеи</a></li>
+<li><a href="#как-выглядит-на-практике">Как выглядит на практике</a></li>
+<li><a href="#слепые-зоны-именно-cc">Слепые зоны именно C/C++</a></li>
+<li><a href="#связь-с-нормативкой">Связь с нормативкой</a></li>
+<li><a href="#что-уносим-в-работу">Что уносим в работу</a></li>
+</ul>
+</div>
+<h1 id="конспект-c-и-c-legacy-без-дисциплины-пакетного-менеджера">Конспект: C и C++ legacy без дисциплины пакетного менеджера</h1>
+<h2 id="зачем-модуль">Зачем модуль</h2>
+<p>В управляемых экосистемах состав ПО декларирован lock-файлом, и SBOM почти полностью восстанавливается из манифеста. В C/C++ без Conan или vcpkg такого манифеста нет. Зависимость может прийти из системного <code>apt</code>-пакета, из ручного каталога <code>third_party/</code>, из внутреннего форка с патчами или быть статически вшита в бинарь. Поэтому генератор SBOM, запущенный по исходникам, видит подозрительно мало компонентов — и тишина в отчёте читается как «зависимостей нет», хотя на деле они есть, просто не задекларированы. Модуль учит восстанавливать состав там, где сборка не отдаёт метаданных, и честно фиксировать слепые зоны.</p>
+<blockquote>
+<p>Census III о C/C++
+Census III (Linux Foundation) отмечает, что C и C++, в отличие почти от всех других языков, не предотвращают нарушения memory safety — корневую причину самого распространённого класса уязвимостей. И отдельно: отсутствие единой схемы именования компонентов (CPE/PURL) заметно тормозит анализ. Для C/C++ это бьёт дважды: высокий риск компонента и слабая идентичность.</p>
+</blockquote>
+<h2 id="ключевые-идеи">Ключевые идеи</h2>
+<ul>
+<li><strong><code>#include</code> ≠ зависимость.</strong> Заголовок <code>&lt;openssl/ssl.h&gt;</code> виден компилятору, но не задаёт ни версию, ни факт линковки. Версию даёт только сборка и бинарь.</li>
+<li><strong>Три слоя состава.</strong> Исходная зависимость → динамическая линковка (<code>.so</code>) → статическая линковка (<code>.a</code>). Динамику видно: запись <code>DT_NEEDED</code> в ELF-секции <code>.dynamic</code>. Статику не видно: код <code>libfoo.a</code> копируется в исполняемый файл и теряет границу — компонент исчезает из SBOM.</li>
+<li><strong>Маппинг ELF → DEB даёт координаты.</strong> <code>ldd</code>/<code>readelf -d</code> дают имя <code>.so</code>; <code>dpkg -S</code> / <code>apt</code> превращают путь в пакет с версией и дистрибутивом — а значит, в PURL вида <code>pkg:deb/debian/libssl3@3.0.11</code>.</li>
+<li><strong>Полнота — на этапе сборки.</strong> Поздний скан готового (особенно stripped) бинаря теряет статически слинкованное и vendored. Надёжнее build-scan: перехват вызовов компилятора и линкера во время <code>make</code>/<code>cmake</code>.</li>
+<li><strong>Conan/vcpkg, когда есть.</strong> <code>conan graph info</code> отдаёт граф и идентичность пакета — устойчивый PURL вместо <code>pkg:generic/...</code>.</li>
+</ul>
+<h2 id="как-выглядит-на-практике">Как выглядит на практике</h2>
+<p>Динамическую библиотеку видно в ELF и можно смаппить на пакет:</p>
+<pre><code class="language-text">$ readelf -d ./app | grep NEEDED
+ 0x0001 (NEEDED)  Shared library: [libssl.so.3]
+ 0x0001 (NEEDED)  Shared library: [libcrypto.so.3]
+$ dpkg -S $(ldconfig -p | awk '/libssl.so.3/{print $NF; exit}')
+ libssl3:amd64: /usr/lib/x86_64-linux-gnu/libssl.so.3
+</code></pre>
+<p>Так <code>libssl.so.3</code> получает координату <code>pkg:deb/debian/libssl3@&lt;версия&gt;</code>. А если тот же OpenSSL слинкован статически (<code>-l:libssl.a</code>), в <code>readelf -d</code> его нет вовсе — остаётся искать символы (<code>readelf -s</code>, <code>strings</code>) и поднимать build-log.</p>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-0487a02db2f1-0.svg" rel="noopener" target="_blank"><img alt="Схема: М09. Конспект: C и C++ legacy без дисциплины пакетного менеджера" loading="lazy" src="../assets/course-diagrams/course-0487a02db2f1-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<p>Здесь работает «генератор фактов» (enrichment-утилита): на вход — сырой CycloneDX от <code>cdxgen</code> плюс ELF-бинарники; он добавляет результат бинарного анализа ELF и маппинг динамических библиотек на DEB через <code>apt</code>, дополняет метаданные из PyPI/npm/Conan/apt и отдаёт обогащённый <code>bom.json</code>. См. <a href="doc-eb96e051c415.html">архитектурный кейс</a>.</p>
+<h2 id="слепые-зоны-именно-cc">Слепые зоны именно C/C++</h2>
+<blockquote>
+<p>Что теряется
+- <strong>Статическая линковка (<code>.a</code>)</strong> — компонент вшит, в <code>DT_NEEDED</code> его нет.
+- <strong>Stripped binaries</strong> — вырезаны символы и debug-info, бинарный анализ слепнет.
+- <strong>Vendored / <code>third_party/</code></strong> — копия исходников OSS без версии и истории.
+- <strong>Внутренний форк</strong> — выглядит как апстрим, но имеет свои патчи и другой профиль риска.
+- <strong><code>unresolved</code> библиотеки</strong> — <code>.so</code> не маппится ни на один установленный DEB-пакет.</p>
+</blockquote>
+<h2 id="связь-с-нормативкой">Связь с нормативкой</h2>
+<p><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> требует управляемости работ; <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2, PW.4, RV.1) задаёт связку «SBOM — сторонние компоненты — реакция на уязвимости»; <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> — критерии качества SBOM; <a href="doc-d90628b348e5.html">CERT C C++</a> и <a href="doc-c1e10b3dd003.html">MISRA C C++</a> объясняют, почему риск C/C++ компонента высок. Шаблоны: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a>, <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a>.</p>
+<h2 id="что-уносим-в-работу">Что уносим в работу</h2>
+<ul>
+<li>Почему «хороший» SBOM по C/C++ — это <strong>честный</strong> SBOM, и чем он отличается от плохого: <a href="doc-86a93db6f0fb.html">Почему генерация SBOM — это искусство</a>.</li>
+<li>Тишина в C/C++ SBOM — это не «зависимостей нет», а сигнал к проверке статики и vendored.</li>
+<li>Сначала <code>readelf -d</code> + <code>dpkg -S</code> для динамики, потом отдельно ищем статически вшитое.</li>
+<li>Полноту даёт build-scan, не поздний скан бинаря.</li>
+<li>Любую <code>.so</code> без DEB-координаты заносим в реестр unresolved libraries с ответственным.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a>, <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>, <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>, <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OWASP depscan — КАПО · Пиков</title><meta name="description" content="OWASP depscan. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-ee21843f3dc5.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="owasp-depscan">OWASP depscan</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>depscan — сканер «следующего поколения», который делает упор не на длине списка CVE, а на приоритизации и пояснении. Он собирает SBOM сам (через встроенный cdxgen), обогащает находки оценками эксплуатируемости (EPSS), признаком наличия в KEV и эвристикой достижимости/reachability, а на выходе формирует машинный VDR в формате CycloneDX. Цель — отдать команде короткий список того, что реально требует действия.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запускается чаще всего как контейнер по корню проекта; тип проекта определяется автоматически, либо задаётся явно:</p>
+<blockquote>
+<p>Команда</p>
+</blockquote>
+<pre><code class="language-bash">docker run --rm -v "$PWD:/app" ghcr.io/owasp-dep-scan/dep-scan \
+  depscan --src /app --reports-dir /app/reports \
+  --profile appsec
+# явный тип проекта и каталог отчётов
+depscan --src . --type python --reports-dir reports</code></pre>
+<p>На выходе — <code>*.vdr.json</code> (CycloneDX VDR) и сводка с приоритетом. Записи несут не только <code>id</code> (CVE/GHSA), но и контекст: процент EPSS, флаг KEV, признак достижимости. Это удобно подавать в гейт: блокировать не по severity, а по «EPSS высок И компонент достижим». PURL компонента — стандартный, вида <code>pkg:pypi/django@2.2.0</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Встроенная приоритизация: EPSS + KEV + reachability дают понятный «топ к исправлению», а не сырую простыню CVE.</li>
+<li>Самодостаточность: тянет cdxgen внутри, поэтому генерация SBOM и сканирование — один шаг, удобно для CI «из коробки».</li>
+<li>Машинный VDR в CycloneDX на выходе — напрямую ложится в процесс VDR/VEX и в Dependency-Track.</li>
+<li>Профили (<code>appsec</code>, <code>research</code> и др.) переключают глубину анализа под задачу — от быстрого гейта до подробного разбора.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Reachability и качество приоритизации сильно зависят от языка и зрелости анализатора; для части стеков это лишь обогащение метаданными, а не настоящий анализ достижимости.</li>
+<li>Наследует слабые места cdxgen по нативному C/C++: без пакетного менеджера координаты неполны.</li>
+<li>EPSS/KEV подтягиваются из внешних источников — в закрытом контуре их нужно зеркалировать, иначе обогащение деградирует до обычного матчинга.</li>
+<li>Менее распространён, чем Grype/Trivy; меньше готовых интеграций и примеров под нестандартные пайплайны.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Базы уязвимостей depscan кэширует локально (каталог <code>~/.local/share/vdb</code>) и умеет работать с готовым кэшем без сети. Сложность — в обогащении: актуальные EPSS и KEV приходят извне, поэтому в закрытом контуре нужно регулярно завозить их снапшоты во внутреннее зеркало. После наполнения кэша и фидов прогон автономен.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и VDR/VEX</a> · <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a>
+Практика: <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX</a>
+Смежные карточки: <a href="doc-35e5f81f86fe.html">cdxgen</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-d18b969b4915.html">CISA KEV</a> · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-0678004e9f55.html">OWASP Dependency-Track</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

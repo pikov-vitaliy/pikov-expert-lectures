@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>pkg-config — КАПО · Пиков</title><meta name="description" content="pkg-config. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e4184a38ebbe.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="pkg-config">pkg-config</h1>
+<blockquote>
+<p>Контекст
+pkg-config — утилита, которая отдаёт сборочной системе флаги компиляции и линковки для установленных библиотек на основе их <code>*.pc</code>‑файлов. Сама библиотека публикует свой метаданный файл (например, <code>/usr/lib/pkgconfig/openssl.pc</code>), где указаны версия, пути и зависимости. Для SCA это один из немногих мест в C/C++, где у системной библиотеки есть задекларированная версия на этапе конфигурации сборки.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>pkg-config отвечает на вопрос «какие <code>-I</code>, <code>-L</code>, <code>-l</code> нужны, чтобы собрать против библиотеки X, и какой она версии». Он читает <code>*.pc</code>‑файлы из путей <code>PKG_CONFIG_PATH</code>, разрешает транзитивные <code>Requires:</code> и выдаёт согласованный набор флагов. В инвентаризации он полезен как источник <em>задекларированной</em> версии и графа межбиблиотечных зависимостей до сборки.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Получить версию и флаги библиотеки:</p>
+<pre><code class="language-bash">pkg-config --modversion openssl        # → 3.2.1
+pkg-config --cflags --libs openssl     # → -I/usr/include  -lssl -lcrypto
+pkg-config --print-requires gtk+-3.0   # транзитивные Requires
+</code></pre>
+<p>Пример <code>*.pc</code>‑файла, который читает утилита:</p>
+<pre><code class="language-text"># /usr/lib/x86_64-linux-gnu/pkgconfig/openssl.pc
+Name: OpenSSL
+Version: 3.2.1
+Requires.private: libssl libcrypto
+Libs: -L${libdir} -lssl -lcrypto
+</code></pre>
+<p><code>Version:</code> и <code>Requires</code> отсюда дают версию и связи компонента ещё до того, как соберётся бинарь.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Даёт <em>задекларированную версию</em> системной библиотеки (<code>--modversion</code>) — то, чего нет ни в CMake <code>find_package</code>, ни в <code>-lssl</code> из Makefile.</li>
+<li>Разрешает транзитивные <code>Requires:</code>/<code>Requires.private:</code> — виден маленький граф зависимостей между системными библиотеками.</li>
+<li>Универсален и встроен в большинство autotools/CMake/Meson‑проектов; данные читаются скриптом без сборки.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Версия из <code>*.pc</code> — это версия <em>установленного dev‑пакета</em>, а не гарантия того, что слинкуется именно она (на проде может оказаться другая <code>.so</code>).</li>
+<li>Покрывает только библиотеки, поставившие <code>*.pc</code>. Многие библиотеки и весь vendored‑код их не публикуют.</li>
+<li>Не различает статику и динамику по факту: <code>Libs</code>/<code>Libs.private</code> описывают намерение, а реальная модель линковки видна лишь в артефакте.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. pkg-config полностью локален: читает <code>*.pc</code>‑файлы из файловой системы и ничего не скачивает. Работает в любом закрытом контуре, где установлены dev‑пакеты библиотек; сетевого доступа не требует.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-c6a99c0dee86.html">CMake</a> · <a href="doc-143d4440b290.html">qmake</a> · <a href="doc-50df475ac430.html">ldd readelf LIEF</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

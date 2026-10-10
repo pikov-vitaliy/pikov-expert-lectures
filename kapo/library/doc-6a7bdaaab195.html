@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>version normalization — КАПО · Пиков</title><meta name="description" content="version normalization. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6a7bdaaab195.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="version-normalization">version normalization</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Матчинг на уязвимости — это не сравнение строк, а проверка попадания версии в уязвимый диапазон CVE (<code>versionStartIncluding</code>, <code>versionEndExcluding</code>). Но «версия» в C/C++ записывается десятком несовместимых способов: upstream-тег <code>3.0.11</code>, debian-версия <code>3.0.11-1~deb12u2</code> с epoch и ревизией, RPM-релиз <code>3.0.11-2.el9</code>, строка из бинаря <code>OpenSSL 3.0.11 19 Sep 2023</code>, suffix <code>1.2.13.dfsg</code>. Если в SBOM попала дистрибутивная строка целиком, а CVE оперирует upstream-версией, сравнение версий ломается — и снова не как ошибка, а как тишина в findings.</p>
+<p>C/C++ особенно уязвим, потому что одна и та же библиотека приходит из разных миров с разными схемами версий: системный <code>apt</code>/<code>rpm</code>, Conan, ручной <code>third_party/</code>. Нормализация версии — это приведение к той форме, в которой её сравнивает целевая база уязвимостей, с сохранением исходной строки для трассировки.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Дистрибутивная версия несёт лишние компоненты, которых нет в CVE-диапазоне:</p>
+<pre><code class="language-text">upstream (как в CVE):   3.0.11
+deb:                    3.0.11-1~deb12u2        epoch?  rev=-1  +~deb12u2
+rpm:                    3.0.11-2.el9            release=-2.el9
+из бинаря:              "OpenSSL 3.0.11 19 Sep 2023"
++dfsg/+ds:              1.2.13.dfsg-1           +dfsg — переупаковка, не апстрим-версия
+epoch:                  1:1.2.13.dfsg-1         ведущее "1:" — debian epoch
+</code></pre>
+<p>Сравнение версий по-разному ведёт себя в разных схемах: для deb это <code>dpkg --compare-versions</code>, для rpm — <code>rpmdev-vercmp</code>, для упорядоченных по компонентам — semver. Поэтому одну и ту же версию нельзя сравнивать «как строку»:</p>
+<pre><code class="language-bash">$ dpkg --compare-versions "3.0.11-1~deb12u2" lt "3.0.11" &amp;&amp; echo "tilde &lt; release"
+tilde &lt; release          # ~ делает версию МЕНЬШЕ базовой — частый источник ошибок
+</code></pre>
+<p>Для матчинга на NVD из <code>3.0.11-1~deb12u2</code> нужно извлечь upstream-ядро <code>3.0.11</code>; ревизию <code>-1~deb12u2</code> и epoch сохранить отдельно — они различают сборку, но не входят в CVE-диапазон upstream.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — сравнивать версии лексикографически и терять смысл суффиксов. <code>3.0.11-1~deb12u2</code> строкой «больше» <code>3.0.11</code>, а по правилам Debian — меньше; <code>1.2.13.dfsg</code> — это та же upstream <code>1.2.13</code>, переупакованная. Приём: знать схему версии источника (deb/rpm/semver) и сравнивать её родными правилами, отделяя upstream-ядро (для CVE-диапазона) от distro-метаданных (для трассировки сборки). Не выкидывайте epoch и ревизию — сохраняйте их рядом.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Для каждого компонента фиксировать схему версии источника: deb, rpm, conan/semver, строка из бинаря.</li>
+<li>Выделять upstream-ядро версии для матчинга на upstream-CVE; epoch/ревизию/<code>+dfsg</code> хранить отдельно как distro-метаданные.</li>
+<li>Сравнивать версии родными правилами: <code>dpkg --compare-versions</code> для deb, <code>rpm</code>-сравнение для rpm, semver — для упорядоченных.</li>
+<li>Сверять не точную строку, а попадание в уязвимый диапазон CVE (<code>versionStartIncluding</code>/<code>versionEndExcluding</code>).</li>
+<li>Сохранять исходную строку версии в SBOM как evidence — не затирать её нормализованной.</li>
+<li>Отдельно проверять версии, восстановленные из бинаря: формат там свободный и легко искажается.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> (версия — часть координаты), <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> (разные источники версий).</li>
+<li>Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> (версия внутри PURL), <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> (версия в CPE-диапазоне).</li>
+<li>Нормативка: <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (точность идентификаторов, включая версию), <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> (версия как базовый элемент), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1).</li>
+<li>Смежные заметки: <a href="doc-4bd8e3178892.html">dpkg apt metadata</a> (откуда deb-версии с epoch), <a href="doc-18ad3858fbbc.html">CPE alias для libssl3</a> (версия + alias), <a href="doc-9fa864f09c7c.html">detection accuracy</a> (версия как источник пропусков).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

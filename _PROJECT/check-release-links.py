@@ -86,6 +86,7 @@ def resolve_internal(url, payload):
 def audit(index_path):
     index = json.loads(index_path.read_text(encoding='utf-8-sig'))
     payload, references, html_count = {}, [], 0
+    content_issues = []
     for target in index:
         domain = target['domain']
         if domain in payload:
@@ -98,17 +99,24 @@ def audit(index_path):
                     html_count += 1
                     content = archive.read(name).decode('utf-8-sig')
                     parsed = References(source, content)
+                    if re.search(r'class=["\'][^"\']*\bvisual-placeholder\b', content, re.I):
+                        content_issues.append({'source': source, 'url': source, 'issue': 'unpublished visual placeholder'})
                     references.extend((source, u) for u in parsed.references)
                     for style in re.findall(r'<style\b[^>]*>(.*?)</style>', content, re.I | re.S):
                         references.extend((source, u) for u in css_references(source, style))
                 elif name.lower().endswith('.css'):
                     references.extend((source, u) for u in css_references(source, archive.read(name).decode('utf-8-sig')))
+                elif name.lower().endswith('.svg'):
+                    try:
+                        ElementTree.fromstring(archive.read(name))
+                    except ElementTree.ParseError as error:
+                        content_issues.append({'source': source, 'url': source, 'issue': 'invalid SVG XML: ' + str(error)})
                 elif name.lower().endswith(('.md', '.markdown')):
                     references.extend((source, u) for u in markdown_references(source, archive.read(name).decode('utf-8-sig')))
                 elif name == 'sitemap.xml':
                     doc = ElementTree.fromstring(archive.read(name))
                     references.extend((source, node.text) for node in doc.iter() if node.tag.endswith('}loc') or node.tag == 'loc')
-    issues = []
+    issues = content_issues
     for domain, names in payload.items():
         if 'index.html' not in names:
             issues.append({'source': domain, 'url': '/', 'issue': 'missing entry page'})

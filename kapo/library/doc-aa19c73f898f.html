@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cargo-sbom — КАПО · Пиков</title><meta name="description" content="cargo-sbom. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-aa19c73f898f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cargo-sbom">cargo-sbom</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>cargo-sbom — узкоспециализированный генератор SBOM для проектов на Rust. Он читает результат разрешения зависимостей Cargo (метаданные <code>Cargo.lock</code>/<code>cargo metadata</code>) и строит точный SBOM именно для crates: с прямыми и транзитивными зависимостями, версиями и источниками crate. Это тот случай, когда «родной» генератор знает экосистему лучше, чем универсальный.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запуск в корне Rust-проекта с выбором формата:</p>
+<pre><code class="language-bash">cargo sbom --output-format cyclone_dx_json_1_4 &gt; sbom.cdx.json
+cargo sbom --output-format spdx_json_2_3 &gt; sbom.spdx.json
+</code></pre>
+<p>Каждый crate получает PURL вида <code>pkg:cargo/serde@1.0.197</code>, а корневой пакет и зависимости связываются по фактическому графу разрешения Cargo, а не по «плоскому» списку из манифеста.</p>
+<blockquote>
+<p>«Родной» генератор точнее универсального
+cargo-sbom берёт состав из фактического графа разрешения Cargo, а не угадывает по манифесту. Для Rust это даёт корректные <code>pkg:cargo</code> PURL и честное различение прямых и транзитивных зависимостей.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Точность для Rust: данные берутся из реального графа разрешения Cargo, без эвристик.</li>
+<li>Корректные <code>pkg:cargo</code> PURL и различение прямых/транзитивных зависимостей.</li>
+<li>Экспорт и в CycloneDX, и в SPDX — встраивается в любую трассировку.</li>
+<li>Минимальная настройка: работает «из коробки» в каноничном Rust-проекте.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Слепая зона на границе с C
+cargo-sbom видит crate, но не нативные C-библиотеки, которые <code>*-sys</code>-крейты и build-скрипты подтягивают и линкуют. Для таких зависимостей Rust-SBOM нужно дополнять анализом бинаря (<a href="doc-9e42322f0345.html">blint</a>).</p>
+</blockquote>
+<ul>
+<li>Только Rust/Cargo; для любых других экосистем бесполезен.</li>
+<li>Видит зависимости уровня crate, но не учитывает нативные C-библиотеки, подтянутые через <code>*-sys</code>-крейты и сборочные скрипты.</li>
+<li>Зависит от наличия валидного <code>Cargo.lock</code>/разрешённого графа.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью офлайн при наличии локального кеша Cargo (<code>~/.cargo</code>) или внутреннего реестра crate (registry mirror). Генерация идёт по уже разрешённому графу, обращений в сеть не требует — пригодно для закрытого контура с зеркалом crates.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-4a0b7bceee7b.html">М04 Идентификаторы</a> · <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-35e5f81f86fe.html">cdxgen</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

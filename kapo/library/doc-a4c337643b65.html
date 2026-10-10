@@ -1,0 +1,43 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NVD — КАПО · Пиков</title><meta name="description" content="NVD. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a4c337643b65.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="nvd">NVD</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>NVD (National Vulnerability Database, NIST) — это <strong>слой обогащения поверх CVE List</strong>: к каждой записи CVE NVD добавляет вектор и оценку CVSS, привязку к слабостям CWE и формальный список затронутых конфигураций в виде CPE-критериев (<code>cpe:2.3:...</code>). Именно эти CPE-конфигурации позволяют сопоставлять уязвимость с продуктом по его координатам, а не только по тексту.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>NVD отдаёт данные через NVD API 2.0 (JSON). Запрос конкретной записи и извлечение CVSS-вектора и CPE-критериев:</p>
+<pre><code class="language-bash">curl -s "https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2022-25883" \
+  | jq '.vulnerabilities[0].cve | {id, metrics:.metrics.cvssMetricV31[0].cvssData, cpe:[.configurations[0].nodes[0].cpeMatch[0]]}'
+</code></pre>
+<p>Ключевой артефакт — CPE Match в конфигурации, по которому строится сопоставление «компонент ↔ уязвимость»:</p>
+<pre><code class="language-json">{ "criteria": "cpe:2.3:a:npmjs:semver:*:*:*:*:*:node.js:*:*",
+  "versionEndExcluding": "7.5.2", "vulnerable": true }
+</code></pre>
+<p>Сканеры, работающие по CPE (например, OWASP Dependency-Check), скачивают фид NVD целиком и матчат компоненты офлайн по этим критериям; для массовых выгрузок используют пагинацию API и инкрементальное обновление по <code>lastModStartDate</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Готовые CVSS v3.1/v4.0 базовые оценки и векторы — основа для первичной приоритизации.</li>
+<li>Структурированные CPE-конфигурации с диапазонами версий (<code>versionStartIncluding</code>/<code>versionEndExcluding</code>) — машинное сопоставление по координатам.</li>
+<li>Привязка CVE→CWE даёт классификацию причины уязвимости.</li>
+<li>Стабильный REST API 2.0 и официальные фиды для полного зеркалирования.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Хроническое отставание обогащения: с 2024 года у NVD большой беклог необогащённых CVE (нет CPE/CVSS) — «пусто в NVD» не равно «безопасно».</li>
+<li>Сопоставление через CPE хрупкое: расхождение vendor/product в имени приводит к ложным минусам (см. практику CPE alias).</li>
+<li>Без ключа API строгие лимиты частоты запросов; полная синхронизация фида занимает время.</li>
+<li>Покрывает мировую базу CVE, но не заменяет национальный источник (БДУ ФСТЭК) для требований регулятора.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично/да. NVD публикует фиды для полной локальной репликации; многие сканеры (Dependency-Check, Trivy и др.) кэшируют базу NVD и матчат компоненты без доступа в интернет после первичной загрузки. В закрытом контуре практикуется периодическая выгрузка фида на «чистой» машине и перенос в изолированную сеть. Прямые онлайн-запросы к <code>services.nvd.nist.gov</code> из изолированного контура невозможны.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a></p>
+<p>Смежные карточки: <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-d85f78927400.html">CWE</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a> · <a href="doc-d18b969b4915.html">CISA KEV</a> · <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> · <a href="doc-56e1c2ed4ba7.html">OWASP Dependency-Check</a> · <a href="doc-99f61d072a43.html">Grype</a></p>
+<p>Практики: <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

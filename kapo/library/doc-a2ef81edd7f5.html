@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Microsoft SBOM Tool — КАПО · Пиков</title><meta name="description" content="Microsoft SBOM Tool. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a2ef81edd7f5.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="microsoft-sbom-tool">Microsoft SBOM Tool</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Microsoft SBOM Tool (sbom-tool) генерирует SBOM в формате SPDX 2.2 для каталога сборки. Его особенность — связка содержимого с метаданными конвейера: на выходе документ с зафиксированными именем, версией и пространством имён пакета, плюс файловые хеши. Внутри он использует ComponentDetection, поэтому опознаёт зависимости множества менеджеров.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Генерация по каталогу с собранными артефактами и манифестами:</p>
+<pre><code class="language-bash">sbom-tool generate -b ./buildDropPath -bc ./buildComponentPath \
+  -pn MyApp -pv 1.4.2 -ps Organization -nsb https://sbom.example.org
+</code></pre>
+<p>Результат кладётся в <code>_manifest/spdx_2.2/manifest.spdx.json</code>. Документ содержит <code>SPDXID</code>, <code>documentNamespace</code> с уникальным URI, перечень <code>packages</code> с PURL во <code>externalRefs</code> и <code>files</code> с <code>SHA256</code>/<code>SHA1</code>-хешами.</p>
+<blockquote>
+<p>Разделяйте «что собрали» и «из чего»
+<code>-b</code> (build drop) — это итоговые артефакты, <code>-bc</code> (build components) — каталог с манифестами зависимостей. Явная граница между ними определяет, что попадёт в SBOM как продукт, а что — как зависимость. Перепутанные пути дают либо раздутый, либо пустой состав.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Сразу даёт валидный SPDX 2.2 с пространством имён и файловыми хешами — пригоден как доказательная единица.</li>
+<li>ComponentDetection покрывает npm, NuGet, PyPI, Maven, Go, Cargo и др. одним проходом.</li>
+<li>Чёткое разделение «что собрали» (build drop) и «из чего собрали» (build components) — управляемая граница SBOM.</li>
+<li>Кроссплатформенный CLI, удобно встраивается в конвейер сборки .NET и не только.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Только SPDX на выходе
+Нативного CycloneDX нет. Если трассировка Организации построена на CycloneDX, документ придётся конвертировать (например, через <a href="doc-94fc7a33c25d.html">protobom</a>), а часть SPDX-специфичных полей при этом упростится.</p>
+</blockquote>
+<ul>
+<li>Жёстко завязан на SPDX; нативного CycloneDX на выходе нет — нужна конвертация.</li>
+<li>Ориентирован на каталог артефактов сборки, а не на готовый контейнерный образ из реестра.</li>
+<li>Для C/C++ без поддерживаемого менеджера детектирование зависимостей слабое.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Генерация манифеста и хеширование работают офлайн. Опциональное обогащение лицензий обращается к внешнему API ClearlyDefined — в закрытом контуре эту функцию отключают (<code>-li false</code>, <code>-pm false</code>), и тогда сеть не нужна. Пространство имён (<code>-nsb</code>) задаётся на внутренний домен Организации.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-94fc7a33c25d.html">protobom</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>
