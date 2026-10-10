@@ -1,0 +1,81 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П22. ELF dynamic dependencies — КАПО · Пиков</title><meta name="description" content="П22. ELF dynamic dependencies. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-68e23af83949.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п22-elf-dynamic-dependencies">П22. ELF dynamic dependencies</h1>
+<h2 id="цель">Цель</h2>
+<p>Снять с готового ELF-бинаря список динамически слинкованных библиотек (записи <code>DT_NEEDED</code>) и смаппить каждую <code>.so</code> на установленный DEB-пакет с версией. Проверяемый результат: таблица «<code>.so</code> → DEB-пакет → версия → PURL <code>pkg:deb/...</code>», где для каждой динамической библиотеки заполнены все четыре колонки или явно отмечено <code>unresolved</code>.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># 1. динамические зависимости из секции .dynamic (надёжнее ldd: не запускает бинарь)
+readelf -d ./app | grep NEEDED
+
+# 2. фактические пути, по которым резолвятся .so на этой системе
+ldd ./app
+
+# 3. маппинг конкретной .so на DEB-пакет
+dpkg -S $(ldconfig -p | awk '/libssl.so.3/{print $NF; exit}')
+
+# 4. версия пакета для PURL
+dpkg-query -W -f='${Package} ${Version}\n' libssl3
+</code></pre>
+<blockquote>
+<p><code>readelf -d</code> против <code>ldd</code>
+<code>ldd</code> показывает, что фактически подгрузится (с учётом <code>RPATH</code>/<code>LD_LIBRARY_PATH</code>), но для этого по сути запускает динамический загрузчик — на чужом бинаре это нежелательно. <code>readelf -d ./app | grep NEEDED</code> читает секцию <code>.dynamic</code> статически, ничего не исполняя. Для инвентаризации опирайтесь на <code>readelf</code>, <code>ldd</code> используйте для уточнения путей.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p><code>readelf -d</code> — записи <code>NEEDED</code> (фрагмент):</p>
+<pre><code class="language-text"> 0x0000000000000001 (NEEDED) Shared library: [libssl.so.3]
+ 0x0000000000000001 (NEEDED) Shared library: [libcrypto.so.3]
+ 0x0000000000000001 (NEEDED) Shared library: [libz.so.1]
+ 0x0000000000000001 (NEEDED) Shared library: [libc.so.6]
+</code></pre>
+<p><code>dpkg -S</code> — путь → пакет:</p>
+<pre><code class="language-text">libssl3:amd64: /usr/lib/x86_64-linux-gnu/libssl.so.3
+</code></pre>
+<p>Итоговая таблица (ориентир: число строк равно числу <code>NEEDED</code> за вычетом <code>libc</code>/<code>libstdc++</code>, которые учитываются как системный runtime):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>.so</th>
+<th>DEB-пакет</th>
+<th>Версия</th>
+<th>PURL</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>libssl.so.3</td>
+<td>libssl3</td>
+<td>3.0.11-1~deb12u2</td>
+<td><code>pkg:deb/debian/libssl3@3.0.11-1~deb12u2?arch=amd64</code></td>
+</tr>
+<tr>
+<td>libz.so.1</td>
+<td>zlib1g</td>
+<td>1:1.2.13.dfsg-1</td>
+<td><code>pkg:deb/debian/zlib1g@1.2.13.dfsg-1?arch=amd64</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Чего здесь принципиально не видно
+В <code>DT_NEEDED</code> попадают только <strong>динамические</strong> библиотеки. Если OpenSSL вшит статически (<code>.a</code>), его в этом списке нет вообще — и это не ошибка снятия, а слепая зона: переходите к <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>dpkg -S</code> → <code>no path found matching pattern</code>.</strong> Файл <code>.so</code> не принадлежит ни одному установленному DEB-пакету: библиотека собрана вручную, vendored или из стороннего репозитория. Это <strong>unresolved</strong> — заносите в реестр, не выбрасывайте.</li>
+<li><strong><code>ldd</code> → <code>not a dynamic executable</code>.</strong> Бинарь полностью статический (<code>-static</code>) — динамических зависимостей нет по построению. Весь состав вшит статически, единственный путь — <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> и build-scan.</li>
+<li><strong><code>readelf</code> пуст, а файл — не ELF.</strong> Проверьте формат: <code>file ./app</code>. Если это не <code>ELF ... executable</code>, вы смотрите не на тот артефакт (скрипт-обёртка, архив, не та архитектура).</li>
+<li><strong>Версия в PURL не совпадает с апстрим-версией.</strong> DEB-версия (<code>3.0.11-1~deb12u2</code>) — это версия пакета дистрибутива, а не чистая upstream-версия (<code>3.0.11</code>). Для матчинга на CVE учитывайте обе; нормализация — задача модуля <a href="doc-4a0b7bceee7b.html">М04</a>.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: вывод <code>readelf -d ./app | grep NEEDED</code> и заполненную таблицу «<code>.so</code> → DEB-пакет → версия → PURL» по всем динамическим библиотекам бинаря. Каждая <code>.so</code>, не смапленная на DEB-пакет, должна быть явно помечена <code>unresolved</code> с обоснованием.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Маппинг ELF → DEB даёт компонентам координаты (имя, версия, поставщик) — это базовые элементы SBOM по <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> и критерий полноты по <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>. Управляемость инвентаризации — <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>; связка «SBOM → сторонние компоненты → уязвимости» — PW.4/RV.1 <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>.
+Смежные практики модуля <a href="doc-fa808e147d8e.html">М09</a>: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>, <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>. Шаблон: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

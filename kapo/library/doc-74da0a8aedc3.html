@@ -1,0 +1,80 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М04. Конспект: идентификаторы компонентов и уязвимостей — КАПО · Пиков</title><meta name="description" content="М04. Конспект: идентификаторы компонентов и уязвимостей. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-74da0a8aedc3.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-модуль">Зачем модуль</a></li>
+<li><a href="#ключевые-идеи">Ключевые идеи</a></li>
+<li><a href="#как-выглядит-на-практике">Как выглядит на практике</a></li>
+<li><a href="#слепые-зоны-именно-этой-темы">Слепые зоны именно этой темы</a></li>
+<li><a href="#связь-с-нормативкой">Связь с нормативкой</a></li>
+<li><a href="#что-уносим-в-работу">Что уносим в работу</a></li>
+</ul>
+</div>
+<h1 id="конспект-идентификаторы-компонентов-и-уязвимостей">Конспект: идентификаторы компонентов и уязвимостей</h1>
+<h2 id="зачем-модуль">Зачем модуль</h2>
+<p>Сканер уязвимостей не анализирует код компонента — он соединяет две таблицы по ключу. С одной стороны лежит ваш компонент с координатой (PURL или CPE), с другой — записи об уязвимостях, привязанные к таким же координатам. Совпали ключи — появилась находка; не совпали — её нет. Поэтому качество SCA определяется не «мощностью» движка, а точностью координат на входе. Самый коварный результат — не ложная тревога (её видно и можно снять), а <strong>молчаливый пропуск</strong>: компонент уязвим, но без корректного PURL/CPE он просто не попал в join и в отчёте отсутствует. Отчёт «0 уязвимостей» при этом выглядит как хорошая новость.</p>
+<h2 id="ключевые-идеи">Ключевые идеи</h2>
+<p><strong>Два мира матчинга.</strong> Экосистемные сканеры (OSV-Scanner, Grype, Trivy в режиме осведомлённости об экосистеме) матчат по <strong>PURL</strong> — пакет в пределах своей экосистемы и диапазон затронутых версий. NVD матчит по <strong>CPE</strong> — <code>vendor:product:version</code>. Это разные системы координат, и компонент должен иметь правильную координату для каждого мира, иначе соответствующий источник его «не увидит».</p>
+<p><strong>PURL — координата экосистемы.</strong> Грамматика: <code>pkg:type/namespace/name@version?qualifiers#subpath</code>. Примеры:
+- <code>pkg:npm/lodash@4.17.21</code>
+- <code>pkg:pypi/django@4.2.1</code>
+- <code>pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1</code>
+- <code>pkg:golang/github.com/gorilla/mux@v1.8.0</code>
+- <code>pkg:deb/debian/curl@7.74.0-1.3?arch=amd64</code></p>
+<p>PURL хорош тем, что у пакетных экосистем уже есть канонические имена — для npm/PyPI/Maven координата вычисляется почти однозначно.</p>
+<p><strong>CPE — координата словаря NVD.</strong> Формата 2.3 это строка ровно из 13 полей: <code>cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw:target_hw:other</code>, где <code>part</code> ∈ {a, o, h}, пустое поле = <code>*</code>. Пример: <code>cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*</code>. CPE назначается централизованно, словарём NVD, и здесь начинаются расхождения имён.</p>
+<p><strong>Идентификаторы уязвимостей — тоже координаты, и их несколько.</strong> <code>CVE-2021-44228</code> (MITRE/NVD), <code>GHSA-jfh8-c2jp-5v3q</code> (GitHub Advisory). OSV (osv.dev) — это и схема, и агрегатор: его записи имеют экосистемные префиксы (<code>PYSEC-…</code>, <code>RUSTSEC-…</code>, <code>GO-…</code>) либо переиспользуют <code>GHSA-…</code>, а поле <code>aliases</code> связывает эквивалентные записи между собой. <strong>БДУ ФСТЭК</strong> — национальный источник с идентификаторами вида <code>BDU:2021-05541</code>; часть записей БДУ вообще не имеет CVE (специфика РФ), а сроки публикации могут опережать или отставать от NVD. Поэтому БДУ — отдельная координатная система, а не перевод NVD.</p>
+<blockquote>
+<p>Alias-проблема CPE
+Один и тот же продукт в словаре NVD может жить под разными vendor. Для curl исторически существуют записи и под <code>cpe:2.3:a:haxx:curl:...</code>, и под <code>cpe:2.3:a:curl:curl:...</code>. Если ваш SBOM использует один vendor, а часть CVE привязана к другому, эти CVE в join не попадут. Сверять CPE по словарю NVD — отдельная ручная работа (<a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>).</p>
+</blockquote>
+<h2 id="как-выглядит-на-практике">Как выглядит на практике</h2>
+<p>Возьмём log4j — все координаты публичны и проверяемы:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Координата</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>PURL</td>
+<td><code>pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1</code></td>
+</tr>
+<tr>
+<td>CPE 2.3</td>
+<td><code>cpe:2.3:a:apache:log4j:2.14.1:*:*:*:*:*:*:*</code></td>
+</tr>
+<tr>
+<td>CVE</td>
+<td><code>CVE-2021-44228</code></td>
+</tr>
+<tr>
+<td>GHSA</td>
+<td><code>GHSA-jfh8-c2jp-5v3q</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>Обратите внимание на расхождение: в Maven компонент — <code>org.apache.logging.log4j</code> / <code>log4j-core</code>, в CPE — vendor <code>apache</code>, product <code>log4j</code>. Это не опечатка, это два независимых именования одного артефакта. Именно поэтому связку PURL↔CPE нельзя выводить простым склеиванием строк — она требует нормализации и проверки по словарю.</p>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-74da0a8aedc3-0.svg" rel="noopener" target="_blank"><img alt="Схема: М04. Конспект: идентификаторы компонентов и уязвимостей" loading="lazy" src="../assets/course-diagrams/course-74da0a8aedc3-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="слепые-зоны-именно-этой-темы">Слепые зоны именно этой темы</h2>
+<ul>
+<li><strong>Битый PURL = тихий ноль.</strong> Лишний приватный qualifier (<code>?repository_url=...</code>, <code>?user=...</code>) или экзотический <code>type</code> уводит компонент мимо публичной базы — находок ноль, ошибки нет. Чистить приватные qualifiers перед матчингом — задача <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>.</li>
+<li><strong>C/C++ без CPE.</strong> У C/C++ часто нет нативного пакетного менеджера, значит нет естественного PURL. Компонент опирается на CPE, а CPE надо проставить вручную — и тут максимально бьёт alias-проблема. См. <a href="doc-fa808e147d8e.html">М09</a>.</li>
+<li><strong>Диапазоны версий, а не точные.</strong> Уязвимость почти всегда описана диапазоном версий. Если у компонента версия не нормализована (<code>v1.2.0</code> против <code>1.2.0</code>, эпохи в deb), попадание в диапазон ломается.</li>
+<li><strong>Не путать identity и severity.</strong> Этот модуль — про то, нашли ли мы уязвимость вообще. Приоритизация (EPSS, KEV, CVSS) — это уже <a href="doc-cd2bdeca5d64.html">М06</a>.</li>
+</ul>
+<h2 id="связь-с-нормативкой">Связь с нормативкой</h2>
+<ul>
+<li><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> RV.1 — непрерывный поиск уязвимостей в компонентах опирается на корректную идентификацию компонента.</li>
+<li><a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> — уникальные идентификаторы как обязательный элемент SBOM.</li>
+<li><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> — критерии качества SBOM, включая полноту и корректность идентификаторов.</li>
+<li><a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> — национальный источник уязвимостей и требования к его учёту.</li>
+</ul>
+<h2 id="что-уносим-в-работу">Что уносим в работу</h2>
+<ol>
+<li>На каждый значимый компонент должны быть <strong>обе</strong> координаты — PURL и CPE; для C/C++ CPE проставляется и сверяется вручную (<a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>).</li>
+<li>Перед матчингом PURL нормализуем и снимаем приватные qualifiers (<a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>).</li>
+<li>«0 уязвимостей» трактуем как гипотезу, а не вывод: проверяем, что компоненты вообще попали в join (есть ли у них координаты).</li>
+<li>CPE сверяем по словарю NVD на alias (vendor может быть не один).</li>
+<li>БДУ ФСТЭК подключаем как самостоятельный источник, не ожидая полного совпадения с NVD по идентификаторам.</li>
+</ol></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

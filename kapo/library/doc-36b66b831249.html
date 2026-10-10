@@ -1,0 +1,50 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CSAF — КАПО · Пиков</title><meta name="description" content="CSAF. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-36b66b831249.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="csaf">CSAF</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>CSAF (Common Security Advisory Framework, OASIS 2.0) — машиночитаемый формат <strong>бюллетеней безопасности</strong>: производитель ПО публикует в нём, какие его продукты затронуты уязвимостью, а какие — нет, с какой версии исправлено и что делать. Это формат самого advisory; источником выступает тот, кто его издаёт (вендор, CERT). Профиль <code>csaf_vex</code> позволяет издавать в CSAF и VEX-утверждения. Для собственного продукта порядок issuer/evidence такой же, как в <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Документ CSAF 2.0 — JSON из трёх крупных частей: <code>document</code> (метаданные, издатель, трекинг), <code>product_tree</code> (дерево продуктов и их версии) и <code>vulnerabilities</code> (привязка CVE к статусам продуктов). Статус продукта задаётся категориями <code>product_status</code>:</p>
+<pre><code class="language-json">{
+  "vulnerabilities": [
+    {
+      "cve": "CVE-2024-0001",
+      "product_status": {
+        "known_affected": ["CSAFPID-0001"],
+        "known_not_affected": ["CSAFPID-0002"],
+        "fixed": ["CSAFPID-0003"],
+        "under_investigation": ["CSAFPID-0004"]
+      }
+    }
+  ]
+}
+</code></pre>
+<p>Продукты в <code>product_status</code> ссылаются на идентификаторы из <code>product_tree</code>, где они описаны через <code>product_identification_helper</code> (включая <a href="doc-17e9049e2a17.html">CPE</a> и хеши). Издатели публикуют CSAF-документы по стандартизованному каталогу (CSAF provider), откуда их забирают автоматически.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Полноценный фреймворк бюллетеня: издатель, трекинг версий, серьёзность (CVSS), ремедиации — а не только статус.</li>
+<li>Дерево продуктов <code>product_tree</code> точно адресует, какая ветка/сборка затронута.</li>
+<li>Профиль <code>csaf_vex</code> совмещает классический бюллетень и VEX в одном стандарте OASIS.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Тяжеловесный по сравнению с <a href="doc-7a6dec2d2bd5.html">OpenVEX</a>: для простого утверждения «не затронуто» избыточен.</li>
+<li>Издавать CSAF корректно сложно — нужен зрелый процесс на стороне вендора (provider-метаданные, подпись).</li>
+<li>Потребление требует разбора <code>product_tree</code> и сопоставления продуктов с вашим SBOM, что нетривиально.</li>
+<li>CSAF поставщика не заменяет ваш VEX, если вы встраиваете его компонент в собственный продукт: сначала проверяется контекст сборки и достижимость кода.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Документы CSAF — обычные JSON-файлы: их создание, валидация по схеме и потребление полностью локальны. В закрытом контуре advisory можно зеркалировать с внешнего provider и раздавать внутри без выхода в интернет.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей</a> · <a href="doc-778f51173f56.html">М13 Нормативная трассировка</a>
+Справка: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>
+Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a>
+Смежные карточки: <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-17e9049e2a17.html">CPE</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

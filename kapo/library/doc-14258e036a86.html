@@ -1,0 +1,48 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GitHub Security Advisory — КАПО · Пиков</title><meta name="description" content="GitHub Security Advisory. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-14258e036a86.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="github-security-advisory">GitHub Security Advisory</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>GitHub Security Advisory (GHSA) — это <strong>база уязвимостей с привязкой к экосистемам пакетных менеджеров</strong> (npm, PyPI, Maven, Go, RubyGems, NuGet, Composer, Rust crates и др.). В отличие от NVD, где компонент описан через CPE, GHSA сразу указывает имя пакета в его реестре и затронутые диапазоны версий. Каждой записи присваивается собственный идентификатор <code>GHSA-xxxx-xxxx-xxxx</code>, который часто (но не всегда) связан с CVE.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>GHSA доступна через GraphQL API GitHub и используется как один из источников экосистемного матчинга в сканерах (Grype, OSV — GHSA входит в агрегат OSV.dev). Запрос advisory по экосистеме:</p>
+<pre><code class="language-graphql">query {
+  securityVulnerabilities(ecosystem: NPM, package: "semver", first: 5) {
+    nodes { advisory { ghsaId, identifiers { type value } }
+            vulnerableVersionRange, firstPatchedVersion { identifier } }
+  }
+}
+</code></pre>
+<p>Фрагмент ответа (то, что реально потребляет SCA — пакет, диапазон, патч):</p>
+<pre><code class="language-json">{ "advisory": { "ghsaId": "GHSA-c2qf-rxjj-qqgw",
+    "identifiers": [{ "type": "CVE", "value": "CVE-2022-25883" }] },
+  "vulnerableVersionRange": "&lt; 7.5.2", "firstPatchedVersion": { "identifier": "7.5.2" } }
+</code></pre>
+<p>Полная база advisories также выгружается из открытого репозитория <code>advisory-database</code> в формате OSV (по файлу на запись), что удобно для офлайн-джойна по PURL.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Координаты сразу в терминах пакетного менеджера и PURL — точный матчинг для OSS без боли с CPE.</li>
+<li>Часто оперативнее NVD: advisory для OSS-пакета нередко появляется раньше или без CVE вовсе.</li>
+<li>Открытая выгрузка <code>advisory-database</code> в формате OSV — единый разбор с OSV.dev.</li>
+<li>Богатые метаданные: затронутые/исправленные версии, ссылки на коммиты-фиксы, severity.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Покрывает экосистемы пакетных менеджеров; системные библиотеки C/C++ без реестра и проприетарное ПО — вне охвата.</li>
+<li>Severity и диапазоны заполняют мейнтейнеры/GitHub — возможны неполнота и расхождения с NVD.</li>
+<li>Часть записей не имеет CVE-идентификатора, что усложняет сшивку с источниками, работающими только по CVE.</li>
+<li>Не заменяет национальный источник для требований регулятора (БДУ ФСТЭК).</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Вся база advisories доступна как открытый Git-репозиторий с записями в формате OSV — его можно полностью зеркалировать в закрытый контур и обновлять по расписанию, затем матчить компоненты локально. Онлайн-обращение к GraphQL API GitHub из изолированной сети недоступно; в нём работают с реплицированным дампом.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a></p>
+<p>Смежные карточки: <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-b869bb94c8bb.html">OSS Index</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a> · <a href="doc-b91f24d1a12a.html">OpenSSF Scorecard</a></p>
+<p>Практики: <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

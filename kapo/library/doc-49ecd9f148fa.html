@@ -1,0 +1,71 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SLSA — КАПО · Пиков</title><meta name="description" content="SLSA. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-49ecd9f148fa.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="slsa">SLSA</h1>
+<h2 id="о-документе">О документе</h2>
+<blockquote>
+<p>Что это
+<strong>SLSA</strong> (Supply-chain Levels for Software Artifacts) — открытый фреймворк OpenSSF, задающий <strong>уровни зрелости защиты процесса сборки и происхождения артефактов</strong> (build provenance). Произносится «salsa». В отличие от SBOM, который отвечает на вопрос «<em>из чего</em> собрано», SLSA отвечает на вопрос «<em>как и где</em> собрано и можно ли этому доверять». Это уровневая модель, а не формат данных.</p>
+</blockquote>
+<p>В редакции v1.0 ядро — трек <strong>Build</strong> с уровнями <strong>L0–L3</strong>: от отсутствия гарантий до полностью изолированной, неподделываемой сборки с подписанным provenance. Provenance при этом обычно выражается через формат in-toto attestation.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Provenance существует (≥ Build L1).</strong> Сборка автоматически порождает машиночитаемое описание происхождения (что, чем и из каких исходников собрано).</li>
+<li><strong>Provenance аутентичен (≥ Build L2).</strong> Происхождение генерируется доверенным build-сервисом и подписано, а не формируется разработчиком вручную.</li>
+<li><strong>Изоляция сборки (Build L3).</strong> Сборка выполняется в изолированной среде, защищённой от вмешательства, исключающей подмену между источником и артефактом.</li>
+<li><strong>Неподделываемость.</strong> Каждый уровень усиливает защиту от того, чтобы provenance можно было сфальсифицировать.</li>
+<li><strong>Уровневое наращивание.</strong> Требования адресуются по трекам и уровням; цель — поднять конкретный артефакт до целевого уровня, а не «соответствовать SLSA» целиком.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<blockquote>
+<p>Артефакты соответствия
+- Подписанный provenance-attestation (in-toto) на релизный артефакт — основной evidence.
+- Конфигурация CI, подтверждающая, что provenance генерируется самим build-сервисом (L2), а не вручную.
+- Описание изоляции сборочной среды и контроля доступа к pipeline (для L3).
+- Запись о проверке подписи provenance перед допуском артефакта в controlled repository.</p>
+</blockquote>
+<p>Соответствие уровней Build их доказательной базе:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Уровень Build</th>
+<th>Что требуется</th>
+<th>Подтверждающий артефакт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>L1</td>
+<td>Provenance существует</td>
+<td>Машиночитаемый provenance на артефакт</td>
+</tr>
+<tr>
+<td>L2</td>
+<td>Provenance подписан build-сервисом</td>
+<td>Подписанный provenance + конфигурация CI</td>
+</tr>
+<tr>
+<td>L3</td>
+<td>Изолированная сборка</td>
+<td>Описание изоляции среды, контроль доступа к pipeline</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li>Генерация и проверка provenance: <a href="doc-6b4e039ebebe.html">П15. SLSA и in-toto provenance</a>.</li>
+<li>Подпись артефактов: <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a>.</li>
+<li>Допуск артефактов и pipeline-контроль: <a href="doc-956aadabef7b.html">Требования к controlled repository</a>, <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a>.</li>
+<li>Контекст модуля: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a>. Смежный документ: <a href="doc-094e43a07d21.html">in-toto</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<blockquote>
+<p>Это учебная карточка
+Карточка пересказывает уровневую модель под курс и не воспроизводит официальную спецификацию. Точные требования по трекам и уровням Build L0–L3 для аудита сверять с актуальной редакцией SLSA и регламентами Организации.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

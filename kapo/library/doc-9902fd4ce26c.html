@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>build logs как аудиторский артефакт — КАПО · Пиков</title><meta name="description" content="build logs как аудиторский артефакт. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9902fd4ce26c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="build-logs-как-аудиторский-артефакт">build logs как аудиторский артефакт</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>В C/C++ единственный момент, когда состав зависимостей виден полностью и достоверно, — это сама сборка. После неё информация теряется: статическая библиотека растворяется в бинаре, символы стрипаются, флаги забываются. Поэтому полный лог компиляции и линковки — не служебный мусор, а <strong>ground truth о составе</strong>: он показывает каждый запуск компилятора, каждый <code>-I</code>/<code>-L</code>/<code>-l</code>, каждый входной <code>.a</code>/<code>.o</code>, переданный линкеру. Поздний скан готового бинаря этого не восстановит — он работает с тем, что от зависимостей осталось, а лог фиксирует, что в них входило.</p>
+<p>Для аудита лог решает задачу доказуемости. Запись в SBOM «компонент X версии Y» приобретает вес только тогда, когда за ней стоит строка лога, где этот компонент реально передан компилятору/линкеру. Без такой привязки SBOM — декларация, с ней — доказательство.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Полный лог сборки получают принудительно verbose-режимом и сохраняют целиком; из него извлекают команды линковки и компиляции:</p>
+<pre><code class="language-bash"># Принудительно полные команды (иначе make/ninja прячут их за «CC app.o»)
+make V=1 2&gt;&amp;1 | tee build.log
+# или: ninja -v ; cmake --build . --verbose ; bear -- make   (compile_commands.json)
+
+# Что реально слинковалось: входные .a/.o и флаги -l/-L в команде линкера
+grep -E '\b(gcc|g\+\+|c\+\+|ld|clang\+\+)\b' build.log | grep -oE '[^ ]+\.a|[^ ]+\.o|-l[a-z0-9_]+|-L *[^ ]+'
+
+# Какие заголовки и include path видел компилятор
+grep -oE '\-I *[^ ]+' build.log | sort -u
+
+# Compile DB как структурированный аналог лога
+jq -r '.[].command' compile_commands.json | grep -oE '\-l[a-z0-9_]+' | sort -u
+</code></pre>
+<p>Каждая такая строка — кандидат на компонент SBOM и одновременно его доказательство (evidence).</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — <strong>немой лог</strong>. По умолчанию <code>make</code>/<code>ninja</code>/CMake печатают только цели (<code>CC app.o</code>, <code>LINK app</code>), скрывая фактические команды. В таком логе ни одной зависимости не видно, и его легко принять за «ничего интересного». Второй провал — лог не сохраняют: сборка прошла в CI, контейнер удалён, evidence исчезло вместе с ним.</p>
+<blockquote>
+<p>Приём: build-scan вместо пост-скана
+Перехват вызовов компилятора во время сборки (<code>bear</code>, <code>compiledb</code>, verbose-режим сборщика) даёт состав, который не восстановить из бинаря, — в частности статически слинкованные библиотеки, которые после линковки не оставляют <code>DT_NEEDED</code>. Сохраняйте полный лог как иммутабельный артефакт сборки рядом с бинарём и SBOM (см. <a href="doc-ae9d449dcb2c.html">статическая линковка</a>).</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Включите полный verbose-режим (<code>make V=1</code>, <code>ninja -v</code>, <code>cmake --build . --verbose</code>) и пишите лог целиком в файл.</li>
+<li>Снимите <code>compile_commands.json</code> (<code>bear -- make</code> / <code>-DCMAKE_EXPORT_COMPILE_COMMANDS=ON</code>) — структурированный, машиночитаемый источник состава.</li>
+<li>Извлеките из лога входные <code>.a</code>/<code>.o</code>, флаги <code>-l</code>/<code>-L</code>/<code>-I</code> и сопоставьте каждый с компонентом SBOM.</li>
+<li>Привяжите записи SBOM к строкам лога как evidence; то, что в логе есть, а в SBOM нет, — пропуск генератора (см. <a href="doc-91fc18825af4.html">SBOM evidence occurrences</a>).</li>
+<li>Сохраняйте лог как иммутабельный артефакт сборки (артефакт-репозиторий, хеш), а не как временный вывод CI.</li>
+<li>Для приёмки чужой сборки требуйте build-лог в составе поставки — без него полнота состава не доказуема (см. <a href="doc-8333283e22d3.html">поставка от соисполнителя</a>).</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>; доказательная база — <a href="doc-778f51173f56.html">М13. Нормативная трассировка</a>.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. make build inventory</a> (инвентаризация из лога сборки), <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a>, <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>.</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (документация и управляемость процесса разработки), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2 — provenance, PW.4), <a href="doc-49ecd9f148fa.html">SLSA</a> (build provenance).</li>
+<li>Смежные 06: <a href="doc-ae9d449dcb2c.html">статическая линковка</a>, <a href="doc-e70b62e31bd7.html">компиляция и линковка</a>, <a href="doc-06c6cc985f59.html">unresolved libraries</a>, <a href="doc-23ddb7fbc5e2.html">containerized build</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

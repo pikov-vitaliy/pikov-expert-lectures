@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П23. Статическая линковка как слепая зона — КАПО · Пиков</title><meta name="description" content="П23. Статическая линковка как слепая зона. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-deff60ff9043.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п23-статическая-линковка-как-слепая-зона">П23. Статическая линковка как слепая зона</h1>
+<h2 id="цель">Цель</h2>
+<p>На одном и том же коде показать разницу между динамической и статической сборкой: для динамической библиотека видна в <code>DT_NEEDED</code>, для статической — исчезает из секции <code>.dynamic</code>, и её присутствие приходится доказывать косвенно (по символам и строкам). Проверяемый результат: два бинаря из одного исходника и доказательство, что поздний скан статического бинаря НЕ даёт версию вшитой библиотеки.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># 1. собрать один и тот же код дважды: динамика и статика
+g++ main.cpp -o app_dyn -lssl -lcrypto -lz
+g++ main.cpp -o app_static -l:libssl.a -l:libcrypto.a -l:libz.a -static-libstdc++
+
+# 2. сравнить динамические зависимости
+readelf -d ./app_dyn    | grep NEEDED      # OpenSSL виден
+readelf -d ./app_static | grep NEEDED      # OpenSSL НЕ виден
+
+# 3. косвенный поиск вшитого кода: символы и строки версий
+nm -C ./app_static 2&gt;/dev/null | grep -i -E 'SSL_|OPENSSL' | head
+strings ./app_static | grep -iE 'OpenSSL [0-9]+\.[0-9]+'
+</code></pre>
+<blockquote>
+<p>Главный тезис практики
+Поздний скан <strong>готового</strong> бинаря не равен build-scan. У статически слинкованной библиотеки нет ни <code>DT_NEEDED</code>, ни DEB-пакета, ни (в stripped-бинаре) символов. Версию приходится угадывать по строке вида <code>OpenSSL 3.0.11</code> — если она вообще осталась. Это и есть слепая зона C/C++ SCA.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Динамический бинарь — OpenSSL в <code>NEEDED</code>:</p>
+<pre><code class="language-text">$ readelf -d ./app_dyn | grep NEEDED
+ 0x0000000000000001 (NEEDED) Shared library: [libssl.so.3]
+ 0x0000000000000001 (NEEDED) Shared library: [libcrypto.so.3]
+</code></pre>
+<p>Статический бинарь — тех же записей нет (остаётся только <code>libc</code>/<code>libstdc++</code> или вообще пусто при <code>-static</code>):</p>
+<pre><code class="language-text">$ readelf -d ./app_static | grep NEEDED
+ 0x0000000000000001 (NEEDED) Shared library: [libc.so.6]
+</code></pre>
+<p>Косвенное доказательство присутствия (не всегда есть!): строка версии в <code>strings</code>:</p>
+<pre><code class="language-text">$ strings ./app_static | grep -iE 'OpenSSL [0-9]'
+OpenSSL 3.0.11 19 Sep 2023
+</code></pre>
+<p>Ориентир: разница между <code>app_dyn</code> и <code>app_static</code> — минус 2+ записи <code>NEEDED</code>. Если в stripped-сборке <code>nm</code> пуст и <code>strings</code> не нашёл версию, итог практики — «компонент присутствует, версия из бинаря недоступна», и это правильный, честный результат.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Нет <code>.a</code> библиотек, статика не собирается (<code>cannot find -l:libssl.a</code>).</strong> Установите dev-пакеты со статическими архивами (<code>apt-get install libssl-dev zlib1g-dev</code>) или соберите учебный пример с любой доступной <code>.a</code>. Цель практики — увидеть исчезновение из <code>DT_NEEDED</code>, конкретная библиотека вторична.</li>
+<li><strong><code>nm</code> выдаёт <code>no symbols</code>.</strong> Бинарь stripped (<code>strip</code> или сборка с <code>-s</code>). Это не сбой — это ровно демонстрация слепой зоны: символов нет, остаётся только <code>strings</code> (и тот может быть пуст). Зафиксируйте это как результат.</li>
+<li><strong><code>strings</code> не находит версию.</strong> Многие библиотеки не вшивают строку версии. Вывод: из бинаря версию не восстановить — нужен build-log (<a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>) или Conan-граф (<a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>). Это и есть ключевой урок.</li>
+<li><strong><code>readelf -d ./app_static</code> совсем пуст.</strong> При полном <code>-static</code> динамической секции нет вообще. Тогда сравнивайте не <code>NEEDED</code>, а факт: у <code>app_dyn</code> секция <code>.dynamic</code> есть, у <code>app_static</code> — нет.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: два бинаря из одного исходника, side-by-side вывод <code>readelf -d ... | grep NEEDED</code> для обоих (видно исчезновение библиотеки) и письменный вывод одной фразой — почему поздний скан статического бинаря не заменяет build-scan и где здесь риск false negative при поиске уязвимостей.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Статическая линковка — каноничный пример, почему полнота SBOM достигается на этапе сборки (PS.3.2, PW.4 <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>), а не поздним сканом; управляемость этого этапа требует <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>. Невидимая вшитая библиотека = пропуск компонента = false negative при матчинге, что напрямую снижает качество SBOM по <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> и связано с alias/identity-проблемой модуля <a href="doc-4a0b7bceee7b.html">М04</a>.
+Смежные практики модуля <a href="doc-fa808e147d8e.html">М09</a>: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>, <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>. Шаблон: <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

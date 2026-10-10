@@ -1,0 +1,66 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>private Conan qualifiers — КАПО · Пиков</title><meta name="description" content="private Conan qualifiers. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-59d2d8170564.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="private-conan-qualifiers">private Conan qualifiers</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Когда компонент пришёл из Conan, его PURL несёт не только имя и версию, но и приватные qualifiers: <code>user</code>, <code>channel</code>, recipe revision (<code>rrev</code>), package revision (<code>prev</code>). Пример: <code>pkg:conan/zlib@1.3.1?user=org&amp;channel=stable&amp;rrev=ab12...</code>. Эти поля точно описывают, <em>откуда именно</em> собрался пакет в приватном репозитории, и это ценно для provenance. Но ровно эти же поля ломают матчинг на публичные источники уязвимостей: ни NVD, ни БДУ ФСТЭК не знают про ваш <code>user=org&amp;channel=stable</code>, и попытка найти CVE по PURL целиком даёт ноль совпадений там, где уязвимость на самом деле есть.</p>
+<p>То есть приватные qualifiers создают вилку: для трассируемости их нужно сохранять, а для сопоставления с уязвимостями — отбрасывать. SCA-конвейер обязан уметь и то, и другое одновременно.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Один и тот же компонент в двух представлениях ведёт себя по-разному при поиске уязвимостей:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>PURL</th>
+<th>Назначение</th>
+<th>Матчинг на NVD/БДУ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkg:conan/openssl@3.2.1?user=org&amp;channel=stable&amp;rrev=ab12cd</code></td>
+<td>provenance: точный пакет из приватного репо</td>
+<td>не находит (qualifiers не знакомы)</td>
+</tr>
+<tr>
+<td><code>pkg:conan/openssl@3.2.1</code> (нормализованный)</td>
+<td>сопоставление с публичными источниками</td>
+<td>находит CVE/CPE по <code>openssl 3.2.1</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Где живут qualifiers</p>
+</blockquote>
+<pre><code class="language-bash">conan graph info . --format=json | jq '.graph.nodes[].ref'
+# zlib/1.3.1@org/stable#ab12cd...</code></pre>
+<blockquote>
+<p>Запись <code>name/version@user/channel#rrev</code> — это и есть источник приватных полей PURL. <code>@org/stable</code> → <code>?user=org&amp;channel=stable</code>, <code>#ab12cd</code> → <code>?rrev=ab12cd</code>.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — «тихий ноль»: сканер прогоняет PURL с приватными qualifiers, не находит уязвимостей и помечает компонент чистым, хотя на деле просто не было совпадения по ключу. Это ложноотрицательный результат, который выглядит как успешная проверка.</p>
+<blockquote>
+<p>Нормализация для матчинга, оригинал для provenance
+Храните две формы PURL. Полную (с <code>user</code>/<code>channel</code>/<code>rrev</code>/<code>prev</code>) — в evidence и в поле <code>bom-ref</code> для трассируемости. Нормализованную (только <code>pkg:conan/&lt;name&gt;@&lt;version&gt;</code>) — для запроса к NVD/БДУ. Никогда не подменяйте одну другой молча: иначе теряется либо provenance, либо findings.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Для каждого Conan-компонента сохраните полный PURL c приватными qualifiers как evidence/identity.</li>
+<li>Перед матчингом на уязвимости стройте нормализованный PURL: отбросьте <code>user</code>, <code>channel</code>, <code>rrev</code>, <code>prev</code>, оставьте тип/имя/версию.</li>
+<li>Дополнительно сформируйте CPE-кандидат по <code>name</code>+<code>version</code> — многие источники матчатся по CPE, а не по PURL.</li>
+<li>Проверьте, что «ноль findings» по приватному PURL не маскирует реальную уязвимость: перепроверьте по нормализованной форме.</li>
+<li>Зафиксируйте правило нормализации в политике конвейера, чтобы оно применялось ко всем приватным экосистемам единообразно.</li>
+<li>Если по нормализованному PURL всё равно нет совпадений (форк, патч), переводите компонент в worklist ручной доразметки.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a></li>
+<li>Смежные заметки: <a href="doc-f5b27d7d4408.html">Conan package id graph</a> · <a href="doc-6a7bdaaab195.html">version normalization</a> · <a href="doc-18ad3858fbbc.html">CPE alias</a> · <a href="doc-53c0c842e715.html">PURL generic fallback</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

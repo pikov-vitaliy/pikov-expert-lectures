@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CISA Minimum Elements for SBOM — КАПО · Пиков</title><meta name="description" content="CISA Minimum Elements for SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-8be3c2d9de59.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="cisa-minimum-elements-for-sbom">CISA Minimum Elements for SBOM</h1>
+<h2 id="о-документе">О документе</h2>
+<p>Обновление и расширение <a href="doc-f8e87801f278.html">NTIA-перечня 2021 года</a>, подготовленное CISA (агентство кибербезопасности при Министерстве внутренней безопасности США). Версия 2025 года вышла на публичное обсуждение в августе 2025 (срок комментариев — до 3 октября 2025). Документ переносит «минимальный SBOM» из эпохи первичного внедрения в режим эксплуатации: добавляет поля, которых не хватало для практической верификации (хеш компонента, лицензия), и разводит роли автора SBOM и производителя ПО.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Новые поля данных</strong> по сравнению с NTIA: Component Hash (криптографический отпечаток компонента), License (лицензия использования), Tool Name (инструмент генерации), Generation Context (как и когда собран SBOM).</li>
+<li><strong>Разделение ролей SBOM Author и Software Producer</strong>: явно различаются тот, кто составил SBOM, и тот, кто произвёл компонент; они могут совпадать, но в цепочке OSS/дистрибуции — нет.</li>
+<li><strong>Уточнённые прежние элементы</strong>: версия компонента, производитель ПО, уникальные идентификаторы переформулированы для устранения неоднозначностей NTIA.</li>
+<li><strong>Хеш как якорь целостности</strong>: наличие Component Hash превращает SBOM из декларации в проверяемую опись — компонент в поставке можно сверить с записью.</li>
+<li><strong>Сохранение базы NTIA</strong>: связи зависимостей, машиночитаемость, генерация на каждую версию остаются обязательными.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<ul>
+<li>SBOM с заполненными <code>hashes</code> (SHA-256) по компонентам — отчёт о доле компонентов с хешем; результат сверки хешей артефактов поставки с записями SBOM.</li>
+<li>Поля <code>licenses</code> по компонентам и отчёт о покрытии лицензий (доля компонентов с распознанной лицензией).</li>
+<li><code>metadata.tools</code> (Tool Name) и описание контекста генерации: в каком пайплайне, на каком этапе сборки получен SBOM.</li>
+<li>Явно различённые <code>metadata.authors</code>/<code>supplier</code> (SBOM Author) и <code>metadata.component.supplier</code>/<code>manufacturer</code> (Software Producer).</li>
+<li>Подпись SBOM (Sigstore/cosign) как доказательство, что author-поля не подменены после генерации.</li>
+</ul>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li><a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> и <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> — генерация с хешами и проверка покрытия новых полей.</li>
+<li><a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a> — целостность и авторство SBOM (Component Hash + подпись).</li>
+<li><a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> и <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> — заполнение поля License.</li>
+<li><a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>, <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a> — пороги по хешу/лицензии/инструменту.</li>
+<li>Модули: <a href="doc-97c8afb5a218.html">Модуль М02</a> (SBOM как источник фактов), <a href="doc-778f51173f56.html">Модуль М13</a> (трассировка и evidence).</li>
+<li>База требований: <a href="doc-f8e87801f278.html">NTIA Minimum Elements (2021)</a>; формат-носитель: <a href="doc-9a74303c4069.html">CycloneDX</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<p>Это учебная карточка, а не официальный текст. Версия 2025 на момент составления — редакция для публичного обсуждения; финальные формулировки и состав полей сверяйте с актуальной публикацией CISA «2025 Minimum Elements for a Software Bill of Materials (SBOM)».</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

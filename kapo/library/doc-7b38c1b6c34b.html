@@ -1,0 +1,147 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Паспорт open source библиотеки — КАПО · Пиков</title><meta name="description" content="Паспорт open source библиотеки. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7b38c1b6c34b.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#идентификация">Идентификация</a></li>
+<li><a href="#версии-и-линковка">Версии и линковка</a></li>
+<li><a href="#лицензия">Лицензия</a></li>
+<li><a href="#здоровье-и-риск">Здоровье и риск</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="паспорт-open-source-библиотеки">Паспорт open source библиотеки</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Долговечная учётная карточка одной open source библиотеки в контролируемом репозитории (ППК) Организации: канонический <code>purl</code>, апстрим, разрешённые версии, лицензия, владелец и состояние сопровождения. Отвечает на вопрос «что это за компонент и на каких условиях мы его используем», а не «что мы решили в конкретной поставке».</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>Заводится при первом включении библиотеки в ППК (после приёмки и распознавания) и поддерживается на всём сроке использования. Обновляется при смене версии, лицензии, статуса сопровождения апстрима.</p>
+<blockquote>
+<p>Паспорт ≠ отчёт
+Паспорт — это <strong>идентичность</strong> компонента (стабильна между поставками). Точечная оценка и вердикт по конкретной поставке — в <a href="doc-05b61c497caa.html">Шаблон отчета по компоненту</a>. Паспорт дедуплицирован по <code>purl</code>; отчётов по нему может быть много.</p>
+</blockquote>
+<h2 id="идентификация">Идентификация</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Каноническое имя</td>
+<td></td>
+</tr>
+<tr>
+<td>Канонический <code>purl</code></td>
+<td><code>pkg:.../...@...</code></td>
+</tr>
+<tr>
+<td><code>cpe</code> (если есть)</td>
+<td></td>
+</tr>
+<tr>
+<td>Экосистема</td>
+<td>npm · pypi · cpp · deb · docker · go · ...</td>
+</tr>
+<tr>
+<td>Апстрим (репозиторий)</td>
+<td>публичный URL</td>
+</tr>
+<tr>
+<td>Включена в ППК с</td>
+<td>дата</td>
+</tr>
+<tr>
+<td>Владелец компонента</td>
+<td>роль/команда (без ФИО)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="версии-и-линковка">Версии и линковка</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Разрешённые версии</td>
+<td>список / диапазон</td>
+</tr>
+<tr>
+<td>Запрещённые версии</td>
+<td>с причиной (CVE, EOL)</td>
+</tr>
+<tr>
+<td>Тип линковки</td>
+<td>динамическая / статическая (см. <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a>)</td>
+</tr>
+<tr>
+<td>Способ поставки</td>
+<td>пакетный менеджер / vendored / собранный из исходников</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="лицензия">Лицензия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Объявленная лицензия</td>
+<td>SPDX id / expression</td>
+</tr>
+<tr>
+<td>Заключённая лицензия</td>
+<td>по <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></td>
+</tr>
+<tr>
+<td>Класс по политике</td>
+<td>разрешён / условный / запрещён (см. <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a>)</td>
+</tr>
+<tr>
+<td>Юридический вердикт</td>
+<td>ссылка на заключение</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="здоровье-и-риск">Здоровье и риск</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Состояние сопровождения</td>
+<td>активный / редкие релизы / заброшен (EOL)</td>
+</tr>
+<tr>
+<td>OpenSSF Scorecard / Scorecard-сигналы</td>
+<td>см. <a href="doc-b91f24d1a12a.html">OpenSSF Scorecard</a></td>
+</tr>
+<tr>
+<td>Известные уязвимости</td>
+<td>ссылка на статус в портфеле / VEX</td>
+</tr>
+<tr>
+<td>Дата последнего пересмотра</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-97c8afb5a218.html">М02. SBOM и ППК</a> · <a href="doc-457364f50285.html">М11. Корпоративный кейс</a></li>
+<li>Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-adce46441199.html">П30. Исключения и принятие риска</a></li>
+<li>Нормативка: <a href="doc-9ed897f12463.html">Проект ГОСТ Р КАПО</a> · <a href="doc-6445f24aa231.html">OpenSSF Scorecard</a> · <a href="doc-348bb0ac58ac.html">OpenChain ISO IEC 5230</a></li>
+<li>Связанные шаблоны: <a href="doc-0cc54b9609f7.html">Минимальный набор полей ППК</a> · <a href="doc-05b61c497caa.html">Шаблон отчета по компоненту</a> · <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

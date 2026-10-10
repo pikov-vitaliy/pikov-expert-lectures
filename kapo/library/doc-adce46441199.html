@@ -1,0 +1,109 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П30. Исключения и принятие риска — КАПО · Пиков</title><meta name="description" content="П30. Исключения и принятие риска. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-adce46441199.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п30-исключения-и-принятие-риска">П30. Исключения и принятие риска</h1>
+<p>Security gate завалил сборку на конкретном finding. Чинить нельзя/нечем прямо сейчас — нужно осознанно «жить с этим» ограниченное время. Эта практика — про то, как оформить принятие риска <strong>как запись с владельцем и сроком</strong>, а не как «голый mute» в интерфейсе сканера, и как связать карточку исключения с подавлением в gate одной датой.</p>
+<h2 id="цель">Цель</h2>
+<p>Для одного блокирующего finding оформить связку «карточка в реестре + подавление в gate», где <code>expiry</code> карточки и <code>ignoreUntil</code> в конфиге сканера — <strong>одна и та же дата</strong>, а конфиг ссылается на ID карточки. Проверяемый результат: после добавления исключения число блокирующих findings у gate уменьшается ровно на одно, а в выводе сканера видно, что finding перенесён в «проигнорированные» с указанием причины.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Берём воспроизводимый пример из модуля М14: <code>lodash@4.17.19</code>, CVE-2021-23337 (CVSS 7.2, command injection через <code>_.template</code>). Сначала фиксируем решение карточкой в реестре исключений (поля ниже), затем переносим ту же дату и ID в конфиг подавления OSV-Scanner.</p>
+<p>Конфиг <code>osv-scanner.toml</code> рядом со сканируемым lockfile:</p>
+<pre><code class="language-toml">[[02 Справочник/Глоссарий/IgnoredVulns|IgnoredVulns]]
+id = "CVE-2021-23337"
+ignoreUntil = 2026-09-17T00:00:00Z   # = expiry карточки EXC-2026-014
+reason = "EXC-2026-014: _.template с пользовательским вводом не вызывается; ретест после планового апгрейда"
+</code></pre>
+<p>Запуск gate с конфигом (OSV-Scanner v2, scan-подкоманда):</p>
+<pre><code class="language-bash"># Базовый прогон — finding блокирует
+osv-scanner scan -L package-lock.json
+
+# Прогон с подавлением — конфиг ОБЯЗАТЕЛЬНО передаётся явно
+osv-scanner scan -L package-lock.json --config ./osv-scanner.toml
+echo "exit code: $?"
+</code></pre>
+<blockquote>
+<p>«Вечное» исключение — самая частая ошибка
+Подавление без <code>ignoreUntil</code> (или с датой, которую никто не отслеживает) живёт годами: фикс давно вышел, а risk acceptance всё ещё «активен». Поле срока обязательно. Истёкший <code>ignoreUntil</code> снова делает finding блокирующим — это и есть автоматический возврат на пересмотр, а не баг.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Карточка в реестре исключений (минимальная единица учёта):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ID</td>
+<td>EXC-2026-014</td>
+</tr>
+<tr>
+<td>Компонент</td>
+<td><code>pkg:npm/lodash@4.17.19</code></td>
+</tr>
+<tr>
+<td>Finding</td>
+<td>CVE-2021-23337 (CVSS 7.2)</td>
+</tr>
+<tr>
+<td>Тип решения</td>
+<td>accepted risk</td>
+</tr>
+<tr>
+<td>Обоснование</td>
+<td><code>_.template</code> с пользовательским вводом не используется; фикс требует ломающего API мажорного апгрейда</td>
+</tr>
+<tr>
+<td>Компенсирующая мера</td>
+<td>статическое правило, запрещающее <code>_.template</code>; ретест после апгрейда</td>
+</tr>
+<tr>
+<td>Автор (роль)</td>
+<td>владелец риска продукта</td>
+</tr>
+<tr>
+<td>Открыто / Expiry</td>
+<td>2026-06-17 / 2026-09-17</td>
+</tr>
+<tr>
+<td>Статус</td>
+<td>active</td>
+</tr>
+</tbody>
+</table></div>
+<p>Поведение gate — ориентир по числу findings:</p>
+<ul>
+<li><strong>Базовый прогон</strong>: CVE-2021-23337 присутствует в таблице уязвимостей, ненулевой exit code (сборка падает).</li>
+<li><strong>Прогон с <code>--config</code></strong>: то же finding уходит из блокирующих; OSV-Scanner отмечает его как отфильтрованное по конфигу, число блокирующих findings уменьшается на одно, exit code <code>0</code> (если это была единственная блокировка):</li>
+</ul>
+<pre><code>Filtered 1 vulnerability from output
+No issues found
+exit code: 0
+</code></pre>
+<p>Ключевая проверка: дата в <code>ignoreUntil</code> и <code>Expiry</code> карточки совпадают, а <code>reason</code> начинается с ID карточки — подавление трассируется до управленческого решения.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>--config</code> передали, но finding всё равно блокирует</strong> — конфиг не подхватился: либо забыли флаг (<code>osv-scanner</code> без <code>--config</code> ищет <code>osv-scanner.toml</code> только в сканируемой директории), либо неверный путь, либо <code>id</code> написан не в том регистре/формате (нужно ровно <code>CVE-2021-23337</code>).
+- <strong><code>ignoreUntil</code> в прошлом</strong> — подавление не действует, finding остаётся блокирующим. Это правильное поведение для истёкшего исключения; для активного — проверьте, что дата в будущем.
+- <strong>Mute в UI сканера вместо карточки</strong> — finding скрыт, но решение нигде не записано: нет владельца, обоснования, срока. Через полгода никто не объяснит, почему он «ignored». Любое подавление должно ссылаться на ID карточки реестра.
+- <strong><code>unknown command "scan"</code> / флаг не распознан</strong> — установлен OSV-Scanner v1, где форма иная (<code>osv-scanner --config=osv-scanner.toml -L package-lock.json</code>, без подкоманды <code>scan</code>). Сверьте <code>osv-scanner --version</code>.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: заполненную карточку исключения (с владельцем-ролью, обоснованием, компенсирующей мерой и <code>expiry</code>), конфиг <code>osv-scanner.toml</code> со ссылкой на ID карточки, и два прогона gate — до и с <code>--config</code> — где видно, что число блокирующих findings уменьшилось на одно. Совпадение дат <code>ignoreUntil</code> ↔ <code>expiry</code> обязательно.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-e29be6710c8d.html">М14. Политики, исключения и принятие риска</a> — родительский модуль.</li>
+<li>Смежные практики: <a href="doc-faa8e4b65ca3.html">П29</a> (вердикт готовности, который исключение помогает снять корректно), <a href="doc-4ce78beb1257.html">П07</a> (базовый прогон OSV-Scanner), <a href="doc-fd2abd912efa.html">П28</a> (откуда приходят непрошедшие приёмку компоненты).</li>
+<li><a href="doc-b5856ada3679.html">ISO/IEC 27001</a> — risk treatment: принятие риска как осознанный выбор с владельцем; <a href="doc-0e548f119316.html">NIST SSDF</a> — PW.4/RV.1.</li>
+<li>Шаблоны: <a href="doc-f0ded133ff51.html">Реестр исключений</a> · <a href="doc-3449932010c8.html">Порядок принятия риска</a> · <a href="doc-7001d4a35f2f.html">Политика приёмки сторонних компонентов</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

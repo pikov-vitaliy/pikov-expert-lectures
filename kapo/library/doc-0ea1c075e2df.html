@@ -1,0 +1,50 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ручные third_party каталоги — КАПО · Пиков</title><meta name="description" content="ручные third_party каталоги. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0ea1c075e2df.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="ручные-third_party-каталоги">ручные third_party каталоги</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>В проектах без Conan/vcpkg зависимости часто живут в руками собранном каталоге — <code>third_party/</code>, <code>extern/</code>, <code>libs/</code>, <code>vendor/include</code>. Туда складывают заголовки и заранее собранные <code>.a</code>/<code>.so</code>/<code>.lib</code>, а сборка подхватывает их через <code>-Ithird_party/include</code> и <code>-Lthird_party/lib</code>. С точки зрения компилятора это работает идеально; с точки зрения SCA — это чёрный ящик. Нет манифеста, который перечислил бы, что лежит в каталоге, нет версий, нет соответствия системным пакетам. Каталог <code>third_party/</code> отвечает на вопрос «как собрать», но не на вопрос «из чего собрано».</p>
+<p>Отличие от vendoring в том, что здесь обычно лежат не исходники, а артефакты — заголовки плюс прекомпилированные библиотеки, часто непонятного происхождения (кто-то когда-то скачал <code>libfoo-dev</code> и положил в репозиторий). Это одновременно и слепая зона состава, и риск provenance: бинарь в <code>third_party/lib/</code> мог быть собран кем угодно и из чего угодно.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Зависимость не объявлена нигде, кроме флагов компилятора. Восстанавливать состав приходится из самого каталога и из команд сборки:</p>
+<pre><code class="language-bash"># Что вообще лежит в каталоге зависимостей
+find third_party/ -name '*.h' -o -name '*.a' -o -name '*.so*' | sort
+
+# Как сборка подхватывает каталог — ключи -I/-L/-l в логе компиляции
+grep -oE '\-I *[^ ]*third_party[^ ]*|\-L *[^ ]*third_party[^ ]*|\-l[a-z0-9_]+' build.log | sort -u
+
+# Версия часто спрятана в заголовке — ищем макрос версии
+grep -rhoE '#define [A-Z_]*VERSION[A-Z_]* +"?[0-9][0-9A-Za-z._-]*' third_party/include/
+
+# Прекомпилированный .a без исходников: чьи символы внутри?
+nm -C third_party/lib/libfoo.a 2&gt;/dev/null | grep ' T ' | head
+</code></pre>
+<p>Без этих шагов <code>libfoo.a</code> попадёт в линковку, но не в SBOM: генератор фактов не знает ни имени пакета, ни версии, ни лицензии.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — <strong>разрыв между include path и идентичностью компонента</strong>. <code>-Ithird_party/openssl/include</code> доказывает, что заголовки OpenSSL доступны компилятору, но не доказывает ни версию, ни что слинкована именно эта сборка, ни что бинарь в <code>lib/</code> не подменён. Прекомпилированные <code>.a</code> усугубляют: символы есть, а исходного релиза и лицензии нет.</p>
+<blockquote>
+<p>Приём: include/link path как карта зависимостей
+Соберите все <code>-I</code>/<code>-L</code>/<code>-l</code>, указывающие в <code>third_party/</code>, из реального лога сборки — это исчерпывающий список того, что проект оттуда тянет. Дальше каждый пункт привязывайте к версии (макрос в заголовке) и к источнику (откуда взят бинарь). Каталог, который не отражён ни в одном <code>-I</code>/<code>-L</code>, — мёртвый груз, его можно исключить из анализа.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Снимите реальные <code>-I</code>/<code>-L</code>/<code>-l</code> из лога компиляции, а не из CMake-конфига: фактическая команда — источник правды (см. <a href="doc-9902fd4ce26c.html">build logs как аудиторский артефакт</a>).</li>
+<li>Для каждой библиотеки в каталоге извлеките версию из заголовочного макроса и зафиксируйте <code>pkg:generic/&lt;name&gt;@&lt;version&gt;</code>.</li>
+<li>Прекомпилированные <code>.a</code>/<code>.so</code> прогоните через <code>nm -C</code>/<code>readelf -d</code> и сверьте с системным пакетом через <code>dpkg -S</code>/<code>rpm -qf</code>, если такая библиотека есть в дистрибутиве (см. <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a>).</li>
+<li>Запишите хеш каждого прекомпилированного артефакта и путь occurrences — provenance прекомпила иначе не доказать (см. <a href="doc-dc314b2d790a.html">hash-based identification</a>).</li>
+<li>Введите правило: новый элемент в <code>third_party/</code> сопровождается README с именем, версией, лицензией и источником загрузки.</li>
+<li>Непривязанное — в <a href="doc-06c6cc985f59.html">unresolved libraries</a>.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. make build inventory</a> (инвентаризация состава сборки), <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> (что реально слинковалось).</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (заимствованные компоненты), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.1 — provenance компонентов).</li>
+<li>Смежные 06: <a href="doc-0655587ecc4d.html">vendored source</a>, <a href="doc-66a01da76fb0.html">pkg-config и файлы pc</a>, <a href="doc-44ca67214176.html">stripped binaries</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

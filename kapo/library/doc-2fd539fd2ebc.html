@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Nexus Repository — КАПО · Пиков</title><meta name="description" content="Nexus Repository. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-2fd539fd2ebc.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="nexus-repository">Nexus Repository</h1>
+<blockquote>
+<p>Контекст
+Менеджер репозиториев Sonatype: хранит и проксирует пакеты для Maven, npm, PyPI, NuGet, Go, apt, yum, Docker/OCI, Conan и Raw. В курсе фигурирует как один из двух типовых движков <strong>controlled repository</strong> для OSA-входа (наряду с Artifactory) — управляемая прокладка между разработчиком и публичным реестром, через которую идут все скачивания.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Сводит все запросы пакетных менеджеров в одну подконтрольную точку. Три типа репозиториев — <strong>hosted</strong> (свои артефакты), <strong>proxy</strong> (кэширующий прокси публичного реестра) и <strong>group</strong> (объединение нескольких под одним URL) — дают индекс, на котором можно держать политику допуска: пакет из block-правила физически не отдаётся в сборку.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Менеджер настраивают на group-репозиторий Nexus вместо публичного реестра. Пример для Python:</p>
+<pre><code class="language-ini"># pip.conf — install идёт только через подконтрольный индекс
+[global]
+index-url = https://nexus.internal/repository/pypi-group/simple/
+</code></pre>
+<p>Maven — через <code>settings.xml</code> с <code>&lt;mirror&gt;</code>, заворачивающим <code>central</code> на group-репозиторий:</p>
+<pre><code class="language-xml">&lt;mirror&gt;
+  &lt;id&gt;nexus-group&lt;/id&gt;
+  &lt;mirrorOf&gt;*&lt;/mirrorOf&gt;
+  &lt;url&gt;https://nexus.internal/repository/maven-group/&lt;/url&gt;
+&lt;/mirror&gt;
+</code></pre>
+<p>Загрузка и поиск компонентов — через REST API (<code>/service/rest/v1/components</code>, <code>/v1/search</code>). Поиск уязвимостей и оценка состава — отдельный продукт (IQ Server / Lifecycle), а не базовый Repository.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Бесплатная редакция (Community/OSS) разворачивается on-premise — низкий порог для учебного и пилотного controlled-repo контура.</li>
+<li>Покрывает основные экосистемы курса одним движком; proxy-репозиторий кэширует артефакты и снижает зависимость от внешней сети.</li>
+<li>Routing rules позволяют ограничить, какие пути/группы артефактов вообще доступны через proxy — грубый, но рабочий блок-механизм.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Базовый Repository не вычисляет уязвимости и не сопоставляет лицензии — для вердиктов нужен отдельный анализатор поверх содержимого.</li>
+<li>Тонкие политики OSA (карантин «молодых» версий, malware-фид, классификация) требуют коммерческого слоя или внешнего движка; routing rules для этого слишком грубы.</li>
+<li>Как и любой proxy, не отменяет выполнение <code>install</code>-скриптов после выдачи пакета и сам по себе не закрывает dependency confusion.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. Полностью разворачивается в закрытом контуре; proxy-репозитории работают офлайн как кэш единожды скачанного. Для наполнения кэша или обновления нужен управляемый доступ наружу либо ручная заливка в hosted-репозиторий.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> · <a href="doc-457364f50285.html">М11. Генератор фактов и сервис вердиктов</a></li>
+<li>Практики: <a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a> · <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a></li>
+<li>Смежные карточки: <a href="doc-91aae62a30a4.html">JFrog Artifactory</a> · <a href="doc-0e2dcd9e30c8.html">CodeScoring</a> · <a href="doc-a1fedd6d04cf.html">GitLab CI</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

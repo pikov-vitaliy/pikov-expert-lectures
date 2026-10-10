@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>container image layers — КАПО · Пиков</title><meta name="description" content="container image layers. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-659dc2ec481f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="container-image-layers">container image layers</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Контейнерный образ — это не один файл, а стопка слоёв (OCI layers), каждый из которых хранит лишь дельту к предыдущему. SBOM, собранный по итоговой «сплющенной» файловой системе, описывает то, что видно на финальном слое, но образ физически несёт и всё, что было добавлено и затем «удалено» в промежуточных слоях. Для C/C++ это особенно болезненно: исходники, объектные файлы, статические <code>.a</code>, отладочные символы и приватные ключи подписи часто кладут в образ на этапе сборки и «убирают» в финальном <code>RUN rm</code>. Composition analysis обязан анализировать слои, а не только верхнюю проекцию, иначе SBOM пропустит реально извлекаемые артефакты и компоненты.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Удаление файла в верхнем слое не стирает его из нижнего блоба — оверлейная ФС лишь помечает его файлом-whiteout (<code>.wh.&lt;имя&gt;</code>). Файл по-прежнему лежит в tar нижнего слоя и извлекается полностью.</p>
+<pre><code class="language-bash">docker save myapp:1.4 -o myapp.tar
+mkdir img &amp;&amp; tar -xf myapp.tar -C img
+# манифест: какой слой за что отвечает
+cat img/manifest.json | jq '.[0].Layers'
+# whiteout-маркеры удалённых файлов по всем слоям
+for l in img/blobs/sha256/*; do tar -tf "$l" 2&gt;/dev/null | grep -E '\.wh\.'; done
+# извлечь предположительно «удалённый» приватный ключ из нижнего слоя
+tar -xf img/blobs/sha256/&lt;layer_digest&gt; -C extracted/ build/signing.key
+</code></pre>
+<p>Инструмент <code>dive</code> показывает то же интерактивно: по слоям видно, что <code>RUN rm -rf /build</code> уменьшил «эффективный» размер, но блоб со статической библиотекой и ключом остался в истории образа.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Слепая зона: сканер по squashed-FS
+<code>syft myapp:1.4</code> без флага охвата читает только финальную файловую систему и не видит удалённые в whiteout файлы. «Чисто» на верхнем слое не значит «чисто» в поставляемом образе — секрет и лишняя GPL-библиотека едут заказчику внутри блоба.</p>
+</blockquote>
+<p>Приём: всегда сканировать с охватом всех слоёв (<code>--scope all-layers</code>) и отдельно прогонять поиск секретов и лицензий по распакованным блобам, а не по <code>docker run</code>-проекции.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Распаковать образ через <code>docker save … | tar</code> (или <code>crane export</code>) и пройти по <code>manifest.json</code> → <code>Layers</code>, зафиксировать, какой слой что добавляет.</li>
+<li>Найти все <code>.wh.</code>-маркеры и сопоставить с тем, что «удалялось» в <code>Dockerfile</code> (<code>RUN rm …</code>); каждый удалённый секрет/ключ — инцидент.</li>
+<li>Генерировать SBOM с <code>--scope all-layers</code>, а не по верхней ФС.</li>
+<li>Прогнать gitleaks/trufflehog и сканер лицензий по содержимому каждого слоя, а не по итоговому контейнеру.</li>
+<li>В сборке переносить секреты и build-артефакты в отбрасываемые стадии (multi-stage <code>FROM … as build</code>), чтобы они физически не попадали в финальные слои.</li>
+<li>Зафиксировать хеши слоёв в evidence: какой слой какой компонент внёс — это occurrences для записей SBOM.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a>.</li>
+<li>Практики: <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>, <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>.</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements</a>, <a href="doc-3c212b09f984.html">BSI TR-03183-2</a>.</li>
+<li>Смежные заметки: <a href="doc-e4a620b9b139.html">container image obfuscation</a>, <a href="doc-a2c530fc1bbc.html">honest SBOM</a>, <a href="doc-44ca67214176.html">stripped binaries</a>, <a href="doc-23ddb7fbc5e2.html">containerized build</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

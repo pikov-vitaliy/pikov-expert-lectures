@@ -1,0 +1,41 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CPE — КАПО · Пиков</title><meta name="description" content="CPE. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-17e9049e2a17.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cpe">CPE</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>CPE (Common Platform Enumeration, NIST IR 7695) — структурированное имя для операционных систем, прикладного ПО и аппаратных платформ. Это ключ, по которому записи NVD связываются с компонентом: уязвимость в NVD описывает диапазон затронутых версий именно через CPE-конфигурации (<code>cpe:2.3:a:openssl:openssl:...</code>). Без сопоставления «компонент → CPE» сопоставить находку с CVE через NVD нельзя.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Современная форма — CPE 2.3 formatted string binding: ровно 13 полей, разделённых двоеточием, где <code>*</code> означает ANY, а <code>-</code> означает NA (не применимо):</p>
+<pre><code>cpe:2.3:a:openssl:openssl:3.0.13:*:*:*:*:*:*:*
+       │ │       │       │       └ обновление, edition, language, sw_edition, target_sw, target_hw, other
+       │ │       │       └ version
+       │ │       └ product
+       │ └ vendor
+       └ part: a (application) | o (os) | h (hardware)
+</code></pre>
+<p>Устаревшая форма — CPE 2.2 URI binding: <code>cpe:/a:openssl:openssl:3.0.13</code>. В записи NVD затронутые версии задаются через <code>versionStartIncluding</code> / <code>versionEndExcluding</code> поверх базового CPE. Сканер (например, <a href="doc-56e1c2ed4ba7.html">OWASP Dependency-Check</a>) строит CPE-кандидаты по имени артефакта и проверяет их по локальной выгрузке CPE Dictionary и NVD.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Единственный ключ для сопоставления с NVD: без CPE запись NVD недостижима по имени.</li>
+<li>Покрывает не только пакеты, но и ОС и «железо» (<code>part:o</code>, <code>part:h</code>) — то, что <a href="doc-41eb01248f66.html">Package URL</a> не адресует.</li>
+<li>Диапазоны версий (<code>versionEndExcluding</code>) позволяют одной CPE-конфигурацией закрыть множество выпусков.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Строки <code>vendor:product</code> назначаются вручную аналитиками NVD и нестабильны: один продукт встречается как <code>openssl:openssl</code>, <code>openssl_project:openssl</code> и т. п. — отсюда пропуски при сопоставлении (работа с алиасами — <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>).</li>
+<li>Нет детерминированного алгоритма «артефакт → CPE»: имя угадывается эвристикой, отсюда и ложные срабатывания, и пропуски.</li>
+<li>Для C/C++ и вендорённых библиотек CPE часто просто отсутствует в словаре.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Сама схема именования сетевого доступа не требует. Для сопоставления в закрытом контуре нужны зеркала официальной выгрузки CPE Dictionary и NVD (JSON-фиды); их разворачивают локально и обновляют по расписанию, после чего сопоставление идёт без выхода в интернет.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-4a0b7bceee7b.html">М04 Идентификаторы компонентов и уязвимостей</a> · <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей</a>
+Практики: <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>
+Смежные карточки: <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-4c0810e8e35a.html">CVE</a> · <a href="doc-56e1c2ed4ba7.html">OWASP Dependency-Check</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,87 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П07. OSV-Scanner и lockfiles — КАПО · Пиков</title><meta name="description" content="П07. OSV-Scanner и lockfiles. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4ce78beb1257.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п07-osv-scanner-и-lockfiles">П07. OSV-Scanner и lockfiles</h1>
+<blockquote>
+<p>Контекст
+OSV-Scanner силён там, где есть <strong>lock-файл</strong>: <code>package-lock.json</code>, <code>yarn.lock</code>, <code>poetry.lock</code>, <code>go.sum</code>, <code>Cargo.lock</code>. Lock фиксирует не объявленные диапазоны (<code>^4.0.0</code>), а <em>разрешённые</em> версии транзитивного дерева. OSV.dev оперирует точными диапазонами уязвимых версий по PURL — поэтому по lock-файлу находки получаются точнее, чем по <code>package.json</code>, где версия ещё не «застыла».</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Показать на одном проекте, как <strong>наличие и качество lock-файла</strong> влияет на результат сканирования: по объявленным зависимостям находок меньше и они «размыты», по lock-файлу — точные находки с конкретными версиями и диапазоном фикса.</p>
+<p>Проверяемый результат: два прогона OSV-Scanner (по каталогу и по конкретному lock-файлу) и JSON-отчёт, где у каждой находки есть <code>package.version</code> и ссылка на запись OSV/GHSA.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># 0. Версия инструмента (часть evidence)
+osv-scanner --version
+
+# 1. Рекурсивно по каталогу: OSV сам найдёт все манифесты и lock-файлы
+osv-scanner scan source --recursive .
+
+# 2. Прицельно по одному lock-файлу (самый точный режим)
+osv-scanner scan source --lockfile=package-lock.json
+
+# 3. Машинный отчёт для триажа
+osv-scanner scan source --lockfile=package-lock.json --format=json --output osv-report.json
+
+# 4. CI-gate: ненулевой код возврата при наличии находок
+osv-scanner scan source --recursive .
+echo "exit code: $?"
+</code></pre>
+<blockquote>
+<p>Старый и новый синтаксис
+В свежих версиях команда — <code>osv-scanner scan source ...</code>. В версиях до 2.0 работал короткий вид <code>osv-scanner --recursive .</code> и <code>osv-scanner --lockfile=...</code> без подкоманды <code>scan source</code>. Если короткая форма ругается на неизвестный флаг — проверьте <code>osv-scanner --version</code> и используйте <code>scan source</code>.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Табличный вывод OSV-Scanner группирует находки по источнику (файлу):</p>
+<pre><code>╭─────────────────────────────────────┬──────┬───────────┬─────────┬──────────────────┬─────────╮
+│ OSV URL                             │ ...  │ ECOSYSTEM │ PACKAGE │ VERSION          │ SOURCE  │
+├─────────────────────────────────────┼──────┼───────────┼─────────┼──────────────────┼─────────┤
+│ https://osv.dev/GHSA-c2qf-rxjj-qqgw │      │ npm       │ semver  │ 7.3.7            │ ...     │
+│ https://osv.dev/GHSA-35jh-r3h4-6jhm │      │ npm       │ lodash  │ 4.17.19          │ ...     │
+╰─────────────────────────────────────┴──────┴───────────┴─────────┴──────────────────┴─────────╯
+</code></pre>
+<p>Скелет JSON-отчёта (<code>osv-report.json</code>):</p>
+<pre><code class="language-json">{
+  "results": [
+    {
+      "source": { "path": "package-lock.json", "type": "lockfile" },
+      "packages": [
+        {
+          "package": { "name": "semver", "version": "7.3.7", "ecosystem": "npm" },
+          "vulnerabilities": [
+            { "id": "GHSA-c2qf-rxjj-qqgw", "aliases": ["CVE-2022-25883"] }
+          ]
+        }
+      ]
+    }
+  ]
+}
+</code></pre>
+<p>Ориентир: при сканировании по lock-файлу <code>source.type</code> будет <code>lockfile</code>, и у каждого пакета будет конкретная <code>version</code>. Если же находок неожиданно <code>0</code>, а проект явно тянет уязвимые версии — почти всегда дело в том, что lock-файла нет или он не закоммичен.</p>
+<blockquote>
+<p>Проверка эффекта lock-файла
+Сравните число находок: <code>osv-scanner scan source --lockfile=package-lock.json --format=json --output a.json</code> против сканирования каталога без lock. Затем <code>jq '[.results[].packages[].vulnerabilities[].id] | length' a.json</code>. Прогон по lock-файлу обычно даёт больше и точнее адресованных находок.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>0 vulnerabilities</code> при наличии lock-файла.</strong> Lock не закоммичен или указан не тот путь. Убедитесь, что файл существует: <code>ls -la package-lock.json</code>. Для монорепо нужен <code>--recursive</code>.
+- <strong><code>unsupported lockfile</code> / файл не распознан.</strong> OSV-Scanner определяет парсер по имени файла. Нестандартное имя (например, <code>npm-shrinkwrap-old.json</code>) он не подхватит — переименуйте или используйте каноническое имя lock-файла экосистемы.
+- <strong>Короткая форма команды не работает.</strong> Версия ≥ 2.0 требует <code>scan source</code>. Признак — ошибка вида <code>unknown flag</code> на <code>--recursive</code>.
+- <strong>CI не падает.</strong> OSV-Scanner возвращает ненулевой код при находках сам по себе; если pipeline зелёный — проверьте, что шаг не маскирует код возврата (<code>|| true</code>, <code>continue-on-error</code>).</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю:
+1. <code>osv-scanner --version</code>;
+2. два отчёта — по каталогу и по конкретному lock-файлу — и разницу в числе/точности находок;
+3. <code>osv-report.json</code> с непустым <code>vulnerabilities[]</code> и видимыми <code>version</code>;
+4. вывод о том, почему по lock-файлу результат точнее, чем по объявленным зависимостям.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a> · <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1) · <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a></p>
+<p>Смежные практики: <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

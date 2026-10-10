@@ -1,0 +1,52 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>unresolved libraries — КАПО · Пиков</title><meta name="description" content="unresolved libraries. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-06c6cc985f59.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="unresolved-libraries">unresolved libraries</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Unresolved libraries — это компоненты, которые сборка точно использует, но генератор фактов не смог привязать к устойчивому идентификатору: есть <code>.so</code>, который <code>ldd</code> показал, но <code>dpkg -S</code> не нашёл; есть <code>.a</code>, который слинкован, но непонятно, какой это пакет и версия; есть <code>libfoo</code>, упомянутая в <code>-l</code>, но не сопоставленная ни с одним системным пакетом. Ключевая идея темы — <strong>такой компонент нельзя ни молча выкинуть, ни молча выдать за разрешённый</strong>. Молчаливый пропуск превращает неполный SBOM в формально «зелёный», и именно в этом провале живут невидимые уязвимости.</p>
+<p>Честная обработка unresolved — это маркер зрелости процесса. SBOM, который явно говорит «вот эти N компонентов я не смог опознать», полезнее SBOM, который делает вид, что их нет: первый даёт worklist и измеримое покрытие, второй создаёт ложную уверенность.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Unresolved появляется на стыке шагов: библиотека видна в одном инструменте, но проваливается на сопоставлении в другом.</p>
+<pre><code class="language-bash"># .so есть в зависимостях бинаря...
+readelf -d ./app | grep NEEDED
+#   0x0000000000000001 (NEEDED) Shared library: [libfoo.so.2]
+
+# ...но система не знает, какому пакету он принадлежит
+dpkg -S "$(ldconfig -p | awk '/libfoo\.so\.2/{print $NF; exit}')"
+#   dpkg-query: no path found matching pattern *libfoo.so.2*   ← unresolved
+
+# Статическая библиотека слинкована, но идентичность не установлена
+ar t third_party/lib/libbar.a | head     # объектники есть, версии/пакета нет
+</code></pre>
+<p>В CycloneDX это компонент с непустым <code>name</code>, но <code>purl == null</code> (или <code>pkg:generic/...</code> без версии). Подсчёт таких записей и есть метрика покрытия:</p>
+<pre><code class="language-bash">jq -r '.components[] | select(.purl == null) | .name' bom.json | sort -u   # → worklist
+jq '[.components[] | select(.purl==null)] | length' bom.json               # → число unresolved
+</code></pre>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона возникает не от самого наличия unresolved, а от их <strong>тихого исчезновения</strong>. Если генератор просто не добавляет то, что не смог опознать, разрыв между «слинковано» и «учтено в SBOM» не виден никому. Приём — превратить unresolved в явный, считаемый и адресуемый артефакт: отдельный список <code>unresolved.json</code>, число в метриках покрытия, пониженный confidence на записи.</p>
+<blockquote>
+<p>Приём: unresolved как первоклассный артефакт поставки
+Делайте <code>unresolved.json</code> обязательной частью поставки наравне с <code>bom.json</code> и build-логами. Тогда приёмка проверяет не только «есть ли SBOM», но и «насколько он полон». Компонент без идентификатора — это не «нет компонента», а «компонент есть, идентичность не доказана» (см. <a href="doc-a2c530fc1bbc.html">honest SBOM</a>).</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Сопоставьте список линковки (<code>readelf -d</code>, <code>-l</code> из логов, входные <code>.a</code>) с тем, что реально опознано в SBOM; разница и есть unresolved.</li>
+<li>Выгрузите unresolved в отдельный <code>unresolved.json</code> с полями: имя, путь occurrences, хеш, источник (динамика/статика/каталог).</li>
+<li>По каждому пункту проведите доразметку: <code>dpkg -S</code>/<code>rpm -qf</code>, поиск по хешу, сверка с upstream-релизом (см. <a href="doc-dc314b2d790a.html">hash-based identification</a>).</li>
+<li>Считайте покрытие как (всего − unresolved) / всего и выводите его в gate качества SBOM (см. <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>).</li>
+<li>На записи, оставшиеся без идентификатора, ставьте пониженный confidence — не выдавайте их за чистые.</li>
+<li>Передавайте worklist ответственному (для своей сборки — команде, для чужой — соисполнителю).</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>; приёмка чужого — <a href="doc-3235e84d3a49.html">М10. Много исполнителей</a>.</li>
+<li>Практики: <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> (доразметка неопознанного), <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> (покрытие как gate), <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a>.</li>
+<li>Нормативка: <a href="doc-3c212b09f984.html">BSI TR-03183-2</a> (полнота и качество SBOM), <a href="doc-8be3c2d9de59.html">CISA Minimum Elements</a> (known unknowns), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+<li>Смежные 06: <a href="doc-a2c530fc1bbc.html">honest SBOM</a>, <a href="doc-9fa864f09c7c.html">detection accuracy</a>, <a href="doc-8333283e22d3.html">поставка от соисполнителя</a>, <a href="doc-53c0c842e715.html">PURL pkg generic fallback</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

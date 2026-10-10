@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ldd · readelf · LIEF — КАПО · Пиков</title><meta name="description" content="ldd · readelf · LIEF. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-50df475ac430.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="ldd-readelf-lief">ldd · readelf · LIEF</h1>
+<blockquote>
+<p>Контекст
+Это связка инструментов бинарного анализа ELF, которая работает с <em>готовым артефактом</em>, а не с исходниками или манифестом. Когда сборочный процесс не отдал метаданных (нет Conan/vcpkg, есть только <code>g++</code> и системные библиотеки), состав восстанавливают по самому бинарю: какие <code>.so</code> он требует, какие символы импортирует, что зашито в секции. Это «последняя инстанция» инвентаризации C/C++.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<ul>
+<li><strong>ldd</strong> — показывает, какие разделяемые библиотеки будут загружены динамическим линковщиком и куда они разрешаются на данной машине.</li>
+<li><strong>readelf</strong> — читает структуру ELF напрямую: динамическую секцию, записи <code>DT_NEEDED</code>, RPATH/RUNPATH, таблицу символов — без запуска бинаря.</li>
+<li><strong>LIEF</strong> — библиотека (Python/C++) для программного разбора и модификации ELF/PE/Mach‑O; нужна, когда разбор надо встроить в автоматический пайплайн и собрать факты в структуру.</li>
+</ul>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Динамические зависимости из самой ELF‑секции (безопаснее, чем <code>ldd</code>):</p>
+<pre><code class="language-bash">readelf -d ./app | grep NEEDED
+#  0x0000000000000001 (NEEDED)  Shared library: [libssl.so.3]
+#  0x0000000000000001 (NEEDED)  Shared library: [libcrypto.so.3]
+ldd ./app                       # разрешение в реальные пути на этой машине
+</code></pre>
+<p>Программный сбор через LIEF (вход для генератора фактов):</p>
+<pre><code class="language-python">import lief
+b = lief.parse("./app")
+needed = [e.name for e in b.dynamic_entries if e.tag == lief.ELF.DYNAMIC_TAGS.NEEDED]
+# ['libssl.so.3', 'libcrypto.so.3', 'libz.so.1']
+</code></pre>
+<p>Дальше <code>libssl.so.3</code> маппится на DEB‑координаты: <code>dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.3</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Работают с фактом, а не с декларацией: <code>DT_NEEDED</code> — это то, что реально потребуется при загрузке, в отличие от <code>find_package</code>/<code>-lssl</code>.</li>
+<li>Не требуют исходников и сборочного окружения — применимы к чужому или унаследованному бинарю.</li>
+<li><code>readelf</code> (и LIEF) читают ELF без запуска кода, что безопасно для непроверенного артефакта; LIEF легко встраивается в автоматическую обработку.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li><strong>Статическая линковка — слепая зона</strong>: вшитый <code>.a</code> не оставляет записи <code>DT_NEEDED</code>, компонент просто исчезает; нужен build‑scan или поиск сигнатур/строк версий.</li>
+<li><code>ldd</code> фактически запускает загрузчик и отражает разрешение <em>на текущей машине</em> — на другой состав путей и версий будет иным; для непроверенного бинаря <code>ldd</code> не запускают.</li>
+<li><code>readelf</code>/LIEF дают имя <code>.so</code> (<code>libssl.so.3</code>), но не версию пакета — нужен отдельный шаг маппинга на <code>dpkg</code>/<code>apt</code>; для stripped‑бинарей символьной информации почти нет.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. Все три инструмента локальны и не обращаются в сеть: <code>ldd</code>/<code>readelf</code> входят в binutils/glibc, LIEF ставится из колеса Python. Полностью применимы в закрытом контуре; единственное внешнее звено — обновляемая база соответствий <code>.so</code> → пакет, которая берётся из локального зеркала дистрибутива.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-9e42322f0345.html">blint</a> · <a href="doc-143d4440b290.html">qmake</a> · <a href="doc-e4184a38ebbe.html">pkg-config</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

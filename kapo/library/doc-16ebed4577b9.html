@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>динамическая линковка — КАПО · Пиков</title><meta name="description" content="динамическая линковка. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-16ebed4577b9.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="динамическая-линковка">динамическая линковка</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Динамическая линковка — единственный слой состава C/C++, который остаётся читаемым в готовом бинаре без журнала сборки. Линкер не вшивает код библиотеки, а записывает в файл лишь её имя (soname), а реальное связывание выполняет загрузчик <code>ld.so</code> при старте процесса. Поэтому динамическую зависимость можно восстановить пост-фактум: имя <code>.so</code> лежит в бинаре, а на хосте оно резолвится в файл и далее — в системный пакет с версией. Это «лёгкая» часть инвентаризации, на которой держится автоматический скан.</p>
+<p>Ровно поэтому здесь возникает ложное ощущение полноты: сканер уверенно перечисляет динамические библиотеки и молчит про всё остальное. Важно понимать границу — динамическая линковка показывает компонент, но не его точную версию, и не видит ничего, что вшито статически.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Резолвинг идёт по soname, а не по имени файла. В бинаре записан мажорный ABI (<code>libssl.so.3</code>), <code>ld.so</code> ищет совпадение через кэш и подставляет конкретный файл:</p>
+<pre><code class="language-bash">$ ldd ./app
+        libssl.so.3 =&gt; /usr/lib/x86_64-linux-gnu/libssl.so.3 (0x00007f...)
+        libz.so.1   =&gt; /usr/lib/x86_64-linux-gnu/libz.so.1   (0x00007f...)
+
+$ ldconfig -p | grep libssl
+        libssl.so.3 (libc6,x86-64) =&gt; /usr/lib/x86_64-linux-gnu/libssl.so.3
+</code></pre>
+<p>Имя <code>libssl.so.3</code> фиксирует только мажорную ABI-версию — «какая-то OpenSSL 3.x». Чтобы получить точную версию (<code>3.0.11</code>), нужно перейти от файла к пакету (<code>dpkg -S</code> / <code>rpm -qf</code>), а от пакета — к его версии. Этот переход «soname → файл → DEB/RPM-пакет → версия» и есть рабочая логика динамической инвентаризации.</p>
+<blockquote>
+<p>soname задаёт совместимость, не версию
+Мажор в soname (<code>.so.3</code>) меняется при несовместимом изменении ABI, а патч-версии (<code>3.0.11</code> → <code>3.0.13</code>) живут под одним soname. Значит, по самому бинарю патч-версию узнать нельзя — её даёт только пакетный менеджер хоста, на котором собирали или будут запускать.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона динамической линковки — <code>RPATH</code>/<code>RUNPATH</code>: бинарь может указывать загрузчику искать <code>.so</code> не в системных путях, а в каталоге поставки. Тогда <code>libssl.so.3</code> по имени то же, но физически загрузится другая, vendored-копия с иной версией, чем системный <code>libssl3</code>. <code>ldd</code> покажет фактический путь и тем самым выдаст подмену; структура этих записей разбирается в <a href="doc-28706d741e92.html">ELF и разделы dynamic</a>.</p>
+<p>Приём — не доверять имени soname как версии. Имя даёт только идентичность компонента (мажорная ABI), точную версию подтверждает пакет хоста, а реальный файл — <code>ldd</code>/путь. Если путь ведёт не в системный каталог, компонент vendored и требует отдельной разметки.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Снимать динамический состав надёжным способом — из секции <code>.dynamic</code> (<code>readelf -d</code>), не запуская бинарь; <code>ldd</code> использовать как уточнение путей (детали в <a href="doc-19fd6dae6997.html">ldd readelf objdump</a>).</li>
+<li>Каждую <code>.so</code> доводить до версии: <code>dpkg -S</code> / <code>rpm -qf</code> → имя пакета → версия пакета, а не останавливаться на soname.</li>
+<li>Проверять фактический путь резолвинга: <code>.so</code> вне системных каталогов (<code>/opt/app/lib</code>, рядом с бинарём) — признак <code>RPATH</code>/vendored-копии.</li>
+<li>Фиксировать обе версии — soname (мажор ABI) и точную версию пакета: для матчинга на CVE нужны обе.</li>
+<li><code>libc</code>/<code>libstdc++</code> учитывать как системный runtime отдельно, не смешивая с прикладными компонентами.</li>
+<li>Любую <code>.so</code>, не привязанную к пакету, отправлять в реестр unresolved (см. <a href="doc-06c6cc985f59.html">unresolved libraries</a>).</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a></li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a></li>
+<li>Смежные заметки 06: <a href="doc-28706d741e92.html">ELF и разделы dynamic</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-19fd6dae6997.html">ldd readelf objdump</a> · <a href="doc-4bd8e3178892.html">dpkg apt metadata</a> · <a href="doc-06c6cc985f59.html">unresolved libraries</a> · <a href="doc-18ad3858fbbc.html">CPE alias для libssl3</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

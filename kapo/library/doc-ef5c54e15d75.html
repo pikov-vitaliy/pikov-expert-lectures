@@ -1,0 +1,87 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П16. GitLab CI security gate — КАПО · Пиков</title><meta name="description" content="П16. GitLab CI security gate. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-ef5c54e15d75.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п16-gitlab-ci-security-gate">П16. GitLab CI security gate</h1>
+<blockquote>
+<p>Контекст практики
+Цель CI security gate — не «прогнать сканер», а <strong>остановить pipeline</strong> на заранее оговорённом пороге: критичность уязвимостей и запрещённые лицензии. Здесь вы соберёте gate из трёх шагов: генерация SBOM (Syft) → сканирование (Grype с <code>--fail-on</code>) → отдельный fail по лицензиям. Ключевая идея — gate валит сборку <em>кодом возврата задачи</em>, а не текстом в логе, который никто не читает.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Получить <code>.gitlab-ci.yml</code>, в котором:
+- стадия <code>sca</code> падает (job статус <code>failed</code>), если в зависимостях есть уязвимость уровня <strong>High</strong> или <strong>Critical</strong> с известным фиксом;
+- стадия <code>license</code> падает, если встречена лицензия из стоп-листа (например, <code>GPL-3.0-only</code>);
+- артефакты (SBOM, отчёт сканера) сохраняются и доступны на вкладке Job artifacts.</p>
+<p>Проверяемый результат: один намеренно уязвимый коммит → pipeline красный; после фикса версии → зелёный.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p><code>.gitlab-ci.yml</code> (раннер с Docker executor):</p>
+<pre><code class="language-yaml">stages:
+  - sca
+
+variables:
+  SYFT_VERSION: "v1.18.1"
+  GRYPE_VERSION: "v0.85.0"
+
+sca_scan:
+  stage: sca
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache curl
+    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh | sh -s -- -b /usr/local/bin "${SYFT_VERSION}"
+    - curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin "${GRYPE_VERSION}"
+  script:
+    # 1. SBOM из исходников проекта
+    - syft dir:. -o cyclonedx-json=sbom.cdx.json
+    # 2. Gate по критичности: задача падает на High/Critical
+    - grype sbom:sbom.cdx.json --fail-on high --only-fixed -o table | tee grype-report.txt
+  artifacts:
+    when: always
+    paths:
+      - sbom.cdx.json
+      - grype-report.txt
+    expire_in: 1 week
+</code></pre>
+<p>Стоп-лист лицензий — отдельный шаг (CycloneDX кладёт лицензии в <code>components[].licenses</code>):</p>
+<pre><code class="language-bash"># license gate: падаем, если в SBOM есть запрещённая лицензия
+FORBIDDEN='GPL-3.0-only|AGPL-3.0|GPL-2.0-only'
+if jq -r '.components[].licenses[]?.license.id // .components[].licenses[]?.expression' sbom.cdx.json \
+     | grep -E "$FORBIDDEN"; then
+  echo "FORBIDDEN LICENSE FOUND"; exit 1
+fi
+</code></pre>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Лог <code>grype</code> при срабатывании gate (флаг <code>--only-fixed</code> оставляет только уязвимости с доступным исправлением):</p>
+<pre><code>NAME       INSTALLED  FIXED-IN  TYPE  VULNERABILITY   SEVERITY
+lodash     4.17.15    4.17.21   npm   GHSA-p6mc-m468  High
+minimist   1.2.0      1.2.6     npm   GHSA-xvch-5gv4  Critical
+
+1 error occurred:
+    * discovered vulnerabilities at or above the severity threshold
+</code></pre>
+<p>Статус задачи в GitLab — <code>failed</code>, exit code 1. На вкладке <strong>Job artifacts</strong> лежат <code>sbom.cdx.json</code> и <code>grype-report.txt</code>. После обновления <code>lodash</code>/<code>minimist</code> до фикс-версий повторный pipeline — зелёный, <code>grype</code> выводит <code>No vulnerabilities found</code>, exit code 0.</p>
+<blockquote>
+<p>Сначала visibility, потом блокировка
+На первом проходе по репозиторию запустите gate в режиме <code>allow_failure: true</code> (или <code>grype</code> без <code>--fail-on</code>), соберите статистику и согласуйте порог. Жёсткий <code>--fail-on high</code> включают, когда команда уже разобрала текущий долг — иначе первый же pipeline встанет колом и gate отключат административно.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Pipeline зелёный, хотя уязвимости есть.</strong> Скорее всего, <code>grype</code> нашёл их, но gate не сработал: проверьте, что <code>--fail-on</code> действительно стоит (<code>low|medium|high|critical</code>), а не забыт. Либо все находки — без фикса, и их отсёк <code>--only-fixed</code>; уберите флаг, чтобы увидеть полный список.</li>
+<li><strong><code>syft: not found</code> / <code>grype: not found</code>.</strong> Установочный скрипт не положил бинарь в PATH. На alpine нужен <code>curl</code> (в <code>before_script</code>), а путь установки <code>-b /usr/local/bin</code> должен быть в PATH раннера.</li>
+<li><strong>License gate всегда падает или всегда зелёный.</strong> <code>jq</code> молчит, если поля называются иначе: лицензия может лежать как <code>license.id</code> (SPDX-идентификатор), как <code>license.name</code> (текст) или как <code>expression</code> (SPDX-выражение). Проверьте структуру: <code>jq '.components[0].licenses' sbom.cdx.json</code>.</li>
+<li><strong>Job завис на скачивании баз Grype.</strong> На офлайн-раннере нет доступа к фидам. Используйте <code>grype db update</code> заранее и переменную <code>GRYPE_DB_CACHE_DIR</code> с примонтированным кэшем; см. <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a> про офлайн-контур.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) <code>.gitlab-ci.yml</code> с двумя gate-условиями (критичность + лицензии); (2) скриншот/лог <strong>красного</strong> pipeline на уязвимом коммите с видимым exit code 1 и строкой Grype; (3) скриншот <strong>зелёного</strong> pipeline после фикса; (4) сохранённые артефакты SBOM и отчёта. Устно — почему gate валит по коду возврата, а не по тексту лога, и зачем нужен этап <code>allow_failure</code> перед жёсткой блокировкой.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> — родительский модуль.</li>
+<li><a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a> · <a href="doc-1e5ce9414ca8.html">П12. ORT и license policy</a></li>
+<li><a href="doc-9d81f3d4e106.html">Требования к CI security gate</a> — поля регламента gate (область, ответственный, решение, evidence).</li>
+<li><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> — PW.4 (повторно используемые компоненты), RV.1 (выявление уязвимостей); <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — управляемость работ и контроль сторонних компонентов.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

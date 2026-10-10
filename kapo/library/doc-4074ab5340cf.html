@@ -1,0 +1,40 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPDX — КАПО · Пиков</title><meta name="description" content="SPDX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4074ab5340cf.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="spdx">SPDX</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>SPDX (Software Package Data Exchange) — формат описания состава ПО с историческим фокусом на лицензировании и происхождении. Стандартизован как ISO/IEC 5962. Его сильная сторона — строго каталогизированные лицензии: каждая выражается идентификатором из SPDX License List (<code>Apache-2.0</code>, <code>GPL-2.0-only</code>) и комбинируется через SPDX License Expressions. Под BSI TR-03183-2 v2.1.0 SBOM принимается в SPDX версии <strong>≥ 3.0.1</strong>.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>SPDX существует в двух сериализациях. Исторический tag-value:</p>
+<pre><code>SPDXVersion: SPDX-2.3
+PackageName: openssl
+PackageVersion: 3.0.13
+PackageLicenseConcluded: Apache-2.0
+ExternalRef: PACKAGE-MANAGER purl pkg:conan/openssl@3.0.13
+</code></pre>
+<p>и JSON (в т. ч. для 3.0). Идентификаторы компонента кладутся в <code>externalRefs</code>: purl как <code>PACKAGE-MANAGER purl</code>, <a href="doc-17e9049e2a17.html">CPE</a> как <code>SECURITY cpe23Type</code>. Важно: модель 3.0 — несовместимый разрыв с линейкой 2.x (новая графовая модель элементов и отношений), поэтому потребитель должен понимать, какую мажорную версию он читает.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Лицензии формализованы списком SPDX License List и выражениями (<code>(MIT OR Apache-2.0)</code>) — основа юридического заключения (<a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a>).</li>
+<li>Статус ISO/IEC 5962 — вес в регуляторике и при межведомственном обмене.</li>
+<li><code>relationships</code> описывают происхождение и связи (<code>CONTAINS</code>, <code>GENERATED_FROM</code>) детально.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Модель 3.0 ломает совместимость с 2.x — инструменты и парсеры догоняют спецификацию неравномерно.</li>
+<li>Встроенный VEX исторически слабее, чем в <a href="doc-dbc1ace95cba.html">CycloneDX</a>; для VEX-сценариев чаще берут <a href="doc-7a6dec2d2bd5.html">OpenVEX</a>/<a href="doc-36b66b831249.html">CSAF</a>.</li>
+<li>Tag-value многословен и менее удобен для машинной обработки, чем JSON.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Формат самодостаточен: SPDX License List и схемы поставляются как данные и разворачиваются локально, валидация лицензионных идентификаторов и структуры идёт без сети. Это делает SPDX удобным для закрытого юридического workflow.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота</a>
+Практики: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>
+Смежные карточки: <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-9bce61f41d9c.html">SWID</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-bddae25ab5db.html">ScanCode Toolkit</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

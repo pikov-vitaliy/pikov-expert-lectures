@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Docker BuildKit — КАПО · Пиков</title><meta name="description" content="Docker BuildKit. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-cddc58f61e6f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="docker-buildkit">Docker BuildKit</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Docker BuildKit — движок сборки образов, который умеет порождать SBOM прямо в момент сборки и прикладывать его к образу как attestation. Ключевое отличие от пост-сканирования готового образа: BuildKit видит сборку изнутри (стадии, копируемые слои, базовый образ) и формирует SBOM на этапе, когда контекст ещё известен, а затем сохраняет его в OCI-манифесте рядом с образом.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Сборка с генерацией SBOM-attestation и его последующий просмотр:</p>
+<pre><code class="language-bash">docker buildx build --sbom=true -t registry.example.org/app:1.4.2 --push .
+docker buildx imagetools inspect registry.example.org/app:1.4.2 --format '{{ json .SBOM }}'
+</code></pre>
+<p>Флаг <code>--sbom=true</code> (внутри использует генератор-сканер) прикрепляет SBOM как attestation к образу; он переезжает вместе с образом в реестр и доступен через <code>imagetools inspect</code>. Дополнительно <code>--provenance=true</code> добавляет SLSA-provenance о самой сборке.</p>
+<blockquote>
+<p>SBOM не отрывается от образа
+Главное преимущество — SBOM рождается в момент сборки и хранится в OCI-манифесте рядом с образом, а не лежит отдельным файлом, который легко потерять или подменить. При выгрузке образа в реестр attestation едет вместе с ним.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>SBOM генерируется на этапе сборки и хранится вместе с образом — не отрывается от артефакта.</li>
+<li>Знание контекста сборки (стадии, базовый образ) повышает корректность состава.</li>
+<li>Параллельно может прикладывать provenance-attestation о том, как собран образ.</li>
+<li>Не нужен отдельный шаг сканирования образа — всё в одном <code>buildx build</code>.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Глубина — за встроенным генератором
+SBOM описывает то, что распознал встроенный генератор BuildKit; C/C++ и статическая линковка остаются слепой зоной. Для глубокого графа зависимостей образ всё равно прогоняют через <a href="doc-e0e63f957dcf.html">Syft</a>/cdxgen.</p>
+</blockquote>
+<ul>
+<li>SBOM описывает то, что распознал встроенный генератор; C/C++ и статическая линковка по-прежнему слепая зона.</li>
+<li>Привязка к экосистеме buildx/OCI: вне этого конвейера ценность теряется.</li>
+<li>Качество зависит от версии и встроенного генератора; для глубокого графа всё равно нужен cdxgen/Syft.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Сборка и генерация attestation работают офлайн при наличии базовых образов в локальном/внутреннем реестре. SBOM сохраняется в OCI-формате рядом с образом и не требует внешних сервисов — пригодно для закрытого контура с собственным реестром.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-ef214c81e577.html">М16 Честный SBOM контейнеров</a> · <a href="doc-0c23b1ba214a.html">М08 Защита цепочки поставки и OSA</a> · <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-e0e63f957dcf.html">Syft</a> · <a href="doc-12aa987e5adb.html">Tern</a> · <a href="doc-c9b80f761f41.html">SLSA</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

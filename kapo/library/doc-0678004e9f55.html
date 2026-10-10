@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OWASP Dependency-Track — КАПО · Пиков</title><meta name="description" content="OWASP Dependency-Track. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0678004e9f55.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="owasp-dependency-track">OWASP Dependency-Track</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Dependency-Track — серверная платформа, которая принимает SBOM (CycloneDX) по проектам и держит их непрерывно сопоставленными с источниками уязвимостей. В отличие от разовых CLI-сканеров, это «портфель»: загруженный однажды SBOM продолжает переоцениваться при появлении новых advisories, а дашборд показывает риск по всем проектам сразу. Дополнительно ведёт учёт лицензий и применяет политики на уровне организации.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>SBOM генерируется в CI отдельным инструментом (Syft/cdxgen/Trivy) и публикуется в Dependency-Track через REST API; платформа сама запускает анализ:</p>
+<blockquote>
+<p>Публикация SBOM в CI</p>
+</blockquote>
+<pre><code class="language-bash">curl -X POST "https://dtrack.local/api/v1/bom" \
+  -H "X-Api-Key: $DT_API_KEY" \
+  -F "project=$PROJECT_UUID" \
+  -F "bom=@sbom.cdx.json"</code></pre>
+<p>Гейт строят не на самом факте уязвимости, а на нарушении политики: в Policy задаются условия по severity/лицензии/возрасту компонента, а CI опрашивает endpoint вердиктов:</p>
+<blockquote>
+<p>Проверка нарушений политики</p>
+</blockquote>
+<pre><code class="language-bash">curl -s "https://dtrack.local/api/v1/violation/project/$PROJECT_UUID" \
+  -H "X-Api-Key: $DT_API_KEY"</code></pre>
+<p>Источники подключаются модулями (NVD mirror, OSS Index, GitHub Advisories, OSV, при необходимости — внутренние фиды). Поддерживается приём VEX (CycloneDX VEX) для подавления неэксплуатируемых находок без удаления факта. Принимать VEX в портфель можно только как утверждение ответственного issuer с <code>status</code>, <code>justification</code> и evidence; порядок — <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Непрерывная переоценка: новый CVE автоматически «подсвечивает» все ранее загруженные SBOM, где есть уязвимый компонент, — не нужен повторный прогон CI.</li>
+<li>Портфельный взгляд: единый дашборд риска, метрики, тренды и сравнение проектов — то, чего не даёт ни один CLI-сканер.</li>
+<li>Политики и приём VEX/VDR: гейт строится на бизнес-правилах и решениях о неэксплуатируемости, а не на сыром списке CVE.</li>
+<li>Разделяет роли: генерация SBOM (CI) и хранение/анализ/политики (платформа) — масштабируется на много команд и исполнителей.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Сам SBOM не генерирует — нужен внешний инструмент; качество анализа полностью наследует качество входного SBOM.</li>
+<li>Это сервис: требует развёртывания, СУБД, обслуживания, бэкапов и контроля доступа — операционная нагрузка выше, чем у CLI.</li>
+<li>Каждый встроенный источник нужно отдельно настроить и зеркалировать; интеграция БДУ ФСТЭК «из коробки» отсутствует и требует кастомного фида.</li>
+<li>Для нативного C/C++ остаётся та же проблема координат: если PURL/CPE в SBOM пусты, анализатор не находит уязвимости.</li>
+<li>Подавление finding в UI без оформленного VEX и evidence не является управлением уязвимостью; это аудиторский стоп-сигнал.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да, это профильный сценарий. Платформа разворачивается on-premise (контейнеры API-server и frontend + СУБД PostgreSQL), внешние источники работают через зеркала: NVD mirror, локальная база OSS Index/OSV. После настройки зеркал и отключения внешних вызовов система функционирует в закрытом контуре. Подходит как «сервис аудита/вердиктов» уровня организации.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и VDR/VEX</a> · <a href="doc-3235e84d3a49.html">М10 Много исполнителей и корпоративная модель продукта</a> · <a href="doc-457364f50285.html">М11 Генератор фактов и сервис вердиктов</a>
+Справка: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>
+Практика: <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-fd2abd912efa.html">П28. Поставка от нескольких исполнителей</a>
+Смежные карточки: <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-b869bb94c8bb.html">OSS Index</a> · <a href="doc-e0e63f957dcf.html">Syft</a> · <a href="doc-35e5f81f86fe.html">cdxgen</a> · <a href="doc-56e1c2ed4ba7.html">OWASP Dependency-Check</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

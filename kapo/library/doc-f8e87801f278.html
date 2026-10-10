@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NTIA Minimum Elements for SBOM — КАПО · Пиков</title><meta name="description" content="NTIA Minimum Elements for SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-f8e87801f278.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>05 Нормативка</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#о-документе">О документе</a></li>
+<li><a href="#ключевые-требования">Ключевые требования</a></li>
+<li><a href="#что-считать-evidence">Что считать evidence</a></li>
+<li><a href="#маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</a></li>
+<li><a href="#ограничение">Ограничение</a></li>
+</ul>
+</div>
+<h1 id="ntia-minimum-elements-for-sbom">NTIA Minimum Elements for SBOM</h1>
+<h2 id="о-документе">О документе</h2>
+<p>Базовый документ, определивший «минимально достаточный» SBOM. Выпущен NTIA (Министерство торговли США) в июле 2021 года во исполнение поручения <a href="doc-e10d22d24de3.html">Executive Order 14028</a>. Это не формат и не стандарт записи, а перечень того, что SBOM обязан содержать, чтобы быть пригодным для автоматической обработки. Документ задаёт три измерения: набор минимальных полей данных, требования к практикам генерации и обновления, а также требования к автоматизации и доставке. На нём построены последующие отраслевые профили; в 2025 году NTIA-перечень переработан в <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM (2025)</a>.</p>
+<h2 id="ключевые-требования">Ключевые требования</h2>
+<ul>
+<li><strong>Семь минимальных полей на каждый компонент</strong>: Supplier Name, Component Name, Version, Other Unique Identifiers (например, CPE/PURL), Dependency Relationship, Author of SBOM Data, Timestamp.</li>
+<li><strong>Связи зависимостей</strong> фиксируются хотя бы на верхнем уровне (top-level): для каждого включённого компонента известно, что он входит в состав продукта.</li>
+<li><strong>Машиночитаемый формат</strong> — допускаются SPDX, CycloneDX, SWID; SBOM должен поддаваться автоматическому разбору, а не быть PDF-таблицей.</li>
+<li><strong>Практики жизненного цикла</strong>: SBOM генерируется на каждую новую версию или сборку, хранится и распространяется по согласованному каналу с контролем доступа.</li>
+<li><strong>Глубина и известные пробелы</strong>: допускается «known unknowns» — явная отметка, что часть графа зависимостей не раскрыта, вместо молчаливого пропуска.</li>
+</ul>
+<h2 id="что-считать-evidence">Что считать evidence</h2>
+<ul>
+<li>SBOM в CycloneDX или SPDX, в котором для каждого компонента непусты все семь полей; отчёт о покрытии полей (доля компонентов с заполненным supplier/version/identifier).</li>
+<li>Отчёт о качестве идентификаторов: доля компонентов с валидным PURL/CPE, список компонентов без уникального идентификатора.</li>
+<li>Поле <code>metadata.timestamp</code> и <code>metadata.tools</code> (CycloneDX) или <code>creationInfo.created</code>/<code>creators</code> (SPDX) — доказательство свежести и авторства генерации.</li>
+<li>Журнал генерации SBOM на релизах: подтверждение, что артефакт пересоздаётся на каждую версию, а не делается однократно.</li>
+<li>Явный список «known unknowns» (нераскрытых поддеревьев), если полнота графа не достигнута.</li>
+</ul>
+<h2 id="маппинг-на-практики-и-шаблоны">Маппинг на практики и шаблоны</h2>
+<ul>
+<li><a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> — где в JSON лежат семь обязательных полей.</li>
+<li><a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> и <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> — генерация и проверка покрытия полей.</li>
+<li><a href="doc-0cc54b9609f7.html">Минимальный набор полей ППК</a> — российский аналог перечня обязательных полей.</li>
+<li><a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a> — пороги покрытия и SLA по полям.</li>
+<li>Модули: <a href="doc-97c8afb5a218.html">Модуль М02</a> (SBOM как источник фактов), <a href="doc-778f51173f56.html">Модуль М13</a> (трассировка и evidence).</li>
+<li>Развитие требований: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements (2025)</a>; форматы-носители: <a href="doc-9a74303c4069.html">CycloneDX</a>, <a href="doc-cf001a40d806.html">SPDX</a>.</li>
+</ul>
+<h2 id="ограничение">Ограничение</h2>
+<p>Это учебная карточка, а не официальный текст. Точные формулировки семи полей и требований к автоматизации сверяйте с оригиналом NTIA «The Minimum Elements For a Software Bill of Materials (SBOM)» (2021) и с локальными регламентами Организации.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

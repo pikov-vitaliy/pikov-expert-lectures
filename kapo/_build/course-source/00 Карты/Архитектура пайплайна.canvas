@@ -1,0 +1,25 @@
+{
+	"nodes":[
+		{"id":"laneD","type":"group","x":-80,"y":280,"width":1480,"height":320,"color":"2","label":"СЛОЙ РЕШЕНИЙ — сервис аудита / вердиктов"},
+		{"id":"laneF","type":"group","x":-80,"y":-80,"width":1480,"height":300,"color":"5","label":"СЛОЙ ФАКТОВ — генератор фактов (enrichment)"},
+		{"id":"f1","type":"text","text":"### Артефакты соисполнителей\nСырой SBOM (cdxgen)\n+ ELF-бинарники\n+ исходники / vendored","x":-40,"y":-40,"width":240,"height":240,"color":"5"},
+		{"id":"f2","type":"text","text":"### Генератор фактов\nБинарный анализ ELF (LIEF)\nМаппинг .so → DEB (apt/dpkg -S)\nОбогащение из PyPI / npm / Conan / apt\nНормализация PURL/CPE","x":320,"y":-40,"width":280,"height":240,"color":"4"},
+		{"id":"d3","type":"text","text":"### Readiness\nГотовность продукта\nвердикт / исключение / риск\nвладелец + SLA","x":360,"y":320,"width":240,"height":240,"color":"1"},
+		{"id":"d4","type":"text","text":"### Доказательная база\naudit trail\nevidence для аудита\nтрассировка на нормативку","x":-40,"y":320,"width":240,"height":240,"color":"6"},
+		{"id":"f4","type":"text","text":"### Артефакт-репозиторий\nобмен между этапами\nверсионирование SBOM","x":1120,"y":-40,"width":230,"height":240,"color":"5"},
+		{"id":"d1","type":"text","text":"### Сервис аудита / вердиктов\nЗагрузка SBOM соисполнителей\nЛицензии → юр. заключение\nУязвимости → обработка","x":1080,"y":320,"width":260,"height":240,"color":"2"},
+		{"id":"f3","type":"text","text":"### Обогащённый CycloneDX\nbom.json\nмаксимум координат\nфакты, не решения","x":820,"y":-40,"width":220,"height":240,"color":"4"},
+		{"id":"title","type":"text","text":"# 🖼 Корпоративный пайплайн SCA/OSA\nФакты отделены от решений: генератор фактов строит состав, сервис аудита принимает вердикты.","x":-70,"y":-220,"width":1420,"height":80,"color":"6"},
+		{"id":"legend","type":"text","text":"**Принцип:** SBOM/ППК фиксирует ФАКТ; интерпретация (лицензии, CVE, БДУ, политики) — отдельно; РЕШЕНИЕ (вердикт/исключение/исправление/принятие риска) имеет автора, дату, срок пересмотра.\n\nСм. модуль [[01 Курс/М11 Корпоративный кейс генератор фактов и сервис вердиктов/00 Карта модуля|М11]] и [[01 Курс/М09 C и C++ legacy без дисциплины пакетного менеджера/00 Карта модуля|М09]].","x":-80,"y":640,"width":1480,"height":120,"color":"6"},
+		{"id":"d2","type":"text","text":"### Dependency-Track\nПортфель SBOM\nVDR (факт уязвимости)\nVEX (применимость/решение)\nмониторинг новых CVE","x":740,"y":320,"width":280,"height":240,"color":"2"}
+	],
+	"edges":[
+		{"id":"e1","fromNode":"f1","fromSide":"right","toNode":"f2","toSide":"left","label":"вход"},
+		{"id":"e2","fromNode":"f2","fromSide":"right","toNode":"f3","toSide":"left","label":"обогащение"},
+		{"id":"e3","fromNode":"f3","fromSide":"right","toNode":"f4","toSide":"left"},
+		{"id":"e4","fromNode":"f4","fromSide":"bottom","toNode":"d1","toSide":"top","label":"передача фактов"},
+		{"id":"e5","fromNode":"d1","fromSide":"left","toNode":"d2","toSide":"right"},
+		{"id":"e6","fromNode":"d2","fromSide":"left","toNode":"d3","toSide":"right","label":"триаж"},
+		{"id":"e7","fromNode":"d3","fromSide":"left","toNode":"d4","toSide":"right","label":"фиксация"}
+	]
+}

@@ -1,0 +1,60 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Приемочные сценарии пилота — КАПО · Пиков</title><meta name="description" content="Приемочные сценарии пилота. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-dd4ac51e3d11.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>07 CodeScoring</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#сценарии">Сценарии</a></li>
+<li><a href="#протокол-результата">Протокол результата</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="приемочные-сценарии-пилота">Приемочные сценарии пилота</h1>
+<blockquote>
+<p>Назначение
+Пошаговый <strong>тест-плейбук</strong> пилота: что именно прогнать на реальных сборках, чтобы снять открытые статусы 🟡🔴 из <a href="doc-765d7f069356.html">матрицы соответствия</a>. Это сценарии проверки; решение по их итогам — в <a href="doc-ed246e9adf3a.html">критериях Go/No-Go</a>.</p>
+</blockquote>
+<h2 id="сценарии">Сценарии</h2>
+<blockquote>
+<ol>
+<li>
+<p>Установка в закрытом контуре
+Развернуть on-premise/Offline инсталляцию в тестовом контуре Организации. Зафиксировать фактическую архитектуру: серверы, БД, сеть, доступы, способ обновления базы знаний. <strong>Успех:</strong> нет неучтённых внешних соединений; зафиксирована схема развёртывания.</p>
+</li>
+<li>
+<p>C/C++ build scan без Conan
+Подключить GitLab и один CI/CD pipeline C/C++ проекта без Conan; выполнить build scan на <strong>make, CMake и отдельно qmake</strong>. <strong>Успех:</strong> список распознанных компонентов по каждому типу сборки либо письменное подтверждение ограничения (особенно по qmake).</p>
+</li>
+<li>
+<p>Статическая линковка и форки
+Проект с <code>.a</code>/<code>.so</code>, stripped binary и внутренней форкнутой библиотекой. <strong>Успех:</strong> зафиксировано, что распознаётся автоматически, а что требует ручной разметки; unresolved попадают в worklist, а не теряются.</p>
+</li>
+<li>
+<p>Conan flow
+Прямые и транзитивные зависимости, SBOM, граф зависимостей, license/security policy. <strong>Успех:</strong> граф и SBOM корректны, политики срабатывают.</p>
+</li>
+<li>
+<p>OSA-блокировка в фактическом режиме
+Через Nexus/JFrog plugin либо OSA Proxy — в зависимости от контура. Отдельно проверить Maven, NPM, NuGet, PyPI, Go, APT/RPM, <strong>Conan, Conda, RubyGems</strong> (если остаются обязательными в ТЗ). <strong>Успех:</strong> контролируемая блокировка по политике; зафиксировано, какой режим закрывает какую экосистему.</p>
+</li>
+<li>
+<p>SBOM export / import
+CycloneDX JSON, SPDX JSON, CSV-выгрузки; импорт в <a href="doc-0678004e9f55.html">Dependency-Track</a>; совместимость с результатом стороннего OSS-инструмента. <strong>Успех:</strong> форматы экспортируются и читаются целевыми системами.</p>
+</li>
+<li>
+<p>Уведомления и аудит
+SMTP, Jira, UI-события; audit log и выгрузка логов во внешнюю систему (ELK/Syslog/SIEM). <strong>Успех:</strong> уведомления доходят; логи выгружаются нужным способом.</p>
+</li>
+<li>
+<p>Доступ и роли
+LDAP/AD или OIDC, RBAC, роли администратор / ИБ / разработчик / наблюдатель. <strong>Успех:</strong> аутентификация и разграничение работают по ролям.</p>
+</li>
+<li>
+<p>Документы поставщика
+Запросить и проверить: лицензия ФСТЭК, ISO 9001, подтверждение опыта, структура ИБ-подразделения, состав поставки, SLA. <strong>Успех:</strong> документы предоставлены и соответствуют требованиям к исполнителю.</p>
+</li>
+</ol>
+</blockquote>
+<h2 id="протокол-результата">Протокол результата</h2>
+<p>Для каждого сценария фиксировать: что проверяли, что увидели, статус (✅ / 🟡 / 🔴), кто наблюдал (роль), дата. Сводный результат переносится в <a href="doc-765d7f069356.html">матрицу</a> и питает <a href="doc-ed246e9adf3a.html">решение Go/No-Go</a>.</p>
+<h2 id="связь">Связь</h2>
+<ul>
+<li><a href="doc-c88d413f95e0.html">Вопросы для пилота CodeScoring</a> · <a href="doc-ed246e9adf3a.html">Критерии Go No-Go после пилота</a> · <a href="doc-ecda758e9fc0.html">C C++ build scan make cmake qmake</a> · <a href="doc-b514486fab08.html">OSA Proxy и поддержанные экосистемы</a></li>
+<li>Практики: <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,33 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М04. Контрольные вопросы — КАПО · Пиков</title><meta name="description" content="М04. Контрольные вопросы. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c6f52fa0fad9.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#ориентиры-для-самопроверки">Ориентиры для самопроверки</a></li>
+</ul>
+</div>
+<h1 id="контрольные-вопросы">Контрольные вопросы</h1>
+<blockquote>
+<p>Базовый уровень
+1. Из каких частей состоит строка PURL? Разберите по компонентам <code>pkg:maven/org.apache.logging.log4j/log4j-core@2.14.1</code>.
+2. Сколько полей в строке CPE 2.3 и что означает первое поле <code>part</code>? Какими значениями оно ограничено?
+3. Чем PURL отличается от CPE по назначению: какой источник уязвимостей матчит по каждому из них?
+4. Что означает пустое поле в CPE и как оно записывается в формате 2.3?</p>
+<p>Средний уровень
+5. Почему при битом или отсутствующем PURL сканер возвращает не ошибку, а просто меньше находок? Опишите механизм.
+6. Что такое alias-проблема CPE? Приведите пример продукта с несколькими vendor в словаре NVD.
+7. Чем идентификаторы OSV отличаются от CVE и зачем в схеме OSV нужно поле <code>aliases</code>?
+8. Почему БДУ ФСТЭК — это самостоятельный источник координат, а не перевод NVD? Назовите два конкретных отличия.
+9. Почему для C/C++ компонентов alias-проблема CPE проявляется чаще, чем для npm/PyPI/Maven?</p>
+<p>Продвинутый уровень
+10. Зачем перед публичным матчингом нормализовать PURL и снимать приватные qualifiers? Что произойдёт с <code>pkg:conan/openssl@3.1.1?user=org&amp;repository_url=https://nexus.internal</code>, если отдать его как есть?
+11. Компонент имеет корректный PURL, но в отчёте «0 уязвимостей». Перечислите минимум три причины, по которым это может быть ложным нулём.
+12. Почему связку PURL↔CPE нельзя получить простой склейкой строк? Покажите на примере log4j.</p>
+<p>Кейс-задачи
+<strong>Кейс А. Тихий ноль.</strong> Сканер по SBOM релиза показал 0 уязвимостей для <code>libcurl</code>, хотя версия заведомо старая. В SBOM координата: <code>pkg:generic/libcurl@7.74.0?repository_url=https://artifactory.internal/libs</code>, CPE отсутствует. Что именно сломало матчинг и какие два действия вернут находки?</p>
+<p><strong>Кейс Б. Разошлись источники.</strong> Для одного компонента osv.dev отдаёт <code>GHSA-jfh8-c2jp-5v3q</code> и <code>CVE-2021-44228</code>, а NVD по вашему CPE — пусто. CPE в SBOM: <code>cpe:2.3:a:apache:log4j-core:2.14.1:*:*:*:*:*:*:*</code>. В чём ошибка координаты и как её исправить?</p>
+<p><strong>Кейс В. Внутренний форк без координаты.</strong> Внутренняя библиотека — форк open-source-проекта с собственными патчами. Какую координату ей назначить (PURL/CPE), как пометить статус для матчинга и почему её нельзя автоматически приравнивать к upstream при поиске уязвимостей?</p>
+</blockquote>
+<h2 id="ориентиры-для-самопроверки">Ориентиры для самопроверки</h2>
+<ul>
+<li>В кейсе А ломает матчинг приватный qualifier <code>repository_url</code> + отсутствие CPE: нормализовать PURL (<a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>) и проставить CPE (<code>cpe:2.3:a:haxx:curl:...</code>, проверить alias <code>curl:curl</code>).</li>
+<li>В кейсе Б product в CPE должен быть <code>log4j</code>, а не <code>log4j-core</code> (CPE-имя продукта не равно Maven artifactId).</li>
+<li>В кейсе В форк фиксируется как отдельная сущность с собственной координатой и пометкой «unresolved/internal»; см. <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

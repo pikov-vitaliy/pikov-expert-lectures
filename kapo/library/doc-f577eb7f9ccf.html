@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. Что проверять на проекте: форматы и качество SBOM — КАПО · Пиков</title><meta name="description" content="М03. Что проверять на проекте: форматы и качество SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-f577eb7f9ccf.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#чек-лист">Чек-лист</a></li>
+<li><a href="#типовые-несоответствия">Типовые несоответствия</a></li>
+<li><a href="#опора">Опора</a></li>
+</ul>
+</div>
+<h1 id="что-проверять-на-проекте-форматы-и-качество-sbom">Что проверять на проекте: форматы и качество SBOM</h1>
+<p>Чек-лист аудитора по теме модуля. Проверяется не «есть ли SBOM», а соответствует ли он формату и порогу качества BSI TR-03183-2.</p>
+<blockquote>
+<p>Принцип проверки
+Сначала формат и версия (формальный фильтр), затем обязательные поля компонента (5.2.2), затем семантика лицензий и идентификаторов. Если формат/версия не проходят — остальное проверять преждевременно.</p>
+</blockquote>
+<h2 id="чек-лист">Чек-лист</h2>
+<ul>
+<li>[ ] <strong>Формат и версия.</strong> SBOM представлен в CycloneDX <strong>≥ 1.6</strong> или SPDX <strong>≥ 3.0.1</strong>, в JSON или XML. Файлы 1.4/1.5 и SPDX 2.x не принимаются как соответствующие BSI.</li>
+<li>[ ] <strong>SWID на своём месте.</strong> SWID-теги (если есть) используются как идентификатор компонента (<code>swid.tagId</code> / <code>externalIdentifierType: swid</code>), а не выдаются за SBOM целиком.</li>
+<li>[ ] <strong>Поля самого SBOM.</strong> Заполнены creator (email или URL) и timestamp (рекомендуется UTC/Zulu); присутствует SBOM-URI/serialNumber.</li>
+<li>[ ] <strong>Обязательные поля компонента (5.2.2).</strong> Для каждого компонента есть creator, name, version, filename, dependencies с признаком полноты, distribution licence, hash SHA-512 deployable, executable/archive/structured property.</li>
+<li>[ ] <strong>Свойства BSI.</strong> Executable/archive/structured закодированы через <code>bsi:component:*</code> (CycloneDX) или <code>software_additionalPurpose</code> (SPDX); их отсутствие отмечено как пробел качества, а не «всё ок».</li>
+<li>[ ] <strong>Идентификаторы.</strong> Есть устойчивый ключ (purl и/или CPE); проверена нормализация — см. <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>, <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>.</li>
+<li>[ ] <strong>Лицензии по трём категориям.</strong> Различаются original / distribution / effective; лицензии заданы SPDX-идентификаторами или выражениями, а не только текстом (BSI 6.1).</li>
+<li>[ ] <strong>Глубина (level of detail).</strong> Объявлен класс/глубина SBOM (top-level / n-level / transitive / delivery item / complete); прямые и транзитивные зависимости разрешены минимум до первого компонента вне scope of delivery.</li>
+<li>[ ] <strong>Чистота от уязвимостей.</strong> В файле SBOM нет блока уязвимостей; информация об уязвимостях вынесена в CSAF/VEX — см. <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и управление VDR VEX</a>.</li>
+<li>[ ] <strong>Конвертация под контролем.</strong> Если SBOM конвертируется между форматами, зафиксирован список теряемых полей (hash, declared/concluded, properties) и решение, как это компенсируется.</li>
+<li>[ ] <strong>Класс SBOM заявлен.</strong> Указано, это Design / Source / Build / Analysed / Deployed / Runtime SBOM — от этого зависит, какие поля вообще достижимы (например, hash требует доступа к бинарю).</li>
+<li>[ ] <strong>Подпись.</strong> SBOM по возможности подписан для проверки подлинности — см. <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a>.</li>
+</ul>
+<h2 id="типовые-несоответствия">Типовые несоответствия</h2>
+<blockquote>
+<p>Частые провалы аудита
+- SBOM в CycloneDX 1.4 «по умолчанию инструмента» — формально не BSI.
+- SWID/инвентарь активов выдан за SBOM.
+- Лицензия как свободный текст без SPDX-идентификатора.
+- Уязвимости вшиты в SBOM (статика тащит динамику по всей цепочке).
+- Не заявлен класс SBOM, поэтому непонятно, почему нет hash или filename.</p>
+</blockquote>
+<h2 id="опора">Опора</h2>
+<p><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (разделы 4, 5.1, 5.2, 6.1, 8.3, 8.4) · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a> · <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a> · <a href="doc-0cc54b9609f7.html">Минимальный набор полей ППК</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,41 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Package URL — КАПО · Пиков</title><meta name="description" content="Package URL. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-41eb01248f66.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="package-url">Package URL</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Package URL (purl) — детерминированная схема координат пакета: по типу экосистемы, имени и версии она указывает на конкретный артефакт в конкретном реестре. В отличие от назначаемых вручную строк <a href="doc-17e9049e2a17.html">CPE</a>, purl вычисляется из метаданных пакета однозначно, поэтому служит первичным ключом компонента в <a href="doc-dbc1ace95cba.html">CycloneDX</a> и <a href="doc-4074ab5340cf.html">SPDX</a> и ключом запроса к <a href="doc-1875214e9551.html">OSV.dev</a>.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Каноническая форма: <code>pkg:type/namespace/name@version?qualifiers#subpath</code>. Примеры по экосистемам:</p>
+<pre><code>pkg:npm/lodash@4.17.21
+pkg:npm/%40angular/core@17.0.0          # @scope кодируется как %40
+pkg:pypi/requests@2.31.0
+pkg:maven/org.apache.commons/commons-lang3@3.14.0
+pkg:conan/zlib@1.3.1?channel=stable     # C/C++ через Conan
+pkg:generic/openssl@3.0.13?download_url=https%3A%2F%2Fdownloads.example.com%2Fopenssl-3.0.13.tar.gz&amp;checksum=sha256:...
+</code></pre>
+<p>Ключевые правила: <code>type</code> и <code>name</code> обязательны; <code>namespace</code> зависит от экосистемы (Maven groupId, npm scope); <code>qualifiers</code> несут уточнения (<code>arch</code>, <code>repository_url</code>, <code>channel</code>); при нормализации регистр и кодирование приводятся к канону, иначе одна зависимость двоится. В SBOM purl кладётся в <code>components[].purl</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Детерминизм: одинаковый артефакт даёт одинаковую строку — корректная дедупликация и стабильное сопоставление с OSV.</li>
+<li>Покрывает десятки экосистем (<code>npm</code>, <code>pypi</code>, <code>maven</code>, <code>nuget</code>, <code>golang</code>, <code>deb</code>, <code>conan</code>, <code>generic</code>).</li>
+<li><code>pkg:generic</code> и <code>qualifiers</code> (<code>download_url</code>, <code>checksum</code>) позволяют идентифицировать вендорённые исходники, у которых нет реестра.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Не адресует ОС и аппаратные платформы — здесь нужен CPE (<code>part:o</code>, <code>part:h</code>).</li>
+<li>Для C/C++ без пакетного менеджера каноничного purl часто нет; <code>pkg:generic</code> спасает лишь при наличии устойчивого <code>download_url</code>/<code>checksum</code>.</li>
+<li>Расхождения в кодировании (<code>%40</code>, регистр, лишние <code>qualifiers</code>) ломают дедупликацию, если не нормализовать.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Схема не требует сети: purl формируется из локальных метаданных пакета (lockfile, манифест) при генерации SBOM в закрытом контуре. Сетевой доступ нужен лишь следующему шагу — запросу к источнику уязвимостей по этому purl, который тоже разворачивается локально (зеркало OSV).</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-4a0b7bceee7b.html">М04 Идентификаторы компонентов и уязвимостей</a> · <a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a>
+Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>
+Смежные карточки: <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-1875214e9551.html">OSV.dev</a> · <a href="doc-6df02436591e.html">Conan</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

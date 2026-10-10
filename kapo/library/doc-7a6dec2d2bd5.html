@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OpenVEX — КАПО · Пиков</title><meta name="description" content="OpenVEX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7a6dec2d2bd5.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="openvex">OpenVEX</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>OpenVEX — минималистичный формат VEX-утверждений (Vulnerability Exploitability eXchange): он отвечает не на вопрос «есть ли в составе уязвимый компонент», а на вопрос «эксплуатируема ли эта уязвимость в нашем продукте». Это инструмент гашения шума: сканер нашёл CVE в зависимости, OpenVEX-документ заявляет <code>not_affected</code> с обоснованием — и находка обоснованно снимается. В отличие от тяжёлого <a href="doc-36b66b831249.html">CSAF</a>, это отдельный компактный JSON-LD. Смысл issuer и evidence разобран в <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Документ — JSON-LD с массивом <code>statements</code>, каждое связывает уязвимость, продукт и статус:</p>
+<pre><code class="language-json">{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "author": "Организация",
+  "statements": [{
+    "vulnerability": { "name": "CVE-2024-0001" },
+    "products": [{ "@id": "pkg:conan/openssl@3.0.13" }],
+    "status": "not_affected",
+    "justification": "vulnerable_code_not_in_execute_path"
+  }]
+}
+</code></pre>
+<p>Статус — ровно одно из четырёх значений: <code>not_affected</code>, <code>affected</code>, <code>fixed</code>, <code>under_investigation</code>. Ключевое правило: статус <code>not_affected</code> обязан нести обоснование — либо <code>justification</code> из фиксированного перечня (<code>component_not_present</code>, <code>vulnerable_code_not_present</code>, <code>vulnerable_code_not_in_execute_path</code>, <code>vulnerable_code_cannot_be_controlled_by_adversary</code>, <code>inline_mitigations_already_exist</code>), либо текстовый <code>impact_statement</code>. Продукт адресуется через <a href="doc-41eb01248f66.html">Package URL</a>. Сканеры (<a href="doc-99f61d072a43.html">Grype</a>, <a href="doc-866090cf44a0.html">OSV-Scanner</a>) принимают такой документ на вход и фильтруют находки. Поле <code>author</code> должно указывать сторону, ответственную за продукт, а не базу уязвимостей.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Предельно компактен: одно утверждение «не затронуто» — несколько строк, без <code>product_tree</code> как в CSAF.</li>
+<li>Жёсткий enum обоснований заставляет аргументировать <code>not_affected</code>, а не просто глушить находку.</li>
+<li>Адресация продукта по purl ложится прямо на SBOM и вывод сканера; конвейер триажа — <a href="doc-c01924770ece.html">П35. VEX triage</a>.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Это только VEX: метаданных бюллетеня, серьёзности и ремедиаций, как в CSAF, у него нет.</li>
+<li>Дисциплина обоснований переносит ответственность на человека — неверный <code>justification</code> маскирует реальную уязвимость (<a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>).</li>
+<li>Upstream VEX/advisory можно использовать как evidence, но финальное утверждение для собственного продукта выпускает производитель/владелец продукта.</li>
+<li>Утверждения нужно поддерживать в актуальности: смена версии компонента может сделать прежний <code>not_affected</code> недействительным.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью офлайновый: документ генерируется и потребляется как локальный JSON, привязка к находкам сканера идёт без сети. В закрытом контуре VEX-утверждения хранятся рядом с SBOM и применяются на этапе триажа без внешних обращений.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей</a> · <a href="doc-0c23b1ba214a.html">М08 Защита цепочки поставки и OSA</a>
+Справка: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>
+Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a>
+Смежные карточки: <a href="doc-36b66b831249.html">CSAF</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

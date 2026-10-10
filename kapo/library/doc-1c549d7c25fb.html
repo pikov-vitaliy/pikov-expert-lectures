@@ -1,0 +1,200 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>RACI для SCA OSA процесса — КАПО · Пиков</title><meta name="description" content="RACI для SCA OSA процесса. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1c549d7c25fb.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#легенда-raci">Легенда RACI</a></li>
+<li><a href="#роли">Роли</a></li>
+<li><a href="#матрица-роль-задача">Матрица роль × задача</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="raci-для-sca-osa-процесса">RACI для SCA OSA процесса</h1>
+<blockquote>
+<p>Назначение
+Распределяет ответственность по шагам <a href="doc-e8c524b20a2a.html">регламента SCA/OSA</a> между ролями: кто исполняет (R), кто отвечает за результат (A), с кем согласуют (C), кого информируют (I). Снимает спор «чья это задача» до старта релиза.</p>
+</blockquote>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>При запуске процесса на новом продукте, при найме/смене ответственного, при разборе инцидента «никто не сделал шаг». Матрица заполняется один раз на продукт и пересматривается при изменении ролей.</p>
+<h2 id="легенда-raci">Легенда RACI</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Код</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>R</strong></td>
+<td>Responsible — выполняет работу</td>
+</tr>
+<tr>
+<td><strong>A</strong></td>
+<td>Accountable — единолично отвечает за результат (один на строку)</td>
+</tr>
+<tr>
+<td><strong>C</strong></td>
+<td>Consulted — даёт экспертизу до решения</td>
+</tr>
+<tr>
+<td><strong>I</strong></td>
+<td>Informed — уведомляется о результате</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="роли">Роли</h2>
+<ul>
+<li><strong>DEV</strong> — разработчик / команда сборки.</li>
+<li><strong>REL</strong> — релиз-инженер / владелец CI.</li>
+<li><strong>SCA</strong> — аналитик композиционного анализа.</li>
+<li><strong>SEC</strong> — ИБ / триаж уязвимостей.</li>
+<li><strong>LEG</strong> — юрист по лицензиям.</li>
+<li><strong>AUD</strong> — «сервис аудита/вердиктов» (выпуск вердикта).</li>
+<li><strong>OWN</strong> — владелец процесса / руководитель.</li>
+</ul>
+<h2 id="матрица-роль-задача">Матрица роль × задача</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Шаг регламента</th>
+<th style="text-align: center;">DEV</th>
+<th style="text-align: center;">REL</th>
+<th style="text-align: center;">SCA</th>
+<th style="text-align: center;">SEC</th>
+<th style="text-align: center;">LEG</th>
+<th style="text-align: center;">AUD</th>
+<th style="text-align: center;">OWN</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Приёмка и фиксация входа</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>2. Генерация/получение SBOM (+ build evidence)</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td>3. Контроль качества SBOM</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">A/R</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td>4. Идентификация компонентов</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">A/R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td>5. Обогащение фактами (генератор фактов)</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">A/R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+</tr>
+<tr>
+<td>6. Анализ уязвимостей (VDR/VEX)</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>7. Анализ лицензий</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>8. Триаж и решения по рискам</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>9. Релизный gate (вердикт)</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>10. Журналирование и audit trail</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">I</td>
+</tr>
+<tr>
+<td>11. Мониторинг в продуктиве</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">A</td>
+<td style="text-align: center;">A</td>
+</tr>
+<tr>
+<td>Исключение / принятие риска</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">I</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">C</td>
+<td style="text-align: center;">R</td>
+<td style="text-align: center;">A</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Правило одного A
+В каждой строке ровно один <strong>A</strong>. Если за шаг «никто не A» — шаг выпадает; если «двое A» — конфликт ответственности. Проверять при заполнении.</p>
+</blockquote>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модули: <a href="doc-3235e84d3a49.html">М10 Много исполнителей и корпоративная модель продукта</a>, <a href="doc-457364f50285.html">М11 Корпоративный кейс генератор фактов и сервис вердиктов</a>, <a href="doc-e29be6710c8d.html">М14 Политики, исключения и принятие риска</a>.</li>
+<li>Смежные шаблоны: <a href="doc-e8c524b20a2a.html">Регламент композиционного анализа ПО</a> (источник строк), <a href="doc-915741bcb430.html">Модель ролей в сервисе аудита</a> (права ролей), <a href="doc-3449932010c8.html">Порядок принятия риска</a>.</li>
+<li>Нормативка: <a href="doc-b5856ada3679.html">ISO IEC 27001</a>, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

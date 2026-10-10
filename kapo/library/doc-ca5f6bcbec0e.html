@@ -1,0 +1,56 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>vcpkg manifests — КАПО · Пиков</title><meta name="description" content="vcpkg manifests. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-ca5f6bcbec0e.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="vcpkg-manifests">vcpkg manifests</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>vcpkg в режиме манифеста (<code>vcpkg.json</code>) — это попытка дать C/C++ воспроизводимость уровня lock-файла. Но ключевой нюанс для SCA в том, что версии в <code>vcpkg.json</code> сами по себе ничего не фиксируют: реальные версии определяет <code>builtin-baseline</code> — это git-commit реестра портов. Манифест без baseline означает плавающие версии: на разных машинах и в разное время один и тот же <code>vcpkg.json</code> соберёт разный состав. Поэтому для композиционного анализа <code>vcpkg.json</code> надо читать в паре с baseline и с <code>vcpkg.json</code> блоком <code>overrides</code>, который пинит конкретные версии.</p>
+<p>Вторая хорошая новость: современный vcpkg при установке порта генерирует per-package SPDX SBOM (<code>vcpkg.spdx.json</code>) внутри дерева установки. Это готовое evidence с именами, версиями и лицензиями, которое не нужно реконструировать бинарным анализом.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Версия компонента определяется не строкой <code>"version&gt;="</code>, а триадой «baseline + overrides + версионные ограничения»:</p>
+<pre><code class="language-json">{
+  "name": "demo-app",
+  "version-string": "0.1.0",
+  "dependencies": [ "openssl", "fmt", { "name": "zlib", "version&gt;=": "1.3" } ],
+  "builtin-baseline": "a1b2c3d4...",
+  "overrides": [ { "name": "openssl", "version": "3.2.1" } ]
+}
+</code></pre>
+<p><code>builtin-baseline</code> — это git commit реестра портов, который задаёт версии по умолчанию; <code>overrides</code> — жёсткий пин конкретной зависимости.</p>
+<blockquote>
+<p>Где брать фактические версии и SBOM</p>
+</blockquote>
+<pre><code class="language-bash">vcpkg install        # в каталоге с vcpkg.json: ставит зависимости по baseline в vcpkg_installed/
+# после установки:
+find . -name vcpkg.spdx.json        # per-package SPDX SBOM каждого порта
+cat vcpkg_installed/&lt;triplet&gt;/share/openssl/vcpkg.spdx.json | jq '.packages[].versionInfo'</code></pre>
+<blockquote>
+<p><code>vcpkg.spdx.json</code> отдаёт имя, версию и лицензию порта — это первичный источник состава, точнее, чем разбор <code>vcpkg.json</code>.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — манифест без <code>builtin-baseline</code>. Версии в нём плавают, и зафиксированный однажды SBOM перестаёт соответствовать тому, что соберётся завтра. Вторая ловушка — читать только <code>vcpkg.json</code> и игнорировать <code>vcpkg-configuration.json</code>, где могут быть подключены приватные registries: оттуда приходят порты, которых нет в публичном реестре, и их версии/лицензии нужно проверять отдельно.</p>
+<blockquote>
+<p>Берите SBOM из дерева установки, а не из манифеста
+Источник истины — <code>vcpkg.spdx.json</code> после установки плюс зафиксированный baseline. Разбор <code>vcpkg.json</code> руками — только дополнение: он не знает, во что baseline развернул диапазоны.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Проверьте наличие <code>builtin-baseline</code> в <code>vcpkg.json</code>; его отсутствие — повод понизить confidence (версии плавают).</li>
+<li>Соберите все <code>vcpkg.spdx.json</code> из <code>vcpkg_installed/</code> как первичное evidence: имя, версия, лицензия каждого порта.</li>
+<li>Сверьте <code>overrides</code> — это жёсткие пины, они переопределяют baseline.</li>
+<li>Откройте <code>vcpkg-configuration.json</code>: при наличии приватных registries отметьте их порты для отдельной проверки версий и лицензий.</li>
+<li>Сопоставьте состав из SPDX с <code>ldd</code> готового артефакта — статически слинкованные порты в <code>ldd</code> не появятся, их даёт только SBOM установки.</li>
+<li>Зафиксируйте baseline-commit в provenance сборки, чтобы SBOM был воспроизводим.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-cf001a40d806.html">SPDX ISO IEC 5962</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-f5b27d7d4408.html">Conan package id graph</a> · <a href="doc-189e151e1830.html">CMake target_link_libraries</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-6a7bdaaab195.html">version normalization</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

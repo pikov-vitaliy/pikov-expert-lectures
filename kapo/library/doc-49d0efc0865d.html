@@ -1,0 +1,92 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П38. Честный SBOM контейнерного образа — КАПО · Пиков</title><meta name="description" content="П38. Честный SBOM контейнерного образа. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-49d0efc0865d.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п38-честный-sbom-контейнерного-образа">П38. Честный SBOM контейнерного образа</h1>
+<h2 id="цель">Цель</h2>
+<p>Сгенерировать SBOM одного и того же образа двумя независимыми генераторами (Syft и Trivy), сравнить число компонентов и доказать, что «честность» SBOM измеряется не количеством строк, а <strong>источником факта</strong> для каждого компонента. Проверяемый результат — таблица расхождений + объяснение, откуда взялся каждый «лишний» или «пропущенный» пакет.</p>
+<blockquote>
+<p>Что значит «нечестный» SBOM образа
+SBOM по образу опирается на <em>следы</em>: базы пакетных менеджеров (<code>/var/lib/dpkg/status</code>, <code>/lib/apk/db/installed</code>, <code>/var/lib/rpm</code>), lockfile'ы языков и метаданные бинарей. Если ПО положено в образ <code>COPY</code>-ом мимо пакетного менеджера, метаданные стёрты (<code>mint --obfuscate-metadata</code>) или бинарь упакован UPX — генератор не видит компонент, и SBOM покажет «0 уязвимостей» при дырявом образе. Честный SBOM явно перечисляет, <em>какие</em> источники фактов использованы и где их нет.</p>
+</blockquote>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Возьмите реальный публичный образ среднего размера и снимите два SBOM в одном формате (CycloneDX JSON), чтобы их можно было сравнивать:</p>
+<pre><code class="language-bash">IMG=ghcr.io/benc-uk/nodejs-demoapp:latest
+
+# 1. SBOM генератором Syft
+syft "$IMG" -o cyclonedx-json=syft.cdx.json
+
+# 2. SBOM генератором Trivy
+trivy image --format cyclonedx --output trivy.cdx.json "$IMG"
+
+# 3. сколько компонентов нашёл каждый
+echo "syft : $(jq '.components | length' syft.cdx.json)"
+echo "trivy: $(jq '.components | length' trivy.cdx.json)"
+
+# 4. множества PURL и их разница (что нашёл один и не нашёл другой)
+jq -r '.components[].purl' syft.cdx.json  | sort -u &gt; syft.purls
+jq -r '.components[].purl' trivy.cdx.json | sort -u &gt; trivy.purls
+echo "--- только в syft ---";  comm -23 syft.purls trivy.purls
+echo "--- только в trivy ---"; comm -13 syft.purls trivy.purls
+
+# 5. проверка «честности»: сколько компонентов БЕЗ purl (висячая идентичность)
+jq '[.components[] | select(.purl == null)] | length' syft.cdx.json
+</code></pre>
+<p>Для CI-гейта по качеству SBOM (а не только по severity) добавьте порог на долю компонентов без PURL:</p>
+<pre><code class="language-bash">TOTAL=$(jq '.components | length' syft.cdx.json)
+NOPURL=$(jq '[.components[] | select(.purl == null)] | length' syft.cdx.json)
+awk -v t="$TOTAL" -v n="$NOPURL" 'BEGIN{ r=n/t; printf "no-purl ratio: %.2f\n", r; exit (r&gt;0.10)}'
+# код возврата 1, если больше 10% компонентов без PURL — пайплайн падает
+</code></pre>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Числа у двух генераторов <strong>различаются</strong> — это норма, а не ошибка. Для node-демо ориентир — десятки компонентов (apk-пакеты базового Alpine + npm-зависимости приложения), и наборы PURL пересекаются не полностью:</p>
+<pre><code>syft : 213
+trivy: 198
+--- только в syft ---
+pkg:npm/path-to-regexp@0.1.10
+pkg:apk/alpine/libcrypto3@3.3.2-r0?...
+--- только в trivy ---
+pkg:apk/alpine/.python-rundeps@...
+</code></pre>
+<p>Скелет компонента в CycloneDX, по которому видно источник факта (поле <code>purl</code> + <code>properties</code>):</p>
+<pre><code class="language-json">{
+  "type": "library",
+  "name": "axios",
+  "version": "1.7.7",
+  "purl": "pkg:npm/axios@1.7.7",
+  "properties": [
+    { "name": "syft:package:foundBy", "value": "javascript-package-cataloger" },
+    { "name": "syft:location:0:path", "value": "/app/node_modules/axios/package.json" }
+  ]
+}
+</code></pre>
+<p>CI-проверка печатает долю компонентов без PURL и завершается кодом <code>0</code>, если она ≤ 10 %:</p>
+<pre><code>no-purl ratio: 0.03
+</code></pre>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>jq: error ... Cannot index ...</code>.</strong> У Trivy и Syft немного разные ветви CycloneDX (<code>components</code> vs вложенность в <code>metadata.component</code>). Проверьте <code>jq 'keys' trivy.cdx.json</code> и <code>jq '.components[0]'</code> — если <code>components</code> отсутствует, у вас SBOM без зависимостей (пустой образ или ошибка скана).</li>
+<li><strong><code>syft</code> и <code>trivy</code> дают одинаковые числа.</strong> Маловероятно для реального образа; чаще значит, что вы сравниваете не PURL, а строки целиком (с разными query-параметрами <code>?arch=...&amp;distro=...</code>). Сравнивайте по нормализованному PURL (имя+версия+тип), отбросив query.</li>
+<li><strong><code>0 vulnerabilities</code> / пустой SBOM на «чистом» образе.</strong> Возможна обфускация: проверьте образ на <code>mint --obfuscate-metadata</code> или UPX (<code>trivy image --scanners vuln,secret</code> + ручной <code>dive</code>). Нулевой результат без проверки coverage — не доказательство безопасности, а красный флаг.</li>
+<li><strong>CI-гейт всегда зелёный.</strong> Убедитесь, что <code>awk ... exit (r&gt;0.10)</code> действительно возвращает код в пайплайн (<code>set -e</code>, проверка <code>$?</code>). Частая ошибка — порог считается, но код возврата теряется в конвейере.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Сдаёте: <code>syft.cdx.json</code>, <code>trivy.cdx.json</code>, файл с разницей PURL и письменный разбор 3–5 расхождений (для каждого — <em>почему</em> один генератор нашёл компонент, а другой нет: разный каталогизатор, версия БД, обработка бинарей). Плюс рабочий CI-фрагмент с порогом по доле компонентов без PURL и демонстрация того, что он валит сборку на искусственно «ослеплённом» SBOM.</p>
+<blockquote>
+<p>Два генератора — это фича, а не баг
+На приёмке полезно держать кросс-проверку: расхождение наборов PURL подсвечивает компоненты со слабой идентичностью и зоны, где одному инструменту не хватает каталогизатора. Это и есть переход от «у нас есть SBOM» к «у нас есть честный SBOM».</p>
+</blockquote>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-ef214c81e577.html">Модуль М16</a> — разрыв между декларацией и реальным составом образа.</li>
+<li>Смежные практики: <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>, <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a>, <a href="doc-00d2962ed78f.html">П40. Огнестойкость РБПО и SCA процесс</a>.</li>
+<li>Инструменты: <a href="doc-e0e63f957dcf.html">Syft</a>, <a href="doc-2c326e169620.html">Trivy</a>.</li>
+<li>Шаблоны: <a href="doc-c07a2034e54b.html">Чек-лист честного SBOM контейнерного образа</a>, <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a>, <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>.</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a>, <a href="doc-3c212b09f984.html">BSI TR-03183-2</a>, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

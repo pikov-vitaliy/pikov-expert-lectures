@@ -1,0 +1,89 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П12. ORT и license policy — КАПО · Пиков</title><meta name="description" content="П12. ORT и license policy. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1e5ce9414ca8.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п12-ort-и-license-policy">П12. ORT и license policy</h1>
+<blockquote>
+<p>Зачем эта практика
+ScanCode отвечает на вопрос «какая лицензия найдена», но не «можно ли с ней выпускаться». OSS Review Toolkit (ORT) добавляет недостающий слой — <strong>исполняемую политику</strong>: правила на Kotlin DSL, которые из набора лицензий вычисляют нарушения (violations) с уровнем <code>ERROR</code>/<code>WARNING</code>/<code>HINT</code>. Это превращает лицензионный анализ из ручного просмотра в воспроизводимый CI-gate: pipeline падает не потому, что «кому-то не понравился GPL», а потому что сработало записанное правило.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Прогнать проект через конвейер ORT <code>analyze → scan → evaluate → report</code> со своим файлом политики и получить отчёт, где есть хотя бы одно зафиксированное нарушение (например, strong copyleft в продукте, помеченном как проприетарный) с категорией severity. Проверяемый результат — отчёт ORT и ненулевой код возврата <code>ort evaluate</code>, на котором можно строить CI-gate.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash">ort --version
+
+# 1. Построить дерево зависимостей и собрать заявленные лицензии
+ort analyze -i . -o out/
+
+# 2. (опц.) досканировать исходники детектором лицензий — точные находки
+ort scan -i out/analyzer-result.yml -o out/
+
+# 3. Применить политику: правила превращают лицензии в violations
+ort evaluate \
+  -i out/scan-result.yml \
+  --rules-file curations/rules.kts \
+  --license-classifications-file curations/license-classifications.yml \
+  -o out/
+
+# 4. Человекочитаемые и машинные отчёты
+ort report -i out/evaluation-result.yml -o out/ \
+  -f WebApp,CycloneDX,SpdxDocument
+</code></pre>
+<p>Минимальный фрагмент политики (<code>rules.kts</code>) — блокировать strong copyleft в проприетарной поставке:</p>
+<pre><code class="language-kotlin">fun RuleSet.copyleftRule() = packageRule("STRONG_COPYLEFT_IN_DISTRIBUTION") {
+    require { -isExcluded() }
+    licenseRule("STRONG_COPYLEFT", LicenseView.CONCLUDED_OR_DECLARED_AND_DETECTED) {
+        require { isStrongCopyleft() }  // класс из license-classifications.yml
+        error(
+            "Лицензия ${license} класса strong copyleft в распространяемом компоненте ${pkg.id.toCoordinates()}.",
+            "Получить юридическое заключение либо заменить компонент."
+        )
+    }
+}
+</code></pre>
+<blockquote>
+<p><code>LicenseView</code> решает, какие лицензии считать
+<code>CONCLUDED_OR_DECLARED_AND_DETECTED</code> берёт сначала concluded-вердикт (если человек его внёс через curations), иначе declared + detected. Это и есть мост между П11 (detected) и П27 (concluded): курация в ORT поднимает ручной вердикт выше машинной находки, и правило перестаёт срабатывать на уже разобранном кейсе.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p><code>ort evaluate</code> пишет в stdout сводку и завершается ненулевым кодом при наличии ошибок:</p>
+<pre><code>Resolved 248 license findings.
+Found 3 rule violations:
+  ERROR:   STRONG_COPYLEFT_IN_DISTRIBUTION — GPL-3.0-only in 'NPM::somelib:2.4.1'
+  WARNING: WEAK_COPYLEFT_REVIEW — LGPL-3.0-or-later in 'NPM::otherlib:1.0.0'
+  HINT:    UNHANDLED_LICENSE — LicenseRef-custom-eula in 'PyPI::vendored:0.9'
+</code></pre>
+<p>Скелет <code>evaluation-result.yml</code> (секция нарушений):</p>
+<pre><code class="language-yaml">evaluator:
+  violations:
+  - rule: "STRONG_COPYLEFT_IN_DISTRIBUTION"
+    pkg: "NPM::somelib:2.4.1"
+    license: "GPL-3.0-only"
+    severity: "ERROR"
+    message: "Лицензия GPL-3.0-only класса strong copyleft..."
+</code></pre>
+<p>Проверка для CI: после <code>ort evaluate</code> команда <code>echo $?</code> должна вернуть <code>2</code> (есть violations с severity ERROR) — именно этот код останавливает pipeline. Если правил нет или классы не заданы, violations будет <code>0</code> и gate пропустит copyleft — это ложноотрицательный результат, а не «всё чисто».</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>ort: command not found</code></strong> — ORT не установлен. Проще всего запускать официальным образом: <code>docker run --rm -v "$PWD":/project ghcr.io/oss-review-toolkit/ort:latest ...</code>. Самостоятельная сборка требует JDK 17+.
+- <strong><code>analyze</code> находит 0 пакетов</strong> — не отработал нужный package manager (нет <code>package-lock.json</code> / <code>go.sum</code>). ORT читает реальные lock-файлы; без них дерево зависимостей пустое. Проверьте секцию <code>analyzer</code> в результате.
+- <strong>violations всегда 0, хотя copyleft в проекте есть</strong> — не подключён <code>--license-classifications-file</code> или в нём не размечены классы (<code>isStrongCopyleft()</code> не на что опереться). Правило компилируется, но никогда не истинно.
+- <strong><code>ort evaluate</code> падает с ошибкой компиляции <code>.kts</code></strong> — синтаксис Kotlin DSL чувствителен к версии ORT; сверьте сигнатуры функций с версией из <code>ort --version</code>, не копируйте правила из старых примеров вслепую.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) <code>evaluation-result.yml</code> с минимум одним <code>severity: ERROR</code>; (2) ваш <code>rules.kts</code> и <code>license-classifications.yml</code> (политика, а не дефолт); (3) вывод <code>echo $?</code> после <code>ort evaluate</code> с ненулевым кодом и формулировку, как этот код встроить в CI-шаг (<code>needs</code>/<code>allow_failure: false</code>). Запуск без собственной политики не засчитывается — суть практики именно в policy-driven подходе.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a></li>
+<li>Смежные практики: <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> · <a href="doc-7995e3acdb2a.html">П13. FOSSology как юридический workflow</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></li>
+<li>Нормативка: <a href="doc-cf001a40d806.html">SPDX ISO/IEC 5962</a> · <a href="doc-348bb0ac58ac.html">OpenChain ISO/IEC 5230</a></li>
+<li>Шаблоны: <a href="doc-ab31bcfd34fb.html">Политика лицензионной чистоты</a> · <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a></li>
+<li>Инструмент: <a href="doc-5daf51958a11.html">OSS Review Toolkit</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

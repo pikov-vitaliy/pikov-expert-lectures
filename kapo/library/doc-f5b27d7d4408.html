@@ -1,0 +1,71 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conan recipe package id graph — КАПО · Пиков</title><meta name="description" content="Conan recipe package id graph. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-f5b27d7d4408.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="conan-recipe-package-id-graph">Conan recipe package id graph</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Conan — один из немногих случаев, когда C/C++ проект отдаёт настоящий граф зависимостей с устойчивой идентичностью пакета. В отличие от голого CMake, здесь есть recipe (<code>conanfile.py</code>/<code>conanfile.txt</code>), lock-файл (<code>conan.lock</code>) и команда <code>conan graph info</code>, которая печатает полный транзитивный граф с версиями, ревизиями и опциями. Для SCA это золото: из графа восстанавливается состав, который иначе пришлось бы вытаскивать бинарным анализом.</p>
+<p>Но именно из-за <code>package_id</code> идентичность в Conan не сводится к паре «имя+версия». <code>package_id</code> — это хеш от настроек (<code>settings</code>), опций (<code>options</code>) и требований (<code>requires</code>). Поэтому <code>openssl/3.2.1</code> с <code>shared=True</code> и <code>openssl/3.2.1</code> с <code>shared=False</code> — это два разных бинарных пакета с разными <code>package_id</code>, и в SBOM их нельзя схлопывать в одну запись: у них может отличаться поверхность уязвимостей и набор слинкованного кода.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Граф с идентичностью снимается одной командой и отдаёт ровно те поля, которых не хватает в CMake-проекте:</p>
+<blockquote>
+<p><code>conan graph info</code> как источник состава</p>
+</blockquote>
+<pre><code class="language-bash">conan graph info . --format=json &gt; graph.json</code></pre>
+<blockquote>
+<p>В каждом узле графа: <code>ref</code> (например <code>zlib/1.3.1#&lt;recipe_revision&gt;</code>), <code>package_id</code>, развёрнутые <code>options</code>, <code>settings</code> и список <code>requires</code>. Recipe revision (<code>#...</code> после версии) фиксирует, какая именно версия рецепта собрала бинарь, — это часть provenance, которую теряет любой поздний скан готового артефакта.</p>
+</blockquote>
+<p>Принципиальный момент для полноты SBOM — разделение контекстов сборки и запуска:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Тип требования</th>
+<th>Попадает в артефакт</th>
+<th>Должно быть в SBOM продукта</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>requires</code> (host)</td>
+<td>да, линкуется/вкомпилируется</td>
+<td>да</td>
+</tr>
+<tr>
+<td><code>build_requires</code> / <code>tool_requires</code> (cmake, ninja, протоген)</td>
+<td>нет, только инструмент сборки</td>
+<td>нет (или отдельной секцией)</td>
+</tr>
+<tr>
+<td><code>test_requires</code></td>
+<td>нет</td>
+<td>нет</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — это <code>build_requires</code>/<code>tool_requires</code>. Они видны в <code>conan graph info</code>, но не входят в поставляемый бинарь, и если механически выгрузить весь граф в SBOM, продукт получит фантомные «зависимости» от компилятора и кодогенераторов. Обратная ошибка не менее опасна: схлопывание разных <code>package_id</code> одной версии скрывает, что собранный с другими опциями пакет — это другой код.</p>
+<blockquote>
+<p>Фиксируйте lock и различайте контексты
+Снимайте <code>conan.lock</code> (<code>conan lock create</code>) — он замораживает точные ревизии и <code>package_id</code> всего графа. В SBOM переносите только узлы host-контекста (<code>context: host</code>), а build/test-контекст выносите отдельно или помечайте scope как <code>excluded</code>/<code>optional</code>.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Выгрузите граф: <code>conan graph info . --format=json &gt; graph.json</code> и сохраните как артефакт сборки.</li>
+<li>Зафиксируйте <code>conan.lock</code>; сравнивайте сборки по нему, а не по диапазонам версий из рецепта.</li>
+<li>В SBOM переносите только узлы с <code>context: host</code>; <code>tool_requires</code>/<code>test_requires</code> исключайте или помечайте отдельным scope.</li>
+<li>Для каждого компонента возьмите <code>ref</code> с recipe revision и <code>package_id</code> — это устойчивый ключ; не схлопывайте разные <code>package_id</code> одной версии.</li>
+<li>Сверьте <code>options</code> критичных пакетов (<code>shared</code>, <code>fPIC</code>, <code>with_*</code>): они меняют, какой код реально слинкован.</li>
+<li>PURL формируйте по типу <code>conan</code> и нормализуйте приватные qualifiers (см. смежную заметку) перед матчингом на публичные источники уязвимостей.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-59d2d8170564.html">private Conan qualifiers</a> · <a href="doc-ca5f6bcbec0e.html">vcpkg manifests</a> · <a href="doc-6a7bdaaab195.html">version normalization</a> · <a href="doc-53c0c842e715.html">PURL generic fallback</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

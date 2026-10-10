@@ -1,0 +1,116 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М06. Практическая работа: от SBOM к VEX-триажу — КАПО · Пиков</title><meta name="description" content="М06. Практическая работа: от SBOM к VEX-триажу. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-eed1954f9e9f.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#вход">Вход</a></li>
+<li><a href="#шаги">Шаги</a><ul>
+<li><a href="#1-зафиксировать-контекст-анализа">1. Зафиксировать контекст анализа</a></li>
+<li><a href="#2-получить-vdr-через-grype-поверх-sbom">2. Получить VDR через Grype поверх SBOM</a></li>
+<li><a href="#3-получить-второй-vdr-через-osv-scanner">3. Получить второй VDR через OSV-Scanner</a></li>
+<li><a href="#4-загрузить-sbom-в-dependency-track">4. Загрузить SBOM в Dependency-Track</a></li>
+<li><a href="#5-сверить-с-бду-фстэк">5. Сверить с БДУ ФСТЭК</a></li>
+<li><a href="#6-оформить-vex-по-5-находкам">6. Оформить VEX по 5 находкам</a></li>
+<li><a href="#7-дополнить-триаж-управленческими-полями">7. Дополнить триаж управленческими полями</a></li>
+</ul>
+</li>
+<li><a href="#ожидаемый-результат">Ожидаемый результат</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-от-sbom-к-vex-триажу">Практическая работа: от SBOM к VEX-триажу</h1>
+<h2 id="цель">Цель</h2>
+<p>Из готового SBOM получить VDR двумя инструментами, сверить находки с национальным источником и оформить полноценный VEX-триаж: каждая обработанная находка получает состояние, обоснование, владельца, SLA и условие ретеста.</p>
+<h2 id="вход">Вход</h2>
+<ul>
+<li><code>sbom.cdx.json</code> уязвимого сервиса (берётся из практики генерации SBOM, <a href="doc-1bca905af1a7.html">М05</a>) либо <code>package-lock.json</code> проекта.</li>
+<li>Развёрнутый стенд по <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a>.</li>
+<li>Обязательное чтение перед шагом 6: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</li>
+</ul>
+<h2 id="шаги">Шаги</h2>
+<h3 id="1-зафиксировать-контекст-анализа">1. Зафиксировать контекст анализа</h3>
+<p>Запишите: репозиторий, commit/tag, имя и версию SBOM-генератора, дату, дату последнего обновления баз сканера. Без этого VDR неповторяем.</p>
+<h3 id="2-получить-vdr-через-grype-поверх-sbom">2. Получить VDR через Grype поверх SBOM</h3>
+<pre><code class="language-bash">grype sbom:./sbom.cdx.json -o cyclonedx-json &gt; vdr.cdx.json
+grype sbom:./sbom.cdx.json -o table   # для глаз
+</code></pre>
+<p>Детали — <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a>.</p>
+<h3 id="3-получить-второй-vdr-через-osv-scanner">3. Получить второй VDR через OSV-Scanner</h3>
+<pre><code class="language-bash">osv-scanner --lockfile=package-lock.json --format=json &gt; osv.json
+</code></pre>
+<p>Сравните списки. Найдите минимум одну находку, которая есть в одном инструменте и отсутствует в другом, и объясните почему. Детали — <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a>.</p>
+<h3 id="4-загрузить-sbom-в-dependency-track">4. Загрузить SBOM в Dependency-Track</h3>
+<p>Через UI или API загрузите <code>sbom.cdx.json</code> как проект, получите портфельный список уязвимостей. Это рабочее место для непрерывного триажа — <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a>.</p>
+<h3 id="5-сверить-с-бду-фстэк">5. Сверить с БДУ ФСТЭК</h3>
+<p>Возьмите 3 наиболее серьёзные CVE и проверьте их наличие в <a href="https://bdu.fstec.ru/" rel="noopener noreferrer" target="_blank">БДУ ФСТЭК</a>. Отметьте расхождения с NVD/OSV — <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a>.</p>
+<h3 id="6-оформить-vex-по-5-находкам">6. Оформить VEX по 5 находкам</h3>
+<p>Для пяти находок составьте VEX-записи. В каждой записи укажите, кто в вашей организации является <strong>issuer</strong> решения для этой версии продукта: Product Security / PSIRT / AppSec / РБПО совместно с владельцем продукта и разработчиком. Обязательно: одна <code>not_affected</code> с корректным <code>justification</code>, одна <code>affected</code> с <code>response</code>, одна <code>under_investigation</code>. Подход — <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>, <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>, <a href="doc-c01924770ece.html">П35. VEX triage</a>.</p>
+<pre><code class="language-json">{
+  "vulnerability": { "id": "CVE-2022-25883" },
+  "affects": [{ "ref": "pkg:npm/semver@7.3.7" }],
+  "analysis": {
+    "state": "not_affected",
+    "justification": "code_not_reachable",
+    "detail": "semver используется только build-time на доверенном вводе",
+    "response": ["will_not_fix"]
+  }
+}
+</code></pre>
+<h3 id="7-дополнить-триаж-управленческими-полями">7. Дополнить триаж управленческими полями</h3>
+<p>К каждой VEX-записи добавьте таблицей: <strong>issuer / владелец решения</strong> (роль), <strong>SLA</strong> (срок по severity), <strong>дата ретеста / триггер пересмотра</strong>. Сканер, NVD, БДУ или upstream advisory не являются issuer вашего VEX; они дают evidence для решения.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>Состояние</th>
+<th>Justification/Response</th>
+<th>Issuer / владелец</th>
+<th>SLA</th>
+<th>Ретест</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CVE-2022-25883</td>
+<td>not_affected</td>
+<td>code_not_reachable</td>
+<td>Product Security + тех. лид сервиса</td>
+<td>—</td>
+<td>при смене версии semver</td>
+</tr>
+<tr>
+<td>CVE-2021-23337</td>
+<td>affected</td>
+<td>update</td>
+<td>Команда сервиса + AppSec</td>
+<td>High / 30 дн</td>
+<td>после релиза фикса</td>
+</tr>
+<tr>
+<td>CVE-2023-26136</td>
+<td>under_investigation</td>
+<td>—</td>
+<td>AppSec / РБПО</td>
+<td>High / 30 дн</td>
+<td>до конца спринта</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="ожидаемый-результат">Ожидаемый результат</h2>
+<ul>
+<li>два VDR-файла (Grype, OSV-Scanner) и проект в Dependency-Track;</li>
+<li>объяснённое расхождение между сканерами (минимум 1 находка);</li>
+<li>отметка о сверке 3 CVE с БДУ ФСТЭК;</li>
+<li>5 VEX-записей в JSON с обязательным <code>justification</code> для <code>not_affected</code>;</li>
+<li>таблица с issuer/владельцем/SLA/ретестом по каждой записи.</li>
+</ul>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Частые сбои
+- <strong>Grype нашёл 0 находок</strong> — почти всегда SBOM беден на PURL/CPE (проблема входа из М04/М05), а не «всё чисто».
+- <strong>OSV-Scanner ругается на lockfile</strong> — указали не тот файл; нужен именно lock (<code>package-lock.json</code>, <code>go.sum</code>, <code>poetry.lock</code>), а не манифест.
+- <strong><code>not_affected</code> без justification</strong> — Dependency-Track/CycloneDX не примет такой VEX как валидный триаж; выберите значение из списка.
+- <strong>VEX от имени базы уязвимостей</strong> — так нельзя. NVD, БДУ, OSV и GHSA подтверждают внешний факт, но VEX для продукта выпускает владелец продукта / Product Security / PSIRT.
+- <strong>Базы устарели</strong> — Grype/OSV без свежей БД дают неполный VDR; обновите перед прогоном.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) два VDR с объяснённым расхождением, (2) пять корректных VEX-записей с обязательными <code>justification</code>, (3) заполненную таблицу issuer/владелец/SLA/ретест, (4) отметку о сверке с БДУ. Опора на регламент — <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>, <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a>, <a href="doc-620bbc0766f4.html">Порядок загрузки VDR из Dependency-Track</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

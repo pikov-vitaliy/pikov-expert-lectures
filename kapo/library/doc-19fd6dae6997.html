@@ -1,0 +1,53 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ldd readelf objdump — КАПО · Пиков</title><meta name="description" content="ldd readelf objdump. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-19fd6dae6997.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="ldd-readelf-objdump">ldd readelf objdump</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Три классические утилиты бинарного анализа отвечают на разные вопросы, и путать их — значит получать неверный состав. <code>ldd</code> отвечает «что фактически загрузится на этом хосте», <code>readelf</code> — «что записано в самом файле», <code>objdump</code> — «как устроены секции и код». Для инвентаризации это не взаимозаменяемые инструменты, а разные срезы: один показывает рантайм с учётом окружения, другой — статичную запись, третий — детали уровня дизассемблера.</p>
+<p>Выбор инструмента влияет и на достоверность, и на безопасность. Опираться на <code>ldd</code> там, где нужен <code>readelf</code>, опасно: <code>ldd</code> зависит от текущих <code>LD_LIBRARY_PATH</code>/<code>RPATH</code> и — что важнее — фактически задействует динамический загрузчик целевого бинаря. На чужом, недоверенном артефакте это уже не пассивное чтение.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Один и тот же бинарь, три инструмента, три разных ответа:</p>
+<pre><code class="language-bash"># ldd — резолвинг на ЭТОМ хосте: имя -&gt; фактический файл (зависит от окружения)
+$ ldd ./app
+        libssl.so.3 =&gt; /usr/lib/x86_64-linux-gnu/libssl.so.3 (0x00007f...)
+        libc.so.6   =&gt; /lib/x86_64-linux-gnu/libc.so.6 (0x00007f...)
+
+# readelf — что записано в файле, без запуска и без окружения
+$ readelf -d ./app | grep NEEDED
+ 0x0...0001 (NEEDED) Shared library: [libssl.so.3]
+
+# objdump — секции/заголовки; полезно для формата, опций сборки, отладочной инфы
+$ objdump -p ./app | grep -E 'NEEDED|RUNPATH'
+  NEEDED               libssl.so.3
+  RUNPATH              $ORIGIN/../lib
+</code></pre>
+<p><code>ldd</code> дал путь (но он верен только для этого хоста и окружения), <code>readelf</code> дал имя без пути (зато детерминированно и для любой архитектуры), <code>objdump -p</code> показал и имена, и пути поиска. Для воспроизводимой инвентаризации источник истины — <code>readelf</code>/<code>objdump</code>, а <code>ldd</code> — уточнение «куда оно реально резолвится здесь».</p>
+<blockquote>
+<p><code>ldd</code> запускает загрузчик бинаря
+<code>ldd</code> работает, по сути, вызывая динамический загрузчик целевого файла, чтобы тот разрешил зависимости. На недоверенном бинаре это нежелательно (и исторически приводило к выполнению кода). Для инвентаризации недоверенных артефактов используйте <code>readelf -d</code> / <code>objdump -p</code> — они только читают файл. <code>ldd</code> оставляйте для своих сборок, когда нужен фактический путь.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Общая слепая зона всех трёх — они видят только то, что попало в ELF динамически или в символы. Статически вшитый код (<code>.a</code>) ни <code>ldd</code>, ни <code>readelf -d</code>, ни <code>objdump -p</code> не покажут как зависимость — это зона <a href="doc-ae9d449dcb2c.html">статической линковки</a>. А <code>ldd</code> вдобавок зависит от хоста: на машине с другим <code>RPATH</code>/<code>LD_LIBRARY_PATH</code> он выдаст другие пути, чем целевая среда.</p>
+<p>Приём — комбинировать по роли: <code>readelf -d</code> как детерминированный список (<code>DT_NEEDED</code>, структура разобрана в <a href="doc-28706d741e92.html">ELF и разделы dynamic</a>), <code>objdump</code> для деталей формата и опций сборки, <code>ldd</code> — только чтобы подтвердить фактический путь на доверенном хосте. Для одиночного бинаря этого набора достаточно; для пачки артефактов ручные утилиты неудобны — там нужен программный парсер (см. <a href="doc-7770d940686f.html">LIEF как программный анализ ELF</a>).</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Источником списка динамических зависимостей делать <code>readelf -d ... | grep NEEDED</code>, а не <code>ldd</code> — детерминированно и без исполнения.</li>
+<li><code>ldd</code> применять только к своим, доверенным сборкам и только чтобы уточнить фактический путь резолвинга.</li>
+<li>Перед анализом проверять формат: <code>file ./app</code> — ELF ли это и та ли архитектура; иначе вывод утилит обманчив.</li>
+<li><code>objdump -p</code> использовать, чтобы за один вызов увидеть и <code>NEEDED</code>, и <code>RPATH</code>/<code>RUNPATH</code>; <code>objdump -h</code>/<code>readelf -S</code> — чтобы понять, stripped ли бинарь (см. <a href="doc-44ca67214176.html">stripped binaries</a>).</li>
+<li>Помнить, что <code>ldd</code> на аудиторском хосте может дать пути, отличные от целевой среды, — версии подтверждать через пакетный менеджер, а не через путь <code>ldd</code>.</li>
+<li>Для массового разбора (десятки бинарей) переходить с ручных команд на скрипт поверх ELF-парсера.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a></li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a></li>
+<li>Смежные заметки 06: <a href="doc-28706d741e92.html">ELF и разделы dynamic</a> · <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-7770d940686f.html">LIEF как программный анализ ELF</a> · <a href="doc-44ca67214176.html">stripped binaries</a> · <a href="doc-06c6cc985f59.html">unresolved libraries</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

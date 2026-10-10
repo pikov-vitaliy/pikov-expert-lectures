@@ -1,0 +1,118 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П31. Пилот CodeScoring: make CMake qmake — КАПО · Пиков</title><meta name="description" content="П31. Пилот CodeScoring: make CMake qmake. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e77c8a828d52.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п31-пилот-codescoring-make-cmake-qmake">П31. Пилот CodeScoring: make CMake qmake</h1>
+<h2 id="цель">Цель</h2>
+<p>На реальной (или тестовой) C/C++ сборке прогнать build scan агента CodeScoring и получить <strong>проверяемый</strong> результат: машинный отчёт со списком распознанных компонентов и отдельный файл unresolved-библиотек. Зачёт строится не на самом факте запуска, а на том, что вы можете предъявить три разных исхода по трём системам сборки: make, CMake и qmake — с явной отметкой, где сборка прозрачна для агента, а где библиотека не разрешилась в компонент. Это и есть момент истины пилота: SCA по исходникам у C/C++ почти всегда неполон, а build scan ловит то, что реально линкуется.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Build scan агента перехватывает вызовы компилятора и линковщика во время сборки, поэтому запускается <strong>поверх</strong> вашей обычной команды сборки. Конфигурация сборки описывается в <code>buildConfig.json</code> (что именно собирать и какой командой), а сам прогон делается так:</p>
+<pre><code class="language-bash"># 1) Обычный build scan (агент оборачивает сборку)
+./johnny scan build ./buildConfig.json \
+  --output result-make.json \
+  --unresolved-file unresolved-make.json \
+  --branch-or-tag refs/heads/pilot \
+  --commit "$(git rev-parse HEAD)"
+
+# 2) Тот же прогон через eBPF (перехват вызовов линковщика на уровне ядра Linux)
+./johnny scan build ebpf ./buildConfig.json \
+  --output result-make-ebpf.json \
+  --unresolved-file unresolved-make-ebpf.json
+</code></pre>
+<p>Минимальный <code>buildConfig.json</code> под три системы сборки (по очереди подставляйте свою цель):</p>
+<pre><code class="language-json">{
+  "build_command": "cmake -S . -B build &amp;&amp; cmake --build build -j",
+  "build_result": "./build"
+}
+</code></pre>
+<p>Повторите прогон трижды, меняя <code>build_command</code> и имена выходных файлов:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Сборка</th>
+<th><code>build_command</code></th>
+<th>output / unresolved</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>make</td>
+<td><code>make -j</code></td>
+<td><code>result-make.json</code> / <code>unresolved-make.json</code></td>
+</tr>
+<tr>
+<td>CMake</td>
+<td><code>cmake -S . -B build &amp;&amp; cmake --build build -j</code></td>
+<td><code>result-cmake.json</code> / <code>unresolved-cmake.json</code></td>
+</tr>
+<tr>
+<td>qmake</td>
+<td><code>qmake &amp;&amp; make -j</code></td>
+<td><code>result-qmake.json</code> / <code>unresolved-qmake.json</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Сборка должна быть полной и «чистой»
+Агент видит только то, что реально компилируется и линкуется в этом прогоне. Перед запуском удалите кэш сборки (<code>rm -rf build/</code>, <code>make clean</code>), иначе инкрементальная сборка пропустит часть вызовов компилятора и компоненты «исчезнут» из отчёта не по вине инструмента. qmake — главная цель пилота: по материалам поставщика make/CMake обсуждались, а qmake прямо не подтверждён, поэтому его прогон фиксируем особенно тщательно.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Команда завершается с <strong>кодом возврата</strong>, который и есть первый машинный сигнал результата:</p>
+<ul>
+<li><code>0</code> — анализ выполнен, политики не нарушены;</li>
+<li><code>1</code> — анализ выполнен, <strong>есть нарушения политик</strong> (для manual-гейта это ожидаемо);</li>
+<li><code>2</code> — анализ упал (сборка не прошла / агент не перехватил вызовы);</li>
+<li><code>3</code> — пустой результат (если включён <code>--block-on-empty-result</code>).</li>
+</ul>
+<p>Проверьте код сразу:</p>
+<pre><code class="language-bash">./johnny scan build ./buildConfig.json --output result-cmake.json ; echo "exit=$?"
+</code></pre>
+<p>В <code>result-*.json</code> — перечень распознанных компонентов с координатами. Ориентир по содержанию (структура, не дословный дамп):</p>
+<pre><code class="language-json">{
+  "components": [
+    {
+      "name": "zlib",
+      "version": "1.2.13",
+      "purl": "pkg:generic/zlib@1.2.13",
+      "evidence": "linker",
+      "scope": "required"
+    },
+    {
+      "name": "openssl",
+      "version": "3.0.11",
+      "purl": "pkg:deb/debian/libssl3@3.0.11"
+    }
+  ]
+}
+</code></pre>
+<p>В <code>unresolved-*.json</code> — то, что агент увидел при линковке, но <strong>не смог</strong> сопоставить с компонентом (внутренний форк, vendored-исходник, приватная <code>.a</code>/<code>.so</code> без метаданных):</p>
+<pre><code class="language-json">{
+  "unresolved": [
+    { "path": "/opt/src/third_party/libfoo.a", "reason": "no metadata / no PURL" }
+  ]
+}
+</code></pre>
+<p>Ориентир по числу: на честной C/C++ сборке <strong>unresolved почти никогда не пуст</strong>. Пустой <code>unresolved</code> на legacy-проекте — повод не радоваться, а перепроверить, что сборка была полной. Сравните три прогона: число компонентов и unresolved у make/CMake/qmake должно различаться — это и есть данные для протокола.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>exit=2</code>, отчёт пустой или почти пустой.</strong> Скорее всего сборка не запустилась под агентом или была инкрементальной. Признак: в логе агента нет перехваченных вызовов <code>gcc</code>/<code>clang</code>/<code>ld</code>. Лечение: <code>make clean</code> / <code>rm -rf build</code>, проверить, что <code>build_command</code> реально собирает проект в чистом дереве.</li>
+<li><strong>eBPF-режим не стартует (<code>Operation not permitted</code>).</strong> Для перехвата на уровне ядра агенту нужны привилегии (<code>CAP_BPF</code>/<code>CAP_SYS_ADMIN</code>) и поддерживающее ядро. На Astra/Debian это частый стоп. Признак: ошибка при загрузке BPF-программы. Лечение: запустить обычный <code>scan build</code> без <code>ebpf</code> и зафиксировать ограничение прав как пункт протокола — см. <a href="doc-52554dc4889b.html">eBPF права агента и ограничения</a>.</li>
+<li><strong>qmake собрался, но компонентов почти нет.</strong> qmake тянет Qt-модули и системные библиотеки иначе, чем CMake. Если <code>result-qmake.json</code> подозрительно беднее CMake-прогона — это и есть искомый результат пилота: фиксируем как «частично, требует подтверждения», а не как успех. См. <a href="doc-ecda758e9fc0.html">C C++ build scan make cmake qmake</a>.</li>
+<li><strong>Всё в unresolved.</strong> Значит сборка использует только внутренние/форкнутые библиотеки без метаданных — это не сбой инструмента, а сигнал завести <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a> и <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a>.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Предъявить преподавателю <strong>три пары файлов</strong> (<code>result-*</code> + <code>unresolved-*</code>) по make, CMake и qmake с зафиксированными кодами возврата, плюс короткий вывод (3–5 строк): где сборка прозрачна, где агент потерял компоненты, и какой режим (<code>scan build</code> или <code>scan build ebpf</code>) реально отработал в вашей среде. Минимум один компонент в unresolved должен быть разобран до решения (опознан вручную либо отправлен в worklist). Решение по гейту — <strong>manual</strong>: на основании результатов сформулировать, можно ли блокировать сборку автоматически или пока только предупреждать.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-a69d6f30f09c.html">М12. CodeScoring и подготовка пилота</a></li>
+<li>Смежные практики: <a href="doc-9176592b9170.html">П04. Генерация SBOM через cdxgen для C C++</a> · <a href="doc-c440241de897.html">П32. CodeScoring offline architecture</a> · <a href="doc-ea3b2e743d82.html">П33. AppSec и CodeScoring сравнение по задаче</a></li>
+<li>Источники пилота: <a href="doc-ecda758e9fc0.html">C C++ build scan make cmake qmake</a> · <a href="doc-135282a613dc.html">Статическая линковка и форки</a> · <a href="doc-dd4ac51e3d11.html">Приемочные сценарии пилота</a></li>
+<li>Шаблоны: <a href="doc-f09f288cf2a1.html">Шаблон протокола пилота SCA инструмента</a> · <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a> · <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (РБПО, доказуемость работ) · <a href="doc-9ed897f12463.html">Проект ГОСТ Р КАПО</a> (композиционный анализ) · <a href="doc-0e548f119316.html">NIST SSDF</a> (PW.4 — управление сторонними компонентами)</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,75 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>blint — КАПО · Пиков</title><meta name="description" content="blint. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9e42322f0345.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="blint">blint</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>blint — анализатор бинарных файлов (ELF, PE, Mach-O), который извлекает их свойства безопасности и состав напрямую из исполняемого файла, без исходников и пакетного менеджера. Помимо проверки флагов защиты (PIE, RELRO, NX, canary) он умеет собирать SBOM по символам, импортируемым библиотекам и встроенным метаданным — это закрывает слепую зону, где обычные генераторы по манифестам ничего не видят.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Проверка свойств бинаря и генерация SBOM по нему:</p>
+<pre><code class="language-bash">blint -i ./build/app -o ./out
+blint sbom -i ./build/app -o sbom.cdx.json
+</code></pre>
+<p>В отчёте — таблица hardening-флагов и список обнаруженных зависимостей/символов. SBOM выдаётся в CycloneDX и фиксирует найденные библиотеки как компоненты с эвристическими координатами.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Флаг</th>
+<th>Что значит</th>
+<th>«Плохой» сигнал</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NX</code></td>
+<td>неисполняемый стек</td>
+<td><code>no</code></td>
+</tr>
+<tr>
+<td><code>PIE</code></td>
+<td>позиционно-независимый код</td>
+<td><code>no</code></td>
+</tr>
+<tr>
+<td><code>RELRO</code></td>
+<td>защита GOT/PLT</td>
+<td><code>partial</code> / <code>no</code></td>
+</tr>
+<tr>
+<td><code>Canary</code></td>
+<td>стековый канарейка</td>
+<td><code>no</code></td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Два инструмента в одном файле
+blint совмещает аудит свойств безопасности бинаря (hardening) и инвентаризацию его состава. Для C/C++ это часто единственный способ хоть что-то увидеть, когда SBOM по манифестам пуст.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Работает там, где нет ни менеджера, ни исходников — только готовый бинарь.</li>
+<li>Совмещает аудит свойств безопасности (hardening) и инвентаризацию в одном проходе.</li>
+<li>Полезен для статически слинкованных C/C++-артефактов, где SBOM по манифестам пуст.</li>
+<li>Кроссформатный: ELF, PE и Mach-O одним инструментом.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Stripped-бинарь почти ничего не отдаёт
+Полнота SBOM напрямую зависит от наличия символов. Если бинарь собран с <code>strip</code>, blint видит крайне мало, а координаты компонентов эвристические — это оценка, а не доказанный состав.</p>
+</blockquote>
+<ul>
+<li>Координаты компонентов эвристические: точные имя/версию upstream-библиотеки из бинаря восстановить удаётся не всегда.</li>
+<li>Не строит граф транзитивных зависимостей — это срез того, что попало в бинарь.</li>
+<li>Результат сильно зависит от наличия символов; stripped-бинарь даёт скудный SBOM.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью офлайн: анализ идёт по локальному файлу, сеть не нужна. Подходит для закрытого контура, где собранные C/C++-артефакты нужно инвентаризировать без обращения к внешним реестрам.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a> · <a href="doc-50df475ac430.html">ldd readelf LIEF</a> · <a href="doc-35e5f81f86fe.html">cdxgen</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

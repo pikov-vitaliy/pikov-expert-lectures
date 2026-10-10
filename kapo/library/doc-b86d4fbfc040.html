@@ -1,0 +1,51 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Astra Debian RPM среды — КАПО · Пиков</title><meta name="description" content="Astra Debian RPM среды. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-b86d4fbfc040.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="astra-debian-rpm-среды">Astra Debian RPM среды</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Маппинг ELF → системный пакет — основной способ дать <code>.so</code> координаты (имя пакета, версия, дистрибутив). Но команда такого маппинга зависит от пакетного менеджера: в DEB-мире это <code>dpkg -S</code>, в RPM-мире — <code>rpm -qf</code>. В отечественных средах сосуществуют оба: Astra Linux и Debian-подобные дистрибутивы используют DEB, а ряд платформ — RPM. Анализ, заточенный под один менеджер, на другой среде просто молчит: <code>dpkg -S</code> на RPM-системе бесполезен, и <code>.so</code> остаётся unresolved не потому, что компонента нет, а потому что спросили не тем инструментом.</p>
+<p>Вторая причина — версии в отечественных репозиториях не равны upstream. Дистрибутив перепаковывает библиотеку под себя: своя ревизия (<code>1.1.1n-0+deb11u5+astra...</code>), свои бэкпорты безопасности, иногда свой набор патчей. Поэтому версия пакета из репозитория Astra — это не то же самое, что одноимённый релиз upstream, и для CVE-мэтчинга это критично.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>На DEB-среде (Astra/Debian) <code>.so</code> сопоставляют через <code>dpkg</code>/<code>apt</code>, на RPM-среде — через <code>rpm</code>:</p>
+<pre><code class="language-bash"># DEB-среда (Astra Linux, Debian): .so → пакет → версия
+ldd ./app | awk '/=&gt;/{print $3}'                 # пути реальных .so
+dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.1.1  # → libssl1.1: ...
+dpkg -query -W -f='${Package} ${Version}\n' libssl1.1
+#   libssl1.1 1.1.1n-0+deb11u5+astra...   ← версия с маркерами репозитория, не upstream
+
+# RPM-среда: тот же ELF, другой менеджер
+rpm -qf /usr/lib64/libssl.so.1.1                 # → openssl-libs-1.1.1k-7.el...
+rpm -q --qf '%{NAME} %{VERSION}-%{RELEASE}\n' openssl-libs
+
+# Какой менеджер вообще на среде — определяет всю стратегию маппинга
+command -v dpkg &gt;/dev/null &amp;&amp; echo DEB || (command -v rpm &gt;/dev/null &amp;&amp; echo RPM)
+</code></pre>
+<p>Имя пакета между мирами тоже расходится: то же содержимое — это <code>libssl1.1</code> в DEB и <code>openssl-libs</code> в RPM. Это прямой повод для CPE/PURL-алиасинга.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона двойная. Первая — <strong>не тот пакетный менеджер</strong>: пайплайн с зашитым <code>dpkg -S</code> на RPM-среде выдаёт сплошной unresolved, и это выглядит как «зависимостей не нашли», хотя их просто спросили не той командой. Вторая — <strong>версия репозитория ≠ upstream</strong>: маркеры <code>+deb11uX</code>, <code>+astra</code>, <code>.elN</code> несут бэкпорты безопасности, поэтому applicability CVE по «голой» upstream-версии даёт ложные срабатывания.</p>
+<blockquote>
+<p>Сначала определи менеджер, потом маппь
+Перед маппингом ELF на пакет определите среду: DEB (Astra/Debian) или RPM. Команда маппинга, имя пакета и формат версии различаются. Версию берите как есть, со всеми суффиксами репозитория, — именно репозиторная ревизия определяет, какие бэкпорты безопасности уже наложены.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Определите пакетный менеджер среды сборки/исполнения и выберите команду маппинга (<code>dpkg -S</code>/<code>apt</code> для DEB-сред Astra/Debian, <code>rpm -qf</code> для RPM).</li>
+<li>Для каждой <code>.so</code> из <code>ldd</code>/<code>readelf -d</code> получите пакет и его полную версию с суффиксами репозитория (см. <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a>).</li>
+<li>Не нормализуйте версию к upstream «на глаз»: репозиторная ревизия несёт бэкпорты; учитывайте их при триаже CVE (см. <a href="doc-6a7bdaaab195.html">version normalization</a>).</li>
+<li>Сведите различие имён между DEB и RPM (<code>libssl1.1</code> ↔ <code>openssl-libs</code>) в alias-таблицу для CPE/PURL (см. <a href="doc-18ad3858fbbc.html">CPE alias для libssl3</a>).</li>
+<li>Фиксируйте дистрибутив и его версию как контекст SBOM — без него координаты пакета неоднозначны.</li>
+<li>То, что не маппится ни одним менеджером, уносите в <a href="doc-06c6cc985f59.html">unresolved libraries</a>.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>; идентификаторы — <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a>.</li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> (маппинг .so → пакет), <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> (алиасы имён между дистрибутивами), <a href="doc-a505ea20ce92.html">П24. PURL нормализация</a>.</li>
+<li>Нормативка: <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> (национальный источник уязвимостей под отечественные сборки), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+<li>Смежные 06: <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a>, <a href="doc-18ad3858fbbc.html">CPE alias для libssl3</a>, <a href="doc-6a7bdaaab195.html">version normalization</a>, <a href="doc-56d82ed22bd5.html">cross-compilation</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

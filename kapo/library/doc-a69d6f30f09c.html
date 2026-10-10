@@ -1,0 +1,50 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М12. М12. CodeScoring и подготовка пилота — КАПО · Пиков</title><meta name="description" content="М12. М12. CodeScoring и подготовка пилота. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a69d6f30f09c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#спорные-зоны-ради-которых-нужен-пилот">Спорные зоны, ради которых нужен пилот</a></li>
+<li><a href="#материалы-модуля">Материалы модуля</a></li>
+<li><a href="#опорные-материалы-раздела-07">Опорные материалы раздела 07</a></li>
+<li><a href="#связи">Связи</a></li>
+<li><a href="#результат-модуля">Результат модуля</a></li>
+</ul>
+</div>
+<h1 id="м12-codescoring-и-подготовка-пилота">М12. CodeScoring и подготовка пилота</h1>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>Организация выбирает SCA/OSA-инструмент под собственное ТЗ, где преобладают C/C++ legacy-сборки без дисциплины пакетного менеджера. Маркетинговое «соответствует всем требованиям» здесь не работает: половина требований ТЗ либо смешивает разные режимы продукта (Proxy, plugin репозитория, CLI/агент), либо шире того, что инструмент реально подтверждает. Модуль учит <strong>превращать ТЗ в проверяемую матрицу</strong> и <strong>строить пилот так, чтобы спорные требования закрывались демонстрацией, а не обещанием</strong>.</p>
+<p>Сквозной навык модуля — методика <strong>требование → evidence → статус</strong>:</p>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-a69d6f30f09c-0.svg" rel="noopener" target="_blank"><img alt="Схема: М12. М12. CodeScoring и подготовка пилота" loading="lazy" src="../assets/course-diagrams/course-a69d6f30f09c-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="спорные-зоны-ради-которых-нужен-пилот">Спорные зоны, ради которых нужен пилот</h2>
+<ul>
+<li><strong>OSA Proxy ≠ все пакетные менеджеры.</strong> Proxy-firewall подтверждён для Maven, NPM, PyPI, NuGet V3, Go, Debian, Alpine/APK, RPM, Docker Registry. Conan, Conda, RubyGems в режиме Proxy не подтверждены — это «риск несоответствия».</li>
+<li><strong>C/C++ build scan: make/CMake — да, qmake — под вопрос.</strong> Сборочный анализ через агент/eBPF на GCC/Clang заявлен; qmake прямо не подтверждён и требует демо на реальном проекте.</li>
+<li><strong>Готовые бинарники и статическая линковка.</strong> Архивы и контейнеры распознаются; native stripped, <code>.a</code>/<code>.so</code> без сборочного контекста — ненадёжно (заявлено поставщиком прямо).</li>
+<li><strong>Reachability</strong> (анализ вызовов) только для Java/Python/Go; IDE-плагины — VS Code и IntelliJ-based, Qt Creator не покрыт.</li>
+</ul>
+<h2 id="материалы-модуля">Материалы модуля</h2>
+<ul>
+<li><a href="doc-0caeb3e35545.html">01 Конспект</a> — методика оценки и спорные зоны.</li>
+<li><a href="doc-ba8777c826f8.html">02 План занятия</a> — тайминг занятия на 90 минут.</li>
+<li><a href="doc-87dae8e7f6e4.html">03 Практическая работа</a> — собрать матрицу и сценарии пилота.</li>
+<li><a href="doc-a41c57d062ad.html">04 Контрольные вопросы</a> — проверка понимания + кейсы.</li>
+<li><a href="doc-82c96b5af89a.html">05 Что проверять на проекте</a> — чек-лист аудитора пилота.</li>
+</ul>
+<h2 id="опорные-материалы-раздела-07">Опорные материалы раздела 07</h2>
+<ul>
+<li><a href="doc-765d7f069356.html">Матрица соответствия требованиям OSA SCA</a></li>
+<li><a href="doc-ed246e9adf3a.html">Критерии Go No-Go после пилота</a></li>
+<li><a href="doc-b514486fab08.html">OSA Proxy и поддержанные экосистемы</a></li>
+<li><a href="doc-ecda758e9fc0.html">C C++ build scan make cmake qmake</a></li>
+<li><a href="doc-135282a613dc.html">Статическая линковка и форки</a></li>
+<li><a href="doc-dbc3a2e1423b.html">Ограничения готовых бинарников</a></li>
+<li><a href="doc-dd4ac51e3d11.html">Приемочные сценарии пилота</a></li>
+<li><a href="doc-5ec5df90d2dc.html">Документы поставщика для закупки</a></li>
+</ul>
+<h2 id="связи">Связи</h2>
+<ul>
+<li>Смежные модули: <a href="doc-0c23b1ba214a.html">М08 Защита цепочки поставки и OSA</a> · <a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-e29be6710c8d.html">М14 Политики и риск</a></li>
+<li>Практики: <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-ea3b2e743d82.html">П33. AppSec и CodeScoring сравнение по задаче</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> · <a href="doc-9ed897f12463.html">Проект ГОСТ Р КАПО</a></li>
+<li>Шаблоны: <a href="doc-f09f288cf2a1.html">Шаблон протокола пилота SCA инструмента</a> · <a href="doc-e6347f4cd6c7.html">Матрица соответствия требованиям</a></li>
+</ul>
+<h2 id="результат-модуля">Результат модуля</h2>
+<p>Готовая матрица соответствия с расставленными статусами, перечень сценариев пилота под спорные зоны и сформулированные критерии Go/No-Go, по которым принимается решение о закупке.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

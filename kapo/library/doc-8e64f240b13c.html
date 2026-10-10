@@ -1,0 +1,91 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П09. VDR и VEX: различие факта и решения — КАПО · Пиков</title><meta name="description" content="П09. VDR и VEX: различие факта и решения. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-8e64f240b13c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п09-vdr-и-vex-различие-факта-и-решения">П09. VDR и VEX: различие факта и решения</h1>
+<blockquote>
+<p>Контекст
+Эта практика без сканера. Её задача — научиться отличать <strong>VDR-факт</strong> (машинная связь «компонент ↔ CVE», которую выдал инструмент) от <strong>VEX-решения</strong> (человеческий вывод о применимости с обоснованием, issuer/владельцем и сроком). На проектах эти два слоя постоянно сваливают в одну кучу: «сканер сказал High — патчим». VEX превращает поток находок в управляемые статусы; кто выпускает VEX и какие evidence нужны, разобрано в <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Взять одну находку из VDR (полученного в <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> или <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a>) и оформить поверх неё корректное VEX-решение <code>not_affected</code> в формате CycloneDX — с обоснованием из разрешённого списка <code>justification</code>, автором/issuer и ссылкой на evidence.</p>
+<p>Проверяемый результат: валидный VEX-фрагмент, где у находки заполнены <code>analysis.state</code>, <code>analysis.justification</code>, <code>analysis.detail</code> и <code>analysis.response</code>, а <code>affects[].ref</code> указывает на конкретный компонент. Автором решения должна быть ответственная за продукт сторона, а не база уязвимостей или сканер.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Сначала вычленяем факт из VDR, затем дописываем поверх него решение. <code>jq</code> здесь — только просмотр, не сканер.</p>
+<pre><code class="language-bash"># 1. Достать из VDR один факт: id, severity, что затронуто
+jq '.vulnerabilities[] | {id, severity: .ratings[0].severity, affects}' vdr.cdx.json
+
+# 2. Оформить VEX-решение руками (это и есть содержание практики)
+cat &gt; vex.cdx.json &lt;&lt;'JSON'
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "version": 1,
+  "metadata": {
+    "authors": [{ "name": "Product Security / Организация" }],
+    "component": { "type": "application", "name": "my-product", "version": "1.0.0" }
+  },
+  "vulnerabilities": [
+    {
+      "id": "CVE-2022-25883",
+      "source": { "name": "NVD", "url": "https://nvd.nist.gov/vuln/detail/CVE-2022-25883" },
+      "analysis": {
+        "state": "not_affected",
+        "justification": "code_not_reachable",
+        "detail": "semver вызывается только на доверенном вводе в build-time, в рантайме недостижим; evidence: build log + call graph + issue SEC-123",
+        "response": ["will_not_fix"]
+      },
+      "affects": [{ "ref": "pkg:npm/semver@7.3.7" }]
+    }
+  ]
+}
+JSON
+
+# 3. Самопроверка структуры
+jq '.metadata.authors[0].name as $issuer | .vulnerabilities[] | {issuer: $issuer, id, state: .analysis.state, just: .analysis.justification}' vex.cdx.json
+</code></pre>
+<blockquote>
+<p>Разрешённые значения, а не свободный текст
+<code>state</code> ∈ {<code>resolved</code>, <code>exploitable</code>, <code>in_triage</code>, <code>false_positive</code>, <code>not_affected</code>} (CycloneDX) либо {<code>affected</code>, <code>not_affected</code>, <code>fixed</code>, <code>under_investigation</code>} (модель OpenVEX/SSVC). <code>justification</code> для <code>not_affected</code> — из списка: <code>code_not_present</code>, <code>code_not_reachable</code>, <code>requires_configuration</code>, <code>requires_dependency</code>, <code>requires_environment</code>, <code>protected_by_compiler</code>, <code>protected_at_runtime</code>, <code>protected_at_perimeter</code>, <code>protected_by_mitigating_control</code>. Свободный текст идёт только в <code>detail</code>, не в <code>justification</code>.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Шаг 1 (факт из VDR) — без всякого решения:</p>
+<pre><code class="language-json">{ "id": "CVE-2022-25883", "severity": "high", "affects": [{ "ref": "pkg:npm/semver@7.3.7" }] }
+</code></pre>
+<p>Шаг 3 (решение поверх факта) — появился слой <code>analysis</code> и issuer:</p>
+<pre><code class="language-json">{ "issuer": "Product Security / Организация", "id": "CVE-2022-25883", "state": "not_affected", "just": "code_not_reachable" }
+</code></pre>
+<p>Ключевая разница, которую вы должны проговорить: в VDR нет поля <code>analysis</code> вообще — там только факты (id, ratings, affects). VEX добавляет именно <code>analysis</code> (state + justification + detail + response). Один и тот же факт допускает разные VEX в разных продуктах.</p>
+<blockquote>
+<p>Один факт — три решения
+<code>CVE-2021-44228</code> (Log4Shell) в <code>log4j-core 2.14.1</code>:
+- сервис, где класс не на classpath в рантайме → <code>not_affected</code>, <code>justification: code_not_reachable</code>;
+- сервис на периметре, ещё не обновлён → <code>affected</code> / <code>exploitable</code>, <code>response: ["update"]</code>, SLA по severity;
+- после обновления до 2.17.1 → <code>fixed</code> / <code>resolved</code>.
+Факт во всех трёх случаях один; различает их триаж.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong><code>not_affected</code> без <code>justification</code>.</strong> Это не триаж, а отписка. CycloneDX и здравый смысл требуют обоснование из разрешённого списка; пустой <code>justification</code> = находка не разобрана.
+- <strong>Свободный текст в <code>justification</code>.</strong> <code>"мы посмотрели, не страшно"</code> — невалидно. Свободное описание идёт в <code>detail</code>; <code>justification</code> — только из перечня.
+- <strong><code>affects[].ref</code> не совпадает с <code>bom-ref</code>/PURL компонента.</strong> Решение «висит в воздухе»: формально VEX есть, но ни к какому компоненту не привязан. Сверьте ref с PURL из исходного SBOM.
+- <strong>Нет issuer или evidence.</strong> VEX без автора решения и доказательств превращается в ручное подавление finding. Укажите ответственную роль и evidence: SBOM, build log, reachability report, triage issue.
+- <strong>Просроченное <code>not_affected</code>.</strong> Обоснование приняли для версии 1.2, продукт уехал на 2.0. Решение надо пересмотреть — у <code>not_affected</code> тоже есть срок жизни.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю:
+1. факт из VDR (шаг 1) и VEX-решение поверх него (шаг 3) — рядом, чтобы видна была разница слоёв;
+2. валидный <code>justification</code> из разрешённого списка и осмысленный <code>detail</code>;
+3. issuer решения и минимум одно evidence, подтверждающее применимость именно к вашему продукту;
+4. устно: почему один и тот же VDR-факт может дать разные VEX в разных продуктах;
+5. кто владелец этого решения и когда оно подлежит пересмотру (роль, не сканер).</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a> · <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> (VEX-расширение) · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-36b66b831249.html">CSAF</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.2 — оценка и реагирование) · <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a></p>
+<p>Смежные практики: <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

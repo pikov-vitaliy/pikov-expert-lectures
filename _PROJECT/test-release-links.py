@@ -11,6 +11,20 @@ spec.loader.exec_module(links)
 
 
 class ReleaseLinksTests(unittest.TestCase):
+    def test_visual_placeholder_and_invalid_svg_fail_even_when_every_url_exists(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            archive = root / 'site.zip'
+            with zipfile.ZipFile(archive, 'w') as z:
+                z.writestr('index.html', '<div class="visual-placeholder">Figure 1</div><img src="figure.svg">')
+                z.writestr('figure.svg', '<svg xmlns="http://www.w3.org/2000/svg"><text><br></text></svg>')
+            index = root / 'index.json'
+            index.write_text(json.dumps([{'domain': 'pikov.expert', 'archivePath': str(archive)}]), encoding='utf-8')
+            issues = links.audit(index)['issues']
+            self.assertEqual(len(issues), 2)
+            self.assertTrue(any(x['issue'] == 'unpublished visual placeholder' for x in issues))
+            self.assertTrue(any(x['issue'].startswith('invalid SVG XML:') for x in issues))
+
     def test_markdown_checks_handout_links_but_not_local_lab_commands(self):
         text = '[Handout](../files/%D0%A4.pdf)\n[Lab](http://127.0.0.1:3000/)\n```sh\n[Example](missing.md)\n```\n`[code](missing.md)`\n[ref]: ../notes.md'
         self.assertEqual(list(links.markdown_references('https://dast.pikov.expert/practice/lab.md', text)), ['https://dast.pikov.expert/files/%D0%A4.pdf','https://dast.pikov.expert/notes.md'])

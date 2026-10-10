@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>dpkg apt metadata — КАПО · Пиков</title><meta name="description" content="dpkg apt metadata. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-4bd8e3178892.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="dpkg-apt-metadata">dpkg apt metadata</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Динамическая зависимость C/C++ видна как файл <code>.so</code> без имени компонента, версии и лицензии — голый путь вроде <code>/usr/lib/x86_64-linux-gnu/libssl.so.3</code>. Метаданные пакетного менеджера дистрибутива — это мост от этого пути к полноценной координате: <code>dpkg</code>/<code>apt</code> знают, какой deb-пакет владеет файлом, какая у него версия, из какого Source-пакета он собран и под какой лицензией поставлен. Без этого моста системная библиотека остаётся безымянным артефактом, который не матчится ни на что.</p>
+<p>Для Debian/Ubuntu и совместимых (в т.ч. отечественных deb-сборок) это основной способ обогатить ELF-зависимость до уровня, пригодного для SBOM и матчинга. Связка «файл → пакет → версия → Source → лицензия» восстанавливает ровно те поля, которых требуют минимальные элементы SBOM, и делает это из данных, уже лежащих в системе сборки.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Полная цепочка от <code>.so</code> к координате идёт через несколько команд <code>dpkg</code>/<code>apt</code>:</p>
+<pre><code class="language-bash">$ ldd ./service | grep ssl
+        libssl.so.3 =&gt; /usr/lib/x86_64-linux-gnu/libssl.so.3
+$ dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.3
+libssl3:amd64: /usr/lib/x86_64-linux-gnu/libssl.so.3
+$ dpkg-query -W -f='${Package} ${Version} ${Source}\n' libssl3
+libssl3 3.0.11-1~deb12u2 openssl          # Source ≠ Package — важно для CPE/upstream
+$ apt-cache show libssl3 | grep -E '^(Homepage|Architecture)'
+Homepage: https://www.openssl.org/
+Architecture: amd64
+$ cat /usr/share/doc/libssl3/copyright | head -1   # лицензия пакета
+</code></pre>
+<p>Отсюда собирается PURL <code>pkg:deb/debian/libssl3@3.0.11-1~deb12u2?arch=amd64</code>, а из поля <code>Source: openssl</code> — upstream-имя для CPE и нормализации версии. Без <code>dpkg -S</code> тот же <code>.so</code> остался бы <code>pkg:generic/...</code> без матчинга.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — metadata описывает только то, что установлено как deb-пакет. Если библиотека собрана из исходников и положена руками в <code>/usr/local/lib</code>, <code>dpkg -S</code> ответит «no path found» — пакетного владельца нет, и обогащать нечего. Так же <code>dpkg</code> ничего не знает о статически вшитых библиотеках и о файлах из <code>third_party/</code>. Приём: трактовать «нет владельца пакета» как сигнал «это не системная зависимость» и переводить такой артефакт в worklist ручной разметки, а не считать его отсутствующим.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Снять список <code>.so</code> через <code>ldd</code>/<code>readelf -d</code> и для каждого выполнить <code>dpkg -S &lt;путь&gt;</code> — получить пакет-владельца.</li>
+<li>Для каждого пакета взять версию и <code>Source</code> через <code>dpkg-query -W -f='${Package} ${Version} ${Source}'</code> — Source нужен для CPE и upstream-версии.</li>
+<li>Собрать PURL <code>pkg:deb/&lt;distro&gt;/&lt;pkg&gt;@&lt;version&gt;?arch=&lt;arch&gt;</code>, сохранив <code>arch</code> (различающий qualifier).</li>
+<li>Лицензию брать из <code>/usr/share/doc/&lt;pkg&gt;/copyright</code>, не угадывать по имени.</li>
+<li>Файлы, для которых <code>dpkg -S</code> не нашёл владельца (<code>/usr/local/...</code>, <code>third_party/</code>, статика), выносить в реестр unresolved.</li>
+<li>Фиксировать дистрибутив и его версию: одна и та же <code>.so</code> в разных deb-средах имеет разные версии пакета.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> (маппинг ELF → DEB — опорный механизм модуля), <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> (deb-метаданные дают PURL/версию/Source для CPE).</li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> (снятие <code>.so</code> и маппинг на пакеты), <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> (инвентаризация сборки).</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> (имя, версия, supplier как базовые элементы), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (полнота идентификаторов), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1).</li>
+<li>Смежные заметки: <a href="doc-b86d4fbfc040.html">Astra Debian RPM среды</a> (rpm-эквивалент через <code>rpm -qf</code>), <a href="doc-18ad3858fbbc.html">CPE alias для libssl3</a> (Source → upstream → CPE), <a href="doc-6a7bdaaab195.html">version normalization</a> (deb-версии с epoch/ревизией), <a href="doc-06c6cc985f59.html">unresolved libraries</a> (файлы без пакета-владельца).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

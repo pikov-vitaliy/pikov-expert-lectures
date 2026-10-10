@@ -1,0 +1,72 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М06. План занятия (90 минут) — КАПО · Пиков</title><meta name="description" content="М06. План занятия (90 минут). Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-77012f6d9ba9.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цели">Цели</a></li>
+<li><a href="#материалы">Материалы</a></li>
+<li><a href="#ход-занятия">Ход занятия</a></li>
+<li><a href="#контрольная-точка">Контрольная точка</a></li>
+</ul>
+</div>
+<h1 id="план-занятия-90-минут">План занятия (90 минут)</h1>
+<h2 id="цели">Цели</h2>
+<p>К концу занятия слушатель умеет:
+- получить VDR из готового SBOM тремя инструментами (Grype, OSV-Scanner, Dependency-Track) и объяснить, какой из них для какого входа;
+- словами и в JSON различить VDR (факт) и VEX (решение);
+- расставить четыре состояния VEX (<code>not_affected</code>, <code>affected</code>, <code>fixed</code>, <code>under_investigation</code>) с обязательным <code>justification</code>;
+- назвать источники (NVD/OSV/GHSA/БДУ ФСТЭК) и сказать, чем они отличаются;
+- привязать к каждой находке владельца, SLA и условие ретеста.</p>
+<h2 id="материалы">Материалы</h2>
+<ul>
+<li>Стенд из <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a> (Grype, OSV-Scanner, Dependency-Track в Docker).</li>
+<li>Заранее подготовленный <code>sbom.cdx.json</code> уязвимого сервиса (вход из <a href="doc-1bca905af1a7.html">М05</a>).</li>
+<li><a href="doc-9fb248a3c6f2.html">Конспект М06</a>, шаблон <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a>.</li>
+<li><a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a> — раздать до занятия как обязательное чтение: откуда берется VEX, кто его выпускает, чем <code>not_affected</code> доказывается.</li>
+</ul>
+<h2 id="ход-занятия">Ход занятия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Мин</th>
+<th>Блок</th>
+<th>Что происходит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0–10</td>
+<td><strong>Вводный кейс</strong></td>
+<td>Показываю один SBOM, прогоняю Grype: 187 находок, 40 Critical. Вопрос аудитории: «что патчим первым?» — фиксируем растерянность как проблему модуля.</td>
+</tr>
+<tr>
+<td>10–30</td>
+<td><strong>Лекция: VDR vs VEX</strong></td>
+<td>Факт против решения. Четыре состояния VEX и список <code>justification</code>. Источники NVD/OSV/GHSA/БДУ и почему один источник недостаточен. Отдельно: VEX выпускает производитель/ответственный за продукт, а не база уязвимостей. Владелец/SLA/ретест.</td>
+</tr>
+<tr>
+<td>30–50</td>
+<td><strong>Демо: три сканера</strong></td>
+<td><code>grype sbom:./sbom.cdx.json -o cyclonedx-json</code>; затем <code>osv-scanner --lockfile=...</code> на том же проекте — сравниваем расхождение в находках. Загрузка SBOM в Dependency-Track, показ портфеля и API VEX.</td>
+</tr>
+<tr>
+<td>50–75</td>
+<td><strong>ПЗ в парах</strong></td>
+<td>Каждая пара берёт 5 находок из VDR, оформляет VEX-записи: состояние + justification + владелец + SLA. Одна находка должна попасть в <code>under_investigation</code>, одна — сверена с БДУ ФСТЭК.</td>
+</tr>
+<tr>
+<td>75–85</td>
+<td><strong>Разбор</strong></td>
+<td>Пары показывают самый спорный <code>not_affected</code>. Проверяем: обоснование из разрешённого списка? есть ли срок жизни решения?</td>
+</tr>
+<tr>
+<td>85–90</td>
+<td><strong>Рефлексия</strong></td>
+<td>Что из этого фиксируем в регламенте Организации: пороги SLA, список justification, периодичность ретеста. Выдача <a href="doc-eed1954f9e9f.html">ПР</a>.</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Типичная ошибка на демо
+Студенты ждут, что Grype и OSV-Scanner дадут одинаковый список. Покажите расхождение явно: OSV точнее по диапазонам версий в lockfile, Grype шире покрывает контейнерные и системные пакеты. Это не баг, а повод сверять источники.</p>
+</blockquote>
+<h2 id="контрольная-точка">Контрольная точка</h2>
+<p>Слушатель на одной находке проходит цепочку: факт из VDR → выбор состояния VEX → обоснование → владелец → SLA → когда пересмотреть. Если на любом шаге «не знаю» — материал не усвоен.</p>
+<p>Дополнительный контроль: слушатель должен назвать, кто имеет право выпустить VEX для собственного продукта Организации и почему upstream advisory является evidence, но не заменяет VEX Организации.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

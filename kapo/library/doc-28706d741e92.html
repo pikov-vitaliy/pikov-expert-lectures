@@ -1,0 +1,55 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ELF и разделы dynamic — КАПО · Пиков</title><meta name="description" content="ELF и разделы dynamic. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-28706d741e92.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="elf-и-разделы-dynamic">ELF и разделы dynamic</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Секция <code>.dynamic</code> ELF-файла — это машиночитаемая запись о том, что бинарь требует от загрузчика. Она хранит набор тегов <code>DT_*</code>: имена нужных библиотек (<code>DT_NEEDED</code>), собственное имя модуля (<code>DT_SONAME</code>), пути поиска (<code>DT_RPATH</code>/<code>DT_RUNPATH</code>) и прочее. Для SCA это самый прямой и дешёвый источник состава: чтобы перечислить динамические зависимости, достаточно прочитать структуру <code>.dynamic</code>, не запуская файл и не имея журнала сборки.</p>
+<p>Понимать <code>.dynamic</code> именно как структуру данных важно, потому что от тегов зависит интерпретация. <code>DT_NEEDED</code> даёт имя, но не путь; <code>DT_RPATH</code>/<code>DT_RUNPATH</code> меняют, какой файл реально подставится под это имя. Читать список зависимостей в отрыве от тегов поиска — значит рисковать тем, что инвентаризация назовёт системный пакет, а в продукт уедет vendored-копия.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Полный дамп секции читается одной командой; каждая строка — отдельный тег <code>DT_*</code>:</p>
+<pre><code class="language-bash">$ readelf -d ./app
+
+Dynamic section at offset 0x2da8 contains 27 entries:
+  Tag                Type        Name/Value
+ 0x0000000000000001 (NEEDED)     Shared library: [libssl.so.3]
+ 0x0000000000000001 (NEEDED)     Shared library: [libcrypto.so.3]
+ 0x0000000000000001 (NEEDED)     Shared library: [libc.so.6]
+ 0x000000000000000e (SONAME)     Library soname: [libapp.so.1]
+ 0x000000000000001d (RUNPATH)    Library runpath: [$ORIGIN/../lib]
+ 0x000000000000000c (INIT)       0x3000
+</code></pre>
+<p>Здесь читается всё нужное для инвентаризации: какие библиотеки требуются (<code>NEEDED</code>), как называет себя сам модуль (<code>SONAME</code> — по нему его найдут другие), и — критично — <code>RUNPATH: $ORIGIN/../lib</code>, то есть загрузчик будет искать <code>.so</code> рядом с бинарём раньше системных путей.</p>
+<blockquote>
+<p>Ключевые теги <code>.dynamic</code> для SCA
+| Тег | Что означает | Зачем SCA |
+|-----|--------------|-----------|
+| <code>DT_NEEDED</code> | имя требуемой <code>.so</code> (soname) | список динамических зависимостей |
+| <code>DT_SONAME</code> | как называется сам модуль | идентичность библиотеки-артефакта |
+| <code>DT_RPATH</code> | устаревший путь поиска (до <code>LD_LIBRARY_PATH</code>) | риск подмены/vendored |
+| <code>DT_RUNPATH</code> | современный путь поиска (после <code>LD_LIBRARY_PATH</code>) | то же, приоритетнее RPATH |</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона <code>.dynamic</code> — расхождение между именем и файлом. <code>DT_NEEDED</code> называет <code>libssl.so.3</code>, но <code>DT_RUNPATH = $ORIGIN/../lib</code> заставит загрузчик взять <code>libssl.so.3</code> из каталога поставки, а не системный <code>libssl3</code>. Инвентаризация по одному <code>DT_NEEDED</code> запишет системную версию, тогда как в рантайме поедет vendored-копия с другой. Приём — всегда читать <code>RPATH</code>/<code>RUNPATH</code> вместе со списком <code>NEEDED</code> и сверять с фактическим путём резолвинга (<code>ldd</code>, см. <a href="doc-19fd6dae6997.html">ldd readelf objdump</a>).</p>
+<p>Вторая граница: <code>.dynamic</code> по определению не содержит статически вшитого кода — там нет ни <code>DT_NEEDED</code>, ни иного следа для <code>.a</code>-архивов. Это зона <a href="doc-ae9d449dcb2c.html">статической линковки</a>, а не <code>.dynamic</code>.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Снимать состав из <code>.dynamic</code> через <code>readelf -d</code> — статически, не исполняя файл; это базовый источник динамических зависимостей.</li>
+<li>Читать не только <code>DT_NEEDED</code>, но и <code>DT_RPATH</code>/<code>DT_RUNPATH</code>: их наличие — сигнал, что фактический файл может отличаться от системного.</li>
+<li>При непустом <code>RPATH</code>/<code>RUNPATH</code> сверять имя из <code>NEEDED</code> с реальным путём резолвинга и помечать vendored-копии отдельно.</li>
+<li>Использовать <code>DT_SONAME</code> как идентичность модуля при маппинге и дедупликации компонентов.</li>
+<li>Отсутствие <code>DT_NEEDED</code> для ожидаемой библиотеки трактовать не как «зависимости нет», а как «возможно, вшита статически» — и уходить в build-scan.</li>
+<li>Для разбора <code>.dynamic</code> пачкой бинарей — программный парсер вместо ручного <code>readelf</code> (см. <a href="doc-7770d940686f.html">LIEF как программный анализ ELF</a>).</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a></li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a></li>
+<li>Смежные заметки 06: <a href="doc-16ebed4577b9.html">динамическая линковка</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-19fd6dae6997.html">ldd readelf objdump</a> · <a href="doc-7770d940686f.html">LIEF как программный анализ ELF</a> · <a href="doc-06c6cc985f59.html">unresolved libraries</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

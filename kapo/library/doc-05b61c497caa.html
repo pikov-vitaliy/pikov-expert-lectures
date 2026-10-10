@@ -1,0 +1,131 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Шаблон отчета по компоненту — КАПО · Пиков</title><meta name="description" content="Шаблон отчета по компоненту. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-05b61c497caa.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#карточка-отчёта">Карточка отчёта</a></li>
+<li><a href="#факты-что-увидели-инструменты">Факты (что увидели инструменты)</a></li>
+<li><a href="#вердикт">Вердикт</a></li>
+<li><a href="#evidence">Evidence</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="шаблон-отчета-по-компоненту">Шаблон отчета по компоненту</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Точечная оценка одной библиотеки в контексте конкретной поставки/релиза с фиксацией вердикта: разрешено, блокировано, доработка или риск принят. В отличие от паспорта (идентичность компонента), отчёт фиксирует <strong>решение на дату</strong> и доказательства, на которых оно построено.</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>Формируется при оценке компонента в ходе приёмки поставки — когда по конкретной версии нужно принять решение (новая уязвимость, спорная лицензия, неподтверждённые координаты). Один компонент → много отчётов во времени; каждый ссылается на свой <a href="doc-7b38c1b6c34b.html">паспорт</a>.</p>
+<h2 id="карточка-отчёта">Карточка отчёта</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Компонент (<code>purl</code>)</td>
+<td><code>pkg:.../...@...</code></td>
+</tr>
+<tr>
+<td>Паспорт</td>
+<td><a href="doc-7b38c1b6c34b.html">Паспорт open source библиотеки</a> (ссылка на конкретный)</td>
+</tr>
+<tr>
+<td>Поставка / релиз</td>
+<td>продукт, версия, дата</td>
+</tr>
+<tr>
+<td>Соисполнитель</td>
+<td>роль/организация (без ФИО)</td>
+</tr>
+<tr>
+<td>Дата оценки</td>
+<td></td>
+</tr>
+<tr>
+<td>Оценщик</td>
+<td>роль (без ФИО)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="факты-что-увидели-инструменты">Факты (что увидели инструменты)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Аспект</th>
+<th>Источник факта</th>
+<th>Результат</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Координаты</td>
+<td>SBOM / build evidence</td>
+<td>purl/cpe подтверждены?</td>
+</tr>
+<tr>
+<td>Уязвимости</td>
+<td>сканер + БДУ ФСТЭК / OSV</td>
+<td>список + severity</td>
+</tr>
+<tr>
+<td>Лицензия</td>
+<td>license scan</td>
+<td>объявлено / заключено</td>
+</tr>
+<tr>
+<td>Статус VEX</td>
+<td>VDR/VEX поставки</td>
+<td>applicable / not affected</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Факт ≠ вердикт
+Таблица выше — машинные факты (см. <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>). Решение ниже принимает человек/политика и обязано иметь автора, дату и срок пересмотра.</p>
+</blockquote>
+<h2 id="вердикт">Вердикт</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Значение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Решение</td>
+<td>✅ разрешено · 🔴 блокировано · 🟡 доработка · ⚪ риск принят</td>
+</tr>
+<tr>
+<td>Обоснование</td>
+<td>почему именно так</td>
+</tr>
+<tr>
+<td>Условия / компенсирующие меры</td>
+<td></td>
+</tr>
+<tr>
+<td>Срок пересмотра</td>
+<td>дата (для «риск принят» — обязательно)</td>
+</tr>
+<tr>
+<td>Ссылка на исключение</td>
+<td><a href="doc-adce46441199.html">П30. Исключения и принятие риска</a> (если применимо)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="evidence">Evidence</h2>
+<ul>
+<li>[ ] Указаны артефакты-источники (SBOM, build log, license report) и их версии инструментов.</li>
+<li>[ ] Решение трассируемо до версии компонента и даты поставки.</li>
+<li>[ ] Отчёт связан с паспортом и, при блокировке, с записью в <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a> или реестре исключений.</li>
+</ul>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-cd2bdeca5d64.html">М06. Уязвимости и VDR/VEX</a> · <a href="doc-e29be6710c8d.html">М14. Политики и исключения</a></li>
+<li>Практики: <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-adce46441199.html">П30. Исключения и принятие риска</a></li>
+<li>Нормативка: <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a></li>
+<li>Связанные шаблоны: <a href="doc-7b38c1b6c34b.html">Паспорт open source библиотеки</a> · <a href="doc-8e9fc48d965c.html">Шаблон отчета по соисполнителю</a> · <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

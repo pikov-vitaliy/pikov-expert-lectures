@@ -1,0 +1,99 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П15. SLSA и in-toto provenance — КАПО · Пиков</title><meta name="description" content="П15. SLSA и in-toto provenance. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6b4e039ebebe.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п15-slsa-и-in-toto-provenance">П15. SLSA и in-toto provenance</h1>
+<blockquote>
+<p>Чем provenance отличается от подписи SBOM
+В <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a> мы подтверждали <em>что</em> лежит в артефакте (состав). Provenance отвечает на другой вопрос — <em>как и где</em> артефакт был собран: какой исходник (commit), какой builder, какой workflow, с какими параметрами. SLSA задаёт уровни зрелости этой гарантии, а in-toto — формат самого attestation (<code>predicateType: https://slsa.dev/provenance/v1</code>). Цель практики — не просто получить provenance, а <strong>проверить его привязку к исходнику</strong>, иначе любой может приложить provenance от чужой сборки.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Получить и <strong>верифицировать SLSA build provenance</strong> для собранного артефакта: provenance выпущен доверенным builder'ом, оформлен как in-toto attestation, а <code>slsa-verifier</code> подтверждает, что артефакт собран из заявленного <code>source-uri</code> и (опционально) указанным workflow/tag. Проверяемый результат — артефакт, который проходит verify с явным указанием ожидаемого источника, и при подмене источника verify <strong>падает</strong>.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Сценарий: артефакт собран в GitHub Actions через официальный SLSA-генератор (<code>slsa-framework/slsa-github-generator</code>), который положил рядом файл <code>*.intoto.jsonl</code> — это DSSE-конверт с provenance, подписанный keyless через Fulcio/Rekor.</p>
+<pre><code class="language-bash"># 1. Установить slsa-verifier (Go-инструмент)
+go install github.com/slsa-framework/slsa-verifier/v2/cli/slsa-verifier@latest
+
+# 2. Проверить артефакт против provenance + ожидаемого источника.
+#    --source-uri и --source-tag — это контроль: verify проходит, только если
+#    provenance действительно ссылается на этот репозиторий и тег.
+slsa-verifier verify-artifact app-linux-amd64 \
+  --provenance-path app-linux-amd64.intoto.jsonl \
+  --source-uri github.com/&lt;github-owner&gt;/&lt;repository&gt; \
+  --source-tag v1.4.0
+
+# 3. Посмотреть, что внутри provenance (decoded in-toto statement)
+jq -r '.payload' app-linux-amd64.intoto.jsonl | base64 -d | jq '{
+  predicateType,
+  subject,
+  builder: .predicate.runDetails.builder.id,
+  invocation: .predicate.buildDefinition.externalParameters
+}'
+</code></pre>
+<p>Для контейнерных образов provenance проверяется по digest:</p>
+<pre><code class="language-bash">TRUSTED_BUILDER_ID='&lt;trusted-builder-id-from-provenance-policy&gt;'
+
+slsa-verifier verify-image ghcr.io/org/app@sha256:&lt;digest&gt; \
+  --source-uri github.com/&lt;github-owner&gt;/&lt;repository&gt; \
+  --builder-id "$TRUSTED_BUILDER_ID"
+</code></pre>
+<p><code>--builder-id</code> — это строковый идентификатор builder из provenance, а не браузерная ссылка. Значение с <code>@refs/tags/...</code> проверяют как часть доверенной политики: оно должно совпадать с заранее разрешённым builder'ом и версией workflow. Для официального GitHub container generator сверяйте семейство builder'а с workflow в репозитории <code>slsa-framework/slsa-github-generator</code>: https://github.com/slsa-framework/slsa-github-generator/blob/main/.github/workflows/generator_container_slsa3.yml.</p>
+<blockquote>
+<p><code>--source-uri</code> обязателен по смыслу, даже если формально опционален
+verify без <code>--source-uri</code> подтверждает только то, что provenance подписан и не повреждён — но не то, что артефакт собран <em>из вашего кода</em>. Атакующий с собственным валидным pipeline получит валидное provenance на свой форк. Привязка к источнику (и по возможности к тегу/builder-id) — это и есть граница доверия, ради которой существует SLSA.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Успешный verify-artifact заканчивается строкой <code>PASSED</code>:</p>
+<pre><code>Verified signature against tlog entry index 88241039 ...
+Verified build using builder "https://github.com/slsa-framework/slsa-github-generator/..." at commit a1b2c3d...
+Verifying artifact app-linux-amd64: PASSED
+
+PASSED: SLSA verification passed
+</code></pre>
+<p>Декодированный in-toto statement (шаг 3) — это provenance v1 со следующим скелетом:</p>
+<pre><code class="language-json">{
+  "predicateType": "https://slsa.dev/provenance/v1",
+  "subject": [
+    { "name": "app-linux-amd64", "digest": { "sha256": "&lt;digest&gt;" } }
+  ],
+  "builder": "https://github.com/slsa-framework/slsa-github-generator/.github/workflows/...",
+  "invocation": {
+    "workflow": {
+      "ref": "refs/tags/v1.4.0",
+      "repository": "github.com/&lt;github-owner&gt;/&lt;repository&gt;"
+    }
+  }
+}
+</code></pre>
+<p>Ориентир: <code>subject.digest.sha256</code> обязан совпадать с <code>sha256sum app-linux-amd64</code>. Если хеши расходятся — verify не дойдёт до <code>PASSED</code>, потому что проверяется именно тот артефакт, что лежит на диске.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки и как их распознать
+- <strong><code>FAILED: expected source ... got ...</code></strong> — provenance ссылается на другой репозиторий, чем указан в <code>--source-uri</code>. Это <strong>сработавший контроль</strong>, а не сбой: либо опечатка в URI, либо артефакт собран не из вашего источника. Не «лечите» это удалением <code>--source-uri</code>.
+- <strong><code>FAILED: artifact hash does not match provenance subject</code></strong> — вы проверяете не тот файл (например, пересобрали локально, а provenance от релизного артефакта). Сверьте <code>sha256sum</code> с <code>subject.digest</code>.
+- <strong><code>no matching signatures</code> / ошибка Rekor</strong> — provenance не был залогирован в transparency log или повреждён <code>.intoto.jsonl</code>. Скачайте артефакт и provenance заново из release/registry, не редактируйте jsonl вручную.
+- <strong><code>unexpected builderID</code></strong> при <code>verify-image</code> — образ собран не тем builder'ом, который вы указали в <code>--builder-id</code>. Уточните builder из самого provenance (<code>.predicate.runDetails.builder.id</code>) и сверьте, что он доверенный, а не подставленный.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю:
+1. Вывод <code>slsa-verifier verify-artifact</code> (или <code>verify-image</code>) со строкой <code>PASSED</code> <strong>и</strong> заполненными <code>--source-uri</code>/<code>--source-tag</code>.
+2. Декодированный provenance с <code>predicateType: https://slsa.dev/provenance/v1</code>, где <code>subject.digest.sha256</code> совпадает с локальным <code>sha256sum</code>.
+3. <strong>Отрицательный тест</strong>: тот же verify с заведомо неверным <code>--source-uri</code> (например, <code>github.com/org/fork</code>) — он должен дать <code>FAILED</code>. Это доказывает, что проверка реально работает, а не «всегда зелёная».
+4. Устно: чем provenance (как собрано) дополняет подпись SBOM (что внутри) из <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a>.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-49ecd9f148fa.html">SLSA</a> — уровни build provenance (L1–L3) и требования к builder'у; verify против source-uri/builder-id — это и есть проверка соответствия уровню.</li>
+<li><a href="doc-094e43a07d21.html">in-toto</a> — формат attestation (DSSE-конверт, statement/predicate), в котором живёт provenance.</li>
+<li><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> — PO.3 (доверенная среда сборки) и PS.3.1 (сохранение provenance релизов): <code>*.intoto.jsonl</code> + verify — машинный evidence.</li>
+<li><a href="doc-a6189f5ab42c.html">NIST SP 800-161 Rev.1</a> — контроль целостности и происхождения компонентов в C-SCRM-контексте цепочки поставки.</li>
+<li><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — управляемость и прослеживаемость работ по сборке безопасного ПО.</li>
+<li><a href="doc-9d81f3d4e106.html">Требования к CI security gate</a> — шаблон требований к gate, куда добавляется обязательная verify-проверка provenance перед релизом.</li>
+<li>Смежные практики: <a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a> (подпись состава — парный контур), <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> (где verify provenance включается обязательным шагом gate), <a href="doc-fd2abd912efa.html">П28. Поставка от нескольких исполнителей</a> (provenance как способ проверить, что сборка соисполнителя пришла из заявленного источника).</li>
+<li>Модуль: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

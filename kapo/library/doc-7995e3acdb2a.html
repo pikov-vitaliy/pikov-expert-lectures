@@ -1,0 +1,82 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П13. FOSSology как юридический workflow — КАПО · Пиков</title><meta name="description" content="П13. FOSSology как юридический workflow. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-7995e3acdb2a.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п13-fossology-как-юридический-workflow">П13. FOSSology как юридический workflow</h1>
+<blockquote>
+<p>Зачем эта практика
+ScanCode и ORT автоматизируют находку, но финальное лицензионное решение — это работа человека с фиксацией ответственности. FOSSology — это сервер для <strong>clearing workflow</strong>: загрузка артефакта → прогон агентов-сканеров (<code>nomos</code>, <code>monk</code>, <code>ojo</code>, <code>copyright</code>) → ручной review reviewer-ом → утверждённое заключение (concluded license) с автором и историей. Именно здесь «detected» из П11 превращается в «concluded» с подписью и аудиторским следом, а не остаётся машинной строкой.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Развернуть FOSSology, загрузить артефакт, запустить агенты лицензионного анализа, провести хотя бы один файл через ручной clearing (расхождение detected/concluded) и выгрузить отчёт (SPDX или ReadMe_OSS), в котором зафиксированы concluded-лицензии и кто их утвердил. Проверяемый результат — выгруженный clearing-отчёт с историей решения.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># Поднять сервер одной командой (web UI на http://localhost:8081/repo)
+docker run -d --name fossology -p 8081:80 fossology/fossology
+# логин по умолчанию: fossy / fossy
+
+# Дальше через web UI:
+#   Upload → From File / From URL  (артефакт: tarball исходников)
+#   при загрузке отметить агенты: nomos, monk, ojo, copyright
+#   Jobs → дождаться завершения scheduler
+#   Browse → пакет → License → ручной review (Bulk/Concluded)
+#   Exports → SPDX2 / ReadMe_OSS / DEP5
+</code></pre>
+<p>Если нужна автоматизация через REST API (генерация токена в web UI → Admin → API tokens):</p>
+<pre><code class="language-bash">TOKEN="&lt;bearer-token&gt;"
+BASE="http://localhost:8081/repo/api/v1"
+
+# загрузить артефакт в папку folderId=1
+curl -s -X POST "$BASE/uploads" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "folderId: 1" \
+  -F "fileInput=@somelib-2.4.1.tar.gz"
+
+# запустить агенты для upload (uploadId из ответа выше)
+curl -s -X POST "$BASE/jobs" \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "folderId: 1" -H "uploadId: 3" -H "Content-Type: application/json" \
+  -d '{"analysis":{"nomos":true,"monk":true,"ojo":true,"copyright":true},
+       "decider":{"nomos_monk":true}}'
+</code></pre>
+<blockquote>
+<p>nomos и monk ловят разное — поэтому запускают оба
+<code>nomos</code> распознаёт лицензии по регулярным сигнатурам (широко, но шумно), <code>monk</code> — по точному совпадению с эталонными текстами из БД (узко, но уверенно), <code>ojo</code> вытягивает SPDX-теги <code>SPDX-License-Identifier</code>. Расхождение их вердиктов на одном файле — это и есть кандидат на ручной review: где агенты согласны, человек тратит время зря; где спорят — там настоящая работа clearing-а.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>После завершения Jobs в Browse у пакета появляется сводка лицензий с разбивкой по агентам. Концептуально:</p>
+<pre><code>File: parser.c
+  nomos:      GPL-2.0-only        (signature match)
+  monk:       GPL-2.0-only  98%   (reference text)
+  concluded:  GPL-2.0-only        ← внесён reviewer-ом вручную, с датой и логином
+</code></pre>
+<p>Фрагмент SPDX-экспорта (виден concluded vs declared):</p>
+<pre><code>FileName: ./parser.c
+LicenseConcluded: GPL-2.0-only
+LicenseInfoInFile: GPL-2.0-only
+LicenseComments: Concluded by reviewer 'auditor' on 2026-06-17, clearing OK.
+</code></pre>
+<p>Ориентир: на одном среднем пакете агенты дают десятки file-level находок; для зачёта достаточно довести до concluded хотя бы один файл, где видно различие «что нашла машина» и «что утвердил человек». Главное — в отчёте присутствует поле <code>LicenseConcluded</code> и комментарий о том, кто и когда вынес решение (audit trail), а не только <code>LicenseInfoInFile</code>.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки
+- <strong>Контейнер стартовал, но web UI не открывается</strong> — FOSSology инициализирует БД при первом запуске, это занимает минуту-две. Смотрите <code>docker logs -f fossology</code> до строки готовности scheduler; не ломитесь в UI сразу.
+- <strong>Jobs висят в <code>Scheduled</code> и не стартуют</strong> — не поднялся <code>fo-scheduler</code> внутри контейнера. В all-in-one образе он встроен; при ручной установке проверяйте <code>systemctl status fossology</code>. Перезапуск контейнера обычно лечит.
+- <strong>Все лицензии остались <code>No license found</code></strong> — загрузили бинарники/архив без исходных текстов либо забыли отметить агенты при upload. Перезапустите job с <code>nomos</code>+<code>monk</code> по тому же upload через Jobs → Agents.
+- <strong>REST <code>401 Unauthorized</code></strong> — токен просрочен или скопирован с лишними пробелами. Токены в FOSSology короткоживущие; сгенерируйте заново в Admin → API tokens и подставьте без переносов строк.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) экспорт (SPDX2 / ReadMe_OSS) с заполненным <code>LicenseConcluded</code>; (2) хотя бы один файл, где detected-вердикты агентов разошлись и вы вынесли concluded руками; (3) объяснение, чем clearing-решение в FOSSology отличается от машинной находки ScanCode (наличие автора, даты, истории — audit trail). Просто «загрузил и прогнал агенты» без ручного review не засчитывается: суть практики — юридический workflow с ответственным.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a></li>
+<li>Смежные практики: <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> · <a href="doc-1e5ce9414ca8.html">П12. ORT и license policy</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></li>
+<li>Нормативка: <a href="doc-cf001a40d806.html">SPDX ISO/IEC 5962</a> · <a href="doc-348bb0ac58ac.html">OpenChain ISO/IEC 5230</a></li>
+<li>Шаблоны: <a href="doc-70e65566b066.html">Шаблон юридического заключения по лицензии</a> · <a href="doc-e65a39cb2dfa.html">Журналирование и audit trail</a></li>
+<li>Инструмент: <a href="doc-bc53e098bca4.html">FOSSology</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

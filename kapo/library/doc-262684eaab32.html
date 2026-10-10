@@ -1,0 +1,32 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. Контрольные вопросы — КАПО · Пиков</title><meta name="description" content="М03. Контрольные вопросы. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-262684eaab32.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#кейс-задачи">Кейс-задачи</a></li>
+</ul>
+</div>
+<h1 id="контрольные-вопросы">Контрольные вопросы</h1>
+<blockquote>
+<p>Базовый уровень
+1. Какие два формата и в каких минимальных версиях признаёт форматом SBOM <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>?
+2. Чем по назначению исторически различаются CycloneDX и SPDX?
+3. Является ли SWID (ISO/IEC 19770-2) форматом SBOM по BSI? Если нет — какую роль он играет в SBOM?
+4. В каких сериализациях BSI разрешает SBOM, а какие форматные сериализации (RDF, Protobuf, YAML) к делу не относятся?</p>
+<p>Средний уровень
+5. Как устроена модель данных CycloneDX (единый <code>component</code> + <code>type</code>) против SPDX (граф <code>software_Package</code>/<code>software_File</code> + <code>Relationship</code>)? Приведите пример, где это даёт разницу.
+6. Назовите три категории лицензий BSI (original / distribution / effective) и покажите, через какие поля они выражаются в CycloneDX и в SPDX.
+7. Какие обязательные по BSI поля компонента отсутствуют нативно в обоих форматах и как их кодируют (<code>bsi:component:*</code>, <code>software_additionalPurpose</code>)?
+8. Почему BSI запрещает помещать информацию об уязвимостях в SBOM и какой формат рекомендован вместо этого?
+9. Почему конвертация CycloneDX↔SPDX почти всегда теряет данные? Приведите два конкретных поля, которые рискуют потеряться.</p>
+<p>Продвинутый уровень
+10. Чем отличаются <code>acknowledgement: declared</code> и <code>acknowledgement: concluded</code> в CycloneDX и как они соотносятся с original/distribution/effective licence BSI?
+11. Что меняется в требованиях к SBOM в зависимости от его класса (Design / Source / Build / Analysed / Deployed / Runtime) — на примере наличия hash SHA-512 и filename?
+12. Как BSI описывает ссылку одного SBOM на другой (referenced component) и какие три поля обязательно дублируются в ссылающемся SBOM?</p>
+</blockquote>
+<h2 id="кейс-задачи">Кейс-задачи</h2>
+<blockquote>
+<p>Кейс 1. «Это же SBOM»
+Соисполнитель прислал набор XML SWID-тегов установленного ПО и заявил, что выполнил требование «предоставить SBOM». Что вы ответите со ссылкой на BSI и что попросите прислать вместо этого?</p>
+<p>Кейс 2. Версии не те
+На вход пришёл валидный по схеме CycloneDX <code>specVersion: 1.5</code>. Заказчик требует соответствия BSI TR-03183-2 v2.1.0. Проходит ли SBOM? Что нужно сделать и почему именно версия здесь блокер?</p>
+<p>Кейс 3. Потеря при конвертации
+Команда генерирует SBOM в SPDX, а портфельный инструмент принимает только CycloneDX, поэтому файлы конвертируют автоматически. После конвертации в отчёте по лицензиям пропало различие declared/concluded, а для части компонентов исчез hash. Объясните механизм потерь и предложите процессное решение (а не «починить конвертер»).</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

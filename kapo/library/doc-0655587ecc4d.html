@@ -1,0 +1,48 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>vendored source — КАПО · Пиков</title><meta name="description" content="vendored source. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0655587ecc4d.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="vendored-source">vendored source</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Vendoring — это когда исходники чужой библиотеки скопированы прямо в дерево проекта (<code>src/zlib/</code>, <code>deps/sqlite3.c</code>) и собираются как «свой» код, без submodule, без пакетного менеджера, без lock-файла. Для SCA это худший из миров: компонент физически присутствует и попадает в итоговый бинарь, но не оставляет ни одной декларативной зацепки — нет ни строки в <code>conanfile</code>, ни записи в <code>dpkg</code>, ни <code>DT_NEEDED</code>. Генератор SBOM, который ходит по манифестам и графу линковки, такой код просто не видит и молча относит к first-party. В результате уязвимость в вендоренной версии zlib не порождает ни одного finding, хотя код собран и работает.</p>
+<p>Опасность усугубляется тем, что вендоринг почти всегда замораживает версию. Команда один раз скопировала <code>libpng</code> версии 1.6.34 «чтобы собиралось», и три года спустя в продукте едет именно она — со всеми накопившимися CVE, тогда как upstream давно на 1.6.43. Без явной фиксации версии в SBOM этот разрыв невидим.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Вендоренный код выглядит как обычные исходники проекта. Отличить его от first-party можно по косвенным следам — копирайтам, оригинальным <code>VERSION</code>/<code>CHANGELOG</code>, нетипичному стилю:</p>
+<pre><code class="language-bash"># Заголовок версии библиотеки внутри чужого кода — частый маркер vendoring
+grep -rn "ZLIB_VERSION" src/        # → "1.2.11" — заморожённая версия
+grep -rln "Copyright (C)" third_party/ | head
+
+# Файл целиком скопирован из upstream? git его не «знает» как историю проекта
+git log --oneline -- src/sqlite3.c   # одна строка "import sqlite 3.36" вместо истории
+
+# Сверка с эталоном: хеш вендоренного файла против известного релиза upstream
+sha256sum src/miniz.c
+</code></pre>
+<p>В SBOM такой компонент должен появиться как отдельная запись <code>pkg:generic/zlib@1.2.11</code> с указанием, что источник — вендоренная копия, а не системный пакет. CycloneDX поле <code>evidence.occurrences</code> фиксирует конкретный путь в дереве, где найден компонент.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Главная слепая зона: <strong>вендоренный компонент по умолчанию учитывается как first-party и выпадает из анализа уязвимостей</strong>. Второй слой — потерянная версия: даже если факт наличия zlib зафиксирован, без точной версии сканеру не на что мэтчить CVE, и компонент даёт ложное ощущение «учтён, чистый». Третий — патчи: вендоренную копию часто правят руками, и она уже не равна ни одному официальному релизу, что ломает применимость как уязвимостей, так и лицензионных выводов.</p>
+<blockquote>
+<p>Тихая реклассификация в first-party
+Если в отчёте сканера резко мало компонентов для проекта, который очевидно тянет крипто/сжатие/парсинг, первым делом ищите вендоринг: <code>find . -name "*.c" -path "*third_party*"</code> или поиск чужих копирайтов. «Маленький чистый SBOM» здесь — симптом, а не успех.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Инвентаризируйте подозрительные каталоги: <code>third_party/</code>, <code>deps/</code>, <code>external/</code>, <code>vendor/</code>, <code>contrib/</code>, плюс одиночные «амальгамы» (<code>sqlite3.c</code>, <code>miniz.c</code>).</li>
+<li>Для каждой вендоренной библиотеки извлеките версию из <code>VERSION</code>/<code>*_VERSION</code> макроса/<code>CHANGELOG</code> и зафиксируйте её в SBOM как <code>pkg:generic/&lt;name&gt;@&lt;version&gt;</code> (см. <a href="doc-53c0c842e715.html">PURL generic fallback</a>).</li>
+<li>Сверьте файлы с upstream-релизом по хешу; если расходятся — пометьте компонент как модифицированный (форк) и не выдавайте за чистый upstream (см. <a href="doc-fd56cb075f09.html">форки open source библиотек</a>).</li>
+<li>Запишите путь occurrences в <code>evidence.occurrences</code>, чтобы аудит видел, откуда взят компонент (см. <a href="doc-91fc18825af4.html">SBOM evidence occurrences</a>).</li>
+<li>Заведите политику: новый вендоринг допустим только с зафиксированной версией и лицензией; ревизия — на каждом релизе.</li>
+<li>То, что не удалось привязать к версии и источнику, уносите в <a href="doc-06c6cc985f59.html">unresolved libraries</a> с пониженным confidence.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. make build inventory</a> (инвентаризация состава сборки), <a href="doc-9176592b9170.html">П04. cdxgen для C/C++</a> (что генератор видит и не видит).</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (требования к работе с заимствованными компонентами), <a href="doc-3c212b09f984.html">BSI TR-03183-2</a> (полнота состава SBOM).</li>
+<li>Смежные 06: <a href="doc-0ea1c075e2df.html">ручные third_party каталоги</a>, <a href="doc-7cac09e1dec1.html">копипаста кода</a>, <a href="doc-a2c530fc1bbc.html">honest SBOM</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

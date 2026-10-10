@@ -1,0 +1,43 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PURL pkg generic fallback — КАПО · Пиков</title><meta name="description" content="PURL pkg generic fallback. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-53c0c842e715.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="purl-pkg-generic-fallback">PURL pkg generic fallback</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>PURL кодирует тип экосистемы (<code>pkg:deb/...</code>, <code>pkg:conan/...</code>, <code>pkg:cargo/...</code>), и именно по типу публичные сканеры решают, в какую базу идти за уязвимостями. Когда генератор SBOM находит C/C++ артефакт, который не лёг ни в один известный пакетный менеджер — статически вшитую библиотеку, файл из <code>third_party/</code>, бинарь без apt/dpkg-происхождения — он часто выдаёт <code>pkg:generic/&lt;name&gt;@&lt;version&gt;</code>. Это честный, но «немой» идентификатор: тип <code>generic</code> не указывает на публичный индекс, поэтому OSV/экосистемные сканеры по нему ничего не ищут. Компонент остаётся в SBOM, но фактически выпадает из матчинга.</p>
+<p><code>generic</code> — это не баг, а сигнал «инструмент не смог определить экосистему». Опасность в том, что строка выглядит как полноценная координата, и при беглом взгляде кажется, что компонент покрыт. На деле <code>pkg:generic/openssl@3.0.11</code> и <code>pkg:deb/debian/libssl3@3.0.11</code> для сканера — разные миры: первый не матчится, второй матчится.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Генератор SBOM не нашёл системного происхождения и подставил <code>generic</code>:</p>
+<pre><code class="language-json">{ "type": "library", "name": "zlib", "version": "1.2.13",
+  "purl": "pkg:generic/zlib@1.2.13",
+  "properties": [{ "name": "cdx:bom:resolvedFrom", "value": "static-archive" }] }
+</code></pre>
+<p>Сравните с тем, что дал бы маппинг на пакет:</p>
+<pre><code class="language-text">pkg:generic/zlib@1.2.13                         → OSV: 0 находок (тип не маршрутизируется)
+pkg:deb/debian/zlib1g@1:1.2.13.dfsg-1?arch=amd64 → OSV: матчится по deb-экосистеме
+pkg:conan/zlib@1.2.13                            → OSV: матчится по conan
+</code></pre>
+<p>Тот же эффект у вшитых форков: <code>pkg:generic/customnet@1.0</code> для внутренней библиотеки без апстрима — это правильный fallback, его и не нужно тянуть к публичной координате. А вот <code>pkg:generic/curl@7.88.1</code> — это упущенный публичный компонент, который надо переразметить в <code>pkg:deb/...</code> или <code>pkg:conan/...</code>.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — принять <code>generic</code> за покрытие. Приём: разделить <code>generic</code>-компоненты на два класса. Первый — публичный OSS, для которого fallback случаен (инструмент не нашёл deb/conan-происхождение): его дотягивают до типизированного PURL и возвращают в матчинг. Второй — действительно внутренний компонент без апстрима: <code>generic</code> для него корректен, его версионируете и отслеживаете вручную, не выдумывая публичный тип.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Отфильтровать из SBOM все <code>pkg:generic/...</code> — это явный worklist «без публичной координаты».</li>
+<li>Для каждого решить: это публичный OSS или внутренний компонент? Подсказки — наличие апстрима, лицензия, имя.</li>
+<li>Публичные — переразметить: восстановить экосистему через <code>dpkg -S</code>/<code>rpm -qf</code> (→ <code>pkg:deb</code>/<code>pkg:rpm</code>) или Conan/vcpkg metadata (→ <code>pkg:conan</code>), проверить матчинг на OSV.</li>
+<li>Внутренние — оставить <code>generic</code>, но завести собственную версию и наблюдение; не подменять публичным PURL.</li>
+<li>Сохранять исходный <code>generic</code>-PURL рядом как evidence того, откуда компонент попал в SBOM.</li>
+<li>Не считать наличие <code>pkg:generic</code> строки покрытием: в отчёте о качестве данных это строка с пониженным confidence.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> (PURL как маршрут к OSV), <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> (откуда берутся безымянные компоненты).</li>
+<li>Практики: <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> (канон PURL), <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> (когда у компонента нет даже CPE).</li>
+<li>Нормативка: <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> (уникальный идентификатор как базовый элемент), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (полнота и точность идентификаторов), <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1).</li>
+<li>Смежные заметки: <a href="doc-4bd8e3178892.html">dpkg apt metadata</a> (как поднять generic до deb), <a href="doc-91fc18825af4.html">SBOM evidence occurrences</a> (чем подтвердить происхождение), <a href="doc-9fa864f09c7c.html">detection accuracy</a> (generic как скрытый false negative).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

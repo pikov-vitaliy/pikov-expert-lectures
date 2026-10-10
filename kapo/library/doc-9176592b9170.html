@@ -1,0 +1,66 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П04. Генерация SBOM через cdxgen для C/C++ — КАПО · Пиков</title><meta name="description" content="П04. Генерация SBOM через cdxgen для C/C++. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9176592b9170.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п04-генерация-sbom-через-cdxgen-для-cc">П04. Генерация SBOM через cdxgen для C/C++</h1>
+<h2 id="цель">Цель</h2>
+<p>Сгенерировать SBOM для C/C++ проекта режимом <code>cdxgen -t cpp</code> и убедиться на конкретных компонентах, что <strong>сырой C/C++ SBOM неполон</strong>: версии часто пусты, идентификаторы вырождаются в <code>pkg:generic/...</code>, динамические <code>.so</code> и их привязка к системным DEB-пакетам не восстанавливаются. Дополнительно показать дельту «без Conan» против «с Conan»: декларация пакетного менеджера превращает часть generic-компонентов в нормальные координаты с версией. Проверяемый результат — <code>cdxgen-bom.json</code>, в котором видны и заполненные, и «слепые» компоненты.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>На вход — учебный C/C++ проект (CMake/make). Прогон делаем дважды: на «голом» дереве и после того, как зависимости объявлены через Conan.</p>
+<pre><code class="language-bash">cdxgen --version
+
+# 1) без Conan: cdxgen видит только то, что нашёл в дереве сборки
+cdxgen -t cpp -o cdxgen-noconan.json .
+
+# 2) с Conan: объявляем зависимости, затем повторный прогон
+conan install . --output-folder=build --build=missing
+cdxgen -t cpp -o cdxgen-conan.json .
+
+# сравнить число компонентов и долю пустых версий
+jq '.components | length' cdxgen-noconan.json cdxgen-conan.json
+jq '[.components[] | select(.version == null or .version == "")] | length' cdxgen-conan.json
+</code></pre>
+<p>cdxgen — публичный генератор CycloneDX (https://github.com/cdxgen/cdxgen). Сырой <code>cdxgen-bom.json</code> затем уходит на обогащение в <strong>генератор фактов (enrichment-утилита)</strong>, который дотягивает динамические <code>.so</code> через анализ ELF и привязывает их к DEB-пакетам, — это уже следующий шаг конвейера, не покрытый данной практикой.</p>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>В <code>cdxgen-noconan.json</code> компонентов немного, и значительная часть из них без версии и с вырожденным PURL — это нормальное состояние C/C++ без дисциплины пакетного менеджера:</p>
+<pre><code class="language-json">{
+  "type": "library",
+  "name": "zlib",
+  "version": "",
+  "purl": "pkg:generic/zlib"
+}
+</code></pre>
+<p>После <code>conan install</code> часть таких записей в <code>cdxgen-conan.json</code> получает версию и осмысленный идентификатор:</p>
+<pre><code class="language-json">{
+  "type": "library",
+  "name": "zlib",
+  "version": "1.3.1",
+  "purl": "pkg:conan/zlib@1.3.1"
+}
+</code></pre>
+<p>Ориентир по числам: компонентов в обоих файлах единицы–десятки (а не сотни, как в npm-проекте из <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a>); счётчик пустых версий в варианте без Conan заметно выше.</p>
+<blockquote>
+<p>cdxgen для C/C++ даёт каркас, а не полный состав
+<code>#include</code> не несёт версии, а статически вшитая библиотека вообще исчезает из артефакта — поэтому <code>pkg:generic/...</code> без версии здесь не баг инструмента, а граница метода. Не принимайте такой SBOM за полный: его обязательно дообогащают данными ELF/DEB. Эта неполнота — причина, по которой в конвейере Организации существует отдельный генератор фактов.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>cdxgen</code> не запускается / <code>command not found</code>.</strong> Инструмент ставится через npm (<code>npm install -g @cyclonedx/cdxgen</code>) и требует Node.js. Проверьте <code>node --version</code> и <code>cdxgen --version</code>.</li>
+<li><strong><code>components</code> пуст (<code>[]</code> или <code>length</code> = 0).</strong> cdxgen не нашёл артефактов сборки в каталоге: запуск был не из корня проекта, либо проект ни разу не конфигурировался (<code>CMakeCache.txt</code>/<code>Makefile</code> отсутствуют). Сконфигурируйте сборку и повторите.</li>
+<li><strong>Файлы «без Conan» и «с Conan» идентичны.</strong> <code>conan install</code> не отработал (нет <code>conanfile.txt</code>/<code>conanfile.py</code>, или профиль не задан) — Conan-граф не появился, дельты нет. Проверьте <code>conan profile detect</code> и наличие conanfile.</li>
+<li><strong>Все версии пусты даже после Conan.</strong> cdxgen прочитал дерево до установки зависимостей; запускайте генерацию строго после <code>conan install</code> и из того же каталога.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: <code>cdxgen-noconan.json</code> и <code>cdxgen-conan.json</code>, два числа из <code>jq</code> и счётчик пустых версий. Указать пальцем хотя бы один компонент, который в варианте без Conan был <code>pkg:generic/...</code> без версии, а с Conan получил версию и нормальный PURL. Сформулировать, какие данные о компонентах в этом SBOM всё ещё отсутствуют и где они добираются.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09 C/C++ legacy без дисциплины пакетного менеджера</a></li>
+<li>Смежные практики (цепочка C/C++): <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a></li>
+<li>Критерии качества SBOM (полнота PURL, версий, зависимостей) — <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>; формат — <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>; минимальный состав полей — <a href="doc-f8e87801f278.html">NTIA Minimum Elements for SBOM</a>; управляемость работ — <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

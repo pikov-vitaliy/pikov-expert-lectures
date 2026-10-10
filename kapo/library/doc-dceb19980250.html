@@ -1,0 +1,98 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П14. Подпись SBOM через Sigstore — КАПО · Пиков</title><meta name="description" content="П14. Подпись SBOM через Sigstore. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-dceb19980250.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п14-подпись-sbom-через-sigstore">П14. Подпись SBOM через Sigstore</h1>
+<blockquote>
+<p>Что именно решает эта практика
+SBOM сам по себе — обычный JSON-файл, который кто угодно может подменить между сборкой и проверкой. Подпись через Sigstore привязывает SBOM к конкретному образу как <strong>attestation</strong> (in-toto DSSE-конверт), фиксирует, <em>кто</em> и <em>в каком pipeline</em> его выпустил (OIDC-identity вместо приватного ключа), и заносит факт подписи в публичный transparency log Rekor. Без этого этапа любой downstream-потребитель доверяет SBOM «на слово».</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>Получить <strong>верифицируемую привязку</strong> CycloneDX SBOM к контейнерному образу: образ подписан keyless-подписью Sigstore, SBOM приложен как attestation типа <code>cyclonedx</code>, а <code>cosign verify-attestation</code> возвращает корректный DSSE-конверт с проверенным OIDC-identity и записью в Rekor. Проверяемый результат — это пара «образ + attestation», которую можно скачать из реестра на другой машине и заново верифицировать без секретов.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Подготовка: образ уже в реестре (например, <code>ghcr.io/org/app@sha256:...</code>), SBOM сгенерирован (см. <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>) в файл <code>bom.cdx.json</code>.</p>
+<pre><code class="language-bash"># 1. Авторизация в реестре (cosign использует те же креды, что docker)
+cosign login ghcr.io -u &lt;user&gt; --password-stdin &lt;&lt;&lt; "$GHCR_TOKEN"
+
+# 2. Прикрепить SBOM как attestation. В cosign v2 keyless-режим включён по умолчанию:
+#    Fulcio выдаёт короткоживущий сертификат на OIDC-identity, Rekor логирует факт.
+cosign attest \
+  --predicate bom.cdx.json \
+  --type cyclonedx \
+  --yes \
+  ghcr.io/org/app@sha256:&lt;digest&gt;
+
+# 3. Проверка attestation с привязкой к ожидаемому identity и issuer
+GITHUB_REPOSITORY='&lt;github-owner&gt;/&lt;repository&gt;'
+EXPECTED_CERT_IDENTITY="^https:\/\/github\.com\/${GITHUB_REPOSITORY}\/.+$"
+
+cosign verify-attestation \
+  --type cyclonedx \
+  --certificate-identity-regexp "$EXPECTED_CERT_IDENTITY" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  ghcr.io/org/app@sha256:&lt;digest&gt; | jq -r '.payload' | base64 -d | jq .
+</code></pre>
+<p><code>https://token.actions.githubusercontent.com</code> здесь не справочная страница, а значение OIDC issuer в сертификате Fulcio. Если нужно проверить саму конфигурацию issuer, смотрите <code>https://token.actions.githubusercontent.com/.well-known/openid-configuration</code>.</p>
+<blockquote>
+<p>Адресуйте образ по digest, а не по тегу
+Подпись и attestation в Sigstore привязываются к <strong>digest</strong> (<code>@sha256:...</code>), а не к тегу. Тег <code>:latest</code> можно переназначить на другой образ — и ваша подпись «отвалится». В CI всегда получайте digest сразу после push (<code>docker inspect --format '{{index .RepoDigests 0}}'</code>) и работайте с ним.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>При <code>cosign attest</code> в терминал выводится подтверждение публикации в Rekor:</p>
+<pre><code>Generating ephemeral keys...
+Retrieving signed certificate...
+...
+tlog entry created with index: 148203715
+</code></pre>
+<p><code>cosign verify-attestation</code> сначала печатает блок верификации, затем выдаёт DSSE-конверт. После декодирования payload вы увидите in-toto statement с вашим SBOM внутри <code>predicate</code>:</p>
+<pre><code class="language-json">{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "predicateType": "https://cyclonedx.org/bom",
+  "subject": [
+    { "name": "ghcr.io/org/app", "digest": { "sha256": "&lt;digest&gt;" } }
+  ],
+  "predicate": {
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "components": [
+      {
+        "type": "library",
+        "name": "zlib",
+        "version": "1.3.1"
+      }
+    ]
+  }
+}
+</code></pre>
+<p>Ключевой признак успеха в выводе verify: строки <code>Certificate subject</code>, соответствующие шаблону <code>^https:\/\/github\.com\/&lt;github-owner&gt;\/&lt;repository&gt;\/.+$</code>, и <code>Certificate issuer URL: https://token.actions.githubusercontent.com</code> — они подтверждают, что подписал именно ваш CI-pipeline, а не посторонний.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки и как их распознать
+- <strong><code>Error: no matching attestations</code></strong> при verify — либо вы проверяете другой digest (тег уехал на новый образ), либо attestation так и не загрузился в реестр. Сверьте digest и убедитесь, что шаг <code>attest</code> отработал без ошибок.
+- <strong><code>error verifying certificate: ... no matching subject</code></strong> — <code>--certificate-identity-regexp</code>/<code>--certificate-oidc-issuer</code> не совпали с тем, кто реально подписал. Это <strong>не баг, а сработавшая проверка</strong>: либо ошиблись в regexp, либо образ подписан не тем pipeline. Никогда не «чините» это, убрав флаги identity — verify без них принимает любую подпись.
+- <strong><code>getting signer: getting key from Fulcio: ... 401</code></strong> — в CI нет валидного OIDC-токена (например, в GitLab не задан <code>id_tokens</code>/<code>SIGSTORE_ID_TOKEN</code>, в GitHub Actions не выставлен <code>permissions: id-token: write</code>). Keyless-подпись без OIDC невозможна.
+- <strong>Подпись прошла локально с браузерной авторизацией, но падает в CI</strong> — локально вы прошли interactive OIDC-flow, а в pipeline токена нет. Проверяйте именно CI-окружение, ради которого gate и делается.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю:
+1. Лог шага <code>cosign attest</code> с непустым <code>tlog entry created with index</code>.
+2. Вывод <code>cosign verify-attestation</code> с зелёной верификацией и видимыми <code>Certificate subject</code> + <code>Certificate issuer URL</code>.
+3. Декодированный in-toto statement, где <code>subject.digest.sha256</code> совпадает с digest проверяемого образа, а <code>predicateType</code> = <code>https://cyclonedx.org/bom</code>.
+4. Устно: почему verify с привязкой к identity/issuer — это контроль, а verify без них — фикция доверия.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-49ecd9f148fa.html">SLSA</a> — подпись и attestation образа покрывают требования provenance (build L2+); следующий шаг — <a href="doc-6b4e039ebebe.html">П15. SLSA и in-toto provenance</a>.</li>
+<li><a href="doc-094e43a07d21.html">in-toto</a> — attestation Sigstore хранится именно как in-toto DSSE-конверт; модель statement/predicate описана здесь.</li>
+<li><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> — PS.2 (защита целостности артефактов) и PO.3 (доверенная toolchain): keyless-подпись и Rekor — машинный evidence под эти практики.</li>
+<li><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — управляемость и контролируемость артефактов цепочки поставки.</li>
+<li><a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> — формат SBOM, который мы подписываем; качество самого BOM проверяется в <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>.</li>
+<li><a href="doc-9d81f3d4e106.html">Требования к CI security gate</a> — шаблон требований к gate, в который встраивается обязательная проверка подписи перед публикацией.</li>
+<li>Смежные практики: <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> (откуда берём BOM), <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> (где подпись становится обязательным шагом gate), <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> (куда складываем верифицированные SBOM).</li>
+<li>Модуль: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

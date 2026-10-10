@@ -1,0 +1,94 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П35. VEX triage — КАПО · Пиков</title><meta name="description" content="П35. VEX triage. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c01924770ece.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п35-vex-triage">П35. VEX triage</h1>
+<blockquote>
+<p>Контекст практики
+<a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> учит оформить <strong>одно</strong> решение. Здесь задача другая — провести триаж <strong>всего потока</strong> находок и сделать так, чтобы решения не лежали в текстовом файле, а <em>машинно вычитались</em> сканером: помеченные <code>not_affected</code> находки исчезают из выдачи, и gate перестаёт падать на разобранном шуме. Инструмент — OpenVEX <code>vexctl</code> (минимальный, формат-агностичный). Контролируемый результат — OpenVEX-документ, после применения которого число findings у сканера снижается ровно на разобранные CVE. Перед практикой прочитайте <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</p>
+</blockquote>
+<h2 id="цель">Цель</h2>
+<p>По VDR из 5–10 находок:
+- разнести каждую находку по статусу OpenVEX: <code>not_affected</code> / <code>affected</code> / <code>fixed</code> / <code>under_investigation</code>;
+- для каждого <code>not_affected</code> указать обязательный <code>justification</code> из разрешённого перечня;
+- указать <code>author</code>/issuer, который вправе выпускать VEX для этой версии продукта;
+- собрать валидный OpenVEX-документ через <code>vexctl create</code>;
+- применить его к выводу сканера так, чтобы разобранные <code>not_affected</code> находки <strong>ушли из отчёта</strong>, а <code>affected</code> — остались.</p>
+<p>Проверяемый результат: число findings до триажа &gt; числа findings после применения VEX, и разница равна количеству <code>not_affected</code>-записей.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>OpenVEX через <code>vexctl</code> (Go-инструмент проекта OpenVEX):</p>
+<pre><code class="language-bash"># 1. Исходный поток находок (тот же SBOM, что и в gate)
+grype sbom:sbom.cdx.json -o table | tee before.txt
+
+# 2. Решение по одной находке -&gt; запись OpenVEX
+vexctl create \
+  --product "pkg:npm/myapp@1.0.0" \
+  --subcomponent "pkg:npm/semver@7.3.7" \
+  --vuln "CVE-2022-25883" \
+  --status "not_affected" \
+  --justification "vulnerable_code_not_in_execute_path" \
+  --status-note "semver используется только на build-time, в рантайме недостижим" \
+  &gt; vex.openvex.json
+
+# (повторить для остальных находок; статусы affected/fixed/under_investigation
+#  объединить в один документ через несколько --vuln или vexctl merge)
+# Проверьте, что author/issuer в итоговом документе отражает Product Security/PSIRT/AppSec,
+# а не имя сканера или внешней базы уязвимостей.
+
+# 3. Применить VEX при сканировании: not_affected уходят из отчёта
+grype sbom:sbom.cdx.json --vex vex.openvex.json -o table | tee after.txt
+</code></pre>
+<p>Разрешённые <code>justification</code> для <code>not_affected</code> (OpenVEX): <code>component_not_present</code>, <code>vulnerable_code_not_present</code>, <code>vulnerable_code_not_in_execute_path</code>, <code>vulnerable_code_cannot_be_controlled_by_adversary</code>, <code>inline_mitigations_already_exist</code>.</p>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Скелет OpenVEX-документа (<code>vex.openvex.json</code>):</p>
+<pre><code class="language-json">{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://openvex.dev/docs/public/vex-...",
+  "author": "AppSec / Организация",
+  "timestamp": "2026-06-18T10:00:00Z",
+  "statements": [
+    {
+      "vulnerability": { "name": "CVE-2022-25883" },
+      "products": [
+        { "@id": "pkg:npm/myapp@1.0.0",
+          "subcomponents": [ { "@id": "pkg:npm/semver@7.3.7" } ] }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path"
+    }
+  ]
+}
+</code></pre>
+<p>Эффект применения — число findings падает:</p>
+<pre><code># before.txt:  4 findings (CVE-2022-25883 High, CVE-... ...)
+# after.txt:   3 findings  &lt;- CVE-2022-25883 отфильтрована как not_affected
+</code></pre>
+<p>Признак готовности: <code>diff</code> между <code>before.txt</code> и <code>after.txt</code> показывает ровно те CVE, которые вы пометили <code>not_affected</code>; <code>affected</code>/<code>under_investigation</code> остались в отчёте; gate в CI после VEX перестал падать на разобранном шуме, но продолжает падать на нетриажированных <code>affected</code>.</p>
+<blockquote>
+<p>VEX не «глушит» уязвимость — он документирует решение
+<code>not_affected</code> без <code>justification</code> из перечня — невалидная запись: <code>vexctl</code> либо отклонит её, либо она не отфильтрует находку. VEX без <code>author</code>/issuer и evidence — слабое управленческое утверждение. И помните: фильтрация работает, только если PURL в <code>subcomponents</code> точно совпадает с координатой компонента в SBOM. Несовпадение PURL = VEX «висит в воздухе», находка остаётся.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>after.txt</code> равен <code>before.txt</code> — ничего не отфильтровалось.</strong> PURL в VEX не совпал с PURL компонента в SBOM (версия, namespace, qualifiers). Сверьте: <code>jq '.components[] | select(.name=="semver") | .purl' sbom.cdx.json</code> и тот же ref в VEX.</li>
+<li><strong><code>vexctl: invalid justification</code>.</strong> Использован <code>justification</code> не из перечня OpenVEX (например, скопирован из CycloneDX-словаря — там другие значения, см. <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a>). Возьмите значение из списка выше.</li>
+<li><strong><code>author</code> заполнен внешним источником.</strong> NVD, БДУ, OSV, GHSA и upstream advisory не являются issuer вашего VEX. Их можно указать как evidence, но итоговое утверждение выпускает ответственная за продукт сторона.</li>
+<li><strong>Отфильтровались <code>affected</code>-находки.</strong> Неверный <code>status</code>: фильтр снимает только <code>not_affected</code> и <code>fixed</code>. Проверьте, что эксплуатируемые находки помечены <code>affected</code>, а не ошибочно <code>not_affected</code>.</li>
+<li><strong>Документ невалиден / <code>vexctl</code> молчит.</strong> Нет обязательных полей верхнего уровня (<code>@context</code>, <code>author</code>, <code>timestamp</code>) или пустой <code>statements</code>. Проверьте <code>jq . vex.openvex.json</code> и наличие хотя бы одного statement.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) VDR из 5–10 находок и таблицу триажа со статусом, issuer/владельцем и evidence по каждой; (2) валидный OpenVEX-документ с <code>author</code> и <code>justification</code> из перечня для всех <code>not_affected</code>; (3) <code>before.txt</code>/<code>after.txt</code>, где разница findings = числу <code>not_affected</code>; (4) пояснение, чем эта практика отличается от <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> (там — одно решение, здесь — машинно применяемый триаж потока и срок пересмотра <code>not_affected</code>).</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> — родительский модуль.</li>
+<li><a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a> — кто выпускает VEX, чем подтверждать <code>not_affected</code>, где хранить evidence.</li>
+<li><a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a> · <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a></li>
+<li><a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a> · <a href="doc-3449932010c8.html">Порядок принятия риска</a></li>
+<li><a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> (VEX-расширение) · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.2 — оценка и реагирование) · <a href="doc-47ec0c98fe05.html">OWASP SCVS</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

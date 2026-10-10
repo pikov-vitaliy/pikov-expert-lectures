@@ -1,0 +1,172 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "SCA/OSA: факты, решения и доказательства",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "backend": {
+          "label": "Операции"
+        },
+        "database": {
+          "label": "Данные"
+        },
+        "security": {
+          "label": "Контроль"
+        },
+        "external": {
+          "label": "Источники"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "facts",
+      "label": "Генератор фактов"
+    },
+    {
+      "id": "analysis",
+      "label": "Анализ"
+    },
+    {
+      "id": "decisions",
+      "label": "Решение и доказательства"
+    }
+  ],
+  "mainPath": [
+    "supplier",
+    "enrich",
+    "bom",
+    "repo",
+    "audit",
+    "portfolio",
+    "readiness",
+    "evidence"
+  ],
+  "nodes": [
+    {
+      "id": "supplier",
+      "lane": "facts",
+      "col": 0,
+      "type": "external",
+      "label": "Соисполнители",
+      "sublabel": "SBOM, ELF, исходники",
+      "width": 132
+    },
+    {
+      "id": "enrich",
+      "lane": "facts",
+      "col": 1,
+      "type": "backend",
+      "label": "Обогащение",
+      "sublabel": "ELF → DEB, PURL / CPE",
+      "width": 132
+    },
+    {
+      "id": "bom",
+      "lane": "facts",
+      "col": 2,
+      "type": "database",
+      "label": "CycloneDX",
+      "sublabel": "Нормализованный состав",
+      "width": 132
+    },
+    {
+      "id": "repo",
+      "lane": "facts",
+      "col": 3,
+      "type": "database",
+      "label": "Репозиторий",
+      "sublabel": "Версии артефактов",
+      "width": 132
+    },
+    {
+      "id": "audit",
+      "lane": "analysis",
+      "col": 3,
+      "type": "security",
+      "label": "Сервис аудита",
+      "sublabel": "Уязвимости и лицензии",
+      "width": 132
+    },
+    {
+      "id": "portfolio",
+      "lane": "analysis",
+      "col": 4,
+      "type": "backend",
+      "label": "Dependency-Track",
+      "sublabel": "Портфель и мониторинг",
+      "width": 132
+    },
+    {
+      "id": "readiness",
+      "lane": "decisions",
+      "col": 4,
+      "type": "security",
+      "label": "Готовность",
+      "sublabel": "Риск, владелец, срок",
+      "width": 132
+    },
+    {
+      "id": "evidence",
+      "lane": "decisions",
+      "col": 5,
+      "type": "database",
+      "label": "Доказательства",
+      "sublabel": "История и трассировка",
+      "width": 132
+    }
+  ],
+  "edges": [
+    {
+      "from": "supplier",
+      "to": "enrich"
+    },
+    {
+      "from": "enrich",
+      "to": "bom"
+    },
+    {
+      "from": "bom",
+      "to": "repo"
+    },
+    {
+      "from": "repo",
+      "to": "audit"
+    },
+    {
+      "from": "audit",
+      "to": "portfolio"
+    },
+    {
+      "from": "portfolio",
+      "to": "readiness",
+      "label": "триаж"
+    },
+    {
+      "from": "readiness",
+      "to": "evidence"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Состав",
+      "items": [
+        "Сырой SBOM дополняется данными сборки и бинарного анализа.",
+        "Неопознанные и статически включённые компоненты требуют отдельного учёта."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Ответственность",
+      "items": [
+        "Решение по применимости уязвимости обосновывает владелец продукта.",
+        "Схема — авторская модель из курса М11, не обязательная архитектура."
+      ]
+    }
+  ]
+}

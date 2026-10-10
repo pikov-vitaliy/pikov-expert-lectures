@@ -1,0 +1,39 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>SPDX SBOM Generator — КАПО · Пиков</title><meta name="description" content="SPDX SBOM Generator. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-8f3dea503b59.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="spdx-sbom-generator">SPDX SBOM Generator</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>SPDX SBOM Generator (spdx-sbom-generator) — CLI от SPDX-сообщества, который строит SBOM в формате SPDX по манифестам пакетных менеджеров проекта. Он подключает отдельный модуль-«хендлер» под каждый менеджер (npm, Go modules, Python pip/poetry, Cargo, Composer, Gradle/Maven и др.) и собирает из lock-файла список зависимостей с лицензиями и контрольными суммами.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Запуск в корне проекта с выбором формата вывода:</p>
+<pre><code class="language-bash">spdx-sbom-generator -p ./ -o ./out/ -f json
+</code></pre>
+<p>Инструмент сам определяет используемый менеджер по наличию манифеста (<code>go.mod</code>, <code>package.json</code>, <code>requirements.txt</code>) и выдаёт <code>bom-&lt;manager&gt;.spdx.json</code> либо tag-value <code>.spdx</code>. В документе присутствуют <code>PackageLicenseConcluded</code>, <code>PackageDownloadLocation</code> и <code>PackageChecksum (SHA1)</code> по каждой зависимости.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Архитектура «один менеджер — один хендлер»: предсказуемое поведение для поддержанных экосистем.</li>
+<li>Нативный SPDX и в JSON, и в tag-value — удобно для нормативной трассировки по SPDX.</li>
+<li>Тянет лицензии и адреса загрузки прямо из метаданных менеджера, без отдельного шага.</li>
+<li>Лёгкий статический бинарь, просто встраивается в CI-шаг.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Покрытие ограничено набором хендлеров
+Инструмент видит ровно те экосистемы, под которые написан хендлер. Проект без поддерживаемого манифеста (типичный C/C++ без менеджера) даст пустой или неполный SBOM — это не «чисто», это «не проанализировано».</p>
+</blockquote>
+<ul>
+<li>Покрытие менеджеров ограничено реализованными хендлерами; экзотические и C/C++-проекты без менеджера не поддержаны.</li>
+<li>Проект развивается медленно — часть хендлеров может отставать от свежих форматов lock-файлов.</li>
+<li>Только SPDX на выходе; для CycloneDX нужна последующая конвертация.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Если все зависимости уже вытянуты в локальный кеш менеджера, генерация идёт офлайн. Часть хендлеров для разрешения версий или лицензий может обращаться к публичным реестрам — в закрытом контуре их заменяют внутренним зеркалом менеджера (npm/Go proxy), после чего сеть наружу не нужна.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-a2ef81edd7f5.html">Microsoft SBOM Tool</a> · <a href="doc-94fc7a33c25d.html">protobom</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

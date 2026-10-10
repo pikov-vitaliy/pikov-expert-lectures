@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Conan — КАПО · Пиков</title><meta name="description" content="Conan. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-6df02436591e.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="conan">Conan</h1>
+<blockquote>
+<p>Контекст
+Conan — пакетный менеджер для C/C++ (Python‑based). В отличие от голой связки CMake + системный <code>apt</code>, Conan хранит декларацию зависимостей в <code>conanfile.txt</code>/<code>conanfile.py</code>, фиксирует точные версии и опции сборки в <code>conan.lock</code> и оперирует устойчивой идентичностью пакета вида <code>openssl/3.2.1#&lt;recipe_revision&gt;:&lt;package_id&gt;</code>. Это редкий для мира C/C++ случай, когда состав ПО объявлен машиночитаемо.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Conan управляет внешними C/C++ зависимостями: разрешает граф <code>requires</code>, скачивает или собирает бинарные пакеты под конкретный профиль (компилятор, архитектура, <code>build_type</code>) и отдаёт сборочной системе пути к заголовкам и библиотекам. Для SCA важно, что он даёт то, чего обычно нет в legacy‑C/C++: воспроизводимый список компонентов с версиями и каноническим ключом пакета, пригодным для нормализации в PURL.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Граф зависимостей с точными ревизиями и опциями:</p>
+<pre><code class="language-bash">conan graph info . --format=json &gt; graph.json
+conan lock create .            # фиксирует conan.lock
+</code></pre>
+<p>Идентичность пакета в выводе: <code>openssl/3.2.1@_/_#a1b2... :da39a3ee...</code> (recipe revision + package_id). Это нормализуется в PURL:</p>
+<pre><code class="language-text">pkg:conan/openssl@3.2.1?rrev=a1b2c3&amp;prev=d4e5f6
+</code></pre>
+<p>SBOM в CycloneDX штатно генерируется CycloneDX‑deployer'ом (в составе расширений Conan):</p>
+<pre><code class="language-bash">conan install . --deployer-package=* --format=json   # + cyclonedx-генерация поверх графа
+</code></pre>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Устойчивый ключ компонента (recipe/package revision) — снимает половину боли C/C++: версия и опции сборки зафиксированы, PURL восстанавливается без догадок.</li>
+<li><code>conan.lock</code> делает состав воспроизводимым между машинами и CI — это «lockfile», которого в чистом CMake‑проекте нет.</li>
+<li>Различает варианты одного пакета по <code>package_id</code> (например, <code>shared=True</code> vs статическая сборка) — видно, что именно слинковано.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Покрывает только то, что объявлено через <code>requires</code>. Зависимости, добавленные мимо Conan (ручной <code>third_party/</code>, системный <code>apt</code>, <code>FetchContent</code> в CMake), в граф не попадают.</li>
+<li>Транзитивные системные библиотеки, подтянутые через <code>system_requirements()</code>/<code>apt</code>, видны как факт установки, но не всегда с точной версией дистрибутива.</li>
+<li>Статическая линковка стирает границу компонента в итоговом бинаре — Conan знает, что <code>.a</code> был использован, но в готовом артефакте без build‑evidence это не проверить.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. Conan работает с приватным remote (<code>conan remote add &lt;name&gt; &lt;url&gt;</code>), пакеты и рецепты кешируются локально (<code>~/.conan2</code>); возможен полностью закрытый контур с зеркалом ConanCenter во внутреннем репозитории артефактов. Сам Conan ставится из колеса Python и не требует обращения наружу при наличии заполненного локального кеша.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-fa808e147d8e.html">М09 C/C++ legacy</a> · <a href="doc-1bca905af1a7.html">М05 Генерация SBOM</a> · <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-e77c8a828d52.html">П31. Пилот CodeScoring make CMake qmake</a> · <a href="doc-c6a99c0dee86.html">CMake</a> · <a href="doc-fd94147229e0.html">vcpkg</a> · <a href="doc-41eb01248f66.html">Package URL</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

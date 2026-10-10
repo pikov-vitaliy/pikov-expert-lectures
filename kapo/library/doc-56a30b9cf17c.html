@@ -1,0 +1,85 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. План занятия (90 минут) — КАПО · Пиков</title><meta name="description" content="М03. План занятия (90 минут). Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-56a30b9cf17c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цели-занятия">Цели занятия</a></li>
+<li><a href="#материалы">Материалы</a></li>
+<li><a href="#тайминг-и-ход-занятия">Тайминг и ход занятия</a></li>
+<li><a href="#демонстрация-опорные-команды">Демонстрация (опорные команды)</a></li>
+<li><a href="#контрольная-точка">Контрольная точка</a></li>
+<li><a href="#связи">Связи</a></li>
+</ul>
+</div>
+<h1 id="план-занятия-90-минут">План занятия (90 минут)</h1>
+<h2 id="цели-занятия">Цели занятия</h2>
+<ul>
+<li>Слушатель отличает CycloneDX, SPDX и SWID по структуре файла и по назначению.</li>
+<li>Слушатель знает, что по <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> форматом SBOM признаются только CycloneDX ≥ 1.6 и SPDX ≥ 3.0.1, а SWID — лишь идентификатор компонента.</li>
+<li>Слушатель умеет найти обязательные по BSI (раздел 5.2.2) поля компонента в обоих форматах и назвать, что теряется при конвертации.</li>
+<li>Слушатель связывает три категории лицензий BSI (original / distribution / effective) с полями форматов.</li>
+</ul>
+<h2 id="материалы">Материалы</h2>
+<ul>
+<li>Стенд из <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a> (CLI, <code>jq</code>).</li>
+<li>Два готовых SBOM одного артефакта: CycloneDX 1.6 JSON и SPDX 3.0.1 JSON.</li>
+<li><a href="doc-e84ddfeeb864.html">Конспект М03</a>, <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>, <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a>.</li>
+<li>Выдержка обязательных полей из <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (раздел 5.2).</li>
+</ul>
+<h2 id="тайминг-и-ход-занятия">Тайминг и ход занятия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Мин</th>
+<th>Блок</th>
+<th>Формат</th>
+<th>Содержание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0–8</td>
+<td>Вводный кейс</td>
+<td>разбор</td>
+<td>«Заказчик прислал SWID-теги и назвал это SBOM» — почему это не проходит по BSI.</td>
+</tr>
+<tr>
+<td style="text-align: right;">8–25</td>
+<td>Теория: назначение форматов</td>
+<td>лекция</td>
+<td>CycloneDX (безопасность/VEX) vs SPDX (лицензии/граф provenance) vs SWID (инвентаризация). Версии BSI: 1.6 / 3.0.1.</td>
+</tr>
+<tr>
+<td style="text-align: right;">25–40</td>
+<td>Модель данных</td>
+<td>лекция + доска</td>
+<td><code>component</code>+<code>type</code> в CDX против графа <code>Package</code>/<code>File</code>+<code>Relationship</code> в SPDX; три категории лицензий; <code>bsi:component:*</code>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">40–60</td>
+<td>Демо: один компонент в двух форматах</td>
+<td>демонстрация</td>
+<td><code>jq</code> по CDX и SPDX: достаём creator, version, hash, licenses, purl/swid. Показ потерь при конвертации.</td>
+</tr>
+<tr>
+<td style="text-align: right;">60–82</td>
+<td>ПЗ в парах</td>
+<td>практика</td>
+<td>По <a href="doc-9a2fe0e73a66.html">ПЗ М03</a>: проверить обязательные поля компонента (BSI 5.2.2), заполнить таблицу.</td>
+</tr>
+<tr>
+<td style="text-align: right;">82–90</td>
+<td>Рефлексия</td>
+<td>обсуждение</td>
+<td>Какой формат закрепить в Организации под какую задачу; что записать в <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a>.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="демонстрация-опорные-команды">Демонстрация (опорные команды)</h2>
+<pre><code class="language-bash"># CycloneDX 1.6: спецверсия и обязательные поля компонента
+jq '.specVersion' bom.cdx.json
+jq '.components[0] | {name, version, purl, hashes, licenses}' bom.cdx.json
+# SPDX 3.0.1: версия профиля и пакет
+jq '.creationInfo.specVersion // ."@graph"[]?.type' bom.spdx.json
+</code></pre>
+<h2 id="контрольная-точка">Контрольная точка</h2>
+<p>Слушатель устно отвечает: (1) является ли SWID форматом SBOM по BSI и почему; (2) какие минимальные версии CycloneDX и SPDX требует BSI; (3) одно поле компонента, которое нет нативно ни в одном формате и кодируется через <code>bsi:component:*</code>.</p>
+<h2 id="связи">Связи</h2>
+<p>Опирается на <a href="doc-97c8afb5a218.html">М02</a>, ведёт в <a href="doc-1bca905af1a7.html">М05</a> и <a href="doc-2db02216b0fa.html">М07</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,110 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М03. Практическая работа: один компонент в CycloneDX и SPDX — КАПО · Пиков</title><meta name="description" content="М03. Практическая работа: один компонент в CycloneDX и SPDX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9a2fe0e73a66.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#что-понадобится">Что понадобится</a></li>
+<li><a href="#обязательные-поля-компонента-bsi-522-чек-лист">Обязательные поля компонента (BSI 5.2.2) — чек-лист</a></li>
+<li><a href="#порядок-выполнения">Порядок выполнения</a></li>
+<li><a href="#ожидаемый-результат">Ожидаемый результат</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-и-практическая-связка">Нормативная и практическая связка</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-один-компонент-в-cyclonedx-и-spdx">Практическая работа: один компонент в CycloneDX и SPDX</h1>
+<h2 id="цель">Цель</h2>
+<p>Взять один и тот же компонент, найти его описание в SBOM формата CycloneDX 1.6 и SPDX 3.0.1, сверить наличие <strong>обязательных полей компонента по BSI TR-03183-2, раздел 5.2.2</strong>, и зафиксировать, какие поля теряются при сравнении двух форматов.</p>
+<h2 id="что-понадобится">Что понадобится</h2>
+<ul>
+<li>Стенд из <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a> с <code>jq</code>.</li>
+<li>Два SBOM одного артефакта: <code>bom.cdx.json</code> (CycloneDX ≥ 1.6) и <code>bom.spdx.json</code> (SPDX ≥ 3.0.1). Сгенерировать можно по <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> (<code>syft &lt;образ&gt; -o cyclonedx-json</code> и <code>-o spdx-json</code>).</li>
+</ul>
+<h2 id="обязательные-поля-компонента-bsi-522-чек-лист">Обязательные поля компонента (BSI 5.2.2) — чек-лист</h2>
+<ol>
+<li>Component creator (email или URL)</li>
+<li>Component name</li>
+<li>Component version</li>
+<li>Filename of the component</li>
+<li>Dependencies on other components (+ признак полноты)</li>
+<li>Distribution licences</li>
+<li>Hash value of the deployable component (SHA-512)</li>
+<li>Executable property</li>
+<li>Archive property</li>
+<li>Structured property</li>
+</ol>
+<blockquote>
+<p>Где искать в форматах
+В CycloneDX поля 8–10 нет нативно — они кодируются свойствами <code>bsi:component:executable</code> / <code>:archive</code> / <code>:structured</code> (BSI property taxonomy). В SPDX 3.0.1 для них используют <code>software_additionalPurpose</code> и <code>comment</code>. Если этих свойств нет — поле считается <strong>отсутствующим</strong>, даже если файл валиден по схеме формата.</p>
+</blockquote>
+<h2 id="порядок-выполнения">Порядок выполнения</h2>
+<ol>
+<li><strong>Зафиксируйте вход:</strong> артефакт (образ/архив), инструмент и его версия, дата генерации, версии форматов:
+   <code>bash
+   jq -r '.specVersion' bom.cdx.json        # ожидаем 1.6 или выше
+   jq -r '."@graph"[]? | select(.type=="CreationInfo") | .specVersion' bom.spdx.json</code></li>
+<li><strong>Выберите один компонент</strong> (например <code>zlib</code>) и вытащите его из CycloneDX:
+   <code>bash
+   jq '.components[] | select(.name=="zlib") |
+       {name, version, purl, swid, licenses, hashes,
+        bsi: (.properties // [] | map(select(.name|startswith("bsi:")))) }' bom.cdx.json</code></li>
+<li><strong>Найдите тот же компонент в SPDX</strong> (пакет + идентификаторы):
+   <code>bash
+   jq '."@graph"[]? | select(.name=="zlib")' bom.spdx.json</code></li>
+<li><strong>Заполните таблицу сверки</strong> по 10 полям: для каждого формата отметьте «есть / нет / частично» и впишите фактическое значение или причину отсутствия.</li>
+<li><strong>Отметьте расхождения:</strong> где значение в CycloneDX и SPDX отличается (особенно версия, лицензия <code>declared</code>/<code>concluded</code>, наличие hash), и какое поле есть в одном формате, но отсутствует в другом.</li>
+</ol>
+<h2 id="ожидаемый-результат">Ожидаемый результат</h2>
+<p>Заполненная таблица вида:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле BSI 5.2.2</th>
+<th>CycloneDX</th>
+<th>SPDX</th>
+<th>Расхождение</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>creator</td>
+<td>есть (<code>...@...</code>)</td>
+<td>есть</td>
+<td>—</td>
+</tr>
+<tr>
+<td>version</td>
+<td><code>1.3.1</code></td>
+<td><code>1.3.1</code></td>
+<td>—</td>
+</tr>
+<tr>
+<td>hash SHA-512</td>
+<td>есть</td>
+<td>нет</td>
+<td>потеря в SPDX</td>
+</tr>
+<tr>
+<td>executable property</td>
+<td><code>bsi:component:executable</code></td>
+<td>нет</td>
+<td>поле не закодировано</td>
+</tr>
+<tr>
+<td>distribution licence</td>
+<td><code>Zlib</code> (concluded)</td>
+<td><code>hasConcludedLicense</code></td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<p>Плюс вывод 3–5 строк: какой формат полнее по выбранному компоненту, какие поля BSI отсутствуют в обоих и почему (ограничение инструмента генерации или формата).</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><code>specVersion</code> = 1.4/1.5 или SPDX 2.x — SBOM <strong>не проходит</strong> BSI v2.1.0; перегенерируйте инструментом поновее.</li>
+<li>Компонент не находится по имени — проверьте <code>group</code>/<code>namespace</code> и регистр; в SPDX имя может быть в <code>software_Package</code>, а файл — в <code>software_File</code>.</li>
+<li>Нет полей <code>bsi:component:*</code> — это норма для большинства генераторов; зафиксируйте как пробел качества, а не как ошибку выполнения.</li>
+<li>Нет hash SHA-512 — частая потеря; проверьте, что генератор имел доступ к бинарю (Analysed/Build SBOM), а не только к lockfile.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) обе версии форматов соответствуют BSI; (2) заполненную таблицу сверки по 10 полям с фактическими значениями; (3) минимум одно реальное расхождение между форматами и одно поле BSI, отсутствующее в обоих, с объяснением причины.</p>
+<h2 id="нормативная-и-практическая-связка">Нормативная и практическая связка</h2>
+<p><a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (раздел 5.2.2, маппинг 8.2) · <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a> · <a href="doc-407c56d0fd20.html">Чек-лист качества SPDX</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

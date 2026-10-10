@@ -1,0 +1,78 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П02. Чтение CycloneDX JSON руками — КАПО · Пиков</title><meta name="description" content="П02. Чтение CycloneDX JSON руками. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-1796537889fe.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п02-чтение-cyclonedx-json-руками">П02. Чтение CycloneDX JSON руками</h1>
+<h2 id="цель">Цель</h2>
+<p>Научиться читать CycloneDX JSON глазами, до всякой автоматизации: найти и назвать назначение пяти верхнеуровневых ключей (<code>bomFormat</code>, <code>specVersion</code>, <code>serialNumber</code>, <code>metadata</code>, <code>components</code>), показать у одного компонента его <code>purl</code> и лицензию, и отличить лицензию-идентификатор от лицензии-выражения. Проверяемый результат — вы можете на чужом <code>bom.json</code> за минуту сказать, сколько в нём компонентов и какой это формат/версия, не запуская ни одного сканера.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<pre><code class="language-bash"># Сколько компонентов в SBOM — первый ориентир
+jq '.components | length' bom.json
+
+# Шапка SBOM: формат, версия спецификации, серийный номер, кто сгенерировал
+jq '{bomFormat, specVersion, serialNumber, version, tool: .metadata.tools}' bom.json
+
+# Координаты и лицензии по каждому компоненту
+jq '.components[] | {name, version, purl, licenses}' bom.json
+</code></pre>
+<blockquote>
+<p>Сначала глазами, потом jq
+<code>jq</code> здесь — не инструмент анализа, а лупа. Цель практики — чтобы вы понимали структуру и без него: открыли файл, увидели <code>"bomFormat": "CycloneDX"</code> и поняли, что это, где искать состав, а где — связи. <code>jq</code> лишь подсвечивает то, что вы уже умеете находить руками.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Скелет валидного CycloneDX 1.6 (JSON). Запомните каркас — по нему вы ориентируетесь в любом SBOM:</p>
+<pre><code class="language-json">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "serialNumber": "urn:uuid:3e671687-395b-41f5-a30f-a58921a69b79",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-06-17T10:00:00Z",
+    "tools": [{ "name": "syft", "version": "1.18.1" }],
+    "component": { "type": "application", "name": "sample-app", "version": "0.1.0" }
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "pkg:npm/lodash@4.17.21",
+      "name": "lodash",
+      "version": "4.17.21",
+      "purl": "pkg:npm/lodash@4.17.21",
+      "licenses": [ { "license": { "id": "MIT" } } ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pkg:maven/org.springframework/spring-core@6.1.5",
+      "name": "spring-core",
+      "version": "6.1.5",
+      "purl": "pkg:maven/org.springframework/spring-core@6.1.5",
+      "licenses": [ { "expression": "Apache-2.0 OR MIT" } ]
+    }
+  ],
+  "dependencies": [
+    { "ref": "pkg:npm/lodash@4.17.21", "dependsOn": [] }
+  ]
+}
+</code></pre>
+<p><code>jq '.components | length'</code> на таком файле вернёт <code>2</code>. Ключевое, что нужно разглядеть: лицензия записывается <strong>двумя разными способами</strong> — как идентификатор (<code>"license": {"id": "MIT"}</code>) и как выражение (<code>"expression": "Apache-2.0 OR MIT"</code>). А <code>dependencies</code> — это отдельный граф: связи задаются ключом <code>bom-ref</code> (syft проставляет его равным <code>purl</code>), а ссылки <code>ref</code> / <code>dependsOn</code> указывают именно на <code>bom-ref</code>, а не на <code>purl</code>. Граф НЕ дублирует список <code>components</code>.</p>
+<blockquote>
+<p>Что именно проговорить вслух
+«Это CycloneDX 1.6, сгенерирован syft, в нём 2 компонента-библиотеки. У lodash лицензия задана идентификатором SPDX <code>MIT</code>, у spring-core — выражением <code>Apache-2.0 OR MIT</code>. Корень дерева — <code>metadata.component</code> (само приложение), связи лежат в <code>dependencies</code> отдельно от состава.»</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong><code>jq: error: Cannot index ... with "components"</code></strong> — это не CycloneDX или не тот корень. Проверьте <code>jq 'keys' bom.json</code>: у SPDX верхнеуровневые ключи другие (<code>spdxVersion</code>, <code>packages</code>), состав там в <code>packages</code>, а не <code>components</code>.</li>
+<li><strong><code>licenses</code> пустой <code>[]</code> или отсутствует</strong> — генератор не определил лицензию. Это нормальная слепая зона, а не ошибка чтения; такой компонент уходит в ручной разбор (см. лицензионные практики).</li>
+<li><strong>Путаете <code>license.id</code> и <code>license.name</code></strong> — <code>id</code> обязан быть валидным SPDX-идентификатором (<code>MIT</code>, <code>Apache-2.0</code>), <code>name</code> — свободный текст. Если видите <code>name</code>, лицензия не нормализована.</li>
+<li><strong><code>jq: command not found</code></strong> — утилита не установлена в WSL: <code>sudo apt-get install -y jq</code>. Для разовой проверки можно открыть файл и просто прочитать ключи глазами — это и есть навык практики.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>На предоставленном <code>bom.json</code> показать преподавателю: число компонентов (<code>jq '.components | length'</code>), формат и версию спецификации из шапки, и для одного компонента — его <code>purl</code> и лицензию, проговорив, идентификатор это или выражение. Зачёт — если объяснение даётся без подсказок и без запуска сканера.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p>Структура файла задаётся спецификацией <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>; минимальный набор полей, которые в нём обязаны присутствовать, — это <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> и измеримые критерии <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>. Чек-лист для приёмки такого файла — <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>. Смежные практики: стенд для запуска — <a href="doc-85ddbe5bccd7.html">П01. Стенд WSL2 Docker и базовая гигиена</a>; как этот файл порождается — <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a>; как те же поля превращаются в gate — <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>. Модуль: <a href="doc-1648d69d5029.html">М03. Форматы SBOM: CycloneDX, SPDX, SWID</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

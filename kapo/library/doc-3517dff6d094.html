@@ -1,0 +1,135 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М04. Практическая работа: координаты компонентов и эффект битого PURL — КАПО · Пиков</title><meta name="description" content="М04. Практическая работа: координаты компонентов и эффект битого PURL. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-3517dff6d094.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#что-понадобится">Что понадобится</a></li>
+<li><a href="#часть-1-таблица-координат-4-компонента">Часть 1. Таблица координат (4 компонента)</a><ul>
+<li><a href="#шаги">Шаги</a></li>
+</ul>
+</li>
+<li><a href="#часть-2-эксперимент-битый-purl-тихий-ноль">Часть 2. Эксперимент «битый PURL → тихий ноль»</a></li>
+<li><a href="#ожидаемый-результат">Ожидаемый результат</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#практики">Практики</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-координаты-компонентов-и-эффект-битого-purl">Практическая работа: координаты компонентов и эффект битого PURL</h1>
+<h2 id="цель">Цель</h2>
+<p>Собрать корректные координаты (PURL, CPE, идентификаторы уязвимостей) для четырёх компонентов и на собственном опыте увидеть, как порча координаты превращает уязвимый компонент в «чистый» в отчёте сканера.</p>
+<h2 id="что-понадобится">Что понадобится</h2>
+<ul>
+<li>стенд из <a href="doc-85ddbe5bccd7.html">П01</a> (Docker, доступ в сеть к публичным базам);</li>
+<li><code>osv-scanner</code> (см. <a href="doc-4ce78beb1257.html">П07</a>);</li>
+<li>доступ к NVD CPE Search (nvd.nist.gov/products/cpe/search), osv.dev, БДУ ФСТЭК (bdu.fstec.ru).</li>
+</ul>
+<h2 id="часть-1-таблица-координат-4-компонента">Часть 1. Таблица координат (4 компонента)</h2>
+<p>Заполните таблицу для <strong>OpenSSL, zlib, libcurl и одной внутренней библиотеки Организации</strong>. Версии берите фиксированные (как в реальном релизе).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Компонент</th>
+<th>PURL</th>
+<th>CPE 2.3</th>
+<th>CVE / GHSA</th>
+<th>BDU</th>
+<th>Источник координаты</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenSSL 3.0.7</td>
+<td><code>pkg:generic/openssl@3.0.7</code> или экосистемный</td>
+<td><code>cpe:2.3:a:openssl:openssl:3.0.7:*:*:*:*:*:*:*</code></td>
+<td>…</td>
+<td>…</td>
+<td>NVD CPE Search / osv.dev</td>
+</tr>
+<tr>
+<td>zlib 1.2.11</td>
+<td><code>pkg:generic/zlib@1.2.11</code></td>
+<td><code>cpe:2.3:a:zlib:zlib:1.2.11:*:*:*:*:*:*:*</code></td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+<tr>
+<td>libcurl 7.74.0</td>
+<td><code>pkg:deb/debian/curl@7.74.0-1.3?arch=amd64</code></td>
+<td><code>cpe:2.3:a:haxx:curl:7.74.0:*:*:*:*:*:*:*</code></td>
+<td>…</td>
+<td>…</td>
+<td>проверить alias <code>curl:curl</code></td>
+</tr>
+<tr>
+<td>внутренняя библиотека</td>
+<td><code>pkg:generic/&lt;name&gt;@&lt;ver&gt;</code> (приватный)</td>
+<td>назначить вручную или пометить «нет CPE»</td>
+<td>—</td>
+<td>—</td>
+<td>реестр Организации</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Где брать значения
+PURL экосистемного пакета часто берётся из самого SBOM. Для C/C++ компонента CPE приходится искать вручную: вбейте product в NVD CPE Search и посмотрите, под какими vendor он зарегистрирован. Для libcurl специально проверьте обе формы — <code>haxx:curl</code> и <code>curl:curl</code>.</p>
+</blockquote>
+<h3 id="шаги">Шаги</h3>
+<ol>
+<li>Зафиксируйте вход: компонент, версию, дату анализа, версии инструментов.</li>
+<li>Для каждого компонента найдите PURL и проверьте его в osv.dev → выпишите CVE/GHSA.</li>
+<li>Найдите CPE в NVD CPE Search; для libcurl зафиксируйте <strong>обе</strong> vendor-формы (alias).</li>
+<li>Проверьте каждый CVE по <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> — выпишите <code>BDU:YYYY-NNNNN</code>, где есть; отметьте записи без CVE.</li>
+<li>Для внутренней библиотеки решите: есть ли публичная координата вообще; если нет — пометьте как «unresolved, требует ручной разметки».</li>
+</ol>
+<h2 id="часть-2-эксперимент-битый-purl-тихий-ноль">Часть 2. Эксперимент «битый PURL → тихий ноль»</h2>
+<ol>
+<li>Возьмите lockfile или manifest с заведомо уязвимым пакетом (например, устаревший npm/PyPI). Запустите базовый скан:</li>
+</ol>
+<pre><code class="language-bash">osv-scanner scan source --lockfile=package-lock.json
+</code></pre>
+<p>Зафиксируйте число находок (например, <code>N</code> уязвимостей).</p>
+<ol start="2">
+<li>Смоделируйте порчу координаты. В SBOM (CycloneDX JSON) у этого компонента добавьте приватный qualifier и/или измените <code>type</code>, затем прогоните скан по SBOM:</li>
+</ol>
+<pre><code class="language-bash"># было:  pkg:npm/lodash@4.17.20
+# стало: pkg:npm/lodash@4.17.20?repository_url=https://nexus.internal/repo
+osv-scanner scan --sbom=bom.cdx.json
+</code></pre>
+<ol start="3">
+<li>
+<p>Сравните: число находок упало (часто до нуля по этому компоненту), при этом <strong>скан завершился без ошибок</strong>. Запишите результат.</p>
+</li>
+<li>
+<p>Снимите приватный qualifier (нормализуйте PURL по правилам <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>) и повторите — находки должны вернуться.</p>
+</li>
+</ol>
+<blockquote>
+<p>Главный вывод части 2
+Снижение числа находок не сопровождается ошибкой. Это и есть механизм false negative: компонент «выпал» из матчинга, а отчёт выглядит благополучно.</p>
+</blockquote>
+<h2 id="ожидаемый-результат">Ожидаемый результат</h2>
+<ul>
+<li>Заполненная таблица из 4 строк с PURL, CPE (для libcurl — две vendor-формы), CVE/GHSA и BDU.</li>
+<li>Зафиксированная пара чисел находок: до порчи PURL и после, плюс восстановление после нормализации.</li>
+<li>Короткий вывод (3–5 строк): какие компоненты остались без надёжной координаты и что отправить в worklist.</li>
+</ul>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>osv-scanner находит ноль на чистом проекте</strong> — проверьте, что lockfile реальный и пакет действительно уязвимой версии; возможно, версия уже пропатчена.</li>
+<li><strong>CPE не находится в NVD</strong> — продукт может быть под другим vendor (alias) или вообще без записи в словаре; это нормальный результат для C/C++ — фиксируйте в <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>.</li>
+<li><strong>После порчи PURL находок столько же</strong> — вероятно, сканер взял координату не из изменённого поля; убедитесь, что меняете именно тот <code>purl</code>, по которому идёт матчинг.</li>
+<li><strong>БДУ пусто, а CVE есть</strong> — нормально: часть CVE не имеет записи в БДУ и наоборот; так и фиксируйте.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) таблицу координат с alias для libcurl; (2) воспроизведённый эффект «битый PURL → падение находок → восстановление после нормализации» с конкретными числами; (3) список unresolved-координат.</p>
+<h2 id="практики">Практики</h2>
+<ul>
+<li><a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a></li>
+<li><a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a></li>
+<li><a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a></li>
+<li><a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a></li>
+</ul>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> RV.1 (поиск уязвимостей опирается на корректную идентификацию), <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> (уникальные идентификаторы), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (качество SBOM), <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

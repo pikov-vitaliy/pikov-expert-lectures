@@ -1,0 +1,61 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sigstore Cosign — КАПО · Пиков</title><meta name="description" content="Sigstore Cosign. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-f4e02b87ce6c.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="sigstore-cosign">Sigstore Cosign</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Cosign подписывает контейнерные образы и произвольные артефакты и прикрепляет к ним подписи и attestations (например, SBOM или provenance), храня их рядом с образом в OCI-реестре. Главная фишка — <strong>keyless-подпись</strong>: вместо долгоживущего приватного ключа Cosign получает короткоживущий сертификат от Fulcio на OIDC-идентичность (кто и в каком pipeline подписал) и заносит факт подписи в публичный transparency log Rekor. На выходе — подпись, которую downstream-потребитель может проверить, не доверяя «на слово».</p>
+<blockquote>
+<p>Что Cosign добавляет к SBOM
+SBOM — это просто JSON, который можно подменить между сборкой и проверкой. Cosign превращает его в <a href="doc-fca70f6c6e3d.html">in-toto</a> DSSE-конверт, жёстко привязанный к digest образа, и фиксирует подписанта. Без этого шага attestation не отличается от любого файла, положенного злоумышленником.</p>
+</blockquote>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Привязка CycloneDX-SBOM к образу как attestation и проверка с контролем идентичности подписанта (keyless, cosign v2):</p>
+<pre><code class="language-bash"># Прикрепить SBOM как attestation (Fulcio выдаёт сертификат, Rekor логирует факт)
+cosign attest \
+  --predicate bom.cdx.json \
+  --type cyclonedx \
+  --yes \
+  ghcr.io/org/app@sha256:&lt;digest&gt;
+
+# Проверить attestation С ПРИВЯЗКОЙ к ожидаемому identity и issuer
+GITHUB_REPOSITORY='&lt;github-owner&gt;/&lt;repository&gt;'
+EXPECTED_CERT_IDENTITY="^https:\/\/github\.com\/${GITHUB_REPOSITORY}\/.+$"
+
+cosign verify-attestation \
+  --type cyclonedx \
+  --certificate-identity-regexp "$EXPECTED_CERT_IDENTITY" \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com \
+  ghcr.io/org/app@sha256:&lt;digest&gt;
+</code></pre>
+<p><code>https://token.actions.githubusercontent.com</code> — это OIDC issuer для GitHub Actions. Для ручной диагностики открывают не корень issuer, а well-known endpoint: <code>https://token.actions.githubusercontent.com/.well-known/openid-configuration</code>.</p>
+<p>Для закрытого контура применяется ключевой режим: <code>cosign generate-key-pair</code>, затем <code>cosign sign --key cosign.key ...</code> и <code>cosign verify --key cosign.pub ...</code>. Адресовать объект всегда по <code>@sha256:&lt;digest&gt;</code>, а не по тегу — тег переназначаем.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Keyless-модель снимает проблему хранения и ротации приватных ключей: подписант — это проверяемая OIDC-идентичность CI, а не секрет в переменной.</li>
+<li>Подписи и attestations живут в том же OCI-реестре, что и образ, — отдельная инфраструктура хранения не нужна.</li>
+<li>Запись в Rekor даёт неотрекаемость: факт и время подписи фиксируются в transparency log.</li>
+<li>Один инструмент закрывает и подпись образа, и attestations (SBOM, SLSA-provenance, произвольные предикаты).</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Проверка без <code>--certificate-identity*</code>/<code>--key</code> подтверждает лишь целостность подписи, но не <em>кто</em> подписал — это фикция доверия, частая ошибка внедрения.</li>
+<li>Keyless-режим требует доступного OIDC-провайдера и сетевого доступа к Fulcio и Rekor; в CI без <code>id-token: write</code> (GitHub) или <code>id_tokens</code> (GitLab) выпуск подписи невозможен.</li>
+<li>Привязка к digest означает, что подпись «отваливается» при работе по тегу <code>:latest</code> — нужно дисциплинированно адресовать образ по digest.</li>
+<li>Cosign подтверждает происхождение и целостность, но не качество содержимого: подпись честна и под пустым или нечестным SBOM.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Полностью офлайн работает ключевой режим (<code>--key</code>), без Fulcio и Rekor. Keyless-модель в закрытом контуре возможна при развёртывании self-hosted Fulcio, Rekor и OIDC-провайдера; иначе нужен сетевой доступ к публичным сервисам Sigstore. Проверку подписи можно делать офлайн при наличии локального бандла (<code>--bundle</code>) и корневых материалов TUF, выгруженных заранее (<code>cosign initialize</code> против внутреннего зеркала).</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li><a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> — где подпись встраивается в контур доверия.</li>
+<li><a href="doc-dceb19980250.html">П14. Подпись SBOM через Sigstore</a> — практика: attestation + verify с привязкой к identity.</li>
+<li><a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> — где проверка подписи становится обязательным шагом gate.</li>
+<li>Смежные карточки: <a href="doc-fca70f6c6e3d.html">in-toto</a> (формат attestation, который выпускает Cosign), <a href="doc-6413c2642006.html">Witness</a> (альтернативный путь сбора и подписи evidence), <a href="doc-c9b80f761f41.html">SLSA</a> (уровень provenance, который подпись помогает закрыть), <a href="doc-dbc1ace95cba.html">CycloneDX</a> (подписываемый формат SBOM).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,25 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Вопросы для пилота CodeScoring — КАПО · Пиков</title><meta name="description" content="Вопросы для пилота CodeScoring. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-c88d413f95e0.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>07 CodeScoring</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#контекст">Контекст</a></li>
+<li><a href="#вопросы-для-проверки-в-пилоте">Вопросы для проверки в пилоте</a></li>
+<li><a href="#риск-формулировка">Риск-формулировка</a></li>
+</ul>
+</div>
+<h1 id="вопросы-для-пилота-codescoring">Вопросы для пилота CodeScoring</h1>
+<h2 id="контекст">Контекст</h2>
+<p>CodeScoring рассматривается как кандидат для OSA/SCA/TQI в контуре Организации. Главный предмет проверки — не общая способность показывать отчеты, а достоверная инвентаризация C/C++ legacy-сборок, где не везде внедрен Conan и часть зависимостей проявляется только на этапе сборки.</p>
+<h2 id="вопросы-для-проверки-в-пилоте">Вопросы для проверки в пилоте</h2>
+<ol>
+<li>Подтвердите поддержку make, CMake и qmake в C/C++ build scan на реальных сборках, а не только в документации.</li>
+<li>Какие права нужны агенту для eBPF, можно ли работать без root и какой функционал при этом теряется?</li>
+<li>Как фиксируются unresolved libraries, кто и как доразмечает версии внутренних <code>.a/.so</code>?</li>
+<li>Как отличается анализ динамической и статической линковки?</li>
+<li>Какой формат SBOM экспортируется: CycloneDX версия, SPDX версия, VDR/VEX, CSV/JSON?</li>
+<li>Какие экосистемы реально поддерживает OSA Proxy, OSA Proxy Go, Nexus/JFrog plugin и CLI agent; где именно Conan и Conda?</li>
+<li>Что хранится и что покидает контур в online/on-premise; как устроен offline update index?</li>
+<li>Какие документы поставщик готов предоставить: реестр отечественного ПО, ФСТЭК/ISO 9001 при необходимости закупки, SLA, состав поставки?</li>
+<li>Как проверить TQI на пилоте и какие метрики не надо смешивать с security readiness?</li>
+<li>Какие критерии считаются успешным пилотом для C/C++ legacy?</li>
+</ol>
+<h2 id="риск-формулировка">Риск-формулировка</h2>
+<p>Нельзя считать продукт полностью соответствующим требованиям до пилота на реальных сборках. Особенно проверяются qmake, статическая линковка, stripped binaries, внутренние форки, offline обновление базы знаний, OSA Proxy по нужным пакетным менеджерам и экспорт данных в существующий процесс.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

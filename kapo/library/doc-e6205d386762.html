@@ -1,0 +1,79 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Чек-лист SBOM for AI — КАПО · Пиков</title><meta name="description" content="Чек-лист SBOM for AI. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e6205d386762.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#metadata">Metadata</a></li>
+<li><a href="#system-level-properties">System-level properties</a></li>
+<li><a href="#models">Models</a></li>
+<li><a href="#datasets">Datasets</a></li>
+<li><a href="#infrastructure">Infrastructure</a></li>
+<li><a href="#security-properties">Security properties</a></li>
+<li><a href="#kpi">KPI</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="чек-лист-sbom-for-ai">Чек-лист SBOM for AI</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Рабочая форма проверки полноты SBOM для системы с компонентами ИИ (модели и датасеты): расширяет обычный SBOM продукта элементами модели, обучающих данных и инфраструктуры. Цель — убедиться, что AI SBOM не сводится к списку Python-пакетов и описывает то, что отличает AI-систему: веса, данные, их происхождение и лицензии.</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<ul>
+<li>Приёмка поставки, содержащей обученную модель или внешний датасет.</li>
+<li>Подготовка релизного evidence для продукта с AI-функциональностью.</li>
+<li>Аудит поставщика AI-компонента на минимальные элементы.</li>
+</ul>
+<h2 id="metadata">Metadata</h2>
+<ul>
+<li>[ ] Указаны author, version, format, инструмент генерации (генератор фактов) и timestamp.</li>
+<li>[ ] Зафиксирован контекст генерации (что и из чего собрано) и dependency relationships.</li>
+<li>[ ] SBOM подписан или есть иной механизм проверки целостности и авторства.</li>
+</ul>
+<h2 id="system-level-properties">System-level properties</h2>
+<ul>
+<li>[ ] Указаны имя системы, производитель, версия и состав компонентов.</li>
+<li>[ ] Описаны data flow и data usage (как данные ходят через систему).</li>
+<li>[ ] Зафиксированы input/output properties и область применения (application area).</li>
+</ul>
+<h2 id="models">Models</h2>
+<ul>
+<li>[ ] Для каждой модели: имя, идентификатор, версия, производитель.</li>
+<li>[ ] Есть hash весов модели или явно указано <code>unknown</code>.</li>
+<li>[ ] Зафиксированы training properties и архитектурные свойства модели.</li>
+<li>[ ] Указана <strong>лицензия модели</strong> отдельно от лицензий runtime-компонентов.</li>
+<li>[ ] Есть external references (карточка модели, источник).</li>
+</ul>
+<h2 id="datasets">Datasets</h2>
+<ul>
+<li>[ ] Для каждого датасета: имя, описание, состав, идентификатор.</li>
+<li>[ ] Есть hash датасета или явно <code>unknown</code>.</li>
+<li>[ ] Зафиксирован provenance (происхождение) и dependency relationship к модели.</li>
+<li>[ ] Описаны статистические свойства и <strong>чувствительность данных</strong> (PII/секретность).</li>
+<li>[ ] Указана <strong>лицензия датасета</strong> отдельно от лицензии модели.</li>
+</ul>
+<h2 id="infrastructure">Infrastructure</h2>
+<ul>
+<li>[ ] Перечислены runtime, фреймворки, пакетные менеджеры и их версии.</li>
+<li>[ ] Указано специализированное железо / ссылка на HBOM, если применимо.</li>
+</ul>
+<h2 id="security-properties">Security properties</h2>
+<ul>
+<li>[ ] Перечислены применённые контроли и сведения о соответствии (compliance).</li>
+<li>[ ] Есть vulnerability referencing и связь с triage-процессом (<a href="doc-620bbc0766f4.html">VDR</a>/VEX).</li>
+<li>[ ] Зафиксирована применимая cybersecurity policy.</li>
+</ul>
+<h2 id="kpi">KPI</h2>
+<ul>
+<li>[ ] Приведены метрики безопасности и операционной производительности (если требуются заказчиком).</li>
+</ul>
+<blockquote>
+<p>AI SBOM ≠ обычный SBOM
+Если в отчёте есть только Python-зависимости, но нет модели, датасета, их лицензий и происхождения — это SBOM приложения, а не SBOM AI-системы. Явно укажите, чем AI SBOM расширяет обычный.</p>
+<p>Три разные лицензии
+Лицензия модели, лицензия датасета и лицензии runtime-кода — независимы и часто конфликтуют (например, non-commercial-датасет в коммерческом продукте). Их нельзя сворачивать в одно поле.</p>
+</blockquote>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a></li>
+<li>Практики: <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a></li>
+<li>Нормативка: <a href="doc-3850f36a7630.html">G7 SBOM for AI Minimum Elements 2026</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> · <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a></li>
+<li>Связанные шаблоны: <a href="doc-c07a2034e54b.html">Чек-лист честного SBOM контейнерного образа</a> · <a href="doc-ab31bcfd34fb.html">Политика лицензионной чистоты</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

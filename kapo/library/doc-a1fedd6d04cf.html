@@ -1,0 +1,57 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>GitLab CI — КАПО · Пиков</title><meta name="description" content="GitLab CI. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-a1fedd6d04cf.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="gitlab-ci">GitLab CI</h1>
+<blockquote>
+<p>Контекст
+CI/CD-оркестратор GitLab: pipeline описывается файлом <code>.gitlab-ci.yml</code> в корне репозитория, задачи (<code>jobs</code>) исполняются раннерами. В курсе это место, где живёт <strong>CI security gate</strong> — точка, в которой SCA/OSA-проверка останавливает сборку по заранее согласованному порогу (критичность уязвимостей, запрещённые лицензии, провал quality gate на SBOM).</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Запускает SCA/OSA-инструменты как шаги конвейера и превращает их результат в решение «пропустить / остановить». Ключевая идея gate: сборка валится <strong>кодом возврата задачи</strong> (статус <code>failed</code>, exit code 1), а не строкой в логе, которую никто не читает. Так проверка состава становится управляемой, а не информационной.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Gate из трёх шагов — генерация SBOM, сканирование с порогом, отдельный fail по лицензиям:</p>
+<pre><code class="language-yaml">stages: [sca]
+
+sca_scan:
+  stage: sca
+  image: alpine:3.20
+  before_script:
+    - apk add --no-cache curl jq
+    - curl -sSfL https://raw.githubusercontent.com/anchore/syft/main/install.sh  | sh -s -- -b /usr/local/bin
+    - curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
+  script:
+    - syft dir:. -o cyclonedx-json=sbom.cdx.json
+    - grype sbom:sbom.cdx.json --fail-on high --only-fixed -o table | tee grype-report.txt
+  artifacts:
+    when: always
+    paths: [sbom.cdx.json, grype-report.txt]
+    expire_in: 1 week
+</code></pre>
+<p>Перед жёсткой блокировкой gate обкатывают в режиме <code>allow_failure: true</code>, собирают статистику и согласуют порог. Артефакты (SBOM, отчёт сканера) сохраняются и доступны на вкладке <strong>Job artifacts</strong>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Естественная точка для CI-gate: проверка привязана к конкретному коммиту, результат виден в MR, exit code раннера = решение.</li>
+<li><code>artifacts</code> дают воспроизводимый след: SBOM и отчёт сканера сохраняются вместе со сборкой и доступны аудиту.</li>
+<li>Любой SCA/OSA-инструмент в виде контейнера или бинаря встраивается шагом без привязки к вендору; этапы кэшируются.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Gate на сборке — <strong>наблюдающе-блокирующий по релизу</strong>, а не по входу: он останавливает pipeline, но не мешает разработчику затянуть пакет на dev-машину (это зона controlled repository / OSA Proxy).</li>
+<li>Качество находок целиком зависит от вложенного сканера и его фидов; сам GitLab CI не вычисляет уязвимости.</li>
+<li>На офлайн-раннере шаги, тянущие установочные скрипты и базы сканера из сети, падают — нужен предзаполненный кэш и примонтированные БД.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. Self-managed GitLab и раннеры разворачиваются в закрытом контуре. Условие работы gate офлайн — заранее загруженные образы, бинари инструментов и кэш баз сканера (например, <code>GRYPE_DB_CACHE_DIR</code> с примонтированной базой); шаги не должны зависеть от доступа в публичную сеть на каждый запуск.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> · <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и VDR/VEX</a></li>
+<li>Практики: <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a> · <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a></li>
+<li>Смежные карточки: <a href="doc-91aae62a30a4.html">JFrog Artifactory</a> · <a href="doc-2fd539fd2ebc.html">Nexus Repository</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-2c326e169620.html">Trivy</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

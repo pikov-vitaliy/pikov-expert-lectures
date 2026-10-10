@@ -1,0 +1,73 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>cross-compilation — КАПО · Пиков</title><meta name="description" content="cross-compilation. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-56d82ed22bd5.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="cross-compilation">cross-compilation</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Кросс-компиляция ломает самое надёжное допущение C/C++ SCA: что библиотеки лежат в системе, на которой ведётся анализ. При сборке под другую архитектуру (ARM, MIPS, aarch64) код линкуется не с хостовыми <code>/usr/lib</code>, а с библиотеками из целевого <code>--sysroot</code> — отдельного дерева с заголовками и <code>.so</code> под целевую платформу. Поэтому маппинг «<code>.so</code> → пакет» нельзя делать инструментами хоста: <code>dpkg -S</code> и <code>ldd</code> на хосте дадут координаты <em>не того</em> окружения либо вообще откажутся работать с чужой архитектурой.</p>
+<p>Это самая чистая слепая зона группы: аудитор по привычке снимает <code>ldd</code> на своей машине, получает правдоподобный список и не замечает, что версии и пакеты относятся к хосту, а не к тому, что реально слинковано под целевую платформу.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Архитектуру артефакта и источник его зависимостей определяет не хост, а заголовок ELF и sysroot:</p>
+<blockquote>
+<p>Сначала определите целевую платформу</p>
+</blockquote>
+<pre><code class="language-bash">readelf -h app | grep Machine        # Machine: AArch64  → это НЕ хостовый x86-64
+file app                             # ELF 64-bit LSB, ARM aarch64
+ldd app
+#  → "not a dynamic executable" или ошибка: хостовый ldd не умеет чужую архитектуру</code></pre>
+<blockquote>
+<p><code>ldd</code> на хосте бесполезен. Резолвить зависимости нужно против sysroot цели.</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Действие</th>
+<th>На хосте (неверно)</th>
+<th>Против sysroot цели (верно)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Список <code>.so</code></td>
+<td><code>ldd app</code> (ошибка/чужие пути)</td>
+<td><code>readelf -d app</code> → <code>DT_NEEDED</code> + поиск в sysroot</td>
+</tr>
+<tr>
+<td>Маппинг на пакет</td>
+<td><code>dpkg -S /usr/lib/...</code> (хостовый пакет)</td>
+<td><code>dpkg-query</code> в chroot/sysroot цели</td>
+</tr>
+<tr>
+<td>Версия библиотеки</td>
+<td>версия хоста</td>
+<td>версия из sysroot/package DB цели</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>DT_NEEDED архитектурно-нейтрален
+<code>readelf -d app</code> читает секцию <code>.dynamic</code> любого ELF независимо от своей архитектуры и печатает <code>DT_NEEDED</code> (<code>libssl.so.3</code>, <code>libc.so.6</code>). Это даёт имена библиотек; версии и пакеты ищите в sysroot цели, а не на хосте.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — «правдоподобный, но хостовый» результат. Инструменты не падают, отдают список, и его принимают за состав, хотя версии относятся к машине аналитика. Усугубляет дело то, что toolchain-файл CMake (<code>CMAKE_TOOLCHAIN_FILE</code> с <code>CMAKE_SYSROOT</code>) и переменные <code>--sysroot</code>/<code>PKG_CONFIG_SYSROOT_DIR</code> задают целевое окружение в стороне от привычных системных путей — их легко не заметить.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Определите целевую архитектуру артефакта: <code>readelf -h</code> (поле <code>Machine</code>) и <code>file</code>. Не доверяйте <code>ldd</code> хоста.</li>
+<li>Найдите sysroot сборки: <code>CMAKE_SYSROOT</code> в toolchain-файле, <code>--sysroot</code> в командах компилятора, <code>PKG_CONFIG_SYSROOT_DIR</code>.</li>
+<li>Снимите <code>DT_NEEDED</code> через <code>readelf -d</code> — это работает на любой архитектуре и даёт имена <code>.so</code>.</li>
+<li>Резолвите версии и пакеты против package DB целевого окружения (chroot/sysroot, <code>dpkg-query</code>/<code>rpm</code> в нём), а не хоста.</li>
+<li>Зафиксируйте версию кросс-toolchain и sysroot в provenance: один и тот же исходник под разные sysroot даёт разный состав.</li>
+<li>Если sysroot собран вручную из вендоренных библиотек — каждая такая <code>.so</code> идёт в worklist доразметки, координат у неё нет.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-28706d741e92.html">ELF и DT_NEEDED</a> · <a href="doc-19fd6dae6997.html">ldd/readelf/objdump</a> · <a href="doc-b86d4fbfc040.html">Astra/Debian/RPM среды</a> · <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

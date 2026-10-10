@@ -202,8 +202,8 @@ check("RBPO terminology and PPK-to-SBOM relationship are precise", () => {
   assert.ok(!certification.includes("БРПО"), "obsolete БРПО abbreviation remains");
   assert.ok(certification.includes("РБПО"), "РБПО abbreviation is missing");
   includesAll(composition, [
-    "российский машиночитаемый перечень состава программного обеспечения",
-    "сопоставимый по назначению с SBOM",
+    "В проекте ППК — машиночитаемый документ о составе.",
+    "сопоставим по назначению с SBOM",
     "не является универсальным синонимом любого SBOM",
   ]);
   assert.ok(!composition.includes("Отечественный аналог SBOM"), "oversimplified PPK/SBOM equivalence remains");

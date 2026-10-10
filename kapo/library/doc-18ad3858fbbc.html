@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CPE alias для libssl3 — КАПО · Пиков</title><meta name="description" content="CPE alias для libssl3. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-18ad3858fbbc.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="cpe-alias-для-libssl3">CPE alias для libssl3</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Матчинг на NVD идёт по строке CPE вида <code>cpe:2.3:a:&lt;vendor&gt;:&lt;product&gt;:&lt;version&gt;:...</code>. Проблема в том, что у одного и того же продукта в NVD CPE Dictionary исторически живёт несколько разных написаний <code>vendor:product</code>, а имя бинарного артефакта (<code>libssl3</code>, <code>libssl.so.3</code>) вообще не совпадает ни с одним из них. OpenSSL встречается и как <code>openssl:openssl</code>, и как <code>openssl_project:openssl</code>; уязвимости при этом могут быть привязаны к одному alias, а ваш SBOM нести другой. Тогда матчинг не находит CVE — и это не ошибка инструмента, а штатная тишина: findings приходит подозрительно мало.</p>
+<p>Для C/C++ это бьёт сильнее, чем для экосистемных языков: системный пакет называется <code>libssl3</code> (Debian/Ubuntu) или <code>openssl-libs</code> (RPM), upstream-проект — <code>openssl</code>, а в NVD продукт — <code>openssl</code> под двумя vendor. Между «именем <code>.so</code>», «именем пакета» и «CPE-продуктом» нет автоматического моста, его строят руками.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Пакет в системе и его upstream-имя расходятся, а NVD знает только третье написание:</p>
+<pre><code class="language-bash">$ dpkg -S /usr/lib/x86_64-linux-gnu/libssl.so.3
+libssl3:amd64: /usr/lib/x86_64-linux-gnu/libssl.so.3
+$ apt-cache show libssl3 | grep -E '^(Package|Version|Source)'
+Package: libssl3
+Version: 3.0.11-1~deb12u2
+Source: openssl            # ← upstream-имя, а не libssl3
+</code></pre>
+<p>В NVD CPE Dictionary тот же продукт имеет минимум два vendor:</p>
+<pre><code class="language-text">cpe:2.3:a:openssl:openssl:3.0.11:*:*:*:*:*:*:*
+cpe:2.3:a:openssl_project:openssl:3.0.11:*:*:*:*:*:*:*
+</code></pre>
+<p>Если генератор SBOM подставил CPE по имени пакета (<code>libssl3</code>) или взял только один alias, часть CVE OpenSSL к компоненту не привяжется. При этом доля версий в CVE задаётся диапазонами (<code>versionStartIncluding</code>/<code>versionEndExcluding</code>), поэтому даже верный alias с неточной версией даст пропуск.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — «один компонент, один CPE». Реальная идентичность libssl3 — это связка <code>имя .so → имя deb-пакета → Source-пакет → upstream-проект → набор CPE alias в NVD</code>. Приём: для критичных сетевых библиотек (openssl, libcurl, libxml2) вести не единственный CPE, а список всех известных alias и проверять, к какому из них привязаны нужные CVE. Один зафиксированный alias = потенциальный false negative.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Выгрузить из SBOM C/C++ компоненты с пустым <code>cpe</code>, но известным именем/PURL — это вход в alias-worklist.</li>
+<li>Для каждого восстановить цепочку: <code>dpkg -S</code> / <code>rpm -qf</code> → <code>apt-cache show ... | grep Source</code> (или <code>rpm -qi</code>) → upstream-имя.</li>
+<li>По upstream-имени найти в NVD CPE Dictionary <strong>все</strong> записи <code>vendor:product</code>, а не первую; зафиксировать alias списком.</li>
+<li>Сверять не точную строку версии, а попадание версии в уязвимый диапазон CVE.</li>
+<li>Приоритизировать: сетевые/криптобиблиотеки размечать первыми, внутренние помечать <code>CPE отсутствует (internal)</code>.</li>
+<li>Хранить worklist как передаваемый артефакт со статусом и приоритетом — NVD добавляет и депрекейтит записи, разовая правка устаревает.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы компонентов и уязвимостей</a> (alias-проблема CPE — ядро модуля), <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a> (где имя <code>.so</code> ≠ имя пакета ≠ CPE).</li>
+<li>Практики: <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> (ручная разметка), <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> (вторая координата — PURL).</li>
+<li>Нормативка: <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> и NVD как источники, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1 — поиск уязвимостей в компонентах), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (полнота идентификаторов SBOM).</li>
+<li>Смежные заметки: <a href="doc-4bd8e3178892.html">dpkg apt metadata</a> (откуда берётся Source-пакет), <a href="doc-6a7bdaaab195.html">version normalization</a> (формат версии для матчинга), <a href="doc-9fa864f09c7c.html">detection accuracy</a> (как alias влияет на полноту).</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

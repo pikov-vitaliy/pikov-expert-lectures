@@ -1,0 +1,53 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JFrog Artifactory — КАПО · Пиков</title><meta name="description" content="JFrog Artifactory. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-91aae62a30a4.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="jfrog-artifactory">JFrog Artifactory</h1>
+<blockquote>
+<p>Контекст
+Универсальный менеджер артефактов и пакетов: один сервер хранит и проксирует репозитории десятков экосистем (Maven, npm, PyPI, NuGet, Go, Debian/APT, RPM/YUM, Alpine, Docker/OCI, Conan, Generic). В курсе это опорный узел двух контуров: <strong>controlled repository</strong> для OSA-входа и <strong>артефакт-репозиторий</strong> в конвейере Организации между «генератором фактов» и «сервисом аудита/вердиктов».</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Хранит, версионирует и раздаёт сборочные артефакты и зависимости через единую точку. Три типа репозиториев — <strong>local</strong> (свои артефакты), <strong>remote</strong> (прокси-кэш публичного реестра) и <strong>virtual</strong> (агрегат local+remote под одним URL) — позволяют завести весь трафик пакетных менеджеров через подконтрольный индекс, что и делает его носителем OSA-политики допуска.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Менеджер пакетов настраивают ходить не в публичный реестр, а в virtual-репозиторий Artifactory. Пример для npm:</p>
+<pre><code class="language-bash"># .npmrc — весь install идёт через подконтрольный индекс
+registry=https://artifactory.internal/artifactory/api/npm/npm-virtual/
+//artifactory.internal/artifactory/api/npm/npm-virtual/:_authToken=${ART_TOKEN}
+</code></pre>
+<p>Публикация артефакта и чтение метаданных — через REST API:</p>
+<pre><code class="language-bash"># заливка собранного бинаря в local-репозиторий
+curl -H "Authorization: Bearer $ART_TOKEN" -T app-1.4.2.tar.gz \
+  "https://artifactory.internal/artifactory/builds-local/app/1.4.2/app-1.4.2.tar.gz"
+# поиск по координатам (для расследования происхождения артефакта)
+curl -H "Authorization: Bearer $ART_TOKEN" \
+  "https://artifactory.internal/artifactory/api/search/gavc?g=org.apache&amp;a=commons-text"
+</code></pre>
+<p>Сам по себе Artifactory не строит SBOM и не вычисляет уязвимости — за это отвечает дополнительный модуль (Xray) или внешний сканер по содержимому репозитория.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Один контролируемый индекс на множество экосистем — естественная точка для блокирующего OSA-режима (запрошенный пакет физически не отдаётся, если попал под block-правило).</li>
+<li>Богатый REST API и checksum-based storage: воспроизводимое разрешение зависимостей, дедупликация, прослеживаемость происхождения артефакта.</li>
+<li><code>build-info</code> фиксирует, какая сборка какие зависимости и в каких версиях втянула — материал для последующего аудита состава.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Базовый репозиторий «видит» проблему состава и уязвимости только с дополнительным компонентом или внешним сканером; без него это хранилище, а не SCA.</li>
+<li>Блокирующий OSA-режим работает, лишь когда менеджер действительно настроен ходить через virtual-репозиторий; прямой доступ в публичный реестр обходит контур.</li>
+<li>Не закрывает dependency confusion сам по себе — нужны резервирование внутренних имён и приоритет local над remote в virtual-репозитории.</li>
+<li><code>install</code>-скрипты пакета выполняются уже после выдачи: проксирование не отменяет <code>--ignore-scripts</code> как отдельный контроль.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. Self-hosted редакция разворачивается полностью в закрытом контуре; remote-репозитории работают как офлайн-кэш единожды скачанных артефактов, дальнейшие сборки идут без выхода во внешнюю сеть. Обновление метаданных требует управляемого «окна» наружу либо ручной заливки.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-0c23b1ba214a.html">М08. Защита цепочки поставки и OSA</a> · <a href="doc-457364f50285.html">М11. Генератор фактов и сервис вердиктов</a></li>
+<li>Практики: <a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a> · <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a></li>
+<li>Смежные карточки: <a href="doc-2fd539fd2ebc.html">Nexus Repository</a> · <a href="doc-a1fedd6d04cf.html">GitLab CI</a> · <a href="doc-cddc58f61e6f.html">Docker BuildKit</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

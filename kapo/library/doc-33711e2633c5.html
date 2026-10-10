@@ -1,0 +1,73 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П05. Trivy как генератор и сканер — КАПО · Пиков</title><meta name="description" content="П05. Trivy как генератор и сканер. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-33711e2633c5.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п05-trivy-как-генератор-и-сканер">П05. Trivy как генератор и сканер</h1>
+<h2 id="цель">Цель</h2>
+<p>Показать на одном инструменте два разных режима работы и их разделение: сначала Trivy <strong>генерирует</strong> CycloneDX SBOM (артефакт фактов о составе), затем тем же Trivy <strong>сканирует</strong> этот SBOM на уязвимости (артефакт решения о рисках). Проверяемый результат — файл <code>trivy-bom.json</code> без уязвимостей внутри и отдельная таблица findings, полученная из него командой <code>trivy sbom</code>.</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Берём контейнерный образ (учебный или базовый, например <code>python:3.11-slim</code>). Шаг 1 — генерация SBOM, шаг 2 — сканирование готового SBOM. Разделение шагов наглядно показывает, что генерация и поиск уязвимостей — две разные операции.</p>
+<pre><code class="language-bash">trivy --version
+
+# шаг 1 — ГЕНЕРАТОР: образ → CycloneDX SBOM (только состав, без CVE)
+trivy image --format cyclonedx --output trivy-bom.json python:3.11-slim
+
+# шаг 2 — СКАНЕР: тот же Trivy матчит готовый SBOM на уязвимости
+trivy sbom trivy-bom.json
+</code></pre>
+<p><code>trivy sbom &lt;файл&gt;</code> сам определяет формат как <code>cyclonedx-json</code> и по умолчанию включает сканирование уязвимостей — отдельный флаг не нужен. Для воспроизводимости в оффлайн-контуре БД уязвимостей загружают заранее (<code>trivy image --download-db-only</code>), иначе Trivy попытается обновить её из сети.</p>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Шаг 1 пишет на диск <code>trivy-bom.json</code> — чистый CycloneDX без блока уязвимостей. Скелет:</p>
+<pre><code class="language-json">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.5",
+  "metadata": {
+    "tools": { "components": [ { "name": "trivy", "version": "0.x.x" } ] }
+  },
+  "components": [
+    {
+      "type": "library",
+      "name": "openssl",
+      "version": "3.0.11-1~deb12u2",
+      "purl": "pkg:deb/debian/openssl@3.0.11-1~deb12u2"
+    }
+  ]
+}
+</code></pre>
+<p>Шаг 2 печатает в терминал сводку и таблицу findings — это и есть «слой решения», которого в самом SBOM нет:</p>
+<pre><code>trivy-bom.json (debian 12.x)
+
+Total: 37 (UNKNOWN: 0, LOW: 12, MEDIUM: 18, HIGH: 6, CRITICAL: 1)
+
+┌───────────────┬────────────────┬──────────┬───────────────────┬───────────────┐
+│    Library    │ Vulnerability  │ Severity │ Installed Version │ Fixed Version │
+├───────────────┼────────────────┼──────────┼───────────────────┼───────────────┤
+│ openssl       │ CVE-2023-xxxxx │ HIGH     │ 3.0.11-1~deb12u2  │ 3.0.11-1~..u3 │
+└───────────────┴────────────────┴──────────┴───────────────────┴───────────────┘
+</code></pre>
+<p>Точное число findings зависит от образа и даты БД — важен не модуль числа, а то, что таблица непустая и severity-разбивка присутствует.</p>
+<blockquote>
+<p>Один инструмент — два слоя
+SBOM — это факт («в образе есть openssl@3.0.11»), а findings — производное решение («у этой версии есть CVE-2023-xxxxx»). Trivy умеет и то, и другое, но в <code>trivy-bom.json</code> уязвимостей нет: они появляются только на шаге <code>trivy sbom</code>. Это правильное разделение — SBOM долговечен, а вердикты по нему пересчитываются при каждом обновлении БД.</p>
+</blockquote>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><strong>Шаг 1 не создал файл.</strong> Не указан <code>--output</code> (тогда CycloneDX ушёл в stdout) либо целевой образ не скачан. Проверьте <code>docker images</code> и наличие <code>trivy-bom.json</code> на диске.</li>
+<li><strong><code>trivy sbom</code> пишет <code>unsupported format</code> или сканирует пусто.</strong> На вход подан не CycloneDX-JSON (например, табличный вывод). Убедитесь, что шаг 1 сделан с <code>--format cyclonedx</code>.</li>
+<li><strong><code>Total: 0</code> при свежем популярном образе.</strong> БД уязвимостей не загрузилась (оффлайн без <code>--download-db-only</code>) либо образ действительно чистый. Сначала проверьте обновление БД и сетевой доступ/зеркало.</li>
+<li><strong>Долгая первая загрузка или сетевой таймаут.</strong> Trivy тянет БД (~сотни МБ). В закрытом контуре заранее выполните <code>trivy image --download-db-only</code> или укажите внутреннее зеркало БД.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: файл <code>trivy-bom.json</code> (открыть и убедиться, что блока <code>vulnerabilities</code> в нём нет), вывод <code>trivy sbom trivy-bom.json</code> со строкой <code>Total:</code> и severity-разбивкой, строку <code>trivy --version</code>. Объяснить одним предложением, почему уязвимости не записаны в SBOM, а считаются отдельно.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li>Модуль: <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a></li>
+<li>Смежные практики: <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a></li>
+<li>Разделение факта (SBOM) и решения (findings/VEX) — основа: <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2 формирование SBOM, RV.1 реакция на уязвимости); формат — <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>; критерии качества SBOM — <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>; управляемость работ — <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

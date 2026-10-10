@@ -1,0 +1,58 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Порядок работы с неопознанной библиотекой — КАПО · Пиков</title><meta name="description" content="Порядок работы с неопознанной библиотекой. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e452b14f0cd3.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#назначение">Назначение</a></li>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#шаги">Шаги</a></li>
+<li><a href="#критерий-завершения">Критерий завершения</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="порядок-работы-с-неопознанной-библиотекой">Порядок работы с неопознанной библиотекой</h1>
+<h2 id="назначение">Назначение</h2>
+<p>Пошаговый регламент идентификации компонента, который сканер увидел, но не сопоставил с координатами. Описывает, как от симптома «не распозналось» дойти до <code>purl</code> и паспорта либо до обоснованного принятого риска — без молчаливого пропуска.</p>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>Запускается на каждый компонент со статусом unresolved после форматных чек-листов. Результат каждого шага фиксируется в <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a> (порядок поставляет в реестр записи и двигает их статусы).</p>
+<blockquote>
+<p>Порядок vs реестр
+Этот документ — <strong>что делать</strong> (шаги). Где это учитывается — в <a href="doc-bf3827cc407c.html">реестре unresolved</a>. Каждый шаг ниже меняет статус соответствующей записи реестра.</p>
+</blockquote>
+<h2 id="шаги">Шаги</h2>
+<ol>
+<li>
+<p><strong>Зафиксировать симптом.</strong> Завести запись в реестре: артефакт, поставка, тип проблемы (<code>static link</code> / <code>vendored</code> / <code>cpe alias</code> / <code>binary</code> / <code>format gap</code>). Назначить владельца и срок.</p>
+</li>
+<li>
+<p><strong>Собрать сборочный контекст.</strong> Для C/C++ — поднять build evidence: логи сборки, граф (см. <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a>). Часто координаты восстанавливаются именно из контекста сборки, а не из бинарника.</p>
+</li>
+<li>
+<p><strong>Поискать апстрим и метаданные.</strong> Проверить заголовки исходников, README, hash файлов против публичных индексов. Для vendored-кода — найти оригинальный репозиторий и версию.</p>
+</li>
+<li>
+<p><strong>Сформировать кандидата <code>purl</code>.</strong> Построить нормализованный <code>purl</code> (тип, namespace, name, version) по <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>. Если versions диапазон — зафиксировать неопределённость.</p>
+</li>
+<li>
+<p><strong>Сопоставить уязвимостные координаты.</strong> Если <code>cpe</code> не совпал — провести alias-сопоставление (см. <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a>), чтобы компонент проверялся против БДУ ФСТЭК/OSV.</p>
+</li>
+<li>
+<p><strong>Эскалировать соисполнителю при тупике.</strong> Если данных недостаточно — запросить у соисполнителя исходные метаданные/SBOM-фрагмент. Перевести запись в статус «эскалация».</p>
+</li>
+<li>
+<p><strong>Закрыть запись одним из исходов:</strong>
+   - <strong>Идентифицирована</strong> → завести <a href="doc-7b38c1b6c34b.html">паспорт</a>, статус «закрыта-идентифицирована».
+   - <strong>Риск принят</strong> → оформить по <a href="doc-adce46441199.html">П30. Исключения и принятие риска</a> с владельцем и сроком пересмотра, статус «закрыта-риск принят».
+   - <strong>Подтверждённый ложный элемент</strong> → удалить из состава с обоснованием.</p>
+</li>
+</ol>
+<h2 id="критерий-завершения">Критерий завершения</h2>
+<ul>
+<li>[ ] У записи нет статуса «новая»/«в работе» без движения дольше срока.</li>
+<li>[ ] Каждый закрытый элемент имеет либо <code>purl</code>+паспорт, либо принятый риск со сроком.</li>
+<li>[ ] Итог отражён в доле unresolved для <a href="doc-6975e3770695.html">соглашения о качестве</a>.</li>
+</ul>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модуль: <a href="doc-4a0b7bceee7b.html">М04. Идентификаторы</a> · <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-2c6bb1831ead.html">П25. CPE alias worklist</a> · <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a></li>
+<li>Нормативка: <a href="doc-515b8f930c7c.html">БДУ ФСТЭК</a> · <a href="doc-a6189f5ab42c.html">NIST SP 800-161 Rev.1</a> · <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a></li>
+<li>Связанные шаблоны: <a href="doc-bf3827cc407c.html">Реестр unresolved libraries</a> · <a href="doc-7b38c1b6c34b.html">Паспорт open source библиотеки</a> · <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

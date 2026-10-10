@@ -1,0 +1,131 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М16. Практическая работа — КАПО · Пиков</title><meta name="description" content="М16. Практическая работа. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-d29007012eb4.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#часть-а-честный-sbom-контейнерного-образа">Часть А. Честный SBOM контейнерного образа</a><ul>
+<li><a href="#шаг-1-собрать-учебный-образ-с-удалённым-секретом">Шаг 1. Собрать учебный образ с «удалённым» секретом</a></li>
+<li><a href="#шаг-2-сгенерировать-декларируемый-sbom">Шаг 2. Сгенерировать «декларируемый» SBOM</a></li>
+<li><a href="#шаг-3-вскрыть-реальное-содержимое-слоёв">Шаг 3. Вскрыть реальное содержимое слоёв</a></li>
+<li><a href="#шаг-4-проверить-эффект-обфускации">Шаг 4. Проверить эффект обфускации</a></li>
+<li><a href="#шаг-5-оформить-вывод">Шаг 5. Оформить вывод</a></li>
+</ul>
+</li>
+<li><a href="#часть-б-sbom-for-ai-минимальные-элементы">Часть Б. SBOM for AI (минимальные элементы)</a></li>
+<li><a href="#артефакты-на-сдачу">Артефакты на сдачу</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#связь-с-практиками">Связь с практиками</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа">Практическая работа</h1>
+<p>Две связанные части. Часть А — доказать нечестность SBOM контейнерного образа и собрать честный. Часть Б — заполнить минимальные элементы SBOM for AI для одной модели и одного датасета.</p>
+<blockquote>
+<p>Что фиксируем перед стартом
+Образ (<code>repo:tag</code> + digest), commit/tag сборки, версии инструментов (<code>syft</code>, <code>trivy</code>/<code>grype</code>, docker), дату анализа. Без этого результат невоспроизводим.</p>
+</blockquote>
+<h2 id="часть-а-честный-sbom-контейнерного-образа">Часть А. Честный SBOM контейнерного образа</h2>
+<h3 id="шаг-1-собрать-учебный-образ-с-удалённым-секретом">Шаг 1. Собрать учебный образ с «удалённым» секретом</h3>
+<pre><code class="language-dockerfile">FROM busybox:latest
+COPY key.api .
+RUN rm key.api
+</code></pre>
+<pre><code class="language-bash">docker build -t secrets-test .
+</code></pre>
+<h3 id="шаг-2-сгенерировать-декларируемый-sbom">Шаг 2. Сгенерировать «декларируемый» SBOM</h3>
+<pre><code class="language-bash">syft secrets-test:latest -o cyclonedx-json &gt; declared.cdx.json
+trivy image --scanners secret secrets-test:latest   # обратите внимание на вывод
+</code></pre>
+<h3 id="шаг-3-вскрыть-реальное-содержимое-слоёв">Шаг 3. Вскрыть реальное содержимое слоёв</h3>
+<pre><code class="language-bash">mkdir layers &amp;&amp; docker save secrets-test:latest | tar -x -C layers
+find layers/blobs/sha256/ -type f -exec file {} \; | grep tar
+# извлечь подозрительный слой
+tar xvf layers/blobs/sha256/&lt;hash-нижнего-слоя&gt;
+cat key.api
+</code></pre>
+<h3 id="шаг-4-проверить-эффект-обфускации">Шаг 4. Проверить эффект обфускации</h3>
+<p>На паре «оригинал / обфусцированный образ» (заготовка преподавателя, собранная через <code>mint slim --obfuscate-metadata</code>):</p>
+<pre><code class="language-bash">grype &lt;image&gt;:latest --sort-by severity
+grype &lt;image&gt;:obfuscated --sort-by severity
+</code></pre>
+<h3 id="шаг-5-оформить-вывод">Шаг 5. Оформить вывод</h3>
+<p>Таблица расхождений «декларация ↔ реальность»: что показал <code>declared.cdx.json</code> / <code>grype</code>, что нашлось в слоях, какой техникой скрыто (rm в слое, затёртые метаданные, UPX).</p>
+<blockquote>
+<p>Что вы должны увидеть
+- <code>trivy --scanners secret</code> по финальной ФС секрет <strong>не находит</strong> (он в нижнем слое).
+- В <code>blobs/sha256/</code> — несколько <code>POSIX tar archive</code>; в одном из них живой <code>key.api</code> с <code>BEGIN OPENSSH PRIVATE KEY</code>.
+- <code>grype</code> на оригинале — десятки matches (порядка 97), на обфусцированном — <code>0 vulnerability matches / No vulnerabilities found</code>.</p>
+<p>Если не получилось
+- <code>find … grep tar</code> пусто — образ однослойный (<code>scratch</code>) или сжат: проверьте <code>manifest.json</code> и распакуйте все blob'ы.
+- Секрет «не нашёлся» в слоях — вы распаковали верхний (финальный) слой; берите нижний, по порядку из <code>manifest.json</code>.
+- <code>grype</code> показал одинаковое число на обоих образах — обфускация не отработала; проверьте, что сравниваете именно <code>:obfuscated</code>.</p>
+</blockquote>
+<h2 id="часть-б-sbom-for-ai-минимальные-элементы">Часть Б. SBOM for AI (минимальные элементы)</h2>
+<p>Заполните таблицу для одной открытой модели и её обучающего датасета. Минимум — по 4 элемента на кластер.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Кластер</th>
+<th>Элемент</th>
+<th>Значение (пример)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Models</td>
+<td>Model identifier</td>
+<td>PURL/SWHID/commit-hash</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>Model hash value + algorithm</td>
+<td>хэш весов, IANA-имя алгоритма</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>Model license</td>
+<td>open weight / open architecture / open data / open training</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>Model training properties</td>
+<td>pre-training + fine-tuning (RLHF / DPO / PPO)</td>
+</tr>
+<tr>
+<td>Models</td>
+<td>Model description (lineage)</td>
+<td>модель-предшественник, дистилляция</td>
+</tr>
+<tr>
+<td>Datasets</td>
+<td>Dataset provenance</td>
+<td>источник, способ сбора (web crawling / коммерческое соглашение)</td>
+</tr>
+<tr>
+<td>Datasets</td>
+<td>Dataset sensitivity</td>
+<td>PII / copyright / sensitive</td>
+</tr>
+<tr>
+<td>Datasets</td>
+<td>Dataset hash</td>
+<td>хэш файла датасета</td>
+</tr>
+<tr>
+<td>Datasets</td>
+<td>Dataset license</td>
+<td>ссылка на лицензию датасета</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Что вы должны увидеть
+Заполненная таблица, где видно: (1) хэш <strong>весов</strong>, а не только кода; (2) явный тип открытости лицензии модели; (3) provenance датасета с указанием способа сбора. Эти три поля — то, чего нет в обычном SBOM.</p>
+</blockquote>
+<h2 id="артефакты-на-сдачу">Артефакты на сдачу</h2>
+<ul>
+<li>Dockerfile, команды сборки/анализа, версии инструментов.</li>
+<li><code>declared.cdx.json</code> и извлечённый из слоя секрет (замаскированный).</li>
+<li>Таблица расхождений «декларация ↔ реальность» (Часть А).</li>
+<li>Заполненная таблица кластеров Models/Datasets (Часть Б).</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) артефакт, извлечённый из нижнего слоя и <strong>отсутствующий</strong> в финальной ФС; (2) доказанный эффект обфускации (число matches до/после); (3) таблицу SBOM for AI с заполненными <code>Model hash</code>, <code>Model license</code> (тип открытости) и <code>Dataset provenance</code>. Сформулировать одно правило для регламента приёмки Организации.</p>
+<h2 id="связь-с-практиками">Связь с практиками</h2>
+<p><a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a> · справочник <a href="doc-c243eb88011f.html">SBOM for AI - минимальные элементы</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

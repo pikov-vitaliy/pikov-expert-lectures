@@ -1,0 +1,85 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>поставка от соисполнителя — КАПО · Пиков</title><meta name="description" content="поставка от соисполнителя. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-8333283e22d3.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="поставка-от-соисполнителя">поставка от соисполнителя</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Корпоративное изделие Организации редко собирается одной командой: подсистемы приходят от соисполнителей как готовая поставка. Для C/C++ это разворачивает SCA наизнанку — источник факта о составе подсистемы не ваш пайплайн, а артефакт внешней команды. Вы не наблюдаете их сборку, не снимаете <code>ldd</code> на их машине, не контролируете их <code>third_party/</code>. Всё, что у вас есть, — то, что они положили в поставку. Значит, ключевой вопрос смещается с «как восстановить состав» на «как принять чужой состав и измерить его пригодность, а не предположить её».</p>
+<p>Отсюда главный принцип приёмки: поставке подлежит не один <code>bom.json</code>, а доказуемый комплект — SBOM плюс build evidence (что реально слинковалось) плюс явный список того, что соисполнитель сам не смог опознать. Без build-логов и unresolved «технически валидный SBOM» не доказывает полноту состава.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Поставку забирают по иммутабельным координатам из артефакт-репозитория (а не из почты), проверяют структуру и измеряют покрытие:</p>
+<pre><code class="language-bash"># 1. Структура поставки: должны быть SBOM, build evidence и список нераспознанного
+unzip -l contractor-A.zip
+#   ожидаем минимум: bom.json, build/link.log, unresolved.json
+
+# 2. Покрытие обогащённого SBOM (jq поверх CycloneDX)
+BOM=contractor-A/bom.json
+echo "всего      : $(jq '.components|length' "$BOM")"
+echo "без PURL   : $(jq '[.components[]|select(.purl==null)]|length' "$BOM")"
+echo "с лицензией: $(jq '[.components[]|select(.licenses!=null and (.licenses|length&gt;0))]|length' "$BOM")"
+
+# 3. Сверка: версия ZIP == версия metadata.component внутри bom.json?
+jq -r '.metadata.component.version' "$BOM"   # должна совпадать с координатами поставки
+</code></pre>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Соисполнитель</th>
+<th>Компонентов</th>
+<th>PURL coverage</th>
+<th>unresolved</th>
+<th>Вердикт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>142</td>
+<td>96%</td>
+<td>3</td>
+<td>принято</td>
+</tr>
+<tr>
+<td>B</td>
+<td>88</td>
+<td>61%</td>
+<td>27</td>
+<td>вернуть worklist</td>
+</tr>
+<tr>
+<td>N</td>
+<td>210</td>
+<td>89%</td>
+<td>11</td>
+<td>принято с замечаниями</td>
+</tr>
+</tbody>
+</table></div>
+<p>Строка B — «технически валидный SBOM»: файл есть, но 27 компонентов без идентификаторов, поэтому состав подсистемы не считается известным до доразметки.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — <strong>доверие к самому факту наличия SBOM</strong>. Файл <code>bom.json</code> присутствует, формат валиден — и приёмка ставит галочку, не глядя на покрытие. Между тем 61% PURL coverage означает, что про 39% состава ничего не известно: эти компоненты не мэтчатся на CVE и не проверены по лицензиям. Вторая слепая зона — provenance: поставка из почты без иммутабельных координат не доказывает, что принятый ZIP — тот же, что собрали и протестировали.</p>
+<blockquote>
+<p>«SBOM есть» ≠ «состав известен»
+Принимать поставку по наличию файла — значит подписаться под невидимым риском. Критерий приёмки — измеримое покрытие (доля компонентов с PURL и версией) плюс наличие build evidence и <code>unresolved.json</code>, а не сам факт, что <code>bom.json</code> лежит в архиве.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Забирайте поставку из артефакт-репозитория по иммутабельным координатам <code>имя:версия</code>, не из переписки.</li>
+<li>Проверяйте структуру: обязательны <code>bom.json</code>, build/link-логи и <code>unresolved.json</code> (см. <a href="doc-9902fd4ce26c.html">build logs как аудиторский артефакт</a>, <a href="doc-06c6cc985f59.html">unresolved libraries</a>).</li>
+<li>Считайте три числа покрытия и принимайте одно из трёх решений: принято / принято с замечаниями / вернуть worklist.</li>
+<li>Сверяйте версию поставки с <code>metadata.component.version</code> внутри SBOM — иначе provenance ломается молча.</li>
+<li>Зафиксируйте требования к качеству данных в контракте поставки заранее (минимальный PURL coverage, обязательные артефакты).</li>
+<li>По поставке с низким покрытием возвращайте worklist (список компонентов без PURL), а не принимайте молча.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-3235e84d3a49.html">М10. Много исполнителей и корпоративная модель продукта</a>; технологическая база — <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a>.</li>
+<li>Практики: <a href="doc-fd2abd912efa.html">П28. Поставка от нескольких исполнителей</a> (вердикт приёмки по покрытию), <a href="doc-faa8e4b65ca3.html">П29. Readiness dashboard</a> (сведение по всем соисполнителям), <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>.</li>
+<li>Нормативка: <a href="doc-a6189f5ab42c.html">NIST SP 800-161</a> (управление поставщиками и provenance), <a href="doc-b5856ada3679.html">ISO/IEC 27001</a> (supplier relationships), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+<li>Смежные 06: <a href="doc-06c6cc985f59.html">unresolved libraries</a>, <a href="doc-a2c530fc1bbc.html">honest SBOM</a>, <a href="doc-9902fd4ce26c.html">build logs как аудиторский артефакт</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

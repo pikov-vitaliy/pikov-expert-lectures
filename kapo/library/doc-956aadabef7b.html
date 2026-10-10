@@ -1,0 +1,80 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Требования к controlled repository — КАПО · Пиков</title><meta name="description" content="Требования к controlled repository. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-956aadabef7b.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#требования-к-источникам">Требования к источникам</a></li>
+<li><a href="#политика-блокировки-и-карантина">Политика блокировки и карантина</a></li>
+<li><a href="#поддерживаемые-режимы-проксирования">Поддерживаемые режимы проксирования</a></li>
+<li><a href="#evidence-и-аудит">Evidence и аудит</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="требования-к-controlled-repository">Требования к controlled repository</h1>
+<blockquote>
+<p>Назначение
+Задаёт требования к управляемому хранилищу компонентов (controlled repository / OSA proxy): какие источники разрешены, как небезопасный пакет блокируется или отправляется в карантин до попадания в сборку. Это «входной фильтр» цепочки поставки — раньше, чем CI security gate.</p>
+</blockquote>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>При построении внутреннего контура зависимостей, при переходе на закрытый периметр, при настройке проксирования пакетных менеджеров. Действует постоянно на каждую загрузку пакета в контур.</p>
+<h2 id="требования-к-источникам">Требования к источникам</h2>
+<ul>
+<li>[ ] Прямые обращения сборок к публичным registry запрещены — только через controlled repository.</li>
+<li>[ ] Список разрешённых upstream-источников утверждён и версионируется.</li>
+<li>[ ] Каждый втянутый компонент получает PURL/CPE и попадает в реестр контура.</li>
+<li>[ ] Внутренние форки публичных библиотек маркируются private qualifiers (см. <a href="doc-a505ea20ce92.html">П24. PURL нормализация и private qualifiers</a>).</li>
+</ul>
+<h2 id="политика-блокировки-и-карантина">Политика блокировки и карантина</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Событие при загрузке</th>
+<th>Действие контура</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Пакет с уязвимостью выше порога политики</td>
+<td>блокировка загрузки</td>
+</tr>
+<tr>
+<td>malware / protestware</td>
+<td>блокировка + алерт ИБ</td>
+</tr>
+<tr>
+<td>Запрещённая лицензия</td>
+<td>блокировка</td>
+</tr>
+<tr>
+<td>Новый, ранее не виденный пакет/версия</td>
+<td>карантин до проверки «генератором фактов»</td>
+</tr>
+<tr>
+<td>Несовпадение хеша/подписи upstream</td>
+<td>блокировка (подмена)</td>
+</tr>
+<tr>
+<td>Отложенная блокировка (delayed)</td>
+<td>пропуск на заданный интервал, затем блок</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="поддерживаемые-режимы-проксирования">Поддерживаемые режимы проксирования</h2>
+<ul>
+<li>[ ] Для каждого пакетного менеджера зафиксирован режим: OSA Proxy (Maven, NPM, PyPI, NuGet, Go, APT/RPM, Docker) либо плагин repo-manager (Nexus/JFrog) для остальных (Conan, Conda, RubyGems).</li>
+<li>[ ] Для пакетных менеджеров вне Proxy явно описано, чем обеспечивается контроль (см. <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a>).</li>
+<li>[ ] Для C/C++ без пакетного менеджера controlled repository дополняется build-инвентаризацией (источник истины — сборка, не registry).</li>
+</ul>
+<blockquote>
+<p>Слепая зона режимов
+Не путать «SCA анализирует пакет» и «Proxy блокирует загрузку». Для части менеджеров доступен только анализ, но не proxy-перехват — это фиксируется как ограничение, а не выдаётся за полный firewall.</p>
+</blockquote>
+<h2 id="evidence-и-аудит">Evidence и аудит</h2>
+<ul>
+<li>Каждая блокировка/карантин — запись в <a href="doc-e65a39cb2dfa.html">audit trail</a>.</li>
+<li>Реестр разрешённых источников и логи блокировок — evidence в <a href="doc-91e9697aff8e.html">Матрица evidence для аудита</a>.</li>
+</ul>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модули: <a href="doc-0c23b1ba214a.html">М08 Защита цепочки поставки и OSA</a>, <a href="doc-3235e84d3a49.html">М10 Много исполнителей и корпоративная модель продукта</a>.</li>
+<li>Практики: <a href="doc-418ea5a194a4.html">П17. OSA controlled repository policy</a>, <a href="doc-17732fcbbbda.html">П18. OSA Proxy режимы и ограничения</a>, <a href="doc-cf04954d5997.html">П21. Conan graph и package identity</a>.</li>
+<li>Нормативка: <a href="doc-a6189f5ab42c.html">NIST SP 800-161 Rev.1</a>, <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,71 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>dataset license — КАПО · Пиков</title><meta name="description" content="dataset license. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-0c004a15c812.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="dataset-license">dataset license</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Лицензия обучающего датасета и лицензия весов модели — это не лицензия кода, и обычные сканеры лицензий их не видят. Сканер по исходникам читает заголовки <code>.c</code>/<code>.h</code>, файлы <code>LICENSE</code> и <code>SPDX-License-Identifier</code> — но датасет приезжает бинарным архивом или ссылкой на хаб, а его условия живут в карточке датасета, а не в исходниках. При этом именно лицензия данных часто оказывается самой ограничительной в AI-поставке: «только для исследований», некоммерческое использование, обязательная атрибуция. Composition analysis для AI обязан отдельно фиксировать лицензию данных и весов, иначе юридический риск поставки остаётся неучтённым.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Код может быть под пермиссивной лицензией, а данные/веса — под совсем другой, несовместимой с коммерческой поставкой.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Артефакт</th>
+<th>Типичная лицензия</th>
+<th>Где «прячется»</th>
+<th>Что значит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Код инференса</td>
+<td>MIT / Apache-2.0</td>
+<td><code>LICENSE</code>, заголовки</td>
+<td>OSI, коммерческое использование ок</td>
+</tr>
+<tr>
+<td>Веса модели</td>
+<td>Llama Community License, OpenRAIL</td>
+<td>карточка модели</td>
+<td>не OSI, ограничения на use-case/масштаб</td>
+</tr>
+<tr>
+<td>Датасет</td>
+<td>CC-BY-NC-4.0, research-only</td>
+<td>карточка датасета, <code>dataset_infos.json</code></td>
+<td>некоммерческое, либо обязательная атрибуция</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-bash"># сканер лицензий по исходникам видит код, но не датасет:
+scancode --license --json-pretty-print out.json ./src
+#   обнаружит MIT в коде — и промолчит про CC-BY-NC у данных
+</code></pre>
+<p>То есть пермиссивная лицензия кода создаёт ложное ощущение чистоты, пока некоммерческий датасет тихо запрещает коммерческое использование всей системы.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Лицензия данных ≠ лицензия кода
+«Код под Apache-2.0, значит можно» — ловушка. Если веса под Llama Community License, а датасет research-only, коммерческая поставка незаконна независимо от лицензии кода. Сканер исходников этого не покажет — нужна ручная декларация по кластеру Datasets.</p>
+</blockquote>
+<p>Приём: вести лицензию данных и весов как отдельные записи в ML-BOM (кластеры Datasets/Model у G7), с указанием источника условий, а не выводить «лицензию системы» из лицензии кода.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Разделить три объекта лицензирования: код, веса, датасет — и проверять каждый отдельно, не перенося лицензию кода на всё.</li>
+<li>Снять условия датасета из его карточки/<code>dataset_infos.json</code> и зафиксировать как декларацию (сканер исходников их не достанет).</li>
+<li>Особо отмечать «research-only», <code>-NC</code> (некоммерческие) и use-case-ограничения (OpenRAIL) — это блокеры коммерческой поставки.</li>
+<li>Проверять совместимость лицензий данных, весов и кода между собой и с целевым способом использования.</li>
+<li>Заносить лицензию данных и весов в ML-BOM по кластерам G7 со ссылкой на источник условий.</li>
+<li>Спорные случаи отправлять в юридический workflow; до заключения держать запись с пониженным confidence.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-ef214c81e577.html">М16. SBOM for AI и честный SBOM контейнерных образов</a>.</li>
+<li>Практики: <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a>, <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a>, <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a>.</li>
+<li>Нормативка: <a href="doc-3850f36a7630.html">G7 SBOM for AI Minimum Elements</a>, <a href="doc-348bb0ac58ac.html">OpenChain ISO/IEC 5230</a>.</li>
+<li>Смежные заметки: <a href="doc-5199c2a646ed.html">AI model dependencies</a>, <a href="doc-fd56cb075f09.html">форки open source библиотек</a>, <a href="doc-0655587ecc4d.html">vendored source</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

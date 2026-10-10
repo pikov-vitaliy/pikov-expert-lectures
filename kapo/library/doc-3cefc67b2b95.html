@@ -1,0 +1,47 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>sanitizers in CI — КАПО · Пиков</title><meta name="description" content="sanitizers in CI. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-3cefc67b2b95.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="sanitizers-in-ci">sanitizers in CI</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>Санитайзеры (ASan, UBSan, TSan, MSan) — это динамические, тест-время проверки: они ловят ошибки памяти и неопределённое поведение во время выполнения тестов, а не описывают состав поставки. Связь с SCA непрямая, но важная: SCA говорит «в сборку входит vendored <code>libfoo</code> версии X», а санитайзер в CI отвечает на следующий вопрос — действительно ли этот код не падает на heap-overflow и use-after-free на ваших данных. Особенно это ценно для C/C++-кода, который SBOM перечисляет, но за который никто не отвечает: вкомпилированные <code>third_party</code>, форки, копипаста. Санитайзеры превращают «компонент присутствует» в «компонент проверен под нагрузкой тестов».</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Санитайзер — это инструментирующая пересборка под тесты, которая на лету ловит дефект и печатает точный стек. Это не статический анализ и не часть релизного бинаря.</p>
+<pre><code class="language-bash"># отдельная сборка для CI, не для production:
+cmake -DCMAKE_BUILD_TYPE=Debug \
+      -DCMAKE_CXX_FLAGS="-fsanitize=address,undefined -fno-omit-frame-pointer -g" ..
+cmake --build . &amp;&amp; ASAN_OPTIONS=detect_leaks=1:abort_on_error=1 ctest
+
+# типичный вывод ASan на ошибку в vendored-коде:
+# ==1234==ERROR: AddressSanitizer: heap-buffer-overflow
+#   READ of size 4 at 0x... thread T0
+#     #0 in parse_header third_party/libfoo/parser.c:88
+</code></pre>
+<p>Важно: <code>-fsanitize=address</code> несёт overhead по памяти и скорости и не предназначен для production — это режим CI/тестов. В релиз идёт обычная сборка (см. hardening-флаги), санитайзеры остаются в пайплайне тестов.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Покрытие = покрытию тестов
+Санитайзер находит баг только на том пути, который реально исполнили тесты. Непокрытый код vendored-библиотеки останется без проверки, даже если он в SBOM. «ASan зелёный» означает «на прогнанных входах чисто», а не «кода без ошибок».</p>
+</blockquote>
+<p>Слепая зона: запуск ASan только на unit-тестах при пустом фаззинге и отсутствии негативных входов — самые опасные пути парсеров так и не выполняются. Приём: сочетать санитайзеры с фаззингом (libFuzzer/AFL под ASan) на компонентах, разбирающих недоверенные данные.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Завести отдельную CI-сборку с <code>-fsanitize=address,undefined</code> (Debug, <code>-fno-omit-frame-pointer</code>), не смешивая её с релизной.</li>
+<li>Никогда не тащить санитайзеры в production-бинарь — там hardening-флаги, а не ASan.</li>
+<li>Гонять санитайзеры в том числе по vendored/<code>third_party</code>-коду, который перечисляет SBOM, — это код без явного владельца.</li>
+<li>Подключить фаззинг под ASan для парсеров и обработчиков недоверенного ввода, чтобы покрыть опасные пути.</li>
+<li>Падение санитайзера в CI трактовать как блокирующее: настроить <code>abort_on_error</code>, фиксировать стек как evidence.</li>
+<li>Различать роли: санитайзер — runtime-проверка поведения, SCA — инвентаризация состава, статический анализ (CERT/MISRA) — соответствие правилам написания.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>.</li>
+<li>Практики: <a href="doc-ef5c54e15d75.html">П16. GitLab CI security gate</a>, <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>.</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>.</li>
+<li>Смежные заметки: <a href="doc-2108962f12f7.html">secure compiler flags</a>, <a href="doc-afe63a32f59f.html">CERT MISRA рядом с SCA</a>, <a href="doc-0655587ecc4d.html">vendored source</a>, <a href="doc-0ea1c075e2df.html">ручные third_party каталоги</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

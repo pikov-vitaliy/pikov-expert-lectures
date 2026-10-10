@@ -1,0 +1,631 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>VEX в процессе РБПО: откуда берется и как выпускать — КАПО · Пиков</title><meta name="description" content="VEX в процессе РБПО: откуда берется и как выпускать. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-22ba91fe9517.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>02 Справочник</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#короткий-вывод">Короткий вывод</a></li>
+<li><a href="#что-такое-vex-в-рабочем-процессе">Что такое VEX в рабочем процессе</a></li>
+<li><a href="#кто-выдает-vex">Кто выдает VEX</a><ul>
+<li><a href="#если-вы-потребитель-чужого-продукта">Если вы потребитель чужого продукта</a></li>
+<li><a href="#если-вы-производитель-по">Если вы производитель ПО</a></li>
+<li><a href="#если-речь-о-сторонней-библиотеке-внутри-вашего-продукта">Если речь о сторонней библиотеке внутри вашего продукта</a></li>
+</ul>
+</li>
+<li><a href="#откуда-фактически-берется-vex">Откуда фактически берется VEX</a></li>
+<li><a href="#базовый-порядок-работы">Базовый порядок работы</a><ul>
+<li><a href="#шаг-1-зафиксировать-finding-как-факт">Шаг 1. Зафиксировать finding как факт</a></li>
+<li><a href="#шаг-2-завести-triage-задачу">Шаг 2. Завести triage-задачу</a></li>
+<li><a href="#шаг-3-проверить-применимость-к-продукту">Шаг 3. Проверить применимость к продукту</a></li>
+<li><a href="#шаг-4-выбрать-статус">Шаг 4. Выбрать статус</a></li>
+<li><a href="#шаг-5-обосновать-not_affected">Шаг 5. Обосновать not_affected</a></li>
+<li><a href="#шаг-6-оформить-vex-документ">Шаг 6. Оформить VEX-документ</a></li>
+</ul>
+</li>
+<li><a href="#где-хранить-и-где-публиковать-vex">Где хранить и где публиковать VEX</a><ul>
+<li><a href="#внутри-организации">Внутри организации</a></li>
+<li><a href="#для-внешних-потребителей">Для внешних потребителей</a></li>
+</ul>
+</li>
+<li><a href="#как-выбрать-формат">Как выбрать формат</a></li>
+<li><a href="#пример-cc-продукт-и-уязвимость-в-zlib">Пример: C/C++ продукт и уязвимость в zlib</a></li>
+<li><a href="#минимальный-шаблон-triage-записи">Минимальный шаблон triage-записи</a></li>
+<li><a href="#что-должно-блокировать-выпуск-vex">Что должно блокировать выпуск VEX</a></li>
+<li><a href="#как-встроить-vex-в-рбпо-процесс">Как встроить VEX в РБПО-процесс</a><ul>
+<li><a href="#policy-gate">Policy gate</a></li>
+<li><a href="#связь-с-sbomппк">Связь с SBOM/ППК</a></li>
+<li><a href="#связь-с-исключениями-и-принятием-риска">Связь с исключениями и принятием риска</a></li>
+</ul>
+</li>
+<li><a href="#нормативная-и-методическая-привязка">Нормативная и методическая привязка</a></li>
+<li><a href="#контрольный-чек-лист-для-рбпо">Контрольный чек-лист для РБПО</a></li>
+<li><a href="#короткая-формула-для-команды">Короткая формула для команды</a></li>
+<li><a href="#источники">Источники</a></li>
+<li><a href="#связанные-материалы-курса">Связанные материалы курса</a></li>
+</ul>
+</div>
+<h1 id="vex-в-процессе-рбпо-откуда-берется-и-как-выпускать">VEX в процессе РБПО: откуда берется и как выпускать</h1>
+<h2 id="короткий-вывод">Короткий вывод</h2>
+<p>VEX не является еще одной базой уязвимостей и не "скачивается" из NVD, БДУ ФСТЭК, OSV или GitHub Advisory Database. Эти источники дают факт: у компонента, версии или продукта есть известная уязвимость. VEX появляется позже: когда ответственный за конкретный продукт производитель или поставщик устанавливает, влияет ли эта уязвимость на конкретную версию продукта в конкретном контексте использования.</p>
+<p>Если организация сама разрабатывает программное обеспечение, то для своего продукта VEX в общем случае выпускает сама организация. Практически это делает не один сканер, а связка ролей: РБПО / Product Security / PSIRT / AppSec, владелец продукта, владелец компонента и разработчики, которые могут доказать, как компонент реально встроен, собран, вызывается и поставляется.</p>
+<p>SCA-инструмент может подготовить входные данные или черновик, но VEX-утверждение является инженерно-управленческим решением производителя продукта.</p>
+<h2 id="что-такое-vex-в-рабочем-процессе">Что такое VEX в рабочем процессе</h2>
+<p>VEX, Vulnerability Exploitability eXchange, отвечает на вопрос:</p>
+<blockquote>
+<p>Влияет ли конкретная уязвимость на конкретный продукт или компонент в заданной версии, сборке и эксплуатационном контексте?</p>
+</blockquote>
+<p>Это отличается от трех близких, но других артефактов.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Артефакт</th>
+<th>Что фиксирует</th>
+<th>Тип данных</th>
+<th>Кто обычно формирует</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SBOM / ППК</td>
+<td>Состав продукта: компоненты, версии, связи, идентификаторы</td>
+<td>Факт состава</td>
+<td>сборка, SCA, владелец релиза</td>
+</tr>
+<tr>
+<td>VDR / vulnerability report</td>
+<td>Связь "компонент - уязвимость": CVE, GHSA, OSV, БДУ, severity, affected range</td>
+<td>Факт обнаружения</td>
+<td>SCA-инструмент, vulnerability feed, analyst</td>
+</tr>
+<tr>
+<td>VEX</td>
+<td>Решение о применимости уязвимости к конкретному продукту</td>
+<td>Инженерное утверждение с обоснованием</td>
+<td>производитель продукта, PSIRT/AppSec/РБПО</td>
+</tr>
+<tr>
+<td>Risk acceptance / exception</td>
+<td>Разрешение временно принять остаточный риск или отступить от политики</td>
+<td>Управленческое решение</td>
+<td>владелец риска, security governance</td>
+</tr>
+</tbody>
+</table></div>
+<p>Главная ошибка: называть таблицу CVE "VEX-ом". Список найденных CVE является VDR или vulnerability report. VEX начинается только там, где есть статус применимости, обоснование и связь с конкретной версией продукта.</p>
+<h2 id="кто-выдает-vex">Кто выдает VEX</h2>
+<h3 id="если-вы-потребитель-чужого-продукта">Если вы потребитель чужого продукта</h3>
+<p>Если организация покупает или использует чужой продукт, VEX нужно запрашивать у поставщика этого продукта. Типичные места, где он может появиться:</p>
+<ul>
+<li>security advisory поставщика;</li>
+<li>CSAF/VEX feed;</li>
+<li>customer portal;</li>
+<li>release security package;</li>
+<li>SBOM-портал поставщика;</li>
+<li>пакет поставки для закрытого контура;</li>
+<li>ответ поставщика по контрактному запросу на уязвимость.</li>
+</ul>
+<p>Такой VEX имеет смысл только в отношении продукта поставщика и конкретных версий, которые он указал. Его нельзя автоматически переносить на ваш продукт, если вы встроили библиотеку иначе, пересобрали ее, изменили конфигурацию или поставляете другой состав.</p>
+<h3 id="если-вы-производитель-по">Если вы производитель ПО</h3>
+<p>Если организация сама выпускает продукт, VEX для этого продукта выдает сама организация. Внутри процесса это должно выглядеть так:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Ответственность в VEX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>РБПО / AppSec / Product Security</td>
+<td>организует triage, проверяет полноту evidence, ведет политику статусов, контролирует качество VEX</td>
+</tr>
+<tr>
+<td>PSIRT</td>
+<td>выпускает внешние advisories и VEX для клиентов, если продукт поставляется наружу</td>
+</tr>
+<tr>
+<td>Владелец продукта</td>
+<td>подтверждает scope продукта, версию, релиз, SLA и допустимость поставки</td>
+</tr>
+<tr>
+<td>Владелец компонента</td>
+<td>отвечает за техническое решение по конкретному компоненту</td>
+</tr>
+<tr>
+<td>Разработчик / архитектор</td>
+<td>доказывает, как компонент собран, вызывается, конфигурируется и доступен атакующему</td>
+</tr>
+<tr>
+<td>DevOps / release engineer</td>
+<td>подтверждает build evidence: артефакты, SBOM, контейнеры, хэши, pipeline</td>
+</tr>
+<tr>
+<td>Compliance / юрист</td>
+<td>подключается, если VEX связан с контрактными обязательствами, внешней поставкой или регуляторной отчетностью</td>
+</tr>
+</tbody>
+</table></div>
+<p>В зрелом процессе VEX подписывает или утверждает не "любой инженер", а назначенная роль. Для внутреннего VEX это может быть владелец компонента плюс AppSec reviewer. Для внешнего VEX это обычно PSIRT или Product Security от имени производителя.</p>
+<h3 id="если-речь-о-сторонней-библиотеке-внутри-вашего-продукта">Если речь о сторонней библиотеке внутри вашего продукта</h3>
+<p>Upstream-проект может выпустить свой advisory или VEX. Это полезный источник evidence, но не финальный ответ для вашего продукта.</p>
+<p>Причина простая: только ваша организация знает, как библиотека использована именно у вас.</p>
+<p>Например:</p>
+<ul>
+<li>библиотека есть в SBOM, но уязвимый модуль не собран;</li>
+<li>уязвимый код собран, но не вызывается;</li>
+<li>код вызывается только на доверенном локальном вводе;</li>
+<li>компонент входит только в build-time tooling и не поставляется клиенту;</li>
+<li>библиотека статически слинкована и уже не видна как отдельный файл;</li>
+<li>используется внутренний fork с backport-патчем;</li>
+<li>уязвимость проявляется только при опции, которая в продукте отключена;</li>
+<li>продукт поставляется в нескольких вариантах, и один вариант затронут, а другой нет.</li>
+</ul>
+<p>Поэтому upstream VEX можно приложить к triage-задаче, но финальный статус "наш продукт affected / not affected / fixed / under investigation" должен быть вашим.</p>
+<h2 id="откуда-фактически-берется-vex">Откуда фактически берется VEX</h2>
+<p>VEX берется из процесса анализа применимости уязвимости. Входом являются технические факты, а выходом является машиночитаемое утверждение.</p>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-22ba91fe9517-0.svg" rel="noopener" target="_blank"><img alt="Схема: VEX в процессе РБПО: откуда берется и как выпускать" loading="lazy" src="../assets/course-diagrams/course-22ba91fe9517-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<p>Упрощенно:</p>
+<ol>
+<li>SBOM/ППК говорит: компонент есть в продукте.</li>
+<li>SCA/VDR говорит: у компонента есть потенциальная уязвимость.</li>
+<li>Triage выясняет: относится ли эта уязвимость к продукту в реальной поставке.</li>
+<li>VEX фиксирует решение так, чтобы его могли прочитать люди и инструменты.</li>
+</ol>
+<h2 id="базовый-порядок-работы">Базовый порядок работы</h2>
+<h3 id="шаг-1-зафиксировать-finding-как-факт">Шаг 1. Зафиксировать finding как факт</h3>
+<p>Исходная запись должна быть максимально конкретной:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Что фиксировать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Продукт</td>
+<td>имя продукта, редакция, версия, build, platform</td>
+</tr>
+<tr>
+<td>Артефакт</td>
+<td>installer, container image digest, package, firmware, archive</td>
+</tr>
+<tr>
+<td>Компонент</td>
+<td>имя, версия, supplier, PURL/CPE/SWID, hash, путь в SBOM</td>
+</tr>
+<tr>
+<td>Уязвимость</td>
+<td>CVE/GHSA/OSV/БДУ, источник, severity, CVSS, EPSS, KEV при наличии</td>
+</tr>
+<tr>
+<td>Источник факта</td>
+<td>сканер, база, дата базы, команда запуска, ссылка на отчет</td>
+</tr>
+</tbody>
+</table></div>
+<p>На этом этапе еще нет VEX. Есть только факт, что потенциально затронутый компонент найден.</p>
+<h3 id="шаг-2-завести-triage-задачу">Шаг 2. Завести triage-задачу</h3>
+<p>Triage-задача должна иметь владельца и срок. Минимальные поля:</p>
+<ul>
+<li>идентификатор finding;</li>
+<li>продукт и версия;</li>
+<li>компонент и версия;</li>
+<li>уязвимость;</li>
+<li>владелец компонента;</li>
+<li>ответственный от РБПО/AppSec;</li>
+<li>deadline по SLA;</li>
+<li>текущий статус расследования;</li>
+<li>ссылки на SBOM, VDR, build logs, advisory, issue.</li>
+</ul>
+<p>Для критичных CVE, KEV, remote code execution, internet-facing компонентов и криптографических библиотек срок triage должен быть коротким. <code>under_investigation</code> не должен жить неделями без владельца и временных мер.</p>
+<h3 id="шаг-3-проверить-применимость-к-продукту">Шаг 3. Проверить применимость к продукту</h3>
+<p>Ключевые вопросы для разработчика и security reviewer:</p>
+<ol>
+<li>Компонент действительно входит в поставку или только присутствует в репозитории?</li>
+<li>Версия компонента действительно попадает в affected range?</li>
+<li>Идентификаторы сопоставлены корректно: PURL/CPE/name/version не дали ложного совпадения?</li>
+<li>Уязвимый файл, функция, класс или модуль реально присутствует в сборке?</li>
+<li>Уязвимый код достижим из runtime-пути продукта?</li>
+<li>Может ли атакующий контролировать данные, которые попадают в уязвимый код?</li>
+<li>Нужна ли специфическая конфигурация, окружение, feature flag, plugin, protocol или build option?</li>
+<li>Есть ли runtime, perimeter, compiler или configuration mitigation?</li>
+<li>Уязвимость уже исправлена patch/backport/fork-изменением?</li>
+<li>Все ли варианты поставки проверены: Windows/Linux, debug/release, plugin edition, container, offline installer?</li>
+</ol>
+<p>Для C/C++ этот шаг особенно важен: наличие библиотеки в исходном дереве не означает наличие уязвимого кода в поставочном бинарнике, а отсутствие видимого package manifest не означает отсутствие компонента.</p>
+<h3 id="шаг-4-выбрать-статус">Шаг 4. Выбрать статус</h3>
+<p>На уровне общей VEX-модели обычно используют четыре статуса.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Статус</th>
+<th>Смысл</th>
+<th>Что должно быть в evidence</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>affected</code></td>
+<td>продукт затронут, нужны действия</td>
+<td>affected component, exploitability context, план исправления или mitigation, SLA</td>
+</tr>
+<tr>
+<td><code>not_affected</code></td>
+<td>компонент или CVE есть в данных, но продукт не затронут</td>
+<td>обязательное justification, техническое доказательство, reviewer, срок пересмотра</td>
+</tr>
+<tr>
+<td><code>fixed</code></td>
+<td>продуктовая версия содержит исправление</td>
+<td>commit/patch, новая версия, новый SBOM, retest, скан после исправления</td>
+</tr>
+<tr>
+<td><code>under_investigation</code></td>
+<td>применимость еще неизвестна</td>
+<td>владелец, deadline, временные меры, дата следующего обновления</td>
+</tr>
+</tbody>
+</table></div>
+<p>Важно: разные форматы называют эти статусы немного по-разному. OpenVEX использует <code>affected</code>, <code>not_affected</code>, <code>fixed</code>, <code>under_investigation</code>. CSAF VEX использует поля product status вроде <code>known_affected</code>, <code>known_not_affected</code>, <code>fixed</code>, <code>under_investigation</code>. CycloneDX хранит анализ в блоке <code>vulnerabilities[].analysis</code>, где используются свои значения <code>state</code>, <code>justification</code>, <code>response</code>, <code>detail</code>. Методически это одна задача: выразить применимость уязвимости к продукту.</p>
+<h3 id="шаг-5-обосновать-not_affected">Шаг 5. Обосновать <code>not_affected</code></h3>
+<p><code>not_affected</code> является самым полезным и самым опасным статусом. Он снижает шум, но при ошибке маскирует реальную уязвимость.</p>
+<p>Типовые обоснования:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Обоснование</th>
+<th>Когда допустимо</th>
+<th>Что приложить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>компонент не присутствует</td>
+<td>сканер ошибочно сопоставил пакет или компонент есть в исходниках, но не в поставке</td>
+<td>SBOM поставки, build manifest, artifact inventory</td>
+</tr>
+<tr>
+<td>уязвимый код отсутствует</td>
+<td>компонент есть, но уязвимый файл/функция удалены, отключены патчем или не входят в build target</td>
+<td>diff, patch, build config, binary evidence</td>
+</tr>
+<tr>
+<td>уязвимый код не находится в execute path</td>
+<td>код есть, но из продукта не вызывается</td>
+<td>call graph, статический анализ, тест, архитектурное объяснение</td>
+</tr>
+<tr>
+<td>атакующий не может контролировать вход</td>
+<td>код вызывается только на доверенных данных или локальном admin-only сценарии</td>
+<td>data-flow analysis, threat model, access control evidence</td>
+</tr>
+<tr>
+<td>уже есть inline mitigation</td>
+<td>эксплуатация предотвращена встроенной проверкой, настройкой, sandbox, compiler/runtime/perimeter control</td>
+<td>конфигурация, test, hardening evidence, ссылку на контроль</td>
+</tr>
+</tbody>
+</table></div>
+<p>Свободная фраза "не используется" недостаточна. Нужно указать, почему именно не используется, кем проверено, на какой версии продукта, каким способом и до какого изменения это решение считается действующим.</p>
+<h3 id="шаг-6-оформить-vex-документ">Шаг 6. Оформить VEX-документ</h3>
+<p>Минимально VEX должен содержать:</p>
+<ul>
+<li>метаданные документа: идентификатор, версия, автор/issuer, дата выпуска, дата обновления;</li>
+<li>statement: уязвимость, продукт, статус, обоснование или действие;</li>
+<li>идентификаторы продукта и компонента: PURL, CPE, SWID, internal product id, hashes, BOM reference;</li>
+<li>scope: к каким версиям, платформам, редакциям и build variants относится утверждение;</li>
+<li>evidence references: ссылки на SBOM, VDR, issue, test, build log, commit, advisory;</li>
+<li>срок пересмотра или условие пересмотра, особенно для <code>not_affected</code> и <code>under_investigation</code>.</li>
+</ul>
+<h2 id="где-хранить-и-где-публиковать-vex">Где хранить и где публиковать VEX</h2>
+<h3 id="внутри-организации">Внутри организации</h3>
+<p>Внутренний VEX должен жить рядом с артефактами, на основании которых он принят:</p>
+<ul>
+<li>release folder;</li>
+<li>SBOM/ППК registry;</li>
+<li>vulnerability management system;</li>
+<li>Dependency-Track или аналог;</li>
+<li>issue tracker;</li>
+<li>CI/CD artifacts;</li>
+<li>репозиторий security advisories;</li>
+<li>хранилище evidence для аудита.</li>
+</ul>
+<p>Хорошая практика: не хранить VEX отдельно от версии продукта. VEX должен быть связан с релизом, SBOM/ППК и конкретным finding.</p>
+<p>Пример структуры:</p>
+<pre><code class="language-text">release-security/
+  product-x/
+    2.4.1/
+      sbom/
+        product-x-2.4.1.cdx.json
+        product-x-2.4.1.ppk.json
+      vdr/
+        product-x-2.4.1-vdr.cdx.json
+      vex/
+        product-x-2.4.1.openvex.json
+        CVE-2026-0001.triage.md
+      evidence/
+        build-log.txt
+        reachability-report.html
+        retest-after-fix.txt
+</code></pre>
+<h3 id="для-внешних-потребителей">Для внешних потребителей</h3>
+<p>Если продукт поставляется клиентам, VEX может передаваться:</p>
+<ul>
+<li>в составе release security package;</li>
+<li>через customer portal;</li>
+<li>как CSAF/VEX feed;</li>
+<li>как отдельный OpenVEX JSON;</li>
+<li>как CycloneDX BOM с VEX analysis;</li>
+<li>как приложение к security advisory;</li>
+<li>через контрактный канал ответа на запрос клиента.</li>
+</ul>
+<p>Для внешнего VEX желательно использовать подпись, контрольную сумму и стабильный URL. Клиент должен понимать, что документ выпущен именно производителем, относится к конкретной версии продукта и не был изменен.</p>
+<h2 id="как-выбрать-формат">Как выбрать формат</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Формат</th>
+<th>Когда выбирать</th>
+<th>Сильные стороны</th>
+<th>Ограничения</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CycloneDX VEX</td>
+<td>если основной SBOM уже CycloneDX и VEX удобно хранить рядом с BOM/VDR</td>
+<td>хорошо связывает компоненты, vulnerabilities и analysis; удобен для Dependency-Track и SBOM-процессов</td>
+<td>значения статусов отличаются от OpenVEX/CSAF; нужен аккуратный mapping</td>
+</tr>
+<tr>
+<td>OpenVEX</td>
+<td>если нужен компактный JSON для CI/CD, локального triage и фильтрации findings</td>
+<td>простой, формат-агностичный, удобен для сканеров и pipeline</td>
+<td>не заменяет полноценный security advisory</td>
+</tr>
+<tr>
+<td>CSAF VEX</td>
+<td>если нужно публиковать advisories для клиентов, многих продуктов и версий</td>
+<td>стандартный формат security advisory, подходит для внешних feed и PSIRT-процессов</td>
+<td>тяжелее в подготовке, требует дисциплины product tree и product_status</td>
+</tr>
+</tbody>
+</table></div>
+<p>Практический выбор для курса SCA/OSA:</p>
+<ul>
+<li>для внутреннего обучения triage: OpenVEX;</li>
+<li>для CycloneDX-first контура: CycloneDX VEX/VDR;</li>
+<li>для внешнего производителя с PSIRT и клиентским feed: CSAF VEX;</li>
+<li>для регуляторного или контрактного пакета: SBOM/ППК плюс VEX, связанный с release evidence.</li>
+</ul>
+<h2 id="пример-cc-продукт-и-уязвимость-в-zlib">Пример: C/C++ продукт и уязвимость в zlib</h2>
+<p>Сценарий:</p>
+<ul>
+<li>продукт: <code>Product X 2.4.1</code>;</li>
+<li>компонент: <code>zlib 1.2.11</code>;</li>
+<li>SCA нашел CVE по версии zlib;</li>
+<li>библиотека присутствует в SBOM, потому что статически слинкована в один из модулей.</li>
+</ul>
+<p>Плохая реакция:</p>
+<blockquote>
+<p>"Сканер нашел High, но разработчик сказал, что не используется. Поставим not_affected."</p>
+</blockquote>
+<p>Это не VEX. Это неформальное мнение без evidence.</p>
+<p>Правильный triage:</p>
+<ol>
+<li>Проверить affected range CVE и источник advisory.</li>
+<li>Сопоставить компонент из SBOM с фактической библиотекой в build: версия, hash, fork/patch.</li>
+<li>Проверить, включен ли уязвимый файл/функция в сборку.</li>
+<li>Проверить, вызывается ли этот код из runtime-пути продукта.</li>
+<li>Проверить, может ли внешний пользователь или атакующий передать данные в этот путь.</li>
+<li>Проверить отличия по сборкам: CLI, GUI, server, plugin, Windows/Linux.</li>
+<li>Зафиксировать evidence: build log, linker map, symbols, call graph, тест, issue.</li>
+<li>Выбрать статус:
+   - если код достижим и вход контролируем атакующим: <code>affected</code>;
+   - если код не собран: <code>not_affected</code>;
+   - если код собран, но не достижим: <code>not_affected</code>;
+   - если обновили zlib или применили backport: <code>fixed</code>;
+   - если анализа пока нет: <code>under_investigation</code>.</li>
+</ol>
+<p>Пример OpenVEX-утверждения:</p>
+<pre><code class="language-json">{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "https://security.example.local/vex/product-x/2.4.1/CVE-2026-0001",
+  "author": "Product Security / Example Organization",
+  "timestamp": "2026-06-18T10:00:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2026-0001"
+      },
+      "products": [
+        {
+          "@id": "pkg:generic/example/product-x@2.4.1",
+          "subcomponents": [
+            {
+              "@id": "pkg:generic/zlib@1.2.11"
+            }
+          ]
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_in_execute_path",
+      "impact_statement": "zlib is statically linked, but the vulnerable decompression path is not reachable from Product X runtime interfaces in release build 2.4.1. Evidence: TRIAGE-2026-014, build log 2026-06-18, reachability report RA-2026-014."
+    }
+  ]
+}
+</code></pre>
+<p>Такой пример все равно должен пройти внутреннюю проверку: совпадают ли PURL/идентификаторы с SBOM, достаточно ли evidence, есть ли reviewer, не истек ли срок пересмотра.</p>
+<h2 id="минимальный-шаблон-triage-записи">Минимальный шаблон triage-записи</h2>
+<pre><code class="language-markdown"># VEX triage: CVE-YYYY-NNNN / Product X 2.4.1
+
+## Finding
+- Product:
+- Release / build:
+- Artifact:
+- SBOM / PPK:
+- Component:
+- Component identifiers: PURL / CPE / hash:
+- Vulnerability:
+- Source: NVD / BDU / OSV / GHSA / vendor advisory:
+- Scanner:
+
+## Analysis
+- Component present in delivered artifact: yes/no
+- Vulnerable version range matched: yes/no
+- Vulnerable code present in build: yes/no/unknown
+- Vulnerable code reachable: yes/no/unknown
+- Attacker-controlled input possible: yes/no/unknown
+- Required configuration/environment:
+- Mitigations:
+- Affected build variants:
+
+## Decision
+- VEX status: affected / not_affected / fixed / under_investigation
+- Justification:
+- Action statement:
+- Owner:
+- Reviewer:
+- Decision date:
+- Expiry / review trigger:
+
+## Evidence
+- SBOM / PPK:
+- Build log:
+- Reachability report:
+- Test:
+- Commit / patch:
+- Advisory:
+- Issue:
+</code></pre>
+<h2 id="что-должно-блокировать-выпуск-vex">Что должно блокировать выпуск VEX</h2>
+<p>VEX нельзя выпускать или применять автоматически, если:</p>
+<ul>
+<li>нет конкретной версии продукта;</li>
+<li>нет связи с SBOM/ППК или фактическим артефактом поставки;</li>
+<li><code>not_affected</code> указан без justification;</li>
+<li>justification написан свободным текстом там, где формат требует enum;</li>
+<li>не указан affected component или subcomponent;</li>
+<li>PURL/CPE не совпадает с исходным finding;</li>
+<li>нет владельца решения;</li>
+<li><code>under_investigation</code> не имеет срока;</li>
+<li>решение принято для одной сборки, а применяется ко всем редакциям продукта;</li>
+<li>уязвимость входит в KEV или имеет признаки активной эксплуатации, но анализ ограничился формальной отпиской;</li>
+<li>evidence невозможно повторно проверить.</li>
+</ul>
+<h2 id="как-встроить-vex-в-рбпо-процесс">Как встроить VEX в РБПО-процесс</h2>
+<h3 id="policy-gate">Policy gate</h3>
+<p>Quality/security gate должен различать три состояния:</p>
+<ol>
+<li>Finding без VEX: уязвимость требует triage.</li>
+<li>Finding с <code>affected</code>: сборка блокируется или требует утвержденного mitigation/remediation plan.</li>
+<li>Finding с корректным <code>not_affected</code> или <code>fixed</code>: сборка может проходить, если evidence актуально.</li>
+</ol>
+<p>Нельзя настраивать gate так, чтобы любой VEX автоматически гасил любую уязвимость. Gate должен проверять:</p>
+<ul>
+<li>статус;</li>
+<li>срок действия;</li>
+<li>идентификатор продукта;</li>
+<li>идентификатор компонента;</li>
+<li>совпадение с SBOM;</li>
+<li>наличие justification;</li>
+<li>подпись или доверенный источник VEX;</li>
+<li>правило для KEV/critical findings.</li>
+</ul>
+<h3 id="связь-с-sbomппк">Связь с SBOM/ППК</h3>
+<p>SBOM/ППК является фактической основой VEX. Если меняется состав продукта, VEX нужно пересматривать. Триггеры пересмотра:</p>
+<ul>
+<li>новая версия продукта;</li>
+<li>изменение версии компонента;</li>
+<li>изменение способа линковки;</li>
+<li>изменение build flags;</li>
+<li>добавление plugin/feature;</li>
+<li>переход на другой контейнерный base image;</li>
+<li>новый advisory по той же CVE;</li>
+<li>изменение affected range;</li>
+<li>появление CVE в KEV;</li>
+<li>обнаружение false positive в исходном сопоставлении.</li>
+</ul>
+<h3 id="связь-с-исключениями-и-принятием-риска">Связь с исключениями и принятием риска</h3>
+<p>VEX не равен risk acceptance.</p>
+<p>Если статус <code>not_affected</code>, организация утверждает: "эта уязвимость не влияет на продукт в данном контексте". Это техническое утверждение.</p>
+<p>Если статус <code>affected</code>, но релиз все равно разрешают, это уже risk acceptance или exception. Такой документ должен иметь отдельного владельца риска, срок, компенсирующие меры и управленческое утверждение.</p>
+<h2 id="нормативная-и-методическая-привязка">Нормативная и методическая привязка</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Источник</th>
+<th>Как связан с VEX</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ГОСТ Р 56939-2024</td>
+<td>требует управляемости процессов РБПО, анализа заимствованных компонентов, уязвимостей и доказательной базы по решениям</td>
+</tr>
+<tr>
+<td>NIST SSDF SP 800-218</td>
+<td>поддерживает практики выявления, оценки и реагирования на уязвимости в ПО</td>
+</tr>
+<tr>
+<td>ISO/IEC 27001</td>
+<td>требует управляемого процесса безопасности, контроля поставщиков, управления уязвимостями и документируемой evidence</td>
+</tr>
+<tr>
+<td>ISO/IEC 27034</td>
+<td>связывает application security controls с жизненным циклом приложений</td>
+</tr>
+<tr>
+<td>CISA VEX guidance</td>
+<td>задает минимальные элементы VEX-документа и подход к status justification</td>
+</tr>
+<tr>
+<td>CycloneDX</td>
+<td>дает модель BOM/VDR/VEX, где vulnerabilities могут содержать analysis</td>
+</tr>
+<tr>
+<td>CSAF 2.0</td>
+<td>дает формат security advisory и VEX profile для внешнего обмена</td>
+</tr>
+<tr>
+<td>OpenVEX</td>
+<td>дает компактный JSON-LD формат для VEX statements</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="контрольный-чек-лист-для-рбпо">Контрольный чек-лист для РБПО</h2>
+<ul>
+<li>[ ] У продукта есть SBOM/ППК для конкретной версии и build.</li>
+<li>[ ] Уязвимость заведена как VDR/finding, а не сразу как VEX.</li>
+<li>[ ] Для finding назначен владелец компонента.</li>
+<li>[ ] Проверено, что component identity корректен: PURL/CPE/version/hash.</li>
+<li>[ ] Проверен affected range advisory.</li>
+<li>[ ] Проверено присутствие уязвимого кода в поставке.</li>
+<li>[ ] Проверена reachability и возможность attacker-controlled input.</li>
+<li>[ ] Проверены build variants и способы линковки.</li>
+<li>[ ] Для <code>not_affected</code> есть машинно-читаемое justification и человекочитаемое detail/impact statement.</li>
+<li>[ ] Для <code>affected</code> есть remediation или mitigation plan.</li>
+<li>[ ] Для <code>fixed</code> есть новый SBOM, commit/patch и retest.</li>
+<li>[ ] Для <code>under_investigation</code> есть deadline и временные меры.</li>
+<li>[ ] VEX связан с SBOM/ППК, VDR, issue и evidence.</li>
+<li>[ ] VEX подписан или хранится в доверенном контуре.</li>
+<li>[ ] Gate применяет VEX только при совпадении продукта, версии и компонента.</li>
+<li>[ ] Просроченные VEX-решения автоматически возвращаются в triage.</li>
+</ul>
+<h2 id="короткая-формула-для-команды">Короткая формула для команды</h2>
+<p>VDR отвечает: "У нас есть потенциальная уязвимость в составе".</p>
+<p>VEX отвечает: "Мы как производитель продукта проверили применимость этой уязвимости к конкретной версии продукта и заявляем статус с обоснованием".</p>
+<p>Если нет автора, версии продукта, статуса, justification и evidence, это еще не VEX.</p>
+<h2 id="источники">Источники</h2>
+<ul>
+<li><a href="https://www.cisa.gov/resources-tools/resources/minimum-requirements-vulnerability-exploitability-exchange-vex" rel="noopener noreferrer" target="_blank">CISA, Minimum Requirements for Vulnerability Exploitability eXchange (VEX)</a></li>
+<li><a href="https://www.cisa.gov/resources-tools/resources/vulnerability-exploitability-exchange-vex-status-justification-document-june-2022" rel="noopener noreferrer" target="_blank">CISA, Vulnerability Exploitability eXchange (VEX) Status Justification Document</a></li>
+<li><a href="https://cyclonedx.org/capabilities/vex/" rel="noopener noreferrer" target="_blank">CycloneDX, Vulnerability Exploitability eXchange (VEX)</a></li>
+<li><a href="https://cyclonedx.org/use-cases/vulnerability-exploitability/" rel="noopener noreferrer" target="_blank">CycloneDX, Security Use Case: Vulnerability Exploitability</a></li>
+<li><a href="https://cyclonedx.org/capabilities/vdr/" rel="noopener noreferrer" target="_blank">CycloneDX, Vulnerability Disclosure Report (VDR)</a></li>
+<li><a href="https://docs.oasis-open.org/csaf/csaf/v2.0/os/csaf-v2.0-os.html" rel="noopener noreferrer" target="_blank">OASIS, Common Security Advisory Framework Version 2.0</a></li>
+<li><a href="https://github.com/openvex/spec/blob/main/OPENVEX-SPEC.md" rel="noopener noreferrer" target="_blank">OpenVEX Specification</a></li>
+<li><a href="https://www.first.org/standards/frameworks/psirts/Consolidated-SBOM-VEX-Operational-Framework.pdf" rel="noopener noreferrer" target="_blank">FIRST, Consolidated SBOM and CSAF/VEX Operational Framework</a></li>
+<li><a href="https://csrc.nist.gov/pubs/sp/800/218/final" rel="noopener noreferrer" target="_blank">NIST SP 800-218, Secure Software Development Framework (SSDF)</a></li>
+<li>ГОСТ Р 56939-2024 — Разработка безопасного программного обеспечения. Общие требования (официальный текст — через Росстандарт или ФСТЭК)</li>
+</ul>
+<h2 id="связанные-материалы-курса">Связанные материалы курса</h2>
+<p><a href="doc-8879ae4dc3da.html">Оглавление справочника</a> · <a href="doc-cd2bdeca5d64.html">М06. Поиск уязвимостей и управление VDR/VEX</a> · <a href="doc-778f51173f56.html">М13. Нормативная трассировка</a> · <a href="doc-e751028addc3.html">VEX</a> · <a href="doc-fa46b45b5c93.html">VDR</a> · <a href="doc-aeee0112a6a0.html">SBOM</a> · <a href="doc-64ac549e4034.html">ППК</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a> · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-36b66b831249.html">CSAF</a> · <a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-620bbc0766f4.html">Порядок загрузки VDR из Dependency-Track</a> · <a href="doc-51fdcb300d4b.html">Паспорт риска компонента</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

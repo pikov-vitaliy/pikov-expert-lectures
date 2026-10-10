@@ -1,0 +1,48 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>secure compiler flags — КАПО · Пиков</title><meta name="description" content="secure compiler flags. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-2108962f12f7.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="secure-compiler-flags">secure compiler flags</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p>SCA отвечает на вопрос «какие компоненты внутри», но не на вопрос «как защищён сам бинарь». Флаги защитной компиляции (hardening) — это отдельный пласт: они не меняют список зависимостей, зато оставляют в готовом ELF проверяемые следы того, что код собран по требованиям РБПО. Ценность для аудита в том, что эти следы читаются прямо из поставленного артефакта, без доверия словам поставщика: включён ли стек-канарей, есть ли FORTIFY, собран ли бинарь как PIE с полным RELRO. Поэтому в досье поставки hardening стоит рядом с SBOM — это доказательство свойств самого артефакта, а не его состава.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Hardening не «детектируется как зависимость» — он верифицируется по самому бинарю. Аудитор не верит build-логу, а читает секции ELF.</p>
+<pre><code class="language-bash"># одной командой — сводка защит
+checksec --file=./myapp
+#   RELRO   STACK CANARY  NX   PIE   FORTIFY
+#   Full    Canary found  NX   PIE   Yes
+
+# вручную тем же readelf:
+readelf -d ./myapp | grep -E 'BIND_NOW|FLAGS'     # Full RELRO: BIND_NOW + GNU_RELRO
+readelf -h ./myapp | grep Type                     # Type: DYN  -&gt; PIE
+nm ./myapp | grep __stack_chk_fail                 # есть -&gt; -fstack-protector
+nm ./myapp | grep _chk                             # *_chk -&gt; -D_FORTIFY_SOURCE
+</code></pre>
+<p>Соответствующие флаги сборки: <code>-fstack-protector-strong</code>, <code>-D_FORTIFY_SOURCE=2</code> (или <code>=3</code>) с <code>-O2</code>, <code>-fPIE -pie</code>, <code>-Wl,-z,relro,-z,now</code>, <code>-Wl,-z,noexecstack</code>. Если в бинаре <code>No RELRO</code>, <code>No canary</code>, <code>No PIE</code> — сборка не прошла hardening, и это видно из артефакта.</p>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<blockquote>
+<p>Свойство артефакта, а не состава
+SBOM может быть идеальным, а бинарь — собран без единой защиты. Hardening и состав компонентов измеряются независимо: пройденный SCA ничего не говорит о RELRO/PIE, и наоборот. Проверять нужно оба, иначе досье поставки неполное.</p>
+</blockquote>
+<p>Слепая зона: вендор присылает «безопасную» библиотеку, но <code>.a</code>/<code>.so</code> собраны без <code>-fstack-protector</code>/FORTIFY. Защита не наследуется автоматически — её надо проверять в каждом поставленном бинаре, а не только в своём коде.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Сделать <code>checksec</code>/<code>readelf</code>-проверку hardening обязательной приёмочной операцией над каждым поставляемым ELF.</li>
+<li>Зафиксировать целевой профиль флагов (<code>-fstack-protector-strong</code>, <code>-D_FORTIFY_SOURCE=2/3</code>, <code>-fPIE -pie</code>, Full RELRO, noexecstack) и сверять артефакт с ним.</li>
+<li>Отдельно проверять hardening в бинарях от соисполнителей — их сборка вне вашего контроля.</li>
+<li>Различать «не включено» и «не применимо» (например, FORTIFY требует <code>-O1+</code>); фиксировать обоснование отклонений.</li>
+<li>Класть результат проверки в evidence-досье рядом с SBOM как доказательство свойств артефакта.</li>
+<li>Не путать с проверкой исходного кода: канарей и RELRO ловят последствия ошибок, но не заменяют статический анализ и инвентаризацию компонентов.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy без дисциплины пакетного менеджера</a>.</li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a>, <a href="doc-00d2962ed78f.html">П40. Огнестойкость РБПО и SCA процесс</a>.</li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>, <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a>.</li>
+<li>Смежные заметки: <a href="doc-3cefc67b2b95.html">sanitizers in CI</a>, <a href="doc-afe63a32f59f.html">CERT MISRA рядом с SCA</a>, <a href="doc-44ca67214176.html">stripped binaries</a>, <a href="doc-c74d93ffd65c.html">debug symbols как evidence</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

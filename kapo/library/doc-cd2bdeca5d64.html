@@ -1,0 +1,46 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М06. М06. Поиск уязвимостей и управление VDR/VEX — КАПО · Пиков</title><meta name="description" content="М06. М06. Поиск уязвимостей и управление VDR/VEX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-cd2bdeca5d64.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-этот-модуль">Зачем этот модуль</a></li>
+<li><a href="#карта-связей">Карта связей</a></li>
+<li><a href="#материалы-модуля">Материалы модуля</a></li>
+<li><a href="#связь-с-другими-модулями">Связь с другими модулями</a></li>
+<li><a href="#практики-модуля">Практики модуля</a></li>
+<li><a href="#нормативная-опора">Нормативная опора</a></li>
+<li><a href="#шаблоны">Шаблоны</a></li>
+</ul>
+</div>
+<h1 id="м06-поиск-уязвимостей-и-управление-vdrvex">М06. Поиск уязвимостей и управление VDR/VEX</h1>
+<blockquote>
+<p>О чём модуль
+Готовый SBOM сам по себе не содержит ни одной уязвимости — он описывает только состав. Уязвимости появляются в момент сопоставления координат компонента (PURL/CPE/версия) с базами CVE. Этот модуль учит превращать SBOM в управляемый поток находок: получить <strong>VDR</strong> (список фактов «такая-то CVE затрагивает такой-то компонент»), а затем для каждой находки принять <strong>VEX</strong>-решение (затронут продукт реально или нет, кто как производитель это утверждает и чем подтверждает).</p>
+</blockquote>
+<h2 id="зачем-этот-модуль">Зачем этот модуль</h2>
+<p>Между «сканер нашёл 142 CVE» и «нам нужно срочно патчить» лежит триаж. Без него команда либо тонет в шуме (большинство находок не эксплуатируемы в данном контексте), либо пропускает реальный риск. Модуль разделяет два артефакта, которые на проектах часто путают:</p>
+<ul>
+<li><strong>VDR (Vulnerability Disclosure Report)</strong> — машинный <em>факт</em>: компонент X версии Y связан с CVE-Z. Источник — сканер.</li>
+<li><strong>VEX (Vulnerability Exploitability eXchange)</strong> — человеческое <em>решение</em> о применимости: <code>not_affected</code> / <code>affected</code> / <code>fixed</code> / <code>under_investigation</code>, с обоснованием, владельцем и сроком.</li>
+</ul>
+<h2 id="карта-связей">Карта связей</h2>
+<figure class="diagram-original"><a href="../assets/course-diagrams/course-cd2bdeca5d64-0.svg" rel="noopener" target="_blank"><img alt="Схема: М06. М06. Поиск уязвимостей и управление VDR/VEX" loading="lazy" src="../assets/course-diagrams/course-cd2bdeca5d64-0.svg"/></a><figcaption>Схема из авторского курса. Нажмите, чтобы открыть в полном размере.</figcaption></figure>
+<h2 id="материалы-модуля">Материалы модуля</h2>
+<ul>
+<li><a href="doc-9fb248a3c6f2.html">01 Конспект</a> — теория: сканеры, VDR vs VEX, состояния, источники, SLA.</li>
+<li><a href="doc-77012f6d9ba9.html">02 План занятия</a> — тайминг занятия на 90 минут.</li>
+<li><a href="doc-eed1954f9e9f.html">03 Практическая работа</a> — Grype + OSV-Scanner + Dependency-Track, оформление VEX.</li>
+<li><a href="doc-39bfed3f2b66.html">04 Контрольные вопросы</a> — проверка понимания + кейсы.</li>
+<li><a href="doc-d166e40c5995.html">05 Что проверять на проекте</a> — чек-лист аудитора.</li>
+<li><a href="doc-22ba91fe9517.html">VEX в процессе РБПО: откуда берется и как выпускать</a> — обязательная справка: кто выдает VEX, как проходит triage, какие evidence нужны и где хранить VEX.</li>
+</ul>
+<h2 id="связь-с-другими-модулями">Связь с другими модулями</h2>
+<ul>
+<li><a href="doc-4a0b7bceee7b.html">М04. Идентификаторы</a> — без качественных PURL/CPE сопоставление с CVE не работает (это вход для М06).</li>
+<li><a href="doc-1bca905af1a7.html">М05. Генерация SBOM</a> — SBOM, который мы здесь сканируем, приходит из М05.</li>
+<li><a href="doc-0c23b1ba214a.html">М08. Цепочка поставки и OSA</a> — VEX-обмен с соисполнителями.</li>
+</ul>
+<h2 id="практики-модуля">Практики модуля</h2>
+<p><a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-4ce78beb1257.html">П07. OSV-Scanner и lockfiles</a> · <a href="doc-ebb5b655a8d2.html">П08. Dependency-Track как портфель SBOM</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-3138be8ff1ad.html">П10. БДУ ФСТЭК как национальный источник</a> · <a href="doc-c01924770ece.html">П35. VEX triage</a></p>
+<p>Перед <a href="doc-8e64f240b13c.html">П09</a> слушатель читает <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>, чтобы отличать VEX как утверждение производителя от внешнего vulnerability feed. Перед <a href="doc-c01924770ece.html">П35</a> та же справка используется как критерий качества evidence.</p>
+<h2 id="нормативная-опора">Нормативная опора</h2>
+<p><a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (RV.1/RV.2) · <a href="doc-9c5bd2624d9f.html">БДУ ФСТЭК</a> · <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a> (VEX-расширение) · <a href="doc-47ec0c98fe05.html">OWASP SCVS</a></p>
+<h2 id="шаблоны">Шаблоны</h2>
+<p><a href="doc-597170ba5049.html">Политика управления уязвимостями компонентов</a> · <a href="doc-620bbc0766f4.html">Порядок загрузки VDR из Dependency-Track</a> · <a href="doc-b26fb417c703.html">Регламент ретеста после исправления</a> · <a href="doc-c74101c1bf88.html">Порядок обновления БДУ</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

@@ -1,0 +1,104 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>П28. Поставка от нескольких исполнителей — КАПО · Пиков</title><meta name="description" content="П28. Поставка от нескольких исполнителей. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-fd2abd912efa.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>03 Практикум</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#команда-или-действие">Команда или действие</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="п28-поставка-от-нескольких-исполнителей">П28. Поставка от нескольких исполнителей</h1>
+<p>Корпоративное изделие Организации собирается из подсистем 5–10 соисполнителей. Источник факта о составе подсистемы — не ваш пайплайн, а ZIP-поставка внешней команды. Эта практика — про приёмку такой поставки: проверить, что ZIP содержит всё нужное, и измерить пригодность данных, а не предположить её.</p>
+<h2 id="цель">Цель</h2>
+<p>По одной ZIP-поставке соисполнителя получить <strong>проверяемый вердикт приёмки</strong>: ZIP структурно полон (есть <code>bom.json</code>, build-логи, список <code>unresolved</code>) и SBOM достаточен по качеству координат. Конкретно — посчитать три числа покрытия (всего компонентов, без PURL, с распознанной лицензией) и принять одно из трёх решений: «принято» / «принято с замечаниями» / «вернуть worklist».</p>
+<h2 id="команда-или-действие">Команда или действие</h2>
+<p>Поставку забирают из артефакт-репозитория по иммутабельным координатам (имя:версия), а не из почты. Дальше — два шага: проверка структуры ZIP и измерение покрытия по обогащённому <code>bom.json</code>.</p>
+<pre><code class="language-bash"># 1. Структура поставки: что реально лежит в ZIP
+unzip -l contractor-A.zip
+#   ожидаем как минимум: bom.json, build/*.log, unresolved.json
+
+# 2. Распаковать и обогатить сырой SBOM через генератор фактов (enrichment-утилита)
+unzip contractor-A.zip -d contractor-A/
+enrich-sbom contractor-A/bom.json enriched/A-bom.json --component-path subsystem-A
+
+# 3. Измерить покрытие обогащённого SBOM (jq поверх CycloneDX)
+BOM=enriched/A-bom.json
+echo "всего компонентов : $(jq '.components | length' "$BOM")"
+echo "без PURL          : $(jq '[.components[] | select(.purl == null)] | length' "$BOM")"
+echo "с лицензией       : $(jq '[.components[] | select(.licenses != null and (.licenses | length &gt; 0))] | length' "$BOM")"
+
+# 4. Список нераспознанного — это worklist соисполнителю
+jq -r '.components[] | select(.purl == null) | .name' "$BOM" | sort -u
+</code></pre>
+<blockquote>
+<p>Почему ZIP, а не один <code>bom.json</code>
+Для C/C++ legacy состав не выводится из манифеста — нужен build evidence (что реально слинковалось) и явный перечень того, что инструмент <strong>не</strong> распознал. Один <code>bom.json</code> без логов и <code>unresolved.json</code> не доказывает полноту состава, поэтому приёмке подлежит вся поставка, а не файл SBOM.</p>
+</blockquote>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<p>Шаг 1 — поставка структурно полна (присутствуют три обязательных артефакта):</p>
+<pre><code>Archive:  contractor-A.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+   184320  2026-06-15 11:02   bom.json
+    51200  2026-06-15 11:02   build/link.log
+      980  2026-06-15 11:02   unresolved.json
+</code></pre>
+<p>Шаг 3 — три числа покрытия. Ориентир «хорошей» поставки (подсистема A из карты модуля М10): ~142 компонента, без PURL — единицы, лицензии распознаны:</p>
+<pre><code>всего компонентов : 142
+без PURL          : 3
+с лицензией       : 139
+</code></pre>
+<p>Сводка по партии соисполнителей — основа вердикта. PURL coverage = (всего − без PURL) / всего:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Соисполнитель</th>
+<th>Компонентов</th>
+<th>PURL coverage</th>
+<th>unresolved</th>
+<th>Вердикт</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>142</td>
+<td>96%</td>
+<td>3</td>
+<td>принято</td>
+</tr>
+<tr>
+<td>B</td>
+<td>88</td>
+<td>61%</td>
+<td>27</td>
+<td>вернуть worklist</td>
+</tr>
+<tr>
+<td>N</td>
+<td>210</td>
+<td>89%</td>
+<td>11</td>
+<td>принято с замечаниями</td>
+</tr>
+</tbody>
+</table></div>
+<p>Строка B — «технически валидный SBOM»: файл есть, но 27 компонентов без идентификаторов, поэтому состав подсистемы <strong>не считается известным</strong> до доразметки.</p>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<blockquote>
+<p>Типичные ошибки приёмки
+- <strong><code>unzip: cannot find or open contractor-A.zip</code></strong> — поставку тянут из почты/мессенджера вместо артефакт-репозитория; нет иммутабельных координат и provenance. Забирайте из репозитория по <code>имя:версия</code>.
+- <strong><code>jq: error: Cannot iterate over null (null)</code></strong> — в файле нет ключа <code>.components</code> (это не CycloneDX, а, например, голый SPDX или сырой лог). Проверьте <code>jq '.bomFormat,.specVersion' "$BOM"</code> — должно быть <code>"CycloneDX"</code>.
+- <strong>PURL coverage ~100%, но число findings у сканера почти ноль</strong> — компоненты есть, а версии/идентификаторы пустые: сканер не на что мэтчить CVE. Это ложное ощущение чистоты, а не успех — смотрите долю компонентов с непустым <code>version</code>.
+- <strong>Версия ZIP ≠ версия <code>bom.json</code> внутри</strong> — ZIP пересобрали, а SBOM старый; provenance ломается молча. Сверяйте commit/tag в <code>metadata.component</code> с координатами поставки.</p>
+</blockquote>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: вывод <code>unzip -l</code> (три обязательных артефакта на месте), три числа покрытия по <code>jq</code>, заполненную строку сводки по соисполнителю и обоснованный вердикт приёмки. Для поставки-«двойки» (низкий coverage) — сформированный worklist (список компонентов без PURL), а не молчаливое «принято».</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<ul>
+<li><a href="doc-3235e84d3a49.html">М10. Много исполнителей</a> — родительский модуль.</li>
+<li>Смежные практики: <a href="doc-faa8e4b65ca3.html">П29</a> (сведение состава всех соисполнителей в вердикт готовности), <a href="doc-adce46441199.html">П30</a> (что делать с тем, что не прошло приёмку).</li>
+<li><a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> — управляемость работ и документация разработчика; <a href="doc-b5856ada3679.html">ISO/IEC 27001</a> — supplier relationships; <a href="doc-a6189f5ab42c.html">NIST SP 800-161</a> — управление поставщиками и provenance.</li>
+<li>Шаблоны: <a href="doc-c0bb41adb645.html">Контракт поставки SBOM</a> · <a href="doc-d964f98ca155.html">Чек-лист ZIP поставки</a> · <a href="doc-6975e3770695.html">Соглашение о качестве данных</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

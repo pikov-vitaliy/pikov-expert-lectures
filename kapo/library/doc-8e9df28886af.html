@@ -1,0 +1,71 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М16. План занятия (90 минут) — КАПО · Пиков</title><meta name="description" content="М16. План занятия (90 минут). Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-8e9df28886af.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цели">Цели</a></li>
+<li><a href="#материалы">Материалы</a></li>
+<li><a href="#ход-занятия">Ход занятия</a></li>
+<li><a href="#контрольная-точка">Контрольная точка</a></li>
+<li><a href="#связи">Связи</a></li>
+</ul>
+</div>
+<h1 id="план-занятия-90-минут">План занятия (90 минут)</h1>
+<h2 id="цели">Цели</h2>
+<p>К концу занятия слушатель умеет:</p>
+<ol>
+<li>Назвать семь кластеров SBOM for AI (G7) и объяснить, чем кластеры <strong>Models</strong> и <strong>Datasets</strong> отличаются от обычного SBOM (хэш весов, лицензия open weight/data/training, provenance датасета).</li>
+<li>Доказать на образе, что декларируемый SBOM расходится с реальным содержимым слоёв: извлечь удалённый секрет и показать эффект обфускации метаданных.</li>
+<li>Сформулировать критерий «честности» SBOM для приёмки контейнерной/AI-поставки в Организации.</li>
+</ol>
+<h2 id="материалы">Материалы</h2>
+<ul>
+<li>Подготовленный образ <code>secrets-test</code> (Dockerfile с <code>COPY key.api</code> + <code>RUN rm key.api</code>).</li>
+<li>Демо-образ с обфускацией метаданных (<code>mint slim --obfuscate-metadata</code>) и его оригинал.</li>
+<li>Установленные <code>docker</code>, <code>trivy</code>/<code>grype</code>, <code>syft</code>, утилита разбора слоёв (orca или эквивалент).</li>
+<li>Фрагмент документа G7 «SBOM for AI: Minimum Elements» (обезличенно), карточка модели (model card) для разбора.</li>
+<li><a href="doc-9b20a0de5005.html">01 Конспект</a>, <a href="doc-c243eb88011f.html">SBOM for AI - минимальные элементы</a>.</li>
+</ul>
+<h2 id="ход-занятия">Ход занятия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Мин</th>
+<th>Блок</th>
+<th>Что происходит</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0–8</td>
+<td><strong>Вводный кейс</strong></td>
+<td>«SBOM показал 0 уязвимостей — образ чистый?» Голосование. Показываем, что 0 может означать затёртые метаданные, а не отсутствие проблем.</td>
+</tr>
+<tr>
+<td style="text-align: right;">8–25</td>
+<td><strong>Лекция: SBOM for AI</strong></td>
+<td>Семь кластеров G7. Разбор Models (hash весов, lineage, RLHF/DPO, лицензия open weight/architecture/data/training) и Datasets (provenance: web crawling vs коммерческое соглашение; sensitivity: PII/copyright). Тезис: это <strong>дополнение</strong> к обычному SBOM, а не замена.</td>
+</tr>
+<tr>
+<td style="text-align: right;">25–40</td>
+<td><strong>Лекция: честный SBOM образа</strong></td>
+<td>Как сканер читает образ (tar-ы слоёв, пути пакетных БД). Три слепые зоны: удалённый-но-сохранённый файл, обфускация метаданных, UPX/стрип build-info. Цифры из «дикой природы» (&gt;50% модифицируют метаданные).</td>
+</tr>
+<tr>
+<td style="text-align: right;">40–60</td>
+<td><strong>Демо</strong></td>
+<td>(а) <code>docker save secrets-test \| tar -x</code>, поиск tar-слоёв в <code>blobs/sha256/</code>, извлечение <code>key.api</code> после <code>RUN rm</code>. (б) <code>grype</code> на оригинале (97 matches) vs на обфусцированном (0 matches). Обсуждение: где соврал SBOM.</td>
+</tr>
+<tr>
+<td style="text-align: right;">60–82</td>
+<td><strong>Практика в парах</strong></td>
+<td>По заготовке: собрать честный SBOM образа (syft + разбор слоёв) и заполнить мини-карточку модели по кластерам Models/Datasets. Найти расхождения декларация↔реальность. См. <a href="doc-d29007012eb4.html">03 Практическая работа</a>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">82–90</td>
+<td><strong>Рефлексия</strong></td>
+<td>Что попадает в регламент приёмки Организации: критерий честности, обязательность attestations (in-toto/SLSA), список «неисправимого статикой».</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="контрольная-точка">Контрольная точка</h2>
+<p>Слушатель показывает: извлечённый из нижнего слоя артефакт, который отсутствует в финальной ФС; и таблицу из ≥3 кластеров SBOM for AI с заполненными элементами Models/Datasets. Может объяснить, почему «0 уязвимостей» не равно «чистый образ».</p>
+<h2 id="связи">Связи</h2>
+<p>Практики: <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>, <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a>. Нормативка: <a href="doc-31e6d21d603c.html">05 Нормативка</a> (ГОСТ Р 56939-2024).</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

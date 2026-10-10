@@ -1,0 +1,63 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>ScanCode Toolkit — КАПО · Пиков</title><meta name="description" content="ScanCode Toolkit. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-bddae25ab5db.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="scancode-toolkit">ScanCode Toolkit</h1>
+<blockquote>
+<p>Роль в линейке лицензионных инструментов
+ScanCode — это <strong>детектор</strong>, а не решатель. Он отвечает на вопрос «какая лицензия и чьё авторское право найдены в этих файлах», но никогда не выносит вердикт «можно ли с этим выпускаться». Вердикт (concluded) добавляют сверху <a href="doc-5daf51958a11.html">ORT</a> (политикой) и <a href="doc-bc53e098bca4.html">FOSSology</a> (человеком).</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Посборочный сканер исходного дерева: построчно ищет в файлах лицензионные тексты и copyright-строки, опознаёт их по эталонной базе и выдаёт по каждому файлу SPDX-выражение с уровнем уверенности и координатами совпадения. В отличие от метаданных пакета (<code>package.json</code> пишет «MIT»), ScanCode видит реальный GPL-хедер внутри одного файла того же пакета.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>CLI-утилита на Python. Полное сканирование лицензий с текстом-уликой и классификацией файлов, вывод в машинный JSON:</p>
+<pre><code class="language-bash">scancode --version          # версию движка фиксируем для воспроизводимости
+
+scancode \
+  --license --license-text --classify --info \
+  --processes 4 \
+  --json-pp scancode-licenses.json \
+  ./vendor
+</code></pre>
+<p>Для прямой выгрузки SBOM движок умеет писать <code>--spdx-tv scancode.spdx</code> (SPDX tag/value), а с опцией <code>--package</code> — <code>--cyclonedx=bom.json</code> (CycloneDX осмыслен только при сканировании пакетов). Ключевые поля результата (скелет одного файла):</p>
+<pre><code class="language-json">{
+  "headers": [{ "tool_name": "scancode-toolkit", "tool_version": "32.x" }],
+  "files": [{
+    "path": "vendor/somelib/parser.c",
+    "detected_license_expression_spdx": "GPL-2.0-only",
+    "license_detections": [{
+      "matches": [{ "score": 99.0, "start_line": 3, "end_line": 18,
+                    "matched_text": "This program is free software..." }]
+    }]
+  }]
+}
+</code></pre>
+<p>Поле <code>score</code> — уровень уверенности совпадения: значение около 99 означает полный лицензионный текст, низкое (около 50–70) — упоминание лицензии в README/changelog, которое идёт в очередь на ручной просмотр, а не отбрасывается.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Находит лицензию по факту в тексте файла, а не по заявлению в метаданных — ловит «GPL-хедер внутри MIT-пакета», который пропускают генераторы SBOM.</li>
+<li>File-level точность: для каждого совпадения отдаёт строки, фрагмент текста-улики и score — готовый evidence для аудита.</li>
+<li>Эталонная база лицензий и SPDX-выражений входит в поставку; результат детерминирован и воспроизводим при фиксированной версии движка.</li>
+<li>Используется как сканер-движок внутри ORT — то есть это де-факто базовый слой детекции для всей лицензионной цепочки.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Выдаёт <strong>detected</strong>, а не <strong>concluded</strong>: ScanCode не знает вашей политики и не решает, блокер это, условно-допустимо или ложное срабатывание.</li>
+<li>Шум на низких <code>score</code>: упоминания лицензий в документации дают совпадения, которые надо просеивать руками (<code>--license-score</code>), иначе отчёт раздувается.</li>
+<li>Работает по исходному дереву; на минифицированных бандлах и бинарных артефактах с вырезанными хедерами улик нет — сканировать надо исходники.</li>
+<li>Нет ни хранилища решений, ни истории, ни ответственного — для clearing-workflow нужен слой сверху (FOSSology или курации ORT).</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью автономен. Это локальная CLI-утилита с базой лицензий в составе пакета; сетевой доступ для сканирования не нужен, что делает её пригодной для закрытого контура. Устанавливается через <code>pip install scancode-toolkit</code> (Python 3.9+); облегчённый <code>scancode-toolkit-mini</code> идёт без полного индекса лицензий — для лицензионного анализа берут полный пакет.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a> · <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a></li>
+<li>Практики: <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></li>
+<li>Смежные карточки: <a href="doc-5daf51958a11.html">OSS Review Toolkit</a> · <a href="doc-bc53e098bca4.html">FOSSology</a> · <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-41eb01248f66.html">Package URL</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

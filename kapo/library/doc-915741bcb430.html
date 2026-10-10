@@ -1,0 +1,135 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Модель ролей в сервисе аудита — КАПО · Пиков</title><meta name="description" content="Модель ролей в сервисе аудита. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-915741bcb430.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>08 Шаблоны</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#когда-применяется">Когда применяется</a></li>
+<li><a href="#принципы">Принципы</a></li>
+<li><a href="#каталог-ролей-и-прав">Каталог ролей и прав</a></li>
+<li><a href="#матрица-разделения-полномочий-несовместимые-роли">Матрица разделения полномочий (несовместимые роли)</a></li>
+<li><a href="#связь-с-курсом">Связь с курсом</a></li>
+</ul>
+</div>
+<h1 id="модель-ролей-в-сервисе-аудита">Модель ролей в сервисе аудита</h1>
+<blockquote>
+<p>Назначение
+Определяет роли, права (RBAC) и разделение полномочий внутри «сервиса аудита/вердиктов»: кто вправе выпустить вердикт, кто может переопределить блокировку gate, кто читает и кто администрирует журнал. В отличие от <a href="doc-1c549d7c25fb.html">RACI</a> (кто что делает по процессу) здесь — что роль <em>вправе</em> делать в системе.</p>
+</blockquote>
+<h2 id="когда-применяется">Когда применяется</h2>
+<p>При настройке прав в сервисе аудита/вердиктов, при заведении нового сотрудника, при аудиторской проверке разделения обязанностей (segregation of duties), при разборе «кто переопределил gate».</p>
+<h2 id="принципы">Принципы</h2>
+<ul>
+<li><strong>Минимальные привилегии</strong>: роль получает только права, нужные для её шага процесса.</li>
+<li><strong>Разделение обязанностей</strong>: тот, кто готовит вердикт, не утверждает его единолично; тот, кого аудируют, не администрирует журнал.</li>
+<li><strong>Прослеживаемость</strong>: каждое привилегированное действие (override, удаление, экспорт) пишется в <a href="doc-e65a39cb2dfa.html">audit trail</a> с актором.</li>
+</ul>
+<h2 id="каталог-ролей-и-прав">Каталог ролей и прав</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Роль</th>
+<th>Назначение</th>
+<th>Права в сервисе аудита/вердиктов</th>
+<th>Чего НЕ может</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Наблюдатель (viewer)</td>
+<td>Чтение результатов</td>
+<td>Просмотр SBOM, findings, вердиктов, дашбордов</td>
+<td>Менять статусы, выпускать вердикт</td>
+</tr>
+<tr>
+<td>Аналитик SCA</td>
+<td>Подготовка вердикта</td>
+<td>Запуск «генератора фактов», правка статусов findings, черновик вердикта</td>
+<td>Утверждать собственный вердикт, override gate</td>
+</tr>
+<tr>
+<td>Триаж ИБ</td>
+<td>Решение по уязвимостям</td>
+<td>Присвоение severity/VEX-статуса, эскалация</td>
+<td>Менять лицензионные решения</td>
+</tr>
+<tr>
+<td>Юрист по лицензиям</td>
+<td>Решение по лицензиям</td>
+<td>Лицензионная классификация, заключение</td>
+<td>Менять статусы уязвимостей</td>
+</tr>
+<tr>
+<td>Утверждающий вердикт (approver)</td>
+<td>Выпуск вердикта</td>
+<td>Утверждение/отклонение вердикта, выпуск релизного решения</td>
+<td>Готовить и утверждать один и тот же вердикт</td>
+</tr>
+<tr>
+<td>Владелец исключений</td>
+<td>Принятие риска</td>
+<td>Заведение исключения со сроком, владельцем, обоснованием</td>
+<td>Бессрочные исключения</td>
+</tr>
+<tr>
+<td>Администратор сервиса</td>
+<td>Эксплуатация</td>
+<td>Управление ролями, интеграциями, источниками фактов</td>
+<td>Выпускать вердикты, скрывать записи журнала</td>
+</tr>
+<tr>
+<td>Аудитор</td>
+<td>Независимый контроль</td>
+<td>Чтение всех журналов и evidence, выгрузка</td>
+<td>Любые изменения данных</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="матрица-разделения-полномочий-несовместимые-роли">Матрица разделения полномочий (несовместимые роли)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Роль A \ Роль B</th>
+<th style="text-align: center;">Аналитик SCA</th>
+<th style="text-align: center;">Утверждающий</th>
+<th style="text-align: center;">Админ сервиса</th>
+<th style="text-align: center;">Аудитор</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Аналитик SCA</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✗ запрещено совмещать</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td>Утверждающий</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td>Админ сервиса</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">—</td>
+<td style="text-align: center;">✗</td>
+</tr>
+<tr>
+<td>Аудитор</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">✗</td>
+<td style="text-align: center;">—</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Override gate
+Переопределение блокировки CI security gate доступно только роли «Утверждающий вердикт» и только с обязательным обоснованием и сроком. Каждый override — запись в audit trail и автоматическое уведомление владельца процесса.</p>
+</blockquote>
+<h2 id="связь-с-курсом">Связь с курсом</h2>
+<ul>
+<li>Модули: <a href="doc-457364f50285.html">М11 Корпоративный кейс генератор фактов и сервис вердиктов</a>, <a href="doc-3235e84d3a49.html">М10 Много исполнителей и корпоративная модель продукта</a>.</li>
+<li>Смежные шаблоны: <a href="doc-1c549d7c25fb.html">RACI для SCA OSA процесса</a>, <a href="doc-e65a39cb2dfa.html">Журналирование и audit trail</a>, <a href="doc-f0ded133ff51.html">Реестр исключений</a>, <a href="doc-9d81f3d4e106.html">Требования к CI security gate</a>.</li>
+<li>Нормативка: <a href="doc-b5856ada3679.html">ISO IEC 27001</a> (A.5/A.8 управление доступом), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a>.</li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

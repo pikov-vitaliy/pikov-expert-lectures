@@ -1,0 +1,52 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>CycloneDX — КАПО · Пиков</title><meta name="description" content="CycloneDX. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-dbc1ace95cba.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="cyclonedx">CycloneDX</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>CycloneDX — формат спецификации состава ПО, изначально заточенный под безопасность цепочки поставки. Помимо перечня компонентов он несёт граф зависимостей (<code>dependencies</code>), сведения о происхождении (<code>pedigree</code>), вложенный VEX и описания сервисов. Стандартизован как ECMA-424; под BSI TR-03183-2 v2.1.0 SBOM принимается в CycloneDX версии <strong>≥ 1.6</strong> (JSON или XML).</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Минимальный валидный документ в JSON несёт <code>bomFormat</code>, <code>specVersion</code> и перечень компонентов с идентификаторами:</p>
+<pre><code class="language-json">{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": { "component": { "type": "application", "name": "my-app" } },
+  "components": [
+    {
+      "type": "library",
+      "name": "openssl",
+      "version": "3.0.13",
+      "purl": "pkg:conan/openssl@3.0.13",
+      "cpe": "cpe:2.3:a:openssl:openssl:3.0.13:*:*:*:*:*:*:*"
+    }
+  ]
+}
+</code></pre>
+<p>Компонент несёт сразу <a href="doc-41eb01248f66.html">Package URL</a> и <a href="doc-17e9049e2a17.html">CPE</a> — purl для сопоставления с OSV, cpe для NVD. Граф <code>dependencies</code> отделяет прямые зависимости от транзитивных. Чтение и разбор такого документа отрабатывается в <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>VEX можно встроить прямо в BOM (<code>vulnerabilities[].analysis</code>) — факт состава и решение по уязвимости в одном файле; для аудита всё равно нужно явно хранить issuer, версию продукта и evidence.</li>
+<li>Богатая модель: <code>dependencies</code>, <code>pedigree</code>, <code>services</code>, поддержка ML-BOM/SaaS-BOM.</li>
+<li>Широкая поддержка генераторами (<a href="doc-e0e63f957dcf.html">Syft</a>, <a href="doc-35e5f81f86fe.html">cdxgen</a>, <a href="doc-2c326e169620.html">Trivy</a>) и сканерами.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Поле <code>licenses</code> слабее структурировано, чем в SPDX, — для строгого юридического workflow часто берут SPDX.</li>
+<li>Версии 1.4 → 1.6 различаются полями; старый потребитель может не понять документ новой версии.</li>
+<li>Свобода модели порождает неполные BOM «технически валидные, но бедные» — отсюда нужен quality gate (<a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>).</li>
+<li>Встроенный VEX не должен превращать SBOM в «сам себе вердикт»: порядок выпуска VEX и evidence фиксируется отдельно в <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Генерация и валидация полностью локальны: схема (JSON Schema / XSD) распространяется вместе со спецификацией, проверка структуры идёт без сети. Обогащение уязвимостями и подпись — отдельные шаги, которые тоже работают в закрытом контуре при локальных зеркалах источников.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1648d69d5029.html">М03 Форматы SBOM</a> · <a href="doc-97c8afb5a218.html">М02 SBOM как факт</a> · <a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей</a>
+Справка: <a href="doc-22ba91fe9517.html">VEX в процессе РБПО</a>
+Практики: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a> · <a href="doc-8e64f240b13c.html">П09. VDR и VEX различие факта и решения</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>
+Смежные карточки: <a href="doc-4074ab5340cf.html">SPDX</a> · <a href="doc-9bce61f41d9c.html">SWID</a> · <a href="doc-41eb01248f66.html">Package URL</a> · <a href="doc-17e9049e2a17.html">CPE</a> · <a href="doc-7a6dec2d2bd5.html">OpenVEX</a> · <a href="doc-35e5f81f86fe.html">cdxgen</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

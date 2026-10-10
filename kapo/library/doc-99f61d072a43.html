@@ -1,0 +1,45 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Grype — КАПО · Пиков</title><meta name="description" content="Grype. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-99f61d072a43.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="grype">Grype</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Grype сопоставляет перечень компонентов (готовый SBOM или собственное сканирование образа/директории) с собственной БД уязвимостей и выдаёт список «компонент → CVE/GHSA → диапазон уязвимых версий → исправленная версия». Сильная сторона — связка с Syft: один и тот же движок каталогизации делает SBOM, а Grype только матчит, поэтому покрытие экосистем у них общее.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Канонический сценарий курса — сканирование поверх уже готового SBOM, чтобы матчинг был воспроизводим и отделён от каталогизации:</p>
+<blockquote>
+<p>Команда</p>
+</blockquote>
+<pre><code class="language-bash"># 1) обновить БД (или указать на офлайн-копию)
+grype db update
+# 2) матчинг поверх готового CycloneDX SBOM, вывод в таблицу
+grype sbom:./sbom.cdx.json -o table
+# 3) машинный вывод для гейта + только зафиксированные уязвимости
+grype sbom:./sbom.cdx.json -o json --only-fixed &gt; grype.json</code></pre>
+<p>Прямое сканирование артефакта тоже работает: <code>grype dir:.</code>, <code>grype docker:image:tag</code>, <code>grype registry:...</code>. Гейт настраивается через <code>--fail-on high</code> (порог по severity) и файл <code>.grype.yaml</code> с правилами игнора по CVE/PURL. На входе понимает CycloneDX и SPDX; ключ компонента — PURL вида <code>pkg:npm/lodash@4.17.20</code> или <code>pkg:deb/debian/openssl@1.1.1n</code>.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Чистое разделение «инвентаризация (Syft) → матчинг (Grype)»: SBOM можно хранить как артефакт и пересканировать его позже, не пересобирая проект.</li>
+<li>БД компактна и обновляется одной командой; поддерживается явная фиксация версии БД для воспроизводимости отчёта.</li>
+<li>Управляемый игнор-лист (<code>.grype.yaml</code>) с привязкой к PURL/CVE и сроком действия — удобно для документирования принятых рисков.</li>
+<li>Гибкий контроль гейта: порог <code>--fail-on</code>, фильтр <code>--only-fixed</code>, форматы table/json/cyclonedx/sarif.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Матчинг для нативного C/C++ слаб: без PURL/CPE у статически слинкованных или собранных вручную библиотек уязвимость не привяжется (пустой PURL → нет совпадения).</li>
+<li>Источник — преимущественно агрегированная БД на базе NVD/GHSA/дистрибутивных фидов; российская специфика (БДУ ФСТЭК) и EPSS/KEV из коробки не учитываются.</li>
+<li>Качество результата напрямую определяется качеством SBOM: мусор на входе (неверная версия, отсутствующий namespace) даёт FP/FN.</li>
+<li>Нет собственного оркестратора портфеля — для сводки по многим проектам нужен внешний слой (например, Dependency-Track).</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Да. БД скачивается отдельно (<code>grype db update</code>), её можно зеркалировать во внутренний контур: переменные <code>GRYPE_DB_CACHE_DIR</code> и <code>GRYPE_DB_UPDATE_URL</code> указывают на локальный каталог/прокси, а <code>GRYPE_DB_AUTO_UPDATE=false</code> запрещает выход в сеть при матчинге. После загрузки БД матчинг полностью автономен. Сам бинарь — один статический файл без рантайм-зависимостей.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-cd2bdeca5d64.html">М06 Поиск уязвимостей и VDR/VEX</a> · <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a>
+Практика: <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-1aa79ca94146.html">П34. SBOM quality gate</a>
+Смежные карточки: <a href="doc-e0e63f957dcf.html">Syft</a> · <a href="doc-2c326e169620.html">Trivy</a> · <a href="doc-866090cf44a0.html">OSV-Scanner</a> · <a href="doc-41eb01248f66.html">Package URL (PURL)</a> · <a href="doc-a4c337643b65.html">NVD</a> · <a href="doc-14258e036a86.html">GitHub Security Advisory</a> · <a href="doc-3b8cd65dfda4.html">EPSS</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

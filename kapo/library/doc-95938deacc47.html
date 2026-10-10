@@ -1,0 +1,78 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М05. План занятия: Инструменты генерации SBOM — КАПО · Пиков</title><meta name="description" content="М05. План занятия: Инструменты генерации SBOM. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-95938deacc47.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цели">Цели</a></li>
+<li><a href="#тайминг-и-ход-занятия">Тайминг и ход занятия</a></li>
+<li><a href="#демонстрационные-команды">Демонстрационные команды</a></li>
+<li><a href="#материалы">Материалы</a></li>
+<li><a href="#контрольная-точка">Контрольная точка</a></li>
+</ul>
+</div>
+<h1 id="план-занятия-инструменты-генерации-sbom">План занятия: Инструменты генерации SBOM</h1>
+<h2 id="цели">Цели</h2>
+<ul>
+<li>Объяснить, почему один и тот же проект даёт разные SBOM у Syft, Trivy и cdxgen.</li>
+<li>Развести манифест-скан и бинарь-скан: что каждый видит и какие у каждого слепые зоны.</li>
+<li>Показать роль cdxgen и последующего обогащения «генератором фактов» для C/C++.</li>
+<li>Привить привычку фиксировать версию инструмента и входной артефакт.</li>
+<li>Связать тему с <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a>, <a href="doc-9a74303c4069.html">CycloneDX ECMA-424</a>.</li>
+</ul>
+<h2 id="тайминг-и-ход-занятия">Тайминг и ход занятия</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th style="text-align: right;">Мин</th>
+<th>Блок</th>
+<th>Что делаем</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0–10</td>
+<td><strong>Вводный кейс</strong></td>
+<td>Показываю три <code>bom.json</code> одного репозитория от Syft/Trivy/cdxgen с разным числом компонентов. Вопрос группе: какой «правильный» и почему вопрос поставлен неверно.</td>
+</tr>
+<tr>
+<td style="text-align: right;">10–30</td>
+<td><strong>Лекция: что видит инструмент</strong></td>
+<td>Манифест-скан vs бинарь-скан. Таблица инструмент→что видит. Где теряются версии и лицензии. Зачем нужны PURL/CPE для матчинга CVE.</td>
+</tr>
+<tr>
+<td style="text-align: right;">30–45</td>
+<td><strong>Демо 1: Syft и Trivy</strong></td>
+<td><code>syft dir:.</code> и <code>trivy image</code> на тестовом проекте; сравниваем компоненты; показываю, что Syft не считает CVE, а Trivy считает. Фиксируем <code>syft version</code>/<code>trivy --version</code>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">45–60</td>
+<td><strong>Демо 2: cdxgen + C/C++</strong></td>
+<td><code>cdxgen -t cpp</code> на C/C++ проекте; показываю каркас без версий <code>.so</code>; объясняю, как обогащение читает ELF, маппит на DEB через <code>apt</code> и пишет обогащённый <code>bom.json</code>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">60–80</td>
+<td><strong>Практика в парах</strong></td>
+<td>Слушатели генерируют SBOM тремя инструментами, заполняют сравнительную таблицу охвата (компоненты, доля PURL, лицензии, dependencies). См. <a href="doc-2b037a836052.html">практическую работу</a>.</td>
+</tr>
+<tr>
+<td style="text-align: right;">80–90</td>
+<td><strong>Разбор и рефлексия</strong></td>
+<td>Где какой инструмент сильнее; что фиксировать в регламенте Организации; какие данные нельзя гнать во внешние сервисы без отдельного решения.</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="демонстрационные-команды">Демонстрационные команды</h2>
+<pre><code class="language-bash">syft dir:. -o cyclonedx-json=syft-bom.json
+trivy fs --format cyclonedx --output trivy-bom.json .
+cdxgen -t cpp -o cdxgen-bom.json .
+</code></pre>
+<h2 id="материалы">Материалы</h2>
+<ul>
+<li>Тестовый репозиторий со смешанными экосистемами (npm + PyPI) и отдельный C/C++ проект.</li>
+<li>Установленные Syft, Trivy, cdxgen (зафиксированные версии).</li>
+<li>Конспект <a href="doc-ee6246d98242.html">01 Конспект</a> и таблица инструмент→что видит.</li>
+<li>Доступ к схеме обогащения «генератором фактов» (описание роли, без внутренних путей).</li>
+</ul>
+<h2 id="контрольная-точка">Контрольная точка</h2>
+<p>Слушатель может объяснить: какой инструмент выбрать под конкретную экосистему; чем манифест-скан отличается от бинарь-скана; почему C/C++ SBOM от cdxgen требует обогащения; что именно фиксируется рядом с <code>bom.json</code> для воспроизводимости.</p>
+<blockquote>
+<p>Частая ошибка занятия
+Группа склонна искать «лучший» генератор. Возвращайте к мысли: инструмент выбирается под экосистему и режим, а не абсолютно — Trivy хорош для образов с CVE одним шагом, cdxgen незаменим для C/C++, Syft даёт чистую инвентаризацию.</p>
+</blockquote></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

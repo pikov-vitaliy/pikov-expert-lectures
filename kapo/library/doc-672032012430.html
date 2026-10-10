@@ -1,0 +1,83 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М02. Практическая работа: полнота SBOM и разделение слоёв — КАПО · Пиков</title><meta name="description" content="М02. Практическая работа: полнота SBOM и разделение слоёв. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-672032012430.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#цель">Цель</a></li>
+<li><a href="#входные-данные-зафиксировать-до-начала">Входные данные (зафиксировать до начала)</a></li>
+<li><a href="#шаги">Шаги</a></li>
+<li><a href="#что-вы-должны-увидеть">Что вы должны увидеть</a></li>
+<li><a href="#если-не-получилось">Если не получилось</a></li>
+<li><a href="#критерий-зачёта">Критерий зачёта</a></li>
+<li><a href="#нормативная-связка">Нормативная связка</a></li>
+</ul>
+</div>
+<h1 id="практическая-работа-полнота-sbom-и-разделение-слоёв">Практическая работа: полнота SBOM и разделение слоёв</h1>
+<h2 id="цель">Цель</h2>
+<p>На реальном CycloneDX JSON оценить присутствие минимальных элементов (NTIA/CISA), посчитать «слепые» компоненты и развести найденные проблемы по слоям: дефект факта (SBOM), интерпретация, решение. Проверяемый результат — заполненная таблица дефектов и вывод о готовности артефакта.</p>
+<h2 id="входные-данные-зафиксировать-до-начала">Входные данные (зафиксировать до начала)</h2>
+<p>Запишите: репозиторий, commit/tag, инструмент и его версию, дату генерации SBOM, путь к файлу (<code>bom.json</code>). Без этих координат результат не воспроизводим.</p>
+<h2 id="шаги">Шаги</h2>
+<ol>
+<li><strong>Метаданные артефакта.</strong> Проверьте, кто и чем сгенерировал SBOM:
+   <code>bash
+   jq '.metadata | {timestamp, tools: .tools, authors: .authors, component: .component.name}' bom.json</code></li>
+<li><strong>Общий объём.</strong> Сколько всего компонентов:
+   <code>bash
+   jq '.components | length' bom.json</code></li>
+<li><strong>Компоненты без идентификатора</strong> (не сопоставятся с CVE автоматически):
+   <code>bash
+   jq '[.components[] | select(.purl == null and .cpe == null)] | length' bom.json
+   jq '.components[] | select(.purl == null) | .name' bom.json</code></li>
+<li><strong>Компоненты без версии:</strong>
+<code>bash
+   jq '.components[] | select(.version == null or .version == "" or .version == "unknown") | {name, version}' bom.json</code></li>
+<li><strong>Граф зависимостей.</strong> Есть ли связи (или только плоский список):
+   <code>bash
+   jq '.dependencies | length' bom.json</code></li>
+<li><strong>Классификация.</strong> Для каждой находки определите слой: дефект факта (поле SBOM), интерпретация (нужно сопоставление с базой) или решение (вердикт человека). Отметьте, что из этого — дефект инструмента, а что — дефект процесса поставки (например, соисполнитель прислал SBOM без <code>supplier</code>).</li>
+</ol>
+<h2 id="что-вы-должны-увидеть">Что вы должны увидеть</h2>
+<ul>
+<li>Число вида «из 214 компонентов 37 без <code>purl</code>» — это и есть метрика полноты, а не «файл есть».</li>
+<li>В <code>metadata</code> либо валидные <code>tools</code>/<code>authors</code>/<code>timestamp</code>, либо явный пробел, который вы отмечаете как дефект.</li>
+<li>Заполненную таблицу:</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Находка</th>
+<th>Поле</th>
+<th>Слой (факт/интерпретация/решение)</th>
+<th>Источник (инструмент/процесс)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>37 компонентов без <code>purl</code></td>
+<td><code>components[].purl</code></td>
+<td>факт</td>
+<td>процесс (генерация на этапе after-build)</td>
+</tr>
+<tr>
+<td>версия <code>unknown</code> у внутр. форка</td>
+<td><code>components[].version</code></td>
+<td>факт</td>
+<td>процесс</td>
+</tr>
+<tr>
+<td>«нет CVE → значит безопасно»</td>
+<td>—</td>
+<td>ошибка интерпретации</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="если-не-получилось">Если не получилось</h2>
+<ul>
+<li><code>jq: error ... Cannot index ...</code> — у вас не CycloneDX, а SPDX или иной формат: проверьте <code>jq '.bomFormat, .specVersion' bom.json</code>.</li>
+<li>Команда возвращает <code>null</code> на <code>.metadata.tools</code> — инструмент пишет метаданные в другом месте (<code>.metadata.tools.components</code> в новых спецификациях); посмотрите структуру <code>jq '.metadata | keys' bom.json</code>.</li>
+<li>«Слишком мало CVE» по итогам — почти всегда не удача, а следствие низкого покрытия <code>purl</code>; вернитесь к шагу 3.</li>
+</ul>
+<h2 id="критерий-зачёта">Критерий зачёта</h2>
+<p>Показать преподавателю: (1) число компонентов без <code>purl</code>/версии; (2) состояние <code>metadata</code>; (3) таблицу с минимум пятью находками, каждая отнесена к слою и к источнику; (4) одно предложение — какой gate можно безопасно включить в CI и какой порог полноты в нём задать.</p>
+<h2 id="нормативная-связка">Нормативная связка</h2>
+<p><a href="doc-f8e87801f278.html">NTIA Minimum Elements for SBOM</a> и <a href="doc-8be3c2d9de59.html">CISA Minimum Elements for SBOM</a> (состав полей), <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> (качество), <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> (управляемость). Закрепление: <a href="doc-0cc54b9609f7.html">Минимальный набор полей ППК</a>, <a href="doc-93a5f31bcb72.html">Чек-лист качества CycloneDX</a>, <a href="doc-6975e3770695.html">Соглашение о качестве данных SBOM</a>.</p>
+<p>Основа практики: <a href="doc-1796537889fe.html">П02. Чтение CycloneDX JSON руками</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

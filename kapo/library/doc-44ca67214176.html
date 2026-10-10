@@ -1,0 +1,91 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>stripped binaries — КАПО · Пиков</title><meta name="description" content="stripped binaries. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-44ca67214176.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="stripped-binaries">stripped binaries</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p><code>strip</code> удаляет из ELF отладочную и символьную информацию, уменьшая бинарь перед поставкой. Для SCA это означает потерю улик: именно по символам и отладочным данным можно было бы косвенно доказать присутствие статически вшитого компонента и его версию. На stripped-бинаре этот канал закрыт, и слепая зона статической линковки становится ещё темнее — у компонента не остаётся ни пакета, ни soname, ни имени функции, по которому его можно опознать.</p>
+<p>Ключевой нюанс: <code>strip</code> убирает не всё. Динамическая линковка после strip продолжает работать, значит часть данных обязана уцелеть. Понимать, что именно <code>strip</code> удаляет, а что оставляет, — значит точно знать, какие способы идентификации ещё применимы к поставленному бинарю, а какие уже бесполезны.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>После <code>strip</code> исчезает таблица символов <code>.symtab</code> и отладочные секции <code>.debug_*</code>, но динамическая таблица <code>.dynsym</code> и секции данных остаются — иначе бинарь не запустился бы:</p>
+<pre><code class="language-bash">$ strip ./app_static            # удаляет .symtab и .debug_*
+
+# символов больше нет — косвенная идентификация по nm не работает
+$ nm -C ./app_static
+nm: ./app_static: no symbols
+
+# но динамическая секция и динамические символы целы — рантайм жив
+$ readelf -d ./app_static | grep NEEDED
+ 0x0...0001 (NEEDED) Shared library: [libc.so.6]
+$ readelf --dyn-syms ./app_static | head
+
+# последнее, что иногда уцелевает, — строка версии в данных
+$ strings ./app_static | grep -iE 'OpenSSL [0-9]'
+OpenSSL 3.0.11 19 Sep 2023
+</code></pre>
+<p>Таблица: что <code>strip</code> забирает и что оставляет.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Секция</th>
+<th>После <code>strip</code></th>
+<th>Что значит для SCA</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.symtab</code> (все символы)</td>
+<td>удалена</td>
+<td><code>nm</code> пуст: вшитый код по символам не опознать</td>
+</tr>
+<tr>
+<td><code>.debug_*</code> (DWARF)</td>
+<td>удалена</td>
+<td>теряется evidence из отладочной инфы</td>
+</tr>
+<tr>
+<td><code>.dynsym</code> (динамические символы)</td>
+<td>сохранена</td>
+<td>имена экспортируемых/импортируемых символов видны</td>
+</tr>
+<tr>
+<td><code>.dynamic</code> (<code>DT_NEEDED</code>)</td>
+<td>сохранена</td>
+<td>динамические зависимости читаются как обычно</td>
+</tr>
+<tr>
+<td><code>.rodata</code> / строки</td>
+<td>сохранена</td>
+<td>строка версии библиотеки может уцелеть</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>После strip версию вшитого кода восстановить почти нечем
+<code>strip</code> уносит <code>.symtab</code> и <code>.debug_*</code> — двух главных источников доказательства версии статически слинкованного компонента. Остаётся единственный, ненадёжный канал: строка версии в <code>.rodata</code> (<code>strings</code>), которую вшивают не все библиотеки. Если её нет, честный результат — «компонент присутствует, версия из бинаря недоступна», и закрывать пробел нужно журналом сборки, а не бинарём.</p>
+</blockquote>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Слепая зона — пересечение strip и статической линковки. Динамические зависимости после strip читаются по-прежнему (<code>DT_NEEDED</code> цел), а вот статически вшитая библиотека теряет последнюю улику: символов нет (<code>.symtab</code> удалена), DWARF нет, остаётся только надежда на строку версии в <code>.rodata</code> — а её вшивают не все библиотеки. Если и строки нет, корректный итог — «компонент присутствует, версия из бинаря недоступна».</p>
+<p>Приём — относиться к отладочным символам как к ценному evidence и не выбрасывать их при поставке без причины: непочищенные <code>.debug_*</code>/<code>.symtab</code> (или отдельный debuginfo-пакет) позволяют доказать происхождение и версию вшитого кода. Если бинарь уже stripped, единственный надёжный источник состава — журнал сборки (<a href="doc-e70b62e31bd7.html">компиляция и линковка</a>) и build-inventory, а не сам бинарь.</p>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Проверять, stripped ли бинарь: <code>file ./app</code> (<code>stripped</code>/<code>not stripped</code>) или наличие <code>.symtab</code> через <code>readelf -S</code>.</li>
+<li>На stripped-бинаре не ждать символов: <code>nm</code> будет пуст — это не сбой, а признак удалённого <code>.symtab</code>.</li>
+<li>Использовать уцелевшие каналы: <code>readelf -d</code> (динамические зависимости целы), <code>readelf --dyn-syms</code> (динамические символы), <code>strings</code> (строка версии, если есть).</li>
+<li>Для статически вшитого кода в stripped-бинаре фиксировать честный результат «версия недоступна» и заносить в реестр неопознанных.</li>
+<li>Беречь debug-символы как доказательную базу: хранить debuginfo отдельно, не стрипить артефакты, нужные для аудита (см. <a href="doc-c74d93ffd65c.html">debug symbols как evidence</a>).</li>
+<li>Если состав по бинарю не восстановить — переключаться на источник истины этапа сборки (build-scan), а не угадывать.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-deff60ff9043.html">П23. Статическая линковка как слепая зона</a></li>
+<li>Нормативка: <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a> (PS.3.2, RV.1) · <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a></li>
+<li>Шаблон: <a href="doc-e452b14f0cd3.html">Порядок работы с неопознанной библиотекой</a></li>
+<li>Смежные заметки 06: <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-c74d93ffd65c.html">debug symbols как evidence</a> · <a href="doc-28706d741e92.html">ELF и разделы dynamic</a> · <a href="doc-dc314b2d790a.html">hash-based identification</a> · <a href="doc-e70b62e31bd7.html">компиляция и линковка</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

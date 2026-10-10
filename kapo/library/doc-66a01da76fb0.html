@@ -1,0 +1,85 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>pkg-config и файлы pc — КАПО · Пиков</title><meta name="description" content="pkg-config и файлы pc. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-66a01da76fb0.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>06 C C++ legacy</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</a></li>
+<li><a href="#как-это-проявляется">Как это проявляется</a></li>
+<li><a href="#слепая-зона-или-приём">Слепая зона или приём</a></li>
+<li><a href="#что-делать-на-проекте">Что делать на проекте</a></li>
+<li><a href="#связь">Связь</a></li>
+</ul>
+</div>
+<h1 id="pkg-config-и-файлы-pc">pkg-config и файлы pc</h1>
+<h2 id="почему-это-важно-для-scaosa">Почему это важно для SCA/OSA</h2>
+<p><code>pkg-config</code> и его <code>.pc</code>-файлы — это слой, через который Autotools-, Meson- и многие CMake-проекты узнают, как линковаться с библиотекой. <code>.pc</code>-файл — текстовый, читаемый и содержит ровно те поля, которых не хватает SCA: <code>Version:</code>, <code>Requires:</code>, <code>Libs:</code>, <code>Cflags:</code>. Для аудитора это не слепая зона, а наоборот — готовый источник evidence: по <code>Version:</code> и <code>Requires:</code> можно восстановить и версию компонента, и его прямые зависимости, не разбирая бинарь.</p>
+<p>Но есть две тонкости. Поле <code>Version:</code> проставляет упаковщик дистрибутива вручную, и оно не обязано совпадать с реальной версией кода библиотеки (особенно у форков и пропатченных пакетов). И <code>.pc</code> различает <code>Requires:</code> и <code>Requires.private:</code> — второе нужно только при статической линковке, и его легко пропустить.</p>
+<h2 id="как-это-проявляется">Как это проявляется</h2>
+<p>Типичный <code>.pc</code>-файл — это структурированное evidence:</p>
+<pre><code class="language-ini"># /usr/lib/x86_64-linux-gnu/pkgconfig/libssl.pc
+Name: OpenSSL-libssl
+Version: 3.0.13
+Requires.private: libcrypto
+Libs: -L${libdir} -lssl
+Cflags: -I${includedir}
+</code></pre>
+<blockquote>
+<p>Как достать поля программно</p>
+</blockquote>
+<pre><code class="language-bash">pkg-config --modversion libssl        # 3.0.13  — версия из .pc
+pkg-config --print-requires libssl    # прямые Requires
+pkg-config --print-requires-private --static libssl   # Requires.private (для .a)
+pkg-config --variable=pcfiledir libssl</code></pre>
+<blockquote>
+<p><code>PKG_CONFIG_PATH</code> управляет тем, какой <code>.pc</code> найдётся первым, — на сборочной машине это может быть не системный, а вендоренный <code>.pc</code> из <code>third_party/</code>.</p>
+</blockquote>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле <code>.pc</code></th>
+<th>Что даёт SCA</th>
+<th>Подвох</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Version:</code></td>
+<td>версия компонента</td>
+<td>проставлена упаковщиком, может не совпадать с кодом</td>
+</tr>
+<tr>
+<td><code>Requires:</code></td>
+<td>прямые зависимости (динамика и статика)</td>
+<td>—</td>
+</tr>
+<tr>
+<td><code>Requires.private:</code></td>
+<td>зависимости только для статической линковки</td>
+<td>теряется без <code>--static</code></td>
+</tr>
+<tr>
+<td><code>Libs.private:</code></td>
+<td>флаги линковки для статики</td>
+<td>то же</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="слепая-зона-или-приём">Слепая зона или приём</h2>
+<p>Здесь скорее приём, чем слепая зона: <code>.pc</code> — это harvestable-источник, который часто игнорируют. Но есть и риск — <code>Version:</code> из <code>.pc</code> нельзя принимать на веру для пропатченных и форкнутых пакетов: упаковщик мог оставить апстрим-версию, добавив свои патчи. И <code>Requires.private:</code> без флага <code>--static</code> не виден, а именно он закрывает транзитивные зависимости статически слинкованного кода.</p>
+<blockquote>
+<p>Снимайте Requires вместе с Requires.private
+Всегда запрашивайте и публичные, и приватные зависимости (<code>--static</code>). Версию из <code>.pc</code> сверяйте с реальным источником (changelog пакета, <code>dpkg -s</code>), особенно если библиотека пришла из вендоренного каталога, а не из дистрибутива.</p>
+</blockquote>
+<h2 id="что-делать-на-проекте">Что делать на проекте</h2>
+<ol>
+<li>Найдите все <code>.pc</code>-файлы в путях <code>PKG_CONFIG_PATH</code> и в дереве сборки; вендоренные <code>.pc</code> из <code>third_party/</code> отметьте отдельно.</li>
+<li>Соберите по каждому <code>Version:</code>, <code>Requires:</code>, <code>Requires.private:</code> — это evidence по версии и прямым зависимостям.</li>
+<li>Запросы делайте с <code>--static</code>, иначе потеряете <code>Requires.private</code> статической линковки.</li>
+<li>Сверьте <code>Version:</code> с реальной версией кода для форков/пропатченных пакетов; расхождение — повод понизить confidence.</li>
+<li>Смаппьте имена из <code>.pc</code> на пакеты дистрибутива (<code>dpkg -S</code>/<code>rpm -qf</code> по пути <code>.pc</code>-файла).</li>
+<li>Поля <code>.pc</code> используйте как дополнение к <code>ldd</code>/<code>readelf</code>, а не вместо них: <code>.pc</code> отражает намерение сборки, бинарь — результат.</li>
+</ol>
+<h2 id="связь">Связь</h2>
+<ul>
+<li>Модуль: <a href="doc-fa808e147d8e.html">М09. C/C++ legacy</a></li>
+<li>Практики: <a href="doc-4378a07f26a0.html">П19. C C++ make build inventory</a> · <a href="doc-68e23af83949.html">П22. ELF dynamic dependencies</a> · <a href="doc-a47c43e70b05.html">П20. CMake dependency graph</a></li>
+<li>Нормативка: <a href="doc-9caaddd39675.html">ГОСТ Р 56939-2024</a> · <a href="doc-3c212b09f984.html">BSI TR-03183-2 v2.1.0</a> · <a href="doc-0e548f119316.html">NIST SP 800-218 SSDF</a></li>
+<li>Смежные заметки: <a href="doc-19fd6dae6997.html">ldd/readelf/objdump</a> · <a href="doc-4bd8e3178892.html">dpkg/apt metadata</a> · <a href="doc-ae9d449dcb2c.html">статическая линковка</a> · <a href="doc-0ea1c075e2df.html">ручные third_party каталоги</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

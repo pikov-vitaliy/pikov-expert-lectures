@@ -1,0 +1,58 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OSS Review Toolkit — КАПО · Пиков</title><meta name="description" content="OSS Review Toolkit. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-5daf51958a11.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="oss-review-toolkit">OSS Review Toolkit</h1>
+<blockquote>
+<p>Роль в линейке лицензионных инструментов
+ORT (OSS Review Toolkit) — это <strong>оркестратор и исполняемая политика</strong>. Там, где <a href="doc-bddae25ab5db.html">ScanCode</a> отвечает «какая лицензия найдена», ORT отвечает «можно ли с этим набором лицензий выпускаться» — и превращает ответ в падающий или зелёный CI-gate. ScanCode он использует как один из встроенных сканеров.</p>
+</blockquote>
+<h2 id="для-чего">Для чего</h2>
+<p>Сквозной конвейер лицензионного и зависимостного анализа: строит дерево зависимостей из реальных lock-файлов, досканирует исходники детектором лицензий, прогоняет результат через политику на Kotlin DSL и генерирует отчёты. Главная ценность — этап <code>evaluate</code>: правила вычисляют из набора лицензий нарушения (violations) с уровнем <code>ERROR</code>/<code>WARNING</code>/<code>HINT</code>, на которых строится воспроизводимый CI-gate.</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Конвейер из четырёх стадий <code>analyze → scan → evaluate → report</code>:</p>
+<pre><code class="language-bash">ort analyze  -i . -o out/                       # дерево зависимостей + заявленные лицензии
+ort scan     -i out/analyzer-result.yml -o out/ # детектор лицензий по исходникам
+ort evaluate -i out/scan-result.yml -o out/ \
+  --rules-file curations/rules.kts \
+  --license-classifications-file curations/license-classifications.yml
+ort report   -i out/evaluation-result.yml -o out/ -f WebApp,CycloneDX,SpdxDocument
+</code></pre>
+<p>Правило политики (<code>rules.kts</code>) — блокировать strong copyleft в проприетарной поставке:</p>
+<pre><code class="language-kotlin">fun RuleSet.copyleftRule() = packageRule("STRONG_COPYLEFT_IN_DISTRIBUTION") {
+    licenseRule("STRONG_COPYLEFT", LicenseView.CONCLUDED_OR_DECLARED_AND_DETECTED) {
+        require { isStrongCopyleft() }   // класс из license-classifications.yml
+        error("Лицензия ${license} класса strong copyleft в ${pkg.id.toCoordinates()}.",
+              "Получить юридическое заключение либо заменить компонент.")
+    }
+}
+</code></pre>
+<p><code>ort evaluate</code> завершается ненулевым кодом при наличии violations (например, <code>echo $?</code> → <code>2</code> для severity ERROR) — именно этот код останавливает pipeline.</p>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Исполняемая политика: лицензионное решение записано в <code>rules.kts</code>, версионируется в git и применяется одинаково на каждом прогоне — gate падает по правилу, а не по чьему-то мнению.</li>
+<li>Курации (<code>CONCLUDED_OR_DECLARED_AND_DETECTED</code>) поднимают ручной concluded-вердикт выше машинной находки — мост между detected (ScanCode) и concluded (заключение юриста).</li>
+<li>Одна команда покрывает весь путь: разбор зависимостей, детекция лицензий, оценка политикой, отчёты в WebApp/CycloneDX/SPDX.</li>
+<li>Готов к CI: код возврата и машинный <code>evaluation-result.yml</code> встраиваются в pipeline без обвязки.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<ul>
+<li>Высокий порог входа: политика — это Kotlin DSL, синтаксис чувствителен к версии ORT, правила из старых примеров копировать вслепую нельзя.</li>
+<li>Без подключённого <code>license-classifications.yml</code> правила вроде <code>isStrongCopyleft()</code> не на что опереться — violations будет <code>0</code>, и copyleft пройдёт незамеченным (ложноотрицательно, а не «чисто»).</li>
+<li>Качество зависит от lock-файлов: если <code>analyze</code> не нашёл <code>package-lock.json</code>/<code>go.sum</code>, дерево зависимостей пустое.</li>
+<li>Это батч-инструмент для CI и аналитика, а не интерактивный clearing с reviewer-ом и историей решений по файлам — для этого служит FOSSology.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Частично. Стадии <code>scan</code> и <code>evaluate</code> локальны, но <code>analyze</code> по умолчанию обращается к реестрам пакетов для разрешения зависимостей, а advisor подтягивает данные об уязвимостях из внешних фидов. В закрытом контуре ORT работает только при наличии зеркал пакетных менеджеров и локальных кэшей; без них стадия <code>analyze</code> неполна. Запускается официальным контейнером <code>ghcr.io/oss-review-toolkit/ort:latest</code> или собирается под JDK 17+.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<ul>
+<li>Модули: <a href="doc-2db02216b0fa.html">М07 Лицензионная чистота и юридический workflow</a> · <a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a></li>
+<li>Практики: <a href="doc-1e5ce9414ca8.html">П12. ORT и license policy</a> · <a href="doc-7bd470f91d5a.html">П11. ScanCode для лицензий</a> · <a href="doc-3fec9c1dc597.html">П26. Лицензионная классификация</a> · <a href="doc-98d59fd69bab.html">П27. Юридическое заключение и реестр лицензий</a></li>
+<li>Смежные карточки: <a href="doc-bddae25ab5db.html">ScanCode Toolkit</a> · <a href="doc-bc53e098bca4.html">FOSSology</a> · <a href="doc-13f8d73560e0.html">Eclipse SW360</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-4074ab5340cf.html">SPDX</a></li>
+</ul></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

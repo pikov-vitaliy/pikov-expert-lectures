@@ -1,0 +1,44 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Syft — КАПО · Пиков</title><meta name="description" content="Syft. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-e0e63f957dcf.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>04 Инструменты</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#для-чего">Для чего</a></li>
+<li><a href="#как-применяют">Как применяют</a></li>
+<li><a href="#сильные-стороны">Сильные стороны</a></li>
+<li><a href="#ограничения">Ограничения</a></li>
+<li><a href="#offline-on-premise">Offline / on-premise</a></li>
+<li><a href="#связанные-темы">Связанные темы</a></li>
+</ul>
+</div>
+<h1 id="syft">Syft</h1>
+<h2 id="для-чего">Для чего</h2>
+<p>Syft строит SBOM по содержимому артефакта: распаковывает контейнерный образ по слоям, читает каталоги пакетных менеджеров и lock-файлы и составляет список компонентов с версиями, лицензиями и PURL. Это движок инвентаризации, который сам не ищет уязвимости — он отдаёт «список фактов», на который потом натравливают сканер (Grype, depscan).</p>
+<h2 id="как-применяют">Как применяют</h2>
+<p>Сканирование образа из реестра и каталога исходников с выводом в CycloneDX JSON:</p>
+<pre><code class="language-bash">syft registry.example.org/app:1.4.2 -o cyclonedx-json=sbom.cdx.json
+syft dir:./src -o spdx-json=sbom.spdx.json
+</code></pre>
+<p>Каждый найденный пакет получает координату вида <code>pkg:deb/debian/openssl@3.0.11-1~deb12u2?arch=amd64</code> или <code>pkg:npm/lodash@4.17.21</code>. Поддерживается scope <code>--scope all-layers</code>, чтобы увидеть пакеты, удалённые в верхних слоях образа.</p>
+<blockquote>
+<p>Генератор, а не сканер
+Syft отвечает на вопрос «из чего собран артефакт», но не «что в нём уязвимо». Уязвимости ищет парный сканер (<a href="doc-99f61d072a43.html">Grype</a>) поверх того же SBOM. Не путайте пустой список уязвимостей с их отсутствием — на этом этапе их и не должно быть.</p>
+</blockquote>
+<h2 id="сильные-стороны">Сильные стороны</h2>
+<ul>
+<li>Широкое покрытие экосистем (deb, rpm, apk, npm, PyPI, Go modules, Java, Ruby, Rust) и каталогизаторы под каждый менеджер.</li>
+<li>Один движок одинаково работает по образу, файловой системе и архиву; стабильные PURL на выходе.</li>
+<li>Нативный экспорт в CycloneDX и SPDX без промежуточной конвертации.</li>
+<li>Эталонный источник данных для парного сканера Grype — те же координаты, та же база каталогизаторов.</li>
+</ul>
+<h2 id="ограничения">Ограничения</h2>
+<blockquote>
+<p>Слепая зона
+Syft видит только то, что заявлено пакетным менеджером. Статически слинкованные C/C++-зависимости и вендоренный (скопированный в дерево) код в инвентаризацию не попадают — для них нужен анализ бинаря (<a href="doc-9e42322f0345.html">blint</a>, <code>ldd</code>/<code>readelf</code>).</p>
+</blockquote>
+<ul>
+<li>Видит только то, что заявлено пакетным менеджером: статически слинкованные C/C++-зависимости и вендоренный код в инвентаризацию не попадают.</li>
+<li>Лицензия берётся из метаданных пакета; для точной юридической экспертизы её недостаточно, нужен сканер исходников.</li>
+<li>CPE генерирует эвристически — для сопоставления с NVD по CPE возможны промахи, PURL надёжнее.</li>
+</ul>
+<h2 id="offline-on-premise">Offline / on-premise</h2>
+<p>Полностью офлайн: для построения SBOM сеть не нужна, бинарь самодостаточен. Образы можно подавать из локального tar (<code>docker:archive</code> / <code>oci:archive</code>) или из внутреннего реестра закрытого контура. Каталоги уязвимостей здесь не загружаются — обогащение происходит на стадии сканера.</p>
+<h2 id="связанные-темы">Связанные темы</h2>
+<p><a href="doc-1bca905af1a7.html">М05 Инструменты генерации SBOM</a> · <a href="doc-ef214c81e577.html">М16 Честный SBOM контейнеров</a> · <a href="doc-4a0d55cda965.html">П03. Генерация SBOM через Syft</a> · <a href="doc-db1e407b9464.html">П06. Grype поверх готового SBOM</a> · <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a> · <a href="doc-99f61d072a43.html">Grype</a> · <a href="doc-dbc1ace95cba.html">CycloneDX</a> · <a href="doc-41eb01248f66.html">Package URL</a></p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

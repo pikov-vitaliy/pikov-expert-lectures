@@ -1,0 +1,74 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>М16. Конспект: SBOM for AI и честный SBOM контейнерных образов — КАПО · Пиков</title><meta name="description" content="М16. Конспект: SBOM for AI и честный SBOM контейнерных образов. Авторский курс по композиционному анализу, SBOM, ППК и безопасности цепочки поставки."><link rel="canonical" href="https://kapo.pikov.expert/library/doc-9b20a0de5005.html"><link rel="stylesheet" href="../assets/site.css"><script defer src="../assets/site.js"></script></head><body><a class="skip" href="#content">К содержимому</a><header class="topbar"><a class="wordmark" href="../index.html">Пиков / КАПО</a><div class="toplinks"><a href="index.html">Библиотека</a><button type="button" data-theme-toggle>Тёмная тема</button></div></header><main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>01 Курс</span></nav><details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details><div class="toc">
+<ul>
+<li><a href="#зачем-модуль">Зачем модуль</a></li>
+<li><a href="#ключевые-идеи">Ключевые идеи</a></li>
+<li><a href="#как-выглядит-на-практике">Как выглядит на практике</a></li>
+<li><a href="#связь-с-нормативкой">Связь с нормативкой</a></li>
+<li><a href="#что-уносим-в-работу">Что уносим в работу</a></li>
+</ul>
+</div>
+<h1 id="конспект-sbom-for-ai-и-честный-sbom-контейнерных-образов">Конспект: SBOM for AI и честный SBOM контейнерных образов</h1>
+<h2 id="зачем-модуль">Зачем модуль</h2>
+<p>Две темы, которые не закрываются обычным SBOM. Первая: AI-система — это не дерево npm/pypi-пакетов, а связка «модель + веса + датасеты + инфраструктура исполнения», и риски здесь другие (откуда взяты данные обучения, какова лицензия весов, на чём дистиллировали). Вторая: SBOM, сгенерированный по контейнерному образу, легко делается <strong>нечестным</strong> — он описывает то, что декларируется, а не то, что физически лежит в слоях. Аудитор, который верит распечатке SBOM, пропускает и приватный ключ в нижнем слое, и образ, в котором сканер «не нашёл ничего», потому что метаданные пакетов затёрты.</p>
+<h2 id="ключевые-идеи">Ключевые идеи</h2>
+<p><strong>SBOM for AI = обычный SBOM + семь кластеров.</strong> Документ G7 «SBOM for AI: Minimum Elements» (Avian, France, 2026; авторы — агентства BSI, ACN, ANSSI, CSE, CISA, NCSC, NCO и Еврокомиссия) прямо говорит: AI-система — тоже ПО, поэтому обычные минимальные элементы SBOM сохраняются, а сверху добавляются кластеры: <strong>Metadata, System Level Properties, Models, Datasets Properties, Infrastructure, Security Properties, KPI</strong>. Принципиально новое — в кластерах Models и Datasets:</p>
+<ul>
+<li><strong>Models:</strong> <code>Model hash value</code> / <code>Model hash algorithm</code> (хэш самих весов, не только кода), <code>Model license</code> с явной градацией <em>open weight / open architecture / open data / open training</em>, <code>Model training properties</code> (pre-training, fine-tuning, RLHF, DPO/PPO/GRPO), lineage — указание модели-предшественника, дистилляции, форков.</li>
+<li><strong>Datasets:</strong> <code>Dataset provenance</code> (источник, способ сбора — web crawling или коммерческое соглашение, шаги разметки), <code>Dataset sensitivity</code> (PII, copyright, sensitive — финансы/медицина), <code>Dataset hash</code>, <code>Dataset license</code>.</li>
+</ul>
+<p>Идентификаторы здесь шире привычных PURL/CPE: добавляются SWHID, OmniBOR, commit-хэши.</p>
+<p><strong>Честный SBOM образа = реальное содержимое слоёв, а не декларация.</strong> Сканеры образов (Trivy, Grype) работают так: скачивают образ, извлекают tar-ы слоёв из <code>blobs/sha256/</code>, проверяют пути пакетных БД (<code>/var/lib/dpkg/status</code>, <code>/lib/apk/db/installed</code>, <code>/var/lib/rpm/</code>), собирают результат. Это даёт три слепые зоны:</p>
+<ul>
+<li><strong>Удалённый-но-сохранённый файл.</strong> <code>RUN rm secret</code> создаёт новый слой, где файла нет, но в нижнем слое он остался физически.</li>
+<li><strong>Затёртые метаданные.</strong> Если в образе нет следов менеджера пакетов, сканер не видит зависимостей. В «дикой природе» (топ-100 образов реестров) &gt;50% образов модифицируют метаданные пакетов, ~20% ставят ПО мимо менеджера, у Bitnami — до 90%.</li>
+<li><strong>Спрятанные бинарники.</strong> UPX-упаковка ломает чтение build-info; <code>go build -ldflags "-X runtime.modinfo="</code> обнуляет список зависимостей Go.</li>
+</ul>
+<h2 id="как-выглядит-на-практике">Как выглядит на практике</h2>
+<p>Минимальный воспроизводимый пример «секрет переживает rm»:</p>
+<pre><code class="language-dockerfile">FROM busybox:latest
+COPY key.api .
+RUN rm key.api        # в финальном слое файла нет
+</code></pre>
+<pre><code class="language-bash">$ docker save secrets-test:latest | tar -x -C .
+$ find blobs/sha256/ -type f -exec file {} \; | grep tar
+blobs/sha256/b00389...f17b98: POSIX tar archive
+$ tar xvf blobs/sha256/b00389...f17b98
+key.api
+$ cat key.api
+-----BEGIN OPENSSH PRIVATE KEY-----   # секрет жив в нижнем слое
+</code></pre>
+<p>И демонстрация нечестности SBOM через обфускацию метаданных:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Команда</th>
+<th>Результат grype</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>grype …/nodejs-demoapp:latest</code></td>
+<td>97 vulnerability matches</td>
+</tr>
+<tr>
+<td><code>mint slim --obfuscate-metadata …</code> → <code>grype …:obfuscated</code></td>
+<td>0 vulnerability matches</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p>Слепые зоны именно этой темы
+- <strong>AI:</strong> SBOM for AI описывает <em>состав</em>, но не достижимость/автономность — G7 сознательно не вынес «уровень автономности агента» в отдельный элемент. Открытые веса без <code>Dataset provenance</code> — это лицензионная и legal-ловушка (copyright/PII в обучении).
+- <strong>Контейнеры:</strong> «статика» защищает только от легитимного пользователя — вредоносный образ обходит сканер (multi-stage, внешние загрузки в рантайме, обфускация неисправимы статикой). Перевыпуск SBOM после компрометации реестра (имитация коммитов, tag poisoning) делает подпись бесполезной без attestations.</p>
+</blockquote>
+<h2 id="связь-с-нормативкой">Связь с нормативкой</h2>
+<p>ГОСТ Р 56939-2024 (РБПО, общие требования) и проект ГОСТ Р по композиционному анализу требуют сохранять evidence и контролировать заимствованный код — для образов это значит фиксировать реальный, а не декларируемый состав. Целостность подтверждается attestations (in-toto, SLSA, подпись через Sigstore). См. <a href="doc-31e6d21d603c.html">05 Нормативка</a> и <a href="doc-fcb53dbf39b6.html">Регламент приёмки контейнерного образа</a>.</p>
+<h2 id="что-уносим-в-работу">Что уносим в работу</h2>
+<ol>
+<li>Для AI-поставки заполняем кластеры Models и Datasets отдельно от обычного SBOM — особенно <code>Model license</code> (open weight/data/training) и <code>Dataset provenance/sensitivity</code>.</li>
+<li>Никогда не верим SBOM образа без сверки с реальными слоями: <code>docker save</code> + извлечение tar-ов.</li>
+<li>Секреты ищем во <strong>всех</strong> слоях, а не в финальной ФС — <code>RUN rm</code> не удаляет.</li>
+<li>Проверяем образ на обфускацию: расхождение «декларация vs реальность» — это red flag, а не «чистый образ».</li>
+<li>Доверяй, но проверяй: статику дополняем динамикой и attestations.</li>
+</ol>
+<p>Практики: <a href="doc-43129979e613.html">П37. Контейнерный образ слои секреты и удаленные файлы</a>, <a href="doc-49d0efc0865d.html">П38. Честный SBOM контейнерного образа</a>, <a href="doc-b028f5647dce.html">П39. SBOM for AI minimum elements</a>. Справочник: <a href="doc-c243eb88011f.html">SBOM for AI - минимальные элементы</a>.</p></main><footer>Пиков Виталий Александрович · Авторские учебные материалы.<br><a href="../index.html#standard">Проект стандарта и границы применимости</a> · <a href="https://pikov.expert/">Все лекции</a></footer></body></html>

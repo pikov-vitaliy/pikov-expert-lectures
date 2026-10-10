@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "От компонента к обоснованному решению",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "auto",
+      "entries": {
+        "backend": {
+          "label": "Операции"
+        },
+        "database": {
+          "label": "Данные"
+        },
+        "security": {
+          "label": "Контроль"
+        },
+        "external": {
+          "label": "Источники"
+        }
+      }
+    }
+  },
+  "lanes": [
+    {
+      "id": "facts",
+      "label": "Факты о составе"
+    },
+    {
+      "id": "analysis",
+      "label": "Композиционный анализ"
+    },
+    {
+      "id": "decision",
+      "label": "Допуск и сопровождение"
+    }
+  ],
+  "mainPath": [
+    "input",
+    "identify",
+    "inventory",
+    "assess",
+    "resolve",
+    "monitor"
+  ],
+  "nodes": [
+    {
+      "id": "input",
+      "lane": "facts",
+      "col": 0,
+      "type": "external",
+      "label": "Компонент",
+      "sublabel": "Исходники и артефакты"
+    },
+    {
+      "id": "identify",
+      "lane": "facts",
+      "col": 1,
+      "type": "backend",
+      "label": "Идентификация",
+      "sublabel": "Версия, хеш, источник"
+    },
+    {
+      "id": "inventory",
+      "lane": "facts",
+      "col": 2,
+      "type": "database",
+      "label": "Состав продукта",
+      "sublabel": "SBOM и связи",
+      "width": 128
+    },
+    {
+      "id": "assess",
+      "lane": "analysis",
+      "col": 2,
+      "type": "security",
+      "label": "Оценка",
+      "sublabel": "Уязвимости и лицензии"
+    },
+    {
+      "id": "resolve",
+      "lane": "decision",
+      "col": 3,
+      "type": "security",
+      "label": "Решение",
+      "sublabel": "Доказательства и владелец",
+      "width": 128
+    },
+    {
+      "id": "monitor",
+      "lane": "decision",
+      "col": 4,
+      "type": "backend",
+      "label": "Сопровождение",
+      "sublabel": "Изменения и новые данные",
+      "width": 128
+    }
+  ],
+  "edges": [
+    {
+      "from": "input",
+      "to": "identify"
+    },
+    {
+      "from": "identify",
+      "to": "inventory"
+    },
+    {
+      "from": "inventory",
+      "to": "assess"
+    },
+    {
+      "from": "assess",
+      "to": "resolve"
+    },
+    {
+      "from": "resolve",
+      "to": "monitor"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Факты",
+      "items": [
+        "Состав привязан к конкретной сборке.",
+        "Для C/C++ учитываются vendored-код и статическая линковка."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Решение",
+      "items": [
+        "Отчёт сканера — вход для оценки.",
+        "Исключение имеет владельца, срок и обоснование."
+      ]
+    }
+  ]
+}
