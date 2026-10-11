@@ -392,7 +392,8 @@ foreach ($folder in $uniqueFolders) {
     }
     Write-Output "controlCustomHtaccess=$folder"
   } else {
-    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines)
+    $hasWebpImages = $null -ne (Get-ChildItem -LiteralPath $folderPath -Filter '*.webp' -Recurse -File | Select-Object -First 1)
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -WebpImages:$hasWebpImages)
   }
   Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
   Write-SitemapFile -Path (Join-Path $folderPath 'sitemap.xml') -Urls @($urls) -DefaultLastMod $lastMod
