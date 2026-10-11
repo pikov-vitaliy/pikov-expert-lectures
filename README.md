@@ -8,16 +8,16 @@
 
 ## Состояние репозитория
 
-Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **10 октября 2026 года**:
+Актуально по реестру [`_PROJECT/lectures.json`](_PROJECT/lectures.json) на **11 октября 2026 года**:
 
 | Показатель | Значение |
 |---|---:|
-| Записей в каталоге | 36 |
-| Канонических папок материалов | 32 |
-| Тематических разделов | 6 |
+| Записей в каталоге | 42 |
+| Канонических папок материалов | 38 |
+| Тематических разделов на главной | 5 |
 | `ready-local` | 22 |
-| `published-snapshot` | 14 |
-| Уникальных URL в `sitemap.xml` вместе с корнем | 38 |
+| `published-snapshot` | 20 |
+| Уникальных URL в `sitemap.xml` вместе с корнем | 44 |
 
 Несколько записей могут вести в одну папку: например, базовый пентест, углублённый пентест, статический анализ и фаззинг представлены страницами или якорями домена `new-courses.pikov.expert`.
 
@@ -38,41 +38,47 @@
 | # | Лекция или материал | URL | Раздел | Статус |
 |---:|---|---|---|---|
 | 1 | Введение в ОС Astra Linux SE 1.7 | [astra-intro.pikov.expert](https://astra-intro.pikov.expert/) | ОС и платформы | `published-snapshot` |
-| 2 | Astra Linux: экосистема и уровни защищенности | [astralinux01.pikov.expert](https://astralinux01.pikov.expert/) | ОС и платформы | `ready-local` |
+| 2 | Astra Linux: экосистема и уровни защищённости | [astralinux01.pikov.expert](https://astralinux01.pikov.expert/) | ОС и платформы | `ready-local` |
 | 3 | Формальные модели безопасности ОС | [astralinux02.pikov.expert](https://astralinux02.pikov.expert/) | ОС и платформы | `ready-local` |
-| 4 | Безопасная настройка Astra Linux 1.7 / 1.8 и ОС Linux | [astra-hardening.pikov.expert](https://astra-hardening.pikov.expert/) | ОС и платформы | `published-snapshot` |
+| 4 | Безопасная настройка Astra Linux 1.7 / 1.8 и ОС Linux (hardening) | [astra-hardening.pikov.expert](https://astra-hardening.pikov.expert/) | ОС и платформы | `published-snapshot` |
 | 5 | Безопасность ОС Windows | [windows.pikov.expert](https://windows.pikov.expert/) | ОС и платформы | `ready-local` |
 | 6 | Архитектура ЭВМ и аппаратная безопасность | [pc-elbrus.pikov.expert](https://pc-elbrus.pikov.expert/) | ОС и платформы | `published-snapshot` |
 | 7 | KOMRAD Enterprise SIEM 4.5 | [komrad.pikov.expert](https://komrad.pikov.expert/) | ОС и платформы | `published-snapshot` |
-| 8 | Сканер-ВС 7 и компонент «Инспектор»: двухдневный практикум | [scaner-vs.pikov.expert](https://scaner-vs.pikov.expert/) | ОС и платформы | `ready-local` |
+| 8 | Сканер-ВС 7 и компонент «Инспектор» | [scaner-vs.pikov.expert](https://scaner-vs.pikov.expert/) | ОС и платформы | `ready-local` |
 | 9 | Сертификация средств защиты информации | [cert.pikov.expert](https://cert.pikov.expert/) | Регулирование и право | `ready-local` |
 | 10 | Лицензирование в сфере ТЗИ | [lic-tzi.pikov.expert](https://lic-tzi.pikov.expert/) | Регулирование и право | `ready-local` |
 | 11 | Подразделения ТЗИ и их функции | [tzi-dept.pikov.expert](https://tzi-dept.pikov.expert/) | Регулирование и право | `published-snapshot` |
 | 12 | День I. Риски ИБ, безопасность ЗО КИИ, инциденты | [risk.pikov.expert](https://risk.pikov.expert/) | Регулирование и право | `published-snapshot` |
 | 13 | День II. Объекты КИИ: угрозы, меры, уязвимости | [threats-kii.pikov.expert](https://threats-kii.pikov.expert/) | Регулирование и право | `published-snapshot` |
-| 14 | Техническое задание: проверяемые требования и РБПО | [tz.pikov.expert](https://tz.pikov.expert/) | РБПО | `ready-local` |
-| 15 | Подготовка к сертификации процессов РБПО | [fstec-sdlc.pikov.expert](https://fstec-sdlc.pikov.expert/) | РБПО | `published-snapshot` |
+| 14 | Техническое задание (ТЗ): проверяемые требования и встраивание РБПО | [tz.pikov.expert](https://tz.pikov.expert/) | РБПО | `ready-local` |
+| 15 | Подготовка к сертификации процессов РБПО (Приказы №240 и №230 ФСТЭК России) | [fstec-sdlc.pikov.expert](https://fstec-sdlc.pikov.expert/) | РБПО | `published-snapshot` |
 | 16 | РБПО — разработка безопасного программного обеспечения | [gost56939.pikov.expert](https://gost56939.pikov.expert/) | РБПО | `ready-local` |
-| 17 | Композиционный анализ ПО | [kapo.pikov.expert](https://kapo.pikov.expert/) | РБПО | `ready-local` |
-| 18 | Статический анализ безопасности приложений | [sast.pikov.expert](https://sast.pikov.expert/) | РБПО | `published-snapshot` |
-| 19 | Нефункциональное тестирование безопасности ПО | [p19.pikov.expert](https://p19.pikov.expert/) | РБПО | `ready-local` |
-| 20 | Архитектурный анализ / ППК ФСТЭК | [ppk.pikov.expert](https://ppk.pikov.expert/) | РБПО | `published-snapshot` |
+| 17 | Композиционный анализ ПО (КАПО) | [kapo.pikov.expert](https://kapo.pikov.expert/) | РБПО | `ready-local` |
+| 18 | Статический анализ безопасности приложений (SAST) | [sast.pikov.expert](https://sast.pikov.expert/) | РБПО | `published-snapshot` |
+| 19 | Нефункциональное тестирование безопасности ПО (процесс №19) | [p19.pikov.expert](https://p19.pikov.expert/) | РБПО | `ready-local` |
+| 20 | Архитектурный анализ. Формирование и предоставление ППК ФСТЭК России (процессы №6, №7, №16, №17) | [ppk.pikov.expert](https://ppk.pikov.expert/) | РБПО | `published-snapshot` |
 | 21 | Информационная безопасность и системы менеджмента ИБ | [27001.pikov.expert](https://27001.pikov.expert/) | РБПО | `ready-local` |
-| 22 | Технологии хакеров и оценка защищенности | [pentest.pikov.expert](https://pentest.pikov.expert/) | Авторские учебные направления | `published-snapshot` |
-| 23 | Статический анализ ПО + PVS-Studio | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Авторские учебные направления | `ready-local` |
-| 24 | Пентест базовый | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Авторские учебные направления | `ready-local` |
-| 25 | Пентест углубленный | [new-courses.pikov.expert/pentest-02.html](https://new-courses.pikov.expert/pentest-02.html) | Авторские учебные направления | `published-snapshot` |
-| 26 | Фаззинг-тестирование | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Авторские учебные направления | `ready-local` |
+| 22 | Технологии хакеров и оценка защищённости информационной инфраструктуры | [pentest.pikov.expert](https://pentest.pikov.expert/) | Авторские учебные направления | `published-snapshot` |
+| 23 | Статический анализ ПО + PVS-Studio (3 дня) | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pvsstat) | Авторские учебные направления | `ready-local` |
+| 24 | Тестирование на проникновение, базовый (5 дней) | [new-courses.pikov.expert](https://new-courses.pikov.expert/#pentest01) | Авторские учебные направления | `ready-local` |
+| 25 | Тестирование на проникновение, углублённый (10 дней) | [new-courses.pikov.expert](https://new-courses.pikov.expert/pentest-02.html) | Авторские учебные направления | `published-snapshot` |
+| 26 | Фаззинг-тестирование для разработки безопасного ПО | [new-courses.pikov.expert](https://new-courses.pikov.expert/#fuzzing) | Авторские учебные направления | `ready-local` |
 | 27 | Проектирование информационных систем | [is.pikov.expert](https://is.pikov.expert/) | Студенческие курсы | `ready-local` |
 | 28 | Методика формулирования тем ВКР | [vkr.pikov.expert](https://vkr.pikov.expert/) | Студенческие курсы | `ready-local` |
-| 29 | Лицензии SPDX на русском | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | `ready-local` |
+| 29 | Лицензии SPDX на русском с вердиктами | [spdx.pikov.expert](https://spdx.pikov.expert/) | Справочник | `ready-local` |
 | 30 | Жизненный цикл безопасного ПО: языки, стеки и четыре дефекта | [27-07-2026.pikov.expert](https://27-07-2026.pikov.expert/) | РБПО | `ready-local` |
 | 31 | Языки, архитектура и безопасный SQL | [29-07-2026.pikov.expert](https://29-07-2026.pikov.expert/) | РБПО | `ready-local` |
-| 32 | Безопасность приложений: программа и материалы двух дней | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `ready-local` |
-| 33 | Безопасность приложений: практикум и лабораторные задания | [appsec-lections.pikov.expert/practice.html](https://appsec-lections.pikov.expert/practice.html) | РБПО | `ready-local` |
+| 32 | Безопасность приложений: программа и материалы двух дней | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/) | РБПО | `published-snapshot` |
+| 33 | Безопасность приложений: практикум и лабораторные задания | [appsec-lections.pikov.expert](https://appsec-lections.pikov.expert/practice.html) | РБПО | `published-snapshot` |
 | 34 | Не ищите шаблон: постройте безопасную разработку | [main-rbpo.pikov.expert](https://main-rbpo.pikov.expert/) | РБПО | `ready-local` |
 | 35 | Каталог угроз для анализа безопасности ПО | [threats.pikov.expert](https://threats.pikov.expert/) | РБПО | `ready-local` |
 | 36 | Динамический анализ ПО: проект стандарта и практика | [dast.pikov.expert](https://dast.pikov.expert/) | РБПО | `ready-local` |
+| 37 | Безопасная разработка: история, стандарты и процессы | [56939-lections.pikov.expert](https://56939-lections.pikov.expert/) | Безопасная разработка ПО (РБПО) | `published-snapshot` |
+| 38 | Сервис «РБПО-аудит»: композиционный анализ | [rbpo-audit.pikov.expert](https://rbpo-audit.pikov.expert/) | Безопасная разработка ПО (РБПО) | `published-snapshot` |
+| 39 | Сервис SBOM-аудита: устройство и результаты проекта | [rbpo-audit-start-result.pikov.expert](https://rbpo-audit-start-result.pikov.expert/) | Безопасная разработка ПО (РБПО) | `published-snapshot` |
+| 40 | Лицензионный аудит программных компонентов | [sbom-license-audit.pikov.expert](https://sbom-license-audit.pikov.expert/) | Безопасная разработка ПО (РБПО) | `published-snapshot` |
+| 41 | МАИ: расписание осеннего семестра 2026/27 | [mai.pikov.expert](https://mai.pikov.expert/) | Учебные курсы и справочники | `published-snapshot` |
+| 42 | Самопроверка по безопасной разработке | [tests.pikov.expert](https://tests.pikov.expert/) | Учебные курсы и справочники | `published-snapshot` |
 
 ## Структура
 

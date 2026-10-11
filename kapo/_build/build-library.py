@@ -11,6 +11,7 @@ root=Path(__file__).resolve().parents[1]
 source=root/'_build/course-source'
 out=root/'library';out.mkdir(exist_ok=True)
 esc=html.escape
+repairs=json.loads((root/'_build/external-link-repairs.json').read_text(encoding='utf-8'))
 files=sorted(source.rglob('*.md'))
 records=[];by_path={};by_stem={};unresolved=[]
 for p in files:
@@ -84,12 +85,18 @@ for rec in records:
  soup=BeautifulSoup(rendered,'html.parser')
  for a in soup.find_all('a',href=True):
   href=a['href']
+  if href in repairs:
+   fix=repairs[href];a['data-original-url']=href;a['href']=fix['url'];a.string=fix['label'];a['title']=fix['note'];href=a['href']
   if re.match(r'https?://(?:localhost|127\.0\.0\.1)(?::\d+)?',href):
    replacement=soup.new_tag('code');replacement.string=href;a.replace_with(replacement);continue
   if href.startswith('http'):a['target']='_blank';a['rel']='noopener noreferrer'
  for table in soup.find_all('table'):
   wrapper=soup.new_tag('div',attrs={'class':'table-wrap'});table.wrap(wrapper)
  notice='<details class="note small"><summary>Как читать авторский курс и нормативные материалы</summary><p>Это учебные материалы, а не заключение о соответствии конкретного продукта. Организационные модели курса отделяйте от терминов стандарта: ППК в опубликованном проекте — машиночитаемый перечень, а живой реестр его версий является практикой сопровождения. Термин OSA в разных материалах имеет разный охват. Статус и обязательность нормативного документа проверяются отдельно; проект КАПО опубликован как проект первой редакции.</p></details>'
+ for original,fix in repairs.items():
+  if original in body:
+   fallback='' if soup.find('a',href=fix['url']) else f' <a href="{esc(fix["url"])}" target="_blank" rel="noopener noreferrer">{esc(fix["label"])}</a>'
+   notice+=f'<p class="note small">{esc(fix["note"])}{fallback}</p>'
  page=f'<main class="reader" id="content"><nav class="breadcrumbs"><a href="../index.html">КАПО</a> / <a href="index.html">Библиотека</a> / <span>{esc(rec["section"])}</span></nav>{notice}{soup}</main>'
  (out/rec['href']).write_text(shell(rec['title'],page,'library/'+rec['href']),encoding='utf-8')
 

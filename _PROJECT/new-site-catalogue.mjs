@@ -37,7 +37,7 @@ const CATEGORY_PRESENTATION = {
 // These source labels name institutions or subjects, rather than material types.
 // Classify those entries explicitly; an unfamiliar label must be reviewed.
 const KIND_BY_URL = new Map([
-  ['https://kapo.pikov.expert/', 'lecture'],
+  ['https://kapo.pikov.expert/', 'course'],
   ['https://sast.pikov.expert/', 'lecture'],
   ['https://p19.pikov.expert/', 'lecture'],
   ['https://ppk.pikov.expert/', 'course'],

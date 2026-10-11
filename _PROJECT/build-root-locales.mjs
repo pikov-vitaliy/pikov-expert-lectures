@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { parseCatalogue } from "./new-site-catalogue.mjs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -50,7 +51,7 @@ function buildRussian(english) {
         "url": "https://pikov.expert/",
         "name": "pikov.expert",
         "inLanguage": ["en", "ru"],
-        "description": "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; сами учебные материалы — на русском.",
+        "description": "Личный каталог авторских лекций и курсов Виталия Пикова по информационной безопасности. Интерфейс каталога доступен на русском и английском языках; учебные материалы преимущественно на русском, отдельные выпуски доступны на английском.",
         "author": { "@id": "https://pikov.expert/#person" }
       }
     ]
@@ -61,18 +62,18 @@ function buildRussian(english) {
     ["<a class=\"lang-btn\" id=\"langToggle\" href=\"/ru/\"", "<a class=\"lang-btn\" id=\"langToggle\" href=\"/\"", "language fallback link"],
     ["<title>Vitaliy Pikov — secure software development, DevSecOps and AppSec expert</title>", "<title>Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec</title>", "title"],
     ["<meta name=\"author\" content=\"Vitaliy Pikov\">", "<meta name=\"author\" content=\"Пиков Виталий Александрович\">", "author"],
-    ["<meta name=\"description\" content=\"Original lectures and courses on information security by Vitaliy Pikov: secure software development (SSDLC), DevSecOps, AppSec, SAST, fuzzing, penetration testing, Astra Linux and Windows hardening, SIEM, certification and licensing. Course materials are in Russian.\">", "<meta name=\"description\" content=\"Авторские лекции и курсы по информационной безопасности, защите информации, ОС Astra Linux и Windows, Сканер-ВС 7, архитектуре ЭВМ, сертификации и лицензированию ТЗИ, безопасной разработке ПО и SIEM.\">", "description"],
+    ["<meta name=\"description\" content=\"Original lectures and courses on information security by Vitaliy Pikov: secure software development (SSDLC), DevSecOps, AppSec, SAST, fuzzing, penetration testing, Astra Linux and Windows hardening, SIEM, certification and licensing. Most course materials are in Russian; selected resources are available in English.\">", "<meta name=\"description\" content=\"Авторские лекции и курсы по информационной безопасности, защите информации, ОС Astra Linux и Windows, Сканер-ВС 7, архитектуре ЭВМ, сертификации и лицензированию ТЗИ, безопасной разработке ПО и SIEM.\">", "description"],
     ["<link rel=\"canonical\" href=\"https://pikov.expert/\">", "<link rel=\"canonical\" href=\"https://pikov.expert/ru/\">", "canonical"],
     ["<meta property=\"og:locale\" content=\"en_US\">", "<meta property=\"og:locale\" content=\"ru_RU\">", "OpenGraph locale"],
     ["<meta property=\"og:locale:alternate\" content=\"ru_RU\">", "<meta property=\"og:locale:alternate\" content=\"en_US\">", "OpenGraph alternate locale"],
     ["<meta property=\"og:url\" content=\"https://pikov.expert/\">", "<meta property=\"og:url\" content=\"https://pikov.expert/ru/\">", "OpenGraph URL"],
     ["<meta property=\"og:title\" content=\"Vitaliy Pikov — secure software development, DevSecOps and AppSec expert\">", "<meta property=\"og:title\" content=\"Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec\">", "OpenGraph title"],
-    ["<meta property=\"og:description\" content=\"Original lectures and courses on secure software development, DevSecOps, AppSec, penetration testing, platform hardening and SIEM. Course materials are in Russian.\">", "<meta property=\"og:description\" content=\"Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.\">", "OpenGraph description"],
+    ["<meta property=\"og:description\" content=\"Original lectures and courses on secure software development, DevSecOps, AppSec, penetration testing, platform hardening and SIEM. Most course materials are in Russian; selected resources are available in English.\">", "<meta property=\"og:description\" content=\"Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.\">", "OpenGraph description"],
     ["<meta property=\"og:image:alt\" content=\"Vitaliy Pikov — portrait\">", "<meta property=\"og:image:alt\" content=\"Пиков Виталий Александрович — фото\">", "OpenGraph image alt"],
     ["<meta property=\"profile:first_name\" content=\"Vitaliy\">", "<meta property=\"profile:first_name\" content=\"Виталий\">", "profile first name"],
     ["<meta property=\"profile:last_name\" content=\"Pikov\">", "<meta property=\"profile:last_name\" content=\"Пиков\">", "profile last name"],
     ["<meta name=\"twitter:title\" content=\"Vitaliy Pikov — secure software development, DevSecOps and AppSec expert\">", "<meta name=\"twitter:title\" content=\"Виталий Пиков — эксперт по безопасной разработке ПО, DevSecOps и AppSec\">", "Twitter title"],
-    ["<meta name=\"twitter:description\" content=\"Original lectures and courses on secure software development, DevSecOps, AppSec, penetration testing, platform hardening and SIEM. Course materials are in Russian.\">", "<meta name=\"twitter:description\" content=\"Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.\">", "Twitter description"],
+    ["<meta name=\"twitter:description\" content=\"Original lectures and courses on secure software development, DevSecOps, AppSec, penetration testing, platform hardening and SIEM. Most course materials are in Russian; selected resources are available in English.\">", "<meta name=\"twitter:description\" content=\"Авторские лекции и курсы по безопасной разработке ПО, DevSecOps, AppSec, тестированию на проникновение, защите платформ и SIEM.\">", "Twitter description"],
     ["<meta name=\"twitter:image:alt\" content=\"Vitaliy Pikov — portrait\">", "<meta name=\"twitter:image:alt\" content=\"Пиков Виталий Александрович — фото\">", "Twitter image alt"],
     // Значение обязано совпадать байт в байт с portraitAlt в UI.ru (index.html),
     // иначе статическая разметка и runtime-правка alt разойдутся.
@@ -132,7 +133,24 @@ function buildRussianCourseMap(english) {
   return russian;
 }
 
+function buildCatalogueFallback(source) {
+  const { categories, lectures } = parseCatalogue(source);
+  const escape = value => String(value).replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+  const pair = (ru, en) => '<span data-l="ru">' + escape(ru) + '</span><span data-l="en">' + escape(en) + '</span>';
+  const n = lectures.length;
+  const ruLabel = n % 100 >= 11 && n % 100 <= 14 ? 'учебных материалов' : n % 10 === 1 ? 'учебный материал' : n % 10 >= 2 && n % 10 <= 4 ? 'учебных материала' : 'учебных материалов';
+  const fallback = '<noscript><div class="catalog-fallback">' +
+    '<p class="catalog-note">' + pair('Полный каталог доступен без JavaScript. Поиск и фильтры работают при его включении.', 'The complete catalogue is available without JavaScript. Enable JavaScript to use search and filters.') + '</p>' +
+    categories.map(category => '<section id="cat-' + escape(category.id) + '"><h3>' + pair(category.name, category.nameEn) + '</h3><ul>' +
+      lectures.filter(item => item.category === category.id).map(item => '<li><a href="' + escape(item.url) + '">' + pair(item.title, item.titleEn) + '</a></li>').join('') + '</ul></section>').join('') + '</div></noscript>';
+  if ((source.match(/<noscript>/g) || []).length !== 1) throw new Error('Expected one catalogue fallback');
+  return source.replace(/(<b id="lectureCount">)[^<]*(<\/b>)/, '$1' + n + '$2')
+    .replace(/<span id="lectureCountLabel">[\s\S]*?<\/span>(?:<span data-l="en">[\s\S]*?<\/span><\/span>)?/, '<span id="lectureCountLabel">' + pair(ruLabel, n === 1 ? 'teaching material' : 'teaching materials') + '</span>')
+    .replace(/<noscript>[\s\S]*?<\/noscript>/, fallback);
+}
+
 const documents = [
+  { source: sourcePath, target: sourcePath, build: buildCatalogueFallback },
   { source: sourcePath, target: targetPath, build: buildRussian },
   { source: courseMapSourcePath, target: courseMapTargetPath, build: buildRussianCourseMap },
 ];

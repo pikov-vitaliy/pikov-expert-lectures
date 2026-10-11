@@ -136,7 +136,9 @@ test('preview is noindex and structured data does not call every resource a cour
     assert.equal(data.mainEntity.numberOfItems, catalogue.lectures.length);
     const entries = data.mainEntity.itemListElement.map(entry => entry.item);
     assert.deepEqual(entries.map(item => item.url).sort(), catalogue.lectures.map(item => item.url).sort());
-    assert.ok(entries.every(item => item.inLanguage === 'ru'));
+    for (const item of entries) {
+      assert.deepEqual(item.inLanguage, item.url === 'https://56939-lections.pikov.expert/' ? ['ru', 'en'] : 'ru');
+    }
     assert.ok(entries.some(item => item['@type'] === 'Course'));
     assert.ok(entries.some(item => item['@type'] === 'LearningResource'));
     assert.equal(entries.find(item => item.url === 'https://spdx.pikov.expert/')['@type'], 'CreativeWork');
