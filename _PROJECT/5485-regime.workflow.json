@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "diagram_type": "workflow",
+  "meta": {
+    "title": "От основания к защите информации",
+    "quality_profile": "showcase",
+    "legend": {
+      "mode": "hidden"
+    }
+  },
+  "lanes": [
+    {
+      "id": "basis",
+      "label": "Основание и описание режима"
+    },
+    {
+      "id": "handling",
+      "label": "Обращение и защита"
+    }
+  ],
+  "mainPath": [
+    "law",
+    "list",
+    "level",
+    "mark",
+    "access",
+    "measures",
+    "responsibility"
+  ],
+  "nodes": [
+    {
+      "id": "law",
+      "lane": "basis",
+      "col": 0,
+      "label": "Основание",
+      "sublabel": "Закон и полномочия",
+      "type": "security"
+    },
+    {
+      "id": "list",
+      "lane": "basis",
+      "col": 1,
+      "label": "Перечень",
+      "sublabel": "Состав сведений",
+      "type": "security"
+    },
+    {
+      "id": "level",
+      "lane": "basis",
+      "col": 2,
+      "label": "Степень",
+      "sublabel": "Если предусмотрена",
+      "type": "security"
+    },
+    {
+      "id": "mark",
+      "lane": "basis",
+      "col": 3,
+      "label": "Пометка",
+      "sublabel": "По правилам режима",
+      "type": "security"
+    },
+    {
+      "id": "access",
+      "lane": "handling",
+      "col": 3,
+      "label": "Доступ",
+      "sublabel": "Кто и в каком объёме",
+      "type": "security"
+    },
+    {
+      "id": "measures",
+      "lane": "handling",
+      "col": 4,
+      "label": "Меры",
+      "sublabel": "Защита и контроль",
+      "type": "security"
+    },
+    {
+      "id": "responsibility",
+      "lane": "handling",
+      "col": 5,
+      "label": "Ответственность",
+      "sublabel": "При нарушении",
+      "type": "security",
+      "width": 150
+    }
+  ],
+  "edges": [
+    {
+      "from": "law",
+      "to": "list"
+    },
+    {
+      "from": "list",
+      "to": "level"
+    },
+    {
+      "from": "level",
+      "to": "mark"
+    },
+    {
+      "from": "mark",
+      "to": "access"
+    },
+    {
+      "from": "access",
+      "to": "measures"
+    },
+    {
+      "from": "measures",
+      "to": "responsibility"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Учебная модель",
+      "items": [
+        "Это порядок вопросов для анализа режима.",
+        "Состав действий зависит от вида сведений."
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Государственная тайна",
+      "items": [
+        "Перечни, степени и грифы — по Закону № 5485-1.",
+        "Допуск не заменяет разрешённый доступ."
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Исключения из цепочки",
+      "items": [
+        "ПДн и профессиональные тайны защищаются законом.",
+        "Отсутствие пометки не снимает защиту."
+      ]
+    }
+  ]
+}
