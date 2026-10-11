@@ -84,6 +84,7 @@ $textExtensions = [System.Collections.Generic.HashSet[string]]::new([System.Stri
 # closed until its text and visual provenance have been reviewed explicitly.
 $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 @(
+  'b876810b65c3ac2d64fee2a073ec7e8d85d8e0cfc8169b11f0c15b52f56fc598', # 5485-1: 24-slide author presentation; all rendered slides, text and attribution reviewed
   '7c1178b7ccadd333d128c2c7e7fc277124ae0a0b77cb905428edda705fbfbd46', # 5485-1: author lecture, 30 pages; text, private-reference scan and rendered pages reviewed
   '9a46df9998a7b1c4e244e504f55ba10bcb3498d8a81f5b594cf9a50f2e5912b7', # KAPO: supplied first-edition draft; text, figures and source provenance reviewed
   '260b996af059c20744d6373482970aaede0a32cbdb11adf88a9fbc9fedf287c1', # DAST: aflpp_fuzzing_windows10_student.pdf
