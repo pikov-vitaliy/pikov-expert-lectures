@@ -4,6 +4,7 @@ import json,hashlib,zipfile,re,io
 root=Path(__file__).resolve().parents[1]
 source=root/'_build/course-source'
 manifest=json.loads((root/'_build/course-sources.json').read_text(encoding='utf-8'))
+repairs=json.loads((root/'_build/external-link-repairs.json').read_text(encoding='utf-8'))
 entries={}
 for item in manifest:
  rel=PurePosixPath(item['path'])
@@ -15,6 +16,10 @@ for item in manifest:
  if rel.suffix=='.md':
   text=data.decode('utf-8-sig')
   text=re.sub(r'\[\[99 Служебное/([^\]|]+)(?:\\?\|([^\]]+))?\]\]',lambda m:(m[2] or m[1])+' (редакционная заметка автора)',text)
+  for original,fix in repairs.items():
+   if original in text:
+    text=re.sub(r'\[[^\]]*\]\('+re.escape(original)+r'\)',lambda m:'['+fix['label']+']('+fix['url']+')',text)
+    text=text.replace(original,fix['url']).rstrip()+'\n\n> '+fix['note']+'\n'
   data=text.replace('\r\n','\n').encode('utf-8')
  entries[rel.as_posix()]=data.decode('utf-8').replace('\r\n','\n').encode('utf-8')
 entries['README.md']='''# Курс SCA/OSA — Пиков Виталий Александрович
@@ -27,6 +32,7 @@ entries['README.md']='''# Курс SCA/OSA — Пиков Виталий Але�
 
 Это авторские учебные материалы. Организационная модель сопровождения ППК не заменяет определение ППК в нормативном документе. В опубликованном проекте ППК — машиночитаемый документ; реестр его версий — отдельная практика управления. Проект первой редакции не следует выдавать за утверждённый стандарт. Применимость требований и актуальные версии инструментов проверяются для конкретной задачи.
 Служебные ссылки на редакционные заметки заменены текстом; рабочие документы и переписки в архив не включены.
+Подтверждённые недоступные внешние ссылки заменены теми же адресами, что и в веб-библиотеке; пояснения приведены в соответствующих заметках. Исходные авторские файлы сохранены отдельно без изменений.
 '''.encode('utf-8')
 buf=io.BytesIO()
 with zipfile.ZipFile(buf,'w',compression=zipfile.ZIP_DEFLATED,compresslevel=9) as z:
