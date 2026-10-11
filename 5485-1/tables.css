@@ -1,0 +1,31 @@
+/* Reading controls for wide lecture tables. The PDF/print layout is unchanged. */
+.table-panel{margin:24px 0;min-width:0}
+.table-panel>.table-wrap{margin:0}
+.table-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:10px;background:var(--soft);border:1px solid var(--line);border-radius:6px 6px 0 0}
+.table-tools[hidden],.table-top-scroll[hidden]{display:none}
+.table-tools-label{font-size:13px;color:var(--muted);margin-right:auto}
+.table-tools button,.table-dialog-close{min-height:44px;min-width:44px;padding:7px 13px;border:1px solid var(--line);border-radius:5px;background:var(--panel);color:var(--ink);font:600 14px/1.3 'Segoe UI',Arial,sans-serif;cursor:pointer}
+.table-tools .table-expand{background:var(--accent);border-color:var(--accent);color:var(--panel)}
+:root[data-theme=dark] .table-tools .table-expand{color:#101d2d}
+.table-tools button:disabled{opacity:.4;cursor:default}
+.table-top-scroll{height:36px;display:flex;align-items:center;padding:0 8px;background:var(--panel);border:1px solid var(--line);border-top:0}
+.table-top-scroll input{width:100%;height:30px;margin:0;accent-color:var(--accent);cursor:ew-resize}
+.table-panel.is-scrollable>.table-wrap{max-height:65vh;max-height:65dvh;overscroll-behavior:contain;scrollbar-color:var(--accent) var(--soft)}
+.table-panel.is-scrollable table,.table-dialog table{border-collapse:separate;border-spacing:0}
+.table-panel.is-scrollable thead th,.table-dialog thead th{position:sticky;top:0;z-index:2;background:var(--soft);box-shadow:0 2px 0 var(--line)}
+.table-panel.is-scrollable tr>:first-child,.table-dialog tr>:first-child{position:sticky;left:0;z-index:1;background:var(--panel);box-shadow:2px 0 0 var(--line)}
+.table-panel.is-scrollable thead tr>:first-child,.table-dialog thead tr>:first-child{z-index:3;background:var(--soft)}
+.table-wide{table-layout:fixed;min-width:var(--table-width)}
+.table-wide th,.table-wide td{overflow-wrap:anywhere}
+.table-dialog{padding:0;border:1px solid var(--line);border-radius:10px;background:var(--panel);color:var(--ink);width:calc(100vw - 32px);height:calc(100vh - 32px);height:calc(100dvh - 32px);max-width:none;max-height:none;overflow:hidden}
+.table-dialog[open]{display:flex;flex-direction:column}
+.table-dialog::backdrop{background:rgba(7,20,37,.72)}
+.table-dialog-header{display:flex;align-items:center;gap:16px;justify-content:space-between;padding:14px 18px;flex:none}
+.table-dialog-title{font:600 20px/1.3 'Segoe UI',Arial,sans-serif;margin:0;overflow-wrap:anywhere}
+.table-dialog-close{flex:none}
+.table-dialog>.table-tools,.table-dialog>.table-top-scroll{flex:none;border-radius:0}
+.table-dialog>.table-wrap{flex:1;min-height:0;margin:0;border-radius:0;overscroll-behavior:contain;scrollbar-color:var(--accent) var(--soft)}
+.table-dialog table{font-size:16px;line-height:1.6;min-width:var(--table-width,620px)}
+.table-dialog td,.table-dialog th{padding:14px}
+@media(max-width:550px){.table-tools-label{flex-basis:100%}.table-tools .table-expand{flex:1}.table-dialog{width:calc(100vw - 12px);height:calc(100vh - 12px);height:calc(100dvh - 12px);border-radius:6px}.table-dialog-header{padding:10px;gap:8px}.table-dialog-title{font-size:16px}.table-dialog-close{padding:7px 10px}.table-dialog table{font-size:15px}.table-panel.is-scrollable tr>:first-child,.table-dialog tr>:first-child{max-width:150px}.table-wide tr>:first-child{width:140px}}
+@media print{html{overflow:visible!important}.table-tools,.table-top-scroll,.table-dialog{display:none!important}.table-panel{margin:24px 0}.table-panel.is-scrollable>.table-wrap{max-height:none;overflow:visible}.table-panel.is-scrollable table{border-collapse:collapse;min-width:0}.table-panel.is-scrollable th,.table-panel.is-scrollable td{position:static!important;box-shadow:none!important}.table-wide{min-width:0;table-layout:fixed}}
