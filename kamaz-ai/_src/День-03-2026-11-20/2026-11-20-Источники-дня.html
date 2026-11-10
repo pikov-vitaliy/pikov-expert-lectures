@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Источники третьего дня</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Источники третьего дня</h1>
+<p>Все ссылки, которые встречаются в лекциях, практике, ключах и дополнительных материалах третьего дня. Нумерация общая для всех файлов дня. Ссылки открывались и проверялись 10.11.2026.</p>
+<h2>Научные публикации</h2>
+<p><strong>Поиск идей и концептуальное проектирование</strong></p>
+<ul>
+<li>[1] Ma K., Grandi D., McComb C., Goucher-Lambert K. Conceptual Design Generation Using Large Language Models. 2023. Препринт arXiv. https://doi.org/10.48550/arXiv.2306.01779</li>
+<li>[2] Jiang S., Li W., Qian Y., et al. AutoTRIZ: Automating engineering innovation with TRIZ and large language models // Advanced Engineering Informatics. 2025. https://doi.org/10.1016/j.aei.2025.103312</li>
+<li>[3] Ege D. N., Øvrebø H. H., Stubberud V., et al. ChatGPT as an inventor: eliciting the strengths and weaknesses of current large language models against humans in engineering design // Artificial Intelligence for Engineering Design, Analysis and Manufacturing. 2025. https://doi.org/10.1017/s0890060425000010</li>
+<li>[4] Liu S., Shen Y., Zhang Y., et al. iDesignGPT enhances conceptual design via large language model agentic workflows // Nature Communications. 2026. https://doi.org/10.1038/s41467-026-68672-1</li>
+<li>[5] Xiao S., Zhang G., McAdams D. A. Collaboration Between Two Large Language Models for Design Concept Generation // Journal of Mechanical Design. 2026. https://doi.org/10.1115/1.4072235</li>
+<li>[6] Feng W. B., Hélie S., Panchal J. H. Enhancing design concept diversity: multi-persona prompting strategies for large language models // Design Science. 2025. https://doi.org/10.1017/dsj.2025.10037</li>
+</ul>
+<p><strong>Сравнение вариантов и многокритериальный выбор</strong></p>
+<ul>
+<li>[7] Piñones E., Nikulin C., Briede Westermeyer J. C. SUPPORTING DECISION MAKING IN ENGINEERING DESIGN BY ANALIZING TEAM DISCUSSIONS WITH LANGUAGE MODELS // DYNA. 2026. https://doi.org/10.52152/d11565</li>
+<li>[8] Bohanec M., Rajkovič U., Rajkovič V. An Experimental Evaluation of Large Language Models in Supporting the DEX Multi-Criteria Decision-Making Process // Informatica. 2025. https://doi.org/10.31449/inf.v49i4.12884</li>
+<li>[9] Danielson M. Using LLMs for Multi-Criteria Decision Analysis: The Swedish Nord-Syd Case // Electronics. 2026. https://doi.org/10.3390/electronics15194519</li>
+<li>[10] Grandi D., Jain Y. P., Groom A., et al. Evaluating Large Language Models for Material Selection. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2405.03695</li>
+<li>[11] Sahoo S. K., Choudhury B. B., Dhal P. R., et al. Large Language Models in Multi Criteria Decision Making: A Systematic Review, Taxonomy, and Future Research Agenda // Applied Research Advances. 2026. https://doi.org/10.65069/ara21202614</li>
+<li>[12] Zheng L., Chiang W.-L., Sheng Y., et al. Judging LLM-as-a-Judge with MT-Bench and Chatbot Arena // Advances in Neural Information Processing Systems 36. 2023. https://doi.org/10.52202/075280-2020</li>
+<li>[13] Shi L., Ma C., Liang W., et al. Judging the Judges: A Systematic Study of Position Bias in LLM-as-a-Judge // Proceedings of IJCNLP-AACL 2025. https://doi.org/10.18653/v1/2025.ijcnlp-long.18</li>
+</ul>
+<p><strong>Выдуманные ссылки, патенты и пакеты; доверие к советам ИИ</strong></p>
+<ul>
+<li>[14] Zhao C., Tang Y., Qian Y. Do Deployment Constraints Make LLMs Hallucinate Citations? An Empirical Study across Four Models and Five Prompting Regimes. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2603.07287</li>
+<li>[15] Zhao Z., Wang Y., Stuart T., et al. LLM hallucinations in the wild: Large-scale evidence from non-existent citations. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2605.07723</li>
+<li>[16] McGowan A., Gui Y., Dobbs M., et al. ChatGPT and Bard exhibit spontaneous citation fabrication during psychiatry literature search // Psychiatry Research. 2023. https://doi.org/10.1016/j.psychres.2023.115334</li>
+<li>[17] Spracklen J., Wijewickrama R., Sakib A. H. M. N., et al. We Have a Package for You! A Comprehensive Analysis of Package Hallucinations by Code Generating LLMs. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2406.10279</li>
+<li>[18] Huang Z., Liu C., Wang Z., et al. Package Hallucinations as Phantoms in Open Source Software Supply Chains: An Empirical Security Analysis // ACM Transactions on Software Engineering and Methodology. 2026. https://doi.org/10.1145/3830237</li>
+<li>[19] Jiang P., Wang Y., Han J. Can large language models understand engineering design patents? An exploratory study // Proceedings of the Design Society. 2026. https://doi.org/10.1017/pds.2026.10593</li>
+<li>[20] Jiang P., Arena A. P., Sorce S., Atherton M. Large language models in the patent lifecycle: A systematic review // World Patent Information. 2026. https://doi.org/10.1016/j.wpi.2026.102506</li>
+<li>[21] Klingbeil A., Grützner C., Schreck P. Trust and reliance on AI – An experimental study on the extent and costs of overreliance on AI // Computers in Human Behavior. 2024. https://doi.org/10.1016/j.chb.2024.108352</li>
+<li>[22] Faker O., Toker S. Informed Skepticism: Navigating The Code Hallucination Dilemma // 2026 5th International Informatics and Software Engineering Conference (IISEC). 2026. https://doi.org/10.1109/iisec69317.2026.11418436</li>
+<li>[23] Yu X., Liu L., Hu X., et al. Fight Fire With Fire: How Much Can We Trust ChatGPT on Source Code-Related Tasks? // IEEE Transactions on Software Engineering. 2024. https://doi.org/10.1109/tse.2024.3492204</li>
+</ul>
+<p><strong>Анализ видов и последствий отказов с языковыми моделями</strong></p>
+<ul>
+<li>[24] Collier Z. A., Gruss R. J., Abrahams A. S. How good are large language models at product risk assessment? // Risk Analysis. 2024. https://doi.org/10.1111/risa.14351</li>
+<li>[25] Nair S. S., Court L., Douglas R., et al. Use of Large Language Models to Enhance Failure Mode and Effects Analysis: A Case Study // Advances in Radiation Oncology. 2026. https://doi.org/10.1016/j.adro.2026.102060</li>
+<li>[26] El Hassani I., Masrour T., Kourouma N., et al. Integrating large language models for improved failure mode and effects analysis (FMEA): a framework and case study // Proceedings of the Design Society. 2024. https://doi.org/10.1017/pds.2024.204</li>
+<li>[27] El Hassani I., Masrour T., Kourouma N., Tavčar J. AI-driven FMEA: integration of large language models for faster and more accurate risk analysis // Design Science. 2025. https://doi.org/10.1017/dsj.2025.7</li>
+<li>[28] Bahr L., Wehner C., Wewerka J., et al. Knowledge graph enhanced retrieval-augmented generation for failure mode and effects analysis // Journal of Industrial Information Integration. 2025. https://doi.org/10.1016/j.jii.2025.100807</li>
+<li>[29] Diwakaruni S. S. K., Krishnamurthy A. AI Powered Failure Mode and Effect Analysis in Safety Critical Industry // SAE Technical Paper Series. 2026. https://doi.org/10.4271/2026-01-0106</li>
+<li>[30] Topcu T. G., Husain M., Ofsa M., Wach P. Trust at Your Own Peril: A Mixed Methods Exploration of the Ability of Large Language Models to Generate Expert‐Like Systems Engineering Artifacts and a Characterization of Failure Modes // Systems Engineering. 2025. https://doi.org/10.1002/sys.21810</li>
+<li>[31] Charan K. V., Singh M., Redhu S., Soni G. A framework for automating failure modes and effects analysis (FMEA) using large language models (LLMs) and retrieval-augmented generation (RAG) // International Journal of System Assurance Engineering and Management. 2026. https://doi.org/10.1007/s13198-026-03171-6</li>
+<li>[32] Ciani L., Guidi G., Patrizi G. A Critical Comparison of Alternative Risk Priority Numbers in Failure Modes, Effects, and Criticality Analysis // IEEE Access. 2019. https://doi.org/10.1109/access.2019.2928120</li>
+<li>[33] Fabis-Domagala J., Domagala M. A Concept of Risk Prioritization in FMEA of Fluid Power Components // Energies. 2022. https://doi.org/10.3390/en15176180</li>
+<li>[34] Ayache M., Nardi A., Singh A. R., et al. Evaluating Generative AI for Functional Safety Analysis of Integrated Circuits // 2026 IEEE 32nd International Symposium on On-Line Testing and Robust System Design (IOLTS). 2026. https://doi.org/10.1109/iolts69666.2026.11633655</li>
+</ul>
+<p>Работы [1], [10], [14], [15] и [17] цитируются по препринтам arXiv. Работа [22] – концептуальная и посвящена программному коду.</p>
+<h2>Нормативные и официальные документы</h2>
+<ul>
+<li>[35] AIAG. It's Here...Claim Your Copy of the New AIAG &amp; VDA FMEA Handbook Today! Объявление о выходе руководства, 03.06.2019. https://blog.aiag.org/its-here...claim-your-copy-of-the-new-aiag-vda-fmea-handbook-today ; страница руководства AIAG &amp; VDA FMEA Handbook: https://www.aiag.org/training-and-resources/manuals/details/FMEAAV-1</li>
+<li>[36] ГОСТ Р 27.303-2021 (МЭК 60812:2018). Надежность в технике. Анализ видов и последствий отказов. Введён 01.01.2022 взамен ГОСТ Р 51901.12-2007. Карточка в каталоге стандартов: https://meganorm.ru/Index/75/75897.htm ; текст приказа Росстандарта от 21.09.2021 № 987-ст: https://pravo.ppt.ru/prikaz/rosstandart/n-987-st-261679 (вторичные источники)</li>
+<li>[37] ГОСТ Р 51901.12-2007 (МЭК 60812:2006). Менеджмент риска. Метод анализа видов и последствий отказов. Заменён. Карточка в каталоге стандартов: https://meganorm.ru/Index/44/44254.htm (вторичный источник)</li>
+<li>[38] ГОСТ Р 53165-2008 и ГОСТ Р 53165-2020. Карточки в каталоге стандартов: https://meganorm.ru/Index/48/48163.htm ; https://meganorm.ru/Index/74/74404.htm (вторичные источники)</li>
+<li>[39] SAE J3053. Heavy Duty Truck and Bus Electrical Circuit Performance Requirement for 12/24-Volt Electric Starter Motors. SAE International, редакция 2024-03. https://doi.org/10.4271/j3053_202403</li>
+<li>[40] Патент RU 2745118 C1. Реестр ФИПС: https://new.fips.ru/registers-doc-view/fips_servlet?DB=RUPAT&amp;DocNumber=2745118&amp;TypeFile=html ; Google Patents: https://patents.google.com/patent/RU2745118C1/ru</li>
+<li>[49] ГОСТ 34.602-2020. Информационные технологии. Комплекс стандартов на автоматизированные системы. Техническое задание на создание автоматизированной системы. Введён в действие приказом Росстандарта от 19.11.2021 № 1522-ст с 01.01.2022. Цитаты пп. 4.6.2, 4.6.4.3 и 4.6.4.9 сверены по официальному изданию (М.: Российский институт стандартизации, 2021); текст в справочной системе, открыт 10.11.2026: https://meganorm.ru/mega_doc/norm/gost_gosudarstvennyj-standart/0/gost_34_602-2020_mezhgosudarstvennyy_standart.html (вторичный источник)</li>
+</ul>
+<h2>Сервисы проверки ссылок</h2>
+<ul>
+<li>[41] Служба DOI (проверка регистрации DOI): https://www.doi.org/ , адрес для проверки: https://doi.org/api/handles/ ; поиск по библиографическим данным Crossref: https://api.crossref.org/</li>
+</ul>
+<h2>Выступления и вебинары</h2>
+<ul>
+<li>[42] Гагарин П. Разработка с агентами: от постановки задачи до деплоя. Вебинар 2 по ИИ, УЦ «МАСКОМ» и PVS-Studio, 28.07.2026 (презентация доклада).</li>
+<li>[43] Цымлов А. Агенты пишут код, а кто его проверяет? Вебинар 3 цикла «Качество и безопасность ПО в эпоху GenAI», УЦ «МАСКОМ» и PVS-Studio, 28.08.2026 (презентация доклада).</li>
+<li>[44] Малаканов В. Код, Jev, LLM, WebMCP. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[45] Скидан С. Как создать Агента-оператора. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[46] Субботин А. Платформы для совместной работы с ИИ-агентами. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[47] Овчинников К. Инженер после AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[48] Морозов А. AI в безопасности и безопасность в AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+</ul>
+<h2>Учебные материалы</h2>
+<p>Учебный кейс ЭС-24 (первый день) и его дополнение к третьему дню составлены для курса. Узел условный, значения подобраны для упражнений. Ссылки в учебном ответе модели (документ 3.3) заложены для упражнения. Источники [38]–[41] используются в ключах для преподавателя; что показала проверка, описано там.</p>
+<h2>Что не установлено</h2>
+<ul>
+<li>Официальные тексты ГОСТ Р 27.303-2021, ГОСТ Р 51901.12-2007 и ГОСТ Р 53165 на сайте Росстандарта не сверялись: сведения о статусе, датах и замене приведены по вторичным источникам – каталогу стандартов и тексту приказа на справочных сайтах. Перед использованием в документах организации сверьте с официальным источником.</li>
+<li>Содержание руководства AIAG &amp; VDA FMEA Handbook не пересказывается: руководство платное, использованы только открытое объявление AIAG и научная публикация [33].</li>
+<li>Полные тексты ГОСТ Р 53165-2008 и SAE J3053 не проверялись.</li>
+</ul>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

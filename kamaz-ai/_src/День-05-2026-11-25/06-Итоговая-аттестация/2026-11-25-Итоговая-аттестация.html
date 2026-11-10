@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Итоговая аттестация</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Итоговая аттестация</h1>
+<p>По программе курса итоговая аттестация – профессиональный зачёт из двух частей: итоговый проект и тестирование. Тестирование проходит дистанционно, на Платформе. Объём – 1 академический час.</p>
+<p>Порог прохождения теста, число попыток и сроки сдачи будут указаны в заданиях на Платформе. Ниже приведены предлагаемые значения; при расхождении действуют условия на Платформе.</p>
+<p><strong>Порядок завершения курса.</strong></p>
+<ol>
+<li>25.11 на практике 5.2 группа и преподаватель дают обратную связь по паспорту.</li>
+<li>Паспорт с учётом этой обратной связи сдаётся как контрольная точка модуля 5.</li>
+<li>Преподаватель проверяет контрольную точку и даёт обратную связь по ней.</li>
+<li>Доработанный паспорт (или тот же файл, если замечаний нет) загружается как итоговый проект, тест проходится на Платформе.</li>
+</ol>
+<p>Сроки каждого шага указаны в заданиях на Платформе, преподаватель называет их на занятии 25.11.</p>
+<h2>Часть 1. Итоговый проект: паспорт сценария</h2>
+<p><strong>Что сдать.</strong> Паспорт сценария применения ИИ для одной рутинной задачи вашего подразделения – тот, что вы оформили в контрольной точке модуля 5, доработанный по обратной связи. Если после проверки контрольной точки замечаний не было, сдаётся тот же файл.</p>
+<p><strong>Форма.</strong> Один файл (документ или PDF) по шаблону: документ 5-2 дополнения к учебному кейсу. В приложении – полный текст запросов и пример ответа модели на учебных или придуманных данных с отметками, что проверено и что исправлено.</p>
+<p><strong>Куда.</strong> На Платформу, в задание «Итоговая аттестация: итоговый проект».</p>
+<p><strong>Что проверяется.</strong> Проект засчитывается, если выполнены все обязательные требования.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>№</th>
+<th>Обязательное требование</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Описана одна конкретная задача: вход, выход, кто выполняет, как часто</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Указан сервис, и он разрешён для уровня данных задачи по таблице маршрутов темы 2.1 и правилам организации. Если маршрут не установлен, сервис помечен как предложение и указано, у кого его уточнить</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Запросы приведены полностью: есть исходные данные, задача и формат ответа</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Названы данные и их уровень; если уровень не установлен, указано, у кого его уточнить</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Названы меры защиты: что не отправляется, что заменяется, где хранится результат</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Порядок проверки конкретный: что проверяется, чем, кто проверяет, сколько минут</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Названо хотя бы одно ограничение сценария</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Эффект посчитан по формуле: время «до» и «после» относится к одной и той же полной операции, время «после» включает проверку, значения без замера помечены как оценка, затраты вычтены, арифметика сходится</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Понятно, кто принимает результат и какое решение остаётся за человеком</td>
+</tr>
+<tr>
+<td>10</td>
+<td>В паспорте и приложениях итоговой работы – только учебные или придуманные данные: нет фамилий, обозначений изделий, сведений о заказчиках и поставщиках, внутренних номеров; настоящие документы и их фрагменты, в том числе обезличенные, не вставляются</td>
+</tr>
+</tbody>
+</table></div>
+<p>Дополнительно, но не обязательно: результат пробы на нескольких примерах, контрольный набор примеров, черновик предложения на автоматизацию.</p>
+<p>Отрицательный результат допустим. Если проба показала, что экономии нет или сценарий ненадёжен, и это честно описано в паспорте, проект засчитывается.</p>
+<h2>Часть 2. Тест</h2>
+<p><strong>Форма.</strong> 20 вопросов с выбором одного правильного ответа, на Платформе. Время – 30 минут.</p>
+<p><strong>Темы.</strong> Вопросы охватывают все модули курса:</p>
+<ul>
+<li>как модель составляет ответ, где она ошибается, как составить запрос и проверить ответ;</li>
+<li>защита информации: какие сведения куда можно отправлять, обезличивание, скрытые команды в тексте, теневое использование ИИ;</li>
+<li>работа с технической документацией и помощники по документам;</li>
+<li>поиск технических решений и анализ потенциальных отказов: что делает модель и что решает инженер;</li>
+<li>расчёты и данные испытаний: как проверять вычисления и выводы модели;</li>
+<li>внутренние решения, агенты, шлюзы безопасности, паспорт сценария и расчёт эффекта.</li>
+</ul>
+<p>В тесте есть короткие расчёты. Держите под рукой калькулятор.</p>
+<p><strong>Предлагаемый порог.</strong> Не меньше 14 правильных ответов из 20.</p>
+<h2>Итог</h2>
+<p>Зачёт ставится, если засчитаны обе части: итоговый проект и тест.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

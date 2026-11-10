@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сценарий первого дня: 16.11.2026, понедельник</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Сценарий первого дня: 16.11.2026, понедельник</h1>
+<p>Модуль 1 «Языковые модели и составление запросов». Формат: ВКС на Платформе. Входной контроль, темы 1.1 и 1.2, самостоятельная работа с контрольной точкой.</p>
+<h2>Подготовка</h2>
+<p><strong>За 2–3 дня (до 13.11):</strong></p>
+<ul>
+<li>Уточнить у организаторов, какие сервисы реально открыты у слушателей на рабочих местах и работает ли в них загрузка файлов. От этого зависит, как пройдёт задание 2 практики 1.1.</li>
+<li>Загрузить на Платформу вопросы входного контроля (файл в папке «06-Входной-контроль») и задание контрольной точки модуля 1.</li>
+<li>Выложить для слушателей: лекции 1.1 и 1.2, учебный кейс, оба файла практики.</li>
+<li>Пройти раздел «Что преподавателю проверить руками» в файле «Справка по сервисам». Главное: открываются ли DeepSeek и Qwen из сети слушателей, проходит ли регистрация, как сейчас называются кнопки режимов, где отключается использование данных для обучения.</li>
+</ul>
+<p><strong>Накануне:</strong></p>
+<ul>
+<li>Прогнать запрос из задания 2а практики 1.1 в GigaChat, Алисе AI, DeepSeek и Qwen. Сохранить ответы снимками экрана. Если у группы откроется только один сервис, эти ответы станут материалом для сравнения.</li>
+<li>Прогнать ступени 1 и 5 из задания 1 практики 1.2 хотя бы в одном сервисе. Будет что показать, если у кого-то не пойдёт.</li>
+<li>Проверить, что в своём браузере вы вошли во все четыре сервиса, и закрыть лишние вкладки перед демонстрацией экрана.</li>
+<li>Открыть слайды обеих тем и лендинг дня.</li>
+</ul>
+<p><strong>Перед началом:</strong></p>
+<ul>
+<li>Просмотреть результаты входного контроля, если слушатели прошли его заранее. Выписать задачи из вопроса 16.</li>
+<li>Попросить включить камеры и микрофоны.</li>
+</ul>
+<h2>День по времени</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Время (МСК)</th>
+<th>Что</th>
+<th>Минут</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>до 08:45</td>
+<td>Входной контроль на Платформе: слушатели проходят самостоятельно до начала занятия, в том числе накануне</td>
+<td>45</td>
+</tr>
+<tr>
+<td>08:45–09:30</td>
+<td>Лекция 1.1</td>
+<td>45</td>
+</tr>
+<tr>
+<td>09:30–11:00</td>
+<td>Практика 1.1: задание 1, задание 2а, задание 2б</td>
+<td>90</td>
+</tr>
+<tr>
+<td>11:00–11:10</td>
+<td>Перерыв</td>
+<td>10</td>
+</tr>
+<tr>
+<td>11:10–11:55</td>
+<td>Практика 1.1: задание 3, обсуждение</td>
+<td>45</td>
+</tr>
+<tr>
+<td>11:55–13:00</td>
+<td>Обед</td>
+<td>65</td>
+</tr>
+<tr>
+<td>13:00–13:45</td>
+<td>Лекция 1.2</td>
+<td>45</td>
+</tr>
+<tr>
+<td>13:45–15:15</td>
+<td>Практика 1.2: задание 1, начало задания 2а</td>
+<td>90</td>
+</tr>
+<tr>
+<td>15:15–15:25</td>
+<td>Перерыв</td>
+<td>10</td>
+</tr>
+<tr>
+<td>15:25–16:55</td>
+<td>Практика 1.2: задание 2, задание 3, итоги дня</td>
+<td>90</td>
+</tr>
+<tr>
+<td>после занятия</td>
+<td>Самостоятельная работа и контрольная точка модуля 1</td>
+<td>45</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Лекция 1.1 (08:45–09:30)</h2>
+<p><strong>Знакомство (7 мин).</strong> Коротко о себе и о курсе: пять дней, каждый день две темы, в конце свой рабочий сценарий с ИИ. Сразу правило: теории минимум, всё проверяем руками.</p>
+<p>Вопрос группе, ответы голосом или в чате:</p>
+<ul>
+<li>Кто уже пользовался ИИ-сервисами? Какими?</li>
+<li>У кого сейчас открыт доступ с рабочего места?</li>
+<li>Какую задачу вы бы первой отдали ИИ?</li>
+</ul>
+<p>Ответы записывать: по ним подбираются примеры на весь курс.</p>
+<p><strong>Как устроена модель (10 мин).</strong> Модель продолжает текст, а не ищет готовый ответ. Отсюда и сила (связный текст, перенос приёмов между задачами), и слабость (правдоподобное вместо верного). Контекст диалога: модель видит текущий чат и загруженные файлы, а не все ваши прошлые разговоры. Режимы: рассуждение, поиск, загрузка файлов и изображений.</p>
+<p><strong>Доступ (8 мин).</strong> Учётные записи, бесплатные и платные тарифы, личный и корпоративный доступ, внутренние сервисы. Как получить доступ на работе: по заявке в порядке, принятом в организации. Если настройки рабочего места не пускают, обращаться в службу, которая выдаёт доступ, а не обходить через личный телефон и домашнюю почту.</p>
+<p><strong>Ограничения (12 мин).</strong> Выдуманные факты, ссылки и числа. Устаревшие сведения. Ошибки в вычислениях. Разные ответы на один и тот же вопрос. Цифры из исследований – на слайде, без лишних подробностей. Главный вывод: ответ всегда проверяет инженер.</p>
+<p><strong>От чата к агенту (5 мин).</strong> Четыре ступени: чат, чат с файлами, помощник по документам, агент. Только определение и одна схема цикла. Подробности для желающих – в дополнительном материале.</p>
+<p><strong>Правило данных (3 мин).</strong> С первого занятия: в сервисы отправляем только учебные и открытые материалы. Почему так строго, разберём в среду, в теме 2.1.</p>
+<h2>Практика 1.1 (09:30–11:55)</h2>
+<ul>
+<li><strong>Задание 1, 30 мин.</strong> Пока слушатели осматривают интерфейс, собирайте в чат, у кого какой сервис открылся и где не работает загрузка файлов. Это готовый перечень для обращения в службу доступа.</li>
+<li><strong>Задание 2а, 35 мин.</strong> Если у большинства только один сервис, показывайте ответы других сервисов со своего экрана (подготовленные накануне). Обсуждение строить по таблице критериев.</li>
+<li><strong>Задание 2б, 25 мин.</strong> Ответы в файле «Ключи и разбор заданий». Не раскрывать их сразу: сначала слушатели называют ошибки, потом разбор. Обязательно обсудить, почему 9,3 суток выглядят правдоподобно.</li>
+<li><strong>Задание 3, 30 мин.</strong> Пройтись по двум-трём карточкам слушателей вслух. Типичная проблема: в «ожидаемом результате» стоит «разобраться», а не конкретный результат: таблица причин, перечень проверок, проект ответа.</li>
+<li><strong>Обсуждение, 15 мин.</strong></li>
+</ul>
+<h2>Лекция 1.2 (13:00–13:45)</h2>
+<ul>
+<li>Шесть частей запроса на примере ЭС-24 (12 мин).</li>
+<li>Приёмы: исходные данные, шаги, образец, таблица, вопросы модели, ссылки на пункты, доработка (13 мин).</li>
+<li>Неверная посылка в вопросе и лишнее в запросе (8 мин).</li>
+<li>Что изменилось в новых моделях (7 мин). Сказать честно: искать «волшебную фразу» – не лучшая трата времени, важнее данные и проверка. Оговорить, что исследование на медицинских вопросах переносится на инженерные задачи с осторожностью.</li>
+<li>Шаблон запроса и чек-лист (5 мин).</li>
+</ul>
+<h2>Практика 1.2 (13:45–16:55)</h2>
+<ul>
+<li><strong>Задание 1, 70 мин.</strong> Лучше, если разные слушатели работают в разных сервисах: при сравнении будет что обсудить. Вопрос для обсуждения: на какой ступени ответ стал пригоден для работы.</li>
+<li><strong>Задание 2, 60 мин.</strong> Главная ловушка – З-4 и З-5: модели приписывают им пункты ТЗ. Разбор в файле ключей.</li>
+<li><strong>Задание 3, 30 мин.</strong> Каждый слушатель уходит со своим чек-листом.</li>
+<li><strong>Итоги дня, 20 мин.</strong> Выдать домашнее задание и показать, куда его загружать. Напомнить срок: до занятия 18.11.</li>
+</ul>
+<h2>Запасные варианты</h2>
+<ul>
+<li><strong>Сервисы не открываются ни у кого.</strong> Работа по экрану преподавателя: вы отправляете запросы, группа предлагает изменения и проверяет ответы. Задания 2б и 3 практики 1.1 выполняются без сервиса.</li>
+<li><strong>Нет загрузки файлов.</strong> Текст кейса вставляется в окно чата, он небольшой.</li>
+<li><strong>Группа сильнее ожидаемого.</strong> Переходить к дополнительным заданиям в конце каждого файла практики и к материалу «От чата к агенту».</li>
+<li><strong>Группа слабее ожидаемого.</strong> В практике 1.2 оставить ступени 1, 3 и 5, задание 2а сделать вместе с экрана.</li>
+</ul>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

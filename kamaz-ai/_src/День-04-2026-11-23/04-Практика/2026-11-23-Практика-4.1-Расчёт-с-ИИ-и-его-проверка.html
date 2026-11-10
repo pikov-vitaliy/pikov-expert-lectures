@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Практика к теме 4.1. Расчёт с ИИ и его проверка</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Практика к теме 4.1. Расчёт с ИИ и его проверка</h1>
+<p><strong>Время:</strong> 3 академических часа (08:45–10:15 и 10:25–11:10).
+<strong>Что понадобится:</strong> доступ хотя бы к одному сервису: основные – GigaChat и Алиса AI; DeepSeek – при обосновании и если доступ к нему разрешён; Qwen – для пробы на учебных данных по указанию преподавателя. Кроме того, понадобятся файл «Учебный кейс ЭС-24: дополнение к четвёртому дню» (ТЗ – редакция 1 из кейса первого дня, если в задании не сказано иное), калькулятор, табличный редактор, если он есть на рабочем месте.
+<strong>Правило:</strong> в сервисы отправляем только материалы учебного кейса. Рабочие расчёты, чертежи и данные изделий не вставляем.</p>
+<p>Если доступа к сервису нет, работайте по экрану преподавателя: он отправляет запросы, вы проверяете ответы. Все проверки в этой практике делаются без сервиса – калькулятором и таблицей.</p>
+<h2>Задание 1. Пошаговый расчёт и проверка каждого шага (55 мин)</h2>
+<p><strong>1а. Получить расчёт (15 мин).</strong> Откройте новый чат и отправьте запрос. Вместо квадратных скобок вставьте раздел 1 дополнения к кейсу.</p>
+<pre><code>Я инженер, проверяю сечение провода в цепи фар грузового автомобиля
+с бортовой сетью 24 В. Условие задачи ниже.
+
+[вставьте раздел 1 дополнения к кейсу: условие задачи 1]
+
+Реши задачу пошагово. Требования к ответу:
+1. Сначала выпиши все исходные данные с единицами и все допущения,
+   которые ты принимаешь.
+2. Назови расчётную схему: какую длину провода ты берёшь и почему.
+3. Каждый шаг оформи строкой таблицы: величина – формула –
+   подстановка чисел с единицами – результат с единицей.
+4. Сечение выбери из ряда, указанного в условии.
+5. Если для расчёта не хватает данных, перечисли их и не подставляй
+   значения от себя.
+</code></pre>
+<p>Файл дополнения к кейсу целиком не прикладывайте: в нём есть учебный расчёт с ошибками и контрольные значения этой же задачи, и модель их увидит. Если хотите проверить загрузку файла, скопируйте раздел 1 в отдельный файл TXT, приложите его и напишите «условие задачи – в приложенном файле».</p>
+<p><strong>1б. Проверить каждый шаг (40 мин).</strong> Заполните таблицу проверки. Числа пересчитывайте на калькуляторе, не глядя в ответ модели.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Что проверяем</th>
+<th>Как</th>
+<th>Ответ модели</th>
+<th>Мой пересчёт</th>
+<th>Совпало?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Исходные данные</td>
+<td>Каждое число и единица сверены с условием</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Расчётная схема</td>
+<td>Длина провода l = 2L = 12 м</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Допущения</td>
+<td>Названы ли постоянный ток, 20 °C, двухпроводная схема</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Размерности</td>
+<td>Подставить единицы в каждую формулу</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Допустимое падение</td>
+<td>3 % от 24 В</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Минимальное сечение</td>
+<td>Пересчёт на калькуляторе</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Выбор из ряда</td>
+<td>Ближайшее не меньше расчётного</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Падение при выбранном сечении</td>
+<td>Абсолютное значение и доля от 24 В в процентах</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Мощность потерь</td>
+<td>I² · R</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Предохранитель</td>
+<td>По учебному правилу из условия</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Прикидка</td>
+<td>Обратное умножение: S_min × 0,72 должно дать 1,26</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Контрольный пример.</strong> Прежде чем пересчитывать задачу, проверьте свою формулу на примере с известным ответом: ток 10 А, длина цепи 10 м, сечение 1 мм², ρ = 0,0175 Ом·мм²/м. Должно получиться R = 0,175 Ом и ΔU = 1,75 В.</p>
+<p><strong>Результат:</strong> заполненная таблица проверки и вывод в одну-две строки: можно ли взять ответ модели в работу и что пришлось исправить.</p>
+<h2>Задание 2. Найти ошибки в готовом расчёте (35 мин)</h2>
+<p>В разделе 2 дополнения к кейсу есть расчёт, «выполненный моделью». В нём несколько ошибок разного рода. Найдите как можно больше, проверяя каждый шаг. Для каждой ошибки запишите:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Шаг</th>
+<th>Фрагмент</th>
+<th>Что не так</th>
+<th>Вид ошибки</th>
+<th>Какой проверкой поймали</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Подсказка по видам ошибок: арифметика, логика выбора, единицы измерения, подстановка не того значения. Подсказка по проверкам: пересчёт, прикидка с обратным умножением, анализ размерностей, сверка с условием.</p>
+<p>Отдельно ответьте на вопрос: почему итоговый ответ выглядит убедительно, хотя он неверен?</p>
+<h2>Задание 3. Формула для электронной таблицы (30 мин)</h2>
+<p><strong>3а. Получить формулу (10 мин).</strong> Отправьте модели запрос. Укажите свой табличный редактор и язык его интерфейса.</p>
+<pre><code>Мне нужны формулы для табличного редактора [Excel / Р7-Офис /
+LibreOffice], интерфейс [русский / английский]. Данные расположены так:
+строка 1 – заголовки, расчёт со строки 2.
+A – ток I, А; B – длина цепи l (прямой и обратный провод), м;
+C – сечение S, мм²; D – удельное сопротивление, Ом·мм²/м.
+Нужны формулы для столбцов:
+E – сопротивление проводов, Ом;
+F – падение напряжения, В;
+G – падение в процентах от 24 В;
+H – текст «годится», если G не больше 3, иначе «не годится»;
+I – минимальное сечение при допустимом падении 3 % от 24 В.
+Дай формулу для каждой ячейки строки 2 и поясни, что она считает.
+</code></pre>
+<p><strong>3б. Проверить на контрольных значениях (20 мин).</strong> Если табличный редактор есть, введите формулы и три контрольные строки из раздела 3 дополнения к кейсу. Сравните результат с таблицей контрольных значений. Если редактора нет, подставьте числа строки 2 в формулы вручную.</p>
+<p>Проверьте ещё три вещи:</p>
+<ul>
+<li>удвойте длину в строке 2: падение напряжения должно удвоиться;</li>
+<li>скопируйте формулы на строку 3: ссылки должны указывать на строку 3;</li>
+<li>оставьте сечение пустым: что покажет формула и что с этим делать.</li>
+</ul>
+<p><strong>Результат:</strong> формулы, проверенные на контрольных значениях, или список найденных в них ошибок.</p>
+<h2>Обсуждение (15 мин)</h2>
+<ul>
+<li>На каком шаге задания 1 модель ошиблась чаще всего у группы?</li>
+<li>Какая проверка поймала больше всего ошибок в задании 2?</li>
+<li>Можно ли использовать полученные формулы для своих регулярных расчётов и что для этого нужно проверить?</li>
+</ul>
+<h2>Дополнительно, для тех, кто уже работает с ИИ</h2>
+<ol>
+<li><strong>Нагрев провода.</strong> Попросите модель пересчитать задачу для температуры провода +60 °C, дав ей удельное сопротивление меди 0,017241 Ом·мм²/м при 20 °C и температурный коэффициент 0,00393 на градус. Проверьте пересчёт сами. Меняется ли выбор сечения?</li>
+<li><strong>Другая расчётная схема.</strong> Измените условие: возврат тока через раму, длина провода 6 м. Что модель сделает с сопротивлением рамы, которого в условии нет? Подставит ли его от себя?</li>
+<li><strong>Модель проверяет модель.</strong> Отдайте учебный расчёт из задания 2 модели в новом чате с просьбой найти ошибки. Все ли она нашла? Не нашла ли того, чего нет? Сравните с вашей таблицей.</li>
+<li><strong>Расчёт кодом.</strong> Если в вашем сервисе модель может выполнять код, попросите решить задачу 1 кодом и показать код. Проверьте, что код считает именно ваше условие: длину цепи, ряд сечений, проценты от 24 В.</li>
+</ol>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

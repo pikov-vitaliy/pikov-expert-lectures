@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>День 1. Языковые модели и запросы</title>
+<script>(function(){var t;try{var v=JSON.parse(localStorage.getItem('day1-theme')||'null');if(v&&v.until>Date.now())t=v.t}catch(e){}if(!t){var h=new Date().getHours();t=(h>=20||h<7)?'dark':'light'}document.documentElement.setAttribute('data-theme',t)})();</script>
+<style>
+:root{--bg:#f4f3ee;--card:#ffffff;--ink:#1b2230;--muted:#5a6475;--accent:#1f5fbf;--accent-2:#0f7a5c;--line:#dcdfe5;--chip:#e6edfa;--chip-ink:#173f80;--chip2:#e2f3ec;--chip2-ink:#0b5a43;--hero:#e9eef8}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#10141b;--card:#18202b;--ink:#e7ebf1;--muted:#9aa5b6;--accent:#7fb0ff;--accent-2:#5fd1a8;--line:#2b3542;--chip:#22334e;--chip-ink:#cfe0ff;--chip2:#173d33;--chip2-ink:#b8f0dc;--hero:#152036}}
+:root[data-theme="dark"]{--bg:#10141b;--card:#18202b;--ink:#e7ebf1;--muted:#9aa5b6;--accent:#7fb0ff;--accent-2:#5fd1a8;--line:#2b3542;--chip:#22334e;--chip-ink:#cfe0ff;--chip2:#173d33;--chip2-ink:#b8f0dc;--hero:#152036}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Segoe UI",Roboto,Arial,sans-serif;line-height:1.55}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px 64px}
+.theme{position:fixed;top:16px;right:16px;z-index:5;background:var(--card);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:18px;cursor:pointer}
+.theme:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+header.hero{background:var(--hero);border-bottom:1px solid var(--line);padding:56px 0 40px}
+.kicker{text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--accent-2);font-size:14px}
+h1{font-size:clamp(30px,5vw,52px);line-height:1.12;margin:.2em 0 .3em}
+.lead{font-size:clamp(17px,2.2vw,22px);color:var(--muted);max-width:44em;margin:0}
+.facts{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{background:var(--chip);color:var(--chip-ink);border-radius:999px;padding:5px 14px;font-weight:600;font-size:15px}
+.chip.g{background:var(--chip2);color:var(--chip2-ink)}
+h2{font-size:clamp(22px,3vw,30px);margin:48px 0 16px}
+.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+.card h3{margin:0 0 8px;font-size:20px}
+.card p{margin:.4em 0;color:var(--muted)}
+.card ul{margin:.4em 0;padding-left:1.1em}
+.time{font-variant-numeric:tabular-nums;color:var(--accent);font-weight:700}
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+th,td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{color:var(--muted);font-weight:600;font-size:14px}
+.tl td:first-child{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--accent);font-weight:600}
+.rule{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--accent-2);border-radius:14px;padding:20px 22px;font-size:19px}
+a{color:var(--accent)}
+.files a{display:block;padding:6px 0}
+.small{font-size:14px;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+.diag img{width:100%;height:auto;border-radius:10px;border:1px solid var(--line);background:#fff}
+.diag a.open{display:inline-block;margin-top:8px}
+footer{margin-top:56px;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
+</style>
+</head>
+<body>
+<button class="theme" id="theme" aria-label="Переключить тему">☾</button>
+<header class="hero"><div class="wrap">
+<div class="kicker">Искусственный интеллект для инженеров · день 1 из 5</div>
+<h1>Языковые модели и запросы для инженерных задач</h1>
+<p class="lead">Разбираемся, что умеют сервисы на языковых моделях, где они ошибаются и как поставить задачу так, чтобы ответ можно было проверить и использовать.</p>
+<div class="facts"><span class="chip">16.11.2026, понедельник</span><span class="chip">08:45–16:55 МСК</span><span class="chip g">2 лекции · 7 академических часов практики</span><span class="chip g">GigaChat · Алиса · DeepSeek · Qwen</span></div>
+</div></header>
+<main class="wrap">
+
+<h2>План дня</h2>
+<div class="tablewrap"><table class="tl">
+<thead><tr><th>Время</th><th>Что</th></tr></thead>
+<tbody>
+<tr><td>до 08:45</td><td>Входной контроль на Платформе</td></tr>
+<tr><td>08:45–09:30</td><td>Лекция. Языковые модели и чат-сервисы: что умеют и где ошибаются</td></tr>
+<tr><td>09:30–11:55</td><td>Практика: интерфейс сервисов, одна задача в разных сервисах, поиск ошибок, карточка задачи (перерыв 11:00–11:10)</td></tr>
+<tr><td>11:55–13:00</td><td>Обед</td></tr>
+<tr><td>13:00–13:45</td><td>Лекция. Запросы к языковой модели для инженерных задач</td></tr>
+<tr><td>13:45–16:55</td><td>Практика: лестница запроса, таблица требований, свой чек-лист (перерыв 15:15–15:25)</td></tr>
+<tr><td>после занятия</td><td>Самостоятельная работа и контрольная точка модуля 1, срок – до 18.11</td></tr>
+</tbody></table></div>
+
+<h2>Две темы дня</h2>
+<div class="grid">
+<div class="card"><h3>1.1. Модели и сервисы</h3>
+<ul>
+<li>Модель составляет правдоподобный текст, а не достаёт ответ из базы</li>
+<li>Контекст диалога, история, файлы, режим рассуждения, поиск</li>
+<li>Выдуманные ссылки, устаревшие сведения, ошибки в расчётах</li>
+<li>От чата к агенту: четыре ступени</li>
+</ul>
+<p><a href="02-Слайды/2026-11-16-Слайды-Тема-1.1-Модели-и-сервисы.html">Слайды темы 1.1</a></p></div>
+<div class="card"><h3>1.2. Запросы</h3>
+<ul>
+<li>Шесть частей запроса: контекст, задача, данные, ограничения, формат, критерии</li>
+<li>Приёмы составления запросов и пределы универсальных рецептов</li>
+<li>Неверная посылка в вопросе</li>
+<li>Шаблон запроса и чек-лист проверки ответа</li>
+</ul>
+<p><a href="02-Слайды/2026-11-16-Слайды-Тема-1.2-Запросы.html">Слайды темы 1.2</a></p></div>
+</div>
+
+<h2>Учебный узел на весь курс</h2>
+<div class="grid">
+<div class="card"><h3>ЭС-24</h3><p>Система электроснабжения условного грузового автомобиля. Узел и значения учебные, поэтому кейс целиком можно отправлять в сервисы.</p></div>
+<div class="card"><h3>Что внутри</h3><ul><li>Генератор 28 В, 80 А</li><li>Две батареи 12 В, 190 А·ч последовательно</li><li>Потребители стоянки: тахограф, охрана, блоки управления</li></ul></div>
+<div class="card"><h3>Документы кейса</h3><ul><li>Описание узла</li><li>Фрагмент технического задания, пункты 4.1–4.6</li><li>Пять замечаний по испытаниям</li><li>Ответ модели с ошибками для разбора</li></ul></div>
+</div>
+
+<h2>Схемы дня</h2>
+<div class="grid">
+<div class="card diag"><h3>Учебный узел ЭС-24</h3><a href="08-Схемы/d1-uzel-es24.html"><img src="08-Схемы/d1-uzel-es24.png" alt="Схема учебного узла ЭС-24"></a><a class="open" href="08-Схемы/d1-uzel-es24.html">Открыть интерактивную схему</a></div>
+<div class="card diag"><h3>Работа с ответом модели</h3><a href="08-Схемы/d1-rabota-s-otvetom.html"><img src="08-Схемы/d1-rabota-s-otvetom.png" alt="Схема работы с ответом модели"></a><a class="open" href="08-Схемы/d1-rabota-s-otvetom.html">Открыть интерактивную схему</a></div>
+<div class="card diag"><h3>Как работает агент</h3><a href="08-Схемы/d1-cikl-agenta.html"><img src="08-Схемы/d1-cikl-agenta.png" alt="Схема цикла агента"></a><a class="open" href="08-Схемы/d1-cikl-agenta.html">Открыть интерактивную схему</a></div>
+</div>
+
+<h2>Практика</h2>
+<div class="grid">
+<div class="card"><p class="time">Практика 1.1 · 3 академических часа</p><h3>Сервисы и их ошибки</h3><ul><li>Осмотреть интерфейс и настройки данных</li><li>Одна задача в двух-трёх сервисах, сравнение по критериям</li><li>Найти ошибки в готовом ответе</li><li>Карточка инженерной задачи</li></ul></div>
+<div class="card"><p class="time">Практика 1.2 · 4 академических часа</p><h3>Запросы для инженерных задач</h3><ul><li>Лестница запроса: от одной строки до полной постановки</li><li>Требования из ТЗ в таблицу и сверка замечаний</li><li>Свой чек-лист проверки ответа</li></ul></div>
+</div>
+
+<h2>Правило с первого занятия</h2>
+<div class="rule">В ИИ-сервисы отправляем только учебные и открытые материалы. Рабочие документы, переписку, фамилии и обозначения изделий не вставляем. Почему так строго – разберём в среду.</div>
+
+<h2>Материалы для слушателей</h2>
+<div class="grid files">
+<div class="card"><h3>Лекции</h3>
+<a href="03-Лекции-слушателям/2026-11-16-Тема-1.1-Языковые-модели-и-чат-сервисы.html">Тема 1.1. Языковые модели и чат-сервисы</a>
+<a href="03-Лекции-слушателям/2026-11-16-Тема-1.2-Запросы-для-инженерных-задач.html">Тема 1.2. Запросы для инженерных задач</a></div>
+<div class="card"><h3>Практика</h3>
+<a href="04-Практика/2026-11-16-Учебный-кейс-ЭС-24.html">Учебный кейс ЭС-24</a>
+<a href="04-Практика/2026-11-16-Практика-1.1-Сервисы-и-их-ошибки.html">Практика 1.1</a>
+<a href="04-Практика/2026-11-16-Практика-1.2-Запросы-для-инженерных-задач.html">Практика 1.2</a></div>
+<div class="card"><h3>После занятия</h3>
+<a href="05-Самостоятельная-работа/2026-11-16-Домашнее-задание-модуль-1.html">Домашнее задание и контрольная точка</a>
+<a href="07-Дополнительно/2026-11-16-От-чата-к-агенту.html">Дополнительно: от чата к агенту</a>
+<a href="2026-11-16-Источники-дня.html">Источники дня</a></div>
+</div>
+
+<footer>Курс «Искусственный интеллект для инженеров» · В. А. Пиков · 16.11.2026</footer>
+</main>
+<script>
+(function(){var b=document.getElementById('theme');function c(){return document.documentElement.getAttribute('data-theme')}function i(){b.textContent=c()==='dark'?'☀':'☾'}i();
+b.onclick=function(){var t=c()==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',t);var d=new Date(),x=new Date(d),h=d.getHours();if(h>=7&&h<20){x.setHours(20,0,0,0)}else{if(h>=20){x.setDate(x.getDate()+1)}x.setHours(7,0,0,0)}try{localStorage.setItem('day1-theme',JSON.stringify({t:t,until:x.getTime()}))}catch(e){}i()};})();
+</script>
+</body>
+</html>

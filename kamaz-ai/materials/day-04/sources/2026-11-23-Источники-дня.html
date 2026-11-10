@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Источники четвёртого дня</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Источники четвёртого дня</h1>
+<p>Все ссылки, которые встречаются в лекциях, практике, ключах и дополнительных материалах четвёртого дня. Нумерация общая для всех файлов дня. Научные работы проверены по аннотациям и открытым текстам. Если работа с arXiv вышла в журнале или в материалах конференции, приведены эти выходные данные и отдельно ссылка на препринт. Пометка «препринт arXiv» без выходных данных означает, что рецензируемая публикация при проверке 10.11.2026 не найдена.</p>
+<h2>Научные публикации</h2>
+<p><strong>Тема 4.1: расчёты и вычисления</strong></p>
+<ul>
+<li>[1] Shrestha S., Kim M., Ross K. W. Mathematical Reasoning in Large Language Models: Assessing Logical and Arithmetic Errors across Wide Numerical Ranges. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2502.08680</li>
+<li>[2] Herambourg C., Siuda D., et al. The ORCA Benchmark: Evaluating Real-World Calculation Accuracy in Large Language Models. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2511.02589</li>
+<li>[3] Boye J., Moëll B. Large Language Models and Mathematical Reasoning Failures. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2502.11574</li>
+<li>[4] Mysior M., Iniotakis C. Evaluating large language models on text-based engineering design tasks: performance gaps and failure modes // Research in Engineering Design. 2026. https://doi.org/10.1007/s00163-026-00504-1</li>
+<li>[5] Shin E., Ramanathan M. Evaluation of prompt engineering strategies for pharmacokinetic data analysis with the ChatGPT large language model // Journal of Pharmacokinetics and Pharmacodynamics. 2024. Vol. 51, No. 2. P. 101–108. https://doi.org/10.1007/s10928-023-09892-6</li>
+<li>[6] Goodell A. J., Chu S. N., et al. Large language model agents can use tools to perform clinical calculations // npj Digital Medicine. 2025. Vol. 8. Art. 163. https://doi.org/10.1038/s41746-025-01475-8</li>
+<li>[7] Farajalla F., Rasras M., et al. Accuracy and hallucinations in AI-generated medication dosing calculations: a sequential explanatory mixed-methods evaluation // Scientific Reports. 2026. https://doi.org/10.1038/s41598-026-69321-9</li>
+<li>[8] Kodathala S. V., Vunnam R. Can Large Language Models Solve Engineering Equations? A Systematic Comparison of Direct Prediction and Solver-Assisted Approaches. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2601.01774</li>
+<li>[9] Gao L., Madaan A., et al. PAL: Program-aided Language Models // Proceedings of the 40th International Conference on Machine Learning (ICML 2023). PMLR. 2023. Vol. 202. P. 10764–10799. https://proceedings.mlr.press/v202/gao23f.html (препринт arXiv 2022: https://doi.org/10.48550/arXiv.2211.10435)</li>
+<li>[10] Chen W., Ma X., et al. Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks // Transactions on Machine Learning Research. 2023. Препринт arXiv 2022: https://doi.org/10.48550/arXiv.2211.12588 (сведения о публикации в TMLR – на странице https://arxiv.org/abs/2211.12588)</li>
+<li>[11] Huang J., Chen X., et al. Large Language Models Cannot Self-Correct Reasoning Yet // International Conference on Learning Representations (ICLR 2024). 2024. P. 32808–32824. https://proceedings.iclr.cc/paper_files/paper/2024/hash/8b4add8b0aa8749d80a34ca5d941c355-Abstract-Conference.html (препринт arXiv 2023: https://doi.org/10.48550/arXiv.2310.01798)</li>
+<li>[12] Kamoi R., Zhang Y., et al. When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs // Transactions of the Association for Computational Linguistics. 2024. Vol. 12. P. 1417–1440. https://doi.org/10.1162/tacl_a_00713</li>
+<li>[13] Sasaki M., Kamoda G., et al. Language Models Compare Quantities Using Number-specific and Unit-specific Heuristics. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.03982</li>
+<li>[14] Chen L., Qin Z., et al. Benchmarking Large Language Models on Homework Assessment in Circuit Analysis // International Journal of Artificial Intelligence in Education. 2025. Vol. 35, No. 5. P. 3294–3355. https://doi.org/10.1007/s40593-025-00501-w</li>
+<li>[15] Thorne S. Experimenting with ChatGPT for Spreadsheet Formula Generation: Evidence of Risk in AI Generated Spreadsheets. 2023. Препринт arXiv. https://doi.org/10.48550/arXiv.2309.00095</li>
+<li>[16] Thorne S. Large Language Models for Spreadsheets: Benchmarking Progress and Evaluating Performance with FLARE. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2506.17330</li>
+<li>[17] Lyell D., Coiera E. Automation bias and verification complexity: a systematic review // Journal of the American Medical Informatics Association. 2017. Vol. 24, No. 2. P. 423–431. https://doi.org/10.1093/jamia/ocw105</li>
+<li>[18] Romeo G., Conti D. Exploring automation bias in human–AI collaboration: a review and implications for explainable AI // AI &amp; SOCIETY. 2025. https://doi.org/10.1007/s00146-025-02422-7</li>
+</ul>
+<p><strong>Тема 4.2: таблицы и данные испытаний</strong></p>
+<ul>
+<li>[19] Sui Y., Zhou M., et al. Table Meets LLM: Can Large Language Models Understand Structured Table Data? A Benchmark and Empirical Study // Proceedings of the 17th ACM International Conference on Web Search and Data Mining. 2024. P. 645–654. https://doi.org/10.1145/3616855.3635752</li>
+<li>[20] Liu T., Wang F., Chen M. Rethinking Tabular Data Understanding with Large Language Models // Proceedings of the 2024 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies (NAACL 2024). Vol. 1: Long Papers. 2024. P. 450–482. https://doi.org/10.18653/v1/2024.naacl-long.26 (препринт arXiv 2023: https://doi.org/10.48550/arXiv.2312.16702)</li>
+<li>[21] Liu N. F., Lin K., et al. Lost in the Middle: How Language Models Use Long Contexts // Transactions of the Association for Computational Linguistics. 2024. Vol. 12. https://doi.org/10.1162/tacl_a_00638</li>
+<li>[22] Tian S.-Y., Zhou Z., et al. TabularMath: Understanding Math Reasoning over Tables with Large Language Models // Findings of the Association for Computational Linguistics: ACL 2026. P. 15469–15498. https://doi.org/10.18653/v1/2026.findings-acl.759</li>
+<li>[23] Wu X., Yang J., et al. TableBench: A Comprehensive and Complex Benchmark for Table Question Answering // Proceedings of the AAAI Conference on Artificial Intelligence. 2025. Vol. 39, No. 24. P. 25497–25506. https://doi.org/10.1609/aaai.v39i24.34739 (препринт arXiv 2024: https://doi.org/10.48550/arXiv.2408.09174)</li>
+<li>[24] Li H., Chen X., et al. Exposing Numeracy Gaps: A Benchmark to Evaluate Fundamental Numerical Abilities in Large Language Models // Findings of the Association for Computational Linguistics: ACL 2025. 2025. P. 20004–20026. https://doi.org/10.18653/v1/2025.findings-acl.1026 (препринт arXiv: https://doi.org/10.48550/arXiv.2502.11075)</li>
+<li>[25] Ruta M. R., Gaidici T., et al. ChatGPT for Univariate Statistics: Validation of AI-Assisted Data Analysis in Healthcare Research // Journal of Medical Internet Research. 2025. Vol. 27. e63550. https://doi.org/10.2196/63550</li>
+<li>[26] Ordak M. ChatGPT’s Skills in Statistical Analysis Using the Example of Allergology: Do We Have Reason for Concern? // Healthcare. 2023. Vol. 11, No. 18. Art. 2554. https://doi.org/10.3390/healthcare11182554</li>
+<li>[27] Li A., Zhao Y., et al. Anomaly Detection of Tabular Data Using LLMs. 2024. Препринт arXiv; по сведениям на странице arXiv, работа принята на семинар Anomaly Detection with Foundation Models. https://doi.org/10.48550/arXiv.2406.16308</li>
+<li>[28] Zhou Z., Yu R. Can LLMs Understand Time Series Anomalies? 2024. Препринт arXiv, цитата приведена по версии 3 от 11.03.2025. https://doi.org/10.48550/arXiv.2410.05440. Доработанная версия опубликована: International Conference on Learning Representations (ICLR 2025). 2025. P. 1858–1896. https://proceedings.iclr.cc/paper_files/paper/2025/hash/05774fb74e863308c4b460c9f49f6918-Abstract-Conference.html</li>
+<li>[29] Jiang C., Yu F., et al. TabDSR: Decompose, Sanitize, and Reason for Complex Numerical Reasoning in Tabular Data // Findings of the Association for Computational Linguistics: EMNLP 2025. P. 3172–3196. https://doi.org/10.18653/v1/2025.findings-emnlp.169</li>
+</ul>
+<h2>Нормативные и официальные документы, справка</h2>
+<ul>
+<li>[30] Copper wire tables. National Bureau of Standards Handbook 100. Washington, 1966. https://doi.org/10.6028/NBS.HB.100 (PDF: https://nvlpubs.nist.gov/nistpubs/Legacy/hb/nbshandbook100.pdf). Значения, использованные в материалах: удельное сопротивление отожжённой меди по международному стандарту 0,017241 Ом·мм²/м при 20 °C, температурный коэффициент сопротивления 0,00393 при 20 °C.</li>
+<li>[31] Справка Microsoft Excel: функции СРЗНАЧ, МЕДИАНА, СТАНДОТКЛОН.В, СТАНДОТКЛОН.Г, СЧЁТЕСЛИ, ЕСЛИ. https://support.microsoft.com/ru-ru/office/срзнач-функция-срзнач-047bac88-d466-426c-a32b-8f33eb960cf6 ; https://support.microsoft.com/ru-ru/excel/functions/median-function ; https://support.microsoft.com/ru-ru/office/функция-стандотклон-в-7d69cf97-0c1f-4acf-be27-f3e83904cc23 ; https://support.microsoft.com/ru-ru/office/функция-стандотклон-г-6e917c05-31a0-496f-ade7-4f4e7462f285 ; https://support.microsoft.com/ru-ru/office/функция-счётесли-e0de10c6-f885-4e71-abb4-1f464816df34 ; https://support.microsoft.com/ru-ru/office/функция-если-69aed7c9-4e8a-4755-a9bc-aa8bbff73be2</li>
+</ul>
+<h2>Сервисы</h2>
+<p>Страницы открыты 10.11.2026.</p>
+<ul>
+<li>[37] GigaChat. Справка: частые вопросы (4000 символов в запросе, размеры файлов TXT и PDF); работа с документами (форматы DOCX, PDF, TXT). https://giga.chat/help/articles/faq ; https://giga.chat/help/articles/work-with-docs</li>
+<li>[38] Алиса AI. Справка: файлы в чате (DOC, DOCX, PDF, TXT, до 100 МБ). https://alice.yandex.ru/support/ru/assistant/chat/files</li>
+</ul>
+<h2>Выступления и вебинары</h2>
+<ul>
+<li>[32] Овчинников К. «Инженер после AI». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[33] Малаканов В. «Код, Jev, LLM, WebMCP». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[34] Скидан С. «Как создать Агента-оператора». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[35] Цымлов А. Доклад на вебинаре 3 по ИИ УЦ «МАСКОМ» и PVS-Studio, 28.08.2026 (слайды «slajdy-2026-08-28»).</li>
+<li>[36] Филатов В. «Искусственный автор, привычный контроль». Доклад на вебинаре 3 по ИИ УЦ «МАСКОМ» и PVS-Studio, 28.08.2026 (презентация доклада).</li>
+</ul>
+<p>Положения докладов приведены как позиция докладчиков. Цифры из докладов, у которых нет письменного первоисточника, даны с оговоркой как собственные данные докладчика.</p>
+<h2>Учебные материалы</h2>
+<p>Учебный кейс ЭС-24 и дополнение к нему для четвёртого дня составлены для курса. Узел условный, значения подобраны для упражнений.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Источники пятого дня</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Источники пятого дня</h1>
+<p>Все ссылки, которые встречаются в лекциях, практике и дополнительных материалах пятого дня. Нумерация общая для всех файлов дня. Препринты помечены: они не прошли рецензирование.</p>
+<h2>Научные публикации</h2>
+<ul>
+<li>[1] Noy S., Zhang W. Experimental evidence on the productivity effects of generative artificial intelligence // Science. 2023. https://doi.org/10.1126/science.adh2586</li>
+<li>[2] Brynjolfsson E., Li D., Raymond L. Generative AI at Work // The Quarterly Journal of Economics. 2025. Vol. 140, № 2. P. 889–942. https://doi.org/10.1093/qje/qjae044</li>
+<li>[3] Dell'Acqua F., McFowland E., et al. Navigating the Jagged Technological Frontier: Field Experimental Evidence of the Effects of Artificial Intelligence on Knowledge Worker Productivity and Quality // Organization Science. 2026. https://doi.org/10.1287/orsc.2025.21838</li>
+<li>[4] Cui K., Demirer M., et al. The Effects of Generative AI on High-Skilled Work: Evidence from Three Field Experiments with Software Developers // Management Science. 2026. https://doi.org/10.1287/mnsc.2025.00535</li>
+<li>[5] Becker J., Rush N., et al. Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2507.09089</li>
+<li>[6] Bottesch S., Schwenke C., et al. Faster, Higher, Stronger? The Impact of GenAI on Knowledge Work Productivity - Evidence from the Field. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2607.25922</li>
+<li>[7] Dillon E., Jaffe S., et al. Shifting Work Patterns with Generative AI. 2025. Препринт SSRN. https://doi.org/10.2139/ssrn.5250761</li>
+<li>[8] Hou J., Wang L., et al. The Double-Edged Roles of Generative AI in the Creative Process: Experiments on Design Work // Information Systems Research. 2025. https://doi.org/10.1287/isre.2024.0937</li>
+<li>[9] Dennstädt F., Hastings J., et al. Implementing large language models in healthcare while balancing control, collaboration, costs and security // npj Digital Medicine. 2025. https://doi.org/10.1038/s41746-025-01476-7</li>
+<li>[10] Kernan Freire S., Wang C.-F., et al. Knowledge sharing in manufacturing using LLM-powered tools: user study and model benchmarking // Frontiers in Artificial Intelligence. 2024. https://doi.org/10.3389/frai.2024.1293084</li>
+<li>[11] Curington I., Lano K. Reusing obsolete windows 10 PCs for on-premises large language model inference // Frontiers in Computer Science. 2026. https://doi.org/10.3389/fcomp.2026.1911927</li>
+<li>[12] Li S., Raghuram V. C., et al. PAPILLON: PrivAcy Preservation from Internet-based and Local Language MOdel ENsembles. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2410.17127</li>
+<li>[13] Ibrahim Y., Ikram M., Salama M. The Illusion of Local Privacy: Confidentiality Boundary Failures in Consumer LLM Serving Systems. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2609.18526</li>
+<li>[14] Pattnayak P., Bohra H. Review of Tools for Zero-Code LLM Based Application Development. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2510.19747</li>
+<li>[15] Vu B., Barai S., et al. An auditable no-code platform for building and evaluating hybrid conversational agents // Journal of Information and Telecommunication. 2026. https://doi.org/10.1080/24751839.2026.2623688</li>
+<li>[16] Pacella M., Papadia G., Giliberti V. Governed Agentic Process Automation: A Floor-Safety Guarantee for Compliance-Critical LLM Routing // Algorithms. 2026. https://doi.org/10.3390/a19080627</li>
+<li>[17] Graul C., Żarski W., et al. AI Agents in Industry 4.0: AAS–OPC UA–LLM Architecture as the Foundation of Intelligent Manufacturing Systems in the Context of Industrial Enterprise Implementation // Applied Sciences. 2026. https://doi.org/10.3390/app16115428</li>
+<li>[18] Althoubi A. Look Before You Leap: Pre-Action Verification for LLM Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2609.11957</li>
+<li>[19] Liu Z., Zeng R., et al. Agents4PLC: Automating Closed-Loop PLC Code Generation and Verification in Industrial Control Systems Using LLM-Based Agents // IEEE Transactions on Software Engineering. 2026. https://doi.org/10.1109/TSE.2026.3667895</li>
+<li>[20] Turan E. Oversight Has a Capacity: Calibrating Agent Guards to a Subjective, Fatiguing Human. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.08919</li>
+<li>[21] Chen C.-R., Zhang Z.-P., et al. Comparing Human Oversight Strategies for Computer-Use Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2604.04918</li>
+<li>[22] Wang P.-R., Li Y., Tian Y. Reframing LLM Agent Security as an Agent-Human Interaction Problem. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2605.24309</li>
+<li>[23] Weng X. What You Approve Is What Executes: Consent Integrity for Black-Box LLM Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.02668</li>
+<li>[24] Chong C.-J., Hou C., et al. Casper: Prompt Sanitization for Protecting User Privacy in Web-Based Large Language Models // 2025 IEEE 12th International Conference on Cyber Security and Cloud Computing (CSCloud). 2025. Цитата в лекции – по полному тексту препринтной версии. https://doi.org/10.1109/CSCloud66326.2025.00027</li>
+<li>[25] Agyemang J. O., Kponyo J. J., et al. LLM-Redactor: An Empirical Evaluation of Eight Techniques for Privacy-Preserving LLM Requests. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2604.12064</li>
+<li>[26] Li Q., Wen J.-H., Jin H.-J. Governing Open Vocabulary Data Leaks Using an Edge LLM through Programming by Example // Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies. 2024. https://doi.org/10.1145/3699760</li>
+<li>[27] Debenedetti E., Shumailov I., et al. Defeating Prompt Injections by Design // 2026 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML). 2026. https://doi.org/10.1109/SaTML68715.2026.00040</li>
+<li>[28] Zhan Q., Fang R., et al. Adaptive Attacks Break Defenses Against Indirect Prompt Injection Attacks on LLM Agents // Findings of the Association for Computational Linguistics: NAACL 2025. 2025. https://doi.org/10.18653/v1/2025.findings-naacl.395</li>
+<li>[29] Noessel C. Deskilling and overreliance: Two long‐term risks of AI assistance, and what designers can do about them // AI Magazine. 2026. https://doi.org/10.1002/aaai.70096</li>
+<li>[30] Sorour S., Sahbel A. Large language models in intelligent manufacturing and mechanical engineering: a review of robotics, fault diagnosis, design, and engineering knowledge workflows // Journal of Intelligent Manufacturing. 2026. https://doi.org/10.1007/s10845-026-02927-y</li>
+<li>[31] Mustapha K. A survey of emerging applications of large language models for problems in mechanics, product design, and manufacturing // Advanced Engineering Informatics. 2025. https://doi.org/10.1016/j.aei.2024.103066</li>
+<li>[32] Taş E., Memmert L., Bittner E. A. C. Episodic oversight in generative AI workflows: A nine-step protocol for preserving human agency (OP-9) // Electronic Markets. 2026. https://doi.org/10.1007/s12525-026-00915-x</li>
+<li>[49] Narisetty P., Kore S., et al. Adaptive Evaluation of Out-of-Band Defenses Against Prompt Injection in LLM Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.26479</li>
+<li>[50] Beurer-Kellner L., Creţu A.-M., et al. Design Patterns for Securing LLM Agents against Prompt Injections. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2506.08837</li>
+</ul>
+<h2>Официальные страницы разработчиков</h2>
+<p>Страницы открыты 10.11.2026. Названия и характеристики моделей меняются часто, перед занятием их стоит открыть заново.</p>
+<ul>
+<li>[33] OpenAI. Models. https://developers.openai.com/api/docs/models</li>
+<li>[34] OpenAI. Supported countries and territories. https://developers.openai.com/api/docs/supported-countries</li>
+<li>[35] Google. Models – Gemini API. https://aistudio.google.com/docs/models</li>
+<li>[36] Google. Available regions for Google AI Studio and Gemini API. https://aistudio.google.com/docs/available-regions</li>
+<li>[37] Anthropic. Building effective agents. 19.12.2024. https://www.anthropic.com/research/building-effective-agents</li>
+<li>[38] Anthropic. How AI is transforming work at Anthropic. 02.12.2025 (отчёт компании по опросу своих сотрудников). https://www.anthropic.com/research/how-ai-is-transforming-work-at-anthropic</li>
+<li>[51] Anthropic. Models overview. https://platform.claude.com/docs/en/models/overview</li>
+<li>[52] Anthropic. Claude Fable 5.2 (страница модели). https://platform.claude.com/docs/en/models/fable-5-2/overview</li>
+<li>[53] Anthropic. Supported Regions Policy (на странице указана дата вступления в силу 12.11.2026). https://www.anthropic.com/legal/supported-regions</li>
+</ul>
+<h2>Технические материалы</h2>
+<ul>
+<li>[54] Pico Technology. Parasitic drain testing (методическая статья производителя диагностического оборудования). https://www.picoauto.com/library/application-notes/parasitic-drain-testing</li>
+</ul>
+<h2>Выступления и вебинары</h2>
+<ul>
+<li>[39] Субботин А. Платформы для совместной работы с ИИ-агентами. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[40] Морозов А. AI в безопасности и безопасность в AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[41] Малаканов В. Код, Jev, LLM, WebMCP. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[42] Скидан С. Как создать Агента-оператора. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[43] Овчинников К. Инженер после AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[44] Горшков М. Проблемы использования агентов в разработке. Вебинар учебного центра «МАСКОМ», 28.07.2026 (презентация вебинара).</li>
+<li>[45] Гагарин П. Разработка с агентами: от постановки задачи до деплоя. Вебинар учебного центра «МАСКОМ», 28.07.2026 (презентация вебинара).</li>
+<li>[48] Филатов В. Искусственный автор, привычный контроль. Вебинар учебного центра «МАСКОМ» и PVS-Studio «Качество и безопасность ПО в эпоху GenAI», 28.08.2026 (выступление на вебинаре).</li>
+</ul>
+<h2>Учебные материалы</h2>
+<ul>
+<li>[46] Дополнительная профессиональная программа повышения квалификации «Искусственный интеллект для инженеров», 56 ак. ч: тематический план и описание программы (раздел «Итоговая аттестация»).</li>
+<li>[47] Учебный кейс ЭС-24 (первый день) и дополнение к нему для пятого дня.</li>
+</ul>
+<p>Учебный кейс ЭС-24 составлен для курса. Узел условный, значения в дополнении пятого дня (перечень задач, время, число сотрудников, ставка) подобраны для упражнений.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

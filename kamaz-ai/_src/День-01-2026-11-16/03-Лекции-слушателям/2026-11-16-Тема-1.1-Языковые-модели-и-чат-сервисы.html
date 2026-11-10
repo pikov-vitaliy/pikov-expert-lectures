@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тема 1.1. Языковые модели и чат-сервисы: что умеют и где ошибаются</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Тема 1.1. Языковые модели и чат-сервисы: что умеют и где ошибаются</h1>
+<p>Цель первой темы – понять, с каким инструментом мы имеем дело. Тогда понятно, где ему можно доверять, а где нужно проверять каждую строчку.</p>
+<h2>1. Что такое большая языковая модель</h2>
+<p>Большая языковая модель обучена на огромном объёме текстов. Из них она усвоила, как обычно продолжаются фразы, рассуждения, таблицы, программы. Когда вы задаёте вопрос, модель не ищет готовый ответ в базе. Она по частям составляет продолжение текста, которое лучше всего подходит к вашему запросу и ко всему, что уже есть в диалоге.</p>
+<p>У такого способа работы есть сильные и слабые стороны:</p>
+<ul>
+<li>модель хорошо пишет связный текст, переносит приёмы из одной области в другую, быстро делает черновики, сводки, таблицы;</li>
+<li>модель стремится выдать правдоподобный ответ, даже если не знает верного. Правдоподобное и верное часто совпадают, но не всегда.</li>
+</ul>
+<blockquote>
+<p>«LLMs are prone to hallucination, generating plausible yet nonfactual content.»</p>
+<p>Перевод: «Языковые модели склонны к галлюцинациям: они порождают правдоподобный, но не соответствующий фактам текст.» – Huang и соавт., 2025 [1]</p>
+</blockquote>
+<h2>2. Чат-сервис на основе модели</h2>
+<p>Удобная аналогия из доклада А. Субботина на ИИ-митапе ЦГУ 6 ноября 2026 года [18]: модель похожа на толкового стажёра в первый день. Он умный, быстро читает и пишет, но без инструкции, доступа к нужным документам и руководителя, который принимает работу, пользы от него немного. Всё это вокруг модели и даёт чат-сервис, а в организациях – внутренние системы на её основе.</p>
+<p>Сама модель – это программа на серверах разработчика. Пользователь работает с ней через чат-сервис с дополнительными функциями.</p>
+<p><strong>Контекст диалога.</strong> Модель учитывает текст текущего чата: ваши сообщения, свои ответы и загруженные файлы. Объём контекста ограничен. В очень длинном диалоге начало может перестать учитываться или учитываться хуже. Другие ваши чаты модель, как правило, не видит, если в сервисе не включена специальная функция памяти.</p>
+<p><strong>История чатов.</strong> Сервис хранит диалоги, к ним можно вернуться. Где хранится история и как её удалить, зависит от сервиса и вида доступа. Это разберём на практике.</p>
+<p><strong>Файлы и изображения.</strong> Многие сервисы принимают документы и картинки: модель пересказывает их, извлекает таблицы, отвечает на вопросы по тексту. Распознанное с изображения тоже нужно проверять.</p>
+<p><strong>Режим рассуждения.</strong> Модель перед ответом строит цепочку промежуточных шагов. На задачах с несколькими шагами это обычно помогает, но ответ получается дольше. Безошибочности режим не гарантирует.</p>
+<p><strong>Поиск в интернете.</strong> Сервис находит страницы и опирается на них в ответе. Это снижает риск устаревших сведений, но не отменяет проверку: найденная страница может быть неподходящей, а пересказ – неточным.</p>
+<h2>3. Сервисы, с которыми работаем на курсе</h2>
+<p>Сведения ниже взяты из справки и пользовательских соглашений сервисов на 10.11.2026. Функции и названия меняются часто, поэтому на практике проверим их в интерфейсе.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Сервис</th>
+<th>Оператор</th>
+<th>Вход</th>
+<th>Режимы</th>
+<th>Файлы</th>
+<th>Данные</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GigaChat</td>
+<td>ПАО Сбербанк</td>
+<td>Телефон или Сбер ID</td>
+<td>В интерфейсе есть кнопки «Рассуждение» и «Исследование», ответы со ссылками на источники</td>
+<td>По справке DOCX, PDF, TXT, изображения до 15 МБ. Один новый файл – один новый чат. Запрос до 4000 символов</td>
+<td>Обработка на серверах банка, право РФ. Соглашение запрещает передавать в запросах персональные данные [S1], [S2]</td>
+</tr>
+<tr>
+<td>Алиса AI</td>
+<td>ООО «Платформа ИИ-решений» (Яндекс)</td>
+<td>Яндекс ID</td>
+<td>«Эксперт» – режим рассуждения, без платной опции 20 запросов в день. Поиск через Яндекс</td>
+<td>DOC, DOCX, PDF, TXT до 100 МБ, изображения до 20 МБ</td>
+<td>Без платной опции история хранится 14 дней. Запросы могут использоваться для улучшения сервисов, отказаться можно в настройках Яндекс ID. Данные граждан РФ хранятся в РФ [S3], [S4], [S5]</td>
+</tr>
+<tr>
+<td>DeepSeek</td>
+<td>Hangzhou DeepSeek Artificial Intelligence (КНР)</td>
+<td>Телефон или почта, Google, Apple</td>
+<td>Режимы Expert и Instant, поиск</td>
+<td>Файлы и изображения принимает, форматы официально не указаны</td>
+<td>Данные хранятся в КНР, право КНР. Данные используются для обучения, это можно отключить переключателем «Improve the model for everyone» [S6], [S7]</td>
+</tr>
+<tr>
+<td>Qwen</td>
+<td>Nth Power Global Tech Singapore, обработка Alibaba Cloud (Сингапур)</td>
+<td>Почта, Google, GitHub, Apple</td>
+<td>Поиск, «Глубокое исследование»</td>
+<td>Файлы и изображения принимает, форматы официально не указаны</td>
+<td>Данные хранятся в Сингапуре, право Сингапура. Может использовать обезличенный контент для обучения моделей. Отказаться можно письмом на адрес из соглашения, но отзывы об ответах всё равно используются для обучения [S8], [S9]</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>Названия меняются.</strong> Чат Яндекса сейчас называется «Алиса AI». Платная опция к нему – «Алиса Плюс»: больше запросов в режиме «Эксперт» и бессрочное хранение текстовой истории; сгенерированные изображения хранятся 30 дней. Название «Алиса Про» Яндекс относит к тарифам Яндекс 360, это другая подписка [S4].</p>
+<p><strong>Бесплатный доступ рассчитан на личное использование.</strong> По соглашению GigaChat предоставляется для личного некоммерческого использования совершеннолетнему резиденту РФ [S2]. Условия Алисы AI тоже говорят о некоммерческом использовании, а использовать тексты и изображения в иных целях можно только с опцией «Алиса Плюс» [S3]. Для рабочих задач организации заключают отдельные договоры или разворачивают собственные решения. Какой доступ разрешён вам, определяют правила вашей организации.</p>
+<p>У DeepSeek данные хранятся в Китае, у Qwen – в Сингапуре, и действует право этих стран [S6], [S8], [S9]. Оба сервиса могут использовать данные пользователей для обучения моделей: DeepSeek – пока пользователь не отключит это в настройках, Qwen – в обезличенном виде, отказ оформляется письмом.</p>
+<p>Кроме внешних сервисов, во многих организациях есть внутренние чаты на моделях, развёрнутых на собственных серверах. Такие чаты нужны для работы с данными, которые нельзя отправлять наружу. Если у вас есть такой чат, учитывайте его при выборе инструмента.</p>
+<h2>4. Доступ к сервисам</h2>
+<ul>
+<li><strong>Учётная запись.</strong> Для входа обычно нужен аккаунт сервиса: Сбер ID, Яндекс ID, почта или телефон.</li>
+<li><strong>Бесплатный и платный доступ.</strong> Бесплатно можно работать в GigaChat, Алисе AI и Qwen. Условия оплаты веб-чата DeepSeek в его документах не описаны. Платная подписка обычно даёт больше запросов, дополнительные функции, иногда более сильные модели.</li>
+<li><strong>Личный и корпоративный доступ.</strong> Личная учётная запись и корпоративный доступ отличаются условиями обработки данных. Что разрешено в рабочих задачах, определяют правила вашей организации, а не тариф.</li>
+<li><strong>Ограничения.</strong> У сервисов есть лимиты на длину сообщения, размер файла и число запросов. При превышении сервис предупредит или временно ограничит доступ.</li>
+</ul>
+<p><strong>Как получить доступ на работе.</strong> На предприятиях доступ к ИИ-сервисам часто закрыт по умолчанию и открывается по заявке с обоснованием. Если сервис не открывается с рабочего места, обращайтесь в подразделение, которое выдаёт доступ. Обходные пути не годятся: личный телефон, пересылка файлов на домашнюю почту, флешка. Именно так рабочие данные и утекают.</p>
+<h2>5. Где модели ошибаются</h2>
+<p><strong>Выдуманные факты, ссылки и числа.</strong> Это называют галлюцинациями: ответ правдоподобен по форме, но не соответствует фактам или не подтверждается источником [1]. Особенно заметно это на ссылках. В одном исследовании модели подбирали литературу для систематических обзоров. Доля выдуманных ссылок составила от 28,6 до 91,4 % в зависимости от модели [3]. Это модели 2023 года и одна узкая задача. Но и в проверке 2026 года на вопросах по анатомии доля выдуманных ссылок у трёх современных моделей, в том числе у DeepSeek, составила от 23 до 48 % [16]. Номер стандарта, пункт документа, фамилия автора в ответе модели – всё это надо проверять.</p>
+<blockquote>
+<p>«Hallucination refers to the generation of content by an LLM that is fluent and syntactically correct but factually inaccurate or unsupported by external evidence.»</p>
+<p>Перевод: «Галлюцинацией называют порождение моделью текста, который гладок и грамматически правилен, но фактически неверен или не подтверждается внешними данными.» – Alansari, Luqman, 2025, препринт arXiv [17]</p>
+<p>«Any references generated by such models warrant thorough validation by researchers.»</p>
+<p>Перевод: «Любые ссылки, которые порождают такие модели, требуют тщательной проверки исследователями.» – Chelli и соавт., 2024 [3]</p>
+<p>«Human verification remains essential before incorporating LLM-generated references into academic or educational materials.»</p>
+<p>Перевод: «Проверка человеком остаётся обязательной, прежде чем включать ссылки, порождённые моделью, в научные или учебные материалы.» – Ülkir, Paslı, 2026 [16]</p>
+</blockquote>
+<p><strong>Разные ответы на один вопрос.</strong> Модель может на одинаковый вопрос ответить по-разному, в том числе по существу. Исследователи из Оксфорда показали: когда на один и тот же фактический вопрос модель даёт несовместимые по смыслу ответы, она, скорее всего, сочиняет [2]. Обратное неверно: модель может уверенно и одинаково повторять ошибку. Если ответ важен, задайте вопрос ещё раз в новом чате и сравните факты в ответах. Расхождение – повод проверить, совпадение проверку не заменяет. Для вопросов вида «предложи возможные причины» разные наборы ответов нормальны.</p>
+<blockquote>
+<p>«By detecting when a prompt is likely to produce a confabulation, our method helps users understand when they must take extra care with LLMs and opens up new possibilities for using LLMs that are otherwise prevented by their unreliability.»</p>
+<p>Перевод: «Определяя, когда запрос, скорее всего, приведёт к конфабуляции, наш метод помогает пользователям понять, когда с языковыми моделями нужно быть особенно осторожными, и открывает новые возможности применения моделей, которым иначе мешает их ненадёжность.» – Farquhar и соавт., 2024 [2]</p>
+</blockquote>
+<p><strong>Устаревшие сведения.</strong> Модель знает то, что было в обучающих данных на момент обучения. Новые редакции стандартов, цены, изменения в законодательстве она может не знать. Режим поиска помогает, но ссылки всё равно надо открывать.</p>
+<p><strong>Вычисления и инженерная логика.</strong> Модель может верно описать методику и ошибиться в подстановке чисел или в переводе единиц. В исследовании 2026 года модели решали инженерные задачи по расчёту конструкций и оптимизации. Типовые сбои: геометрические рассуждения, многошаговые вычисления, выбор при противоречивых ограничениях [4].</p>
+<blockquote>
+<p>«The study further exposes systematic failure modes across the examined task types, including geometric reasoning, multi-step numerical computation, and optimization under conflicting constraints.»</p>
+<p>Перевод: «Исследование также выявляет систематические виды сбоев во всех рассмотренных типах задач, в том числе в геометрических рассуждениях, многошаговых численных расчётах и оптимизации при противоречивых ограничениях.» – Mysior, Iniotakis, 2026 [4]</p>
+</blockquote>
+<p>Обзор применения моделей в машиностроении приходит к тому же: модели полезны как помощник для работы с документами, данными и инструкциями, но не как замена инженерного расчёта и проверки [10].</p>
+<blockquote>
+<p>«Overall, the evidence indicates that LLMs are becoming useful semantic and coordination layers in engineering workflows, but not dependable engineering substitutes.»</p>
+<p>Перевод: «В целом данные показывают, что языковые модели становятся полезным смысловым и координирующим звеном в инженерной работе, но не надёжной заменой инженерным инструментам.» – Sorour, Sahbel, 2026 [10]</p>
+</blockquote>
+<p><strong>Согласие с ошибкой в вопросе.</strong> Если в вопрос заложена неверная посылка, модель чаще примет её, чем поправит. Подробнее – в теме 1.2.</p>
+<p>Ответ модели всегда проверяет инженер. Модель экономит время на черновике, но ответственность за результат на том, кто его использует.</p>
+<p>У этого правила есть обратная сторона, которую К. Овчинников в докладе на том же митапе назвал парадоксом надзора [19]. По его мысли, проверка результата требует собственной компетенции, а чрезмерное делегирование может ослаблять навык самостоятельной работы. Практический вывод: ИИ стоит брать помощником в той работе, которую вы понимаете и можете проверить сами.</p>
+<h2>6. От чата к агенту</h2>
+<p>Сервисы на моделях удобно разложить по ступеням:</p>
+<ol>
+<li><strong>Чат</strong> – отвечает на ваш текст.</li>
+<li><strong>Чат с файлами и поиском</strong> – читает загруженные документы и найденные страницы.</li>
+<li><strong>Помощник по документам</strong> – ищет ответ в подключённой базе документов организации.</li>
+<li><strong>Агент</strong> – сам решает, какой инструмент вызвать (поиск, расчёт, запрос в другую систему), вызывает его, смотрит на результат и продолжает работу.</li>
+</ol>
+<p><img alt="Как работает агент: модель выбирает следующий шаг" src="../08-Схемы/d1-cikl-agenta.png" /></p>
+<p>Интерактивная версия схемы – файл <code>08-Схемы/d1-cikl-agenta.html</code>.</p>
+<p>Ступени условные и могут пересекаться: поиск по документам выполняет программа, а за окном обычного чата иногда работает агентный цикл. Главное различие в том, кто выбирает следующий шаг. На первых трёх ступенях работа идёт по сценарию, заданному программой, а решения о дальнейших действиях принимает человек. Агент выбирает следующее действие сам, поэтому и требования к проверке выше. Подробнее – в дополнительном материале «От чата к агенту» и в модуле 5.</p>
+<h2>7. Правило с первого занятия</h2>
+<p>В ИИ-сервисы отправляются только учебные и открытые материалы. Рабочие документы, переписку, фамилии, обозначения изделий не вставляем, даже если очень хочется проверить на настоящей задаче. Почему это правило такое строгое и как работать с данными разного уровня, разберём в теме 2.1.</p>
+<h2>Что запомнить</h2>
+<ul>
+<li>Модель составляет правдоподобный текст, а не достаёт проверенный ответ из базы.</li>
+<li>Ссылки, номера документов, числа и расчёты в ответе проверяются всегда.</li>
+<li>Один и тот же вопрос может дать разные ответы. Это повод проверить, а не выбрать понравившийся.</li>
+<li>Доступ на работе – только законным путём, через подразделение, которое его выдаёт.</li>
+<li>В сервисы – только учебные и открытые материалы.</li>
+</ul>
+<h2>Источники</h2>
+<p>Нумерация общая для тем 1.1 и 1.2.</p>
+<p><strong>Научные публикации</strong></p>
+<ul>
+<li>[1] Huang L., Yu W., et al. A Survey on Hallucination in Large Language Models: Principles, Taxonomy, Challenges, and Open Questions // ACM Transactions on Information Systems. 2025. https://doi.org/10.1145/3703155</li>
+<li>[2] Farquhar S., Kossen J., et al. Detecting hallucinations in large language models using semantic entropy // Nature. 2024. https://doi.org/10.1038/s41586-024-07421-0</li>
+<li>[3] Chelli M., Descamps J., et al. Hallucination Rates and Reference Accuracy of ChatGPT and Bard for Systematic Reviews: Comparative Analysis // Journal of Medical Internet Research. 2024. https://doi.org/10.2196/53164</li>
+<li>[4] Mysior M., Iniotakis C. Evaluating large language models on text-based engineering design tasks: performance gaps and failure modes // Research in Engineering Design. 2026. https://doi.org/10.1007/s00163-026-00504-1</li>
+<li>[10] Sorour S., Sahbel A. Large language models in intelligent manufacturing and mechanical engineering: a review of robotics, fault diagnosis, design, and engineering knowledge workflows // Journal of Intelligent Manufacturing. 2026. https://doi.org/10.1007/s10845-026-02927-y</li>
+<li>[17] Alansari A., Luqman H. Large Language Models Hallucination: A Comprehensive Survey. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2510.06265</li>
+<li>[16] Ülkir M., Paslı B. Reference Hallucination, Citation Reliability, and Readability of Large Language Models in Anatomy-Related Question Answering // Clinical Anatomy. 2026. https://doi.org/10.1002/ca.70187</li>
+</ul>
+<p><strong>Сервисы</strong> (страницы открыты 10.11.2026)</p>
+<ul>
+<li>S1. GigaChat. Справка: начало работы, частые вопросы, документы, изображения. https://giga.chat/help/articles/how-to-start-work-with-gigachat ; https://giga.chat/help/articles/faq ; https://giga.chat/help/articles/work-with-docs ; https://giga.chat/help/articles/gigachat-load-picture</li>
+<li>S2. Пользовательское соглашение GigaChat. https://developers.sber.ru/docs/ru/policies/gigachat/agreement</li>
+<li>S3. Условия использования сервиса «Алиса AI». https://yandex.ru/legal/alice_chat/</li>
+<li>S4. Алиса AI. Справка: чат, опция «Алиса Плюс», режим «Эксперт», файлы. https://alice.yandex.ru/support/ru/assistant/chat-alice ; https://alice.yandex.ru/support/ru/assistant/alice-plus ; https://alice.yandex.ru/support/ru/assistant/chat/intellect ; https://alice.yandex.ru/support/ru/assistant/chat/files</li>
+<li>S5. Политика конфиденциальности Яндекса. https://yandex.ru/legal/confidential/</li>
+<li>S6. DeepSeek Privacy Policy. https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html</li>
+<li>S7. DeepSeek Terms of Use; анонс DeepSeek-V4 Preview. https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html ; https://www.deepseek.com/en/news/v4-preview/</li>
+<li>S8. Qwen. Соглашение об оказании услуг; страница входа; описание сервиса. https://qwen.ai/termsservice ; https://chat.qwen.ai/auth ; https://qwen.ai/home</li>
+<li>S9. Qwen. Политика конфиденциальности. https://qwen.ai/privacypolicy</li>
+</ul>
+<p><strong>Выступления и вебинары</strong></p>
+<ul>
+<li>[18] Субботин А. Платформы для совместной работы с ИИ-агентами. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[19] Овчинников К. Инженер после AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада). На слайде о парадоксе надзора докладчик ссылается на материал Anthropic «How AI Is Transforming Work at Anthropic» (2025).</li>
+<li>[20] Гагарин П. Разработка с агентами: от постановки задачи до деплоя. Вебинар учебного центра «МАСКОМ», 28.07.2026 (презентация вебинара).</li>
+</ul>
+<p>Полный список источников дня – в файле «Источники» в папке дня.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

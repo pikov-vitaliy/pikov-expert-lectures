@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Модель и калькулятор: как ИИ считает с инструментами</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Модель и калькулятор: как ИИ считает с инструментами</h1>
+<p>Материал для тех, кто уже работает с ИИ и хочет понять, почему модели ошибаются в числах и как это обходят разработчики систем. Программировать для этого не нужно: речь о том, как устроены сервисы, которыми вы пользуетесь, и что спрашивать, когда во многих организациях появляются внутренние ИИ-помощники для расчётов.</p>
+<h2>Почему модель ошибается в числах</h2>
+<p>Модель выдаёт ответ по частям текста. Для неё «0,084» – такая же последовательность знаков, как слово. Когда арифметика простая и часто встречалась в обучающих текстах, модель почти всегда «попадает». Когда числа необычные или вычисление встроено в длинный текст задачи, вероятность ошибки растёт [1]. Это не случайный сбой, который исправят в следующей версии, а свойство самого способа работы. Новые модели ошибаются реже, но в проверке 2025 года пять сильных систем давали неверный итог в 37–55 % практических расчётных задач, причём чаще всего – на последнем шаге, при вычислении или округлении [2].</p>
+<p>Во всех решениях ниже модель разбирает задачу и составляет план, а программа выполняет вычисления.</p>
+<h2>Три способа отдать вычисление инструменту</h2>
+<p><strong>Модель пишет программу, программа считает.</strong> В работе, которая вышла препринтом в 2022 году, модель для каждой задачи писала короткую программу на Python, которую затем запускали, чтобы получить ответ. На наборах математических и алгоритмических задач такой подход оказался точнее, чем пошаговое рассуждение у моделей намного большего размера [9]. Близкий подход назвали «программой мыслей»: рассуждение записывается как программа, а вычисление выполняет внешний компьютер. Прирост по сравнению с пошаговым рассуждением – в среднем около 12 % [10].</p>
+<blockquote>
+<p>«With PAL, decomposing the natural language problem into runnable steps remains the only learning task for the LLM, while solving is delegated to the interpreter.»</p>
+<p>Перевод: «При таком подходе единственной задачей модели остаётся разложить задачу, записанную обычным языком, на выполнимые шаги, а решение поручается интерпретатору». – Gao и соавт., ICML 2023 [9]</p>
+</blockquote>
+<p><strong>Модель вызывает готовый специализированный калькулятор.</strong> В медицине проверили три способа помочь модели в клинических расчётах: поиск по справочным материалам, общий интерпретатор кода и набор специальных калькуляторов под каждую формулу. Лучше всего сработали специальные калькуляторы: число неверных ответов сократилось в 5,5 и 13 раз для двух семейств моделей [6]. Для инженера аналог – утверждённые расчётные программы и методики. Если система на основе модели вызывает их, а не считает сама, риск ошибок, которые модель делает при вычислении, снижается. Проверять при этом всё равно нужно: верно ли формула реализована в программе, те ли входные данные, какие заданы настройки метода и допустимая численная погрешность. Остаются и ошибки в исходных данных и в выборе того, что считать.</p>
+<p><strong>Модель составляет уравнение, численный метод его решает.</strong> В инженерных задачах, где решение ищется подбором (уравнения трения в трубах, экспоненциальные зависимости в электронике), модель сама выдавала число с большой ошибкой. Когда модель только записывала уравнение и начальное приближение, а решал классический метод Ньютона, средняя относительная ошибка снизилась на 67,9–81,8 %. Сильнее всего – в задачах электроники, где зависимости экспоненциальные [8].</p>
+<h2>Что остаётся проверять, даже если считает программа</h2>
+<p>Проверенный вычислительный инструмент снижает риск ошибок, которые модель делает при вычислении. Ошибки постановки и ошибки в самой программе он не убирает. Детерминированный расчёт даёт один и тот же результат при тех же данных: это воспроизводимость, а не доказательство правильности.</p>
+<ul>
+<li><strong>Та ли задача посчитана.</strong> Программа выполнит то, что написала модель. Если модель взяла длину провода 6 м вместо 12, программа посчитает неверную задачу, и результат будет выглядеть таким же надёжным, как верный.</li>
+<li><strong>Те ли данные.</strong> Модель может перенести в программу не то число из условия, например 28,2 В вместо 24 В.</li>
+<li><strong>Тот ли метод.</strong> Для табличных данных разные определения дают разные «правильные» ответы: выборочное и генеральное стандартное отклонение, разные способы считать квартили. Программа посчитает по тому определению, которое выбрала модель.</li>
+<li><strong>Нет ли подмены проверки.</strong> Если программа, которую написала модель, сама же проверяет результат, это не независимая проверка: ошибка в понимании задачи попадёт и в расчёт, и в проверку.</li>
+</ul>
+<p>Есть и обратный эффект. Обзор работ о самоисправлении моделей 2024 года пришёл к выводу, что модели плохо исправляют свои ошибки сами, но хорошо – когда есть надёжная внешняя обратная связь, например результат выполнения кода или проверки [12]. Работа, вышедшая препринтом в 2023 году, показала, что без такой обратной связи попытка «подумать ещё раз» иногда даже ухудшает ответ [11]. Значит, ценность инструмента не только в том, что он считает, но и в том, что он даёт модели и человеку проверяемый результат.</p>
+<h2>Таблицы: сначала почистить, потом считать кодом</h2>
+<p>С таблицами разработчики пришли к той же схеме. Одна из систем для сложных вопросов по таблицам работает в три шага: разбивает сложный вопрос на простые, чистит таблицу от шума и лишнего, а ответ получает выполнением программы по очищенной таблице [29]. Для инженера это знакомо: прежде чем считать статистику по протоколу, проверяют, все ли строки на месте и нет ли явных ошибок записи. Отличие одно – в системе эту работу делает модель, и проверять её нужно так же, как любой другой вывод модели. Особенно – то, что именно было «вычищено» как шум: выброс может оказаться несоответствующим образцом, а не ошибкой данных.</p>
+<h2>Вопросы к ИИ-помощнику для расчётов</h2>
+<p>Если в вашей организации предлагают ИИ-помощника для расчётов или анализа протоколов, полезно задать разработчикам несколько вопросов:</p>
+<ol>
+<li>Кто выполняет вычисления: модель или программа? Если программа, то какая и проверена ли она?</li>
+<li>Видит ли пользователь подставленные значения и формулы или только итог?</li>
+<li>Что помощник делает, если данных не хватает: спрашивает или подставляет значение сам?</li>
+<li>Как помощник обращается с подозрительными значениями в таблице: отмечает или исправляет?</li>
+<li>На каких контрольных примерах его проверяли, сколько их было и где результаты этой проверки?</li>
+<li>Как в работу включён инженер: что он подтверждает и что подписывает?</li>
+</ol>
+<p>Самопроверки помощника недостаточно: он должен показывать формулу, подстановку и результат, а инженер – сверять их и принимать решение.</p>
+<h2>Источники</h2>
+<p>Нумерация общая для всех материалов четвёртого дня.</p>
+<ul>
+<li>[1] Shrestha S., Kim M., Ross K. W. Mathematical Reasoning in Large Language Models: Assessing Logical and Arithmetic Errors across Wide Numerical Ranges. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2502.08680</li>
+<li>[2] Herambourg C., Siuda D., et al. The ORCA Benchmark: Evaluating Real-World Calculation Accuracy in Large Language Models. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2511.02589</li>
+<li>[6] Goodell A. J., Chu S. N., et al. Large language model agents can use tools to perform clinical calculations // npj Digital Medicine. 2025. Vol. 8. Art. 163. https://doi.org/10.1038/s41746-025-01475-8</li>
+<li>[8] Kodathala S. V., Vunnam R. Can Large Language Models Solve Engineering Equations? A Systematic Comparison of Direct Prediction and Solver-Assisted Approaches. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2601.01774</li>
+<li>[9] Gao L., Madaan A., et al. PAL: Program-aided Language Models // Proceedings of the 40th International Conference on Machine Learning (ICML 2023). PMLR. 2023. Vol. 202. P. 10764–10799. https://proceedings.mlr.press/v202/gao23f.html (препринт arXiv 2022: https://doi.org/10.48550/arXiv.2211.10435)</li>
+<li>[10] Chen W., Ma X., et al. Program of Thoughts Prompting: Disentangling Computation from Reasoning for Numerical Reasoning Tasks // Transactions on Machine Learning Research. 2023. Препринт arXiv 2022: https://doi.org/10.48550/arXiv.2211.12588 (сведения о публикации в TMLR – на странице https://arxiv.org/abs/2211.12588)</li>
+<li>[11] Huang J., Chen X., et al. Large Language Models Cannot Self-Correct Reasoning Yet // International Conference on Learning Representations (ICLR 2024). 2024. P. 32808–32824. https://proceedings.iclr.cc/paper_files/paper/2024/hash/8b4add8b0aa8749d80a34ca5d941c355-Abstract-Conference.html (препринт arXiv 2023: https://doi.org/10.48550/arXiv.2310.01798)</li>
+<li>[12] Kamoi R., Zhang Y., et al. When Can LLMs Actually Correct Their Own Mistakes? A Critical Survey of Self-Correction of LLMs // Transactions of the Association for Computational Linguistics. 2024. Vol. 12. P. 1417–1440. https://doi.org/10.1162/tacl_a_00713</li>
+<li>[29] Jiang C., Yu F., et al. TabDSR: Decompose, Sanitize, and Reason for Complex Numerical Reasoning in Tabular Data // Findings of the Association for Computational Linguistics: EMNLP 2025. P. 3172–3196. https://doi.org/10.18653/v1/2025.findings-emnlp.169</li>
+</ul>
+<p>Полный список источников дня – в файле «Источники» в папке дня.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

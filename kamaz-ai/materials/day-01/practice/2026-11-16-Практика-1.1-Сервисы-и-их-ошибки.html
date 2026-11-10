@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Практика к теме 1.1. Сервисы на языковых моделях: что умеют и где ошибаются</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Практика к теме 1.1. Сервисы на языковых моделях: что умеют и где ошибаются</h1>
+<p><strong>Время:</strong> 3 академических часа (09:30–11:00 и 11:10–11:55).
+<strong>Что понадобится:</strong> доступ хотя бы к одному сервису: GigaChat или Алиса AI (DeepSeek – если его использование согласовано в вашей организации, Qwen – только на учебном кейсе), файл «Учебный кейс ЭС-24», таблица для записей (можно в блокноте).
+<strong>Правило:</strong> в сервисы отправляем только материалы учебного кейса. Рабочие документы, письма и фамилии коллег не вставляем.</p>
+<p>Если доступа к сервису нет, работайте по экрану преподавателя или вместе с участником, которого назовёт преподаватель: он показывает свой экран, вы предлагаете запросы и проверяете ответы. Сообщите преподавателю, какой сервис не открылся и что пишет браузер: это поможет оформить доступ после занятия.</p>
+<h2>Задание 1. Осмотреть интерфейс (30 мин)</h2>
+<p>Откройте сервис, к которому у вас есть доступ, и найдите в нём перечисленные функции. Если открыто несколько сервисов, заполните столбец для каждого.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Что найти</th>
+<th>Сервис 1: ____</th>
+<th>Сервис 2: ____</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Как начать новый чат</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Где история чатов и как удалить диалог</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Можно ли загрузить файл, какие форматы принимает</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Можно ли загрузить изображение</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Есть ли режим рассуждения («думать», «рассуждение»)</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Есть ли поиск в интернете и как его включить</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Где настройки данных: хранение истории, использование диалогов для улучшения моделей</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Ограничения: длина сообщения, число запросов, что пишет сервис при превышении</td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Короткая проверка загрузки файла: сохраните учебный кейс в файл и попросите сервис пересказать раздел 2 в трёх строках. Если загрузка недоступна, вставьте текст в окно чата.</p>
+<p><strong>Результат:</strong> заполненная таблица. Сохраните её: на следующих занятиях будем возвращаться к настройкам данных.</p>
+<h2>Задание 2. Одна задача в разных сервисах (60 мин)</h2>
+<h3>2а. Сравнить ответы (35 мин)</h3>
+<p>Отправьте один и тот же запрос в два-три сервиса. Каждый раз начинайте новый чат.</p>
+<pre><code>Я инженер, разбираю замечание по испытаниям системы электроснабжения
+грузового автомобиля. Ниже описание узла и фрагмент технического задания.
+
+[вставьте разделы 1 и 2 учебного кейса]
+
+Замечание З-3: на холостом ходу при включённых фарах дальнего света
+и обогреве зеркал напряжение бортовой сети снижается до 26,1 В.
+
+Предложи возможные причины и как проверить каждую.
+Ответ дай таблицей: причина – как проверить – что должно получиться.
+</code></pre>
+<p>Сравните ответы по критериям. Ставьте «+», «−» или короткий комментарий.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Критерий</th>
+<th>Сервис 1</th>
+<th>Сервис 2</th>
+<th>Сервис 3</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Опирается на данные из запроса (26,1 В, 28,2 В, 40 А на холостом ходу)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Цифры из ТЗ переданы без искажений</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Есть утверждения, которых нет в исходных данных (отметьте какие)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Причины правдоподобны для этого узла</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Проверки выполнимы в мастерской</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Задал уточняющие вопросы</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Ответ в нужном формате</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Какой ответ вы бы взяли за основу и что в нём пришлось бы исправить?</p>
+<h3>2б. Найти ошибки в готовом ответе (25 мин)</h3>
+<p>В разделе 4 учебного кейса есть ответ, подготовленный для этого упражнения. В нём несколько ошибок разного рода. Найдите как можно больше, сверяясь только с описанием узла и техническим заданием. Для каждой ошибки запишите:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Фрагмент ответа</th>
+<th>Что не так</th>
+<th>Как проверить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Подсказка по видам ошибок: неверно переданное требование, ошибка в рассуждении, ошибка в арифметике, неверная физика, ссылка на несуществующий источник, рекомендация не по теме.</p>
+<h2>Задание 3. Сформулировать инженерную задачу (30 мин)</h2>
+<p>Сначала сформулируйте задачу, затем пишите запрос. Заполните карточку для замечания З-1.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Содержание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Исходные данные</td>
+<td>Что известно: факты, цифры, документы</td>
+</tr>
+<tr>
+<td>Ожидаемый результат</td>
+<td>Что именно нужно получить и в каком виде</td>
+</tr>
+<tr>
+<td>Критерии приёмки</td>
+<td>По каким признакам вы примете результат</td>
+</tr>
+<tr>
+<td>Ограничения</td>
+<td>Что считать заданным, чего не делать, какие данные нельзя использовать</td>
+</tr>
+</tbody>
+</table></div>
+<p>Затем заполните такую же карточку для одной своей рабочей задачи. Опишите её общими словами, без названий изделий, заказчиков, внутренних номеров и фамилий. Эти карточки понадобятся во второй половине дня и в домашнем задании.</p>
+<h2>Обсуждение (15 мин)</h2>
+<ul>
+<li>В каком сервисе ответ на задание 2а оказался полезнее и почему?</li>
+<li>Какие ошибки в задании 2б было труднее всего заметить?</li>
+<li>Что в карточке задачи было сложнее всего сформулировать?</li>
+</ul>
+<h2>Дополнительно, для тех, кто уже работает с ИИ</h2>
+<ol>
+<li><strong>Устойчивость ответа.</strong> Задайте вопрос из задания 2а три раза, каждый раз в новом чате. Совпадают ли причины и их порядок? Модели иногда отвечают на один и тот же вопрос по-разному, и такой разброс – повод проверять ответ особенно внимательно.</li>
+<li><strong>Режим рассуждения.</strong> Отправьте запрос 2а с режимом рассуждения и без него. Что изменилось: число причин, качество проверок, ошибки?</li>
+<li><strong>Поиск в интернете.</strong> Попросите сервис с включённым поиском найти, какие документы регламентируют проверку тока покоя бортовой сети. Откройте каждую ссылку и проверьте, что документ существует и говорит то, что утверждает модель.</li>
+</ol>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Справка по сервисам GigaChat, Алиса AI, DeepSeek и Qwen (для преподавателя)</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Справка по сервисам GigaChat, Алиса AI, DeepSeek и Qwen (для преподавателя)</h1>
+<p>Дата обращения ко всем источникам: <strong>10.11.2026</strong>. Страницы открывались в браузере без входа в учётную запись.</p>
+<h2>Как читать справку</h2>
+<p>У каждого утверждения стоит уровень доказательности:</p>
+<ul>
+<li><strong>[док]</strong> – текст официального документа или справки: соглашение, политика, FAQ, статья базы знаний, официальный анонс.</li>
+<li><strong>[стр]</strong> – видно на публичной странице сервиса без входа 10.11.2026: подпись кнопки, ярлык модели, атрибут поля загрузки. Документом это не является, интерфейс может измениться в любой день.</li>
+<li><strong>[втор]</strong> – вторичный источник (СМИ, блоги). Выводы на нём не строятся.</li>
+</ul>
+<p>«Не установлено» означает, что в прочитанных официальных источниках сведений нет. В таблице «нет» стоит только там, где источник прямо говорит «нет».</p>
+<hr />
+<h2>1. GigaChat (ПАО Сбербанк)</h2>
+<p>Точки входа: веб-версия https://giga.chat/ (кнопка «Веб-версия» ведёт на https://giga.chat/gigachat), бот в Telegram, бот «ВКонтакте», приложение в MAX (https://max.ru/gigachat). Перечень дан в подвале базы знаний https://giga.chat/help [док]. Мобильные приложения в Google Play, RuStore и AppGallery упомянуты в статье «ГигаЧат: с чего начать» https://giga.chat/help/articles/how-to-start-work-with-gigachat (изм. 23.10.2026) [док].</p>
+<h3>Вход и тарифы</h3>
+<ul>
+<li><strong>Вход.</strong> Войти в ГигаЧат можно двумя способами: по телефону или через Сбер ID. По телефону приходит СМС-код. Для Сбер ID на странице входа есть QR-код, на телефоне нужно приложение СберБанк Онлайн. Источник: https://giga.chat/help/articles/how-to-start-work-with-gigachat [док].</li>
+<li><strong>Сбер ID без счёта в банке.</strong> «Войти в ГигаЧат можно по Сбер ID, для этого совсем не нужно быть клиентом банка… мы видим только ваши имя и номер телефона» (https://giga.chat/help, FAQ [док]). Сбер ID, по справке, могут получить не только клиенты Сбера: для регистрации достаточно сим-карты российского оператора связи (https://giga.chat/help/articles/faq, изм. 01.06.2026 [док]).</li>
+<li><strong>Ограничение по сети.</strong> На вопрос «Как пользоваться GigaChat, если вы не из России?» FAQ отвечает: «понадобятся российский IP-адрес и авторизация через Сбер ID». На вопрос «У меня не работает GigaChat, что делать?» – «Проверьте, что у вас отключен VPN». Источник: https://giga.chat/help/articles/faq [док].</li>
+<li><strong>Кто может быть пользователем.</strong> «Совершеннолетнее, полностью дееспособное физическое лицо, достигшее возраста 18 (восемнадцать) лет… являющееся резидентом Российской Федерации» (п. 1.7 Пользовательского соглашения, обновлено 22.06.2026, https://developers.sber.ru/docs/ru/policies/gigachat/agreement [док]). Ссылка на это соглашение стоит под кнопкой «Войти» на https://giga.chat/ [стр].</li>
+<li><strong>Бесплатно ли.</strong> FAQ на https://giga.chat/help: «Пользоваться ГигаЧатом можно абсолютно бесплатно, без лимитов и ограничений» [док]. В соглашении (п. 3.1) сервис предоставляется «в режиме бета-тестирования… без взимания платы», а пользователь обязуется использовать его «исключительно в некоммерческих целях, то есть для личного использования». Коммерческое использование и «предоставление дополнительных функций Сервиса» допускаются «на платной основе в соответствии с отдельным соглашением» [док].</li>
+<li><strong>Платная подписка для веб-чата.</strong> Не установлено: название и состав в прочитанных официальных материалах не найдены. Тарифы на https://developers.sber.ru/docs/ru/gigachat/api/tariffs и «Соглашение… для физических лиц» (Freemium-режим, «Пакеты услуг», исполнитель SDevices, https://developers.sber.ru/docs/ru/policies/gigachat-agreement/individuals) относятся к API, а не к веб-чату [док].</li>
+</ul>
+<h3>Функции интерфейса</h3>
+<ul>
+<li><strong>Новый чат, история.</strong> Кнопка «Новый чат». «История всех чатов расположена слева… Нажав на три точки в нужном диалоге, вы можете добавить его в избранное, переименовать или удалить». Источник: https://giga.chat/help/articles/how-to-start-work-with-gigachat [док]. На странице есть пункты «Новый чат», «Мои чаты», «Идеи», «Проекты», «Видео», «Поддержка» [стр].</li>
+<li><strong>Документы.</strong> «В ГигаЧат доступен анализ прикреплённого файла формата DOCX, PDF и TXT» (https://giga.chat/help/articles/work-with-docs, изм. 28.10.2026 [док]). В FAQ указан максимальный размер: TXT – 1 Мб, PDF – 20 Мб или первые 50 страниц (https://giga.chat/help/articles/faq [док]). Там же сказано, что на каждый новый файл открывается новый чат, то есть загрузка файла в уже существующий чат невозможна [док].</li>
+<li><strong>Расхождение по форматам.</strong> Поле загрузки на https://giga.chat/ принимает гораздо больше типов: PPT/PPTX, DOC/DOCX, XLS/XLSX, ODT/ODS/ODP, RTF, EPUB, FB2, CSV, MD, HTML, JSON, YAML, исходный код (.py, .java, .cpp, .sql и др.), аудио (MP3, WAV, OGG, M4A и др.), изображения [стр, атрибут <code>accept</code>]. Принимает ли сервис эти файлы на деле, по документам не установлено.</li>
+<li><strong>Изображения на входе.</strong> Форматы jpg, tif, tiff, bmp, png, jpeg, webp, heic, heif. Максимальный размер «до 15 мб», минимальный размер картинки 100×100 пикселей. Источник: https://giga.chat/help/articles/gigachat-load-picture (изм. 28.10.2026) [док].</li>
+<li><strong>Генерация изображений.</strong> «ГигаЧат умеет рисовать картинки» (FAQ на https://giga.chat/help [док]). Отдельная статья: https://giga.chat/help/articles/how-to-generate-images [док]. Раздел «Видео» генерирует ролики, «расходуя один из десяти доступных сегодня запросов» (https://giga.chat/help/articles/how-to-start-work-with-gigachat [док]).</li>
+<li><strong>Режим рассуждения.</strong> На главной странице есть кнопки «Рассуждение» и «Исследование» [стр]. В открывшемся списке статей https://giga.chat/help/articles статьи о них не найдены, их работа по документам не установлена.</li>
+<li><strong>Поиск и источники.</strong> FAQ: «Может ли GigaChat добавлять ссылки на источники? Может. Нейросеть добавляет сноски внутрь текста…» (https://giga.chat/help/articles/faq [док]). Статья базы знаний о поиске в интернете описывает GigaChat как сервис, который «изучает содержимое страниц и включает в ответ только те источники, которые соответствуют запросу» (https://giga.chat/help/articles/ai-search, изм. 26.01.2026; это рекламный текст самого сервиса [док]).</li>
+<li><strong>Ограничения объёма.</strong> По FAQ, в запросе допускается до 4000 символов. В ответе «может быть около 4000 символов, но не больше» (https://giga.chat/help/articles/faq [док]). Это расходится с фразой «без лимитов и ограничений» из FAQ на https://giga.chat/help. Банк вправе «установить лимиты и ограничения на Использование Сервиса… без предварительного уведомления» (п. 4.1.3 соглашения [док]).</li>
+</ul>
+<h3>Данные и обучение</h3>
+<ul>
+<li><strong>Видимость истории.</strong> «Доступ к истории ваших чатов имеете только вы. Другие люди могут увидеть часть диалога… если вы нажмёте на кнопку „Поделиться“» (https://giga.chat/help [док]).</li>
+<li><strong>Удаление диалога.</strong> Значок корзины в открытом диалоге или пункт «Удалить» в меню «три точки» в списке чатов (https://giga.chat/help/articles/faq [док]). Массовое удаление всей истории в документах не описано.</li>
+<li><strong>Запрет на персональные данные.</strong> Пользователь обязуется «не передавать Запрос, содержащий персональные данные Пользователя и (или) третьих лиц» (п. 7.2.1 соглашения [док]).</li>
+<li><strong>Права на загруженное.</strong> Размещая контент, пользователь предоставляет Банку «простой (неисключительной) безвозмездной лицензии… на территории всего мира любыми способами» (п. 5.3) [док]. На сгенерированный контент Банк получает лицензию, в том числе на «воспроизведение, хранение и запись в память ЭВМ Банка и его аффилированных лиц» (п. 5.2.1) [док].</li>
+<li><strong>Обучение моделей.</strong> Прямого упоминания обучения моделей на запросах в соглашении нет: поиск по словам «обучен», «улучшен» совпадений не дал. Возможность отказаться не установлена.</li>
+<li><strong>Где обрабатывается, какое право.</strong> Ответы «формируются автоматически… через обработку Запросов на сервере Банка» (п. 3.4). К отношениям применяется законодательство РФ «вне зависимости от места нахождения Пользователя» (п. 10.3) [док].</li>
+<li><strong>Политика обработки персональных данных.</strong> Ссылка https://www.sberbank.ru/privacy/policy стоит на giga.chat, но первоисточник не открыт: ошибка сертификата при открытии при проверке. Сроки хранения и место хранения по этой политике не установлены.</li>
+</ul>
+<h3>Модели</h3>
+<ul>
+<li>FAQ (изм. 01.06.2026): в основе GigaChat лежат GigaChat версии 30В и Кандинский версии 3.1, нейросетевая модель для генерации изображений (https://giga.chat/help/articles/faq [док]). Актуальность формулировки на 10.11.2026 не подтверждена. На главной есть переключатель с подписью «Гига» [стр], его значение по документам не установлено.</li>
+</ul>
+<hr />
+<h2>2. Алиса AI (Яндекс)</h2>
+<p><strong>Как называется сейчас.</strong> Сервис называется «Алиса AI». Веб-чат: https://alice.yandex.ru/, заголовок страницы «Нейросеть Алиса AI - бесплатный ии-чат Яндекса…» [стр]. По справке, чат с Алисой AI – сервис со встроенной технологией Alice AI (https://alice.yandex.ru/support/ru/assistant/chat-alice [док]). Платная опция называется <strong>«Алиса Плюс»</strong>. Название <strong>«Алиса Про»</strong> справка относит к тарифу Яндекс 360 и отдельно оговаривает, что тариф 360 с Алисой Про и опция Алиса Плюс – разные платные подписки (https://alice.yandex.ru/support/ru/assistant/alice-plus [док]). Чат доступен на alice.yandex.ru, в приложениях «Алиса AI», «Яндекс – с Алисой», Яндекс Браузер, а также в MAX и Telegram (https://alice.yandex.ru/support/ru/assistant/chat-alice [док]; п. 2.2.1 Условий, см. ниже).</p>
+<p>Оператор: <strong>ООО «Платформа ИИ-решений»</strong> (ИНН 9705252275). Источник: «Условия использования Сервиса «Алиса AI»», публикация и вступление в силу 10.09.2026, https://yandex.ru/legal/alice_chat/ (открывается как https://yandex.ru/legal/alice_chat/ru/) [док].</p>
+<h3>Вход и тарифы</h3>
+<ul>
+<li><strong>Вход.</strong> Нужна регистрация или авторизация через Яндекс ID. «Отдельная функциональность Сервиса может быть доступна Пользователю, не прошедшему процедуру авторизации» (п. 2.1 Условий [док]). Без входа страница пишет: «Войдите в аккаунт, чтобы создавать новые чаты и хранить их историю» [стр].</li>
+<li><strong>Бесплатно ли.</strong> «Нет, вы можете отправлять запросы в чат и общаться с Алисой AI совершенно бесплатно». Но «в периоды высокой нагрузки… для пользователей без опции могут быть недоступны рассуждение, генерация картинок, анализ файлов и изображений» (https://alice.yandex.ru/support/ru/assistant/chat-alice, FAQ [док]).</li>
+<li><strong>Опция «Алиса Плюс».</strong> Даёт «приоритетный доступ в чате с Алисой AI», неограниченные запросы в режиме Эксперт, бессрочное хранение текстовых сообщений в чате и хранение изображений 30 дней, скачивание без водяного знака, до трёх оживлений фото в HD-качестве в месяц, «коммерческие права на генерацию», а также детские сценарии и родительский контроль. Подключается только «при наличии мультиподписки Яндекс Плюс» и только «на территории России и Беларуси». Для первого подключения есть бесплатный пробный период. Источник: https://alice.yandex.ru/support/ru/assistant/alice-plus [док]. Цена на прочитанных официальных страницах не указана: «Точную сумму оплаты за опцию вы увидите на странице опции».</li>
+</ul>
+<h3>Функции интерфейса</h3>
+<ul>
+<li><strong>Новый чат, история.</strong> На странице есть «Новый чат» и «Настройки» [стр]. После входа «все чаты будут храниться в одном месте» (FAQ https://alice.yandex.ru/support/ru/assistant/chat-alice [док]).</li>
+<li><strong>Документы.</strong> «В одном сообщении можно прикрепить один файл в формате DOC, DOCX, PDF и TXT. Максимальный размер файла не должен превышать 100 МБ» (https://alice.yandex.ru/support/ru/assistant/chat/files [док]).</li>
+<li><strong>Изображения на входе.</strong> «Одно изображение размером не более 20 МБ» (там же [док]).</li>
+<li><strong>Генерация изображений.</strong> Поддерживается (https://alice.yandex.ru/support/ru/assistant/chat/picture, перечень возможностей на https://alice.yandex.ru/support/ru/assistant/chat-alice [док]). На странице есть раздел «Студия» [стр].</li>
+<li><strong>Режим рассуждения.</strong> Режим «Эксперт», переключается кнопкой «Интеллект» (Авто / Эксперт). «Без опции Алиса Плюс в режиме Эксперт доступно 20 запросов в день. С опцией количество запросов не ограничено» (https://alice.yandex.ru/support/ru/assistant/chat/intellect [док]).</li>
+<li><strong>Поиск в интернете.</strong> «Отдельная функциональность и режимы работы Сервиса предоставляют Пользователям доступ к результатам, получаемым посредством поисковой системы Яндекса» (п. 2.5.1 Условий). Есть агент «Исследования», который «выполняет многошаговый поиск и анализ информации» (п. 2.9) [док].</li>
+<li><strong>Прочее.</strong> ИИ-агенты (бета), работа с почтой, голосовой чат (https://alice.yandex.ru/support/ru/assistant/chat-alice [док]).</li>
+<li><strong>Лимиты.</strong> Доступ «может быть ограничен в зависимости от региона… посредством установления лимита на количество Запросов» (п. 2.5 Условий [док]). Других числовых лимитов, кроме 20 запросов «Эксперта» и размеров файлов, не установлено.</li>
+</ul>
+<h3>Данные и обучение</h3>
+<ul>
+<li><strong>Срок хранения истории.</strong> С опцией Алиса Плюс, по справке, сгенерированные изображения хранятся 30 дней, а диалог – без ограничения срока; без опции история хранится 14 дней (https://alice.yandex.ru/support/ru/assistant/chat-alice, FAQ «Сколько хранится история диалогов в чате?» [док]).</li>
+<li><strong>Удаление.</strong> Удалить все чаты сразу нельзя, только каждый по отдельности. На компьютере: навести курсор на чат, открыть «три точки» и выбрать корзину (там же [док]). Загруженный файл можно удалить значком корзины или фразой «Удали все файлы из чата» (https://alice.yandex.ru/support/ru/assistant/chat/files [док]).</li>
+<li><strong>Использование для улучшения.</strong> «Яндекс вправе использовать Запросы, их части, включая Материалы… в целях улучшения сервисов Яндекса и аффилированных с ним лиц. Пользователь может отказаться от участия в улучшении, используя соответствующие настройки в Яндекс ID по адресу: https://id.yandex.ru/personal/data-access» (п. 6.6 Условий [док]). Отдельно: «любой Контент может использоваться Яндексом и аффилированными с ним компаниями анонимно… в любых целях» (п. 3.4) [док].</li>
+<li><strong>Где хранятся данные.</strong> «Для российских пользователей: Яндекс осуществляет… хранение… персональных данных граждан Российской Федерации с использованием баз данных, находящихся на территории Российской Федерации» (п. 7.3 Политики конфиденциальности, опубл. 26.08.2025, https://yandex.ru/legal/confidential/ [док]).</li>
+<li><strong>Ограничение назначения.</strong> Сервис предоставляется «исключительно для некоммерческого использования Пользователем в домашних условиях в ограниченном кругу людей для развлекательных целей» (п. 5.1 Условий [док]). Пункт 3.1: контент можно использовать «в личных некоммерческих целях. При наличии платной подписки «Алиса Плюс» Тексты (но не аудиоответы Сервиса) и Изображения могут быть использованы и в иных целях» [док]. Это согласуется с «коммерческими правами на генерацию» в описании опции (https://alice.yandex.ru/support/ru/assistant/alice-plus). Для учебного курса это существенная оговорка: без опции результат предназначен для личного некоммерческого использования (вывод автора).</li>
+</ul>
+<h3>Модели</h3>
+<ul>
+<li>Официально сказано: «технология Alice AI», «приоритет для запросов к последним моделям нейросети Alice AI» (https://alice.yandex.ru/support/ru/assistant/chat-alice, https://alice.yandex.ru/support/ru/assistant/alice-plus [док]). «Для построения ответа Сервиса могут быть использованы разные модели искусственного интеллекта» (п. 2.2.2 Условий [док]). Конкретная версия модели в чате не установлена.</li>
+</ul>
+<hr />
+<h2>3. DeepSeek (chat.deepseek.com)</h2>
+<p>Оператор: <strong>Hangzhou DeepSeek Artificial Intelligence Co., Ltd.</strong> («registered address in China»). Источники: Privacy Policy, Last Update Feb 10, 2026, https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html; Terms of Use, Last Update March 27, 2026, https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html [док]. На эти документы ссылается страница входа https://chat.deepseek.com/sign_in [стр].</p>
+<h3>Вход и тарифы</h3>
+<ul>
+<li><strong>Вход.</strong> На странице входа: поле «Phone number / email address» и пароль, «Log in with Google», «Login with Apple» [стр]. В Условиях (п. 2.2): «register an account using your Email or third-party account» [док]. Политика перечисляет «email address and/or telephone number, and password» и вход «such as Apple or Google» [док].</li>
+<li><strong>Бесплатно ли, есть ли подписки.</strong> Не установлено: в Условиях и Политике о плате за чат ничего не сказано. Политика упоминает «payment Personal Data» среди хранимых данных [док], отдельной страницы тарифов веб-чата не найдено. Главная https://www.deepseek.com/en/ ссылается только на «API Pricing» (https://api-docs.deepseek.com/quick_start/pricing) [стр].</li>
+<li><strong>Возраст.</strong> «The Services are primarily intended for adults». Лица младше 18 лет могут пользоваться сервисом с согласия законного представителя (п. 2.1 Условий [док]).</li>
+<li><strong>Доступность.</strong> При проверке первый запрос к chat.deepseek.com вернул отказ CloudFront 403, повторный с обычным браузерным заголовком открыл страницу входа [стр]. О доступности из российских сетей это ничего не говорит.</li>
+</ul>
+<h3>Функции интерфейса</h3>
+<ul>
+<li><strong>Режимы.</strong> Анонс DeepSeek-V4 Preview от 24.04.2026: «Try it now at chat.deepseek.com via Expert Mode / Instant Mode» (https://www.deepseek.com/en/news/v4-preview/ [док]). На главной https://www.deepseek.com/en/ показаны подписи «DeepThink» и «Search» [стр].</li>
+<li><strong>Поиск в интернете.</strong> «When you enable the "Search" function, the accuracy of the Outputs may be improved to some extent» (п. 5.2 Условий [док]).</li>
+<li><strong>Загрузка файлов.</strong> Политика среди собираемых данных называет «uploaded files, photos». Условия (п. 1.2) описывают входную информацию как «including text, images, files, and more» [док]. Форматы и лимиты не установлены.</li>
+<li><strong>История чатов.</strong> «You can manage your chat history… you may also copy or delete your chat history via your settings» (Политика, раздел о выборе пользователя [док]).</li>
+<li><strong>Ссылка на диалог.</strong> Можно поделиться диалогом через уникальную ссылку: «Anyone who has access to a shared link can view the linked Dialogues» (п. 1.6 Условий [док]).</li>
+<li><strong>Генерация изображений, лимиты на число запросов.</strong> Не установлено. Условия запрещают лишь «frequent or bulk registration».</li>
+</ul>
+<h3>Данные и обучение</h3>
+<ul>
+<li><strong>Где хранятся.</strong> «We directly collect, process and store your Personal Data in People's Republic of China» (Политика [док]).</li>
+<li><strong>Обучение.</strong> Среди целей названо «to train and improve our technology, such as our machine learning models and algorithms» (Политика [док]). Условия (п. 4.3): входы и выходы могут использоваться после «de-identification» для развития сервиса. Отказаться можно так: «you can opt out by turning off "Improve the model for everyone"» [док]. Политика также называет «the right to opt-out of using your Personal Data for training our models», запросы по правам принимаются на privacy@deepseek.com [док].</li>
+<li><strong>Где переключатель.</strong> В официальных документах путь в настройках не описан. Блог «Лаборатории Касперского» описывает путь: раздел Settings, в нём Data (https://www.kaspersky.com/blog/deepseek-privacy-and-security/54643/) [втор].</li>
+<li><strong>Срок хранения.</strong> «We keep this Personal Data for as long as you have an account»: это данные учётной записи, ввода и оплаты (Политика [док]). После удаления учётной записи «you will not be able to reactivate your account or retrieve any of the content» [док].</li>
+<li><strong>Применимое право.</strong> «Governed by the laws of the People's Republic of China in the mainland». Споры рассматривает суд по месту регистрации компании (пп. 10.1–10.2 Условий [док]).</li>
+</ul>
+<h3>Модели</h3>
+<ul>
+<li>Связь модели с веб-чатом официально подтверждена только анонсом V4 Preview (24.04.2026): модели DeepSeek-V4-Pro и V4-Flash, доступ через «Expert Mode / Instant Mode» на chat.deepseek.com [док].</li>
+<li>Анонс DeepSeek-V4.1-Flash от 10.09.2026 говорит только об API («now live on the DeepSeek API… Set your model to deepseek-flash»), о веб-чате в нём ничего нет (https://www.deepseek.com/en/news/deepseek-v4-1-flash/ [док]). Какая модель стоит в чате на 10.11.2026, не установлено.</li>
+</ul>
+<hr />
+<h2>4. Qwen (chat.qwen.ai)</h2>
+<p>Ссылки «Пользовательские условия» и «Политика конфиденциальности» со страницы https://chat.qwen.ai/ ведут на https://qwen.ai/termsservice и https://qwen.ai/privacypolicy. Адреса https://chat.qwen.ai/legal-agreement/terms-of-service и …/privacy-policy перенаправляют туда же [стр]. Тексты открылись на русском по языку браузера: «Соглашение об оказании услуг», вступает в силу 10.09.2026; «Политика конфиденциальности», вступает в силу 07.09.2026 [док].</p>
+<p>Оператор: <strong>Nth Power Global Tech Singapore Pte. Ltd.</strong>, компания по праву Сингапура. Адрес: 51 Bras Basah Road No. 03-06 Lazada One Singapore 189554 (Политика и Соглашение [док]). Политика распространяется на приложение Qwen, сайт qwen.ai, клиент для ПК «и другие платформы» [док].</p>
+<h3>Вход и тарифы</h3>
+<ul>
+<li><strong>Вход.</strong> Страница https://chat.qwen.ai/auth: «Вход с кодом подтверждения» на адрес электронной почты, «Войти с паролем», «Продолжить с Google», «Продолжить с GitHub», «Продолжить с Apple» [стр]. Политика подтверждает вход через «Google, Apple или GitHub» [док]. Входа по номеру телефона на странице нет [стр].</li>
+<li><strong>Без входа.</strong> На главной без входа видны поле ввода, кнопка загрузки файлов и кнопки «Войти» / «Зарегистрироваться» [стр]. Сколько можно сделать без входа, не установлено.</li>
+<li><strong>Бесплатно ли.</strong> Главная https://qwen.ai/home называет Qwen ИИ-ассистентом для всех и сообщает, что он бесплатен и открыт для всех [док, рекламный текст].</li>
+<li><strong>Подписки.</strong> «Этот сервис предлагает тарифы на подписку разных уровней… каждый тариф предусматривает различные функции и преимущества, а также лимит использования для каждого периода подписки. Конкретные условия определяются информацией, отображаемой на странице в момент покупки» (Соглашение [док]). Названия и состав тарифов не установлены.</li>
+<li><strong>Возраст.</strong> «Вы должны быть не моложе 18 лет» (Соглашение). Политика: «предназначены для пользователей в возрасте 18 лет и старше» [док].</li>
+</ul>
+<h3>Функции интерфейса</h3>
+<ul>
+<li><strong>Перечень на главной https://qwen.ai/home</strong> [док, рекламный текст]: «Поиск», «Веб‑разработка», «Артефакты», «Глубокое исследование» (Deep Research), «Генерация изображений» (Qwen VLo), «Генерация видео», «Мультимодальное понимание»: текст, изображения, аудио, видео.</li>
+<li><strong>Поиск в интернете.</strong> «Если… вы самостоятельно выберете функцию поиска в Интернете, Сервисы автоматически выполнят поиск… Qwen будет отображать справочные источники» (Соглашение [док]).</li>
+<li><strong>Загрузка файлов.</strong> Кнопка «Upload files» на https://chat.qwen.ai/ [стр]. Политика упоминает «запросы, тексты, файлы, изображения, аудио и видео» [док]. Форматы и размеры не установлены.</li>
+<li><strong>Режим рассуждения.</strong> На странице чата есть переключатель «Авто» [стр], его значение не установлено. Отдельный режим «думать» в документах не описан. На главной сказано лишь: «Qwen превосходно справляется с продвинутым рассуждением» [док, рекламный текст].</li>
+<li><strong>История чатов, новый чат.</strong> В прочитанных документах не описаны. Без входа не проверено.</li>
+<li><strong>Лимиты.</strong> Числовых лимитов для бесплатного доступа нет. Для подписок есть «лимит использования для каждого периода» без чисел (Соглашение [док]).</li>
+</ul>
+<h3>Данные и обучение</h3>
+<ul>
+<li><strong>Обучение: две формулировки, обе дословно.</strong></li>
+<li>Политика: «мы можем использовать обезличенный пользовательский контент и данные отзывов для обучения… однако мы не будем использовать ваши необработанные входные данные для непосредственного обучения ИИ-моделей» [док].</li>
+<li>Соглашение: «Мы можем использовать контент… включая обучение моделей. Отказ от участия. Вы можете отказаться от использования вашего контента для обучения моделей, уведомив нас по адресу privacy@qwen.com… однако предоставленные вами отзывы о контенте по-прежнему будут использоваться для обучения моделей» [док]. Переключатель в настройках в документах не описан.</li>
+<li>Оценки «Нравится» / «Не нравится» сохраняют разговор как часть отзыва (Политика [док]).</li>
+<li><strong>Где хранятся.</strong> «Мы получаем, обрабатываем и храним ваши персональные данные в Сингапуре» (Политика, раздел VI [док]). Запросы обрабатывает Alibaba Cloud (Singapore) Private Limited как «обработчик данных», обработка «будет осуществляться в Сингапуре» [док]. Оператор данных – Nth Power Global Tech Singapore, Alibaba Cloud – обработчик.</li>
+<li><strong>Удаление.</strong> «Вы можете самостоятельно удалить свою учетную запись на странице настроек Qwen» (Политика [док]). Удаление отдельных чатов в документах не описано. Данные могут храниться после удаления учётной записи, если это требуется по закону (раздел VII [док]).</li>
+<li><strong>Применимое право.</strong> Законодательство Сингапура, арбитраж в Сингапуре на английском языке, если региональные условия не говорят иначе (Соглашение [док]).</li>
+</ul>
+<h3>Модели</h3>
+<ul>
+<li>На странице https://chat.qwen.ai/ без входа выбрана модель с подписью <strong>«Qwen3.7-Plus»</strong> [стр]. Других официальных сведений о модели веб-чата не найдено.</li>
+</ul>
+<hr />
+<h2>Сводная таблица</h2>
+<p>Обозначения: «да» / «нет» – по источнику; «не уст.» – не установлено. Номер в скобках отсылает к списку ссылок под таблицей.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Функция</th>
+<th>GigaChat</th>
+<th>Алиса AI</th>
+<th>DeepSeek</th>
+<th>Qwen</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Вход</td>
+<td>телефон (СМС) или Сбер ID [G1]</td>
+<td>Яндекс ID [A1]</td>
+<td>телефон/почта + пароль, Google, Apple [D1][D2]</td>
+<td>почта (код/пароль), Google, GitHub, Apple [Q1]</td>
+</tr>
+<tr>
+<td>Бесплатный доступ</td>
+<td>да [G2]</td>
+<td>да, с ограничениями при нагрузке [A2]</td>
+<td>не уст.</td>
+<td>да (по рекламному тексту) [Q2]</td>
+</tr>
+<tr>
+<td>Платная подписка для чата</td>
+<td>не уст. [G3]</td>
+<td>да, «Алиса Плюс» к Яндекс Плюс [A3]</td>
+<td>не уст.</td>
+<td>да, уровни без названий [Q3]</td>
+</tr>
+<tr>
+<td>Новый чат</td>
+<td>да [G1]</td>
+<td>да [стр, A4]</td>
+<td>не уст.</td>
+<td>не уст.</td>
+</tr>
+<tr>
+<td>История чатов</td>
+<td>да [G1]</td>
+<td>да, 14 дней без опции [A2]</td>
+<td>да [D3]</td>
+<td>не уст.</td>
+</tr>
+<tr>
+<td>Удаление чата</td>
+<td>да, по одному [G4]</td>
+<td>да, только по одному [A2]</td>
+<td>да, в настройках [D3]</td>
+<td>не уст. (удаление учётной записи – да [Q4])</td>
+</tr>
+<tr>
+<td>Загрузка документов</td>
+<td>да: DOCX, PDF, TXT [G5]</td>
+<td>да: DOC, DOCX, PDF, TXT, до 100 МБ [A5]</td>
+<td>да, форматы не уст. [D3]</td>
+<td>да, форматы не уст. [стр, Q4]</td>
+</tr>
+<tr>
+<td>Изображения на входе</td>
+<td>да, до 15 МБ [G6]</td>
+<td>да, до 20 МБ [A5]</td>
+<td>да («photos») [D3]</td>
+<td>да [Q4]</td>
+</tr>
+<tr>
+<td>Генерация изображений</td>
+<td>да [G2]</td>
+<td>да [A4]</td>
+<td>не уст.</td>
+<td>да [Q2]</td>
+</tr>
+<tr>
+<td>Режим рассуждения</td>
+<td>кнопка «Рассуждение» [стр]; в документах не описана</td>
+<td>да, «Эксперт», 20/день без опции [A6]</td>
+<td>Expert / Instant (04.2026) [D4]; «DeepThink» [стр]</td>
+<td>не уст.</td>
+</tr>
+<tr>
+<td>Поиск в интернете</td>
+<td>да, со ссылками на источники [G4][G7]</td>
+<td>да [A1]</td>
+<td>да, «Search» [D2]</td>
+<td>да [Q3]</td>
+</tr>
+<tr>
+<td>Официальные лимиты</td>
+<td>4000 символов в запросе и ответе; видео 10/день [G4][G1]</td>
+<td>Эксперт 20/день; лимиты по региону [A6][A1]</td>
+<td>не уст.</td>
+<td>лимиты подписок без чисел [Q3]</td>
+</tr>
+<tr>
+<td>Данные для обучения или улучшения</td>
+<td>прямо не сказано; широкая лицензия на контент [G3]</td>
+<td>да, для улучшения сервисов [A1]</td>
+<td>да, после обезличивания [D2][D3]</td>
+<td>да, обезличенные данные [Q3][Q4]</td>
+</tr>
+<tr>
+<td>Можно отключить</td>
+<td>не уст.</td>
+<td>да, id.yandex.ru/personal/data-access [A1]</td>
+<td>да, «Improve the model for everyone» [D2]</td>
+<td>да, письмом на privacy@qwen.com [Q3]</td>
+</tr>
+<tr>
+<td>Юрисдикция оператора, место данных</td>
+<td>оператор и право – РФ; место хранения не уст. [G3]</td>
+<td>РФ, базы в РФ для граждан РФ [A1][A7]</td>
+<td>КНР, хранение в КНР [D2][D3]</td>
+<td>Сингапур, хранение в Сингапуре [Q3][Q4]</td>
+</tr>
+<tr>
+<td>Модель (официально)</td>
+<td>«GigaChat 30В», «Кандинский 3.1» (FAQ от 01.06.2026) [G4]</td>
+<td>«Alice AI», версия не уст. [A4]</td>
+<td>V4-Pro / V4-Flash (04.2026), текущая не уст. [D4]</td>
+<td>«Qwen3.7-Plus» [стр]</td>
+</tr>
+</tbody>
+</table></div>
+<p>Ссылки к таблице:
+- [G1] https://giga.chat/help/articles/how-to-start-work-with-gigachat
+- [G2] https://giga.chat/help
+- [G3] https://developers.sber.ru/docs/ru/policies/gigachat/agreement
+- [G4] https://giga.chat/help/articles/faq
+- [G5] https://giga.chat/help/articles/work-with-docs
+- [G6] https://giga.chat/help/articles/gigachat-load-picture
+- [G7] https://giga.chat/help/articles/ai-search
+- [A1] https://yandex.ru/legal/alice_chat/
+- [A2] https://alice.yandex.ru/support/ru/assistant/chat-alice
+- [A3] https://alice.yandex.ru/support/ru/assistant/alice-plus
+- [A4] https://alice.yandex.ru/support/ru/assistant/chat-alice
+- [A5] https://alice.yandex.ru/support/ru/assistant/chat/files
+- [A6] https://alice.yandex.ru/support/ru/assistant/chat/intellect
+- [A7] https://yandex.ru/legal/confidential/
+- [D1] https://chat.deepseek.com/sign_in
+- [D2] https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html
+- [D3] https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html
+- [D4] https://www.deepseek.com/en/news/v4-preview/
+- [Q1] https://chat.qwen.ai/auth
+- [Q2] https://qwen.ai/home
+- [Q3] https://qwen.ai/termsservice
+- [Q4] https://qwen.ai/privacypolicy</p>
+<hr />
+<h2>Что преподавателю проверить руками перед занятием</h2>
+<ol>
+<li><strong>Доступ из учебной сети.</strong> Открываются ли giga.chat, alice.yandex.ru, chat.deepseek.com и chat.qwen.ai из сети аудитории без VPN. Справка GigaChat для пользователей не из России называет условием российский IP-адрес, а при сбоях советует отключить VPN. Для DeepSeek и Qwen доступность из российских сетей по документам не установлена.</li>
+<li><strong>Регистрация.</strong> Проходит ли регистрация в DeepSeek с российским номером телефона и приходят ли коды на российскую почту в DeepSeek и Qwen. У Qwen вход по телефону на странице не предусмотрен, только почта, Google, GitHub или Apple.</li>
+<li><strong>Оговорки о назначении.</strong> У GigaChat: личное некоммерческое использование, 18+, резидент РФ, запрет на персональные данные в запросах. У Алисы AI: «для развлекательных целей». Решить, как сформулировать слушателям правило «рабочие данные не вводим».</li>
+<li><strong>Что видно после входа.</strong> Есть ли кнопки рассуждения и поиска в DeepSeek и Qwen, как они сейчас называются («DeepThink», «Search», Expert / Instant), что делает кнопка «Авто» в Qwen и кнопки «Рассуждение», «Исследование», «Гига» в GigaChat.</li>
+<li><strong>Форматы файлов на практике.</strong> Принимает ли GigaChat PPTX, XLSX и аудио: поле загрузки их допускает, справка называет только DOCX, PDF, TXT. Какие форматы и размеры берут DeepSeek и Qwen.</li>
+<li><strong>Отключение обучения.</strong> Где в настройках DeepSeek переключатель «Improve the model for everyone» (официального описания пути нет). Есть ли подобный переключатель в Qwen (по документам отказ только письмом). Как выглядит страница id.yandex.ru/personal/data-access для Алисы AI.</li>
+<li><strong>История.</strong> Как удалить чат и всю историю в Qwen (не описано) и в DeepSeek (путь в настройках не описан). Помнить, что без «Алисы Плюс» история Алисы AI хранится 14 дней.</li>
+<li><strong>Модели на день занятия.</strong> Подписи моделей в интерфейсах (Qwen3.7-Plus, режимы DeepSeek, «Гига»): официальные сведения о моделях веб-чатов неполные или устаревшие.</li>
+<li><strong>Лимиты бесплатного доступа.</strong> Сколько запросов проходит у слушателей без подписки за одно занятие: у Алисы AI при нагрузке могут отключаться рассуждение, файлы и картинки, «Эксперт» ограничен 20 запросами в день, видео в GigaChat – 10 в день.</li>
+</ol>
+<hr />
+<h2>Источники</h2>
+<p>Дата обращения 10.11.2026. Страницы с пометкой «не открывался» приведены как ссылки из официальных документов, их содержание в справке не используется.</p>
+<p><strong>GigaChat (ПАО Сбербанк)</strong>
+- https://giga.chat/
+- https://giga.chat/gigachat (ссылка «Веб-версия» из подвала справки)
+- https://giga.chat/help
+- https://giga.chat/help/articles
+- https://giga.chat/help/articles/faq
+- https://giga.chat/help/articles/how-to-start-work-with-gigachat
+- https://giga.chat/help/articles/work-with-docs
+- https://giga.chat/help/articles/gigachat-load-picture
+- https://giga.chat/help/articles/how-to-generate-images
+- https://giga.chat/help/articles/ai-search
+- https://developers.sber.ru/docs/ru/policies/gigachat/agreement
+- https://developers.sber.ru/docs/ru/policies/gigachat-agreement/individuals (относится к API)
+- https://developers.sber.ru/docs/ru/gigachat/api/tariffs (тарифы API, указан как ссылка, не открывался)
+- https://max.ru/gigachat (ссылка со страницы справки, не открывалась)
+- https://www.sberbank.ru/privacy/policy (первоисточник не открыт: ошибка сертификата)</p>
+<p><strong>Алиса AI (Яндекс)</strong>
+- https://alice.yandex.ru/
+- https://alice.yandex.ru/support/ru/assistant/chat-alice
+- https://alice.yandex.ru/support/ru/assistant/alice-plus
+- https://alice.yandex.ru/support/ru/assistant/chat/intellect
+- https://alice.yandex.ru/support/ru/assistant/chat/files
+- https://alice.yandex.ru/support/ru/assistant/chat/picture (ссылка из справки, отдельно не открывалась)
+- https://yandex.ru/legal/alice_chat/ (Условия использования Сервиса «Алиса AI», 10.09.2026; открывается как https://yandex.ru/legal/alice_chat/ru/)
+- https://yandex.ru/legal/confidential/ (Политика конфиденциальности, 26.08.2025)
+- https://id.yandex.ru/personal/data-access (адрес из п. 6.6 Условий, не открывался)</p>
+<p><strong>DeepSeek</strong>
+- https://www.deepseek.com/en/
+- https://chat.deepseek.com/sign_in
+- https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html (Last Update Feb 10, 2026)
+- https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html (Last Update March 27, 2026)
+- https://www.deepseek.com/en/news/v4-preview/ (24.04.2026)
+- https://www.deepseek.com/en/news/deepseek-v4-1-flash/ (10.09.2026)
+- https://www.deepseek.com/en/news/
+- https://www.deepseek.com/en/transparency/
+- https://api-docs.deepseek.com/quick_start/pricing (цены API, указан как ссылка, не открывался)</p>
+<p><strong>Qwen</strong>
+- https://chat.qwen.ai/
+- https://chat.qwen.ai/auth
+- https://chat.qwen.ai/legal-agreement/terms-of-service и https://chat.qwen.ai/legal-agreement/privacy-policy (перенаправляют на qwen.ai)
+- https://qwen.ai/home
+- https://qwen.ai/termsservice (Соглашение об оказании услуг, 10.09.2026)
+- https://qwen.ai/privacypolicy (Политика конфиденциальности, 07.09.2026)</p>
+<p><strong>Вторичные источники</strong>
+- https://www.kaspersky.com/blog/deepseek-privacy-and-security/54643/ (путь к настройке данных в DeepSeek; страница не открывалась, сведения из поисковой выдачи)</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Учебный кейс: система электроснабжения 24 В</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Учебный кейс: система электроснабжения 24 В</h1>
+<p>Все материалы кейса учебные. Узел условный, значения подобраны для упражнений и не взяты из документации реального изделия. Поэтому кейс можно целиком отправлять в любой из сервисов, с которыми мы работаем на занятиях.</p>
+<p>Кейс пригодится на всём курсе. В первый день нужны описание узла, фрагмент технического задания и перечень замечаний.</p>
+<h2>1. Описание узла</h2>
+<p>Узел ЭС-24 – система электроснабжения условного грузового автомобиля с бортовой сетью 24 В. В неё входят:</p>
+<ul>
+<li>генератор 28 В, 80 А со встроенным регулятором напряжения;</li>
+<li>две свинцово-кислотные стартерные аккумуляторные батареи 12 В, 190 А·ч, соединённые последовательно;</li>
+<li>дистанционный выключатель массы;</li>
+<li>блок предохранителей и реле;</li>
+<li>потребители, которые работают на стоянке: тахограф, охранная система, блок управления двигателем в дежурном режиме, головное устройство в режиме ожидания.</li>
+</ul>
+<p>Автомобиль эксплуатируется круглый год, в том числе на стоянках под открытым небом при температуре до −25 °C.</p>
+<p><img alt="Учебный узел ЭС-24" src="../diagrams/d1-uzel-es24.png" /></p>
+<p>Интерактивная версия схемы – файл <code>diagrams/d1-uzel-es24.html</code>.</p>
+<h2>2. Фрагмент технического задания</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Пункт</th>
+<th>Требование</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>4.1</td>
+<td>Номинальное напряжение бортовой сети – 24 В.</td>
+</tr>
+<tr>
+<td>4.2</td>
+<td>Напряжение, которое поддерживает регулятор при температуре +25 °C, – 28,2 ± 0,3 В.</td>
+</tr>
+<tr>
+<td>4.3</td>
+<td>Ток, потребляемый от аккумуляторных батарей при выключенном зажигании и включённом выключателе массы (ток покоя), – не более 40 мА. Измеряется через 30 мин после выключения зажигания.</td>
+</tr>
+<tr>
+<td>4.4</td>
+<td>После стоянки 14 суток при температуре окружающего воздуха до −25 °C двигатель должен запускаться штатным стартером без внешнего источника питания.</td>
+</tr>
+<tr>
+<td>4.5</td>
+<td>Напряжение разомкнутой цепи каждой аккумуляторной батареи после стоянки 14 суток – не ниже 12,2 В.</td>
+</tr>
+<tr>
+<td>4.6</td>
+<td>Ток отдачи генератора на холостом ходу двигателя (600 мин⁻¹) – не менее 40 А.</td>
+</tr>
+</tbody>
+</table></div>
+<p>Других пунктов в разделе 4 нет.</p>
+<h2>3. Перечень замечаний по испытаниям опытного образца</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>№</th>
+<th>Замечание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>З-1</td>
+<td>Перед стоянкой батареи были полностью заряжены. После 9 суток стоянки при температуре от −18 до −22 °C напряжение разомкнутой цепи батарей перед пуском – 11,9 В и 12,0 В. Двигатель запустился только со второй попытки.</td>
+</tr>
+<tr>
+<td>З-2</td>
+<td>Ток покоя через 30 мин после выключения зажигания – 85 мА, через 2 ч – 62 мА.</td>
+</tr>
+<tr>
+<td>З-3</td>
+<td>На холостом ходу при включённых фарах дальнего света и обогреве зеркал напряжение бортовой сети снижается до 26,1 В.</td>
+</tr>
+<tr>
+<td>З-4</td>
+<td>На клемме «плюс» батареи № 1 следы окисления. Момент затяжки клемм в документации не указан.</td>
+</tr>
+<tr>
+<td>З-5</td>
+<td>Предохранитель цепи тахографа сгорел дважды за 1200 км пробега.</td>
+</tr>
+</tbody>
+</table></div>
+<h2>4. Учебный ответ модели для проверки</h2>
+<p>Этот ответ подготовлен для занятия, в нём специально оставлены ошибки. Задача слушателя – найти их, сверяясь с описанием узла и техническим заданием. Вопрос, на который «отвечала модель»:</p>
+<blockquote>
+<p>Оцени по замечанию З-2, укладывается ли ток покоя в требования, и посчитай, через сколько суток батареи разрядятся до 50 %.</p>
+</blockquote>
+<p>Ответ:</p>
+<blockquote>
+<p>Ток покоя 85 мА выше рекомендуемого, но укладывается в допуск по п. 4.3 ТЗ (не более 100 мА), так что формально несоответствия нет.</p>
+<p>Две батареи по 190 А·ч, соединённые последовательно, дают общую ёмкость 380 А·ч. Разряд до 50 % – это 190 А·ч. При токе 85 мА: 190 / 0,085 = 2235 ч, то есть примерно 9,3 суток.</p>
+<p>Зимой при −25 °C ёмкость батарей возрастает примерно на 10 %, поэтому запас по стоянке даже больше расчётного. По п. 4.8 ТЗ допускается разряд батарей до 30 % без последствий для пуска.</p>
+<p>Рекомендация: заменить генератор на модель большей мощности. Замечание З-2 можно закрыть без доработки.</p>
+</blockquote>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

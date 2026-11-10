@@ -381,6 +381,10 @@ foreach ($folder in $uniqueFolders) {
     ForEach-Object {
       $relative = Get-RelativePathSafe -BasePath $folderPath -Path $_.FullName
       if ($folder -eq 'gost56939' -and $relative.Replace('\', '/') -eq 'materials/process-map-original/index.html') { return }
+      # kamaz-ai: the sitemap lists only the course landing pages. teachers.html
+      # is noindex, and nested materials (teacher keys included) are reached from
+      # the day pages rather than advertised to search engines.
+      if ($folder -eq 'kamaz-ai' -and ($relative.Replace('\', '/') -eq 'teachers.html' -or $relative.Replace('\', '/').StartsWith('materials/'))) { return }
       if (-not (Should-SkipSitemapPath $relative)) {
         Add-UniqueUrl -List $urls -Url (HtmlPathToUrl -RelativePath $relative -BaseUrl $baseUrl)
       }

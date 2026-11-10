@@ -104,7 +104,17 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   'c31b9bb34a5476bcefdcf65c7e6537bfa9fce23666eff4152a6a77f28e17a657',
   'dda92267f335ca0a2a61d7d0bee65a2cd792b77b3eb8480a8bbddc208bf7b686',
   'f27cd06b0195a08983927b30f6dccb0c744f26bb57239577a7f04aeaff81c18c',
-  'fb5169743783b44c95df5072489c471ff6bbcd350b271ffe60873188e01e0744'
+  'fb5169743783b44c95df5072489c471ff6bbcd350b271ffe60873188e01e0744',
+  '658be45767d4afa3b749378d7cde9f19dc412e00ffdde79a31b446975ce1c34f', # kamaz-ai: 2026-11-16-Слайды-Тема-1.1-Модели-и-сервисы.pdf - author slides rendered from the reviewed HTML deck,
+  '370044a51713584b850a0957ae203fda4ff88f6e3510392d05e2d22ce560e2ff', # kamaz-ai: 2026-11-16-Слайды-Тема-1.2-Запросы.pdf - author slides rendered from the reviewed HTML deck,
+  '0f65060acb242f49160d920406788c8c7e240ff83db1897a753e56460e6dff06', # kamaz-ai: 2026-11-18-Слайды-Тема-2.1-Защита-информации.pdf - author slides rendered from the reviewed HTML deck,
+  'dfad0b5fe9622de9faee0d2c3fbe0542f4e4eeada916dde94db4c84828961f06', # kamaz-ai: 2026-11-18-Слайды-Тема-2.2-Техническая-документация.pdf - author slides rendered from the reviewed HTML deck,
+  '5277baf3241d53c42b5dac7ec607e634bd17cded98ca5786531bef06801a4ef9', # kamaz-ai: 2026-11-20-Слайды-Тема-3.1-Поиск-решений.pdf - author slides rendered from the reviewed HTML deck,
+  '09b3d57b7ddf932ebf5ab4338ff47a499379630a607e116406c8995b23c5e06d', # kamaz-ai: 2026-11-20-Слайды-Тема-3.2-Анализ-отказов.pdf - author slides rendered from the reviewed HTML deck,
+  '8a6d7ab47a6e118af23b18780442f354318e50c8828b262f2c11d2aec1707133', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides rendered from the reviewed HTML deck,
+  '1893f3930b883650db1717a0795be3ccf284858f691daae4ac414c8f60d855f3', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides rendered from the reviewed HTML deck,
+  'b260864152044825621912a46f7dc9a58a872e7cc05254d3fac36b31387a5df1', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides rendered from the reviewed HTML deck,
+  'fe1fe4c6e07cc2150a4ccef7e66819b12bc02cf7a47209f7abbd6625898d8273' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides rendered from the reviewed HTML deck
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
