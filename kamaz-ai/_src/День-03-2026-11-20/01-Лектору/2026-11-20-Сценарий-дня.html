@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сценарий третьего дня: 20.11.2026, пятница</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Сценарий третьего дня: 20.11.2026, пятница</h1>
+<p>Модуль 3 «Поиск технических решений и потенциальных отказов». Формат: ВКС на Платформе. Темы 3.1 и 3.2, самостоятельная работа с контрольной точкой модуля 3.</p>
+<h2>Подготовка</h2>
+<p><strong>За 2–3 дня (до 18.11):</strong></p>
+<ul>
+<li>Выложить для слушателей: лекции 3.1 и 3.2, дополнение к учебному кейсу, оба файла практики, домашнее задание и задание к модулю 5, которое выдаётся заранее (папка «05-Самостоятельная-работа»).</li>
+<li>Создать на Платформе задания «Самостоятельная работа по теме 3.1» и «Контрольная точка по модулю 3» со сроком до начала занятия 23.11.</li>
+<li>Проверить домашние задания модуля 2: в начале лекции 3.1 нужны два-три примера для связки.</li>
+</ul>
+<p><strong>Накануне:</strong></p>
+<ul>
+<li>Прогнать запрос задания 1а практики 3.1 (варианты для задачи К-1) в GigaChat и Алисе AI. Сохранить ответы снимками экрана: если у группы не откроется сервис, разбирать будем их.</li>
+<li>Прогнать шаги 1–2 задания 1 практики 3.2 (черновик DFMEA по Ф-1) хотя бы в одном сервисе.</li>
+<li>Самому проверить четыре ссылки из документа 3.3 по ключам: открыть страницу ФИПС с патентом RU 2745118 C1 и адрес DOI статьи Hoffmann и Lindqvist. Если страницы с рабочего места не открываются, сделать снимки экрана.</li>
+<li>Подготовить электронную таблицу с матрицей модели из документа 3.3: при разборе удобно пересчитать её на экране.</li>
+<li>Открыть слайды обеих тем, схемы дня (папка «08-Схемы») и лендинг дня.</li>
+</ul>
+<p><strong>Перед началом:</strong></p>
+<ul>
+<li>Напомнить включить камеры и микрофоны.</li>
+<li>Держать под рукой файл ключей: в практике 3.1 разбор идёт по нему.</li>
+</ul>
+<h2>День по времени</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Время (МСК)</th>
+<th>Что</th>
+<th>Минут</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>08:00–08:45</td>
+<td>Лекция 3.1</td>
+<td>45</td>
+</tr>
+<tr>
+<td>08:45–10:15</td>
+<td>Практика 3.1: задание 1 (45), задание 2 (45)</td>
+<td>90</td>
+</tr>
+<tr>
+<td>10:15–10:25</td>
+<td>Перерыв</td>
+<td>10</td>
+</tr>
+<tr>
+<td>10:25–11:10</td>
+<td>Практика 3.1: задание 3 (35), итоги (10)</td>
+<td>45</td>
+</tr>
+<tr>
+<td>11:10–11:55</td>
+<td>Лекция 3.2</td>
+<td>45</td>
+</tr>
+<tr>
+<td>11:55–13:00</td>
+<td>Обед</td>
+<td>65</td>
+</tr>
+<tr>
+<td>13:00–14:30</td>
+<td>Практика 3.2: задание 1 (60), задание 2а (30)</td>
+<td>90</td>
+</tr>
+<tr>
+<td>14:30–14:40</td>
+<td>Перерыв</td>
+<td>10</td>
+</tr>
+<tr>
+<td>14:40–16:10</td>
+<td>Практика 3.2: задание 2б (30), задание 3 (45), итоги (15)</td>
+<td>90</td>
+</tr>
+<tr>
+<td>после занятия</td>
+<td>Самостоятельная работа по теме 3.1</td>
+<td>45</td>
+</tr>
+<tr>
+<td>после занятия</td>
+<td>Самостоятельная работа по теме 3.2 и контрольная точка модуля 3</td>
+<td>45</td>
+</tr>
+</tbody>
+</table></div>
+<p>Аудиторная часть: 45 + 135 + 45 + 180 = 405 мин, это 9 академических часов (2 лекции и 7 часов практики по программе модуля 3). Самостоятельная работа – 2 академических часа.</p>
+<h2>Лекция 3.1 (08:00–08:45)</h2>
+<p><strong>Связка с модулем 2 (3 мин).</strong> Один пример из домашних заданий: что модель исказила при извлечении требований. Мостик: сегодня модель будет не пересказывать документ, а придумывать. Ошибки станут другими.</p>
+<p><strong>Модель как помощник в поиске идей (12 мин).</strong> Исследование Ma и соавт.: решения модели осуществимее, решения людей новее. Конкурс прототипов (Ege и соавт.): второе место, но преждевременный отказ от идей и застревание на одном решении. Противоречия в задаче К-1: обесточить всё нельзя (тахограф и охрана), поставить батареи больше нельзя (ограничение). Показать запрос «доводы против».</p>
+<p>Вопрос группе: какие решения задачи К-1 приходят в голову без модели? Записать 3–4 варианта в чат. На практике сравним с вариантами модели.</p>
+<p><strong>Матрица выбора (13 мин).</strong> Три уязвимых места: шкала, веса, обоснования. Отсев до матрицы. Критерий как «сценарий + результат». Исследования: модель полезна для структуры и черновиков (Piñones, Bohanec), а не для итоговых оценок. Смещение по позиции и длине. Пример на числах с вариантами А и Б: сдвиг 0,2 веса меняет лидера. Схема «От задачи к выбранному решению».</p>
+<p><strong>Проверка источников (13 мин).</strong> Цифры: в эксперименте с четырьмя моделями без доступа к источникам – не больше 47,5 % подтверждённых ссылок (Zhao и соавт., 2026); в отдельной проверке 2023 года – 2 настоящие из 35. Подчеркнуть, что это результаты отдельных экспериментов, а не норма для любого сервиса. Выдуманные пакеты и то, что поиск в интернете эту проблему не снимает. Шаги проверки и шесть итогов, без разбора ссылок из документа 3.3: их слушатели проверяют сами в задании 3. Информированный скептицизм.</p>
+<p><strong>Итог (4 мин).</strong> Таблица «что делает модель – что решает инженер».</p>
+<h2>Практика 3.1 (08:45–11:10)</h2>
+<ul>
+<li><strong>Задание 1, 45 мин.</strong> Пусть пары работают в разных сервисах. Пока идёт 1а, напомнить: модель не должна приводить источники на этом шаге. На 1б обязательно, чтобы хотя бы один слушатель вслух посчитал энергобаланс подогрева (В3): 50 Вт / 24 В ≈ 2,08 А, около 50 А·ч в сутки. Это переломный момент практики.</li>
+<li><strong>Задание 2, 45 мин.</strong> Сначала 2а: пересчитать матрицу модели на экране. Не подсказывать про сумму весов сразу, пусть найдут. Затем 2б и 2в. Если группа медленная, 2в сделать вместе с экрана.</li>
+<li><strong>Задание 3, 35 мин.</strong> Каждая пара проверяет все четыре ссылки. Если ФИПС или doi.org не открываются с рабочих мест, показать снимки экрана. Итог по ключам. Главный вывод: номер существует, но документ другой.</li>
+<li><strong>Итоги, 10 мин.</strong></li>
+</ul>
+<h2>Лекция 3.2 (11:10–11:55)</h2>
+<p><strong>Что такое DFMEA (12 мин).</strong> Цепочка: функция, вид отказа, последствие, причина, меры, оценки. Пример Ф-1. ГОСТ Р 27.303-2021 и AIAG &amp; VDA – только то, что видно в открытых источниках: семь шагов, приоритет действий вместо ПЧР. Содержание платного руководства не пересказывать. Почему от ПЧР отходят: пример 9 × 2 × 5 и 3 × 6 × 5.</p>
+<p><strong>Что делает модель и что решает инженер (15 мин).</strong> Collier и соавт.: хорошо перебирает отказы, рекомендации общие. Nair и соавт.: 190 строк, после проверки 79; значимость 7,3 у моделей против 4,1 у экспертов. Diwakaruni: меры обнаружения модели не придумывают надёжно. Самопроверка модели не работает; вторая модель даёт замечания, но не заменяет проверку инженером. Отдельно проговорить: <strong>оценки значимости, вероятности и обнаружения ставит инженер или команда</strong>. Схема «Цикл DFMEA».</p>
+<p><strong>Как получить конкретный ответ (12 мин).</strong> Описание узла, границы, условия эксплуатации, одна функция на запрос, «оценки не ставь». Стоп-условия: нет данных – так и сказать. <strong>Реальные отказы и рекламации – только по маршруту, разрешённому правилами организации; на занятии – учебные данные.</strong> Инварианты и оракул. Схема «Строка DFMEA».</p>
+<p><strong>Меры (6 мин).</strong> Четыре вопроса хорошей меры. Разобранная строка DFMEA: текущие меры – только из документов, предложения – в рекомендуемые действия. Связь с утренней задачей К-1.</p>
+<h2>Практика 3.2 (13:00–16:10)</h2>
+<ul>
+<li><strong>Задание 1, 60 мин.</strong> Следить, чтобы шли по шагам, а не одним запросом. Частая проблема: модель ставит S, O, D, хотя её просили не ставить. Это хороший повод показать, что модель не всегда выполняет ограничения запроса.</li>
+<li><strong>Задание 2а, 30 мин.</strong> Разбор документа 3.6 по ключам. Сначала слушатели называют решения по строкам, потом разбор. Обязательно обсудить строку 7 (генератор на стоянке) и вывод модели со ссылкой на заменённый стандарт.</li>
+<li><strong>Задание 2б, 30 мин.</strong> Инварианты из лекции – на экран. Пропущенные причины собирать в общий чат: получится общий список, который полезно сравнить с эталоном в ключах.</li>
+<li><strong>Задание 3, 45 мин.</strong> Оценки в парах или тройках. Через 20 мин попросить две команды назвать оценки для одной и той же строки (например, «головное устройство не переходит в режим ожидания»). Разброс оценок между командами – главный материал для итогов: если люди расходятся, модель тем более не может «знать» правильную оценку.</li>
+<li><strong>Итоги, 15 мин.</strong> Обсуждение итогов практики и выдача домашнего задания – 12–13 мин: показать, куда загружать, срок – до начала занятия 23.11. В последние 2–3 мин выдать задание к модулю 5 (файл «Задание к модулю 5 выдаётся заранее» в папке «05-Самостоятельная-работа» этого дня): выписать 3–5 рутинных задач подразделения, одну описать карточкой, замерить время без ИИ, узнать про данные и внутренние инструменты. Сдавать не нужно, результат принести к началу занятия 25.11, 08:00. Замер лучше сделать два-три раза в рабочие дни до 25.11.</li>
+</ul>
+<h2>Запасные варианты</h2>
+<ul>
+<li><strong>Сервисы не открываются ни у кого.</strong> Работа по экрану преподавателя: вы отправляете запросы, группа предлагает правки. Задания 2а практики 3.1 и 2а практики 3.2 выполняются без сервиса, по документам 3.3 и 3.6.</li>
+<li><strong>Не открываются ФИПС или doi.org.</strong> Показать снимки экрана, сделанные накануне. Проверку ГОСТ можно сделать по любому каталогу стандартов, который открывается.</li>
+<li><strong>Группа сильнее ожидаемого.</strong> Дополнительные задания в конце файлов практики и материал «Генератор и проверки».</li>
+<li><strong>Группа слабее ожидаемого.</strong> В практике 3.1 задание 2б сократить до трёх вариантов и четырёх критериев; в практике 3.2 задание 1 выполнить вместе с экрана, а самостоятельно – только задание 2а и оценки для трёх строк.</li>
+<li><strong>Не хватает времени на практике 3.2.</strong> Задание 3б сократить до одной строки; меры по двум другим строкам – в контрольную точку.</li>
+</ul>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

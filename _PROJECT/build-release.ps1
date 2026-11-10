@@ -275,7 +275,13 @@ $script:ApprovedIgnoredReleaseArtifacts = @(
   'appsec-lections/downloads/day-01-edited-transcript-and-summaries.zip',
   'appsec-lections/downloads/day-02-edited-transcript-and-protocol.zip',
   'appsec-lections/downloads/day-02-laboratory-materials.zip',
-  'appsec-lections/downloads/day-02-public-materials.zip'
+  'appsec-lections/downloads/day-02-public-materials.zip',
+  'kamaz-ai/downloads/kamaz-ai-day-01.zip',
+  'kamaz-ai/downloads/kamaz-ai-day-02.zip',
+  'kamaz-ai/downloads/kamaz-ai-day-03.zip',
+  'kamaz-ai/downloads/kamaz-ai-day-04.zip',
+  'kamaz-ai/downloads/kamaz-ai-day-05.zip',
+  'kamaz-ai/downloads/kamaz-ai-course.zip'
 )
 
 function Test-HighRiskReleaseFileName([string]$Name) {
@@ -405,6 +411,15 @@ $script:ReviewedNestedDistributables = @{
     'downloads\day-02-laboratory-materials.zip',
     'downloads\day-02-public-materials.zip',
     'downloads\day-02\participant-materials\lr-ssrf\README.md'
+  )
+  # Offline packages of the five course days and of the whole course.
+  'kamaz-ai' = @(
+    'downloads\kamaz-ai-day-01.zip',
+    'downloads\kamaz-ai-day-02.zip',
+    'downloads\kamaz-ai-day-03.zip',
+    'downloads\kamaz-ai-day-04.zip',
+    'downloads\kamaz-ai-day-05.zip',
+    'downloads\kamaz-ai-course.zip'
   )
 }
 

@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>От чата к агенту</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>От чата к агенту</h1>
+<p>Дополнительный материал для тех, кто уже работает с ИИ и хочет понять, что стоит за словом «агент». Здесь – основы, подробно агентов разберём в модуле 5.</p>
+<h2>1. Четыре сценария использования</h2>
+<p>Условно выделим четыре ступени использования сервисов на языковых моделях. Ступени могут пересекаться: в окне обычного чата иногда работает агентный цикл, а поиск по документам выполняет программа, а не модель. Но в целом на каждой следующей ступени модель получает больше возможностей, и вместе с ними растёт цена ошибки.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Ступень</th>
+<th>Что делает модель</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Чат</td>
+<td>Отвечает на текст, который вы написали</td>
+<td>Вопрос о причинах просадки напряжения</td>
+</tr>
+<tr>
+<td>Чат с файлами и поиском</td>
+<td>Читает загруженный файл или результаты поиска в интернете</td>
+<td>Сводка по загруженному техническому заданию</td>
+</tr>
+<tr>
+<td>Помощник по документам</td>
+<td>Ищет ответ в подключённой базе документов организации и опирается на найденное</td>
+<td>Вопрос о порядке испытаний, ответ со ссылкой на внутренний стандарт</td>
+</tr>
+<tr>
+<td>Агент</td>
+<td>Сам решает, какой инструмент вызвать, вызывает его, получает результат и продолжает работу</td>
+<td>Проверка комплекта документов: агент получает файлы, сверяет их с требованиями, готовит перечень расхождений</td>
+</tr>
+</tbody>
+</table></div>
+<p>На первых трёх ступенях поиск и чтение документов идут по заданному сценарию, а решения о дальнейших действиях принимает человек. На четвёртой следующий шаг выбирает модель, и её вывод превращается в действие.</p>
+<h2>2. Что такое агент</h2>
+<p>В отчёте NIST о состязательном машинном обучении (2025) агент описан так: программная система, которая многократно обращается к модели, обрабатывает её ответы (например, выбирает функцию и вызывает её с нужными входными данными) и возвращает результат модели в следующем запросе. У агента могут быть инструменты: просмотр веб-страниц, выполнение программ. Бывают и дополнительные возможности, например память и планирование [11].</p>
+<blockquote>
+<p>«An increasingly common use of GenAI models is constructing an (often LLM-based) AGENT, a software system that iteratively prompts a model, process its outputs – such as to select and call a function with specified inputs – and provides the results back to the model as a part of its next prompt.»</p>
+<p>Перевод: «Всё чаще генеративные модели используют для построения агента (как правило, на основе большой языковой модели) – программной системы, которая многократно обращается к модели, обрабатывает её ответы (например, чтобы выбрать и вызвать функцию с заданными входными данными) и возвращает результаты модели как часть следующего запроса.» – NIST AI 100-2e2025, раздел 3.5 [11]</p>
+</blockquote>
+<p>В руководствах OWASP по безопасности агентных систем агентный ИИ рассматривается как развитие автономных систем. Большие языковые модели заметно расширили его возможности, а вместе с ними и риски [12].</p>
+<p>Агент отличается от чата не качеством ответа, а тем, что модель сама выбирает следующее действие.</p>
+<h2>3. Как агент работает: цикл «подумал – сделал – посмотрел»</h2>
+<p>Основная схема описана в работе о подходе ReAct [13]. Модель чередует рассуждения и действия. Рассуждение помогает составить и уточнить план, а действие позволяет обратиться к внешнему источнику, например к базе знаний, и получить недостающие сведения.</p>
+<blockquote>
+<p>«reasoning traces help the model induce, track, and update action plans as well as handle exceptions, while actions allow it to interface with external sources, such as knowledge bases or environments, to gather additional information.»</p>
+<p>Перевод: «Цепочки рассуждений помогают модели выстраивать, отслеживать и обновлять план действий, а также обрабатывать исключения, а действия позволяют ей обращаться к внешним источникам, например к базам знаний или среде, чтобы собрать дополнительные сведения.» – Yao и соавт., 2022, препринт arXiv [13]</p>
+</blockquote>
+<p><img alt="Как работает агент: модель выбирает следующий шаг" src="../08-Схемы/d1-cikl-agenta.png" /></p>
+<p>Интерактивная версия схемы – файл <code>08-Схемы/d1-cikl-agenta.html</code>.
+По шагам это выглядит так:</p>
+<ol>
+<li>Пользователь ставит задачу.</li>
+<li>Модель решает, нужен ли инструмент, и если нужен, какой и с какими параметрами.</li>
+<li>Программа агента вызывает инструмент: поиск по документам, запрос в учётную систему, расчёт.</li>
+<li>Результат возвращается модели и добавляется к контексту.</li>
+<li>Модель решает: задача решена или нужен ещё шаг.</li>
+<li>Когда шагов больше не нужно, модель пишет ответ пользователю.</li>
+</ol>
+<p>На вопрос «Сколько раз вызывалась модель, чтобы ответить пользователю?» ответ почти всегда «больше одного». В журнале работы агента это хорошо видно: сначала модель возвращает не текст, а указание вызвать инструмент. Затем в диалог добавляется результат инструмента, и только после этого появляется ответ.</p>
+<h2>4. Пример: помощник с базой знаний</h2>
+<p>Представим корпоративного помощника, к которому подключены поиск по внутренней базе документов и поиск задач в системе учёта. Каждый инструмент включается отдельным переключателем.</p>
+<ul>
+<li>На вопрос «Как у нас положено хранить пароли от служебных систем?» помощник сначала ищет по базе документов, находит стандарт и отвечает по нему.</li>
+<li>На вопрос «Как лучше провести планёрку?» он отвечает сразу, без инструментов: задача не требует внутренних данных.</li>
+</ul>
+<p>Полезность такого помощника зависит от модели, включённых инструментов и документов, которые ему разрешено читать. Выключите поиск по базе, и ответ про хранение паролей будет взят из общих знаний модели, а не из вашего стандарта.</p>
+<h2>5. Почему с агентами осторожнее</h2>
+<ul>
+<li><strong>Ошибка становится действием.</strong> Если чат ошибся, ошибку видит человек. Если ошибся агент, он может успеть отправить письмо, изменить запись или запустить расчёт с неверными данными.</li>
+<li>Агенту нужно ровно столько прав, сколько требует задача. Лучше инструменты с узкими функциями. Если агенту доступно выполнение команд, его ограничивают правами учётной записи, изоляцией и списком разрешённых ресурсов. Инструкции модели такие ограничения не заменяют.</li>
+<li><strong>Чужой текст может управлять агентом.</strong> Агент читает документы, письма, веб-страницы. Если в них спрятана команда, модель может принять её за задание. В отчёте NIST прямо сказано: враждебные данные, попавшие в контекст, например из ненадёжных источников, могут заставить агента выполнить действия злоумышленника [11]. Подробнее – в теме 2.1.</li>
+</ul>
+<blockquote>
+<p>«Adversarial inputs into this context, such as from interactions with untrusted resources, could hijack the agent into performing adversary-specified actions instead, leading to potential security or safety violations.»</p>
+<p>Перевод: «Враждебные данные, попавшие в этот контекст, например при работе с ненадёжными источниками, могут перехватить управление агентом и заставить его вместо предусмотренных действий выполнять действия, заданные злоумышленником, что может привести к нарушениям защищённости системы или безопасности её функционирования.» – NIST AI 100-2e2025, раздел 3.1.1 [11]</p>
+</blockquote>
+<ul>
+<li><strong>Подтверждение действий.</strong> Для действий с последствиями нужен шаг подтверждения человеком. Где именно его ставить, решается для каждой задачи отдельно: лишние подтверждения тоже стоят времени.</li>
+</ul>
+<h2>6. Упражнение для желающих</h2>
+<p>Опишите на одной странице агента, который помогал бы разбирать замечания по испытаниям, как в учебном кейсе ЭС-24:</p>
+<ul>
+<li>какие данные он получает на вход;</li>
+<li>какие инструменты ему нужны (поиск по ТЗ, расчёт, запрос в журнал испытаний);</li>
+<li>что он делает сам, а что предлагает на подтверждение;</li>
+<li>как проверяется его результат;</li>
+<li>каких прав у него быть не должно.</li>
+</ul>
+<p>Это задел для модуля 5, где мы будем говорить о конструкторах агентов и о том, что поручать модели, а что оставить точным проверкам.</p>
+<h2>Источники</h2>
+<ul>
+<li>[11] NIST AI 100-2e2025. Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations. 2025, разделы 3.1.1 и 3.5. https://doi.org/10.6028/NIST.AI.100-2e2025</li>
+<li>[12] OWASP GenAI Security Project. Agentic AI – Threats and Mitigations. 2025. https://genai.owasp.org/resource/agentic-ai-threats-and-mitigations/</li>
+<li>[13] Yao S., Zhao J., et al. ReAct: Synergizing Reasoning and Acting in Language Models. 2022. https://doi.org/10.48550/arXiv.2210.03629</li>
+</ul>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

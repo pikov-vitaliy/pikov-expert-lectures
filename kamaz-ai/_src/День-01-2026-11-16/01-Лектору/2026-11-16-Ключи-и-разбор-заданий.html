@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ключи и разбор заданий первого дня</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Ключи и разбор заданий первого дня</h1>
+<p>Файл только для преподавателя, слушателям не раздаётся.</p>
+<h2>Входной контроль</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Вопрос</th>
+<th>Ответ</th>
+<th>Что показывает неверный ответ</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>б</td>
+<td>Представление о модели как о базе готовых ответов или поисковике</td>
+</tr>
+<tr>
+<td>2</td>
+<td>б</td>
+<td>Доверие к ссылкам «по виду»</td>
+</tr>
+<tr>
+<td>3</td>
+<td>в</td>
+<td>Непонимание контекста диалога: отсюда «модель всё помнит» или «модель ничего не помнит»</td>
+</tr>
+<tr>
+<td>4</td>
+<td>б</td>
+<td>Доверие к режиму поиска как к гарантии</td>
+</tr>
+<tr>
+<td>5</td>
+<td>в</td>
+<td>Вера в «волшебные фразы» вместо исходных данных</td>
+</tr>
+<tr>
+<td>6</td>
+<td>б</td>
+<td>Доверие к вычислениям модели</td>
+</tr>
+<tr>
+<td>7</td>
+<td>б</td>
+<td>Главное для темы 2.1: обезличивание само по себе не даёт права отправлять материал</td>
+</tr>
+<tr>
+<td>8</td>
+<td>в</td>
+<td>Ожидание, что модель исправит ошибку в посылке</td>
+</tr>
+<tr>
+<td>9</td>
+<td>б</td>
+<td>Незнание термина «галлюцинация»</td>
+</tr>
+<tr>
+<td>10</td>
+<td>б</td>
+<td>Непонимание, чем агент отличается от чата</td>
+</tr>
+<tr>
+<td>11</td>
+<td>б</td>
+<td>Ожидание повторяемости, как у калькулятора</td>
+</tr>
+<tr>
+<td>12</td>
+<td>б</td>
+<td>Непонимание, зачем просить ответ таблицей</td>
+</tr>
+</tbody>
+</table></div>
+<p>Вопросы 13–16 не оцениваются. По ним видно, сколько в группе начинающих, у кого есть доступ и какие задачи брать в примеры. Ответы на вопрос 16 стоит выписать перед лекцией 1.2: по ним подбираются примеры задач во второй половине дня.</p>
+<h2>Практика 1.1, задание 2б: ошибки в учебном ответе</h2>
+<p>Правильный разбор по данным кейса:</p>
+<ul>
+<li>ток покоя 85 мА больше 40 мА по п. 4.3 – требование не выполнено;</li>
+<li>батареи соединены последовательно, ёмкость цепочки остаётся 190 А·ч, напряжение 24 В;</li>
+<li>50 % – это 95 А·ч, 95 / 0,085 ≈ 1118 ч ≈ 46,6 суток. Это условная оценка при полном заряде в начале, номинальной ёмкости и постоянном токе 85 мА. Прогнозом допустимой зимней стоянки она не является: ток в кейсе меняется, на холоде отдаваемая ёмкость меньше, саморазряд не учтён;</li>
+<li>за 9 суток при условно постоянных 85 мА расходуется 18,36 А·ч, около 9,7 % номинальной ёмкости. Этого расчёта недостаточно, чтобы объяснить затруднённый пуск в З-1 или исключить влияние тока покоя. Неизвестны фактическая ёмкость и состояние батарей, их пусковые характеристики на холоде, ток в остальное время стоянки. Хороший вопрос группе: какие измерения нужны, чтобы разобраться?</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Фрагмент ответа</th>
+<th>Ошибка</th>
+<th>Вид ошибки</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>«укладывается в допуск по п. 4.3 ТЗ (не более 100 мА)»</td>
+<td>В п. 4.3 – не более 40 мА</td>
+<td>Неверно переданное требование</td>
+</tr>
+<tr>
+<td>«формально несоответствия нет»</td>
+<td>85 мА &gt; 40 мА, несоответствие есть</td>
+<td>Ложный вывод из ошибки выше</td>
+</tr>
+<tr>
+<td>«последовательно… дают общую ёмкость 380 А·ч»</td>
+<td>При последовательном соединении складываются напряжения, ёмкость остаётся 190 А·ч</td>
+<td>Ошибка в рассуждении (физика цепи)</td>
+</tr>
+<tr>
+<td>«190 / 0,085 = 2235 ч, то есть примерно 9,3 суток»</td>
+<td>2235 ч – это около 93 суток. Деление верное, перевод в сутки – нет</td>
+<td>Арифметика</td>
+</tr>
+<tr>
+<td>«при −25 °C ёмкость батарей возрастает»</td>
+<td>На холоде отдаваемая ёмкость свинцово-кислотной батареи снижается</td>
+<td>Неверная физика</td>
+</tr>
+<tr>
+<td>«По п. 4.8 ТЗ допускается разряд… до 30 %»</td>
+<td>В разделе 4 нет п. 4.8, сказано прямо</td>
+<td>Ссылка на несуществующий источник</td>
+</tr>
+<tr>
+<td>«заменить генератор на модель большей мощности»</td>
+<td>Мощность генератора на ток покоя не влияет: при выключенном двигателе он не заряжает батареи. Замена ничем не обоснована. Утечку через цепи самого генератора (например, через неисправный диодный мост) при диагностике исключать нельзя, но это вопрос проверки, а не мощности</td>
+<td>Рекомендация без обоснования</td>
+</tr>
+<tr>
+<td>«Замечание З-2 можно закрыть без доработки»</td>
+<td>Нужно найти потребитель с повышенным током</td>
+<td>Ложный итоговый вывод</td>
+</tr>
+</tbody>
+</table></div>
+<p>Интересная деталь для обсуждения: две ошибки частично компенсируют друг друга. Из-за удвоенной ёмкости и ошибки в переводе часов в сутки получилось 9,3 суток, а это близко к 9 суткам из З-1. Ответ выглядит правдоподобно именно потому, что совпал с наблюдением. Полезно спросить группу, кто поверил этой цифре и почему.</p>
+<h2>Практика 1.2, задание 2б: замечания против требований</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Замечание</th>
+<th>Пункт ТЗ</th>
+<th>Ожидаемая оценка</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>З-1</td>
+<td>4.4, 4.5</td>
+<td>Нельзя оценить формально: стоянка 9 суток, требования заданы для 14 суток. Кроме того, в ТЗ не определён критерий успешного пуска и условия измерения напряжения. Но уже через 9 суток напряжение ниже 12,2 В, а пуск удался только со второй попытки. Это сигнал о риске несоответствия, его нужно исследовать. Само по себе 12,2 В не доказывает способность к пуску</td>
+</tr>
+<tr>
+<td>З-2</td>
+<td>4.3</td>
+<td>Не соответствует: 85 мА &gt; 40 мА</td>
+</tr>
+<tr>
+<td>З-3</td>
+<td>4.2, 4.6</td>
+<td>Прямо не оценивается. П. 4.2 задаёт напряжение регулятора при +25 °C, п. 4.6 – ток отдачи генератора на холостом ходу. Причина снижения напряжения по замечанию не установлена: возможны недостаточная отдача на холостом ходу, особенности регулирования, неисправность привода, падение напряжения в соединениях. Не известны температура, место измерения, ток генератора и ток заряда или разряда батарей. Ответ модели «не соответствует п. 4.2» или «генератор не справляется» стоит обсудить: это вывод без измерений</td>
+</tr>
+<tr>
+<td>З-4</td>
+<td>нет</td>
+<td>Требования нет. Это замечание к документации: момент затяжки не задан. Если модель приписала пункт, это выдумка</td>
+</tr>
+<tr>
+<td>З-5</td>
+<td>нет</td>
+<td>Требования нет. Если модель приписала пункт, это выдумка</td>
+</tr>
+</tbody>
+</table></div>
+<p>Главное для обсуждения: модели склонны находить пункт для каждого замечания. Строка «если подходящего пункта нет, так и напиши» снижает это, но не всегда.</p>
+<h2>Практика 1.2, задание 1: чего ожидать на ступенях</h2>
+<ul>
+<li>Ступени 1–2: общий список причин для любого автомобиля, иногда с советами для легковых машин 12 В.</li>
+<li>Ступень 3: появляется сравнение с 40 мА и привязка к потребителям стоянки.</li>
+<li>Ступень 4: таблица, конкретные проверки (поочерёдное снятие предохранителей с замером тока, проверка перехода блоков в сон).</li>
+<li>Ступень 5: модель отдельно объясняет превышение 40 мА и снижение тока со временем, например постепенным переходом блоков в спящий режим. Хорошо, если она допускает сочетание нескольких причин. Иногда появляются вопросы о времени перехода блоков в спящий режим, о дополнительном оборудовании, о методике замера.</li>
+</ul>
+<p>Если на ступени 5 ответ не стал лучше ступени 4, это хороший пример к разделу лекции о том, что работает в новых моделях.</p>
+<h2>Контрольная точка модуля 1: на что смотреть при проверке</h2>
+<ul>
+<li>В описании задач нет служебных сведений. Если есть, это первое замечание в обратной связи.</li>
+<li>Запрос содержит исходные данные и формат ответа, а не только вопрос.</li>
+<li>Проверка по чек-листу конкретная. «Всё верно» без перечня проверенного не засчитывается.</li>
+<li>Оценка экономии времени есть хотя бы на уровне «примерно столько-то минут на задачу». Она пригодится в модуле 5.</li>
+</ul>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

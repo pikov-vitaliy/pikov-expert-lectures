@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Практика к теме 3.1. Варианты решения, матрица выбора, проверка источников</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Практика к теме 3.1. Варианты решения, матрица выбора, проверка источников</h1>
+<p><strong>Время:</strong> 3 академических часа (08:45–10:15 и 10:25–11:10).
+<strong>Что понадобится:</strong> один-два сервиса, учебный кейс ЭС-24 (день 1; ТЗ – редакция 1, если в задании не сказано иное) и дополнение к третьему дню, документы 3.1 и 3.3. Для расчётов – калькулятор или таблица.
+<strong>Правило:</strong> в сервисы отправляем только материалы учебного кейса.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Задание</th>
+<th>Время</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Варианты решения и отсев</td>
+<td>45 мин</td>
+</tr>
+<tr>
+<td>2. Матрица выбора и проверка обоснований</td>
+<td>45 мин</td>
+</tr>
+<tr>
+<td>Перерыв</td>
+<td>10 мин</td>
+</tr>
+<tr>
+<td>3. Проверка источников</td>
+<td>35 мин</td>
+</tr>
+<tr>
+<td>Итоги</td>
+<td>10 мин</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Задание 1. Варианты решения и отсев (45 мин)</h2>
+<h3>1а. Получить варианты (20 мин)</h3>
+<p>Отправьте в сервис задачу К-1 целиком: постановку, таблицы Д-1 и Д-2, ограничения. Запрос:</p>
+<pre><code>Ниже учебная конструкторская задача. Предложи 6–8 вариантов решения
+с разными принципами действия. Для каждого варианта:
+- как он работает, одной-двумя фразами;
+- какие ограничения задачи он может нарушить;
+- два довода против;
+- что нужно измерить или посчитать, чтобы убедиться, что он работает.
+Отдельным списком перечисли варианты, которые ты считаешь
+неработоспособными, и объясни почему. Источники не приводи.
+
+[текст документа 3.1]
+</code></pre>
+<p>Если работаете вдвоём, пусть один отправит запрос в GigaChat, другой – в Алису AI. Потом обменяйтесь списками.</p>
+<h3>1б. Отсеять неработоспособные (25 мин)</h3>
+<p>Для каждого варианта, который предложила модель, заполните таблицу:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Вариант</th>
+<th>Нарушает ли физику</th>
+<th>Нарушает ли ограничения 1–6</th>
+<th>Решение: оставить или отсеять</th>
+<th>Почему</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Обязательно посчитайте энергобаланс хотя бы для одного варианта, который модель считает удачным: сколько ампер-часов он расходует или сберегает за 336 ч стоянки по сравнению с допустимыми 13,3 А·ч на потребители (таблица Д-2).</p>
+<p>Затем откройте документ 3.3 – учебный ответ модели с семью вариантами. Отметьте, какие из них вы бы отсеяли ещё до матрицы и почему.</p>
+<p><strong>Вопросы для себя.</strong> Какие варианты модель сама сочла неработоспособными? Согласны ли вы с ней? Был ли вариант, который на вид разумен, но не прошёл расчёт энергобаланса?</p>
+<h2>Задание 2. Матрица выбора и проверка обоснований (45 мин)</h2>
+<h3>2а. Проверить матрицу модели (15 мин)</h3>
+<p>В документе 3.3 есть матрица модели. Проверьте её по шагам:</p>
+<ol>
+<li>Сумма весов. Должна быть равна 1.</li>
+<li>Итоговые баллы. Пересчитайте каждый столбец сами: сумма произведений «вес × оценка».</li>
+<li>Состав вариантов. Попали ли в матрицу варианты, которые вы отсеяли в задании 1б?</li>
+<li>Обоснование оценок. Есть ли хоть одно? Какие оценки противоречат физике?</li>
+<li>Рекомендация. Следует ли она из правильно посчитанной матрицы?</li>
+</ol>
+<h3>2б. Своя матрица (20 мин)</h3>
+<p>Оставьте 3–4 допустимых варианта: из ответа модели в задании 1а, из документа 3.3 и свои. Можно добавить комбинацию двух вариантов.</p>
+<ol>
+<li>Назначьте веса семи критериям. Сумма – 1. Одной фразой объясните, почему вы назначили такой вес надёжности или влиянию на пуск.</li>
+<li>Поставьте оценки от 1 до 5. Для каждой оценки – короткое обоснование: расчёт, измерение, опыт или явное допущение.</li>
+<li>Посчитайте итог.</li>
+</ol>
+<p>Шаблон:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Критерий</th>
+<th>Вес</th>
+<th>Вариант А</th>
+<th>Вариант Б</th>
+<th>Вариант В</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Масса</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Стоимость</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Технологичность</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Надёжность</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Ремонтопригодность</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Влияние на пуск</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Совместимость с потребителями стоянки</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Итого</strong></td>
+<td><strong>1,00</strong></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3>2в. Модель как оппонент (10 мин)</h3>
+<p>Отправьте свою матрицу в новый чат. Новый чат не видит предыдущего обсуждения, поэтому вставьте всё, без чего оценки не проверить: постановку задачи К-1 и ограничения 1–6 (документ 3.1), описания оставшихся вариантов, что значат оценки 5 и 1 по каждому критерию, саму матрицу с обоснованиями.</p>
+<pre><code>Ниже матрица выбора для учебной задачи. Веса и оценки ставил инженер.
+Не меняй их. Найди:
+- оценки, которые противоречат описанию вариантов или друг другу;
+- критерии, по которым варианты почти не различаются;
+- что изменится, если вес «влияния на пуск» снизить на 0,10,
+  а вес «стоимости» на столько же поднять.
+Для каждого замечания укажи, на какую строку таблицы оно опирается.
+
+[постановка задачи К-1 и ограничения 1–6]
+[описания вариантов, которые остались после отсева]
+[что значат оценки 5 и 1 по каждому критерию]
+[ваша матрица с обоснованиями]
+</code></pre>
+<p>Сравните замечания модели со своими. Какие приняли бы, какие нет? Каждое замечание проверьте по документу 3.1, прежде чем менять оценку.</p>
+<h2>Задание 3. Проверка источников (35 мин)</h2>
+<p>В документе 3.3 модель привела четыре источника. Проверьте каждый.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>№</th>
+<th>Источник</th>
+<th>Где проверяли</th>
+<th>Найден ли документ</th>
+<th>Совпадают ли название и авторы, действует ли</th>
+<th>Подтверждает ли он приписанное</th>
+<th>Итог</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Статья Hoffmann, Lindqvist, 2021</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Патент RU 2745118 C1</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>3</td>
+<td>ГОСТ Р 53165-2008</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>4</td>
+<td>SAE J3053</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<p>Как проверять:</p>
+<ul>
+<li><strong>статья с DOI</strong> – откройте в браузере адрес https://doi.org/ и допишите к нему DOI из ответа. Если DOI не ведёт на эту статью, поищите статью по точному названию в научной поисковой системе;</li>
+<li><strong>патент</strong> – найдите номер в открытом реестре ФИПС или в Google Patents. Сравните название, правообладателя и класс МПК с тем, что написала модель;</li>
+<li><strong>ГОСТ</strong> – найдите обозначение в каталоге стандартов. Посмотрите статус (действует или заменён), название и область применения. Если стандарт заменён, найдите действующий;</li>
+<li><strong>стандарт SAE</strong> – проверьте, есть ли документ с таким номером и названием. Подумайте, отвечает ли он на вопрос задачи К-1.</li>
+</ul>
+<p>Итог для каждой ссылки – по шагам из лекции 3.1: «подтверждено», «не найдено», «документ другой», «заменён», «не подтверждает» или «содержание не проверено» (документ найден, но текст недоступен). Если подходят два итога, запишите оба.</p>
+<p>Если в вашем ответе из задания 1а модель всё-таки привела ссылки, проверьте одну-две так же.</p>
+<p><strong>Вопрос для себя.</strong> Сколько времени ушло на проверку одной ссылки? Сколько ссылок из четырёх можно было бы оставить в пояснительной записке без изменений?</p>
+<h2>Итоги (10 мин)</h2>
+<ul>
+<li>Какие варианты модель предлагала чаще всего и были ли среди них неработоспособные?</li>
+<li>Изменилась ли рекомендация после того, как матрицу пересчитали правильно?</li>
+<li>Какой из видов ошибок в ссылках показался самым опасным?</li>
+</ul>
+<h2>Дополнительно, для тех, кто уже работает с ИИ</h2>
+<ol>
+<li><strong>Противоречия по ТРИЗ.</strong> Попросите модель сформулировать противоречия задачи К-1 в виде «нужно А, но тогда страдает Б» и предложить для каждого два-три приёма. Появились ли варианты, которых не было в задании 1а?</li>
+<li><strong>Несколько ролей.</strong> Задайте в одном чате по очереди три роли: конструктор электрооборудования, специалист сервиса, технолог сборки. Каждая роль дорабатывает список предыдущей. Сравните итог с первым списком: что добавилось, что исчезло.</li>
+<li><strong>Смещение по позиции.</strong> Дайте модели описания трёх своих вариантов и попросите выставить оценки по семи критериям. Затем в новом чате поменяйте варианты местами и сделайте описание последнего вдвое длиннее. Изменились ли оценки? Что это говорит о матрице, заполненной моделью целиком?</li>
+<li><strong>Устойчивость выбора.</strong> Посчитайте свою матрицу при двух-трёх наборах весов. Меняется ли лидер? Если да, какой критерий решает дело и как его проверить испытанием?</li>
+<li><strong>Энергобаланс комбинации.</strong> Для лучшего, по-вашему, варианта посчитайте, какой средний ток покоя получится и какой запас останется до 13,3 А·ч за 336 ч. Хватит ли запаса, если к постоянному питанию позже подключат ещё один потребитель на 5 мА? Учтите собственное потребление аппаратуры, которую добавляет вариант: если его нет в данных, запишите, какое значение ещё допустимо.</li>
+</ol>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

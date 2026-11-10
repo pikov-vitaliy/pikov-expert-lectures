@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Источники второго дня</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Источники второго дня</h1>
+<p>Все ссылки, которые встречаются в лекциях, практике, ключах и дополнительных материалах второго дня. Нумерация общая для всех файлов дня. Страницы сервисов, тексты законов и перечень OWASP открыты 10.11.2026.</p>
+<h2>Научные публикации</h2>
+<ul>
+<li>[1] Greshake K., Abdelnabi S., et al. Not What You've Signed Up For: Compromising Real-World LLM-Integrated Applications with Indirect Prompt Injection // Proceedings of the 16th ACM Workshop on Artificial Intelligence and Security. 2023. https://doi.org/10.1145/3605764.3623985</li>
+<li>[2] Yi J., Xie Y., et al. Benchmarking and Defending against Indirect Prompt Injection Attacks on Large Language Models // Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.1. 2025. https://doi.org/10.1145/3690624.3709179</li>
+<li>[3] Zhan Q., Fang R., et al. Adaptive Attacks Break Defenses Against Indirect Prompt Injection Attacks on LLM Agents. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2503.00061</li>
+<li>[4] Milani A., Franzoni V., Florindi E. Indirect prompt injection in large language models // Neural Computing and Applications. 2026. https://doi.org/10.1007/s00521-026-12266-x</li>
+<li>[5] Duarte J. D., Cândido G. D., et al. A Systematic Review of Prompt Injection Attacks on Large Language Models: Trends, Taxonomy, Evaluation, Defenses, and Opportunities // IEEE Access. 2026. https://doi.org/10.1109/ACCESS.2026.3656849</li>
+<li>[6] Kimbel A., Glas M., Pernul G. Security and Privacy Perspectives on Using ChatGPT at the Workplace: An Interview Study // IFIP Advances in Information and Communication Technology. Springer, 2025. https://doi.org/10.1007/978-3-031-72563-0_13</li>
+<li>[7] Mireshghallah N., Antoniak M., et al. Trust No Bot: Discovering Personal Disclosures in Human-LLM Conversations in the Wild. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2407.11438</li>
+<li>[8] Silic M., Silić D. From Shadow It to Shadow AI–Threats, Risks and Opportunities for Organizations // Strategic Change. 2025. https://doi.org/10.1002/jsc.2682</li>
+<li>[9] Patsakis C., Lykousas N. Man vs the machine in the struggle for effective text anonymisation in the age of large language models // Scientific Reports. 2023. https://doi.org/10.1038/s41598-023-42977-3</li>
+<li>[10] Staab R., Vero M., et al. Beyond Memorization: Violating Privacy Via Inference with Large Language Models. 2023. Препринт arXiv. https://doi.org/10.48550/arXiv.2310.07298</li>
+<li>[11] Nasr M., Carlini N., et al. Scalable Extraction of Training Data from (Production) Language Models. 2023. Препринт arXiv. https://doi.org/10.48550/arXiv.2311.17035</li>
+<li>[12] Lewis P., Perez E., et al. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks. 2020. Препринт arXiv. https://doi.org/10.48550/arXiv.2005.11401</li>
+<li>[13] Barnett S., Kurniawan S., et al. Seven Failure Points When Engineering a Retrieval Augmented Generation System // Proceedings of the IEEE/ACM 3rd International Conference on AI Engineering - Software Engineering for AI. 2024. https://doi.org/10.1145/3644815.3644945</li>
+<li>[14] Liu N. F., Lin K., et al. Lost in the Middle: How Language Models Use Long Contexts // Transactions of the Association for Computational Linguistics. 2024. https://doi.org/10.1162/tacl_a_00638</li>
+<li>[15] Zou W., Geng R., et al. PoisonedRAG: Knowledge Corruption Attacks to Retrieval-Augmented Generation of Large Language Models. 2024. Препринт arXiv, версия v3 от 13.08.2024 (название и цитата – по этой версии). https://doi.org/10.48550/arXiv.2402.07867</li>
+<li>[16] Gao T., Yen H., et al. Enabling Large Language Models to Generate Text with Citations. 2023. Препринт arXiv. https://doi.org/10.48550/arXiv.2305.14627</li>
+<li>[17] Doris A. C., Grandi D., et al. DesignQA: A Multimodal Benchmark for Evaluating Large Language Models' Understanding of Engineering Documentation. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2404.07917</li>
+<li>[18] Norheim J., Rebentisch E., et al. Challenges in applying large language models to requirements engineering tasks // Design Science. 2024. https://doi.org/10.1017/dsj.2024.8</li>
+<li>[19] Myhovych A., Kunytsia A. COMPARATIVE ANALYSIS OF ENGINEERING DOCUMENTATION USING DETERMINISTIC AND LLM-BASED METHODS // Journal of Rocket-Space Technology. 2026. https://doi.org/10.15421/452571</li>
+<li>[20] Shankar R., Lim A., Qian X. Performance of large language models in data extraction for evidence synthesis: A systematic review // Journal of Biomedical Informatics. 2026. https://doi.org/10.1016/j.jbi.2026.105086</li>
+<li>[21] Fan S., Chen M., et al. Evaluating data extraction error by a large language model from randomised controlled trials: a large-scale empirical study // BMJ Evidence-Based Medicine. 2026. https://doi.org/10.1136/bmjebm-2025-114044</li>
+<li>[22] Yang Y., Zhu Q., et al. When LLMs Read Tables Carelessly: Measuring and Reducing Data Referencing Errors // Proceedings of the 64th Annual Meeting of the Association for Computational Linguistics (Volume 1: Long Papers). 2026. https://doi.org/10.18653/v1/2026.acl-long.762</li>
+<li>[23] Sobhani M., Sayeedi M. F. A., et al. Time Present and Time Past: Benchmarking Large Language Models on Temporally Evolving Document Understanding. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2608.08512</li>
+<li>[24] Ma D., Li J., et al. CiteVQA: Benchmarking Evidence Attribution for Trustworthy Document Intelligence. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2605.12882</li>
+<li>[25] Tanhaei M. Silent-failure detection in RAG pipelines: A controlled fault-injection study of multi-layer quality gates // Results in Engineering. 2026. https://doi.org/10.1016/j.rineng.2026.113085</li>
+<li>[26] Liu Y., Li Z., et al. OCRBench: on the hidden mystery of OCR in large multimodal models // Science China Information Sciences. 2024. https://doi.org/10.1007/s11432-024-4235-6</li>
+<li>[27] Fu L., Kuang Z., et al. OCRBench v2: An Improved Benchmark for Evaluating Large Multimodal Models on Visual Text Localization and Reasoning. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2501.00321</li>
+<li>[28] Yang Z., Tang J., et al. CC-OCR: A Comprehensive and Challenging OCR Benchmark for Evaluating Large Multimodal Models in Literacy // 2025 IEEE/CVF International Conference on Computer Vision (ICCV). 2025. https://doi.org/10.1109/ICCV51701.2025.02019</li>
+<li>[29] Uygun Y., Momodu V. Local large language models to simplify requirement engineering documents in the automotive industry // Production &amp; Manufacturing Research. 2024. https://doi.org/10.1080/21693277.2024.2375296</li>
+<li>[47] Mahbub T., Dghaym D., Shankarnarayanan A., et al. Can GPT-4 Aid in Detecting Ambiguities, Inconsistencies, and Incompleteness in Requirements Analysis? A Comprehensive Case Study // IEEE Access. 2024. Vol. 12. https://doi.org/10.1109/access.2024.3464242</li>
+<li>[48] Shefa J., Iyer A., Topcu T. G. The Tale of the Broken Clock: How LLMs Evaluate Requirement Quality and Where They Fail // INCOSE International Symposium. 2026. Vol. 36. https://doi.org/10.1002/iis2.70245</li>
+<li>[49] Poulsen V. V., Guertler M., Eisenbart B., et al. Context-aware large language models for ambiguity detection in requirements // Proceedings of the Design Society. 2026. Vol. 6. https://doi.org/10.1017/pds.2026.10607</li>
+<li>[50] Seifert D., Jöckel L., Trendowicz A., et al. Can Large Language Models (LLMs) Compete with Human Requirements Reviewers? – Replication of an Inspection Experiment on Requirements Documents // Product-Focused Software Process Improvement (PROFES 2024). Lecture Notes in Computer Science. Springer, 2024. https://doi.org/10.1007/978-3-031-78386-9_3</li>
+</ul>
+<p>Препринты arXiv ([3], [7], [10], [11], [12], [15], [16], [17], [23], [24], [27]) отмечены в описании. Наличие DOI arXiv не означает рецензирования.</p>
+<h2>Нормативные документы и отраслевые перечни</h2>
+<ul>
+<li>[30] Федеральный закон от 27.07.2006 № 152-ФЗ «О персональных данных» (с изменениями). http://www.kremlin.ru/acts/bank/24154</li>
+<li>[31] Федеральный закон от 29.07.2004 № 98-ФЗ «О коммерческой тайне» (с изменениями). http://www.kremlin.ru/acts/bank/21227</li>
+<li>[32] OWASP Top 10 for LLM Applications 2025. LLM01:2025 Prompt Injection. https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/blob/main/2_0_vulns/LLM01_PromptInjection.md</li>
+<li>[33] OWASP Top 10 for LLM Applications 2025. LLM02:2025 Sensitive Information Disclosure. https://github.com/OWASP/www-project-top-10-for-large-language-model-applications/blob/main/2_0_vulns/LLM02_SensitiveInformationDisclosure.md</li>
+</ul>
+<h2>Сервисы</h2>
+<p>Подробно, с уровнем доказательности каждого утверждения, – в справке по сервисам первого дня.</p>
+<ul>
+<li>[34] GigaChat. Пользовательское соглашение; справка: частые вопросы, документы, изображения. https://developers.sber.ru/docs/ru/policies/gigachat/agreement ; https://giga.chat/help ; https://giga.chat/help/articles/faq ; https://giga.chat/help/articles/work-with-docs ; https://giga.chat/help/articles/gigachat-load-picture</li>
+<li>[35] Алиса AI. Условия использования; справка: чат, режим «Эксперт», файлы; политика конфиденциальности Яндекса. https://yandex.ru/legal/alice_chat/ ; https://alice.yandex.ru/support/ru/assistant/chat-alice ; https://alice.yandex.ru/support/ru/assistant/chat/intellect ; https://alice.yandex.ru/support/ru/assistant/chat/files ; https://yandex.ru/legal/confidential/</li>
+<li>[36] DeepSeek. Privacy Policy; Terms of Use. https://cdn.deepseek.com/policies/en-US/deepseek-privacy-policy.html ; https://cdn.deepseek.com/policies/en-US/deepseek-terms-of-use.html</li>
+<li>[37] Qwen. Политика конфиденциальности; соглашение об оказании услуг. https://qwen.ai/privacypolicy ; https://qwen.ai/termsservice</li>
+</ul>
+<h2>Выступления и вебинары</h2>
+<ul>
+<li>[38] Морозов А. «AI в безопасности и безопасность в AI». Доклад на ИИ-митапе ЦГУ, 06.11.2026.</li>
+<li>[39] Субботин А. «Платформы для совместной работы с ИИ-агентами». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[40] Скидан С. «Как создать Агента-оператора». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[41] Малаканов В. «Код, Jev, LLM, WebMCP». Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[42] Горшков М. «Проблемы использования агентов в разработке». Вебинар УЦ «МАСКОМ» и PVS-Studio, 28.07.2026 (презентация выступления).</li>
+</ul>
+<h2>Нормативные документы (требования к ТЗ и текстовым документам)</h2>
+<p>Цитаты и номера пунктов сверены по текстам официальных изданий стандартов. Ссылки ниже ведут на справочную систему и каталог стандартов (вторичные источники), страницы открыты 10.11.2026; для [43] и [44] текст на этих страницах совпал с официальным изданием в цитируемых пунктах.</p>
+<ul>
+<li>[43] ГОСТ 34.602-2020. Информационные технологии. Комплекс стандартов на автоматизированные системы. Техническое задание на создание автоматизированной системы. Введён в действие приказом Росстандарта от 19.11.2021 № 1522-ст с 01.01.2022. Текст в справочной системе: https://meganorm.ru/mega_doc/norm/gost_gosudarstvennyj-standart/0/gost_34_602-2020_mezhgosudarstvennyy_standart.html (вторичный источник)</li>
+<li>[44] ГОСТ Р 2.105-2019. Единая система конструкторской документации. Общие требования к текстовым документам. Утверждён приказом Росстандарта от 29.04.2019 № 175-ст. Текст с изменениями № 1 и 2 в справочной системе: https://meganorm.ru/mega_doc/norm/gost-r_gosudarstvennyj-standart/0/gost_r_2_105-2019_natsionalnyy_standart_rossiyskoy.html (вторичный источник)</li>
+<li>[45] ГОСТ Р 71752-2024. Искусственный интеллект. Техническое задание. Требования к содержанию. Утверждён приказом Росстандарта от 28.10.2024 № 1548-ст. Карточка в каталоге стандартов: https://meganorm.ru/Index/83/83933.htm (вторичный источник)</li>
+</ul>
+<h2>Материалы автора курса</h2>
+<ul>
+<li>[46] Пиков В. А. Авторский курс по техническим заданиям: слайды блока «Кодекс качества требований» (критерии 1–10, проверка перед передачей в разработку), методические материалы курса. https://tz.pikov.expert</li>
+<li>[51] Пиков В. А. Искусство написания ТЗ: большой учебник системного аналитика. Версия 1.0, июнь 2026. Учебник авторского курса по техническим заданиям, раздел «Инструментарий и AI»: библиотека запросов для аналитика. Материал автора, открытой ссылки нет.</li>
+</ul>
+<h2>Учебные материалы</h2>
+<p>Учебный кейс ЭС-24 и дополнение ко второму дню составлены для курса. Узел, документы, организации, люди и номера вымышлены.</p>
+<p>В учебном ответе модели (документ 3 дополнения к кейсу) намеренно приведены выдуманные источники. Это не источники курса, а материал упражнения:</p>
+<ul>
+<li>статья «Petrov и Lindqvist, Reliability Engineering &amp; System Safety, 2025» с адресом https://doi.org/10.1016/j.ress.2025.119874 – выдумана; doi.org на 10.11.2026 отвечает «DOI не найден»;</li>
+<li>«Положение о работе с ИИ-сервисами ПЛ-ИИ-03» – выдуманный документ, его нет ни в кейсе, ни в материалах курса.</li>
+</ul>
+<p>Учебный файл письма поставщика со скрытой строкой: <code>04-Практика/2026-11-18-Письмо-поставщика-со-скрытой-строкой.docx</code>.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

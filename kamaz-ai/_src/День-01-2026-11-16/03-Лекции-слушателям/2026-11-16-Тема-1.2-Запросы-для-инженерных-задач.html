@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Тема 1.2. Запросы к языковой модели для инженерных задач</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Тема 1.2. Запросы к языковой модели для инженерных задач</h1>
+<p>Модель отвечает на тот вопрос, который ей задали. Если в запросе нет исходных данных, она подставит типовые. Если не сказано, в каком виде нужен ответ, получится связный текст на полторы страницы, из которого цифры придётся выписывать руками. Поэтому исходные данные, ограничения и нужный вид ответа лучше указать сразу.</p>
+<h2>1. Из чего состоит хороший запрос</h2>
+<p>Удобно держать в голове шесть частей. Не в каждом запросе нужны все, но если ответ не устраивает, сначала стоит проверить, какой из них не хватило.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Часть</th>
+<th>Что написать</th>
+<th>Пример для учебного узла ЭС-24</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Контекст</td>
+<td>Кто вы и о чём речь</td>
+<td>«Я инженер-электрик, разбираю замечания по испытаниям системы электроснабжения 24 В грузового автомобиля»</td>
+</tr>
+<tr>
+<td>Задача</td>
+<td>Что нужно получить</td>
+<td>«Предложи возможные причины замечания З-2 и способы их проверить»</td>
+</tr>
+<tr>
+<td>Исходные данные</td>
+<td>Факты, на которые модель должна опираться</td>
+<td>Описание узла, пункт 4.3 ТЗ, текст замечания с цифрами</td>
+</tr>
+<tr>
+<td>Ограничения</td>
+<td>Чего делать не надо, что считать заданным</td>
+<td>«Генератор и батареи исправны, их не рассматривай. Не предлагай замену узлов без проверки»</td>
+</tr>
+<tr>
+<td>Формат ответа</td>
+<td>Как оформить</td>
+<td>«Таблица: причина – как проверить – чем измерить – ожидаемый результат»</td>
+</tr>
+<tr>
+<td>Критерии проверки</td>
+<td>По чему вы поймёте, что ответ годится</td>
+<td>«Отдельно объясни превышение 40 мА и снижение тока с 85 до 62 мА. Допускай сочетание нескольких причин и укажи, какие измерения их различат»</td>
+</tr>
+</tbody>
+</table></div>
+<p>Критерии проверки задают модели понятную цель и помогают вам оценить ответ.</p>
+<h2>2. Приёмы, которые помогают</h2>
+<p><strong>Давать все исходные данные сразу.</strong> Модель не знает вашего узла. Если данных не хватает, она подставит типовые предположения, которые могут оказаться неподходящими. Цифры из замечаний и номера пунктов ТЗ лучше вставить в запрос, чем пересказывать.</p>
+<p><strong>Разбивать задачу на шаги.</strong> Вместо «разберись с замечанием» можно попросить по очереди: сначала сравнить измеренное с требованием, потом перечислить причины, потом план проверки. Каждый шаг проще проверить. На этом приёме построены методы декомпозиции задачи, которые описаны в исследованиях: сначала план или более простые подзадачи, затем выполнение по пунктам [8], [14].</p>
+<blockquote>
+<p>«The key idea in this strategy is to break down a complex problem into a series of simpler subproblems and then solve them in sequence.»</p>
+<p>Перевод: «Основная идея этого подхода – разбить сложную задачу на ряд более простых подзадач и решать их последовательно.» – Zhou и соавт., 2022, препринт arXiv [14]</p>
+<p>«Despite the success of Zero-shot-CoT, it still suffers from three pitfalls: calculation errors, missing-step errors, and semantic misunderstanding errors.»</p>
+<p>Перевод: «Несмотря на успех рассуждения по шагам без примеров, у него остаются три слабых места: ошибки в вычислениях, пропущенные шаги и ошибки понимания смысла.» – Wang и соавт., 2023, препринт arXiv [8]</p>
+</blockquote>
+<p><strong>Показать образец.</strong> Одна заполненная строка таблицы объясняет формат лучше абзаца описания. Модель повторит структуру, единицы измерения и уровень подробности.</p>
+<p><strong>Просить таблицу.</strong> Таблицу проще сверить с документом, чем сплошной текст. Если ответ будет использоваться дальше, сразу назовите столбцы.</p>
+<p><strong>Разрешить модели задавать вопросы.</strong> Фраза «если данных не хватает, сначала задай мне уточняющие вопросы» меняет поведение: вместо догадок модель спрашивает про температуру, режим измерения, комплектацию.</p>
+<p><strong>Просить ссылку на источник внутри ваших данных.</strong> «Для каждого вывода укажи пункт ТЗ или номер замечания, на который опираешься». Ссылку на пункт легко проверить, и выдуманный пункт сразу заметен.</p>
+<p><strong>Дорабатывать запрос по ответу.</strong> Первый ответ редко бывает окончательным. Если модель ушла не туда, лучше уточнить запрос в том же диалоге: «не рассматривай генератор, сосредоточься на потребителях стоянки». Не нужно начинать всё заново. Когда диалог запутался, полезно открыть новый чат и сразу дать полный исправленный запрос.</p>
+<h2>3. Чего опасаться в самом запросе</h2>
+<p><strong>Неверная посылка.</strong> Если в вопрос заложено ошибочное утверждение, модель обычно принимает его и развивает дальше. В исследовании каждый клинический вопрос дополнили одной выдуманной деталью. Модели подхватывали её в 50–82 % ответов в зависимости от модели и способа запроса. Дополнительная инструкция опираться только на подтверждённые сведения и прямо говорить о неопределённости снижала долю таких ответов в среднем с 66 до 44 %, но не до нуля [5]. Похожая картина описана для юридических вопросов: модели часто некритично соглашаются с неверными допущениями пользователя [6].</p>
+<blockquote>
+<p>«While prompt engineering reduces errors, it does not eliminate them.»</p>
+<p>Перевод: «Составление запросов уменьшает число ошибок, но не устраняет их.» – Omar и соавт., 2025 [5]</p>
+<p>«we show that LLMs hallucinate at least 58% of the time, struggle to predict their own hallucinations, and often uncritically accept users’ incorrect legal assumptions.»</p>
+<p>Перевод: «Мы показываем, что языковые модели галлюцинируют как минимум в 58 % случаев, плохо предсказывают собственные галлюцинации и часто некритично принимают неверные юридические допущения пользователей.» – Dahl и соавт., 2024 [6]</p>
+</blockquote>
+<p>Вывод для инженера: допущения нужно писать как допущения («предположим, что генератор исправен»), а не как факты. Полезно отдельно попросить: «если какие-то из моих исходных данных противоречат друг другу или физике, скажи об этом».</p>
+<p><strong>Лишнее в запросе.</strong> Длинная переписка, вставленная целиком, мешает больше, чем помогает. Модель может зацепиться за случайную фразу. Оставляйте то, что относится к задаче.</p>
+<p><strong>Служебные сведения.</strong> С первого занятия правило одно: в сервисы отправляются только учебные и открытые материалы. Подробно о том, что и куда можно передавать, – в теме 2.1.</p>
+<h2>4. Как меняется работа с запросами в новых моделях</h2>
+<p>П. Гагарин в вебинаре о разработке с агентами (28.07.2026) описал три ступени работы с моделями [20]. Первая – инженерия запроса: как сформулировать один вопрос, какую роль, примеры и формат задать. Вторая – инженерия контекста: «не как спросить, а что показать модели», то есть какие документы и данные ей дать. Третья – инженерия цикла: не один ответ, а управляемый процесс со стадиями, проверками и границами для человека. Для инженера отсюда простой вывод. Хорошая формулировка важна, но ещё важнее, какие исходные данные получила модель и как проверяется результат.</p>
+<p>Несколько лет назад заметный прирост давали примеры решений с промежуточными шагами [7] и даже простая приписка «давай рассуждать пошагово» [15]. Модель расписывала шаги и реже ошибалась в задачах с вычислениями. Сейчас во многих сервисах есть отдельный режим рассуждения, в котором модель сама строит цепочку шагов. В работе 2025 года на медицинских вопросах сравнивали несколько техник запроса с рассуждением по шагам. Усложнённые варианты не дали статистически значимого преимущества перед более простыми, сильнее влияли модель и тип данных [9]. Это одно исследование в одной области, переносить его на инженерные задачи нужно осторожно.</p>
+<blockquote>
+<p>«We explore how generating a chain of thought -- a series of intermediate reasoning steps -- significantly improves the ability of large language models to perform complex reasoning.»</p>
+<p>Перевод: «Мы исследуем, как построение цепочки рассуждений – последовательности промежуточных шагов – значительно улучшает способность больших языковых моделей выполнять сложные рассуждения.» – Wei и соавт., 2022, препринт arXiv [7]</p>
+<p>«Complex prompting techniques do not significantly enhance performance compared to simpler approaches.»</p>
+<p>Перевод: «Сложные техники составления запросов не дают значимого улучшения по сравнению с более простыми подходами.» – Jeon, Kim, 2025 [9]</p>
+</blockquote>
+<p>Что из этого следует на практике:</p>
+<ul>
+<li>искать «волшебную фразу» – не лучшая трата времени;</li>
+<li>полнота исходных данных, понятная задача и формат ответа по-прежнему важны;</li>
+<li>проверка результата нужна при любом запросе и в любой модели.</li>
+</ul>
+<p>На практическом занятии посмотрим на это сами: отправим одну и ту же задачу коротким и подробным запросом и сравним ответы. Одно сравнение – это демонстрация, а не доказательство.</p>
+<h2>5. Шаблон запроса</h2>
+<p>Шаблон можно копировать и заполнять:</p>
+<pre><code>Контекст: я [должность], работаю с [узел/документ].
+Задача: [что нужно получить].
+Исходные данные:
+[вставить текст, цифры, пункты]
+Ограничения: [что считать заданным, чего не делать].
+Формат ответа: [таблица со столбцами ... / список / не более N строк].
+Проверка: для каждого вывода укажи, на какой пункт исходных данных он опирается.
+Если данных не хватает или они противоречат друг другу, сначала задай вопросы.
+</code></pre>
+<h2>6. Чек-лист проверки ответа</h2>
+<p><img alt="Работа с ответом модели: от задачи до решения" src="../08-Схемы/d1-rabota-s-otvetom.png" /></p>
+<p>Интерактивная версия схемы – файл <code>08-Схемы/d1-rabota-s-otvetom.html</code>.</p>
+<p>Перед тем как использовать ответ в работе:</p>
+<ol>
+<li>Цифры совпадают с исходными данными? Сверьте каждую, которую модель взяла из запроса.</li>
+<li>Расчёты сходятся? Повторите все расчёты, от которых зависит решение. Проверьте единицы измерения.</li>
+<li>Ссылки на пункты документа существуют и говорят то, что утверждает модель?</li>
+<li>Нет ли утверждений, которых не было в исходных данных? Отметьте каждое. Подтвердите его источником, расчётом или измерением, а неподтверждённое не используйте как основание для решения.</li>
+<li>Физика и здравый смысл: не противоречит ли вывод тому, что вы знаете об узле?</li>
+<li>Ответ решает поставленную задачу, а не соседнюю?</li>
+<li>Что модель пропустила? Сравните с тем, что вы сами ожидали увидеть.</li>
+</ol>
+<p>Свой вариант чек-листа вы соберёте на практике. Его стоит держать под рукой до конца курса.</p>
+<h2>Источники</h2>
+<p>Нумерация общая для тем 1.1 и 1.2.</p>
+<p><strong>Научные публикации</strong></p>
+<ul>
+<li>[5] Omar M., Sorin V., et al. Multi-model assurance analysis showing large language models are highly vulnerable to adversarial hallucination attacks during clinical decision support // Communications Medicine. 2025. https://doi.org/10.1038/s43856-025-01021-3</li>
+<li>[6] Dahl M., Magesh V., et al. Large Legal Fictions: Profiling Legal Hallucinations in Large Language Models // Journal of Legal Analysis. 2024. https://doi.org/10.1093/jla/laae003</li>
+<li>[7] Wei J., Wang X., et al. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models. 2022. https://doi.org/10.48550/arXiv.2201.11903</li>
+<li>[8] Wang L., Xu W., et al. Plan-and-Solve Prompting: Improving Zero-Shot Chain-of-Thought Reasoning by Large Language Models. 2023. https://doi.org/10.48550/arXiv.2305.04091</li>
+<li>[9] Jeon S., Kim H.-G. A comparative evaluation of chain-of-thought-based prompt engineering techniques for medical question answering // Computers in Biology and Medicine. 2025. https://doi.org/10.1016/j.compbiomed.2025.110614</li>
+<li>[14] Zhou D., Schärli N., et al. Least-to-Most Prompting Enables Complex Reasoning in Large Language Models. 2022. https://doi.org/10.48550/arXiv.2205.10625</li>
+<li>[15] Kojima T., Gu S. S., et al. Large Language Models are Zero-Shot Reasoners. 2022. https://doi.org/10.48550/arXiv.2205.11916</li>
+<li>[20] Гагарин П. Разработка с агентами: от постановки задачи до деплоя. Вебинар учебного центра «МАСКОМ», 28.07.2026 (презентация вебинара).</li>
+</ul>
+<p>Работы [7], [8], [14] и [15] доступны на arXiv. Полный список источников дня – в файле «Источники» в папке дня.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

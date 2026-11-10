@@ -1,0 +1,253 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Простой ИИ-агент: права, данные, проверка</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Простой ИИ-агент: права, данные, проверка</h1>
+<p>Дополнительный материал для тех, кто уже работает с ИИ или программирует. Продолжает материал первого дня «От чата к агенту». Здесь разбирается, как ограничить последствия ошибки агента в инженерной задаче: какие инструменты и разрешения ему дать, к каким данным открыть доступ и как проверить результат. Образец описания агента – документ 5-5 дополнения к учебному кейсу.</p>
+<h2>1. Начать с самого простого</h2>
+<p>Прежде чем строить агента, проверьте, нужен ли он. Если задача всегда идёт по одним и тем же шагам, достаточно цепочки запросов или схемы в конструкторе. Агент нужен там, где следующий шаг зависит от того, что найдено на предыдущем. Руководство разработчиков Anthropic по построению агентов предупреждает о цене самостоятельности [37]:</p>
+<blockquote>
+<p>«The autonomous nature of agents means higher costs, and the potential for compounding errors. We recommend extensive testing in sandboxed environments, along with the appropriate guardrails.»</p>
+<p>Перевод: «Самостоятельность агентов означает более высокие затраты и возможность накопления ошибок. Мы рекомендуем тщательно испытывать их в изолированной среде, применяя соответствующие защитные ограничения.» – Anthropic, Building effective agents, 2024 [37]</p>
+</blockquote>
+<h2>2. Инструменты и разрешения</h2>
+<p><strong>Узкие инструменты вместо универсальных.</strong> Инструмент «найти пункт ТЗ по номеру» безопаснее, чем «выполнить любую команду» или «открыть любой адрес в интернете». Узкий инструмент сам ограничивает, что агент может сделать, даже если модель ошиблась или её сбили с толку.</p>
+<p><strong>Права у учётной записи агента, а не в тексте инструкции.</strong> Агент работает под своей учётной записью с минимальными правами: читать нужные документы, писать только в свою область черновиков. Проверяет права сервис, к которому агент обращается. Инструкция «не меняй ТЗ» полезна, но не защищает: модель продолжает текст, а не исполняет правила. В исследованиях последних лет описана общая стратегия защиты [49]:</p>
+<blockquote>
+<p>«Recent work (2024 to 2026) has converged on a strategy for defending tool-using LLM agents against indirect prompt injection: rather than training the model to refuse malicious instructions, enforce security outside the model with a deterministic policy that mediates the agent's actions.»</p>
+<p>Перевод: «В работах последних лет (с 2024 по 2026 год) сформировалась общая стратегия защиты агентов с инструментами от косвенного внедрения команд: вместо обучения модели отказу от вредоносных указаний предлагается применять вне модели детерминированную политику безопасности, которая контролирует действия агента.» – Narisetty и соавт., 2026, препринт arXiv [49]</p>
+</blockquote>
+<p>Те же авторы предупреждают: такие защиты пока проверены в основном на постоянных наборах атак, и против атакующего, который подстраивается под защиту, их нужно испытывать отдельно [49].</p>
+<p><strong>Что сразу, что с подтверждением.</strong> Обратимые действия (найти, посчитать, создать черновик) агент выполняет сам. Необратимые (отправить, изменить статус, исправить документ) – только после подтверждения человека. В. Малаканов на ИИ-митапе советовал начинать с действия, которое легко отменить [41]. А. Морозов сформулировал правило в общем виде: «Опасность агента пропорциональна тому, что он умеет делать без подтверждения» [40].</p>
+<p><strong>Подтверждение должно показывать настоящее действие.</strong> Если окно подтверждения заполняет сам агент своими словами, человек одобряет пересказ, а не действие. Исследователи описывают это как уязвимость [23]:</p>
+<blockquote>
+<p>«Coding agents gate consequential actions behind a human-in-the-loop approval dialog, but the dialog is narrated by the agent itself: the human approves a summary the agent writes.»</p>
+<p>Перевод: «Агенты для программирования запрашивают подтверждение человека перед действиями с существенными последствиями, но текст в окне подтверждения пишет сам агент: человек одобряет его пересказ.» – Weng, 2026, препринт arXiv [23]</p>
+</blockquote>
+<p>Отсюда правило: в окне подтверждения – точные параметры, которые сформировала программа: какой документ, какая запись, какой текст. Если параметры изменились, подтверждение нужно заново.</p>
+<h2>3. Доступ к данным</h2>
+<ul>
+<li><strong>Только нужные документы.</strong> Для разбора замечаний по ЭС-24 агенту нужны раздел 4 ТЗ, описание узла, перечень замечаний и протоколы этого узла. Остальной архив ему не нужен.</li>
+<li><strong>Пароли и ключи – вне контекста.</strong> Агент не должен видеть то, что ему не нужно для задачи: тогда он не сможет это и выдать.</li>
+<li><strong>Чужой текст – данные, а не команды.</strong> Протокол, письмо, страница из интернета могут содержать строку, похожую на указание. Агент обрабатывает её как содержимое документа, а не как указание: останавливается до любых записей, показывает строку человеку и продолжает только по его решению. Подробно о скрытых командах – тема 2.1.</li>
+<li><strong>Журнал без секретов.</strong> Записывается каждый вызов инструмента: что, с какими параметрами, на каком основании, результат. Паролей и ключей в журнале нет.</li>
+</ul>
+<p>Для тех, кто будет проектировать такие системы, полезна работа о шаблонах архитектуры агентов, устойчивых к скрытым командам [50]. Один из подходов, описанных в литературе, – отделить управление от данных: план действий строится по запросу пользователя, а документы, которые агент читает по дороге, не могут этот план изменить [27].</p>
+<h2>4. Пять точек контроля</h2>
+<p>Удобно проверять агента в пяти местах. Это учебная схема, а не требование какого-либо стандарта.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Точка</th>
+<th>Что проверить</th>
+<th>Пример для разбора замечаний ЭС-24</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Запрос</td>
+<td>Кто обращается, допустима ли задача, разрешены ли данные</td>
+<td>Инженер службы, замечание по узлу ЭС-24</td>
+</tr>
+<tr>
+<td>2. Внешний материал</td>
+<td>Откуда документ, какая редакция, нет ли посторонних указаний</td>
+<td>Протокол испытаний, редакция ТЗ указана</td>
+</tr>
+<tr>
+<td>3. Сценарий</td>
+<td>Какие шаги и инструменты допустимы, лимит шагов, остановка</td>
+<td>Не больше 10 шагов, стоп при противоречии</td>
+</tr>
+<tr>
+<td>4. Действие</td>
+<td>Операция, объект, параметры, получатель – перед каждым вызовом</td>
+<td>Запись только в область черновиков</td>
+</tr>
+<tr>
+<td>5. Ответ</td>
+<td>Числа, единицы, ссылки на пункты, нет ли лишних сведений</td>
+<td>85 мА и 40 мА совпадают с исходными, п. 4.3 существует</td>
+</tr>
+</tbody>
+</table></div>
+<p>Для необратимых действий проверка перед выполнением (точка 4) важнее проверки ответа (точка 5): отправленное письмо уже не отменить.</p>
+<h2>5. Стоп-условия</h2>
+<p>Агент останавливается и передаёт вопрос человеку, если:</p>
+<ul>
+<li>нет данных для вывода;</li>
+<li>данные противоречат друг другу, например две версии ТЗ с одинаковой редакцией и разными значениями;</li>
+<li>единицы несовместимы;</li>
+<li>в документе встретилась строка, похожая на команду;</li>
+<li>исчерпан лимит шагов;</li>
+<li>действие требует подтверждения, а человек его не дал.</li>
+</ul>
+<p>С. Скидан на митапе записал это коротко: «Стоп-условия: Нет данных, конфликт или риск» [42]. Агент, который в сомнительном случае выдумывает ответ, опаснее агента, который честно останавливается.</p>
+<h2>6. Как проверить результат</h2>
+<p>Проверяется не только итоговый текст, но и то, что агент сделал по дороге. Для этого нужен набор контрольных случаев с заранее известным правильным исходом. Шесть случаев для агента разбора замечаний ЭС-24 – в документе 5-5 дополнения к кейсу: норма, расхождение, посторонняя строка в протоколе, попытка записи в чужую область, повтор после сбоя, противоречие в данных.</p>
+<p>Правила работы с набором:</p>
+<ul>
+<li>оценивать отдельно полезность (задача решена) и безопасность (ничего лишнего не сделано). Агент, который ничего не делает, безопасен, но бесполезен;</li>
+<li>после смены модели, инструкции или инструментов прогонять весь набор заново;</li>
+<li>случаи с правами и повторами проверять на стенде с настоящими правами, в чате их можно только обсудить;</li>
+<li>записывать вызовы инструментов, решения, принятые по правилам безопасности, и итоговое состояние: по одному финальному ответу не видно лишних действий, выполненных в процессе работы.</li>
+</ul>
+<h2>7. Упражнение</h2>
+<p>Опишите агента для одной задачи своего подразделения по образцу документа 5-5. Обязательно:</p>
+<ol>
+<li>Что агент делает и чего не делает.</li>
+<li>Какие данные получает и откуда.</li>
+<li>Инструменты: для каждого – что он умеет и с какими правами.</li>
+<li>Каких инструментов у агента нет и почему.</li>
+<li>Где подтверждение человека и что человек видит.</li>
+<li>Стоп-условия.</li>
+<li>Не меньше четырёх контрольных случаев, один из них – с посторонней строкой-командой в документе.</li>
+</ol>
+<p>Агент рассчитан на внутреннюю инфраструктуру организации. Личные учётные записи, личные ключи доступа к внешним моделям и домашние компьютеры в описании не используются.</p>
+<h2>Источники</h2>
+<ul>
+<li>[23] Weng X. What You Approve Is What Executes: Consent Integrity for Black-Box LLM Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.02668</li>
+<li>[27] Debenedetti E., Shumailov I., et al. Defeating Prompt Injections by Design // 2026 IEEE Conference on Secure and Trustworthy Machine Learning (SaTML). 2026. https://doi.org/10.1109/SaTML68715.2026.00040</li>
+<li>[37] Anthropic. Building effective agents. 19.12.2024. https://www.anthropic.com/research/building-effective-agents</li>
+<li>[40] Морозов А. AI в безопасности и безопасность в AI. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[41] Малаканов В. Код, Jev, LLM, WebMCP. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[42] Скидан С. Как создать Агента-оператора. Доклад на ИИ-митапе ЦГУ, 06.11.2026 (презентация доклада).</li>
+<li>[49] Narisetty P., Kore S., et al. Adaptive Evaluation of Out-of-Band Defenses Against Prompt Injection in LLM Agents. 2026. Препринт arXiv. https://doi.org/10.48550/arXiv.2606.26479</li>
+<li>[50] Beurer-Kellner L., Creţu A.-M., et al. Design Patterns for Securing LLM Agents against Prompt Injections. 2025. Препринт arXiv. https://doi.org/10.48550/arXiv.2506.08837</li>
+</ul>
+<p>Полный список источников дня – в файле «Источники дня» в папке дня.</p>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>
