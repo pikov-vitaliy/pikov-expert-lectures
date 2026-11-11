@@ -113,8 +113,8 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   '2c089748d432954e4add6dffe4a8712578db65168dd2ae1fe412b706c1f9fd4f', # kamaz-ai: 2026-11-20-Слайды-Тема-3.2-Анализ-отказов.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '2c8378a637e9b51de1fb9dd7c7d8a42310da44fc205cb0b94ab10d2020477544', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '5cc34f86138963c30f7c614404fef772466d4acce9e37e1ad90801a1ae40c75d', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  'e17788b224963c3795f601744b68ae8ea18bc78cbd8f63b2358a41b7aa73f384', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '617578a3a826f7d23cacbf06e991413f30bd96b59a510f0d4600d02eb77b9284' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source
+  '4a1f074f886316cc4a8d454671af90a1ba35f4d6973e0cd83a5ce8dc211e8771', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  'e27b24d8a682cc193e1d30034419f17e4166233516972e72f1b7d8298ec02aa7' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
