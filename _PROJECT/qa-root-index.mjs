@@ -16,7 +16,8 @@ const playwrightPath = path.join(projectDir, ".browser-node", "node_modules", "p
 assert.ok(fs.existsSync(playwrightPath), "Playwright is not installed in _PROJECT/.browser-node");
 const { chromium } = require(playwrightPath);
 
-const lectures = JSON.parse(fs.readFileSync(lecturesPath, "utf8")).lectures;
+// Запись с catalogueHidden временно не показывается на главной.
+const lectures = JSON.parse(fs.readFileSync(lecturesPath, "utf8")).lectures.filter(item => !item.catalogueHidden);
 
 const mime = new Map([
   [".html", "text/html; charset=utf-8"], [".css", "text/css; charset=utf-8"],

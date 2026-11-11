@@ -16,7 +16,7 @@ test('DAST is present in the registry, both catalogue designs and both languages
   const entries = registry.lectures.filter(entry => entry.url === url);
   assert.equal(entries.length, 1);
   assert.equal(entries[0].folder, 'dast');
-  assert.equal(registry.summary.cards, registry.lectures.length);
+  assert.equal(registry.summary.cards, registry.lectures.filter(x => !x.catalogueHidden).length);
   assert.equal(registry.summary.thirdLevelDomains, new Set(registry.lectures.map(x => x.folder)).size);
   const card = readCatalogue(root).lectures.find(item => item.url === url);
   assert.match(card.titleEn, /Dynamic software analysis/);
