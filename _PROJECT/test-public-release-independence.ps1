@@ -106,15 +106,15 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   'f27cd06b0195a08983927b30f6dccb0c744f26bb57239577a7f04aeaff81c18c',
   'fb5169743783b44c95df5072489c471ff6bbcd350b271ffe60873188e01e0744',
   'ed9110870bfbf089f034d0d66a750b57b3d0b684b38f5a0f849c9693f9e249b1', # kamaz-ai: 2026-11-16-Слайды-Тема-1.1-Модели-и-сервисы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '8d87129682d7c799f0efa66210440ab61535dd1220f7392851f65f9c7b66db71', # kamaz-ai: 2026-11-16-Слайды-Тема-1.2-Запросы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '3c950dbe62c6631dc7a7216298756b1056777bc77759143386037d25fb6969ae', # kamaz-ai: 2026-11-16-Слайды-Тема-1.2-Запросы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '140c6d411d14a1c3cd5cb0e7bcb59fbd629c204b39c06e61d4c2609fa956b0be', # kamaz-ai: 2026-11-18-Слайды-Тема-2.1-Защита-информации.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '043b1d2ec43a71010f5406713a7244fe9a6b7d059db8a84bc4efa38cf50f77f3', # kamaz-ai: 2026-11-18-Слайды-Тема-2.2-Техническая-документация.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  'f623d9495b0c2975958f8b9802dd78770bfa88a22c2f05631321480bf43c3a3c', # kamaz-ai: 2026-11-20-Слайды-Тема-3.1-Поиск-решений.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '0d16ea8b262c5eb0e5cf4df82bcec6f7b5c2b533bba96d1bc23087dd46995209', # kamaz-ai: 2026-11-18-Слайды-Тема-2.2-Техническая-документация.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '7ca1d48046e432492f64d2248d53e41ccf11645de1e5359cbfb137796b266e83', # kamaz-ai: 2026-11-20-Слайды-Тема-3.1-Поиск-решений.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '2c089748d432954e4add6dffe4a8712578db65168dd2ae1fe412b706c1f9fd4f', # kamaz-ai: 2026-11-20-Слайды-Тема-3.2-Анализ-отказов.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '2c8378a637e9b51de1fb9dd7c7d8a42310da44fc205cb0b94ab10d2020477544', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '5cc34f86138963c30f7c614404fef772466d4acce9e37e1ad90801a1ae40c75d', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  'f667d308e68aaf730489e788a125df42d1bfb770b899c7d0ab43d9458d4a80a4', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '3f94c4a581c930343993f00a45c2b84c50c243c3914b67c1f56f1dd4eb8efa17', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '4a1f074f886316cc4a8d454671af90a1ba35f4d6973e0cd83a5ce8dc211e8771', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  'e27b24d8a682cc193e1d30034419f17e4166233516972e72f1b7d8298ec02aa7' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source
+  '855eaec22e46f506084b5bbc7712e463bc99dfef9f2ed50ac2dea34756753b9b' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
