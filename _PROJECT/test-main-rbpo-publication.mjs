@@ -42,7 +42,8 @@ test('the main RBPO lecture is registered as an evergreen author resource', () =
   assert.equal(lecture.provider, 'Пиков Виталий Александрович');
   assert.equal(lecture.status, 'ready-local');
   assert.match(lecture.title, /не ищите шаблон.+безопасн/iu);
-  assert.equal(catalog.summary.cards, catalog.lectures.length);
+  // summary.cards считает карточки главной; запись с catalogueHidden временно скрыта с главной
+  assert.equal(catalog.summary.cards, catalog.lectures.filter((item) => !item.catalogueHidden).length);
   assert.equal(
     catalog.summary.thirdLevelDomains,
     new Set(catalog.lectures.map((item) => item.domain)).size,

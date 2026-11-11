@@ -20,8 +20,9 @@ const fixtureHtml = value => `<script>\nconst CATEGORIES = ${JSON.stringify(valu
 test('all source URLs match the independent registry, including course anchors', () => {
   const registry = JSON.parse(readFileSync(resolve(root, '_PROJECT', 'lectures.json'), 'utf8'));
   assert.equal(actual.lectures.length, registry.summary.cards);
-  assert.equal(actual.lectures.length, registry.lectures.length);
-  assert.deepEqual(actual.lectures.map(item => item.url).sort(), registry.lectures.map(item => item.url).sort());
+  const listed = registry.lectures.filter(item => !item.catalogueHidden);
+  assert.equal(actual.lectures.length, listed.length);
+  assert.deepEqual(actual.lectures.map(item => item.url).sort(), listed.map(item => item.url).sort());
   assert.equal(new Set(actual.lectures.map(item => item.url)).size, actual.lectures.length);
   assert.deepEqual(actual.categories.map(category => category.id), CATEGORY_ORDER);
 });
@@ -29,7 +30,8 @@ test('all source URLs match the independent registry, including course anchors',
 test('every original source field is preserved while kind is added', () => {
   // The known source fields are separately extracted as string literals, without
   // using the reader or evaluating any JavaScript. Descriptions may contain quotes.
-  const lectureBlock = source.split('const LECTURES = [')[1].split('\n];')[0];
+  // Commented-out entries (a card temporarily hidden from the homepage) are not catalogue items.
+  const lectureBlock = source.split('const LECTURES = [')[1].split('\n];')[0].replace(/\/\*[\s\S]*?\*\//g, '');
   for (const field of ['category', 'url', 'title', 'titleEn', 'description', 'descriptionEn', 'format', 'formatEn']) {
     const literals = [...lectureBlock.matchAll(new RegExp(`\\b${field}: ("(?:[^"\\\\]|\\\\.)*")`, 'g'))]
       .map(match => JSON.parse(match[1]));

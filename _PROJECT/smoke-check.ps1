@@ -176,8 +176,10 @@ foreach ($htaccessPath in @(
   }
 }
 
-if ($lectures.Count -ne [int]$data.summary.cards) {
-  Fail "lectures.json count $($lectures.Count) != summary.cards $($data.summary.cards)"
+# summary.cards counts homepage cards; an entry with catalogueHidden is published but temporarily not listed there.
+$listedLectures = @($lectures | Where-Object { -not $_.catalogueHidden })
+if ($listedLectures.Count -ne [int]$data.summary.cards) {
+  Fail "lectures.json listed count $($listedLectures.Count) != summary.cards $($data.summary.cards)"
 }
 
 $duplicatePositions = $lectures | Group-Object position | Where-Object Count -gt 1
@@ -275,13 +277,14 @@ $html = Get-Content -LiteralPath $indexPath -Encoding UTF8 -Raw
 # array itself (the single source of truth the page renders from) instead;
 # `url: "..."` only matches that JS array, not the quoted "url": "..." keys
 # inside the static Person/WebSite JSON-LD block that ships in <head>.
-$cardUrls = [regex]::Matches($html, 'url:\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
-if (@($cardUrls).Count -ne $lectures.Count) {
-  Fail "LECTURES array count $(@($cardUrls).Count) != lectures.json count $($lectures.Count)"
+$htmlNoComments = [regex]::Replace($html, '/\*[\s\S]*?\*/', '')
+$cardUrls = [regex]::Matches($htmlNoComments, 'url:\s*"([^"]+)"') | ForEach-Object { $_.Groups[1].Value }
+if (@($cardUrls).Count -ne $listedLectures.Count) {
+  Fail "LECTURES array count $(@($cardUrls).Count) != lectures.json listed count $($listedLectures.Count)"
 }
 $cardUrlsNormalized = @($cardUrls | ForEach-Object { $_.TrimEnd('/') })
 
-foreach ($lecture in $lectures) {
+foreach ($lecture in $listedLectures) {
   if ($cardUrlsNormalized -notcontains $lecture.url.TrimEnd('/')) {
     Fail "LECTURES array missing URL $($lecture.url)"
   }

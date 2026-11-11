@@ -10,10 +10,12 @@ const catalogue=readCatalogue(root),registry=JSON.parse(read('_PROJECT/lectures.
 test('every independently published section is represented and aliases stay out of the catalogue',()=>{
  const cards=new Set(catalogue.lectures.map(x=>x.url));
  assert.equal(cards.size,catalogue.lectures.length);
- assert.deepEqual([...cards].sort(),registry.lectures.map(x=>x.url).sort());
+ // запись с catalogueHidden опубликована (домен, карта курсов), но временно не показана на главной
+ const listed=registry.lectures.filter(x=>!x.catalogueHidden);
+ assert.deepEqual([...cards].sort(),listed.map(x=>x.url).sort());
  for(const entry of registry.additionalSites){assert.ok(entry.redirectTo,'Unlisted site: '+entry.domain);assert.ok(cards.has(entry.redirectTo));assert.ok(!cards.has(entry.url));}
  assert.equal(registry.summary.cards,cards.size);
- assert.equal(registry.summary.thirdLevelDomains,new Set(catalogue.lectures.map(x=>new URL(x.url).hostname)).size);
+ assert.equal(registry.summary.thirdLevelDomains,new Set(registry.lectures.map(x=>new URL(x.url).hostname)).size);
  assert.equal(registry.summary.publishedThirdLevelDomains,new Set([...registry.lectures,...registry.additionalSites].map(x=>x.domain)).size);
 });
 test('both classic locales carry accurate counters and a complete no-JavaScript catalogue',()=>{
