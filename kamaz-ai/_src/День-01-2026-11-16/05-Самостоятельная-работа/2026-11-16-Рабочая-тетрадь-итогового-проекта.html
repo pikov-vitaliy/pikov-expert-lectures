@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Рабочая тетрадь итогового проекта</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+img, svg, video { max-width: 100%; height: auto; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Рабочая тетрадь итогового проекта</h1>
+<p>Курс «Искусственный интеллект для инженеров», 16–25.11.2026.</p>
+<p>Тетрадь – это ваш итоговый проект. В ней собираются результаты всех пяти модулей: запросы, ответы модели, проверки, таблицы и в конце паспорт сценария для своей рабочей задачи. Цель проекта – показать, как ИИ повлияет на производительность труда в одной задаче вашего подразделения и как проверить, что результат можно брать в работу.</p>
+<p>Рабочий файл тетради – документ Word, к нему приложен PDF для просмотра. Оба файла – в архиве «Рабочая тетрадь итогового проекта» на главной странице курса, под программой, и в материалах самостоятельной работы первого дня. Заполняйте файл Word, а этот текст держите как описание.</p>
+<h2>Как работать с тетрадью</h2>
+<ul>
+<li><strong>Одна тетрадь на весь курс.</strong> После каждого дня заполните раздел своего модуля и загрузите тетрадь целиком, вместе с прошлыми разделами, в контрольную точку модуля на Платформе.</li>
+<li><strong>Всё внутри тетради.</strong> Текст запросов, ответы модели (текстом или снимком экрана), таблицы, чек-листы вставляйте прямо в раздел. Отдельные файлы не нужны.</li>
+<li><strong>Только учебные или придуманные данные.</strong> Кроме ваших ФИО, должности и подразделения на титуле, в тетради нет сведений о реальных людях и организациях: рабочие документы, переписка, фамилии, обозначения изделий, сведения о заказчиках и поставщиках, внутренние номера в тетрадь не попадают. Настоящие документы и их фрагменты, в том числе обезличенные, не вставляются. Свой опыт можно описать своими словами.</li>
+<li><strong>Зачёт по разделам.</strong> Преподаватель ставит по разделу модуля «зачёт» или «незачёт» и пишет, что получилось и что доработать. Раздел, не получивший зачёт, дорабатывается по замечаниям; сроки повторной загрузки – в заданиях на Платформе.</li>
+<li><strong>Баллы.</strong> До 40 баллов за практику, по 8 за модуль, ставятся по итоговому проекту, то есть по тетради с паспортом сценария. Ещё до 60 баллов даёт итоговый тест. Подробности – в файле «Итоговая аттестация» пятого дня.</li>
+<li><strong>Имя файла:</strong> «Фамилия-Рабочая-тетрадь.docx».</li>
+</ul>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Контрольная точка</th>
+<th>Раздел тетради</th>
+<th>Срок загрузки</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>КТ-1</td>
+<td>Титул и раздел 1</td>
+<td>до занятия 18.11.2026</td>
+</tr>
+<tr>
+<td>КТ-2</td>
+<td>Раздел 2</td>
+<td>до занятия 20.11.2026</td>
+</tr>
+<tr>
+<td>КТ-3</td>
+<td>Раздел 3</td>
+<td>до занятия 23.11.2026</td>
+</tr>
+<tr>
+<td>КТ-4</td>
+<td>Раздел 4</td>
+<td>до 25.11.2026, 08:00</td>
+</tr>
+<tr>
+<td>КТ-5 и итоговый проект</td>
+<td>Раздел 5</td>
+<td>по заданиям на Платформе, преподаватель назовёт сроки 25.11</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Титул</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Что написать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Слушатель</td>
+<td>Фамилия, имя, отчество</td>
+</tr>
+<tr>
+<td>Должность и подразделение</td>
+<td>Без внутренних обозначений</td>
+</tr>
+<tr>
+<td>Задача проекта</td>
+<td>Рабочая задача, которую вы хотите ускорить с ИИ. На первом дне это задача из карточки практики 1.1, к модулю 5 её можно заменить или уточнить</td>
+</tr>
+<tr>
+<td>Цель проекта</td>
+<td>Как ИИ повлияет на производительность труда в этой задаче: сколько минут занимает одна операция сейчас, что вы хотите сократить. Сейчас это оценка, точный расчёт – в разделе 8 паспорта</td>
+</tr>
+</tbody>
+</table></div>
+<h2>Раздел 1. Модуль 1 «Языковые модели и составление запросов» (КТ-1)</h2>
+<p>Основа – практики 1.1 и 1.2 и самостоятельная работа по модулю 1. Две свои типовые задачи, третья – по желанию.</p>
+<p>Для каждой задачи:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Раздел</th>
+<th>Содержание</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Задача</td>
+<td>Название и карточка задачи: исходные данные – ожидаемый результат – критерии приёмки – ограничения</td>
+</tr>
+<tr>
+<td>Запрос</td>
+<td>Полный текст запроса по шаблону из шести частей (лекция 1.2)</td>
+</tr>
+<tr>
+<td>Сервис</td>
+<td>Какой сервис и режим использовали</td>
+</tr>
+<tr>
+<td>Ответ</td>
+<td>Ответ модели целиком или его основная часть, текстом или снимком экрана</td>
+</tr>
+<tr>
+<td>Проверка</td>
+<td>Что проверено по чек-листу, какие ошибки или выдумки нашлись</td>
+</tr>
+<tr>
+<td>Вывод</td>
+<td>Пригоден ли ответ для работы, что пришлось бы исправить, сколько времени это сэкономило бы по вашей оценке</td>
+</tr>
+</tbody>
+</table></div>
+<p>В конце раздела – свой чек-лист проверки ответа (практика 1.2, задание 3).</p>
+<p><strong>Зачёт, если:</strong> описаны не меньше двух задач; у каждой есть карточка, запрос и ответ; запрос содержит исходные данные и формат ответа; проверка конкретная – названы найденные ошибки или явно сказано, какие пункты проверены и почему ошибок нет; в тетради нет служебных сведений.</p>
+<h2>Раздел 2. Модуль 2 «Безопасная работа с ИИ и техническая документация» (КТ-2)</h2>
+<p>Основа – практики 2.1 и 2.2 и самостоятельная работа по модулю 2.</p>
+<p><strong>2.1. Памятка для своего подразделения</strong>, одна страница: какие сведения куда можно отправлять, что нельзя никогда, когда нужно обезличивание, к кому обращаться, три-пять правил проверки ответа.</p>
+<p><strong>2.2. Программа испытаний</strong>, один вариант на выбор:</p>
+<ul>
+<li>вариант А – запрос, таблица модели целиком, таблица найденных ошибок, вывод, сервис и режим;</li>
+<li>вариант Б – запрос, черновик модели целиком, исправленные пункты 5.13 и 5.14, таблица исправлений, сервис и режим.</li>
+</ul>
+<p><strong>Зачёт, если:</strong> в памятке есть разделение сведений по маршрутам, указано, к кому обращаться (или что нужно уточнить), нет выдуманных правил и служебных сведений; часть 2.2 выполнена по условиям зачёта своего варианта из самостоятельной работы по модулю 2.</p>
+<h2>Раздел 3. Модуль 3 «Поиск технических решений и потенциальных отказов» (КТ-3)</h2>
+<p>Основа – практики 3.1 и 3.2 и самостоятельная работа по модулю 3.</p>
+<p><strong>3.1. Варианты решения для задачи К-2:</strong> таблица отсева, матрица с обоснованиями, таблица проверки источников и вывод на 3–5 предложений – какой вариант вы бы предложили и что нужно проверить испытанием.</p>
+<p><strong>3.2. Черновик DFMEA по функции Ф-2</strong> в шаблоне документа 3.5: 4–5 строк с оценками S, O, D и основаниями, столбцы «Кто предложил строку» и «Что исправлено вручную и почему», меры с критерием проверки для двух строк. В конце – три-пять предложений: что модель сделала хорошо, где ошиблась и сколько времени, по вашей оценке, она сэкономила.</p>
+<p><strong>Зачёт, если:</strong> таблица DFMEA выполнена по условиям контрольной точки модуля 3 из самостоятельной работы (4–5 строк, текущие меры из данных кейса или «не установлено», одна причина в строке, не меньше трёх содержательных правок, хотя бы одна строка инженера, критерий проверки у двух мер); в тетради нет служебных сведений.</p>
+<h2>Раздел 4. Модуль 4 «Инженерные расчёты и данные испытаний без программирования» (КТ-4)</h2>
+<p>Основа – практики 4.1 и 4.2 и самостоятельная работа по модулю 4.</p>
+<p><strong>4.1. Расчёт с ИИ и независимый пересчёт:</strong> таблица пяти величин (ответ модели – мой пересчёт – совпало ли) и вывод по вопросу 6 задачи.</p>
+<p><strong>4.2. Выводы по таблице испытаний:</strong> запрос, сервис и режим, ответ модели, таблица выборочной проверки (не меньше пяти чисел), ошибки модели, выводы в виде раздела отчёта со строкой «Как проверено».</p>
+<p><strong>Зачёт, если:</strong> выполнены условия контрольной точки модуля 4 из самостоятельной работы (пересчёт всех пяти величин, проверка не меньше пяти чисел, несоответствия только по условиям, для которых в ТЗ есть требование, подозрительное значение и пропущенный замер названы вопросами к данным); в тетради нет служебных сведений.</p>
+<h2>Раздел 5. Модуль 5 «Применение ИИ в работе подразделения» (КТ-5 и итоговый проект)</h2>
+<p>Основа – задание к модулю 5, практики 5.1 и 5.2 и самостоятельная работа по модулю 5.</p>
+<p><strong>5.1. Задачи подразделения и инструменты:</strong> таблица 5–8 задач (маршрут данных, инструмент, чем проверить результат, минут на задачу сейчас) и разложение шагов выбранной задачи по исполнителям – что делает модель, что точная проверка, что решает человек. Тем, кто программирует, вместо разложения можно дать описание агента по образцу документа 5-5.</p>
+<p><strong>5.2. Паспорт сценария</strong> по шаблону документа 5-2, все девять разделов:</p>
+<ol>
+<li>Задача.</li>
+<li>Сервис.</li>
+<li>Запросы.</li>
+<li>Данные и их уровень.</li>
+<li>Меры защиты.</li>
+<li>Порядок проверки.</li>
+<li>Ограничения.</li>
+<li>Ожидаемый эффект – расчёт по формуле из документа 5-2, с замерами или пометкой «оценка».</li>
+<li>Что дальше.</li>
+</ol>
+<p><strong>5.3. Приложение:</strong> полный текст запросов и пример ответа модели на учебных или придуманных данных с отметками, что проверено и что исправлено.</p>
+<p><strong>Зачёт, если:</strong> выполнены условия контрольной точки модуля 5 из самостоятельной работы. Раздел 8 паспорта отвечает на вопрос цели проекта из титула: как изменится время на операцию и что это даёт подразделению за год.</p>
+<p><strong>Итоговый проект.</strong> После обратной связи по КТ-5 тетрадь с доработанным разделом 5 (или та же, если замечаний нет) загружается в задание «Итоговая аттестация: итоговый проект». Требования к итоговому проекту – в файле «Итоговая аттестация» пятого дня.</p>
+<h2>Лист зачётов (заполняет преподаватель)</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>КТ</th>
+<th>Раздел</th>
+<th>Зачёт / незачёт</th>
+<th>Что получилось</th>
+<th>Что доработать</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>КТ-1</td>
+<td>Титул, раздел 1</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>КТ-2</td>
+<td>Раздел 2</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>КТ-3</td>
+<td>Раздел 3</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>КТ-4</td>
+<td>Раздел 4</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>КТ-5</td>
+<td>Раздел 5</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>Итоговый проект</td>
+<td>Тетрадь целиком</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<hr />
+<!-- author-block -->
+<p><strong>Автор курса</strong></p>
+<p>Виталий Пиков</p>
+<ul>
+<li>Архитектор информационной безопасности
+• РБПО • DevSecOps • AppSec</li>
+<li>Лектор и автор образовательных программ по ИБ и РБПО</li>
+</ul>
+<p>Телефон: +7 (963) 782-92-78 ·
+E-mail: vitaly@pikov.expert ·
+Сайт: https://pikov.expert ·
+Telegram: @UnderLineSecurity</p>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

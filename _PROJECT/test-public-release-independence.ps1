@@ -106,15 +106,16 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   'f27cd06b0195a08983927b30f6dccb0c744f26bb57239577a7f04aeaff81c18c',
   'fb5169743783b44c95df5072489c471ff6bbcd350b271ffe60873188e01e0744',
   'be51e511658f98dc077aa29a22e427a8a4da6062a3feddbacc4900aba6c218ce', # kamaz-ai: 2026-11-16-Слайды-Тема-1.1-Модели-и-сервисы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '314674035909a98c7d3bb14a2d65ffa74a3508b43aeceffe54a4605a9205f416', # kamaz-ai: 2026-11-16-Слайды-Тема-1.2-Запросы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  'b63c449405354cd900cc79f4a26ba4b67c14af3fa91e715f5527af1bc00ca547', # kamaz-ai: 2026-11-16-Слайды-Тема-1.2-Запросы.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '1a681ac7a00146720d3e13b56f7919b3b37c67aeef5ada24741b68f99fbef178', # kamaz-ai: 2026-11-18-Слайды-Тема-2.1-Защита-информации.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   'c0a9a6e9bc0841c5730c2c500dd43fc30c8a329ecc537d43d3fec3248de7c183', # kamaz-ai: 2026-11-18-Слайды-Тема-2.2-Техническая-документация.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   'adf8c7372090ababc491107e87918048e0bf51a8c3a375014ed3b0070ab8c29a', # kamaz-ai: 2026-11-20-Слайды-Тема-3.1-Поиск-решений.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '61b05c421f884832085cd6a8c0887c764e3c7194660ac5cf79a07281ddacef3f', # kamaz-ai: 2026-11-20-Слайды-Тема-3.2-Анализ-отказов.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '23badbeb5402f1d3f3414eccaa48df3b5066656a5b170e18ac6e39849abac15f', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  'f5992ded0a34c837d443d744cd828491f56a422d341dd00ff7735b1a775affbd', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '88119a259d2507ed1cf09bf26190b903eae9a110144dfae598bf666e30e1a3f3', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   'e0c9b506acbd20c46f49114bcad26cad540cd3ee64448255d0ba40fdb4eb4a1f', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '93b11ee729ff5b58b4e11ea59cbcf4e3a065d13a17631c7ef225626ef8a8fab6' # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source
+  'f9f1adbab172af7068c0118165e8b8f73feade215458257795163175df0b7259', # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '7056f199ac89ad60cd7da12c25e5f1570ab03d4791d02822371ba9d1d0a16952' # kamaz-ai: 2026-11-16-Рабочая-тетрадь-итогового-проекта.pdf - course workbook exported by Word from the reviewed DOCX; text checked against the workbook source
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
