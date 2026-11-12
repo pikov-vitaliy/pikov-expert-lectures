@@ -206,8 +206,23 @@ h2[id], h3[id] { scroll-margin-top: 16px; }
 <p>«we show that LLMs hallucinate at least 58% of the time, struggle to predict their own hallucinations, and often uncritically accept users’ incorrect legal assumptions.»</p>
 <p>Перевод: «Мы показываем, что языковые модели галлюцинируют как минимум в 58 % случаев, плохо предсказывают собственные галлюцинации и часто некритично принимают неверные юридические допущения пользователей.» – Dahl и соавт., 2024 [6]</p>
 </blockquote>
+<p>Спорить с моделью тоже нужно осторожно. В исследовании 2025 года трём популярным моделям задавали задачи по математике и медицинские вопросы, а затем возражали на их ответ. Модели меняли ответ под возражение пользователя в 58 % случаев, и почти в 15 % случаев – с верного на неверный. Чаще всего верный ответ ломался, когда возражение подкрепляли ссылкой на источник [25]. Если ответ вызывает сомнение, проверьте его сами, а если спорите – давайте модели исходные данные, а не своё мнение.</p>
+<blockquote>
+<p>«Sycophantic behavior was observed in 58.19% of cases… Progressive sycophancy, leading to correct answers, occurred in 43.52% of cases, while regressive sycophancy, leading to incorrect answers, was observed in 14.66%.»</p>
+<p>Перевод: «Угодливое поведение наблюдалось в 58,19 % случаев… Угодливость, приводившая к верному ответу, встречалась в 43,52 % случаев, а приводившая к неверному – в 14,66 %.» – Fanous и соавт., 2025 [25]</p>
+</blockquote>
 <p>Вывод для инженера: допущения нужно писать как допущения («предположим, что генератор исправен»), а не как факты. Полезно отдельно попросить: «если какие-то из моих исходных данных противоречат друг другу или физике, скажи об этом».</p>
 <p><strong>Лишнее в запросе.</strong> Длинная переписка, вставленная целиком, мешает больше, чем помогает. Модель может зацепиться за случайную фразу. Оставляйте то, что относится к задаче.</p>
+<p>Почему лишнее мешает, показывают и исследования. В работе 2024 года модели искали нужный факт среди многих документов в длинном запросе: лучше всего они справлялись, когда нужное стояло в начале или в конце, и заметно хуже – когда оно оказывалось в середине [22]. Поэтому задачу и ключевые цифры лучше ставить в начало запроса или повторять в конце.</p>
+<blockquote>
+<p>«Performance is often highest when relevant information occurs at the beginning or end of the input context, and significantly degrades when models must access relevant information in the middle of long contexts, even for explicitly long-context models.»</p>
+<p>Перевод: «Качество часто наивысшее, когда нужные сведения стоят в начале или в конце входного контекста, и заметно падает, когда модели нужно найти их в середине длинного контекста, даже у моделей, рассчитанных на длинный контекст.» – Liu и соавт., 2024 [22]</p>
+</blockquote>
+<p>В другой работе к арифметическим задачам для школьников добавляли одну фразу, которая выглядит важной, но на решение не влияет. Авторы сообщили о снижении точности у всех проверенных моделей, у отдельных моделей падение достигало 65 % [23]. Позднейшая перепроверка оспорила статистическую обоснованность общих выводов этой работы, сила эффекта у разных моделей разная [24]. Вывод для инженера тот же: каждая лишняя фраза в запросе – шанс, что модель за неё зацепится.</p>
+<blockquote>
+<p>«Adding a single clause that seems relevant to the question causes significant performance drops (up to 65%) across all state-of-the-art models, even though the clause doesn't contribute to the reasoning chain needed for the final answer.»</p>
+<p>Перевод: «Добавление в вопрос одной фразы, которая кажется относящейся к делу, вызывает значительное падение качества (до 65 %) у всех современных моделей, хотя эта фраза не участвует в цепочке рассуждений, нужной для ответа.» – Mirzadeh и соавт., 2024, препринт arXiv [23]</p>
+</blockquote>
 <p><strong>Служебные сведения.</strong> С первого занятия правило одно: в сервисы отправляются только учебные и открытые материалы. Подробно о том, что и куда можно передавать, – в теме 2.1.</p>
 <h2>4. Как меняется работа с запросами в новых моделях</h2>
 <p>П. Гагарин в вебинаре о разработке с агентами (28.07.2026) описал три ступени работы с моделями [20]. Первая – инженерия запроса: как сформулировать один вопрос, какую роль, примеры и формат задать. Вторая – инженерия контекста: «не как спросить, а что показать модели», то есть какие документы и данные ей дать. Третья – инженерия цикла: не один ответ, а управляемый процесс со стадиями, проверками и границами для человека. Для инженера отсюда простой вывод. Хорошая формулировка важна, но ещё важнее, какие исходные данные получила модель и как проверяется результат.</p>
@@ -264,13 +279,17 @@ h2[id], h3[id] { scroll-margin-top: 16px; }
 <li>[9] Jeon S., Kim H.-G. A comparative evaluation of chain-of-thought-based prompt engineering techniques for medical question answering // Computers in Biology and Medicine. 2025. https://doi.org/10.1016/j.compbiomed.2025.110614</li>
 <li>[14] Zhou D., Schärli N., et al. Least-to-Most Prompting Enables Complex Reasoning in Large Language Models. 2022. https://doi.org/10.48550/arXiv.2205.10625</li>
 <li>[15] Kojima T., Gu S. S., et al. Large Language Models are Zero-Shot Reasoners. 2022. https://doi.org/10.48550/arXiv.2205.11916</li>
+<li>[22] Liu N. F., Lin K., et al. Lost in the Middle: How Language Models Use Long Contexts // Transactions of the Association for Computational Linguistics. 2024. https://doi.org/10.1162/tacl_a_00638</li>
+<li>[23] Mirzadeh I., Alizadeh K., et al. GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in Large Language Models. 2024. Препринт arXiv. https://doi.org/10.48550/arXiv.2410.05229</li>
+<li>[24] Długosz D. A., Oliveira A., Rodríguez N. The Importance of Being Statistically Earnest: A Critical Re-evaluation of GSM-Symbolic // Proceedings of EMNLP 2026. https://aclanthology.org/2026.emnlp-main.1487/</li>
+<li>[25] Fanous A., Goldberg J., et al. SycEval: Evaluating LLM Sycophancy // Proceedings of the AAAI/ACM Conference on AI, Ethics, and Society. 2025. https://doi.org/10.1609/aies.v8i1.36598</li>
 <li>[20] Гагарин П. Разработка с агентами: от постановки задачи до деплоя. Вебинар учебного центра «МАСКОМ», 28.07.2026 (презентация вебинара).</li>
 </ul>
 <p><strong>Практические руководства</strong></p>
 <ul>
 <li>[21] Мокевнин К. Agentic Design Patterns. Приложение «Фразы для AGENTS.md» (книга о паттернах агентного программирования, при поддержке Хекслета и Праксора; дата не указана, страница открыта 11.11.2026). https://mokevnin.github.io/agentic-coding-design-patterns/ru/agents-md-phrases.html</li>
 </ul>
-<p>Работы [7], [8], [14] и [15] доступны на arXiv. Полный список источников дня – в файле «Источники» в папке дня.</p>
+<p>Работы [7], [8], [14], [15] и [23] доступны на arXiv. Полный список источников дня – в файле «Источники» в папке дня.</p>
 <hr />
 <!-- author-block -->
 <p><strong>Автор курса</strong></p>
