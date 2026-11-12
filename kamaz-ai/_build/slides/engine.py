@@ -962,7 +962,7 @@ JS = r"""
  function fromHash(){var h=parseInt((location.hash||'#1').slice(1),10);go(isNaN(h)?0:h-1)}fromHash();window.addEventListener('hashchange',fromHash);
  (function(){var bk=document.getElementById('back');if(!bk)return;try{if(window.self!==window.top||window.opener)return;
   var m=location.pathname.match(/\/materials\/day-0(\d)\/slides\/[^\/]*$/);
-  if(m){bk.href='../../../day-0'+m[1]+'.html#slides';bk.hidden=false}
+  if(m&&/^https?:$/.test(location.protocol)){bk.href='../../../day-0'+m[1]+'.html#slides';bk.hidden=false}
   else if(document.referrer&&history.length>1){bk.href='#';bk.onclick=function(e){e.preventDefault();history.back()};bk.hidden=false}}catch(e){}})();
  document.getElementById('prev').onclick=function(){go(i-1)};document.getElementById('next').onclick=function(){go(i+1)};
  document.addEventListener('keydown',function(e){if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(i-1)}else if(e.key==='Home'){go(0)}else if(e.key==='End'){go(s.length-1)}});
