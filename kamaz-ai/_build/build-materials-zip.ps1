@@ -40,4 +40,22 @@ for ($i = 0; $i -lt $days.Count; $i++) {
   New-CourseArchive -Destination (Join-Path $downloadsRoot ("kamaz-ai-day-0{0}.zip" -f $n)) -Folders @($days[$i])
 }
 New-CourseArchive -Destination (Join-Path $downloadsRoot 'kamaz-ai-course.zip') -Folders $days
+
+# Рабочая тетрадь итогового проекта: Word для заполнения и PDF для просмотра – отдельным архивом
+# рядом с программой курса. Файлы берутся из самостоятельной работы первого дня.
+# Код без кириллицы: скрипт запускается в Windows PowerShell 5.1, файл без BOM.
+$workbookDirs = @(Get-ChildItem -LiteralPath $days[0].FullName -Directory | Where-Object { $_.Name -like '05-*' })
+if ($workbookDirs.Count -ne 1) { throw "Expected one homework folder 05-* in $($days[0].FullName), found $($workbookDirs.Count)" }
+$workbookDir = $workbookDirs[0].FullName
+$workbookFiles = @(Get-ChildItem -LiteralPath $workbookDir -File | Where-Object { $_.Extension -in @('.docx', '.pdf') } | Sort-Object Name)
+if ($workbookFiles.Count -ne 2) { throw "Expected workbook DOCX and PDF in $workbookDir, found $($workbookFiles.Count)" }
+$workbookZip = Join-Path $downloadsRoot 'kamaz-ai-workbook.zip'
+Remove-Item -LiteralPath $workbookZip -Force -ErrorAction SilentlyContinue
+$staging = Join-Path ([System.IO.Path]::GetTempPath()) ('kamaz-ai-workbook-' + [System.Guid]::NewGuid().ToString('N'))
+New-Item -ItemType Directory -Path $staging -Force | Out-Null
+try {
+  foreach ($f in $workbookFiles) { Copy-Item -LiteralPath $f.FullName -Destination $staging -Force }
+  New-DeterministicArchive -SourceRoot $staging -Destination $workbookZip
+}
+finally { Remove-Item -LiteralPath $staging -Recurse -Force -ErrorAction SilentlyContinue }
 Write-Output 'KAMAZ-AI MATERIALS ZIP OK'

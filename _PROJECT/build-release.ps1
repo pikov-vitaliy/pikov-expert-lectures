@@ -281,7 +281,8 @@ $script:ApprovedIgnoredReleaseArtifacts = @(
   'kamaz-ai/downloads/kamaz-ai-day-03.zip',
   'kamaz-ai/downloads/kamaz-ai-day-04.zip',
   'kamaz-ai/downloads/kamaz-ai-day-05.zip',
-  'kamaz-ai/downloads/kamaz-ai-course.zip'
+  'kamaz-ai/downloads/kamaz-ai-course.zip',
+  'kamaz-ai/downloads/kamaz-ai-workbook.zip'
 )
 
 function Test-HighRiskReleaseFileName([string]$Name) {
@@ -419,7 +420,8 @@ $script:ReviewedNestedDistributables = @{
     'downloads\kamaz-ai-day-03.zip',
     'downloads\kamaz-ai-day-04.zip',
     'downloads\kamaz-ai-day-05.zip',
-    'downloads\kamaz-ai-course.zip'
+    'downloads\kamaz-ai-course.zip',
+    'downloads\kamaz-ai-workbook.zip'
   )
 }
 

@@ -944,6 +944,11 @@ code{font-family:Consolas,"Cascadia Mono",monospace;font-size:.92em;background:v
 .bar button,.theme{background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;font-size:16px;cursor:pointer}
 .bar button:focus-visible,.theme:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
 .theme{position:fixed;top:16px;right:16px;z-index:5}
+.bar .back{position:absolute;left:16px;background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:6px 14px;font-size:15px;text-decoration:none;white-space:nowrap}
+.bar .back[hidden]{display:none}
+.bar .back:hover{border-color:var(--teal)}
+.bar .back:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+@media (max-width:640px){.bar .back .bk-t{display:none}}
 @media print{@page{size:13.333in 7.5in;margin:0}html,body{height:auto;background:#fff}.bar,.theme{display:none}.stage{position:static;display:block}
 .slide{display:block;position:relative;left:0;top:0;transform:none!important;box-shadow:none;border-radius:0;break-after:page;page-break-after:always}}
 """
@@ -955,6 +960,10 @@ JS = r"""
  window.addEventListener('resize',fitS);fitS();
  function go(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach(function(e,k){e.classList.toggle('on',k===i)});c.textContent=(i+1)+' / '+s.length;try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
  function fromHash(){var h=parseInt((location.hash||'#1').slice(1),10);go(isNaN(h)?0:h-1)}fromHash();window.addEventListener('hashchange',fromHash);
+ (function(){var bk=document.getElementById('back');if(!bk)return;try{if(window.self!==window.top||window.opener)return;
+  var m=location.pathname.match(/\/materials\/day-0(\d)\/slides\/[^\/]*$/);
+  if(m&&/^https?:$/.test(location.protocol)){bk.href='../../../day-0'+m[1]+'.html#slides';bk.hidden=false}
+  else if(document.referrer&&history.length>1){bk.href='#';bk.onclick=function(e){e.preventDefault();history.back()};bk.hidden=false}}catch(e){}})();
  document.getElementById('prev').onclick=function(){go(i-1)};document.getElementById('next').onclick=function(){go(i+1)};
  document.addEventListener('keydown',function(e){if(['ArrowRight','PageDown',' '].indexOf(e.key)>=0){e.preventDefault();go(i+1)}else if(['ArrowLeft','PageUp'].indexOf(e.key)>=0){e.preventDefault();go(i-1)}else if(e.key==='Home'){go(0)}else if(e.key==='End'){go(s.length-1)}});
  var tx0=null;st.addEventListener('touchstart',function(e){tx0=e.touches[0].clientX},{passive:true});st.addEventListener('touchend',function(e){if(tx0===null)return;var dx=e.changedTouches[0].clientX-tx0;if(Math.abs(dx)>50)go(i+(dx<0?1:-1));tx0=null});
@@ -990,7 +999,8 @@ def render_html(spec, scene, out):
            f'<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>{syms}</defs></svg>'
            f'<button class="theme" id="theme" aria-label="Переключить тему">☾</button>'
            f'<main class="stage">{"".join(parts)}</main>'
-           f'<nav class="bar" aria-label="Навигация по слайдам"><button id="prev" aria-label="Предыдущий слайд">←</button>'
+           f'<nav class="bar" aria-label="Навигация по слайдам"><a class="back" id="back" href="#" hidden aria-label="Вернуться к странице дня курса"><span aria-hidden="true">←</span><span class="bk-t"> К дню курса</span></a>'
+           f'<button id="prev" aria-label="Предыдущий слайд">←</button>'
            f'<span id="cnt"></span><button id="next" aria-label="Следующий слайд">→</button></nav>'
            f'<script>{JS}</script></body></html>')
     open(out, 'w', encoding='utf-8', newline='\n').write(doc)
