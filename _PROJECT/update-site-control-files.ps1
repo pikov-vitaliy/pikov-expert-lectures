@@ -94,7 +94,7 @@ function Should-SkipSitemapPath([string]$RelativePath) {
   return $false
 }
 
-function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect, [switch]$WebpImages) {
+function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect, [switch]$WebpImages, [switch]$SameOriginFrames) {
   $lines = [System.Collections.ArrayList]@(
     '# pikov.expert static lecture site rules',
     '# Keep text and Markdown files readable as UTF-8 in browsers.',
@@ -168,6 +168,17 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
       '</IfModule>',
       ''
     ))
+  }
+
+  if ($SameOriginFrames) {
+    # kamaz-ai: the lesson player shows the course's own slide decks in an iframe
+    # and syncs them by URL hash. Framing stays limited to the same origin.
+    for ($i = 0; $i -lt $lines.Count; $i++) {
+      $lines[$i] = ([string]$lines[$i]).Replace('X-Frame-Options "DENY"', 'X-Frame-Options "SAMEORIGIN"').Replace("frame-ancestors 'none'", "frame-ancestors 'self'")
+    }
+    $index = $lines.IndexOf('AddType image/svg+xml .svg')
+    if ($index -lt 0) { throw 'svg AddType marker is missing from the common template' }
+    [void]$lines.Insert($index, 'AddType audio/mp4 .m4a')
   }
 
   if ($SpdxExtensionlessHtml) {
@@ -397,7 +408,7 @@ foreach ($folder in $uniqueFolders) {
     Write-Output "controlCustomHtaccess=$folder"
   } else {
     $hasWebpImages = $null -ne (Get-ChildItem -LiteralPath $folderPath -Filter '*.webp' -Recurse -File | Select-Object -First 1)
-    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -WebpImages:$hasWebpImages)
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -WebpImages:$hasWebpImages -SameOriginFrames:($folder -eq 'kamaz-ai'))
   }
   Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
   Write-SitemapFile -Path (Join-Path $folderPath 'sitemap.xml') -Urls @($urls) -DefaultLastMod $lastMod
