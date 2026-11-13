@@ -14,6 +14,7 @@
   var nowTitle = document.getElementById('vp-now');
   var syncBox = document.getElementById('vp-sync');
   var openDeck = document.getElementById('vp-open');
+  var timerBox = document.getElementById('vp-timer'), timerLeft = document.getElementById('vp-timer-left');
   var cur = null, curBlock = -1, curFrag = -1, flat = [], deckLoaded = '';
   var KEY = 'kamaz-voice-pos';
 
@@ -129,8 +130,35 @@
     audio.currentTime = t; update(t);
     if (play) audio.play().catch(function () {});
   }
+  function updateTimer(t) {  // обратный отсчёт во время работы по таймеру (как в видео)
+    if (!timerBox) return;
+    var tm = (cur && cur.timers || []).filter(function (x) { return t >= x[0] && t < x[1]; })[0];
+    if (!tm) { if (!timerBox.hidden) timerBox.hidden = true; popupTimer(''); return; }
+    var left = Math.max(0, Math.ceil(tm[1] - t)), mm = Math.floor(left / 60), ss = left % 60;
+    timerLeft.textContent = (mm < 10 ? '0' : '') + mm + ':' + (ss < 10 ? '0' : '') + ss;
+    if (timerBox.hidden) timerBox.hidden = false;
+    popupTimer(timerLeft.textContent);
+  }
+  // окно слайдов могло открыться на паузе или перезагрузиться при смене колоды – раз в секунду досинхронизировать табло
+  setInterval(function () { if (popup && !popup.closed && cur) updateTimer(audio.currentTime); }, 1000);
+  function popupTimer(txt) {  // то же табло в отдельном окне слайдов (показ экрана)
+    if (!popup || popup.closed) return;
+    try {
+      var d = popup.document, el = d.getElementById('vp-ext-timer');
+      if (!el) {
+        if (!txt || !d.body) return;
+        el = d.createElement('div'); el.id = 'vp-ext-timer'; el.setAttribute('role', 'timer'); el.setAttribute('aria-live', 'off');
+        el.style.cssText = 'position:fixed;top:13%;right:2%;z-index:10;padding:.5em .9em;border-radius:10px;background:rgba(0,0,0,.62);color:#fff;font:700 15px/1.15 system-ui,sans-serif;pointer-events:none';
+        el.innerHTML = '<span style="display:block">Работа по таймеру</span><b style="display:block;font-size:32px;font-variant-numeric:tabular-nums"></b>';
+        d.body.appendChild(el);
+      }
+      el.hidden = !txt;
+      if (txt) el.querySelector('b').textContent = txt;
+    } catch (e) {}
+  }
   function update(t) {
     if (!cur) return;
+    updateTimer(t);
     var bi = 0;
     for (var i = 0; i < cur.blocks.length; i++) if (cur.blocks[i].t <= t + 0.05) bi = i;
     if (bi !== curBlock) {
