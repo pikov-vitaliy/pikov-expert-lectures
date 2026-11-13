@@ -139,6 +139,8 @@
     if (timerBox.hidden) timerBox.hidden = false;
     popupTimer(timerLeft.textContent);
   }
+  // окно слайдов могло открыться на паузе или перезагрузиться при смене колоды – раз в секунду досинхронизировать табло
+  setInterval(function () { if (popup && !popup.closed && cur) updateTimer(audio.currentTime); }, 1000);
   function popupTimer(txt) {  // то же табло в отдельном окне слайдов (показ экрана)
     if (!popup || popup.closed) return;
     try {
