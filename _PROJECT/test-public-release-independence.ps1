@@ -115,7 +115,7 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   '88119a259d2507ed1cf09bf26190b903eae9a110144dfae598bf666e30e1a3f3', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   'e0c9b506acbd20c46f49114bcad26cad540cd3ee64448255d0ba40fdb4eb4a1f', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   'f9f1adbab172af7068c0118165e8b8f73feade215458257795163175df0b7259', # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '7056f199ac89ad60cd7da12c25e5f1570ab03d4791d02822371ba9d1d0a16952' # kamaz-ai: 2026-11-16-Рабочая-тетрадь-итогового-проекта.pdf - course workbook exported by Word from the reviewed DOCX; text checked against the workbook source
+  '80a682977349574a308da47f93114f5f761c23f603710cf6e78370b760a5b113' # kamaz-ai: 2026-11-16-Рабочая-тетрадь-итогового-проекта.pdf - course workbook exported by Word from the reviewed DOCX; text checked against the workbook source
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
