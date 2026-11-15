@@ -17,6 +17,10 @@
   var timerBox = document.getElementById('vp-timer'), timerLeft = document.getElementById('vp-timer-left');
   var cur = null, curBlock = -1, curFrag = -1, flat = [], deckLoaded = '';
   var KEY = 'kamaz-voice-pos';
+  // преподаватель в кадре (с дня 3): немое видео справа от слайда, идёт синхронно со звуком
+  var head = document.getElementById('vp-head');
+  var wrap = frame.closest('.vp-frame-wrap');
+  var anyHead = segs.some(function (s) { return !!s.head; });
 
   function esc(x) { return String(x).replace(/[&<>"]/g, function (c) { return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'}[c]; }); }
   function fmt(s) {
@@ -32,14 +36,86 @@
     } catch (e) { return {}; }
   }
   // отдельное окно со слайдами (второй монитор, показ экрана) – листается вместе с рассказом
-  var popup = null, popupDeck = '';
+  var popup = null, popupDeck = '', popupFrame = null, popupHead = null;
   function syncPopup(b) {
-    if (!popup || popup.closed) { popup = null; return; }
+    if (!popup || popup.closed) { popup = null; popupFrame = null; popupHead = null; return; }
     var url = new URL(b.deck, location.href).href;
     try {
+      if (popupFrame) {  // окно «вебинар»: слайды в рамке, рядом преподаватель
+        if (popupDeck !== b.deck) { popupDeck = b.deck; popupFrame.src = url + '#' + b.slide; }
+        else popupFrame.contentWindow.location.hash = '#' + b.slide;
+        return;
+      }
       if (popupDeck !== b.deck) { popupDeck = b.deck; popup.location.href = url + '#' + b.slide; }
       else popup.location.hash = '#' + b.slide;
-    } catch (e) { popup = null; }
+    } catch (e) { popup = null; popupFrame = null; popupHead = null; }
+  }
+  function syncVideo(v, force) {  // видео идёт за звуком: позиция, пауза, скорость
+    if (!v || !cur || !cur.head || !v.getAttribute('src')) return;
+    try {
+      if (Math.abs(v.playbackRate - audio.playbackRate) > 0.001) v.playbackRate = audio.playbackRate;
+      if (v.readyState >= 1 && (force || Math.abs(v.currentTime - audio.currentTime) > 0.3)) v.currentTime = audio.currentTime;
+      // звук на паузе, в перемотке или ждёт данных – видео стоит (иначе уходит вперёд и дёргается при поправке)
+      if (audio.paused || audio.seeking || audio.readyState < 3) { if (!v.paused) v.pause(); }
+      else if (v.paused) { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    } catch (e) {}
+  }
+  function headSync(force) {
+    syncVideo(head, force);
+    if (popup && !popup.closed && popupHead) syncVideo(popupHead, force);
+  }
+  function setHead(v, src) {
+    if (!v) return;
+    var abs = src ? new URL(src, location.href).href : '';
+    if (abs) {
+      if (v.src !== abs) { v.src = abs; v.load(); }
+      v.hidden = false;
+    } else {
+      if (v.getAttribute('src')) { v.removeAttribute('src'); v.load(); }
+      v.hidden = true;
+    }
+  }
+  function onHeadMeta() { headSync(true); }
+  if (head) { head.muted = true; head.addEventListener('loadedmetadata', onHeadMeta); }
+  // окно для второго монитора: слайд слева, преподаватель справа – как вебинар; «Во весь экран» внутри окна
+  function openScreen() {
+    var w = window.open('', 'kamaz-screen', 'popup,width=1280,height=720');
+    if (!w) return false;
+    var d = w.document;
+    d.open();
+    d.write('<!doctype html><html lang="ru"><head><meta charset="utf-8"><title>Занятие – слайды и преподаватель</title>' +
+      '<style>html,body{margin:0;height:100%;background:#f4f6f5;overflow:hidden;font:15px/1.2 system-ui,sans-serif}' +
+      '#st{position:absolute;inset:0;margin:auto;width:min(100vw,177.78vh);height:min(56.25vw,100vh)}' +
+      '#sf{position:absolute;left:.52%;top:10.37%;width:79.17%;height:79.17%;border:0;background:#fff}' +
+      '#sh{position:absolute;left:79.69%;top:27.78%;width:19.79%;height:43.98%;object-fit:cover;background:#000}' +
+      '#sh[hidden]{display:none}#st.nohead #sf{left:0;top:0;width:100%;height:100%}' +
+      '#stimer{position:absolute;top:13%;right:21.5%;padding:.5em .9em;border-radius:10px;background:rgba(0,0,0,.62);color:#fff;font-weight:700;pointer-events:none}' +
+      '#stimer b{display:block;font-size:32px;font-variant-numeric:tabular-nums}#stimer[hidden]{display:none}' +
+      '#sfs{position:fixed;right:10px;bottom:10px;padding:6px 12px;border-radius:999px;border:1px solid #999;background:rgba(255,255,255,.85);cursor:pointer;font:inherit}' +
+      ':fullscreen #sfs{display:none}</style></head><body><div id="st"><iframe id="sf" title="Слайды"></iframe>' +
+      '<video id="sh" muted playsinline preload="metadata" aria-label="Преподаватель"></video>' +
+      '<div id="stimer" role="timer" aria-live="off" hidden><span>Работа по таймеру</span><b></b></div></div>' +
+      '<button id="sfs" type="button">Во весь экран</button></body></html>');
+    d.close();
+    popup = w; popupDeck = ''; popupFrame = d.getElementById('sf'); popupHead = d.getElementById('sh');
+    popupHead.muted = true;
+    popupHead.addEventListener('loadedmetadata', onHeadMeta);
+    var st = d.getElementById('st');
+    function toggleFs() {
+      var r;
+      // во весь экран – всё окно: сцена #st (16:9 через min()) остаётся по центру с полями на любом мониторе
+      try { r = d.fullscreenElement ? d.exitFullscreen() : d.documentElement.requestFullscreen(); } catch (e) { r = null; }
+      if (r && r.catch) r.catch(function () {});
+    }
+    d.getElementById('sfs').addEventListener('click', toggleFs);
+    st.addEventListener('dblclick', toggleFs);
+    if (cur) {
+      setHead(popupHead, cur.head); st.classList.toggle('nohead', !cur.head);
+      if (curBlock >= 0) syncPopup(cur.blocks[curBlock]);
+      updateTimer(audio.currentTime); headSync(true);
+    }
+    try { w.focus(); } catch (x) {}
+    return true;
   }
   function showSlide(b) {
     var url = b.deck + '#' + b.slide;
@@ -55,6 +131,7 @@
   }
   openDeck.setAttribute('target', 'kamaz-slides');
   openDeck.addEventListener('click', function (e) {
+    if (anyHead && openScreen()) { e.preventDefault(); return; }
     var w = window.open(openDeck.href, 'kamaz-slides', 'popup,width=1280,height=760');
     if (!w) return;  // окно заблокировано – ссылка откроется обычной вкладкой с тем же именем
     e.preventDefault();
@@ -64,7 +141,7 @@
   });
   var fsBtn = document.getElementById('vp-fs');
   if (fsBtn) fsBtn.addEventListener('click', function () {
-    var w = frame.parentNode;
+    var w = wrap;
     var req = w.requestFullscreen || w.webkitRequestFullscreen;
     var r;
     try { r = document.fullscreenElement ? document.exitFullscreen() : (req ? req.call(w) : null); } catch (e) { r = null; }
@@ -111,6 +188,17 @@
     [].forEach.call(list.querySelectorAll('button'), function (x) { x.setAttribute('aria-pressed', x.dataset.id === seg.id ? 'true' : 'false'); });
     nowTitle.textContent = seg.time + ' · ' + seg.title;
     render(seg);
+    var dl = document.getElementById('vp-dl');  // готовое видео части – скачать (с дня 3)
+    if (dl) {
+      if (seg.video) { dl.href = seg.video; dl.textContent = 'Скачать видео этой части (MP4, ' + seg.videoMb + ' МБ) ↓'; dl.hidden = false; }
+      else { dl.hidden = true; dl.removeAttribute('href'); }
+    }
+    setHead(head, seg.head);
+    wrap.classList.toggle('has-head', !!seg.head);
+    if (popup && !popup.closed && popupHead) {
+      setHead(popupHead, seg.head);
+      try { popup.document.getElementById('st').classList.toggle('nohead', !seg.head); } catch (e) {}
+    }
     audio.src = seg.audio;
     audio.preload = 'metadata';
     var start = t || 0;
@@ -140,9 +228,20 @@
     popupTimer(timerLeft.textContent);
   }
   // окно слайдов могло открыться на паузе или перезагрузиться при смене колоды – раз в секунду досинхронизировать табло
-  setInterval(function () { if (popup && !popup.closed && cur) updateTimer(audio.currentTime); }, 1000);
+  setInterval(function () {
+    if (popup && !popup.closed && cur) updateTimer(audio.currentTime);
+    if (cur && cur.head) headSync(false);  // поправка дрейфа видео относительно звука
+  }, 1000);
   function popupTimer(txt) {  // то же табло в отдельном окне слайдов (показ экрана)
     if (!popup || popup.closed) return;
+    if (popupFrame) {  // окно «вебинар» – своё табло поверх слайда
+      try {
+        var tb = popup.document.getElementById('stimer');
+        tb.hidden = !txt;
+        if (txt) tb.querySelector('b').textContent = txt;
+      } catch (e) {}
+      return;
+    }
     try {
       var d = popup.document, el = d.getElementById('vp-ext-timer');
       if (!el) {
@@ -192,6 +291,13 @@
     var now = Date.now(); if (now - lastSave > 5000) { lastSave = now; save(); }
   });
   audio.addEventListener('pause', save);
+  ['play', 'playing', 'pause', 'seeking', 'seeked', 'waiting', 'ratechange'].forEach(function (ev) {
+    audio.addEventListener(ev, function () { headSync(ev === 'seeked' || ev === 'playing'); });
+  });
+  // при уходе со страницы окно «вебинар» закрывается: новая страница им уже не управляет
+  window.addEventListener('pagehide', function () {
+    if (popup && !popup.closed && popupFrame) { try { popup.close(); } catch (e) {} }
+  });
   window.addEventListener('pagehide', save);
   document.addEventListener('visibilitychange', function () { if (document.visibilityState === 'hidden') save(); });
   audio.addEventListener('ended', function () {
