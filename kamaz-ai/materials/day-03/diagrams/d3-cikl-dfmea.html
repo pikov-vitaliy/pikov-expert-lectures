@@ -5084,6 +5084,37 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
   </style>
 </head>
 <body>
+<nav class="kai-back" data-kai-back aria-label="Навигация сайта курса"><a href="../../../day-03.html#diagrams" id="kai-back-link">← Назад к странице курса</a></nav>
+<style>
+.kai-back { position: relative; z-index: 5; padding: 10px 16px 0; }
+.kai-back a { display: inline-block; padding: 6px 14px; border: 1px solid rgba(15, 23, 42, 0.16); border-radius: 999px; background: rgba(255, 255, 255, 0.92); color: #0b5f7a; font: 600 14px/1.35 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; text-decoration: none; }
+.kai-back a:hover { text-decoration: underline; }
+.kai-back a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+html[data-theme="dark"] .kai-back a { border-color: rgba(255, 255, 255, 0.18); background: rgba(7, 17, 31, 0.92); color: #65e5ff; }
+[data-embed="true"] .kai-back { display: none; }
+</style>
+<script>
+(function () {
+  var a = document.getElementById('kai-back-link');
+  if (!a) return;
+  var framed = false;
+  try { framed = window.self !== window.top; } catch (_) { framed = true; }
+  if (framed || /[?&]embed=1(&|$)/.test(location.search)) { a.parentNode.parentNode.removeChild(a.parentNode); return; }
+  a.addEventListener('click', function (e) {
+    try {
+      var r = document.referrer ? new URL(document.referrer) : null;
+      if (!r || r.origin !== location.origin) return;
+      // назад в истории вкладки; если предыдущей записи нет – через 0,5 с обычный переход по ссылке
+      e.preventDefault();
+      var left = false;
+      window.addEventListener('pagehide', function () { left = true; }, { once: true });
+      history.back();
+      setTimeout(function () { if (!left) location.href = a.href; }, 500);
+    } catch (_) {}
+  });
+})();
+</script>
+
   <!-- Toolbar: theme, live visual style, trace motion, presentation stage, and export.
        Motion appears only for trace-enabled artifacts and has no shortcut;
        Keyboard: T toggles theme, S cycles style, F toggles the stage, E opens export. -->
