@@ -2,7 +2,11 @@
  var s=[].slice.call(document.querySelectorAll('.slide')),i=0,c=document.getElementById('cnt'),st=document.querySelector('.stage');
  function fitS(){var k=Math.min(st.clientWidth/1280,st.clientHeight/720)*0.97;s.forEach(function(e){e.style.transform='translate(-50%,-50%) scale('+k+')'})}
  window.addEventListener('resize',fitS);fitS();
- function go(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach(function(e,k){e.classList.toggle('on',k===i)});c.textContent=(i+1)+' / '+s.length;try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
+ try{document.fonts.ready.then(function(){fitT(s[i])})}catch(e){}
+ // без Calibri (телефон, Mac) текст шире: уменьшить содержимое слайда, пока оно не поместится
+ function over(e,b){return b.scrollHeight>b.clientHeight+1||e.scrollHeight>e.clientHeight+1}
+ function fitT(e){var b=e.querySelector('.body');if(!b||!e.offsetHeight)return;var ch=[].slice.call(b.children),z=1;ch.forEach(function(x){x.style.zoom=''});while(over(e,b)&&z>0.6){z-=0.04;ch.forEach(function(x){x.style.zoom=z})}}
+ function go(n){i=Math.max(0,Math.min(s.length-1,n));s.forEach(function(e,k){e.classList.toggle('on',k===i)});fitT(s[i]);c.textContent=(i+1)+' / '+s.length;try{history.replaceState(null,'','#'+(i+1))}catch(e){}}
  function fromHash(){var h=parseInt((location.hash||'#1').slice(1),10);go(isNaN(h)?0:h-1)}fromHash();window.addEventListener('hashchange',fromHash);
  (function(){var bk=document.getElementById('back');if(!bk)return;try{if(window.self!==window.top||window.opener)return;
   var m=location.pathname.match(/\/materials\/day-0(\d)\/slides\/[^\/]*$/);
