@@ -1,0 +1,493 @@
+<!-- Лекция 1.1, строки 660–816 (33:55–42:31): как работает агент, почему с агентами осторожнее, правило с первого занятия, повторение, переход к практике 1.1 -->
+
+<section class="slide" data-at="660" data-steps="660,662,663,665,667,669">
+  <p class="kick">Схема: модель выбирает следующий шаг</p>
+  <h2>Так работает агент</h2>
+  <div class="body">
+    <svg class="agl6" viewBox="0 0 1135 458" style="width:100%;height:auto;display:block;font-family:inherit" role="img" aria-label="Схема работы агента: задача, решение модели, вызов инструмента, результат в контекст, подтверждение, ответ или действие">
+      <style>
+        .agl6 .lane{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+        .agl6 .ll{font-size:20px;font-weight:700;fill:var(--muted);letter-spacing:.04em}
+        .agl6 .bx{fill:var(--ct);stroke:var(--c);stroke-width:2.5}
+        .agl6 .t1{font-size:24px;font-weight:700;fill:var(--ci);text-anchor:middle}
+        .agl6 .t2{font-size:19px;fill:var(--ink);text-anchor:middle}
+        .agl6 .ln{fill:none;stroke:var(--c);stroke-width:3.5}
+        .agl6 .ln.d{stroke-dasharray:9 7}
+        .agl6 .ah{fill:var(--c)}
+        .agl6 .lb{font-size:19px;font-weight:700;fill:var(--c)}
+        .agl6 .st.on .bx{stroke-width:6}
+        .agl6 .st.on .ln{stroke-width:5.5}
+      </style>
+      <rect class="lane" x="1" y="1" width="1133" height="106" rx="14"/>
+      <rect class="lane" x="1" y="117" width="1133" height="106" rx="14"/>
+      <rect class="lane" x="1" y="233" width="1133" height="106" rx="14"/>
+      <rect class="lane" x="1" y="349" width="1133" height="106" rx="14"/>
+      <text class="ll" x="20" y="61">Человек</text>
+      <text class="ll" x="20" y="177">Модель</text>
+      <text class="ll" x="20" y="281">Программа</text>
+      <text class="ll" x="20" y="305">агента</text>
+      <text class="ll" x="20" y="409">Инструменты</text>
+
+      <g class="st t-gray" data-s="1">
+        <rect class="bx" x="180" y="18" width="200" height="72" rx="12"/>
+        <text class="t1" x="280" y="49">Задача</text>
+        <text class="t2" x="280" y="74">цель задаёт человек</text>
+      </g>
+
+      <g class="st" data-s="2">
+        <g class="t-gray"><path class="ln" d="M280,90 V125"/><polygon class="ah" points="271,123 289,123 280,134"/></g>
+        <rect class="bx" x="180" y="134" width="240" height="72" rx="12"/>
+        <text class="t1" x="300" y="165">Решение модели</text>
+        <text class="t2" x="300" y="190">нужен ли инструмент</text>
+      </g>
+
+      <g class="st" data-s="3">
+        <path class="ln" d="M300,206 V286 H470"/><polygon class="ah" points="468,277 468,295 480,286"/>
+        <text class="lb" x="314" y="266">нужен инструмент</text>
+        <g class="t-orange">
+          <rect class="bx" x="480" y="250" width="220" height="72" rx="12"/>
+          <text class="t1" x="590" y="281">Вызов</text>
+          <text class="t2" x="590" y="306">имя и параметры</text>
+        </g>
+        <g class="t-gray">
+          <path class="ln" d="M590,322 V357"/><polygon class="ah" points="581,355 599,355 590,366"/>
+          <rect class="bx" x="480" y="366" width="220" height="72" rx="12"/>
+          <text class="t1" x="590" y="397">Инструмент</text>
+          <text class="t2" x="590" y="422">поиск по ТЗ, расчёт</text>
+        </g>
+      </g>
+
+      <g class="st" data-s="4">
+        <g class="t-gray">
+          <path class="ln" d="M700,402 H875 V332"/><polygon class="ah" points="866,334 884,334 875,322"/>
+          <text class="lb" x="716" y="392">результат</text>
+        </g>
+        <g class="t-orange">
+          <rect class="bx" x="745" y="250" width="260" height="72" rx="12"/>
+          <text class="t1" x="875" y="281" style="font-size:22px">Результат в контекст</text>
+          <text class="t2" x="875" y="306">следующий запрос</text>
+        </g>
+        <path class="ln d" d="M875,250 V170 H430"/><polygon class="ah" points="432,161 432,179 420,170"/>
+        <text class="lb" x="650" y="160" text-anchor="middle">следующий шаг</text>
+      </g>
+
+      <g class="st" data-s="5">
+        <path class="ln d" d="M400,134 V54 H575"/><polygon class="ah" points="573,45 573,63 585,54"/>
+        <text class="lb" x="488" y="44" text-anchor="middle">готово</text>
+        <path class="ln" d="M865,54 H890"/><polygon class="ah" points="888,45 888,63 900,54"/>
+        <rect class="bx" x="900" y="18" width="225" height="72" rx="12"/>
+        <text class="t1" x="1012.5" y="62" style="font-size:22px">Ответ или действие</text>
+      </g>
+
+      <g class="st t-red" data-s="6">
+        <rect class="bx" x="585" y="18" width="280" height="72" rx="12"/>
+        <text class="t1" x="725" y="49">Подтверждение</text>
+        <text class="t2" x="725" y="74">для действий с последствиями</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-at="671" data-steps="671,674,675">
+  <p class="kick">По сути</p>
+  <h2>Цикл «подумал – сделал – посмотрел»</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict st" data-s="1"><svg class="i"><use href="#i-brain"/></svg><b>Подумал</b></div>
+      <div class="pict st t-orange" data-s="1"><svg class="i"><use href="#i-wrench"/></svg><b>Сделал</b></div>
+      <div class="pict st" data-s="1"><svg class="i"><use href="#i-eye"/></svg><b>Посмотрел</b></div>
+    </div>
+    <div class="vs sm">
+      <div class="col t-teal st" data-s="2"><h3>Рассуждение</h3><p>Помогает составить и уточнить план</p></div>
+      <div class="col t-orange st" data-s="3"><h3>Действие</h3><p>Обращение к внешнему источнику, например к базе знаний, за недостающими сведениями</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Yao S. et al. ReAct: Synergizing Reasoning and Acting in Language Models, 2022 · doi.org/10.48550/arXiv.2210.03629</p>
+</section>
+
+<section class="slide" data-at="677" data-title="Сколько раз вызывалась модель">
+  <p class="kick t-orange">Простой вопрос</p>
+  <div class="body">
+    <div class="ask t-orange">
+      <span class="q">?</span>
+      <ul>
+        <li style="font-size:58px;line-height:1.14">Сколько раз вызывалась модель, чтобы ответить пользователю?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="679" data-steps="680,681,682,683">
+  <p class="kick">Модель решила вызвать инструмент</p>
+  <h2>Одного обращения к модели мало</h2>
+  <div class="body">
+    <ol class="flow">
+      <li class="step st"><h3>Указание вместо текста</h3><p>Сначала модель возвращает указание вызвать инструмент</p></li>
+      <li class="step st t-orange"><h3>Результат инструмента</h3><p>Затем модель получает результат его работы</p></li>
+      <li class="step st"><h3>Ответ</h3><p>Только после этого модель отвечает</p></li>
+    </ol>
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-zap"/></svg><div><p>Инструмент не нужен – модель может ответить сразу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="684">
+  <p class="kick">Пример</p>
+  <h2>Корпоративный помощник и его инструменты</h2>
+  <div class="body">
+    <div class="tree" style="--n:2">
+      <div class="root" style="font-size:42px;padding:20px 44px"><svg class="i"><use href="#i-bot"/></svg> Корпоративный помощник</div>
+      <div class="kids" style="padding:0 60px;gap:40px">
+        <div class="kid" style="padding:28px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:36px">Поиск по внутренней базе документов</h3></div>
+        <div class="kid t-orange" style="padding:28px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-square-kanban"/></svg></span><h3 style="font-size:36px">Поиск задач в системе учёта</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="687" data-steps="687,689,691">
+  <p class="kick">Пример</p>
+  <h2>Один помощник, разные вопросы</h2>
+  <div class="body" style="gap:20px">
+    <div class="split top" style="gap:30px">
+      <div class="chat st" style="gap:12px">
+        <div class="msg user" style="max-width:94%"><span class="who">Вопрос</span><p>Как у нас положено хранить пароли от служебных систем?</p></div>
+        <div class="msg bot" style="max-width:94%"><span class="who">Помощник</span><p>Сначала ищет по базе, находит <mark>стандарт</mark> и отвечает по нему</p></div>
+      </div>
+      <div class="chat st" style="gap:12px">
+        <div class="msg user" style="max-width:94%"><span class="who">Вопрос</span><p>Как лучше провести планёрку?</p></div>
+        <div class="msg bot" style="max-width:94%"><span class="who">Помощник</span><p>Отвечает сразу, без инструментов: внутренние данные тут не нужны</p></div>
+      </div>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Если выключить поиск по базе, ответ про пароли будет взят из общих знаний модели, а не из вашего стандарта</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="694" data-steps="694,697">
+  <p class="kick t-red">Осторожнее с агентами · 1 из 4</p>
+  <h2>Ошибка становится действием</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-message-square-text"/></svg>Ошибся чат</h3><p>Это видит человек</p></div>
+      <div class="col t-red st"><h3><svg class="i"><use href="#i-bot"/></svg>Ошибся агент</h3><p>Он может успеть:</p><ul><li>отправить письмо</li><li>изменить запись</li><li>запустить расчёт с неверными данными</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="699" data-title="Ровно столько прав, сколько требует задача">
+  <p class="kick t-orange">Осторожнее с агентами · 2 из 4</p>
+  <div class="body">
+    <p class="say">Агенту – ровно столько <em>прав</em>, сколько требует задача</p>
+    <p class="sub">Инструкции модели такие ограничения не заменяют</p>
+  </div>
+</section>
+
+<section class="slide" data-at="701" data-steps="701,703">
+  <p class="kick t-red">Осторожнее с агентами · 3 из 4</p>
+  <h2>Чужой текст может управлять агентом</h2>
+  <div class="body">
+    <div class="picts c3 sm">
+      <div class="pict st" data-s="1"><svg class="i"><use href="#i-file-text"/></svg><b>Документы</b></div>
+      <div class="pict st" data-s="1"><svg class="i"><use href="#i-mail"/></svg><b>Письма</b></div>
+      <div class="pict st" data-s="1"><svg class="i"><use href="#i-globe"/></svg><b>Веб-страницы</b></div>
+    </div>
+    <div class="rule t-red st" data-s="2"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Если в них спрятана команда, модель может принять её за задание</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="704" data-title="NIST: враждебные данные в контексте агента">
+  <p class="kick t-red">Отчёт о состязательном машинном обучении, 2025</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Враждебные данные, попавшие в контекст из ненадёжных источников, могут <b>заставить агента выполнять действия злоумышленника</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-landmark"/></svg></i><span><b>NIST</b>Национальный институт стандартов и технологий США</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>NIST AI 100-2e2025. Adversarial Machine Learning: A Taxonomy and Terminology of Attacks and Mitigations, 2025 · doi.org/10.6028/NIST.AI.100-2e2025</p>
+</section>
+
+<section class="slide" data-at="707" data-steps="708,710" data-title="Инструкция белым шрифтом на белом фоне">
+  <p class="kick">ИИ-митап ЦГУ, 06.11.2026</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:11fr 9fr">
+      <div>
+        <figure class="quote sm t-red">
+          <blockquote>В документ <b>белым шрифтом на белом фоне</b> вписывают инструкцию для модели. Вы&nbsp;своими глазами её не видите. А&nbsp;модель видит и начинает выполнять</blockquote>
+          <figcaption><i class="ava">АМ</i><span><b>Алексей Морозов</b>доклад «Безопасность в AI и AI в безопасности»</span></figcaption>
+        </figure>
+      </div>
+      <div>
+        <div class="docs" style="flex-wrap:nowrap;gap:24px">
+          <div class="doc st" style="width:225px"><h4>Что видите вы</h4><i></i><i></i><i style="background:none"></i><i></i><i class="s"></i><b class="stamp t-gray">человек</b></div>
+          <div class="doc st" style="width:225px"><h4>Что видит модель</h4><i></i><i></i><i class="r"></i><i></i><i class="s"></i><b class="stamp t-red">модель</b></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-calendar-check"/></svg>Об этом подробно поговорим во второй день</p>
+</section>
+
+<section class="slide" data-at="713" data-steps="714,716">
+  <p class="kick t-orange">Осторожнее с агентами · 4 из 4</p>
+  <h2>Действия с последствиями подтверждает человек</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic"><use href="#i-user-check"/></svg></div>
+      <div>
+        <ul class="list">
+          <li class="st">Где ставить подтверждение, решается для каждой задачи отдельно<small>Лишние подтверждения тоже стоят времени</small></li>
+          <li class="st t-orange"><b>Подтверждение работает, только если его читают</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="717" data-steps="720" data-title="Морозов: сам жмёт «разрешить»">
+  <p class="kick">На том же митапе</p>
+  <div class="body">
+    <figure class="quote md t-orange">
+      <blockquote>Признался, что сам постоянно жмёт «разрешить», а когда надоедает, говорит: <b>разрешить всё</b></blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>Алексей Морозов</b>ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+    <div class="tags" style="padding-left:55px;gap:14px">
+      <span class="tag t-gray" style="font-size:26px;padding:8px 22px">Разрешить</span>
+      <span class="tag t-gray" style="font-size:26px;padding:8px 22px">Разрешить</span>
+      <span class="tag t-gray" style="font-size:26px;padding:8px 22px">Разрешить</span>
+      <span class="tag t-red" style="font-size:26px;padding:8px 22px">Разрешить всё</span>
+    </div>
+    <p class="note st" style="padding-left:55px">Хотя только что рассказывал, что так делать нельзя</p>
+  </div>
+</section>
+
+<section class="slide dark" data-at="721" data-title="Рука сама нажимает «да»">
+  <p class="kick t-red">Знакомо каждому, кто долго работал с агентом</p>
+  <div class="body">
+    <p class="say">Подтверждений много, они однообразные, и рука сама нажимает <em>«да»</em></p>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="724" data-steps="724,727,729">
+  <p class="kick">По себе знаю</p>
+  <h2>Несколько дней подряд следишь за работой агентов</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st" style="padding:30px 20px 34px 24px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-eye"/></svg></span><h3>Кажется, что ничего не&nbsp;делаешь</h3></li>
+      <li class="step st t-orange" style="padding:30px 20px 34px 24px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-battery-low"/></svg></span><h3>К&nbsp;вечеру выжат в&nbsp;ноль</h3><p style="font-size:27px">Сидишь, как охранник на&nbsp;смене</p></li>
+      <li class="step st t-red" style="padding:30px 20px 34px 24px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-eye-off"/></svg></span><h3>Внимание к&nbsp;подтверждениям падает</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="730" data-steps="731,733,734" data-title="Агент действует автономно">
+  <p class="kick">Из курса лектора по агентам</p>
+  <div class="body">
+    <div class="term st"><dfn>«Автономно»</dfn><p>На этом слове держится определение агента: между целью и действием нет обязательного человека</p></div>
+    <div class="rule t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Автономность – это не удобство, а источник риска</p></div></div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-shield-check"/></svg><div><p>Система, которая сама выбирает следующие действия, требует явно очерченных полномочий</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="736" data-title="Цымлов: исполнитель с инициативой">
+  <p class="kick">Вебинар о проверке кода, который пишут агенты</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Автономный агент – это исполнитель с инициативой. А исполнитель с инициативой и полными правами – это <b>стажёр, которому вы дали полный доступ в пятницу вечером</b></blockquote>
+      <figcaption><i class="ava">АЦ</i><span><b>Алексей Цымлов</b>цикл «Качество и безопасность ПО в эпоху GenAI», 28.08.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="740" data-steps="740,743">
+  <p class="kick t-orange">Алексей Цымлов</p>
+  <h2>Отсюда его принципы</h2>
+  <div class="body">
+    <div class="rule t-orange st"><svg class="i"><use href="#i-stethoscope"/></svg><div><h3>Права – как у молодого хирурга</h3><p>Смотреть можно, резать только под присмотром</p></div></div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-key-round"/></svg><div><h3>Секреты – вне досягаемости</h3><p>Агент не может слить то, чего не видел</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="745" data-title="Служеникин: бетонные разделительные блоки">
+  <p class="kick">ИТ-форум «Цифровые решения», октябрь 2026</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Поскольку мы так доверяем людям, на дорогах у нас стоят бетонные разделительные блоки. <b>Информационная безопасность – это и есть те самые блоки</b></blockquote>
+      <figcaption><i class="ava">ДС</i><span><b>Дмитрий Служеникин</b>ответственный секретарь консорциума безопасности технологий искусственного интеллекта</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="749" data-steps="750,752,755,757">
+  <p class="kick">Артём Субботин · ИИ-митап ЦГУ, 06.11.2026</p>
+  <h2>Четыре правила перед запуском агента</h2>
+  <div class="body">
+    <div class="cards" style="gap:22px">
+      <div class="card row st" style="padding:22px 26px"><span class="bdg">1</span><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3 style="font-size:29px">Сначала описать работу, потом звать агента</h3><p style="font-size:24px">Кривой процесс он не исправит, а&nbsp;просто сделает быстрее</p></div></div>
+      <div class="card row st t-red" style="padding:22px 26px"><span class="bdg">2</span><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3 style="font-size:29px">Закрыть отправку наружу в&nbsp;настройках</h3><p style="font-size:24px">Агент может сам решить кому-то написать. Просьба в тексте не спасёт, спасёт запрет</p></div></div>
+      <div class="card row st" style="padding:22px 26px"><span class="bdg">3</span><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3 style="font-size:29px">Требовать ежедневный отчёт</h3><p style="font-size:24px">Если агент молча встал, вы узнаете об этом на следующий день, а&nbsp;не&nbsp;через&nbsp;месяц</p></div></div>
+      <div class="card row st t-orange" style="padding:22px 26px"><span class="bdg">4</span><div style="display:flex;flex-direction:column;gap:6px;min-width:0"><h3 style="font-size:29px">Назначить ответственного сотрудника</h3><p style="font-size:24px">У каждого агента есть человек, который отвечает за его работу</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="759" data-steps="759,762,764,765,767">
+  <p class="kick t-orange">Упражнение для желающих</p>
+  <h2>Опишите агента на одной странице</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="st t-orange" data-s="1" style="background:var(--ct);border-radius:20px;padding:30px 32px;align-items:flex-start">
+        <svg class="i" style="font-size:80px;color:var(--c)"><use href="#i-bot"/></svg>
+        <p style="font-size:31px;line-height:1.2;font-weight:600;color:var(--ci)">Агент помогает разбирать замечания по испытаниям, как в учебном кейсе ЭС-24</p>
+      </div>
+      <div>
+        <ul class="list sm" style="font-size:31px;gap:18px">
+          <li class="st" data-s="2">Какие данные он получает</li>
+          <li class="st" data-s="2">Какие инструменты ему нужны</li>
+          <li class="st" data-s="3">Что делает сам, а что предлагает на подтверждение</li>
+          <li class="st" data-s="4">Как проверяется его результат</li>
+          <li class="st t-red" data-s="4">Каких прав у него быть не должно</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="src st" data-s="5"><svg class="i"><use href="#i-book-open-text"/></svg>Это задел для пятого модуля. Подробнее – в дополнительном материале «От чата к агенту»</p>
+</section>
+
+<section class="slide dark" data-at="771" data-steps="771,773" data-title="Правило с первого занятия">
+  <p class="kick t-orange">Правило с первого занятия</p>
+  <div class="body">
+    <p class="say st" data-s="1">В сервисы ИИ – только <b>учебные и открытые</b> материалы</p>
+    <div class="picts c4 sm t-red">
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-file-x"/></svg><b>Рабочие документы</b></div>
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-mail-x"/></svg><b>Переписка</b></div>
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-user-x"/></svg><b>Фамилии</b></div>
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-tag"/></svg><b>Обозначения изделий</b></div>
+    </div>
+    <p class="note st" data-s="2">Не вставляем, даже если очень хочется проверить на настоящей задаче</p>
+  </div>
+</section>
+
+<section class="slide" data-at="776" data-title="Морозов: облачные модели – как интернет">
+  <p class="kick">ИИ-митап ЦГУ, 06.11.2026</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>К внешним облачным моделям нужно относиться так же, как к интернету. <b>Всё, что попало в интернет, навеки там остаётся</b></blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>Алексей Морозов</b>доклад «Безопасность в AI и AI в безопасности»</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="779">
+  <p class="kick">День 2 · тема 2.1</p>
+  <h2>Разберём во второй день</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange" style="padding:40px 36px"><span class="bdg lg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3 style="font-size:40px">Почему это правило такое строгое</h3></div>
+      <div class="card row" style="padding:40px 36px"><span class="bdg lg"><svg class="i"><use href="#i-files"/></svg></span><h3 style="font-size:40px">Как работать с данными разного уровня</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="782" data-steps="782,785,787,789">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Что запомнить</h2>
+  <div class="body">
+    <ul class="list check">
+      <li class="st">Модель составляет <b>правдоподобный текст</b>, а не достаёт проверенный ответ из базы</li>
+      <li class="st">Ссылки, номера документов, числа и расчёты в ответе <b>проверяем всегда</b></li>
+      <li class="st">Один и тот же вопрос может дать разные ответы<small>Это повод проверить, а не выбрать понравившийся</small></li>
+      <li class="st">Доступ на работе – только законным путём<small>Через подразделение, которое его выдаёт</small></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="791" data-steps="791,792" data-title="От чата к агенту: кто выбирает следующий шаг">
+  <p class="kick">Что запомнить · от чата к агенту</p>
+  <div class="body">
+    <div class="ladder">
+      <div class="rung t-gray" style="min-height:150px"><span class="n">Ступень 1</span><h3>Чат</h3><p>Отвечает на ваш текст</p></div>
+      <div class="rung t-gray" style="min-height:215px"><span class="n">Ступень 2</span><h3>Чат с файлами и поиском</h3><p>Читает документы и страницы</p></div>
+      <div class="rung t-gray" style="min-height:280px"><span class="n">Ступень 3</span><h3>Помощник по документам</h3><p>Ищет в базе документов организации</p></div>
+      <div class="rung t-orange st" data-s="1" style="min-height:345px"><span class="n">Ступень 4</span><h3>Агент</h3><p>Сам вызывает инструменты и действует. <b>Следующий шаг выбирает сам</b></p></div>
+    </div>
+    <div class="rule sm t-orange st" data-s="2"><svg class="i"><use href="#i-user-check"/></svg><div><p>Поэтому агенту – ровно столько прав, сколько нужно, и подтверждение человеком там, где у действия есть последствия</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="794" data-steps="794">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Что запомнить</h2>
+  <div class="body">
+    <div class="cards c3 sm">
+      <div class="card"><span class="n">1</span><h3>Модель составляет правдоподобный текст, а&nbsp;не&nbsp;достаёт проверенный ответ из&nbsp;базы</h3></div>
+      <div class="card"><span class="n">2</span><h3>Ссылки, номера документов, числа и расчёты проверяем всегда</h3></div>
+      <div class="card"><span class="n">3</span><h3>Разные ответы на один вопрос – повод проверить, а не выбрать понравившийся</h3></div>
+      <div class="card"><span class="n">4</span><h3>Доступ на работе – только законным путём</h3></div>
+      <div class="card"><span class="n">5</span><h3>Агенту – ровно столько прав, сколько нужно, и подтверждение человеком</h3></div>
+      <div class="card t-orange st"><span class="n">6</span><h3>В сервисы – только учебные и открытые материалы</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect t-orange" data-at="798">
+  <p class="kick">Практика 1.1</p>
+  <span class="no">1.1</span>
+  <h1>Пробуем сервисы на учебном узле ЭС-24</h1>
+  <p class="lead">Заданий три: интерфейс, одна задача в разных сервисах, карточка инженерной задачи</p>
+</section>
+
+<section class="slide" data-at="800" data-steps="801,803">
+  <p class="kick t-orange">Задание 1 из 3 · 30 минут</p>
+  <h2>Осмотреть интерфейс</h2>
+  <div class="body">
+    <div class="picts c4 t-orange">
+      <div class="pict st" data-s="1"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-message-square-plus"/></svg><span style="font-size:30px">Новый чат, история и удаление диалога</span></div>
+      <div class="pict st" data-s="1"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-paperclip"/></svg><span style="font-size:30px">Загрузка файла и картинки</span></div>
+      <div class="pict st" data-s="2"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-search"/></svg><span style="font-size:30px">Режим рассуждения и поиск</span></div>
+      <div class="pict st" data-s="2"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-settings"/></svg><span style="font-size:30px">Настройки данных и лимиты</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="805" data-steps="806,807,808">
+  <p class="kick t-orange">Задание 2 из 3 · 60 минут</p>
+  <h2>Одна задача в разных сервисах</h2>
+  <div class="body">
+    <ol class="flow t-orange">
+      <li class="step st"><h3>Отправить одно и то же замечание</h3><p>В два-три сервиса, каждый раз в новом чате</p></li>
+      <li class="step st"><h3>Сравнить ответы</h3><p>По таблице критериев</p></li>
+      <li class="step st"><h3>Поискать ошибки</h3><p>В готовом ответе из кейса</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="809" data-steps="810,811,812">
+  <p class="kick t-orange">Задание 3 из 3 · 30 минут</p>
+  <h2>Карточка инженерной задачи</h2>
+  <div class="body">
+    <div class="split s64">
+      <div>
+        <div class="prompt st t-orange" data-s="1" style="--tw:230px">
+          <p class="part"><span class="tg">Исходные данные</span><span>Что известно: факты, цифры, документы</span></p>
+          <p class="part"><span class="tg">Ожидаемый результат</span><span>Что нужно получить и&nbsp;в&nbsp;каком виде</span></p>
+          <p class="part"><span class="tg">Критерии приёмки</span><span>По каким признакам примете результат</span></p>
+          <p class="part"><span class="tg">Ограничения</span><span>Что задано и чего не делать</span></p>
+        </div>
+      </div>
+      <div>
+        <div class="card st" data-s="2"><span class="n">Карточка 1</span><h3>По учебному замечанию</h3></div>
+        <div class="card t-orange st" data-s="3"><span class="n">Карточка 2</span><h3>По своей задаче</h3><p>Без служебных сведений</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="813" data-steps="813,816" data-title="К практике">
+  <p class="kick t-orange">Практика 1.1</p>
+  <div class="body">
+    <div class="segbar">
+      <i class="t-teal" style="flex:30">Задание 1 · 30 мин</i><i class="t-orange solid" style="flex:60">Задание 2 · 60 мин</i><i class="t-teal" style="flex:30">Задание 3 · 30 мин</i>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-message-circle"/></svg><div><h3>Что-то не открывается или не получается</h3><p>Пишите в чат сразу, не ждите конца задания. Будем&nbsp;разбираться&nbsp;вместе</p></div></div>
+    <p class="say md st">А теперь – <em>к практике</em></p>
+  </div>
+</section>

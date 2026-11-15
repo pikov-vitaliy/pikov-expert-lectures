@@ -1,0 +1,501 @@
+<!-- Лекция 1.1, строки 331–514 (17:01–26:26): доступ к сервисам, теневой ИИ, раздел «Где модели ошибаются», пять типичных ошибок -->
+
+<section class="slide" data-at="331" data-steps="331,334,336">
+  <p class="kick">Доступ</p>
+  <h2>Доступ к сервисам</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:210px 1fr;gap:40px">
+      <div class="center"><svg class="i big-ic"><use href="#i-key-round"/></svg></div>
+      <div>
+        <dl class="kv" style="--kw:175px">
+          <div class="st"><dt>Вход</dt><dd>Учётная запись сервиса: Сбер ID, Яндекс ID, почта или телефон</dd></div>
+          <div class="st"><dt>Бесплатно</dt><dd>GigaChat, Алиса AI и Qwen<br><span class="muted" style="font-size:.84em">Условия оплаты веб-чата DeepSeek<br>в его документах не описаны</span></dd></div>
+          <div class="st"><dt>Подписка</dt><dd>Обычно больше запросов, дополнительные функции, иногда более сильные модели</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="338" data-steps="338,339">
+  <p class="kick">Доступ</p>
+  <h2>Личный и корпоративный доступ</h2>
+  <div class="body">
+    <div class="st" style="display:flex;flex-direction:column;gap:20px">
+      <div class="vs">
+        <div class="col t-gray"><h3><svg class="i"><use href="#i-user-round"/></svg>Личная учётная запись</h3></div>
+        <div class="col t-teal"><h3><svg class="i"><use href="#i-building-2"/></svg>Корпоративный доступ</h3></div>
+      </div>
+      <p class="sub" style="text-align:center">Условия обработки данных у них разные</p>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-scale"/></svg><div><p>Что разрешено в рабочих задачах, определяют правила вашей организации, а не тариф</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="341" data-steps="341,343">
+  <p class="kick">Доступ</p>
+  <h2>У сервисов есть лимиты</h2>
+  <div class="body">
+    <div class="picts c3 st">
+      <div class="pict"><svg class="i"><use href="#i-text-cursor-input"/></svg><b>Длина сообщения</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-up"/></svg><b>Размер файла</b></div>
+      <div class="pict"><svg class="i"><use href="#i-repeat"/></svg><b>Число запросов</b></div>
+    </div>
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-hourglass"/></svg><div><p>Если лимит превысить, сервис предупредит или временно ограничит доступ</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="344" data-steps="345,346,347">
+  <p class="kick t-orange">Доступ на работе</p>
+  <h2>Как получить доступ на работе</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st t-gray"><span class="bdg"><svg class="i"><use href="#i-lock"/></svg></span><h3>Закрыт по умолчанию</h3><p>На предприятиях доступ к ИИ-сервисам часто закрыт</p></li>
+      <li class="step st t-orange"><span class="bdg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><h3>Заявка с обоснованием</h3><p>По ней доступ открывается</p></li>
+      <li class="step st t-orange"><span class="bdg"><svg class="i"><use href="#i-headset"/></svg></span><h3>Сервис не открывается с рабочего места</h3><p>Обращайтесь в подразделение, которое выдаёт доступ</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="349" data-steps="349,351">
+  <p class="kick t-red">Доступ на работе</p>
+  <h2>Обходные пути не годятся</h2>
+  <div class="body">
+    <div class="cards c3 st">
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-smartphone"/></svg></span><h3>Личный телефон</h3></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-mail"/></svg></span><h3>Пересылка файлов на домашнюю почту</h3></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-usb"/></svg></span><h3>Флешка</h3></div>
+    </div>
+    <div class="rule t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Именно так рабочие данные и утекают</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="352" data-steps="352,353" data-title="Теневой искусственный интеллект">
+  <p class="kick t-red">У этого явления есть название</p>
+  <div class="body">
+    <div class="term t-red st"><dfn>Теневой искусственный интеллект</dfn></div>
+    <figure class="quote md t-red st">
+      <blockquote>Это когда сотрудник вышел в интернет и пошёл спрашивать онлайн-доступные модели</blockquote>
+      <figcaption><i class="ava">ПГ</i><span><b>Пётр Ганелин</b>модератор сессии, ИТ-форум «Цифровые решения», октябрь 2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="357" data-steps="358,360">
+  <p class="kick">ИТ-форум «Цифровые решения», октябрь 2026</p>
+  <h2>Одним запретом здесь не обойтись</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red st">
+        <p style="font-size:34px;line-height:1.2;font-weight:600">Жёсткие запреты немедленно порождают <b class="c">теневые структуры</b></p>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:auto;padding-top:14px">
+          <i class="ava" style="width:66px;height:66px;font-size:26px">АК</i>
+          <p style="font-size:22px;color:var(--muted)"><b style="display:block;font-size:26px;color:var(--ink)">Анна Кулашова</b>вице-президент<br>«Лаборатории Касперского»</p>
+        </div>
+      </div>
+      <div class="card st">
+        <p style="font-size:34px;line-height:1.2;font-weight:600">С силой тяжести бесполезно сражаться, <b class="c">нужно быть умным садовником</b>. А если для вас это очень критично – не пользуйтесь вообще</p>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:auto;padding-top:14px">
+          <i class="ava" style="width:66px;height:66px;font-size:26px">АБ</i>
+          <p style="font-size:22px;color:var(--muted)"><b style="display:block;font-size:26px;color:var(--ink)">Андрей Белеванцев</b>Институт системного<br>программирования РАН</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="365" data-title="Ответит только рабочий процесс">
+  <p class="kick t-orange">ИТ-форум «Цифровые решения», октябрь 2026</p>
+  <div class="body">
+    <figure class="quote t-orange">
+      <blockquote><b>Только ваш рабочий процесс</b> на это ответит. Если вы работаете внутри атомной станции, наверное, нужно даже запрещать</blockquote>
+      <figcaption><i class="ava">ДС</i><span><b>Дмитрий Служеникин</b>ответственный секретарь консорциума безопасности технологий ИИ</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="370" data-steps="370,372" data-title="Правила использования решает организация">
+  <p class="kick t-orange">Вывод для нас</p>
+  <div class="body">
+    <p class="say st">Правила использования решает <b>организация</b></p>
+    <p class="sub st">Наша задача – знать их и, если инструмент нужен, просить его <em>законным путём</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="374" data-steps="374,376,377,378">
+  <p class="kick">Форум All-over-IP, ноябрь 2026</p>
+  <h2>Знакомые названия встречаются и в бизнесе</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:370px 1fr;align-items:stretch;gap:30px">
+      <div class="st" data-s="1" style="background:var(--surface);border-radius:18.8px;padding:24px 28px;justify-content:center;gap:12px">
+        <i class="ava">НГ</i>
+        <p style="font-size:32px;font-weight:700">Н. Галкин</p>
+        <p style="font-size:25px;line-height:1.2;color:var(--muted)">директор департамента ИТ «Кофемании»</p>
+      </div>
+      <div style="gap:20px">
+        <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-id-card"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>«Алиса»</h3><p>Сверка названий должностей в кадровых системах</p></div></div>
+        <div class="card row st" data-s="3"><span class="bdg"><svg class="i"><use href="#i-smartphone"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>GigaChat</h3><p>В мобильном приложении</p></div></div>
+      </div>
+    </div>
+    <div class="rule sm t-orange st" data-s="4"><svg class="i"><use href="#i-info"/></svg><div><p>Но модель, сервис и способ доступа – это разные вещи</p></div></div>
+  </div>
+</section>
+
+<section class="slide sect dark t-orange" data-at="381">
+  <span class="no"><svg class="i"><use href="#i-triangle-alert"/></svg></span>
+  <p class="kick">Ограничения</p>
+  <h1>Где модели ошибаются</h1>
+  <p class="lead">Пять типичных ошибок и что с ними делать</p>
+</section>
+
+<section class="slide" data-at="384" data-steps="384,387">
+  <p class="kick t-red">Где модели ошибаются</p>
+  <h2>Для каждой ошибки посмотрим три вещи</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-eye"/></svg></span><h3>Как она выглядит в ответе</h3></div>
+      <div class="card st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3>Почему она возникает</h3></div>
+      <div class="card t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Что делает инженер, чтобы её поймать</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="388" data-steps="388,390" data-title="Свойства самого инструмента">
+  <p class="kick t-red">Где модели ошибаются</p>
+  <div class="body">
+    <p class="sub st">Цифры из исследований будут на слайдах. Запоминать их не нужно</p>
+    <p class="say st">Это не редкие сбои, а <b>свойства самого инструмента</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="394" data-steps="396,397,400">
+  <p class="kick t-red">Ошибка 1 из 5</p>
+  <h2>Выдуманные факты, ссылки и числа</h2>
+  <div class="body">
+    <div class="term t-red">
+      <dfn class="st">Галлюцинация</dfn>
+      <p class="st">Текст модели, гладкий и грамматически правильный,<br>но <b>фактически неверный</b> или <b>не подтверждённый<br>внешними данными</b></p>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Гладкость здесь и подводит:<br>неверный ответ звучит так же уверенно, как верный</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Alansari A., Luqman H. Препринт arXiv, 2025 · doi.org/10.48550/arXiv.2510.06265</p>
+</section>
+
+<section class="slide" data-at="402" data-steps="402,405,406,407">
+  <p class="kick t-red">Особенно хорошо это видно на ссылках</p>
+  <h2>Доля выдуманных ссылок зависела от модели</h2>
+  <div class="body">
+    <p class="sub st">Модели подбирали литературу для систематических обзоров</p>
+    <div class="st t-red" style="display:grid;grid-template-columns:250px 1fr 200px;gap:24px;align-items:center">
+      <p style="font-size:29px;line-height:1.12;text-align:right">Самая низкая</p>
+      <div style="height:58px;border-radius:12px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:28.6%;border-radius:12px;background:var(--c)"></div></div>
+      <p style="font-size:50px;line-height:1;font-weight:700;color:var(--c);white-space:nowrap">28,6 %</p>
+    </div>
+    <div class="st t-red" style="display:grid;grid-template-columns:250px 1fr 200px;gap:24px;align-items:center">
+      <p style="font-size:29px;line-height:1.12;text-align:right">Самая высокая</p>
+      <div style="height:58px;border-radius:12px;background:var(--surface2);overflow:hidden"><div style="height:100%;width:91.4%;border-radius:12px;background:var(--c)"></div></div>
+      <p style="font-size:50px;line-height:1;font-weight:700;color:var(--c);white-space:nowrap">91,4 %</p>
+    </div>
+    <p class="note st">Это модели 2023 года и одна узкая задача</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Chelli M. et al. Journal of Medical Internet Research, 2024 · doi.org/10.2196/53164</p>
+</section>
+
+<section class="slide" data-at="408">
+  <p class="kick t-red">Проверка 2026 года</p>
+  <h2>И у современных моделей – выдуманные ссылки</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch">
+      <div class="stats"><div class="stat t-red" style="justify-content:center"><b>23–48 %</b><span>выдуманных ссылок</span></div></div>
+      <div style="justify-content:center">
+        <dl class="kv" style="--kw:140px">
+          <div><dt>Год</dt><dd>2026</dd></div>
+          <div><dt>Задача</dt><dd>Вопросы по анатомии</dd></div>
+          <div><dt>Модели</dt><dd>Три современные,<br>в том числе DeepSeek</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ülkir M., Paslı B. Clinical Anatomy, 2026 · doi.org/10.1002/ca.70187</p>
+</section>
+
+<section class="slide" data-at="411" data-steps="411,413">
+  <p class="kick t-orange">Что делать со ссылками</p>
+  <h2>Что пишут авторы этих работ</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-orange st">
+        <h3><svg class="i"><use href="#i-search-check"/></svg>Первая работа</h3>
+        <p>Любые ссылки, которые порождают такие модели, требуют <b>тщательной проверки</b></p>
+        <p style="font-size:20px;line-height:1.25;color:var(--muted);margin-top:auto">Chelli M. et al. Journal of Medical Internet Research, 2024 · doi.org/10.2196/53164</p>
+      </div>
+      <div class="col t-orange st">
+        <h3><svg class="i"><use href="#i-user-check"/></svg>Вторая работа</h3>
+        <p><b>Проверка человеком остаётся обязательной</b>,<br>прежде чем включать такие ссылки<br>в научные или учебные материалы</p>
+        <p style="font-size:20px;line-height:1.25;color:var(--muted);margin-top:auto">Ülkir M., Paslı B. Clinical Anatomy, 2026 · doi.org/10.1002/ca.70187</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="416" data-steps="416,420" data-title="И всё равно открываю каждую ссылку">
+  <p class="kick t-orange">Из практики лектора</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:250px 1fr">
+      <div class="center"><svg class="i big-ic" style="color:var(--orange)"><use href="#i-library-big"/></svg></div>
+      <div>
+        <p class="sub st" style="color:var(--ink)">Когда готовлю исследования, подключаю поиск по базам научных статей: каждая ссылка должна вести на реальную публикацию, а не на выдуманную</p>
+        <p class="say md st">И всё равно <em>открываю каждую</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="421" data-steps="421,425,427,428">
+  <p class="kick">ИИ-митап ЦГУ, 06.11.2026 · выступление представителя банка</p>
+  <h2>Выдумывают модели не только ссылки</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red">
+        <h3><svg class="i"><use href="#i-bot"/></svg>Испытания агента</h3>
+        <ul>
+          <li class="st" data-s="1">Агент отвечал клиентам</li>
+          <li class="st" data-s="2"><b>Напридумывал какие-то цифры и одобрил кредит</b></li>
+          <li class="st" data-s="3">Хорошо, что это был сотрудник банка, а не клиент</li>
+        </ul>
+      </div>
+      <div class="col t-orange st" data-s="4">
+        <h3><svg class="i"><use href="#i-octagon-x"/></svg>Вывод докладчика</h3>
+        <ul>
+          <li>Стоп-условия</li>
+          <li>Поэтапный запуск: сначала на коллегах, потом на ограниченной аудитории</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="432">
+  <p class="kick t-orange">В ответе модели</p>
+  <h2>Всё это нужно проверять</h2>
+  <div class="body">
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i"><use href="#i-hash"/></svg><b>Номер стандарта</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b>Пункт документа</b></div>
+      <div class="pict"><svg class="i"><use href="#i-user-pen"/></svg><b>Фамилия автора</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="436" data-steps="437,439,440,442">
+  <p class="kick t-orange">Действие инженера</p>
+  <h2>Как проверять ссылку – три шага</h2>
+  <div class="body">
+    <ol class="flow t-orange">
+      <li class="step st"><h3>Открыть документ</h3><p>Он существует, и номер совпадает</p></li>
+      <li class="step st"><h3>Найти пункт</h3><p>Тот, на который ссылается модель</p></li>
+      <li class="step st"><h3>Прочитать этот пункт целиком</h3><p>Говорит ли он то, что утверждает модель</p></li>
+    </ol>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p><b>Самая коварная ошибка – на третьем шаге:</b><br>документ настоящий, а пункт о другом</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="447">
+  <p class="kick t-red">Где модели ошибаются</p>
+  <h2>Ещё четыре ошибки</h2>
+  <div class="body">
+    <div class="cards c4">
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-shuffle"/></svg></span><span class="n">ВТОРАЯ</span><h3>Разные ответы на один и тот же вопрос</h3></div>
+      <div class="card t-gray"><span class="bdg"><svg class="i"><use href="#i-calendar-clock"/></svg></span><span class="n">ТРЕТЬЯ</span><h3>Устаревшие сведения</h3></div>
+      <div class="card t-gray"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><span class="n">ЧЕТВЁРТАЯ</span><h3>Вычисления и инженерная логика</h3></div>
+      <div class="card t-gray"><span class="bdg"><svg class="i"><use href="#i-message-circle-question"/></svg></span><span class="n">ПЯТАЯ</span><h3>Согласие с ошибкой в вопросе</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="450" data-steps="450,451">
+  <p class="kick t-red">Ошибка 2 из 5</p>
+  <h2>Разные ответы на один и тот же вопрос</h2>
+  <div class="body">
+    <div class="st" style="display:flex;flex-direction:column;gap:16px">
+      <div class="tree" style="--n:3">
+        <div class="root">Одинаковый вопрос</div>
+        <div class="kids" style="gap:0;text-align:center;width:calc(100% + 22px)">
+          <div class="kid t-gray" style="margin:0 11px"><h3>Ответ 1</h3></div>
+          <div class="kid t-gray" style="margin:0 11px"><h3>Ответ 2</h3></div>
+          <div class="kid t-gray" style="margin:0 11px"><h3>Ответ 3</h3></div>
+        </div>
+      </div>
+      <p class="note" style="text-align:center">Модель может ответить по-разному – в том числе по существу</p>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-microscope"/></svg><div><p><b>Исследователи из Оксфорда:</b> если на один фактический вопрос ответы несовместимы по смыслу, модель, скорее всего, сочиняет</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Farquhar S. et al. Nature, 2024 · doi.org/10.1038/s41586-024-07421-0</p>
+</section>
+
+<section class="slide" data-at="454" data-title="Зачем это знать пользователю">
+  <p class="kick">Зачем это нужно</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Если понять, когда запрос, скорее всего, приведёт к выдумке, пользователь знает, где с моделью нужно быть <b>особенно осторожным</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-microscope"/></svg></i><span><b>Исследователи из Оксфорда</b>авторы работы в журнале Nature, 2024</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Farquhar S. et al. Nature, 2024 · doi.org/10.1038/s41586-024-07421-0</p>
+</section>
+
+<section class="slide dark" data-at="457" data-title="Обратное неверно">
+  <p class="kick t-red">Обратное неверно</p>
+  <div class="body">
+    <p class="say">Модель может <b style="color:var(--red)">уверенно повторять</b> одну и ту же ошибку</p>
+  </div>
+</section>
+
+<section class="slide" data-at="459" data-steps="459,462,463,464">
+  <p class="kick t-orange">Действие инженера</p>
+  <h2>Если ответ важен</h2>
+  <div class="body">
+    <p class="say sm st">Задайте вопрос ещё раз <em>в новом чате</em> и сравните факты</p>
+    <div class="vs">
+      <div class="col t-orange st"><h3><svg class="i"><use href="#i-equal-not"/></svg>Расхождение</h3><p>Повод проверить</p></div>
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-equal"/></svg>Совпадение</h3><p>Проверку не заменяет</p></div>
+    </div>
+    <p class="note st">Если просите «предложи возможные причины», разные наборы ответов – это нормально</p>
+  </div>
+</section>
+
+<section class="slide" data-at="466" data-steps="468,469,470">
+  <p class="kick t-red">Ошибка 3 из 5</p>
+  <h2>Устаревшие сведения</h2>
+  <div class="body">
+    <div class="segbar st"><i class="t-teal" style="flex:3">Модель знает то, что было в обучающих данных<br>на момент обучения</i><i class="off" style="flex:2">Может не знать</i></div>
+    <div class="picts c3 sm t-red st">
+      <div class="pict"><svg class="i"><use href="#i-file-stack"/></svg><span>Новые редакции стандартов</span></div>
+      <div class="pict"><svg class="i"><use href="#i-tag"/></svg><span>Цены</span></div>
+      <div class="pict"><svg class="i"><use href="#i-gavel"/></svg><span>Изменения в законодательстве</span></div>
+    </div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-search"/></svg><div><p>Режим поиска помогает, но ссылки всё равно надо открывать</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="472" data-steps="473,475,476">
+  <p class="kick t-orange">Случай из практики лектора</p>
+  <h2>Вопрос о новой редакции стандарта</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:520px 1fr;gap:40px">
+      <div style="gap:26px">
+        <p class="st" data-s="1" style="font-size:28px;line-height:1.2"><b style="font-size:42px">ГОСТ Р 56939</b><br>стандарт безопасной<br>разработки программ</p>
+        <div class="docs st" data-s="2" style="justify-content:flex-start;flex-wrap:nowrap;gap:36px;padding-bottom:16px">
+          <div class="doc" style="width:230px"><h4 style="font-size:24px">Редакция<br>2016 года</h4><i></i><i></i><i class="s"></i><b class="stamp t-gray">заменена</b></div>
+          <div class="doc" style="width:230px"><h4 style="font-size:24px">Редакция<br>2024 года</h4><i class="t"></i><i></i><i class="s"></i><b class="stamp t-teal">новая</b></div>
+        </div>
+      </div>
+      <div class="chat st" data-s="3">
+        <div class="msg user"><span class="who">Запрос</span><p>Вопрос о новой редакции</p></div>
+        <div class="msg bot bad" style="max-width:100%"><span class="who">Ответ модели</span><p>Нет, вы ошибаетесь, такого ГОСТа нет.<br>Я знаю ГОСТ 2016 года</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="480" data-steps="480,482">
+  <p class="kick t-orange">Случай из практики лектора</p>
+  <h2>Модель не врёт нарочно</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-gray st"><span class="bdg"><svg class="i"><use href="#i-database"/></svg></span><h3>Возможно, новой редакции не было в её обучающих данных</h3></div>
+      <div class="card t-red st"><span class="bdg"><svg class="i"><use href="#i-message-square-warning"/></svg></span><h3>По одному ответу<br>причину не установить</h3><p>И при этом модель спорит уверенно</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="484" data-steps="484,487">
+  <p class="kick t-orange">Действие инженера</p>
+  <h2>Со свежими документами порядок такой</h2>
+  <div class="body">
+    <ol class="flow t-orange st">
+      <li class="step"><h3>Сначала найти документ</h3><p>Поиском или взять его у себя</p></li>
+      <li class="step"><h3>И только потом дать модели</h3></li>
+    </ol>
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-file-clock"/></svg><div><p><b>С вашими стандартами и техническими условиями – то же самое:</b> модель знает ту редакцию, которую видела при обучении, если видела вообще</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="489" data-steps="491">
+  <p class="kick t-red">Ошибка 4 из 5</p>
+  <h2>Вычисления и инженерная логика</h2>
+  <div class="body">
+    <div class="vs st">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-circle-check"/></svg>Модель может верно</h3><ul><li>описать методику</li></ul></div>
+      <div class="col t-red"><h3><svg class="i"><use href="#i-circle-x"/></svg>И ошибиться</h3><ul><li>в подстановке чисел</li><li>в переводе единиц</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="493" data-steps="493,494">
+  <p class="kick t-red">Исследование 2026 года</p>
+  <h2>Типовые сбои на инженерных задачах</h2>
+  <div class="body">
+    <p class="sub st">Модели решали инженерные задачи<br>по расчёту конструкций и оптимизации</p>
+    <div class="cards c3 st">
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-shapes"/></svg></span><h3>Геометрические рассуждения</h3></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3>Многошаговые вычисления</h3></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-git-fork"/></svg></span><h3>Выбор при противоречивых ограничениях</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mysior M., Iniotakis C. Research in Engineering Design, 2026 · doi.org/10.1007/s00163-026-00504-1</p>
+</section>
+
+<section class="slide" data-at="498" data-steps="499,500">
+  <p class="kick">Обзор применения моделей в машиностроении</p>
+  <h2>Обзор говорит то же самое</h2>
+  <div class="body">
+    <div class="st" style="display:flex;flex-direction:column;gap:14px">
+      <p class="sub" style="text-align:center;color:var(--ink)">Модели полезны как помощник для работы</p>
+      <div class="picts c3 sm">
+        <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b>с документами</b></div>
+        <div class="pict"><svg class="i"><use href="#i-table"/></svg><b>с данными</b></div>
+        <div class="pict"><svg class="i"><use href="#i-list-checks"/></svg><b>с инструкциями</b></div>
+      </div>
+    </div>
+    <div class="rule t-red st"><svg class="i"><use href="#i-ban"/></svg><div><p>Но не как замена инженерного расчёта и проверки</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sorour S., Sahbel A. Journal of Intelligent Manufacturing, 2026 · doi.org/10.1007/s10845-026-02927-y</p>
+</section>
+
+<section class="slide" data-at="501" data-title="Вывод авторов обзора">
+  <p class="kick">Вывод авторов обзора</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Языковые модели становятся полезным смысловым и координирующим звеном в инженерной работе, но <b>не надёжной заменой инженерным инструментам</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-book-open-text"/></svg></i><span><b>Sorour S., Sahbel A.</b>обзор применения моделей в машиностроении, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sorour S., Sahbel A. Journal of Intelligent Manufacturing, 2026 · doi.org/10.1007/s10845-026-02927-y</p>
+</section>
+
+<section class="slide dark" data-at="504" data-steps="504,507,509">
+  <p class="kick t-orange">Практическое правило</p>
+  <h2>Считает инструмент, пересчитываете вы</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st t-teal"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Модель</h3><p>Методику может напомнить, формулу – подсказать</p></li>
+      <li class="step st t-gray"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><h3>Инструмент</h3><p>Считает: таблица, расчётная программа, калькулятор</p></li>
+      <li class="step st t-orange"><span class="bdg"><svg class="i"><use href="#i-user-check"/></svg></span><h3>Вы</h3><p>Каждую цифру, от которой зависит решение, пересчитываете сами</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="510" data-steps="512,514">
+  <p class="kick t-red">Ошибка 5 из 5</p>
+  <h2>Согласие с ошибкой в вопросе</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:250px 1fr">
+      <div class="center"><svg class="i big-ic" style="color:var(--red)"><use href="#i-message-circle-question"/></svg></div>
+      <div>
+        <p class="say sm st">Если вопрос исходит из неверного допущения, модель чаще <em>примет</em> его, чем поправит</p>
+        <p class="sub st">Подробнее – во второй теме, после обеда</p>
+      </div>
+    </div>
+  </div>
+</section>

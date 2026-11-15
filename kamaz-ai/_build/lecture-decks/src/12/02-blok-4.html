@@ -1,0 +1,426 @@
+<!-- Лекция 1.2, строки 200–348 (09:56–16:52): семь приёмов, два приёма для уверенных, живой пример «запрос к запросу» -->
+
+<section class="slide" data-at="200">
+  <p class="kick">Приёмы, которые помогают</p>
+  <h2>Семь приёмов</h2>
+  <div class="body">
+    <div class="cards c4">
+      <div class="card"><span class="bdg">1</span><h3>Все исходные данные сразу</h3></div>
+      <div class="card"><span class="bdg">2</span><h3>Задача по шагам</h3></div>
+      <div class="card"><span class="bdg">3</span><h3>Образец</h3></div>
+      <div class="card"><span class="bdg">4</span><h3>Таблица</h3></div>
+    </div>
+    <div class="cards c4" style="grid-template-columns:repeat(3,1fr);padding:0 145px">
+      <div class="card"><span class="bdg">5</span><h3>Вопросы модели</h3></div>
+      <div class="card"><span class="bdg">6</span><h3>Ссылка на пункт</h3></div>
+      <div class="card"><span class="bdg">7</span><h3>Доработка по ответу</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="202" data-steps="204,205">
+  <p class="kick">Приём 1 из 7</p>
+  <h2>Давать все исходные данные сразу</h2>
+  <div class="body">
+    <p class="say md st">Модель <b>не знает</b> вашего узла</p>
+    <div class="rule t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Если данных не хватает, она подставит типовые предположения. К вашему случаю они могут и не подойти</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="207" data-steps="207,209">
+  <p class="kick">Приём 1 из 7</p>
+  <h2>Цифры и номера пунктов – как есть</h2>
+  <div class="body">
+    <div class="vs" style="grid-template-columns:3fr 2fr">
+      <div class="col t-teal st">
+        <h3><svg class="i"><use href="#i-clipboard-list"/></svg>Вставить в запрос, а не пересказывать</h3>
+        <p>Ток покоя <mark>через 30&nbsp;мин после выключения зажигания</mark> – 85&nbsp;мА, <mark>через 2&nbsp;ч</mark> – 62&nbsp;мА</p>
+        <p>Требование ТЗ (п.&nbsp;4.3): ток покоя не&nbsp;более 40&nbsp;мА <mark>через 30&nbsp;мин после выключения&nbsp;зажигания</mark></p>
+      </div>
+      <div class="col t-red st">
+        <h3><svg class="i"><use href="#i-triangle-alert"/></svg>При пересказе теряются условия</h3>
+        <ul>
+          <li>Через сколько минут</li>
+          <li>При какой температуре</li>
+          <li>В каком режиме</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="211" data-steps="213,214,216,217">
+  <p class="kick">Приём 2 из 7</p>
+  <h2>Разбивать задачу на шаги</h2>
+  <div class="body">
+    <div class="chat"><div class="msg bad st" data-s="1" style="align-self:flex-start"><span class="who">Вместо одной просьбы</span><p>Разберись с замечанием</p></div></div>
+    <ol class="flow">
+      <li class="step st" data-s="2"><h3>Сравнить измеренное с требованием</h3></li>
+      <li class="step st" data-s="2"><h3>Перечислить причины</h3></li>
+      <li class="step st" data-s="3"><h3>Составить план проверки</h3></li>
+    </ol>
+    <div class="rule sm t-orange st" data-s="4"><svg class="i"><use href="#i-search-check"/></svg><div><p>Каждый шаг проще проверить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="218">
+  <p class="kick">Приём 2 из 7 · научные работы</p>
+  <h2>Методы декомпозиции задачи</h2>
+  <div class="body">
+    <div class="split">
+      <div class="term"><dfn>Декомпозиция</dfn><p>На приёме «по шагам» построены методы, о них есть научные работы</p></div>
+      <div>
+        <ul class="list num big">
+          <li>Сначала план или более простые подзадачи</li>
+          <li>Затем выполнение по&nbsp;пунктам</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wang L. et al. Препринт arXiv, 2023 · doi.org/10.48550/arXiv.2305.04091; Zhou D. et al. Препринт arXiv, 2022 · doi.org/10.48550/arXiv.2205.10625</p>
+</section>
+
+<section class="slide" data-at="222" data-title="Простые подзадачи по очереди">
+  <p class="kick">Авторы одной из таких работ</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Основная идея – разбить сложную задачу на ряд <b>более простых подзадач</b> и решать их последовательно</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Zhou D., Schärli N. и соавторы</b>Least-to-Most Prompting, препринт arXiv, 2022</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhou D. et al. Препринт arXiv, 2022 · doi.org/10.48550/arXiv.2205.10625</p>
+</section>
+
+<section class="slide" data-at="225">
+  <p class="kick t-red">Другая работа</p>
+  <h2>Слабые места рассуждения по шагам без примеров</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><h3>Ошибки в вычислениях</h3></div>
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-list-x"/></svg></span><h3>Пропущенные шаги</h3></div>
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-message-circle-question"/></svg></span><h3>Ошибки понимания смысла</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wang L. et al. Препринт arXiv, 2023 · doi.org/10.48550/arXiv.2305.04091</p>
+</section>
+
+<section class="slide" data-at="229" data-steps="229,232">
+  <p class="kick t-orange">Совет студентам</p>
+  <h2>Ещё один шаг – самый первый</h2>
+  <div class="body">
+    <p class="say sm st">Прежде чем решать, попросите модель <em>проработать разные варианты решения</em></p>
+    <div class="chat st"><div class="msg user" style="font-size:32px"><span class="who">Запрос</span><p>А что будет, если условия изменятся? Какие есть другие пути? Проработай это сначала</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="235" data-steps="235,239" data-title="Длинная работа – по вехам">
+  <p class="kick t-orange">Второй совет</p>
+  <div class="body">
+    <div class="st" style="display:flex;flex-direction:column;gap:16px">
+      <p class="say md">Длинную работу разбивайте на <b>вехи</b></p>
+      <p class="sub">Не переходите к следующей, пока текущая не принята и не проверена</p>
+    </div>
+    <ol class="flow nonum st">
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><h3>Сделали</h3></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверили</h3></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-circle-check-big"/></svg></span><h3>Приняли</h3></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-milestone"/></svg></span><h3>Тогда дальше</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="241" data-steps="243,244">
+  <p class="kick">Приём 3 из 7</p>
+  <h2>Показать образец</h2>
+  <div class="body">
+    <p class="say sm st">Одна заполненная строка таблицы объясняет формат <b>лучше абзаца описания</b></p>
+    <div class="st" style="display:flex;flex-direction:column;gap:6px">
+      <p class="note">Модель повторит</p>
+      <div class="picts c3">
+        <div class="pict"><svg class="i"><use href="#i-table-properties"/></svg><b>Структуру</b></div>
+        <div class="pict"><svg class="i"><use href="#i-ruler"/></svg><b>Единицы измерения</b></div>
+        <div class="pict"><svg class="i"><use href="#i-align-left"/></svg><b>Уровень подробности</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="247" data-steps="249,250">
+  <p class="kick">Приём 4 из 7</p>
+  <h2>Просить таблицу</h2>
+  <div class="body">
+    <div class="split s46 st">
+      <div class="docs" style="flex-direction:row;flex-wrap:nowrap;gap:28px;align-items:stretch">
+        <div class="doc t-gray" style="width:200px"><h4>Сплошной текст</h4><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i class="s"></i></div>
+        <div class="doc" style="width:200px"><h4>Таблица</h4>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">
+            <i class="t" style="height:18px"></i><i class="t" style="height:18px"></i><i class="t" style="height:18px"></i>
+            <i style="height:18px"></i><i style="height:18px"></i><i style="height:18px"></i>
+            <i style="height:18px"></i><i style="height:18px"></i><i style="height:18px"></i>
+            <i style="height:18px"></i><i style="height:18px"></i><i style="height:18px"></i>
+            <i style="height:18px"></i><i style="height:18px"></i><i style="height:18px"></i>
+          </div>
+          <b class="stamp t-teal">проще сверить</b>
+        </div>
+      </div>
+      <div><p class="say sm">Таблицу проще<br><b>сверить с документом</b>,<br>чем сплошной текст</p></div>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-columns-3"/></svg><div><p>Если ответ пойдёт дальше в работу, сразу назовите столбцы</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="252" data-steps="253,255,257,260">
+  <p class="kick">Образец вместе с таблицей</p>
+  <h2>Столбцы и одна своя строка</h2>
+  <div class="body">
+    <table class="tbl sm">
+      <thead><tr class="st" data-s="1"><th style="width:170px"></th><th>Причина</th><th>Как проверить</th><th>Чем измерить</th><th>Какой результат подтвердит причину</th></tr></thead>
+      <tbody>
+        <tr class="st t-orange" data-s="2"><td style="color:var(--c)">Ваша строка</td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.6;margin-top:9px"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.6;margin-top:9px;width:80%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.6;margin-top:9px;width:65%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.6;margin-top:9px;width:90%"></i></td></tr>
+        <tr class="st" data-s="4"><td style="color:var(--c)">Модель</td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:85%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:70%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:80%"></i></td></tr>
+        <tr class="st" data-s="4"><td style="color:var(--c)">Модель</td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:75%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:60%"></i></td>
+          <td><i style="display:block;height:11px;border-radius:6px;background:var(--c);opacity:.5;margin-top:9px;width:95%"></i></td></tr>
+      </tbody>
+    </table>
+    <div class="cards c4 sm">
+      <div class="card t-gray st" data-s="1"><span class="n">В ЗАПРОСЕ</span><p>Вы пишете столбцы</p></div>
+      <div class="card t-orange st" data-s="2"><span class="n">НИЖЕ</span><p>Одна строка своими словами: так вы сами записали бы причину</p></div>
+      <div class="card st" data-s="3"><span class="n">МОДЕЛЬ УВИДИТ</span><p>Насколько подробно вы пишете, в каких единицах, как формулируете проверку</p></div>
+      <div class="card st" data-s="4"><span class="n">И ДАЛЬШЕ</span><p>Остальные строки сделает так же</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="261" data-steps="263,265">
+  <p class="kick">Приём 5 из 7</p>
+  <h2>Разрешить модели задавать вопросы</h2>
+  <div class="body">
+    <div class="chat" style="gap:26px">
+      <div class="msg user st" style="font-size:34px"><span class="who">Фраза в запросе</span><p>Если данных не хватает,<br>сначала задай мне уточняющие вопросы</p></div>
+      <div class="msg bot st" style="font-size:34px;max-width:100%"><span class="who">Вместо догадок модель спрашивает</span>
+        <div class="tags" style="margin-top:10px;gap:16px">
+          <span class="tag" style="font-size:31px;padding:9px 26px">про температуру</span>
+          <span class="tag" style="font-size:31px;padding:9px 26px">про режим измерения</span>
+          <span class="tag" style="font-size:31px;padding:9px 26px">про комплектацию</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="269" data-steps="269,272" data-title="Сначала модель расспрашивает автора">
+  <p class="kick">ИИ-митап ЦГУ, 06.11.2026 · как начинать большую работу</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote><span class="st">Просит модель <b>сначала расспросить его самого</b>.</span> <span class="st">Откидывается в кресле и рассказывает свои мысли, а модель задаёт вопросы и вытаскивает то, что он не&nbsp;сказал&nbsp;бы&nbsp;сам</span></blockquote>
+      <figcaption><i class="ava">АС</i><span><b>Артём Субботин</b>доклад «Платформы для совместной работы с ИИ-агентами»</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="275" data-title="Сначала контекст, потом план">
+  <p class="kick">Порядок работы</p>
+  <div class="body">
+    <p class="say">Сначала набирается <b>база контекста</b>, и только потом из неё получается <em>план</em></p>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="277" data-steps="279,281">
+  <p class="kick">Приём 6 из 7</p>
+  <h2>Просить ссылку на источник внутри ваших данных</h2>
+  <div class="body">
+    <div class="prompt st" data-s="1" style="font-size:34px;padding:26px 30px"><p class="part t-orange"><span class="tg" style="font-size:20px">Проверка</span><span>Для каждого вывода укажи пункт технического задания или номер замечания, на который опираешься</span></p></div>
+    <div class="cards">
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Ссылку на пункт легко проверить</h3></div>
+      <div class="card row t-red st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3>Выдуманный пункт сразу заметен</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="283" data-steps="283,286,288">
+  <p class="kick t-red">Вспомните пункт, которого нет</p>
+  <h2>В разделе 4 – ровно шесть пунктов</h2>
+  <div class="body">
+    <div class="chat"><div class="msg bad st" data-s="1" style="align-self:flex-start;max-width:100%;font-size:30px"><span class="who">Учебный ответ модели</span><p>По <mark>п. 4.8</mark> ТЗ допускается разряд батарей до 30 % без последствий для пуска</p></div></div>
+    <div class="segbar">
+      <i class="t-teal" style="flex:1">п. 4.1</i><i class="t-teal" style="flex:1">п. 4.2</i><i class="t-teal" style="flex:1">п. 4.3</i><i class="t-teal" style="flex:1">п. 4.4</i><i class="t-teal" style="flex:1">п. 4.5</i><i class="t-teal" style="flex:1">п. 4.6</i>
+      <i class="off st" data-s="2" style="flex:2.2">п. 4.8 – в разделе нет</i>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p><span class="st" data-s="2">Ссылку на пункт, которого в разделе нет, вы увидите за секунду.</span> <b class="st" data-s="3">Но только если попросили ссылку</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="289" data-steps="291,292,294">
+  <p class="kick">Приём 7 из 7</p>
+  <h2>Дорабатывать запрос по ответу</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg bot st" data-s="1" style="width:62%"><span class="who">Первый ответ редко бывает окончательным</span>
+        <i style="display:block;height:12px;border-radius:6px;background:var(--line);margin-top:10px"></i>
+        <i style="display:block;height:12px;border-radius:6px;background:var(--line);margin-top:10px"></i>
+        <i style="display:block;height:12px;border-radius:6px;background:var(--line);margin-top:10px;width:60%"></i>
+      </div>
+      <p class="note st" data-s="2" style="align-self:center;color:var(--orange);font-weight:700;font-size:29px">Модель ушла не туда – лучше уточнить запрос в том же диалоге</p>
+      <div class="msg user st" data-s="3" style="font-size:30px"><span class="who">Уточнение</span><p>Не рассматривай генератор, сосредоточься на потребителях стоянки</p></div>
+      <p class="note st" data-s="3" style="align-self:flex-end;font-size:29px">Начинать всё заново не нужно</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="297" data-steps="297,299,302">
+  <p class="kick">Из вебинара для преподавателей</p>
+  <h2>Как просто уточнять ответ</h2>
+  <div class="body">
+    <p class="say sm st" data-s="1">Не подошёл – напишите <b>одной строкой</b></p>
+    <div class="cards c3">
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-corner-down-right"/></svg></span><h3>Сделай проще</h3></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-corner-down-right"/></svg></span><h3>Добавь пример</h3></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-corner-down-right"/></svg></span><h3>Сократи до трёх строк</h3></div>
+    </div>
+    <div class="rule sm st" data-s="3"><svg class="i"><use href="#i-pencil-line"/></svg><div><p>Модель перепишет ответ, а вы не потеряете то, что в нём уже было хорошего</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Пиков В. А. LLMs – ваш цифровой помощник в преподавании. Вебинар для преподавателей, 17.09.2025</p>
+</section>
+
+<section class="slide" data-at="304">
+  <p class="kick">Приём 7 из 7</p>
+  <h2>Тот же диалог или новый чат</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><span class="bdg lg"><svg class="i"><use href="#i-corner-down-right"/></svg></span><h3>Модель ушла не туда</h3><p style="font-size:33px">Уточнить запрос в том же диалоге</p></div>
+      <div class="col t-orange"><span class="bdg lg"><svg class="i"><use href="#i-message-square-plus"/></svg></span><h3>Диалог запутался</h3><p style="font-size:33px">Открыть новый чат и сразу дать полный исправленный запрос</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="307">
+  <p class="kick t-orange">Для тех, кто уже уверенно работает с моделью</p>
+  <h2>И ещё два приёма</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-orange" style="padding:34px 36px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-messages-square"/></svg></span><span class="n">ПЕРВЫЙ</span><h3 style="font-size:42px">Запрос к запросу</h3><p style="font-size:30px">Модель сама составляет подробный запрос</p></div>
+      <div class="card t-orange" style="padding:34px 36px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-scan-search"/></svg></span><span class="n">ВТОРОЙ</span><h3 style="font-size:42px">Самопроверка</h3><p style="font-size:30px">Модель проверяет свой ответ по исходному тексту</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="309" data-steps="309,310,311,312">
+  <p class="kick t-orange">Запрос к запросу</p>
+  <h2>Пусть модель сама составит запрос</h2>
+  <div class="body">
+    <div class="chat"><div class="msg user" style="max-width:100%"><span class="who">Пример из практики</span><p><span class="st" data-s="1">Напиши подробный запрос к языковой модели для разбора замечания З-2 по описанию узла, которое я вставлю ниже.</span> <span class="st" data-s="2">В запросе должны быть <mark>контекст</mark>, <mark>исходные данные</mark>, <mark>ограничения</mark>, <mark>формат ответа</mark> и <mark>критерии проверки</mark></span></p></div></div>
+    <ol class="flow sm">
+      <li class="step st" data-s="1"><h3>Модель составляет подробный запрос</h3></li>
+      <li class="step st" data-s="3"><h3>Отправьте его в новом чате</h3></li>
+      <li class="step st t-orange" data-s="4"><h3>Сравните ответ со своим</h3><p>Что модель добавила?<br>А что упустила?</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide dark" data-at="315" data-steps="315,318">
+  <p class="kick t-orange">Второй приём</p>
+  <h2>Самопроверка</h2>
+  <div class="body">
+    <p class="say sm st">Попросите модель проверить свой ответ <b>по исходному тексту</b> и перечислить, что она исправила бы</p>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-scan-search"/></svg><div><p>Самопроверка полезна, но вашу собственную она не заменяет</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="319" data-steps="319,321" data-title="Модель соглашается со своими ошибками">
+  <p class="kick">Вебинар о проверке кода, который пишут агенты</p>
+  <div class="body">
+    <figure class="quote st">
+      <blockquote>Модель охотно<br><b>соглашается со своими же ошибками</b></blockquote>
+      <figcaption><i class="ava">АЦ</i><span><b>Алексей Цымлов</b>цикл «Качество и безопасность ПО в эпоху GenAI», 28.08.2026</span></figcaption>
+    </figure>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Она может пропустить ровно то, что пропустила в первый раз</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="322" data-steps="322,323">
+  <p class="kick t-orange">Практика 1.2 · упражнения по желанию</p>
+  <h2>Оба приёма есть в дополнительных заданиях</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange st" data-s="1"><span class="bdg lg">5</span><div><span class="n">УПРАЖНЕНИЕ 5</span><h3>Запрос к запросу</h3></div></div>
+      <div class="card row t-orange st" data-s="1"><span class="bdg lg">2</span><div><span class="n">УПРАЖНЕНИЕ 2</span><h3>Модель проверяет себя</h3></div></div>
+    </div>
+    <div class="rule sm st" data-s="2"><svg class="i"><use href="#i-graduation-cap"/></svg><div><p>Запрос к запросу – дальше на живом примере из вебинара для преподавателей</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="324" data-steps="324,327,328">
+  <p class="kick">Живой пример</p>
+  <h2>Задача: тест для итоговой проверки слушателей</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat st" data-s="1"><b>30</b><span>тестовых вопросов</span></div>
+      <div class="stat st" data-s="1"><b>2</b><span>постановления правительства</span></div>
+      <div class="stat t-orange st" data-s="2"><b>3</b><span>варианта ответа у каждого вопроса</span></div>
+    </div>
+    <div class="rule sm t-orange st" data-s="3"><svg class="i"><use href="#i-git-compare-arrows"/></svg><div><p>Неправильные варианты должны быть близки по смыслу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="329" data-steps="329,330">
+  <p class="kick">Живой пример</p>
+  <h2>Модель сначала составляет запрос</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st"><span class="bdg"><svg class="i"><use href="#i-pencil-line"/></svg></span><h3>Задача – коротко, своими словами</h3></li>
+      <li class="step st t-orange"><span class="bdg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><h3>Просьба к модели</h3><p style="font-size:28px;color:var(--ink)">Не отвечать, а сначала составить по этой задаче подробный запрос</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="331" data-steps="331,333,335,337">
+  <p class="kick">Живой пример</p>
+  <h2>Что расписала модель</h2>
+  <div class="body">
+    <div class="split s64">
+      <div>
+        <ul class="list check">
+          <li class="st" data-s="1">Цель</li>
+          <li class="st" data-s="1">Опираться только на текст постановлений</li>
+          <li class="st" data-s="2">Равномерный охват тем</li>
+          <li class="st" data-s="2">Точный формат вопроса</li>
+        </ul>
+      </div>
+      <div><div class="card t-orange st" data-s="3"><span class="n">ДОБАВИЛА САМА</span><h3>Основание к каждому вопросу</h3><p>Номер постановления и пункт</p></div></div>
+    </div>
+    <div class="rule sm st" data-s="4"><svg class="i"><use href="#i-file-text"/></svg><div><p>Получилось почти готовое техническое задание</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="338" data-steps="338,341,342">
+  <p class="kick">Живой пример</p>
+  <h2>Один запрос – три разных сервиса</h2>
+  <div class="body">
+    <div class="rule sm t-gray st" data-s="1"><svg class="i"><use href="#i-send"/></svg><div><p>Запрос был один и тот же</p></div></div>
+    <div class="cards c3">
+      <div class="card st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-check"/></svg></span><h3>Первый сервис</h3><p>Основание указано у каждого вопроса</p></div>
+      <div class="card st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-check"/></svg></span><h3>Второй сервис</h3><p>Основание указано у каждого вопроса</p></div>
+      <div class="card t-red st" data-s="3"><span class="bdg"><svg class="i"><use href="#i-x"/></svg></span><h3>Третий сервис</h3><p>Это требование пропустил</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="343" data-steps="343,345,346" data-title="Основание проверять в первую очередь">
+  <p class="kick">Основание у вопроса</p>
+  <div class="body">
+    <p class="sub st">Очень удобно: проверить вопрос можно за минуту</p>
+    <p class="say md st">Но именно его и надо<br><em>проверять в первую очередь</em></p>
+    <div class="rule t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Пункт может существовать и при этом говорить о другом</p></div></div>
+  </div>
+</section>

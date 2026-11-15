@@ -1,0 +1,469 @@
+<!-- Лекция 1.2, строки 498–658 (24:32–32:50): что изменилось в новых моделях, три ступени работы с моделями, запрос уменьшает число ошибок, но не устраняет их -->
+
+<section class="slide sect dark" data-at="498">
+  <span class="no"><svg class="i"><use href="#i-refresh-cw"/></svg></span>
+  <p class="kick">Раздел лекции</p>
+  <h1>Что изменилось в новых моделях</h1>
+  <p class="lead">Как меняется работа с запросами</p>
+</section>
+
+<section class="slide" data-at="500" data-steps="500,501,502">
+  <p class="kick">Несколько лет назад</p>
+  <h2>Заметный прирост давали две вещи</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card st"><span class="bdg"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3>Примеры решений с промежуточными шагами</h3></div>
+      <div class="card st"><span class="bdg"><svg class="i"><use href="#i-message-square-text"/></svg></span><h3>Простая приписка к запросу</h3><p><mark>«давай рассуждать пошагово»</mark></p></div>
+    </div>
+    <div class="rule st"><svg class="i"><use href="#i-calculator"/></svg><div><p>Модель расписывала шаги и реже ошибалась в задачах с вычислениями</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="504" data-title="Цепочка рассуждений: работа 2022 года">
+  <p class="kick">Работа 2022 года</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Построение цепочки рассуждений – последовательности промежуточных шагов – <b>значительно улучшает</b> способность больших языковых моделей выполнять сложные рассуждения</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Wei J. и соавторы</b>препринт arXiv, 2022</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wei J. et al. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models, 2022 · doi.org/10.48550/arXiv.2201.11903</p>
+</section>
+
+<section class="slide" data-at="507">
+  <p class="kick">Сейчас</p>
+  <h2>Отдельный режим рассуждения</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-history"/></svg>Раньше</h3><p>Модель просили: «давай рассуждать пошагово»</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-brain"/></svg>Сейчас</h3>
+        <ul><li>Режим рассуждения есть во многих сервисах</li><li>Модель сама строит цепочку шагов</li><li>Просить её об этом уже не нужно</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="510" data-steps="510,512,513">
+  <p class="kick">Работа 2025 года</p>
+  <h2>Сложные техники запроса и простые</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-stethoscope"/></svg><span class="tag">медицинские вопросы</span></div>
+      <dl class="kv" style="--kw:215px">
+        <div class="st"><dt>Что сравнили</dt><dd>Несколько техник запроса с рассуждением по шагам</dd></div>
+        <div class="st"><dt>Результат</dt><dd>Усложнённые варианты <b>не дали статистически значимого преимущества</b> перед более простыми</dd></div>
+        <div class="st"><dt>Что влияло сильнее</dt><dd>Модель и тип данных</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Jeon S., Kim H.-G. Computers in Biology and Medicine, 2025 · doi.org/10.1016/j.compbiomed.2025.110614</p>
+</section>
+
+<section class="slide" data-at="514" data-steps="514,517" data-title="Вывод авторов и оговорка">
+  <p class="kick">Вывод авторов</p>
+  <div class="body">
+    <figure class="quote md st">
+      <blockquote>Сложные техники составления запросов <b>не дают значимого улучшения</b> по сравнению с более простыми подходами</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Jeon, Kim</b>Computers in Biology and Medicine, 2025</span></figcaption>
+    </figure>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Это одно исследование в одной области. Переносить его на инженерные задачи нужно осторожно</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Jeon S., Kim H.-G. Computers in Biology and Medicine, 2025 · doi.org/10.1016/j.compbiomed.2025.110614</p>
+</section>
+
+<section class="slide" data-at="519" data-title="Аналогия: кабина самолёта">
+  <p class="kick">Аналогия из лекций</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-plane"/></svg></div>
+      <div>
+        <p class="say md">Кабина пассажирского лайнера</p>
+        <p class="sub">Сколько в ней тумблеров?</p>
+        <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px 14px;font-size:54px;color:var(--muted)">
+          <svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg>
+          <svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="521" data-steps="521,524">
+  <p class="kick">Аналогия из лекций</p>
+  <h2>Тумблеры запроса: раньше и теперь</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-history"/></svg>Раньше</h3><p>Приходилось щёлкать множество тумблеров</p>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px 16px;font-size:46px;color:var(--c)">
+          <svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg>
+          <svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg>
+          <svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg>
+        </div>
+        <div class="tags"><span class="tag">роль</span><span class="tag">особые слова</span><span class="tag">хитрые формулировки</span></div>
+      </div>
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-brain"/></svg>Теперь</h3><p>Лишние тумблеры постепенно убирают</p>
+        <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px 16px;font-size:46px;color:var(--c)">
+          <svg class="i"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg>
+          <svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg>
+          <svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i"><use href="#i-toggle-right"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-left"/></svg><svg class="i" style="opacity:.14"><use href="#i-toggle-right"/></svg>
+        </div>
+        <p><b>Модели стали умнее</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="526" data-steps="527,528,529">
+  <p class="kick">Вывод</p>
+  <h2>Что из этого следует на практике</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-red st"><span class="bdg"><svg class="i"><use href="#i-wand-sparkles"/></svg></span><h3>«Волшебная фраза»</h3><p>Искать её – не лучшая трата времени</p></div>
+      <div class="card t-teal st"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><h3>По-прежнему важны</h3><p>Полные исходные данные, понятная задача и формат ответа</p></div>
+      <div class="card t-orange st"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверка результата</h3><p>Нужна при любом запросе и в любой модели</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="530" data-title="Честная оговорка">
+  <p class="kick t-orange">Честная оговорка</p>
+  <div class="body">
+    <p class="say sm">Чем больше у модели доступа к вашим материалам, тем меньше значит формулировка и тем больше – <b>сами материалы</b></p>
+    <svg viewBox="0 0 1135 236" style="width:100%;height:auto;display:block" role="img" aria-label="С ростом доступа модели к материалам значение формулировки падает, а значение материалов растёт">
+      <polygon points="0,0 1135,62 1135,80 0,80" fill="var(--gray_t)"/>
+      <text x="26" y="56" font-size="30" font-weight="700" fill="var(--gray_ink)">формулировка</text>
+      <polygon points="0,92 1135,92 1135,172 0,110" fill="var(--teal)"/>
+      <text x="1109" y="146" font-size="30" font-weight="700" text-anchor="end" fill="var(--chip-ink)">сами материалы</text>
+      <path d="M0 196H1116" stroke="var(--muted)" stroke-width="3" fill="none"/>
+      <path d="M1114 187l21 9-21 9z" fill="var(--muted)"/>
+      <text x="0" y="230" font-size="24" fill="var(--muted)">меньше</text>
+      <text x="567" y="230" font-size="24" text-anchor="middle" fill="var(--muted)">доступ модели к вашим материалам</text>
+      <text x="1135" y="230" font-size="24" text-anchor="end" fill="var(--muted)">больше</text>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-at="533" data-steps="533,535,536">
+  <p class="kick t-orange">Честная оговорка</p>
+  <h2>Агент и обычный чат</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-folder-tree"/></svg>Агент видит весь проект</h3><p>Часто достаточно просто сказать, что сделать</p></div>
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-message-square-text"/></svg>Обычный чат</h3><p>Модель знает только то, что вы ей написали</p></div>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-list-checks"/></svg><div><p>Для чата шесть частей запроса – не формальность</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="537" data-title="Выбор модели: реклама и рейтинги не подскажут">
+  <p class="kick">Выбор модели</p>
+  <div class="body">
+    <p class="say md">Какая модель лучше для ваших задач, не скажет ни <b>реклама</b>, ни <b>чужой рейтинг</b></p>
+    <div class="cards">
+      <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-megaphone"/></svg></span><h3>Реклама</h3></div>
+      <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-trophy"/></svg></span><h3>Чужой рейтинг</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="540" data-title="Выбирать по пилоту на своём материале">
+  <p class="kick">Круглый стол по безопасной разработке, октябрь 2026</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Выбирать инструмент – по <b>пилоту на своём материале</b>, а не потому, что кто-то показал на него пальцем</blockquote>
+      <figcaption><i class="ava">ВП</i><span><b>Вартан Падарян</b>Институт системного программирования, модератор круглого стола</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="544" data-steps="544,546,548">
+  <p class="kick t-orange">Для нас это значит</p>
+  <h2>Пилот на своём материале</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-target"/></svg></span><h3>Одна и та же задача</h3></li>
+      <li class="step st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-message-square-text"/></svg></span><h3>Один и тот же запрос</h3></li>
+      <li class="step st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-layers"/></svg></span><h3>Два-три сервиса</h3></li>
+      <li class="step st t-orange" data-s="2"><span class="bdg"><svg class="i"><use href="#i-table-2"/></svg></span><h3>Сравнение по одной таблице критериев</h3></li>
+    </ol>
+    <div class="rule t-orange st" data-s="3"><svg class="i"><use href="#i-history"/></svg><div><p>Ровно то, что вы делали утром</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="549" data-steps="549,551" data-title="Насколько детерминирован результат?">
+  <p class="kick">Тот же круглый стол, октябрь 2026</p>
+  <div class="body">
+    <figure class="quote md st">
+      <blockquote>Опасный тренд года – <b>самописные агенты вместо классических инструментов анализа</b></blockquote>
+      <figcaption><i class="ava">АС</i><span><b>Алексей Смирнов</b>CodeScoring</span></figcaption>
+    </figure>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-circle-help"/></svg><div><h3>Вопрос, который стоит задавать всегда</h3><p style="font-size:44px">Насколько детерминирован результат?</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="553" data-steps="553,556">
+  <p class="kick t-orange">Для нас</p>
+  <h2>Тот же вопрос, что утром</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Модель</h3><p>Помогает подготовить данные</p></li>
+      <li class="step st t-orange" data-s="1"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><h3>Инструмент</h3><p>Даёт один и тот же ответ на одних и тех же данных. Модель его не заменяет</p></li>
+      <li class="step st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Модель</h3><p>Помогает описать результат</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="559" data-title="Павел Гагарин: три ступени работы с моделями">
+  <p class="kick">Вебинар о разработке с агентами, июль 2026</p>
+  <div class="body">
+    <div class="svc t-teal">
+      <div class="svc-hd"><i class="logo">ПГ</i><h3>Павел Гагарин</h3><p>вебинар «Разработка с агентами: от постановки задачи до деплоя», 28.07.2026</p></div>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:30px">
+        <p class="say md">Три ступени работы с&nbsp;моделями</p>
+        <div style="display:flex;align-items:flex-end;gap:14px;height:170px;font-size:40px;font-weight:700;color:var(--ci)">
+          <span style="flex:1;height:40%;background:var(--ct);border-top:7px solid var(--c);border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center">1</span>
+          <span style="flex:1;height:70%;background:var(--ct);border-top:7px solid var(--c);border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center">2</span>
+          <span style="flex:1;height:100%;background:var(--ct);border-top:7px solid var(--c);border-radius:14px 14px 0 0;display:flex;align-items:center;justify-content:center">3</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="562" data-steps="562,565,568">
+  <p class="kick">Павел Гагарин</p>
+  <h2>Запрос, контекст, цикл</h2>
+  <div class="body">
+    <div class="ladder">
+      <div class="rung st" style="min-height:235px"><span class="n">Ступень 1</span><h3 style="font-size:34px">Инженерия запроса</h3><p style="font-size:27px">Как сформулировать один вопрос: какую роль, примеры и формат задать</p></div>
+      <div class="rung st" style="min-height:310px"><span class="n">Ступень 2</span><h3 style="font-size:34px">Инженерия контекста</h3><p style="font-size:27px">«Не как спросить, а что показать модели» – документы и данные</p></div>
+      <div class="rung st" style="min-height:385px"><span class="n">Ступень 3</span><h3 style="font-size:34px">Инженерия цикла</h3><p style="font-size:27px">Не один ответ, а управляемый процесс со стадиями, проверками и границами для человека</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>По вебинару П. Гагарина «Разработка с агентами: от постановки задачи до деплоя», 28.07.2026</p>
+</section>
+
+<section class="slide" data-at="571" data-steps="572,573">
+  <p class="kick">Та же история – студентам</p>
+  <h2>Путь, который мы прошли</h2>
+  <div class="body">
+    <ol class="timeline">
+      <li class="st" data-s="1" style="font-size:30px"><b style="font-size:50px">Запросы</b><span>Составление запросов</span></li>
+      <li class="st" data-s="1" style="font-size:30px"><b style="font-size:50px">Контекст</b><span>Работа с контекстом</span></li>
+      <li class="st t-orange" data-s="2" style="font-size:30px"><b style="font-size:50px">Цикл</b><span>Модель работает долго, и в нужный момент ей добавляют нужный контекст и задачи</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="576" data-steps="576,580" data-title="Сильные инструменты и упряжка">
+  <p class="kick">Вебинар о проверке кода, который пишут агенты, август 2026</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote><span class="st" style="display:block">Хотите более сильного агента – полируйте не ваш запрос, а <b>дайте ему сильные инструменты</b></span><span class="st" style="display:block;margin-top:24px">Модели – лошадки, которых мы запрягаем. Управляем мы ими с помощью упряжки. <b>И упряжка – самое ценное</b></span></blockquote>
+      <figcaption><i class="ava">АЦ</i><span><b>Алексей Цымлов</b>цикл «Качество и безопасность ПО в эпоху GenAI», 28.08.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="583" data-steps="584,588">
+  <p class="kick">Мысль, особенно понятная испытателям</p>
+  <h2>Сначала договориться о проверке</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st"><h3 style="font-size:38px"><svg class="i"><use href="#i-handshake"/></svg>Контракт с агентом</h3><p class="muted" style="font-size:24px">Алексей Цымлов, вебинар о проверке кода</p><p style="font-size:34px">Договариваются заранее: задача не считается сделанной, пока не пройдут команды проверки</p></div>
+      <div class="col t-orange st"><h3 style="font-size:38px"><svg class="i"><use href="#i-clipboard-list"/></svg>Программа и методика испытаний</h3><p class="muted" style="font-size:24px">То же самое в вашей работе</p><p style="font-size:34px">Сначала договорились, как будем проверять, потом принимаем работу</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="591" data-title="Вывод для инженера">
+  <p class="kick t-orange">Вывод для инженера</p>
+  <div class="body">
+    <p class="say md">Хорошая формулировка важна.<br>Ещё важнее – какие <b>исходные данные</b> получила модель и <em>как проверяется результат</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="595" data-steps="597,599,602">
+  <p class="kick">Пример из занятий</p>
+  <h2>Цикл на практике</h2>
+  <div class="body">
+    <p class="sub st">Для длинной работы агенту ставят <b>задачу</b> и <em>условие окончания</em></p>
+    <div class="prompt st" style="--tw:235px;font-size:31px">
+      <p class="part t-teal"><span class="tg">Задача</span><span>Учебный калькулятор</span></p>
+      <p class="part t-orange"><span class="tg">Условие окончания</span><span>Готов, когда проверен в трёх браузерах и выложен на сервер</span></p>
+    </div>
+    <div class="rule sm st"><svg class="i"><use href="#i-repeat"/></svg><div><p>Пока условие не выполнено, агент продолжает работать и проверять себя</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="603">
+  <p class="kick">Пример из занятий</p>
+  <h2>Каждая веха – отдельным файлом</h2>
+  <div class="body">
+    <div class="split">
+      <div><div class="docs" style="flex-wrap:nowrap">
+        <div class="doc" style="width:235px;gap:14px"><h4 style="font-size:26px">Веха</h4><i class="t"></i><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp t-teal">файл</b></div>
+        <div class="doc" style="width:235px;gap:14px"><h4 style="font-size:26px">Веха</h4><i class="t"></i><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp t-teal">файл</b></div>
+      </div></div>
+      <div>
+        <ul class="list big">
+          <li><b>Инструкция</b> для модели</li>
+          <li class="t-orange"><b>Напоминание</b> для себя</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="606">
+  <p class="kick t-orange">Роль человека</p>
+  <h2>Человек остаётся руководителем</h2>
+  <div class="body">
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i" style="width:176px;height:176px;padding:38px;border-radius:40px"><use href="#i-target"/></svg><b style="font-size:38px">Ставит задачу</b></div>
+      <div class="pict"><svg class="i" style="width:176px;height:176px;padding:38px;border-radius:40px"><use href="#i-clipboard-check"/></svg><b style="font-size:38px">Принимает работу</b></div>
+      <div class="pict"><svg class="i" style="width:176px;height:176px;padding:38px;border-radius:40px"><use href="#i-search-check"/></svg><b style="font-size:38px">Проверяет её</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="608" data-steps="609,611">
+  <p class="kick t-orange">Для вас, инженеров</p>
+  <h2>Главное – первые две ступени</h2>
+  <div class="body">
+    <div class="ladder">
+      <div class="rung t-orange st" data-s="1" style="min-height:210px"><span class="n">Ступень 1</span><h3 style="font-size:38px">Ясный запрос</h3></div>
+      <div class="rung t-orange st" data-s="1" style="min-height:300px"><span class="n">Ступень 2</span><h3 style="font-size:38px">Правильные исходные данные</h3></div>
+      <div class="rung t-gray st" data-s="2" style="min-height:390px"><span class="n">Ступень 3</span><h3 style="font-size:38px">Цикл</h3><p style="font-size:29px">Пока не главное. Но знать, куда всё движется, полезно</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="612">
+  <p class="kick">Павел Гагарин · вебинар о разработке с агентами</p>
+  <h2>Мысли, полезные и в обычном чате</h2>
+  <div class="body">
+    <div class="split s64">
+      <div>
+        <ul class="list num big">
+          <li>Чем плох агент без процесса</li>
+          <li>Вопросы</li>
+          <li>Критерий успеха</li>
+        </ul>
+      </div>
+      <div class="center"><svg class="i big-ic"><use href="#i-messages-square"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="613">
+  <p class="kick t-red">Мысль первая</p>
+  <h2>Чем плох агент без процесса</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-circle-alert"/></svg></span><h3 style="font-size:40px">Уверенно делает не то</h3></div>
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-eye-off"/></svg></span><h3 style="font-size:40px">Молча додумывает решения</h3><p style="font-size:31px">Те, которые должен был принять человек</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="616" data-steps="618,622">
+  <p class="kick">Мысль вторая – о вопросах</p>
+  <h2>Пробелы в задаче – двух сортов</h2>
+  <div class="body">
+    <div class="tree" style="--n:2">
+      <div class="root">Пробел в задаче</div>
+      <div class="kids">
+        <div class="kid t-orange st" style="padding:24px 28px;gap:12px"><h3 style="font-size:34px">Меняет то, что увидит пользователь</h3><p style="font-size:29px">Агент задаёт вопрос автору задачи – с&nbsp;вариантами и своей рекомендацией. Автору остаётся выбрать букву</p>
+          <div class="tags"><span class="tag" style="background:var(--bg);font-size:25px">а</span><span class="tag" style="background:var(--bg);font-size:25px">б</span><span class="tag" style="background:var(--bg);font-size:25px">в</span><span class="tag" style="background:var(--c);color:var(--chip-ink);font-size:25px">рекомендация агента</span></div></div>
+        <div class="kid t-teal st" style="padding:24px 28px;gap:12px"><h3 style="font-size:34px">Мелкий технический</h3><p style="font-size:29px">Агент закрывает сам и записывает в&nbsp;раздел «Предположения» – с&nbsp;обоснованием в одну строку</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="625" data-steps="627,628,629">
+  <p class="kick t-orange">Приём для любого запроса</p>
+  <h2>Допишите в свой запрос</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:200px;font-size:32px">
+      <p class="part t-orange st"><span class="tg">Вопросы</span><span>Если данных не хватает, задай вопросы с вариантами ответа и своей рекомендацией,</span></p>
+      <p class="part t-teal st"><span class="tg">Допущения</span><span>а мелкие допущения перечисли отдельно</span></p>
+    </div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-zap"/></svg><div><p>Отвечать на такие вопросы гораздо быстрее, чем на открытые</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="630" data-steps="631,633">
+  <p class="kick">Мысль третья</p>
+  <h2>Критерий успеха</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:33px">
+      <thead><tr><th style="width:21%"></th><th style="width:27%">Не критерий</th><th>Критерий</th></tr></thead>
+      <tbody>
+        <tr class="st"><td>У Гагарина</td><td class="no">«Код написан»</td><td class="yes">Сценарий и результат</td></tr>
+        <tr class="st"><td>По-нашему</td><td class="no">«Ответ получен»</td><td class="yes">По ответу можно составить план проверки, и каждая причина в нём связана с нашими цифрами</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="637" data-title="Замечания людей – в отдельный файл">
+  <p class="kick">Ещё деталь из его процесса</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><div class="doc" style="width:350px;gap:17px;padding:28px 28px 38px"><h4 style="font-size:30px">Замечания людей</h4><i class="hl"></i><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><i class="hl"></i><i class="s"></i><b class="stamp t-teal" style="font-size:23px">отдельный файл</b></div></div>
+      <div>
+        <p class="say sm">Замечания людей записываются в <b>отдельный файл</b> и не испаряются в чате</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="640" data-steps="640,643" data-title="Агенты – конвейер, люди – границы">
+  <p class="kick">Итоговая формула</p>
+  <div class="body">
+    <figure class="quote st">
+      <blockquote style="font-size:98px;line-height:1.1">Агенты – <b>конвейер</b>,<br>люди – <em>границы</em></blockquote>
+      <figcaption><i class="ava">ПГ</i><span><b>Павел Гагарин</b>вебинар о разработке с агентами, 28.07.2026</span></figcaption>
+    </figure>
+    <p class="note st">В пятом модуле мы к этому вернёмся</p>
+  </div>
+</section>
+
+<section class="slide dark" data-at="646" data-title="Запрос помогает, но не спасает">
+  <p class="kick">Фраза, которую стоит запомнить</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:60px">Составление запросов уменьшает число ошибок, <b>но не устраняет их</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Omar M. и соавторы</b>исследование про неверные посылки, 2025</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Omar M. et al. Communications Medicine, 2025 · doi.org/10.1038/s43856-025-01021-3</p>
+</section>
+
+<section class="slide" data-at="650" data-steps="650,651,653" data-title="Хороший запрос – не гарантия">
+  <p class="kick">Что это значит</p>
+  <div class="body">
+    <p class="say md st" data-s="1">Хороший запрос – <b>не гарантия</b> правильного ответа</p>
+    <div class="cards">
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-trending-down"/></svg></span><h3>Он делает ошибку реже</h3></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-eye"/></svg></span><h3>и заметнее</h3></div>
+    </div>
+    <div class="rule t-orange st" data-s="3"><svg class="i"><use href="#i-search-check"/></svg><div><p>А найти её – по-прежнему ваша работа</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="654" data-steps="654,656,657">
+  <p class="kick t-orange">На практике</p>
+  <h2>Лестница запроса заканчивается проверкой</h2>
+  <div class="body">
+    <div class="ladder" style="gap:12px">
+      <div class="rung st" data-s="1" style="min-height:120px"><span class="n" style="font-size:38px;line-height:1">1</span><h3 style="font-size:24px">Одна строка</h3></div>
+      <div class="rung" style="min-height:180px"><span class="n" style="font-size:38px;line-height:1">2</span><h3 style="font-size:24px">Факты из замечания</h3></div>
+      <div class="rung" style="min-height:240px"><span class="n" style="font-size:38px;line-height:1">3</span><h3 style="font-size:24px">Требование и описание узла</h3></div>
+      <div class="rung" style="min-height:300px"><span class="n" style="font-size:38px;line-height:1">4</span><h3 style="font-size:24px">Ограничения и формат</h3></div>
+      <div class="rung st" data-s="1" style="min-height:360px"><span class="n" style="font-size:38px;line-height:1">5</span><h3 style="font-size:24px">Критерии проверки и вопросы</h3><p class="st" data-s="2" style="color:var(--red);font-weight:700;font-size:23px">Ошибки могут остаться и здесь</p></div>
+      <div class="rung t-orange st" data-s="3" style="min-height:420px"><span class="n" style="font-size:38px;line-height:1"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:24px">Проверка по вашему <span style="white-space:nowrap">чек-листу</span></h3></div>
+    </div>
+  </div>
+</section>
