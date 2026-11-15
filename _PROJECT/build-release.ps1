@@ -343,6 +343,12 @@ function Assert-ReleaseSourcePolicy([string]$SourcePath) {
 # document and manifest. Keep this directory-level boundary ahead of the
 # generic nested-file rules so a newly added Markdown or script cannot leak.
 $script:QuarantinedNestedDirectories = @{
+  # kamaz-ai: lesson videos live on the hosting in www/media (outside Git, uploaded by
+  # kamaz-ai/_build/upload-media.sh); deploy-hosting.ps1 keeps that folder. The local copy is
+  # only for the Docker preview and must never enter a release archive.
+  'kamaz-ai' = @(
+    'media'
+  )
   'appsec-lections' = @(
     'downloads\day-01\lab-results',
     'downloads\day-01\participant-materials',
