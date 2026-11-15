@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <script>
+    try { document.querySelector('meta[name="color-scheme"]').content = localStorage.getItem('ai-engineers-color-scheme') || 'light dark'; } catch {}
+    try { if (localStorage.getItem('ai-engineers-projector') === '1') document.documentElement.classList.add('projector'); } catch {}
+  </script>
+  <meta name="description" content="Интерактивная лаборатория нейронной сети: настоящее обучение, подтверждение ответа и пошаговая визуализация 16×16.">
+  <title>Цифра. Слой за слоем | Искусственный интеллект для инженеров</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/cnn.css">
+  <link rel="stylesheet" href="/cnn-lab.css">
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#predict">К распознаванию и обучению</a>
+  <header class="topbar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 44 44" aria-hidden="true"><path d="M8 13h12M8 22h8M8 31h12M24 13h12M28 22h8M24 31h12M20 13l4 9-4 9M24 13l-4 9 4 9"/><circle cx="22" cy="22" r="4"/></svg>
+      <div><p class="course-name">Искусственный интеллект для инженеров</p><h1>Цифра. <span>Слой за слоем.</span></h1></div>
+    </div>
+    <div class="header-actions">
+      <div class="model-status" id="model-status"><span class="status-dot"></span><span>Случайные веса</span></div>
+      <button class="button ghost" id="projector-toggle" type="button" aria-pressed="false" title="Крупный масштаб для проектора и большого экрана">Крупно</button><button class="button ghost" id="help-button" type="button">Сценарий занятия</button>
+      <button class="icon-button" id="theme-toggle" type="button" aria-label="Переключить тему"><svg class="theme-light-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg><svg class="theme-dark-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15.2A8.5 8.5 0 0 1 8.8 4 8.5 8.5 0 1 0 20 15.2Z"/></svg></button>
+    </div>
+  </header>
+
+  <nav class="example-switch" aria-label="Учебные примеры"><button id="example-mlp" type="button" aria-pressed="true">1. Полносвязная сеть</button><button id="example-cnn" type="button" aria-pressed="false">2. Свёрточная сеть</button></nav>
+  <main id="lab-main">
+    <div class="workspace">
+      <aside class="panel input-panel" aria-labelledby="input-title">
+        <div class="panel-heading"><div><span class="axis-label">01 / ВХОД</span><h2 id="input-title">Изображение</h2></div><span class="dimension-badge">16 × 16</span></div>
+        <div class="preview-shell"><div class="preview-grid"><canvas id="input-preview" width="16" height="16" role="img" aria-label="Выбранная цифра"></canvas></div><div class="preview-caption"><span id="sample-name">Загрузка примеров…</span><span>256 сигналов</span></div></div>
+        <div class="source-switch" aria-label="Источник изображения"><button id="source-gallery" type="button" aria-pressed="true">Примеры <span>100</span></button><button id="source-draw" type="button" aria-pressed="false">Нарисовать</button></div>
+        <div id="gallery-source">
+          <details id="gallery-details"><summary>Выбрать из 100 примеров <span>стрелки · Enter</span></summary><div class="dataset-filter-row"><label for="dataset-filter">Показать</label><select id="dataset-filter"><option value="all">Весь набор · 100</option><option value="train">Обучение · 80</option><option value="validation">Проверка · 20</option></select></div><ul id="sample-grid" class="sample-grid" aria-label="Встроенные изображения цифр"></ul></details>
+        </div>
+        <div id="draw-source" hidden><div class="drawing-frame"><canvas id="drawing-canvas" width="256" height="256" aria-label="Нарисуйте цифру здесь">Ваш браузер не поддерживает холст для рисования.</canvas><span class="drawing-hint">Одна цифра · белое по чёрному</span></div><button class="button ghost full-width" id="clear-drawing" type="button">Очистить холст</button></div>
+        <div class="upload-zone" id="upload-zone"><input id="file-input" type="file" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp"><label for="file-input"><strong>Загрузить свою картинку</strong><span>PNG, JPG, WebP, GIF или BMP · общий вход 16×16</span></label></div>
+        <div class="label-control"><label for="correct-answer">Правильный ответ</label><select id="correct-answer" aria-describedby="label-hint"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="0">0</option></select></div>
+        <p class="control-hint" id="label-hint">В обучении щелчок по выходу выбирает цифру. Кнопка «i» только показывает параметры.</p>
+        <button class="button secondary full-width" id="train-one" type="button">Один шаг на обучающем примере</button>
+        <button class="button primary full-width" id="predict" type="button">Распознать цифру <span aria-hidden="true">→</span></button>
+      </aside>
+
+      <section class="panel network-panel" aria-labelledby="network-title">
+        <div class="panel-heading network-heading"><div><span class="axis-label">02 / ПРЕОБРАЗОВАНИЕ</span><h2 id="network-title">Внутри нейросети</h2></div><div class="mode-switch" aria-label="Режим работы"><button id="mode-training" type="button" aria-pressed="true">Обучение</button><button id="mode-recognition" type="button" aria-pressed="false">Распознавание</button></div></div>
+        <div class="architecture-strip" aria-label="Архитектура сети"><span><strong>256</strong> входов</span><i>→</i><span><strong>16</strong> нейронов</span><i>→</i><span><strong>12</strong> нейронов</span><i>→</i><span><strong>10</strong> ответов</span></div>
+        <div class="view-toolbar" aria-label="Управление визуализацией"><button class="button ghost" id="view-focus" type="button" aria-pressed="true">Выбранный расчёт</button><button class="button ghost" id="view-full" type="button" aria-pressed="false">Полный граф</button><button class="button ghost" id="animation-toggle" type="button" disabled>Пауза</button><label for="animation-speed">Темп<select id="animation-speed" disabled><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><a class="button ghost" href="#neuron-inspector">Числа нейрона</a><button class="button secondary" id="teacher-open" type="button">Пошаговый разбор</button></div>
+        <figure class="network-figure" id="network-figure"><canvas id="network-canvas" role="img" aria-describedby="network-description"></canvas><figcaption id="network-description" class="visually-hidden">Сеть 256→16→12→10. Порядок выходов 1…9,0 соответствует классам 1…9,0. Числа и все входящие веса доступны в инспекторе.</figcaption><div class="network-legend" aria-hidden="true"><span class="legend-positive">w &gt; 0</span><span class="legend-negative">w &lt; 0</span><span>кольцо: выбранная метка</span></div><div id="network-tooltip" class="network-tooltip" role="tooltip" hidden></div></figure>
+        <p class="network-caption" id="network-caption">Выберите нейрон или его числовые параметры. Полный граф доступен отдельной кнопкой.</p>
+        <div class="inspector" id="neuron-inspector" tabindex="-1">
+          <div class="inspector-heading"><div><span class="axis-label">ВЫБРАННЫЙ НЕЙРОН</span><h3 id="inspection-title">Выберите нейрон</h3></div><label class="neuron-picker-label" for="neuron-picker">Нейрон<select id="neuron-picker" aria-label="Выбрать нейрон для инспекции"></select></label></div>
+          <div class="signal-readings"><div><span>Сумма z = Σ(w·a) + b</span><strong id="sum-value">—</strong></div><div><span>Активация a / softmax</span><strong id="activation-value">—</strong></div><div><span>Смещение b</span><strong id="bias-value">—</strong></div></div>
+          <p id="inspection-copy">z обозначает входную сумму, a обозначает сигнал после функции активации. Вес w относится к связи, а не к нейрону.</p>
+          <div id="weight-list" class="weight-list" aria-label="Наиболее влиятельные входящие веса"></div>
+          <button class="button ghost" id="inspect-weights" type="button">Все входящие веса · числа</button>
+        </div>
+      </section>
+
+      <aside class="panel output-panel" aria-labelledby="output-title">
+        <div class="panel-heading"><div><span class="axis-label">03 / ВЫХОД</span><h2 id="output-title">Ответ сети</h2></div></div>
+        <div class="verdict" id="verdict"><span>Наиболее похоже на</span><strong id="predicted-digit">—</strong><p id="confidence-copy">Выберите пример и нажмите «Распознать»</p></div>
+        <table class="digit-outputs" id="digit-outputs"><caption class="visually-hidden">Вероятности каждой цифры по результатам softmax</caption><thead class="visually-hidden"><tr><th scope="col">Цифра / выбрать</th><th scope="col">Доля softmax</th><th scope="col">Инспектор</th></tr></thead><tbody>
+          <tr id="output-row-1" data-digit="1"><th scope="row"><button id="choose-output-1" type="button">1</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-1" type="button" aria-label="Параметры нейрона цифры 1">i</button></td></tr>
+          <tr id="output-row-2" data-digit="2"><th scope="row"><button id="choose-output-2" type="button">2</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-2" type="button" aria-label="Параметры нейрона цифры 2">i</button></td></tr>
+          <tr id="output-row-3" data-digit="3"><th scope="row"><button id="choose-output-3" type="button">3</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-3" type="button" aria-label="Параметры нейрона цифры 3">i</button></td></tr>
+          <tr id="output-row-4" data-digit="4"><th scope="row"><button id="choose-output-4" type="button">4</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-4" type="button" aria-label="Параметры нейрона цифры 4">i</button></td></tr>
+          <tr id="output-row-5" data-digit="5"><th scope="row"><button id="choose-output-5" type="button">5</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-5" type="button" aria-label="Параметры нейрона цифры 5">i</button></td></tr>
+          <tr id="output-row-6" data-digit="6"><th scope="row"><button id="choose-output-6" type="button">6</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-6" type="button" aria-label="Параметры нейрона цифры 6">i</button></td></tr>
+          <tr id="output-row-7" data-digit="7"><th scope="row"><button id="choose-output-7" type="button">7</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-7" type="button" aria-label="Параметры нейрона цифры 7">i</button></td></tr>
+          <tr id="output-row-8" data-digit="8"><th scope="row"><button id="choose-output-8" type="button">8</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-8" type="button" aria-label="Параметры нейрона цифры 8">i</button></td></tr>
+          <tr id="output-row-9" data-digit="9"><th scope="row"><button id="choose-output-9" type="button">9</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-9" type="button" aria-label="Параметры нейрона цифры 9">i</button></td></tr>
+          <tr id="output-row-0" data-digit="0"><th scope="row"><button id="choose-output-0" type="button">0</button></th><td><div class="confidence-track"><div class="confidence-bar"></div></div><output>—</output></td><td><button class="inspect-output" id="inspect-output-0" type="button" aria-label="Параметры нейрона цифры 0">i</button></td></tr>
+        </tbody></table>
+        <button class="button secondary full-width" id="feedback-correct" type="button" disabled>Верно, обучить на показанной цифре</button>
+        <p class="control-hint" id="output-mode-hint">Сначала получите ответ. В распознавании выбор цифры только открывает инспектор.</p>
+        <section class="training-feedback" id="training-feedback" aria-live="polite" hidden></section>
+        <div class="softmax-note"><span>Σ = 100%</span><p>Softmax распределяет оценку между десятью классами и не доказывает правильность ответа на любой почерк.</p></div>
+      </aside>
+    </div>
+
+    <section class="control-deck" aria-labelledby="training-title">
+      <div class="training-action"><span class="axis-label">ЦИКЛ ОБУЧЕНИЯ</span><h2 id="training-title">Один шаг и цикл из 12 эпох</h2><div class="lesson-actions"><button class="button primary" id="train-all" type="button">Быстро обучить: 12 эпох</button></div></div>
+      <div class="epoch-progress"><div class="progress-label"><span id="epoch-label">Готов к первой эпохе</span><strong id="epoch-count">0 / 12</strong></div><progress id="training-progress" max="12" value="0">0 из 12</progress><p id="training-message">80 примеров для обучения · 20 отложены для проверки</p></div>
+      <dl class="metrics"><div><dt>Ошибка · loss</dt><dd id="loss-value">—</dd></div><div><dt>Обучение</dt><dd id="train-accuracy">—</dd></div><div><dt>Проверка</dt><dd id="validation-accuracy">—</dd></div></dl>
+      <div class="model-actions" aria-label="Действия с моделью"><button class="button ghost" id="export-model" type="button">Экспорт</button><button class="button ghost" id="import-model" type="button">Импорт</button><input id="import-input" type="file" accept="application/json,.json" hidden><button class="button ghost danger" id="reset-model" type="button">Сбросить</button></div>
+      <details id="history-details"><summary>История метрик по эпохам</summary><div class="history-scroll"><table><caption class="visually-hidden">Фактические метрики каждой завершённой эпохи</caption><thead><tr><th scope="col">Эпоха</th><th scope="col">Шаги</th><th scope="col">Loss</th><th scope="col">Train</th><th scope="col">Validation</th></tr></thead><tbody id="history-body"></tbody></table></div></details>
+    </section>
+  </main>
+  <footer class="footer"><span>Нейросеть вычисляется локально в вашем браузере.</span><span>Два учебных примера · без облака · вход 16×16 · <a href="https://github.com/pikov-vitaliy/neural-network-digit-recognition#readme" target="_blank" rel="noopener">Инструкция и исходники</a></span></footer>
+
+  <dialog id="feedback-dialog" class="confirm-dialog" aria-labelledby="feedback-title"><h2 id="feedback-title">Правильная цифра: <span id="feedback-digit">—</span>. Использовать для обучения?</h2><p id="feedback-context">До подтверждения веса и число шагов не изменятся.</p><div class="dialog-actions"><button class="button ghost" id="cancel-feedback" type="button">Отмена</button><button class="button primary" id="confirm-feedback" type="button" autofocus>Да, обучить</button></div></dialog>
+  <dialog id="teacher-dialog" class="teacher-dialog" aria-labelledby="teacher-title">
+    <div class="dialog-topline"><span class="axis-label">РЕЖИМ ПРЕПОДАВАТЕЛЯ · ОДИН ПРИМЕР</span><button class="icon-button" id="teacher-cancel" type="button" aria-label="Закрыть без обучения">×</button></div>
+    <h2 id="teacher-title">Разбор шага без скрытого обучения</h2>
+    <p id="teacher-label" class="dialog-lead"></p>
+    <label class="label-control" for="teacher-target">Правильная цифра для обучения<select id="teacher-target"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="0">0</option></select></label>
+    <ol class="teacher-stages" id="teacher-stages"><li>Вход</li><li>Сумма z</li><li>Активация a</li><li>Loss</li><li>Градиент</li><li>Вес</li></ol>
+    <div class="teacher-stage"><span class="stage-counter">Этап <output id="teacher-stage-index">1</output> / 6</span><h3 id="teacher-stage-title">Вход</h3><canvas id="teacher-input" width="16" height="16" role="img" aria-label="Фактический вход 16×16"></canvas><code id="teacher-calculation"></code><p id="teacher-explanation"></p></div>
+    <div class="teacher-weight-table"><table><caption>Выбранная связь · фактические значения плана</caption><thead><tr><th scope="col">w_old</th><th scope="col">η</th><th scope="col">gradient</th><th scope="col">Δw</th><th scope="col">w_new</th></tr></thead><tbody><tr><td id="teacher-old-weight">—</td><td id="teacher-rate">—</td><td id="teacher-gradient-value">—</td><td id="teacher-delta-weight">—</td><td id="teacher-new-weight">—</td></tr></tbody></table></div>
+    <p class="teacher-note">План рассчитан, но не применён. Скорость показа не меняет математический результат.</p>
+    <div class="teacher-controls"><button class="button ghost" id="teacher-previous" type="button">Назад</button><button class="button secondary" id="teacher-next" type="button" autofocus>Следующий этап</button><button class="button ghost" id="teacher-play" type="button">Показать шаги</button><label for="teacher-speed">Темп<select id="teacher-speed"><option value="0.5">0,5×</option><option value="1" selected>1×</option><option value="2">2×</option></select></label><button class="button primary" id="teacher-apply" type="button" disabled>Применить один шаг</button></div>
+  </dialog>
+  <dialog id="weights-dialog" class="lesson-dialog" aria-labelledby="weights-title"><div class="dialog-topline"><span class="axis-label">ВЕС СВЯЗИ · НЕ АКТИВАЦИЯ</span><button class="icon-button" id="close-weights" type="button" aria-label="Закрыть">×</button></div><h2 id="weights-title">Входящие веса</h2><p id="weights-description"></p><div class="weight-search"><label for="weight-source">Вход №</label><input id="weight-source" type="number" min="1" value="1"><output id="selected-weight"></output></div><div class="weights-scroll"><table><thead><tr><th scope="col">Вход</th><th scope="col">a входа</th><th scope="col">w</th><th scope="col">w × a</th></tr></thead><tbody id="all-weights-body"></tbody></table></div></dialog>
+  <dialog id="lesson-dialog" class="lesson-dialog" aria-labelledby="lesson-title"><div class="dialog-topline"><span class="axis-label">МЕТОДИЧЕСКАЯ ПАМЯТКА</span><button class="icon-button" id="close-lesson" type="button" aria-label="Закрыть">×</button></div><h2 id="lesson-title">Как показать это на занятии</h2><p class="dialog-lead">Начните с рисунка. Проверьте ответ сети и при необходимости исправьте его.</p><ol class="lesson-steps"><li><strong>Нарисовать и распознать.</strong><p>Нарисуйте одну цифру и нажмите «Распознать». Анимация повторяет прямой проход, но не обучает сеть.</p></li><li><strong>Подтверждение.</strong><p>Если ответ верен, нажмите «Верно, обучить на цифре N». Если нет, выберите правильный выход, затем «Да, обучить». До подтверждения ничего не меняется.</p></li><li><strong>Ровно один шаг.</strong><p>Рисунок остаётся на экране. Сравните вероятность выбранного класса, loss и вес до/после. Один пример не гарантирует улучшения на всех изображениях.</p></li><li><strong>12 эпох отдельно.</strong><p>Быстрое обучение использует только 80 обучающих примеров. Проверочные 20 не участвуют в обновлении весов; это небольшой синтетический набор, а не доказательство распознавания любого почерка.</p></li><li><strong>Свёрточная сеть.</strong><p>Переключитесь на второй пример: рисунок общий, модели и их обучение раздельны. Выберите свёртку, фильтр и ячейку. Сопоставьте окно, произведения и результат. Во второй свёртке суммируются 72 произведения из 8 каналов. Затем изучите выбор максимума в pooling и выходные доли softmax.</p></li><li><strong>Инспекция.</strong><p>В обучении цифра выбирает метку, а «i» показывает параметры. В распознавании никакие действия с входом не меняют веса.</p></li><li><strong>Проектор.</strong><p>Кнопка «Крупно» вверху увеличивает весь интерфейс, чтобы подписи и числа читались с задних рядов; повторное нажатие возвращает обычный масштаб. Выбор запоминается в этом браузере.</p></li></ol><div class="formula-card"><span>Обратное распространение</span><code>w ← w − η · ∂Loss/∂w</code><p>Полносвязная сеть: η = 0,35 для одного примера, η = 0,3 для цикла. Свёрточная сеть: η = 0,03. Выбранный общий вес фильтра получает сумму вкладов от всех позиций. Ошибка считается по логитам без скрытого ограничения loss.</p></div></dialog>
+  <dialog id="reset-dialog" class="confirm-dialog" aria-labelledby="reset-title"><h2 id="reset-title">Вернуть случайные веса?</h2><p>Результат обучения будет удалён из этого браузера. Экспортированный файл, если он есть, останется на диске.</p><div class="dialog-actions"><button class="button ghost" id="cancel-reset" type="button" autofocus>Отмена</button><button class="button danger-solid" id="confirm-reset" type="button">Сбросить модель</button></div></dialog>
+  <div id="toast" class="toast" role="status" hidden></div><div id="announcer" class="visually-hidden" aria-live="polite"></div>
+</body>
+</html>
