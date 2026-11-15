@@ -213,6 +213,14 @@ attestation либо свежая изолированная пересборк�
 
 ### 6.1. Исполнимый rollback на предыдущий принятый SHA
 
+**Видео курса kamaz-ai (`www/media`).** С 15.11.2026 видео занятий живут на хостинге в
+`~/kamaz-ai.pikov.expert/www/media` вне git и вне release: `deploy-hosting.ps1` их не стирает
+(`rsync --exclude=/media/`) и не кладёт в резервную копию (`tar --exclude=www/media`).
+Скрипт выкладки из SHA до этой правки исключения не знает и при `rsync --delete` удалит
+`media`. Перед откатом kamaz-ai на такой SHA: `ssh pikov-hosting "mv ~/kamaz-ai.pikov.expert/www/media ~/kamaz-ai-media-hold"`,
+после отката – `ssh pikov-hosting "mv ~/kamaz-ai-media-hold ~/kamaz-ai.pikov.expert/www/media"`
+(или заново `bash kamaz-ai/_build/upload-media.sh N` для каждого дня из локальной `kamaz-ai/media`).
+
 Источник rollback — previous accepted SHA и его заново проверенный release из
 отдельного чистого worktree. Область возврата должна точно совпадать со списком
 доменов неудачной публикации. До запуска нужно подтвердить сохранённые

@@ -619,7 +619,7 @@ PY
     exit 13
   fi
 
-  tar -C "$(dirname "$target")" -czf "$backup_path" www
+  tar -C "$(dirname "$target")" --exclude=www/media -czf "$backup_path" www
   rm -rf "$unpack_dir"
   mkdir -p "$unpack_dir"
   python3 - "$zip_path" "$unpack_dir" <<'PY'
@@ -664,7 +664,7 @@ PY
     exit 15
   fi
 
-  rsync -a --delete "$unpack_dir"/ "$target"/
+  rsync -a --delete --exclude=/media/ "$unpack_dir"/ "$target"/
   find "$target" -type d -exec chmod 755 {} +
   find "$target" -type f -exec chmod 644 {} +
 

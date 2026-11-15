@@ -47,3 +47,17 @@
 .vp-timer span { display: block; font-size: .9rem; }
 .vp-timer b { display: block; font-size: 2rem; font-variant-numeric: tabular-nums; }
 @media (max-width: 600px) { .vp-timer span { font-size: .7rem; } .vp-timer b { font-size: 1.3rem; } }
+/* с дня 3: преподаватель в кадре – слайд слева, видео справа, как в вебинаре (пропорции готовых видео 1920×1080) */
+.vp-head { display: none; }
+.vp-frame-wrap.has-head { background: #f4f6f5; }
+.vp-frame-wrap.has-head iframe { inset: auto; left: .52%; top: 10.37%; width: 79.17%; height: 79.17%; background: #fff; }
+.vp-frame-wrap.has-head .vp-head { display: block; position: absolute; left: 79.69%; top: 27.78%; width: 19.79%; height: 43.98%; object-fit: cover; background: #000; }
+.vp-frame-wrap.has-head .vp-head[hidden] { display: none; }
+.vp-frame-wrap.has-head .vp-timer { right: 21.5%; }
+.vp-frame-wrap.has-head:fullscreen { background: #f4f6f5; }
+.vp-frame-wrap.has-head:-webkit-full-screen { background: #f4f6f5; }
+/* сцена 16:9 внутри рамки: во весь экран на мониторе с другими пропорциями – по центру, с полями */
+.vp-scene { position: absolute; inset: 0; }
+.vp-frame-wrap:fullscreen .vp-scene { margin: auto; width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); }
+.vp-frame-wrap:-webkit-full-screen .vp-scene { margin: auto; width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); }
+.vp-frame-wrap.has-head .vp-scene { background: #f4f6f5; }
