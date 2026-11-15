@@ -79,3 +79,34 @@ table td a { text-decoration: none; }
 .gloss-index li { margin: .15rem 0; break-inside: avoid; }
 .term { scroll-margin-top: 5.5rem; }
 @media (max-width: 760px) { .faq-toc-list { grid-template-columns: 1fr; } .faq-item { padding: 1rem .95rem .9rem; } }
+
+/* --- Живое расписание дня (live-schedule.js): прошедшее – серое время, идущее – красное, перерыв, ход дня --- */
+:root { --live: #ff6b6b; --live-soft: rgba(255, 107, 107, 0.1); }
+:root[data-theme="light"] { --live: #d92d20; --live-soft: rgba(217, 45, 32, 0.07); }
+@keyframes live-pulse { 0% { box-shadow: 0 0 0 0 var(--live); } 70% { box-shadow: 0 0 0 7px transparent; } 100% { box-shadow: 0 0 0 0 transparent; } }
+.live-head { margin: -.2rem 0 .9rem; }
+.live-clock { display: flex; align-items: center; gap: .5rem; font-size: .88rem; font-weight: 700; color: var(--live); font-variant-numeric: tabular-nums; }
+.live-clock::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: var(--live); animation: live-pulse 1.8s infinite; flex: none; }
+.live-head:has(+ [data-live-state="before"]) .live-clock::before,
+.live-head:has(+ [data-live-state="after"]) .live-clock::before { animation: none; background: var(--muted); }
+.live-head:has(+ [data-live-state="before"]) .live-clock, .live-head:has(+ [data-live-state="after"]) .live-clock { color: var(--muted); }
+.live-day-bar { position: relative; display: block; height: 6px; margin-top: .5rem; border-radius: 999px; background: var(--line); overflow: hidden; }
+.live-day-bar::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--done, 0%); border-radius: inherit; background: linear-gradient(90deg, var(--cyan), var(--live)); transition: width .6s ease; }
+.plan-list li, .timeline-item { position: relative; transition: opacity .3s ease; }
+.plan-list li.is-past .plan-time, .timeline-item.is-past .timeline-time { color: var(--muted); opacity: .45; font-weight: 600; }
+.plan-list li.is-now { margin: 0 -.65rem; padding-left: .65rem; padding-right: .65rem; padding-bottom: .95rem; border-radius: 12px; background: var(--live-soft); box-shadow: inset 3px 0 0 var(--live); border-top-color: transparent; }
+.plan-list li.is-now + li { border-top-color: transparent; }
+.plan-list li.is-now .plan-time, .timeline-item.is-now .timeline-time { color: var(--live); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+.live-left { display: flex; align-items: center; gap: .4rem; margin-top: .3rem; color: var(--live); font-size: .78rem; font-weight: 700; }
+.live-left::before { content: ""; width: .45rem; height: .45rem; border-radius: 50%; background: var(--live); animation: live-pulse 1.8s infinite; flex: none; }
+.live-progress { position: absolute; left: .65rem; right: .65rem; bottom: .35rem; height: 3px; border-radius: 999px; background: var(--line); overflow: hidden; }
+.live-progress::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--done, 0%); background: var(--live); border-radius: inherit; transition: width .6s ease; }
+.timeline-item .live-progress { left: auto; right: 0; bottom: 0; width: calc(100% - 7rem); }
+.timeline-item.is-now .timeline-dot { background: var(--live); border-color: var(--live); animation: live-pulse 1.8s infinite; }
+.timeline-item.is-past .timeline-dot { opacity: .45; }
+.live-gap, .plan-list li.live-gap { display: flex; align-items: center; gap: .55rem; padding: .5rem 0; border-top: 1px dashed var(--line-strong); color: var(--muted); font-size: .82rem; font-weight: 600; list-style: none; }
+.plan-list .live-gap + li { border-top-style: dashed; }
+.live-gap-dot { width: .5rem; height: .5rem; border-radius: 50%; background: var(--amber); animation: live-pulse 2.4s infinite; flex: none; }
+.timeline .live-gap { margin: .2rem 0 .2rem 7rem; }
+@media (prefers-reduced-motion: reduce) { .live-clock::before, .live-left::before, .live-gap-dot, .timeline-item.is-now .timeline-dot { animation: none; } .live-day-bar::after, .live-progress::after { transition: none; } }
+@media (max-width: 640px) { .timeline .live-gap { margin-left: 0; } .timeline-item .live-progress { width: 100%; } }
