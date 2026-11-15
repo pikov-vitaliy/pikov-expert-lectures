@@ -9,8 +9,24 @@
     try { if (localStorage.getItem('ai-engineers-projector') === '1') document.documentElement.classList.add('projector'); } catch {}
   </script>
   <meta name="description" content="Интерактивная лаборатория нейронной сети: настоящее обучение, подтверждение ответа и пошаговая визуализация 16×16.">
+  <meta name="author" content="Виталий Александрович Пиков">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Цифра. Слой за слоем: как нейросеть распознаёт цифру">
+  <meta property="og:description" content="Интерактивная лаборатория нейронной сети: настоящее обучение, подтверждение ответа и пошаговая визуализация 16×16.">
+  <meta property="og:url" content="https://neural-network-digit-recognition.pikov.expert/">
+  <meta property="og:image" content="https://neural-network-digit-recognition.pikov.expert/og-image.jpg">
+  <link rel="canonical" href="https://neural-network-digit-recognition.pikov.expert/">
   <title>Цифра. Слой за слоем | Искусственный интеллект для инженеров</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "LearningResource", "name": "Цифра. Слой за слоем: как нейросеть распознаёт цифру", "inLanguage": "ru", "url": "https://neural-network-digit-recognition.pikov.expert/", "description": "Интерактивная лаборатория нейронной сети: настоящее обучение, подтверждение ответа и пошаговая визуализация 16×16.", "learningResourceType": "Интерактивная лаборатория", "isAccessibleForFree": true, "author": {"@type": "Person", "name": "Виталий Александрович Пиков", "url": "https://pikov.expert/"}}</script>
+  <script>
+    // счётчик посещений портала pikov.expert – только в онлайн-версии; в npx и npm start не загружается
+    if (location.hostname === 'neural-network-digit-recognition.pikov.expert') {
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+      ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+    }
+  </script>
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/cnn.css">
   <link rel="stylesheet" href="/cnn-lab.css">
@@ -93,7 +109,7 @@
       <details id="history-details"><summary>История метрик по эпохам</summary><div class="history-scroll"><table><caption class="visually-hidden">Фактические метрики каждой завершённой эпохи</caption><thead><tr><th scope="col">Эпоха</th><th scope="col">Шаги</th><th scope="col">Loss</th><th scope="col">Train</th><th scope="col">Validation</th></tr></thead><tbody id="history-body"></tbody></table></div></details>
     </section>
   </main>
-  <footer class="footer"><span>Нейросеть вычисляется локально в вашем браузере.</span><span>Два учебных примера · без облака · вход 16×16 · <a href="https://github.com/pikov-vitaliy/neural-network-digit-recognition#readme" target="_blank" rel="noopener">Инструкция и исходники</a></span></footer>
+  <footer class="footer"><span>Нейросеть вычисляется локально в вашем браузере.</span><span>Два учебных примера · без облака · вход 16×16 · <a href="https://github.com/pikov-vitaliy/neural-network-digit-recognition#readme" target="_blank" rel="noopener">Инструкция и исходники</a> · <a class="brand-back" href="https://pikov.expert/">Все курсы и лекции – pikov.expert</a></span></footer>
 
   <dialog id="feedback-dialog" class="confirm-dialog" aria-labelledby="feedback-title"><h2 id="feedback-title">Правильная цифра: <span id="feedback-digit">—</span>. Использовать для обучения?</h2><p id="feedback-context">До подтверждения веса и число шагов не изменятся.</p><div class="dialog-actions"><button class="button ghost" id="cancel-feedback" type="button">Отмена</button><button class="button primary" id="confirm-feedback" type="button" autofocus>Да, обучить</button></div></dialog>
   <dialog id="teacher-dialog" class="teacher-dialog" aria-labelledby="teacher-title">
