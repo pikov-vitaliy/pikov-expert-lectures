@@ -1,0 +1,451 @@
+<!-- Лекция 1.2, строки 8–197 (00:00–09:56): вступление после обеда, план темы, шесть частей хорошего запроса -->
+
+<section class="slide cover" data-at="8">
+  <p class="kick">Модуль 1 · тема 1.2</p>
+  <h1>Запросы к языковой модели для инженерных задач</h1>
+  <p class="lead">Как разговаривать с моделью, чтобы ошибок было меньше, а находить их было проще</p>
+  <p class="meta">День 1 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-steps="14,15">
+  <p class="kick">Две темы дня</p>
+  <h2>Утром – модель, теперь – запрос</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st" style="padding:40px 44px;gap:24px"><h3 style="font-size:44px"><svg class="i"><use href="#i-sunrise"/></svg>Утром</h3><p style="font-size:36px;line-height:1.2">Что модель умеет<br>и где она ошибается</p></div>
+      <div class="col t-teal st" style="padding:40px 44px;gap:24px"><h3 style="font-size:44px"><svg class="i"><use href="#i-message-square-text"/></svg>Теперь</h3><p style="font-size:36px;line-height:1.2">Как с ней разговаривать,<br>чтобы ошибок было меньше,<br>а находить их было проще</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="18" data-title="Главная мысль темы">
+  <p class="kick">Главная мысль темы</p>
+  <div class="body">
+    <p class="say">Большая часть качества ответа закладывается <b>до отправки запроса</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="20" data-steps="21,22,25">
+  <p class="kick">Почему так</p>
+  <h2>Модель отвечает на тот вопрос, который ей задали</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red st"><span class="bdg"><svg class="i"><use href="#i-file-question"/></svg></span><h3>В запросе нет исходных данных</h3><p>Модель подставит типовые</p></div>
+      <div class="card t-red st"><span class="bdg"><svg class="i"><use href="#i-text"/></svg></span><h3>Не сказано, в каком виде нужен ответ</h3><p>Связный текст на полторы страницы, цифры придётся выписывать руками</p></div>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-pen-line"/></svg><div><p>Исходные данные, ограничения и нужный вид ответа лучше указать сразу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="26" data-title="Донести до машины, что от неё хочется">
+  <p class="kick">Вебинар о проверке кода, который пишут агенты</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Самая большая проблема при работе с агентами – люди иногда <b>не умеют правильно донести до машины, что от неё хочется</b>. Люди друг до друга до сих пор доносить не научились. А агенты почему-то должны понимать их с&nbsp;полуслова</blockquote>
+      <figcaption><i class="ava">ВФ</i><span><b>Валерий Филатов</b>ведущий вебинара · цикл «Качество и безопасность ПО в эпоху GenAI», 28.08.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="32" data-title="О чём эта тема">
+  <p class="kick t-orange">Об этом наша тема</p>
+  <div class="body">
+    <p class="say">Как <em>донести до модели</em>,<br>что нам нужно</p>
+  </div>
+</section>
+
+<section class="slide" data-at="34" data-steps="35,37,40">
+  <p class="kick">Вспомним утро</p>
+  <h2>Что показала утренняя практика</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-send"/></svg></span><h3>Один и тот же запрос –<br>в разные сервисы</h3></div>
+      <div class="card row st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Поиск ошибок<br>в готовом ответе</h3></div>
+    </div>
+    <div class="rule sm t-red st" data-s="2"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Многие найденные ошибки начинались не в модели, а в вопросе: чего-то в нём не было – и модель это додумала</p></div></div>
+    <div class="rule sm t-orange st" data-s="3"><svg class="i"><use href="#i-target"/></svg><div><p>Сейчас разберёмся, как сделать так, чтобы додумывать ей приходилось как можно меньше</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="43,45,47,48">
+  <p class="kick">План</p>
+  <h2>Что будет в этой теме</h2>
+  <div class="body">
+    <ul class="list num big" style="gap:22px">
+      <li class="st" data-s="1">Шесть частей хорошего запроса</li>
+      <li class="st" data-s="2">Приёмы, которые помогают</li>
+      <li class="st" data-s="2">Чего опасаться в самом запросе</li>
+      <li class="st" data-s="3">Что изменилось в новых моделях</li>
+      <li class="st t-orange" data-s="4">Шаблон запроса и чек-лист проверки ответа</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="49">
+  <p class="kick t-orange">Практика 1.2</p>
+  <h2>С шаблоном и чек-листом – на практику</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-orange"><span class="bdg"><svg class="i"><use href="#i-trending-up"/></svg></span><h3>Лестница запроса</h3><p>Пять ступеней: от одной строки до полной постановки</p><p class="muted">Задание 1 · 70 мин</p></div>
+      <div class="card t-orange"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3>Таблица требований</h3><p>Фрагмент ТЗ – в таблицу, замечания – против пунктов ТЗ</p><p class="muted">Задание 2 · 60 мин</p></div>
+      <div class="card t-orange"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3>Ваш собственный чек-лист</h3><p>Чек-лист из лекции – под свою работу</p><p class="muted">Задание 3 · 30 мин</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="53,56">
+  <p class="kick">Перед тем как начать</p>
+  <h2>Держите перед глазами карточку задачи</h2>
+  <div class="body">
+    <dl class="kv st" style="--kw:340px">
+      <div><dt>Исходные данные</dt><dd>Что известно: факты, цифры, документы</dd></div>
+      <div><dt>Ожидаемый результат</dt><dd>Что именно нужно получить и в каком виде</dd></div>
+      <div><dt>Критерии приёмки</dt><dd>По каким признакам вы примете результат</dd></div>
+      <div><dt>Ограничения</dt><dd>Что считать заданным, чего не делать</dd></div>
+    </dl>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-clipboard-list"/></svg><div><p>Хороший запрос получается из неё почти целиком</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="57,59">
+  <p class="kick">Учебный кейс</p>
+  <h2>Работаем на том же узле ЭС-24</h2>
+  <div class="body">
+    <div class="split s73" style="gap:36px">
+      <figure class="fig"><img src="@day/08-Схемы/d1-uzel-es24.png" alt="Схема учебного узла ЭС-24"></figure>
+      <div>
+        <ul class="list check sm st">
+          <li>То же техническое задание</li>
+          <li>Те же замечания</li>
+        </ul>
+        <div class="rule xs t-orange st" style="padding:20px 22px"><div><p>Так проще увидеть, как меняется ответ, когда меняется только запрос</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="63,65">
+  <p class="kick">Раздел 1</p>
+  <h2>Из чего состоит хороший запрос</h2>
+  <div class="body">
+    <div class="st">
+      <div class="cards c3">
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-user-round"/></svg></span><h3>Контекст</h3></div>
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-target"/></svg></span><h3>Задача</h3></div>
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-files"/></svg></span><h3>Исходные данные</h3></div>
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-ban"/></svg></span><h3>Ограничения</h3></div>
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3>Формат ответа</h3></div>
+        <div class="card row"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3>Критерии проверки</h3></div>
+      </div>
+    </div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-circle-help"/></svg><div><p>Не в каждом запросе нужны все шесть. Но если ответ не устраивает, сначала проверьте, какой части не хватило</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="68" data-steps="70,73">
+  <p class="kick">Часть 1 из 6</p>
+  <h2>Контекст <small style="font-size:.62em;font-weight:400;color:var(--muted)">кто вы и о чём речь</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i class="solid" style="flex:1 1 auto">Контекст</i><i class="t-gray" style="flex:1 1 auto">Задача</i><i class="t-gray" style="flex:1 1 auto">Исходные данные</i><i class="t-gray" style="flex:1 1 auto">Ограничения</i><i class="t-gray" style="flex:1 1 auto">Формат ответа</i><i class="t-gray" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:27.5px">
+      <div class="chat st"><div class="msg user" style="font-size:34px;max-width:92%"><span class="who">Например</span><p>Я инженер-электрик, разбираю замечания по испытаниям системы электроснабжения 24 В грузового автомобиля</p></div></div>
+      <div class="rule sm st"><svg class="i"><use href="#i-user-round"/></svg><div><p>Одна такая фраза задаёт уровень разговора: модель перестаёт объяснять азы и начинает говорить на языке инженера</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="76" data-steps="78,79">
+  <p class="kick">Часть 2 из 6</p>
+  <h2>Задача <small style="font-size:.62em;font-weight:400;color:var(--muted)">что нужно получить</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i style="flex:1 1 auto">Контекст</i><i class="solid" style="flex:1 1 auto">Задача</i><i class="t-gray" style="flex:1 1 auto">Исходные данные</i><i class="t-gray" style="flex:1 1 auto">Ограничения</i><i class="t-gray" style="flex:1 1 auto">Формат ответа</i><i class="t-gray" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:27.5px">
+      <div class="chat st"><div class="msg user" style="font-size:31px;max-width:92%"><span class="who">Например</span><p>Предложи возможные причины замечания З-2 и способы их проверить</p></div></div>
+      <div class="vs st">
+        <div class="col t-red"><h3><svg class="i"><use href="#i-x"/></svg>Называет тему</h3><p>«Расскажи про ток покоя»</p></div>
+        <div class="col t-teal"><h3><svg class="i"><use href="#i-check"/></svg>Называет результат</h3><p>«Предложи причины<br>и способы проверки»</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="82" data-steps="83,85,86">
+  <p class="kick">Часть 3 из 6</p>
+  <h2>Исходные данные <small style="font-size:.62em;font-weight:400;color:var(--muted)">факты, на которые модель должна опираться</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i style="flex:1 1 auto">Контекст</i><i style="flex:1 1 auto">Задача</i><i class="solid" style="flex:1 1 auto">Исходные данные</i><i class="t-gray" style="flex:1 1 auto">Ограничения</i><i class="t-gray" style="flex:1 1 auto">Формат ответа</i><i class="t-gray" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center">
+      <div class="docs" style="gap:42px;align-items:stretch;flex-wrap:nowrap">
+        <div class="doc st" style="width:340px;padding:26px 28px 34px;gap:14px"><h4 style="font-size:28.5px">Описание узла</h4><p style="font-size:25.5px;line-height:1.25">Генератор 28&nbsp;В, 80&nbsp;А. Две батареи 12&nbsp;В, 190&nbsp;А·ч. Потребители, которые работают на стоянке</p><b class="stamp t-teal" style="font-size:21px">ЭС-24</b></div>
+        <div class="doc st" style="width:340px;padding:26px 28px 34px;gap:14px"><h4 style="font-size:28.5px">Пункт 4.3 технического задания</h4><p style="font-size:25.5px;line-height:1.25">Ток покоя – не более 40&nbsp;мА. Измеряется через 30&nbsp;мин после выключения зажигания</p><b class="stamp t-orange" style="font-size:21px">требование</b></div>
+        <div class="doc st" style="width:340px;padding:26px 28px 34px;gap:14px"><h4 style="font-size:28.5px">Текст замечания с цифрами</h4><p style="font-size:25.5px;line-height:1.25">З-2. Ток покоя через 30&nbsp;мин после выключения зажигания – 85&nbsp;мА, через 2&nbsp;ч – 62&nbsp;мА</p><b class="stamp t-red" style="font-size:21px">замечание</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="87" data-title="Модель не знает вашего узла">
+  <p class="kick t-red">Зачем нужны исходные данные</p>
+  <div class="body">
+    <p class="say">Модель <b>не знает</b> вашего узла</p>
+    <p class="sub">Всё, чего нет в запросе, она додумает</p>
+  </div>
+</section>
+
+<section class="slide" data-at="89" data-steps="91,92,93">
+  <p class="kick">Часть 4 из 6</p>
+  <h2>Ограничения <small style="font-size:.62em;font-weight:400;color:var(--muted)">чего делать не надо и что считать заданным</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i style="flex:1 1 auto">Контекст</i><i style="flex:1 1 auto">Задача</i><i style="flex:1 1 auto">Исходные данные</i><i class="solid" style="flex:1 1 auto">Ограничения</i><i class="t-gray" style="flex:1 1 auto">Формат ответа</i><i class="t-gray" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:27.5px">
+      <div class="cards">
+        <div class="card t-orange"><h3><svg class="i" style="color:var(--c);margin-right:14px"><use href="#i-circle-check"/></svg>Что считать заданным</h3><p class="st" style="font-size:30px">Генератор и батареи исправны,<br>их не рассматривай</p></div>
+        <div class="card t-red"><h3><svg class="i" style="color:var(--c);margin-right:14px"><use href="#i-ban"/></svg>Чего делать не надо</h3><p class="st" style="font-size:30px">Не предлагай замену узлов<br>без проверки</p></div>
+      </div>
+      <div class="rule sm t-gray st"><svg class="i"><use href="#i-filter"/></svg><div><p>Ограничения отсекают то, что вы уже проверили, и то, что вам не подходит</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="95" data-steps="97,99">
+  <p class="kick">Часть 5 из 6</p>
+  <h2>Формат ответа <small style="font-size:.62em;font-weight:400;color:var(--muted)">как его оформить</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i style="flex:1 1 auto">Контекст</i><i style="flex:1 1 auto">Задача</i><i style="flex:1 1 auto">Исходные данные</i><i style="flex:1 1 auto">Ограничения</i><i class="solid" style="flex:1 1 auto">Формат ответа</i><i class="t-gray" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:27.5px">
+      <table class="tbl st">
+        <thead><tr><th>Причина</th><th>Как проверить</th><th>Чем измерить</th><th>Ожидаемый результат</th></tr></thead>
+        <tbody>
+          <tr><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:72%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:88%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:60%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:80%;margin:11px 0"></i></td></tr>
+          <tr><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:85%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:64%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:76%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:58%;margin:11px 0"></i></td></tr>
+          <tr><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:64%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:78%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:52%;margin:11px 0"></i></td><td><i style="display:block;height:13px;border-radius:7px;background:var(--line);width:70%;margin:11px 0"></i></td></tr>
+        </tbody>
+      </table>
+      <div class="rule sm t-orange st"><svg class="i"><use href="#i-table"/></svg><div><p>От формата зависит, сколько работы у вас останется после ответа</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="100" data-steps="101,104,106">
+  <p class="kick">Часть 6 из 6</p>
+  <h2>Критерии проверки <small style="font-size:.62em;font-weight:400;color:var(--muted)">по чему вы поймёте, что ответ годится</small></h2>
+  <div class="body top">
+    <div class="segbar" style="height:52px;font-size:20px;border-radius:13px"><i style="flex:1 1 auto">Контекст</i><i style="flex:1 1 auto">Задача</i><i style="flex:1 1 auto">Исходные данные</i><i style="flex:1 1 auto">Ограничения</i><i style="flex:1 1 auto">Формат ответа</i><i class="solid" style="flex:1 1 auto">Критерии проверки</i></div>
+    <div style="flex:1;min-height:0;display:flex;flex-direction:column;justify-content:center;gap:30px">
+      <ul class="list check" style="font-size:32px">
+        <li class="st">Отдельно объясни превышение 40&nbsp;мА и&nbsp;снижение тока с&nbsp;85 до&nbsp;62&nbsp;мА</li>
+        <li class="st">Допускай сочетание нескольких причин и укажи, какие измерения их различат</li>
+      </ul>
+      <div class="rule sm st"><svg class="i"><use href="#i-target"/></svg><div><p>Критерии задают модели понятную цель и помогают вам оценить ответ</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="108" data-steps="109,111,112,113,115,116">
+  <p class="kick">Соберём всё вместе</p>
+  <h2>Шесть частей читаются как один запрос</h2>
+  <div class="body">
+    <div class="prompt" style="font-size:24px;--tw:225px;gap:5px;padding:14px 20px">
+      <p class="part st"><span class="tg">Контекст</span><span>Я инженер-электрик, разбираю замечания по испытаниям системы электроснабжения 24 В грузового автомобиля.</span></p>
+      <p class="part st"><span class="tg">Задача</span><span>Предложи возможные причины замечания З-2 и способы их проверить.</span></p>
+      <p class="part st"><span class="tg">Исходные данные</span><span>[описание узла, пункт 4.3 технического задания, текст замечания с цифрами]</span></p>
+      <p class="part st t-orange"><span class="tg">Ограничения</span><span>Генератор и батареи исправны, их не рассматривай. Не предлагай замену узлов без проверки.</span></p>
+      <p class="part st"><span class="tg">Формат ответа</span><span>Ответ – таблицей: причина, как проверить, чем измерить, ожидаемый результат.</span></p>
+      <p class="part st t-orange"><span class="tg">Критерии проверки</span><span>Отдельно объясни превышение 40 мА и снижение тока с 85 до 62 мА. Допускай сочетание нескольких причин и укажи, какие измерения их различат.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="118" data-title="Семь-восемь строк">
+  <p class="kick">Сколько это занимает</p>
+  <div class="body">
+    <div class="stats">
+      <div class="stat md"><b>7–8 строк</b><span>весь запрос</span></div>
+      <div class="stat md t-orange"><b>пара минут</b><span>чтобы его написать</span></div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-rotate-ccw"/></svg><div><p>Без них ответ, скорее всего, придётся переделывать</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="121" data-title="Требования и ошибка">
+  <p class="kick">Про критерии · круглый стол по безопасной разработке, октябрь 2026</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Если требования есть и поведение им не соответствует, это <b>ошибка</b>. А если требований нет&nbsp;– это, как говорят программисты, <b>фича</b></blockquote>
+      <figcaption><i class="ava">АБ</i><span><b>Антон Башарин</b>Swordfish Security · SOC Forum 2026, 28.10.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-steps="125,128">
+  <p class="kick">Критерии и проверка</p>
+  <h2>С моделью похоже</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-orange st" style="padding:36px 40px"><h3>Не сказали, по чему примете ответ</h3><p style="font-size:33px;line-height:1.22">Труднее оценить, годится ли он для вашей задачи</p></div>
+      <div class="col t-red st" style="padding:36px 40px"><h3>Фактические ошибки проверяем в любом случае</h3><ul style="font-size:33px"><li>арифметика</li><li>выдуманный пункт</li><li>противоречие физике</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="130">
+  <p class="kick">Как я объясняю это студентам</p>
+  <h2>Шесть частей – четыре простых вопроса</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-user-round"/></svg><b style="font-size:30px">Кто я</b></div>
+      <div class="pict"><svg class="i"><use href="#i-circle-help"/></svg><b style="font-size:30px">Зачем мне это</b></div>
+      <div class="pict"><svg class="i"><use href="#i-package-check"/></svg><b style="font-size:30px">Что мне нужно</b></div>
+      <div class="pict t-red"><svg class="i"><use href="#i-ban"/></svg><b style="font-size:30px">Чего мне не нужно</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="136" data-steps="137,139,140,141">
+  <p class="kick">Пример</p>
+  <h2>Студент просит модель сделать учебное приложение</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg user" style="font-size:31px;max-width:90%"><span class="who">Запрос студента</span>
+        <p class="st" data-s="1">Я выполняю задание преподавателя по такой-то дисциплине.</p>
+        <p class="st" data-s="2">Мне нужна база данных на конкретной системе.</p>
+        <p class="st" data-s="3">Работать в ней будет менеджер с одной ролью.</p>
+        <p class="st" data-s="4"><mark>Разных ролей не надо.</mark></p>
+      </div>
+    </div>
+    <div class="rule sm t-orange st" data-s="4"><svg class="i"><use href="#i-timer"/></svg><div><p>Последняя фраза экономит и модели, и вам кучу лишней работы</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="143,147" data-title="Правильно скажи, что тебе надо">
+  <p class="kick">Студентам я говорю и так</p>
+  <div class="body">
+    <div class="st" style="display:flex;flex-direction:column;gap:20px">
+      <p class="say">Правильно скажи, <b>что тебе надо</b></p>
+      <p class="sub">Чтобы правильно сказать, нужно самому понимать задачу на уровень выше</p>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-user-round"/></svg><div><p>Модель не поставит задачу за вас. Она только хорошо выполнит ту, которую вы поставили</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="149">
+  <p class="kick">Утренняя практика, задание 2а</p>
+  <h2>Запрос, который вы отправляли по замечанию З-3</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg user" style="max-width:100%;font-size:27px;padding:24px 32px"><span class="who">Запрос</span>
+        <p>Я инженер, разбираю замечание по испытаниям системы электроснабжения грузового автомобиля. Ниже описание узла и фрагмент технического задания.</p>
+        <p>[разделы 1 и 2 учебного кейса]</p>
+        <p>Замечание З-3: на холостом ходу при включённых фарах дальнего света и обогреве зеркал напряжение бортовой сети снижается до 26,1 В.</p>
+        <p>Предложи возможные причины и как проверить каждую. Ответ дай таблицей: причина – как проверить – что должно получиться.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-steps="151,153,155,157,159,162">
+  <p class="kick">Разбор по частям</p>
+  <h2>Что было в утреннем запросе, а чего не было</h2>
+  <div class="body" style="gap:16px;padding-top:16px">
+    <div class="prompt" style="font-size:23px;--tw:225px;gap:3px;padding:12px 20px">
+      <p class="part st" data-s="1" style="padding:6px 10px"><span class="tg">Контекст</span><span>Я инженер, разбираю замечание по испытаниям системы электроснабжения грузового автомобиля</span></p>
+      <p class="part st" data-s="2" style="padding:6px 10px"><span class="tg">Исходные данные</span><span>Описание узла, фрагмент технического задания и само замечание</span></p>
+      <p class="part st" data-s="3" style="padding:6px 10px"><span class="tg">Задача</span><span>Предложить возможные причины и как проверить каждую</span></p>
+      <p class="part st" data-s="4" style="padding:6px 10px"><span class="tg">Формат ответа</span><span>Таблица: причина – как проверить – что должно получиться</span></p>
+      <p class="part st t-red" data-s="5" style="padding:6px 10px"><span class="tg">Ограничения</span><span><b style="color:var(--c)">не было</b></span></p>
+      <p class="part st t-red" data-s="5" style="padding:6px 10px"><span class="tg">Критерии проверки</span><span><b style="color:var(--c)">не было</b></span></p>
+    </div>
+    <div class="rule xs t-red st" data-s="6" style="padding:16px 28px"><svg class="i" style="font-size:44px"><use href="#i-triangle-alert"/></svg><div><p>Поэтому модель могла рассматривать что угодно и сама решала, когда ответ достаточно хорош</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="164,165">
+  <p class="kick t-orange">Вопрос к группе</p>
+  <h2>Разминка перед практикой</h2>
+  <div class="body">
+    <div class="ask t-orange">
+      <span class="q">?</span>
+      <ul>
+        <li class="st">Вспомните свой последний запрос к модели</li>
+        <li class="st">Каких из шести частей в нём не было?</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-message-circle"/></svg>Если хотите, напишите в чат одной строкой</p>
+</section>
+
+<section class="slide" data-at="168" data-steps="169,170,171,172,173">
+  <p class="kick">Карточка и запрос</p>
+  <h2>Шесть частей и утренняя карточка задачи</h2>
+  <div class="body">
+    <div class="cards sm" style="gap:11px 70px">
+      <p class="note" style="font-weight:700">В карточке задачи</p><p class="note" style="font-weight:700">В запросе</p>
+      <div class="card row t-gray"><h3>Исходные данные</h3></div><div class="card row st"><h3>Исходные данные</h3></div>
+      <div class="card row t-gray"><h3>Ожидаемый результат</h3></div><div class="card row st"><h3>Задача и формат ответа</h3></div>
+      <div class="card row t-gray"><h3>Критерии приёмки</h3></div><div class="card row st"><h3>Критерии проверки</h3></div>
+      <div class="card row t-gray"><h3>Ограничения</h3></div><div class="card row st"><h3>Ограничения</h3></div>
+      <div class="card row t-gray" style="background:none;box-shadow:none;border:2.5px dashed var(--line)"><h3 class="muted" style="font-weight:400">в карточке этого нет</h3></div><div class="card row t-orange st"><h3>Контекст – одна фраза о том,<br>кто вы и о чём речь</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="174,177">
+  <p class="kick">Порядок работы</p>
+  <h2>Сначала карточка, потом запрос</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step" style="padding:32px 30px 36px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-clipboard-list"/></svg></span><h3 style="font-size:38px">Карточка</h3><p class="st" data-s="2" style="color:var(--red);font-size:28px">В ожидаемом результате написано «разобраться»</p></li>
+      <li class="step" style="padding:32px 30px 36px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-message-square-text"/></svg></span><h3 style="font-size:38px">Запрос</h3><p class="st" data-s="2" style="color:var(--red);font-size:28px">Задача в запросе будет размытой</p></li>
+      <li class="step t-red st" data-s="2" style="padding:32px 30px 36px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-text"/></svg></span><h3 style="font-size:38px">Ответ модели</h3><p style="color:var(--red);font-size:28px">На размытую задачу – размытый текст</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="180" data-title="Вебинар для преподавателей">
+  <p class="kick">Год назад</p>
+  <div class="body">
+    <div class="split s73">
+      <div class="term">
+        <dfn>LLMs – ваш цифровой помощник в преподавании</dfn>
+        <p>Вебинар для преподавателей учебного центра, 17.09.2025: как языковые модели помогают в рутине</p>
+      </div>
+      <div class="center"><svg class="i big-ic"><use href="#i-presentation"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="183,184" data-title="Запрос – техническое задание для модели">
+  <p class="kick">Одна мысль с того вебинара</p>
+  <div class="body">
+    <p class="say st">Хороший запрос – это <b>чёткое техническое задание</b> для модели</p>
+    <p class="sub st">Чем точнее задание, тем меньше времени вы потом тратите на правку</p>
+  </div>
+</section>
+
+<section class="slide" data-steps="185,187">
+  <p class="kick">Что для этого нужно</p>
+  <h2>Программировать не нужно</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-file-text"/></svg></div>
+      <div>
+        <ul class="list">
+          <li class="st">Достаточно уметь ясно объяснить, чего вы хотите</li>
+          <li class="st t-orange">Вы каждый день читаете и пишете технические задания. <b>Запрос к модели – то же самое, только короче</b></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="190,194,197">
+  <p class="kick">Правила для запроса</p>
+  <h2>Преподавателю и инженеру</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st"><h3>Преподавателям – три правила</h3><ul><li>Укажите роль</li><li>Укажите формат</li><li>Укажите аудиторию и цель</li></ul></div>
+      <div class="col t-orange st"><h3>Для инженерной задачи<br>этого мало</h3><ul><li>Роль и формат остаются</li><li>Добавляются исходные данные, ограничения и критерии проверки</li></ul></div>
+    </div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-gauge"/></svg><div><p>У инженера ответ проверяется не вкусом, а цифрами</p></div></div>
+  </div>
+</section>

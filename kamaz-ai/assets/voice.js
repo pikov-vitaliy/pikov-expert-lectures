@@ -151,7 +151,13 @@
 
   function render(seg) {
     chapters.innerHTML = ''; text.innerHTML = ''; flat = [];
+    var lastLi = null, lastP = null;
     seg.blocks.forEach(function (b, bi) {
+      if (b.sub && lastLi) {  // шаг раскрытия того же слайда: кадр меняется, строка списка и абзац – прежние
+        b._ch = lastLi;
+        b.frags.forEach(function (f) { addFrag(lastP, f, bi, false); });
+        return;
+      }
       var li = document.createElement('li');
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -160,11 +166,15 @@
       li.appendChild(btn); chapters.appendChild(li); b._ch = li;
       var p = document.createElement('p');
       p.className = 'vp-para';
-      b.frags.forEach(function (f, fi) {
+      lastLi = li; lastP = p;
+      b.frags.forEach(function (f, fi) { addFrag(p, f, bi, fi === 0); });
+      text.appendChild(p);
+    });
+    function addFrag(p, f, bi, first) {
         var s = document.createElement('span');
         s.className = 'vp-frag'; s.textContent = f[1] + ' ';
         s.setAttribute('role', 'button');
-        s.tabIndex = fi === 0 ? 0 : -1;  // в обходе Tab – одна фраза на слайд, внутри – стрелки
+        s.tabIndex = first ? 0 : -1;  // в обходе Tab – одна фраза на слайд, внутри – стрелки
         s.addEventListener('click', function () { seek(f[0], true); });
         s.addEventListener('keydown', function (e) {
           if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); seek(f[0], true); }
@@ -175,9 +185,7 @@
         });
         p.appendChild(s);
         flat.push({ t: f[0], node: s, block: bi });
-      });
-      text.appendChild(p);
-    });
+    }
   }
   var pendingLoad = null, rate = 1, lastSave = 0;
   function save() { if (cur && audio.currentTime > 0 && !audio.ended) store(false, audio.currentTime); }
