@@ -1,0 +1,30 @@
+:root { --bg: #eef2f7; --panel: #ffffff; --ink: #152039; --muted: #5d6a80; --line: #cdd6e3; --signal: #3157c9; --soft: #e8edf4; --code: #e8edf4; }
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0b1220; --panel: #121c2e; --ink: #edf2ff; --muted: #a1aec3; --line: #2a3a55; --signal: #8fb0ff; --soft: #172338; --code: #172338; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 17px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+a { color: var(--signal); }
+a:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; border-radius: 4px; }
+.top { position: sticky; top: 0; z-index: 5; display: flex; flex-wrap: wrap; gap: 8px 16px; align-items: center; justify-content: space-between; padding: 10px 16px; background: var(--panel); border-bottom: 1px solid var(--line); }
+.top .course { color: var(--muted); font-size: 14px; }
+.top nav { display: flex; flex-wrap: wrap; gap: 8px; }
+.btn { display: inline-block; padding: 7px 14px; border: 1px solid var(--line); border-radius: 999px; background: var(--soft); color: var(--ink); font-weight: 600; font-size: 15px; text-decoration: none; }
+.btn.primary { background: var(--signal); border-color: var(--signal); color: var(--panel); }
+main { max-width: 860px; margin: 0 auto; padding: 24px 16px 48px; }
+h1 { font-size: clamp(26px, 5vw, 36px); line-height: 1.2; margin: 8px 0 16px; }
+h2 { margin: 40px 0 12px; font-size: 24px; line-height: 1.25; padding-top: 8px; border-top: 1px solid var(--line); }
+p, li { max-width: 72ch; }
+ol, ul { padding-left: 1.3em; }
+li { margin: 6px 0; }
+code { padding: 1px 5px; border-radius: 5px; background: var(--code); font: 0.92em ui-monospace, Consolas, monospace; }
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { width: 100%; border-collapse: collapse; background: var(--panel); font-size: 15px; }
+th, td { padding: 8px 10px; border: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { background: var(--soft); }
+figure { margin: 16px 0; }
+figure img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 12px; }
+figcaption { margin-top: 6px; color: var(--muted); font-size: 14px; }
+.lead { font-size: 18px; }
+@media (max-width: 600px) { .top { position: static; } }
+footer { max-width: 860px; margin: 0 auto; padding: 0 16px 32px; color: var(--muted); font-size: 14px; }
