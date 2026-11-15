@@ -61,3 +61,10 @@
 .vp-frame-wrap:fullscreen .vp-scene { margin: auto; width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); }
 .vp-frame-wrap:-webkit-full-screen .vp-scene { margin: auto; width: min(100vw, 177.78vh); height: min(56.25vw, 100vh); }
 .vp-frame-wrap.has-head .vp-scene { background: #f4f6f5; }
+
+/* 15.11.2026: кнопки поверх слайда – только в полноэкранном режиме */
+.vp-fs-bar { display: none; }
+.vp-frame-wrap:fullscreen .vp-fs-bar, .vp-frame-wrap:-webkit-full-screen .vp-fs-bar { display: flex; gap: 10px; position: absolute; top: 14px; right: 14px; z-index: 5; }
+.vp-fs-bar button { font: 700 16px/1.2 system-ui, sans-serif; padding: 10px 16px; border-radius: 10px; border: 1px solid rgba(255,255,255,.35); background: rgba(0,0,0,.62); color: #fff; cursor: pointer; }
+.vp-fs-bar button:hover { background: rgba(0,0,0,.8); }
+.vp-fs-bar button:focus-visible { outline: 3px solid #4FC7B5; outline-offset: 2px; }

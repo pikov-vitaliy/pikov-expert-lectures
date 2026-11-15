@@ -147,6 +147,22 @@
     try { r = document.fullscreenElement ? document.exitFullscreen() : (req ? req.call(w) : null); } catch (e) { r = null; }
     if (r && r.catch) r.catch(function () { fsBtn.textContent = 'Во весь экран недоступно'; });
   });
+  // 15.11.2026: кнопки поверх слайда в полноэкранном режиме – выйти и пауза, без системных жестов
+  var fsExit = document.getElementById('vp-fs-exit'), fsPlay = document.getElementById('vp-fs-play');
+  function fsLeave() {
+    try { if (document.fullscreenElement) document.exitFullscreen(); else if (document.webkitFullscreenElement) document.webkitExitFullscreen(); } catch (e) {}
+  }
+  function fsPlayLabel() {
+    if (!fsPlay) return;
+    fsPlay.textContent = audio.paused ? '▶ Продолжить' : '❚❚ Пауза';
+    fsPlay.setAttribute('aria-label', audio.paused ? 'Продолжить' : 'Пауза');
+  }
+  if (fsExit) fsExit.addEventListener('click', fsLeave);
+  if (fsPlay) fsPlay.addEventListener('click', function () {
+    if (audio.paused) audio.play().catch(function () {}); else audio.pause();
+  });
+  ['play', 'pause', 'ended'].forEach(function (ev) { audio.addEventListener(ev, fsPlayLabel); });
+  fsPlayLabel();
   function mark(node, on) { if (node) node.classList.toggle('is-current', on); }
 
   function render(seg) {
