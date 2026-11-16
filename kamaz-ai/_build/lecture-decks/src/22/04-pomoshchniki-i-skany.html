@@ -1,0 +1,578 @@
+<!-- Лекция 2.2, строки 394–615 (18:55–29:48): помощники по документам (RAG), где они ошибаются, схема, проверка в эксплуатации, сканы и изображения, черновики писем и записок -->
+
+<section class="slide" data-at="394">
+  <p class="kick">Помощники по документам</p>
+  <h2>Отвечают на вопросы по внутренней базе&nbsp;документов</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-scroll-text"/></svg><b style="font-size:38px">Стандарты</b></div>
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-book-open-text"/></svg><b style="font-size:38px">Инструкции</b></div>
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-clipboard-list"/></svg><b style="font-size:38px">Регламенты</b></div>
+    </div>
+    <p class="note" style="text-align:center;font-size:30px">Такие помощники появляются во многих организациях</p>
+  </div>
+</section>
+
+<section class="slide" data-at="398" data-title="RAG – генерация с дополнением найденным">
+  <p class="kick">Чаще всего помощники устроены так</p>
+  <div class="body">
+    <div class="term">
+      <dfn style="font-size:120px">RAG</dfn>
+      <p><b>Retrieval-augmented generation</b> – генерация с дополнением&nbsp;найденным</p>
+      <p class="muted" style="font-size:31px">Схема поиска с дополнением контекста</p>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Подход описан в работе: Lewis P. et al. Препринт arXiv, 2020 · doi.org/10.48550/arXiv.2005.11401</p>
+</section>
+
+<section class="slide" data-at="402">
+  <p class="kick">Проще говоря</p>
+  <h2>У модели две памяти</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-brain"/></svg>Первая</h3>
+        <p style="font-size:38px">То, что модель усвоила при&nbsp;обучении</p>
+      </div>
+      <div class="col t-orange">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-database"/></svg>Вторая</h3>
+        <p style="font-size:38px">Внешняя база документов. Перед ответом программа ищет в ней <b>подходящие фрагменты</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="406" data-steps="408,410,412,414,417">
+  <p class="kick">Помощник по документам</p>
+  <h2>Как это работает по шагам</h2>
+  <div class="body">
+    <ol class="list num" style="font-size:30px;gap:16px">
+      <li class="st"><b>Фрагменты.</b> Документы организации заранее разбиты на фрагменты и&nbsp;проиндексированы</li>
+      <li class="st"><b>Вопрос.</b> Пользователь задаёт вопрос</li>
+      <li class="st"><b>Поиск.</b> Программа ищет в базе фрагменты, близкие к вопросу по&nbsp;смыслу</li>
+      <li class="st"><b>Ответ.</b> Найденное добавляется к вопросу, модель составляет ответ по&nbsp;нему</li>
+      <li class="st t-orange"><b>Ссылка.</b> Хороший помощник показывает, из какого документа и пункта взят&nbsp;ответ</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="418" data-steps="419,422">
+  <p class="kick">ИИ-митап ЦГУ</p>
+  <h2>Примеры таких решений</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card st">
+        <span class="bdg"><svg class="i"><use href="#i-headset"/></svg></span>
+        <h3>С. Скидан</h3>
+        <p>Контактный центр банка: ответы агента строятся по <b>единой базе знаний</b> вместо готовых шаблонов</p>
+      </div>
+      <div class="card st">
+        <span class="bdg"><svg class="i"><use href="#i-search"/></svg></span>
+        <h3>В. Малаканов</h3>
+        <ol class="list num sm" style="font-size:25px;gap:12px">
+          <li>Поиск находит несколько статей</li>
+          <li>Небольшая модель оценивает, какие&nbsp;подходят</li>
+          <li>Большая модель пишет ответ <b>со списком источников</b></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Скидан С. «Как создать Агента-оператора»; Малаканов В. «Код, Jev, LLM, WebMCP». Доклады на ИИ-митапе ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide dark" data-at="425" data-title="Помощник хорош настолько, насколько хороша база">
+  <p class="kick t-orange">Главное условие</p>
+  <div class="body">
+    <p class="say md">Помощник хорош настолько, насколько хороша <em>база</em></p>
+    <p class="sub">Об этом прямо сказал Н. Галкин, директор департамента ИТ сети ресторанов «Кофемания»</p>
+  </div>
+</section>
+
+<section class="slide" data-at="429" data-title="Агенту нужен чёткий контекст">
+  <p class="kick">Онлайн-конференция форума All-over-IP & AI 2026</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Агенту нужен «чёткий контекст. <b>База знаний, база инструкций, база правил и регламентов</b>». Если формализованных документов нет, то «и смысла нет»</blockquote>
+      <figcaption><i class="ava">НГ</i><span><b>Н. Галкин</b>директор департамента ИТ сети ресторанов «Кофемания», 11.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="434" data-title="Нейросетка без контекста">
+  <p class="kick">Дискуссия на той же конференции</p>
+  <div class="body">
+    <figure class="quote md t-orange">
+      <blockquote>Сотрудники, которые сами пробуют делать агентов, быстро это видят: «если они берут <b>нейросетку без контекста</b>, то на выходе они не получают желаемого&nbsp;результата»</blockquote>
+      <figcaption><i class="ava">РА</i><span><b>Р. Ахметзянов</b>Лемана Тех · дискуссия «От данных к бизнес-результату», 11.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+
+<section class="slide dark" data-at="447" data-title="RAG отвечает тем, что нашёл в базе">
+  <p class="kick t-red">Где такой помощник ошибается</p>
+  <div class="body">
+    <figure class="quote t-red">
+      <blockquote>RAG отвечает не «истиной», а тем, что <b>нашёл в вашей базе</b></blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>А. Морозов</b>доклад «AI в безопасности и безопасность в AI», ИИ-митап ЦГУ, 06.11.2026 · дословно со слайда</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="452">
+  <p class="kick t-red">Где ошибается</p>
+  <h2>Что бывает с базой и поиском</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-file-clock"/></svg></span><h3 style="font-size:36px">В базе устаревшая редакция</h3><p style="font-size:30px">Ответ будет по ней</p></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-file-search"/></svg></span><h3 style="font-size:36px">Поиск нашёл не тот фрагмент</h3><p style="font-size:30px">Ответ будет уверенным и неверным</p></div>
+      <div class="card t-red"><span class="bdg"><svg class="i"><use href="#i-file-x"/></svg></span><h3 style="font-size:36px">Нужного документа в&nbsp;базе&nbsp;нет</h3><p style="font-size:30px">Помощнику не на что опереться</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="458,461">
+  <p class="kick t-red">Тихие сбои · исследование 2026 года</p>
+  <h2>Опаснее всего, когда ответ выглядит нормально</h2>
+  <div class="body">
+    <p class="say xs st" data-s="1">Ответ может выглядеть <em>связным и уместным</em>, даже если:</p>
+    <div class="cards sm">
+      <div class="card row t-red st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-history"/></svg></span><p style="font-size:29px">найденные сведения устарели</p></div>
+      <div class="card row t-red st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-scissors"/></svg></span><p style="font-size:29px">нужный фрагмент обрезан</p></div>
+      <div class="card row t-red st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-unlink"/></svg></span><p style="font-size:29px">ссылка больше не указывает на подтверждающий&nbsp;источник</p></div>
+      <div class="card row t-red st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-route"/></svg></span><p style="font-size:29px">система незаметно перешла на резервный путь, без&nbsp;поиска</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Tanhaei M. Results in Engineering, 2026 · doi.org/10.1016/j.rineng.2026.113085</p>
+</section>
+
+<section class="slide" data-at="466">
+  <p class="kick t-red">Есть и злонамеренный вариант</p>
+  <h2>Подложный документ в базе</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div class="docs" style="width:420px;gap:22px">
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i></i><i class="s"></i><i></i></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i class="s"></i><i></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i class="s"></i><i></i><i></i></div>
+          <div class="doc t-red" style="width:118px;padding:16px 14px 20px;gap:9px;border-color:var(--red)"><i class="r"></i><i class="r"></i><i class="s"></i><i class="r"></i><b class="stamp">подлог</b></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i></i><i class="s"></i><i></i></div>
+        </div>
+      </div>
+      <div>
+        <p class="say sm">Можно подложить документ – <em>можно подменить ответ</em></p>
+        <p class="sub" style="font-size:31px">В исследовании 2024 года хватало нескольких подложных текстов на базу из миллионов</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="471">
+  <p class="kick t-red">PoisonedRAG · исследование 2024 года</p>
+  <h2>Пять подложных текстов на вопрос</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-red"><b>5</b><span>вредоносных текстов на каждый целевой вопрос в базе знаний из миллионов текстов</span></div>
+      <div class="stat t-red"><b>90 %</b><span>успешных атак: помощник выдаёт ответ, нужный злоумышленнику</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zou W. et al. PoisonedRAG, 2024, препринт arXiv · doi.org/10.48550/arXiv.2402.07867</p>
+</section>
+
+<section class="slide" data-at="475" data-steps="477" data-title="OWASP: подмена документа в хранилище">
+  <p class="kick t-red">Отраслевой перечень рисков OWASP</p>
+  <div class="body">
+    <div class="term t-red">
+      <dfn>LLM01:2025 Prompt Injection</dfn>
+      <p>Внедрение команд. Один из сценариев – подмена документа в&nbsp;хранилище</p>
+    </div>
+    <ol class="flow nonum">
+      <li class="step st t-red" data-s="1"><span class="bdg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><h3>Злоумышленник меняет документ в&nbsp;хранилище</h3></li>
+      <li class="step st t-red" data-s="1"><span class="bdg"><svg class="i"><use href="#i-search"/></svg></span><h3>По запросу находится изменённый фрагмент</h3></li>
+      <li class="step st t-red" data-s="1"><span class="bdg"><svg class="i"><use href="#i-message-square-warning"/></svg></span><h3>Ответ модели вводит в заблуждение</h3></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>OWASP Top 10 for LLM Applications 2025 · LLM01:2025 Prompt Injection</p>
+</section>
+
+<section class="slide" data-at="480">
+  <p class="kick">Знакомая картина</p>
+  <h2>Похожая история</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-mail-warning"/></svg>Тема 2.1</h3>
+        <p style="font-size:38px">Скрытая строка в письме&nbsp;поставщика</p>
+      </div>
+      <div class="col t-red">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-database"/></svg>Помощник по&nbsp;документам</h3>
+        <p style="font-size:38px">Подложный текст лежит <b>в базе документов</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="485" data-title="Схема: пользователь задаёт вопрос">
+  <p class="kick">Схема · помощник по документам</p>
+  <div class="body">
+    <svg viewBox="360 600 3280 1440" width="1000" height="439" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема помощника по документам: пользователь задаёт вопрос">
+      <foreignObject x="0" y="0" width="3904" height="2728"><img src="@day/08-Схемы/d2-rag.png" width="3904" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M360 600H3640V2040H360Z M375 640H1100V1015H375Z"/>
+      <rect x="375" y="640" width="725" height="375" rx="30" fill="none" stroke="var(--orange)" stroke-width="12"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center">Наверху – <b>пользователь</b>. Он задаёт вопрос, например: «какой ток покоя?»</p>
+  </div>
+</section>
+
+<section class="slide" data-at="488" data-title="Схема: поиск, модель, ответ со ссылкой">
+  <p class="kick">Схема · помощник по документам</p>
+  <div class="body">
+    <svg viewBox="360 600 3280 1440" width="1000" height="439" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема помощника по документам: поиск, найденное, модель, ответ">
+      <foreignObject x="0" y="0" width="3904" height="2728"><img src="@day/08-Схемы/d2-rag.png" width="3904" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M360 600H3640V2040H360Z M380 1113H3625V1527H380Z M775 1750H1350V2000H775Z M2615 755H3035V1015H2615Z"/>
+      <rect x="380" y="1113" width="3245" height="414" rx="30" fill="none" stroke="var(--teal)" stroke-width="12"/>
+      <rect x="775" y="1750" width="575" height="250" rx="30" fill="none" stroke="var(--teal)" stroke-width="12"/>
+      <rect x="2615" y="755" width="420" height="260" rx="30" fill="none" stroke="var(--teal)" stroke-width="12"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center">В середине – <b>программа помощника</b>. Поиск находит близкие по смыслу фрагменты, модель отвечает по найденному, пользователь получает ответ со ссылкой на пункт</p>
+  </div>
+</section>
+
+<section class="slide" data-at="493" data-title="Схема: сбои базы">
+  <p class="kick t-red">Схема · два блока с красной рамкой</p>
+  <div class="body">
+    <svg viewBox="360 600 3280 1440" width="1000" height="439" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема помощника по документам: сбои базы и первоисточник">
+      <foreignObject x="0" y="0" width="3904" height="2728"><img src="@day/08-Схемы/d2-rag.png" width="3904" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M360 600H3640V2040H360Z M2070 1250H2620V2005H2070Z M3190 755H3610V1015H3190Z"/>
+      <rect x="2070" y="1250" width="550" height="755" rx="30" fill="none" stroke="var(--red)" stroke-width="12"/>
+      <rect x="3190" y="755" width="420" height="260" rx="30" fill="none" stroke="var(--red)" stroke-width="7" stroke-dasharray="24 16"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center">Внизу – <b>сбои базы: старая редакция, подлог</b>. От них к модели идёт пунктир с подписью «уверенный неверный ответ»</p>
+  </div>
+</section>
+
+<section class="slide" data-at="498" data-title="Схема: открыть первоисточник">
+  <p class="kick t-orange">Схема · шаг пользователя после ответа</p>
+  <div class="body">
+    <svg viewBox="360 600 3280 1440" width="1000" height="439" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема помощника по документам: от ответа стрелка «открыть» к первоисточнику">
+      <foreignObject x="0" y="0" width="3904" height="2728"><img src="@day/08-Схемы/d2-rag.png" width="3904" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M360 600H3640V2040H360Z M2615 755H3610V1015H2615Z"/>
+      <rect x="2615" y="755" width="995" height="260" rx="30" fill="none" stroke="var(--orange)" stroke-width="12"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center">Справа наверху – первоисточник: пункт и редакция. По стрелке «открыть»: <b>открыть первоисточник и проверить пункт и редакцию</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="506">
+  <p class="kick">Исследователи из Австралии · 2024</p>
+  <h2>Почему нельзя один раз проверить помощника и&nbsp;успокоиться</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal"><b>3</b><span>внедрения RAG в разных областях: научные исследования, образование, биомедицина</span></div>
+      <div class="stat t-red"><b>7</b><span>мест, где такие системы дают сбой</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Barnett S. et al. Proceedings of the IEEE/ACM 3rd International Conference on AI Engineering - Software Engineering for AI, 2024 · doi.org/10.1145/3644815.3644945</p>
+</section>
+
+<section class="slide dark" data-at="510" data-title="Два главных вывода исследователей">
+  <p class="kick">Два главных вывода</p>
+  <div class="body">
+    <div class="cards">
+      <div class="card"><span class="n">ВЫВОД 1</span><h3 style="font-size:40px;line-height:1.18">Проверить систему RAG можно только <span style="color:var(--teal)">в ходе эксплуатации</span></h3></div>
+      <div class="card t-orange"><span class="n">ВЫВОД 2</span><h3 style="font-size:40px;line-height:1.18">Устойчивость системы RAG <span style="color:var(--orange)">складывается со временем</span>, а не закладывается в проект с самого начала</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Barnett S. et al. Proceedings of the IEEE/ACM 3rd International Conference on AI Engineering - Software Engineering for AI, 2024 · doi.org/10.1145/3644815.3644945</p>
+</section>
+
+<section class="slide" data-at="514" data-steps="516,519,521,524">
+  <p class="kick t-orange">Для пользователя корпоративного помощника</p>
+  <h2>Что из этого следует</h2>
+  <div class="body">
+    <ol class="list num">
+      <li class="st t-orange">Ответ помощника – указатель на документ, а не сам документ<small>Для решения открывайте первоисточник</small></li>
+      <li class="st t-orange">Проверяйте редакцию и дату документа, на который сослался&nbsp;помощник</li>
+      <li class="st t-orange">Нет ссылки или ссылка ведёт не туда – считайте ответ&nbsp;непроверенным</li>
+      <li class="st t-orange">О неверных ответах сообщайте владельцам помощника<small>Качество RAG доводится в эксплуатации, ваше сообщение об ошибке – часть этой&nbsp;доводки</small></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="527">
+  <p class="kick">Исследование DesignQA · правила Formula SAE</p>
+  <h2>Весь документ или страницы от поиска</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st todo">
+        <h3><svg class="i"><use href="#i-files"/></svg>Модели дали весь документ&nbsp;правил</h3>
+        <ul><li>Почти всегда отвечали лучше</li><li style="visibility:hidden">Обходилось больше чем в десять раз дороже</li></ul>
+      </div>
+      <div class="col t-gray st todo">
+        <h3><svg class="i"><use href="#i-file-search"/></svg>Страницы подобрала система поиска</h3>
+        <ul><li>Ответы почти всегда хуже</li><li style="visibility:hidden">Дешевле больше чем в десять раз</li></ul>
+      </div>
+    </div>
+    <div class="rule sm t-orange" style="visibility:hidden"><svg class="i"><use href="#i-scale"/></svg><div><p><b>RAG – компромисс между полнотой и ценой</b></p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="529">
+  <p class="kick">Исследование DesignQA · правила Formula SAE</p>
+  <h2>Весь документ или страницы от поиска</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal">
+        <h3><svg class="i"><use href="#i-files"/></svg>Модели дали весь документ&nbsp;правил</h3>
+        <ul><li>Почти всегда отвечали лучше</li><li style="visibility:hidden">Обходилось больше чем в десять раз дороже</li></ul>
+      </div>
+      <div class="col t-gray">
+        <h3><svg class="i"><use href="#i-file-search"/></svg>Страницы подобрала система поиска</h3>
+        <ul><li>Ответы почти всегда хуже</li><li style="visibility:hidden">Дешевле больше чем в десять раз</li></ul>
+      </div>
+    </div>
+    <div class="rule sm t-orange" style="visibility:hidden"><svg class="i"><use href="#i-scale"/></svg><div><p><b>RAG – компромисс между полнотой и ценой</b></p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="532">
+  <p class="kick">Исследование DesignQA · правила Formula SAE</p>
+  <h2>Весь документ или страницы от поиска</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal">
+        <h3><svg class="i"><use href="#i-files"/></svg>Модели дали весь документ&nbsp;правил</h3>
+        <ul><li>Почти всегда отвечали лучше</li><li>Обходилось больше чем в десять раз дороже</li></ul>
+      </div>
+      <div class="col t-gray">
+        <h3><svg class="i"><use href="#i-file-search"/></svg>Страницы подобрала система поиска</h3>
+        <ul><li>Ответы почти всегда хуже</li><li>Дешевле больше чем в десять раз</li></ul>
+      </div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-scale"/></svg><div><p><b>RAG – компромисс между полнотой и ценой</b></p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="536">
+  <p class="kick">Сканы и изображения</p>
+  <h2>Многие сервисы принимают изображения</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal"><b>15 МБ</b><span>GigaChat: размер изображения до 15&nbsp;МБ, по справке сервиса</span></div>
+      <div class="stat t-teal"><b>20 МБ</b><span>Алиса AI: одно изображение до 20&nbsp;МБ в&nbsp;сообщении</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>По справке GigaChat и Алисы AI</p>
+</section>
+
+<section class="slide" data-at="540">
+  <p class="kick">Сканы и изображения</p>
+  <h2>Модель читает текст, таблицы и надписи</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-camera"/></svg><b style="font-size:38px">Фото</b></div>
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-monitor"/></svg><b style="font-size:38px">Снимок экрана</b></div>
+      <div class="pict"><svg class="i" style="width:160px;height:160px;padding:32px;font-size:96px"><use href="#i-scan-text"/></svg><b style="font-size:38px">Скан</b></div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p>Удобно. Но распознанное нужно проверять</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="544,547">
+  <p class="kick">Набор тестов OCRBench</p>
+  <h2>Сильные и слабые стороны моделей</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="stats st" data-s="1"><div class="stat t-teal"><b>29</b><span>наборов данных: как мультимодальные модели распознают&nbsp;текст</span></div></div>
+      <div class="st" data-s="2">
+        <p class="note">Особенно в работе:</p>
+        <ul class="list">
+          <li>с многоязычным текстом</li>
+          <li>с рукописным текстом</li>
+          <li>с <b>текстом без смысловой связности</b></li>
+          <li>в распознавании математических&nbsp;выражений</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu Y. et al. Science China Information Sciences, 2024 · doi.org/10.1007/s11432-024-4235-6</p>
+</section>
+
+<section class="slide dark" data-at="551" data-title="Текст без смысловой связности">
+  <p class="kick t-orange">Что это такое</p>
+  <div class="body">
+    <div class="term t-orange">
+      <dfn>Текст без смысловой связности</dfn>
+      <p>Обозначения, коды, серийные номера и наборы чисел</p>
+    </div>
+    <p class="say sm">Модель плохо читает то, что <em>нельзя угадать по смыслу</em></p>
+    <p class="sub">Серийный номер по смыслу не угадаешь</p>
+  </div>
+</section>
+
+<section class="slide" data-at="555">
+  <p class="kick t-red">Ещё два наблюдения</p>
+  <h2>Сложные тесты и повторы</h2>
+  <div class="body">
+    <div class="split">
+      <div>
+        <p class="note">Более новый и сложный набор тестов</p>
+        <p class="say sm">Большинство моделей набрали <em>меньше половины</em> баллов</p>
+      </div>
+      <div>
+        <div class="rule t-red"><svg class="i"><use href="#i-repeat"/></svg><div><h3>Ещё один вид сбоя</h3><p>Модель повторяет распознанный фрагмент по нескольку раз</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Fu L. et al. OCRBench v2, 2024, препринт arXiv · doi.org/10.48550/arXiv.2501.00321; Yang Z. et al. CC-OCR, ICCV 2025 · doi.org/10.1109/ICCV51701.2025.02019</p>
+</section>
+
+<section class="slide" data-at="559" data-steps="560,563,565">
+  <p class="kick t-orange">Проверка распознанного</p>
+  <h2>На что смотреть: символы</h2>
+  <div class="body">
+    <div class="cards c5" style="gap:14px">
+      <div class="card t-orange st" style="padding:22px 14px" data-s="1"><h3 style="font-size:64px;line-height:1.05;color:var(--c);white-space:nowrap">± − ≤</h3><p style="font-size:24px">Знаки</p></div>
+      <div class="card t-orange st" style="padding:22px 14px" data-s="1"><h3 style="font-size:64px;line-height:1.05;color:var(--c);white-space:nowrap">мин⁻¹</h3><p style="font-size:24px">Верхние индексы</p></div>
+      <div class="card t-orange st" style="padding:22px 14px" data-s="1"><h3 style="font-size:64px;line-height:1.05;color:var(--c);white-space:nowrap">А·ч<br>Н·м</h3><p style="font-size:24px">Единицы</p></div>
+      <div class="card t-orange st" style="padding:22px 14px" data-s="2"><h3 style="font-size:64px;line-height:1.05;color:var(--c);white-space:nowrap">,&nbsp;&nbsp;.</h3><p style="font-size:24px">Десятичные запятые и точки, пропущенные&nbsp;нули</p></div>
+      <div class="card t-orange st" style="padding:22px 14px" data-s="3"><h3 style="font-size:64px;line-height:1.05;color:var(--c);white-space:nowrap">З&nbsp;3<br>О&nbsp;0</h3><p style="font-size:24px">Похожие символы, латинские и русские буквы в&nbsp;обозначениях</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="569">
+  <p class="kick t-orange">Проверка распознанного</p>
+  <h2>На что смотреть: таблицы</h2>
+  <div class="body">
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-rows-3"/></svg><span style="font-size:32px">Все ли строки таблицы на месте</span></div>
+      <div class="pict"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-columns-3"/></svg><span style="font-size:32px">Не сдвинулись ли значения в соседний&nbsp;столбец</span></div>
+      <div class="pict"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px"><use href="#i-table-cells-merge"/></svg><span style="font-size:32px">Объединённые ячейки и заголовки, перенесённые на другую&nbsp;страницу</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="574">
+  <p class="kick t-orange">Полезная строка в запросе</p>
+  <h2>Попросите отметить сомнительное</h2>
+  <div class="body">
+    <div class="prompt"><p class="part t-orange" style="--tw:190px"><span class="tg">В запросе</span><span style="font-size:36px;font-weight:600">«Если символ читается неуверенно, поставь после него [?]»</span></p></div>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-info"/></svg><div><p>Модель не всегда честно отмечает неуверенность. Но иногда это помогает найти сомнительные места</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="579">
+  <p class="kick t-red">Снимок экрана · продолжение темы 2.1</p>
+  <h2>Лишнее на снимке экрана</h2>
+  <div class="body">
+    <div class="split">
+      <div style="align-items:center">
+        <div style="width:520px;border:2.5px solid var(--line);border-radius:14px;background:var(--bg);box-shadow:0 4px 14px var(--shadow)">
+          <div style="display:flex;align-items:center;gap:10px;background:var(--surface2);padding:12px 16px;border-radius:12px 12px 0 0">
+            <span style="width:120px;height:30px;border-radius:8px 8px 0 0;background:var(--bg);display:flex;align-items:center;padding:0 12px"><i style="display:block;height:9px;width:100%;border-radius:5px;background:var(--line)"></i></span>
+            <span style="position:relative;width:120px;height:30px;border-radius:8px 8px 0 0;background:var(--surface);display:flex;align-items:center;padding:0 12px;box-shadow:0 0 0 3px var(--orange)"><i style="display:block;height:9px;width:100%;border-radius:5px;background:var(--line)"></i><b style="position:absolute;top:-16px;right:-14px;width:34px;height:34px;border-radius:50%;background:var(--orange);color:var(--chip-ink);font-size:21px;display:flex;align-items:center;justify-content:center">1</b></span>
+            <span style="flex:1"></span>
+            <span style="position:relative;display:flex;align-items:center;gap:8px;padding:2px 8px;border-radius:8px;box-shadow:0 0 0 3px var(--orange)"><svg class="i" style="font-size:24px;color:var(--muted)"><use href="#i-user"/></svg><i style="display:block;height:9px;width:70px;border-radius:5px;background:var(--line)"></i><b style="position:absolute;top:-16px;right:-14px;width:34px;height:34px;border-radius:50%;background:var(--orange);color:var(--chip-ink);font-size:21px;display:flex;align-items:center;justify-content:center">2</b></span>
+          </div>
+          <div style="padding:22px 22px 18px;display:flex;flex-direction:column;gap:13px">
+            <i style="display:block;height:11px;border-radius:5px;background:var(--surface2)"></i>
+            <i style="display:block;height:11px;border-radius:5px;background:var(--surface2);width:80%"></i>
+            <i style="display:block;height:11px;border-radius:5px;background:var(--surface2)"></i>
+            <i style="display:block;height:11px;border-radius:5px;background:var(--surface2);width:62%"></i>
+            <div style="align-self:flex-end;position:relative;display:flex;align-items:center;gap:10px;margin-top:6px;padding:4px 10px;border-radius:8px;box-shadow:0 0 0 3px var(--orange)"><span style="font-size:20px;font-weight:700;color:var(--muted)">VIN</span><i style="display:block;height:9px;width:110px;border-radius:5px;background:var(--line)"></i><b style="position:absolute;top:-16px;right:-14px;width:34px;height:34px;border-radius:50%;background:var(--orange);color:var(--chip-ink);font-size:21px;display:flex;align-items:center;justify-content:center">3</b></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <ol class="list num sm t-orange">
+          <li>Соседняя вкладка</li>
+          <li>Имя пользователя</li>
+          <li>Номер VIN в углу окна диагностической программы</li>
+        </ol>
+      </div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-eye"/></svg><div><p>На снимке может оказаться больше данных, чем вы хотели отправить. <b>Перед отправкой посмотрите на картинку целиком</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="586">
+  <p class="kick t-orange">Практика · задание 4</p>
+  <h2>Снимок таблицы: распознать и сверить</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-camera"/></svg></span><h3 style="font-size:34px">Снимок</h3><p style="font-size:29px;color:var(--ink)">Снимок экрана или фото таблицы документа 5</p></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-scan-text"/></svg></span><h3 style="font-size:34px">Распознавание</h3><p style="font-size:29px;color:var(--ink)">В сервисе, который принимает изображения</p></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:34px">Сверка с исходником</h3><p style="font-size:29px;color:var(--ink)">Строки, знаки, единицы, десятичные запятые, пометки [?]</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="591">
+  <p class="kick">Последняя задача из нашего списка</p>
+  <h2>Черновики писем, служебных записок и отчётов</h2>
+  <div class="body">
+    <div class="docs">
+      <div class="doc t-teal" style="width:300px;gap:13px"><h4 style="font-size:26px">Письмо</h4><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp">черновик</b></div>
+      <div class="doc t-teal" style="width:300px;gap:13px"><h4 style="font-size:26px">Служебная записка</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp">черновик</b></div>
+      <div class="doc t-teal" style="width:300px;gap:13px"><h4 style="font-size:26px">Отчёт</h4><i></i><i></i><i></i><i class="s"></i><i></i><b class="stamp">черновик</b></div>
+    </div>
+    <p class="say sm" style="text-align:center;margin:0 auto">Модель быстро предлагает <b>структуру</b> и <b>связный текст</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="593">
+  <p class="kick t-orange">Чтобы черновик был полезен</p>
+  <h2>Дайте модели всё, на чём он строится</h2>
+  <div class="body">
+    <div class="prompt" style="font-size:36px;gap:22px;padding:30px 30px">
+      <p class="part t-teal" style="--tw:230px"><span class="tg">Исходные данные</span><span>Результаты анализа, перечень изменений, номера&nbsp;пунктов</span></p>
+      <p class="part t-orange" style="--tw:230px"><span class="tg">Чего не делать</span><span><b>«Не добавляй причин и выводов, которых нет в моих данных»</b></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="598">
+  <p class="kick t-red">Что проверить в черновике</p>
+  <h2>Каждое утверждение – из ваших данных или&nbsp;документа</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg bot bad" style="font-size:40px;padding:24px 34px"><span class="who" style="font-size:21px">Черновик от модели</span><p>…изменения внесены <mark>по требованию заказчика</mark>…</p></div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Выдуманная причина</h3><p>Если вы такой причины не называли, её быть не должно</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="603">
+  <p class="kick t-red">Что проверить в черновике</p>
+  <h2>Числа, лишние слова, реквизиты</h2>
+  <div class="body">
+    <ul class="list check big">
+      <li>Номера пунктов и значения совпадают с документом</li>
+      <li>Нет лишних слов – их лучше вычеркнуть сразу<small><s>«в целях повышения эффективности»</s>, <s>«комплексный подход»</s></small></li>
+      <li>Адресат, дата, подпись не придуманы моделью</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="609">
+  <p class="kick t-orange">Практика · задание 5</p>
+  <h2>Документ по вашей роли</h2>
+  <div class="body">
+    <div class="picts c4 sm t-orange">
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><span style="font-size:27px"><b>А</b> · Служебная записка</span></div>
+      <div class="pict"><svg class="i"><use href="#i-mail"/></svg><span style="font-size:27px"><b>Б</b> · Ответ поставщику</span></div>
+      <div class="pict"><svg class="i"><use href="#i-users"/></svg><span style="font-size:27px"><b>В</b> · Протокол совещания</span></div>
+      <div class="pict"><svg class="i"><use href="#i-clipboard-check"/></svg><span style="font-size:27px"><b>Г</b> · Акт приёмки документации</span></div>
+    </div>
+    <p class="note" style="text-align:center;font-size:29px">Ход у всех один</p>
+    <div class="segbar" style="margin-top:-12px">
+      <i class="t-teal" style="flex:15">Черновик</i><i class="t-orange solid" style="flex:20">Проверка и правка</i><i class="t-gray" style="flex:10">Свежий взгляд</i>
+    </div>
+  </div>
+</section>
