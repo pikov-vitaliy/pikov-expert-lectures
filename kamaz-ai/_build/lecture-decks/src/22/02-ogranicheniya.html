@@ -1,0 +1,411 @@
+<!-- Лекция 2.2, строки 131–278 (06:09–13:26): ограничения и как с ними работать – объём документа, пропуски и искажения при извлечении, оговорка и пять шагов, путаница версий -->
+
+<section class="slide" data-at="131">
+  <p class="kick">Ограничения</p>
+  <h2>Ограничения и как с ними работать</h2>
+  <div class="body">
+    <div class="tree" style="--n:4">
+      <div class="root">Работа с документом</div>
+      <div class="kids">
+        <div class="kid" style="box-shadow:0 0 0 3.8px var(--c)"><svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-files"/></svg><h3>1. Объём документа</h3><p>У сервисов есть пределы</p></div>
+        <div class="kid t-gray" style="opacity:.35"><svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-list-x"/></svg><h3>2. Пропуски и искажения при извлечении</h3></div>
+        <div class="kid t-gray" style="opacity:.35"><svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-git-compare"/></svg><h3>3. Путаница версий</h3></div>
+        <div class="kid t-gray" style="opacity:.35"><svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-text-quote"/></svg><h3>4. Неточные цитаты и ссылки на пункт</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="134" data-title="GigaChat: пределы по справке">
+  <p class="kick">Объём документа · пределы сервисов</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:380px 1fr">
+      <div class="svc-hd"><i class="logo">G</i><h3>GigaChat</h3><p>по справке сервиса</p></div>
+      <dl class="kv" style="--kw:170px">
+        <div style="font-size:34px;padding:22px 18px"><dt>Запрос</dt><dd>до <b>4000 символов</b></dd></div>
+        <div style="font-size:34px;padding:22px 18px"><dt>PDF</dt><dd>до <b>20 МБ</b> или первые <b>50&nbsp;страниц</b></dd></div>
+        <div class="t-orange" style="font-size:34px;padding:22px 18px;background:var(--ct)"><dt style="color:var(--ci)">Правило</dt><dd>Один новый файл – один&nbsp;новый&nbsp;чат</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка GigaChat, состояние на 10.11.2026</p>
+</section>
+
+<section class="slide" data-at="137" data-title="Алиса AI: один файл в сообщении">
+  <p class="kick">Объём документа · пределы сервисов</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:380px 1fr">
+      <div class="svc-hd"><i class="logo">А</i><h3>Алиса AI</h3><p>по справке сервиса</p></div>
+      <dl class="kv" style="--kw:250px">
+        <div style="font-size:34px;padding:22px 18px"><dt>В сообщении</dt><dd><b>Один</b> файл</dd></div>
+        <div style="font-size:34px;padding:22px 18px"><dt>Форматы</dt><dd>DOC, DOCX, PDF или TXT</dd></div>
+        <div style="font-size:34px;padding:22px 18px"><dt>Размер</dt><dd>до <b>100 МБ</b></dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка Алисы AI, состояние на 10.11.2026</p>
+</section>
+
+<section class="slide" data-at="140">
+  <p class="kick t-red">Объём документа · если документ длиннее</p>
+  <h2>А если документ длиннее?</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div class="doc t-red" style="width:330px;gap:13px">
+          <h4>Длинный документ</h4>
+          <i class="t"></i><i class="t"></i><i class="t"></i><i class="t s"></i>
+          <i style="height:0;background:none;border-top:3.8px dashed var(--red);margin:4px 0"></i>
+          <i style="opacity:.5"></i><i style="opacity:.5"></i><i class="s" style="opacity:.5"></i><i style="opacity:.5"></i><i class="s" style="opacity:.5"></i>
+          <b class="stamp">только начало</b>
+        </div>
+      </div>
+      <div>
+        <p class="say sm">Сервис может обработать только <b>начало</b> и <em>не&nbsp;сказать об&nbsp;этом</em></p>
+        <div class="rule sm t-orange"><svg class="i"><use href="#i-notebook-pen"/></svg><div><p>Учебные документы курса тоже упираются в пределы: <b>программа испытаний</b> из домашнего задания длиннее 4000&nbsp;символов</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="145" data-steps="146,151">
+  <p class="kick t-orange">Объём документа · что делать</p>
+  <h2>Не помещается – частями в одном чате</h2>
+  <div class="body">
+    <div class="split s64">
+      <div class="chat st">
+        <div class="msg user"><span class="who">Сообщение 1</span><p>Первая часть документа<br><mark>Пока ничего не делай, дождись задания</mark></p></div>
+        <div class="msg user"><span class="who">Сообщение 2</span><p>Вторая часть документа<br><mark>Пока ничего не делай, дождись задания</mark></p></div>
+        <div class="msg user"><span class="who">Последнее сообщение</span><p>Сам запрос</p></div>
+      </div>
+      <div class="st">
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-file-up"/></svg><div><h3>Другой путь</h3><p>Загрузить документ файлом, если сервис принимает файлы</p></div></div>
+        <div class="rule xs t-gray"><svg class="i"><use href="#i-notebook-pen"/></svg><div><p>Порядок отправки частями для программы испытаний расписан в домашнем&nbsp;задании</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="155" data-title="Модель читает документ неравномерно">
+  <p class="kick">Объём документа · даже если всё поместилось</p>
+  <div class="body">
+    <p class="say md">Даже когда документ целиком помещается, модель читает его <em>неравномерно</em></p>
+    <p class="sub">В исследовании 2024 года проверили, как модели находят нужные сведения в длинном тексте</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu N. F. et al. Transactions of the Association for Computational Linguistics, 2024 · doi.org/10.1162/tacl_a_00638</p>
+</section>
+
+<section class="slide" data-at="159" data-title="Лучше всего – в начале и в конце текста">
+  <p class="kick">Объём документа · слова авторов исследования</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Качество обычно выше всего, когда нужные сведения находятся <b>в начале или в конце</b> входного текста, и заметно падает, когда модели нужно найти их <b>в середине</b> длинного текста. Так происходит даже с моделями, специально рассчитанными на длинный контекст</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Liu N. F. и соавторы</b>Transactions of the Association for Computational Linguistics, 2024</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu N. F. et al. Lost in the Middle, 2024 · doi.org/10.1162/tacl_a_00638</p>
+</section>
+
+<section class="slide" data-at="165" data-title="Потерянная середина">
+  <p class="kick t-orange">Объём документа · приём</p>
+  <div class="body">
+    <div class="term"><dfn>Потерянная середина</dfn><p>Сведения из середины длинного текста модель находит хуже, чем из начала и конца</p></div>
+    <div class="segbar"><i class="t-teal solid" style="flex:2">Начало</i><i class="t-red" style="flex:4">Середина – заметно хуже</i><i class="t-teal solid" style="flex:2">Конец</i></div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-scissors"/></svg><div><p><b>Длинный документ – частями, раздел за разделом.</b> Ответ просить по каждой части отдельно</p></div></div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="172">
+  <span class="no">2</span>
+  <p class="kick">Ограничение 2</p>
+  <h1>Пропуски и искажения<br>при извлечении</h1>
+  <p class="lead">Обычно боятся, что модель что-нибудь выдумает. Исследования показывают немного другую картину</p>
+</section>
+
+<section class="slide" data-at="176">
+  <p class="kick">Пропуски и искажения · систематический обзор 2026 года</p>
+  <h2>Модели извлекают данные из статей</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-library"/></svg></span><h3 style="font-size:44px">27 исследований</h3><p>Собраны в одном систематическом обзоре</p></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-file-search"/></svg></span><h3>Извлечение данных</h3><p>Модели извлекали данные из научных статей</p></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-users"/></svg></span><h3>Сравнение с людьми</h3><p>Результаты моделей сравнивали с работой людей</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shankar R. et al. Journal of Biomedical Informatics, 2026 · doi.org/10.1016/j.jbi.2026.105086</p>
+</section>
+
+<section class="slide" data-at="179" data-title="Пропуски чаще выдумок">
+  <p class="kick">Пропуски и искажения · слова авторов обзора</p>
+  <div class="body">
+    <div class="split s64">
+      <figure class="quote xs">
+        <blockquote>Основным видом ошибок были <b>пропуски</b> (60–74 %), а доля выдуманных значений составляла лишь 0,08–6 %, что расходится с распространённым мнением о выдумках как главной проблеме</blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-book-open-text"/></svg></i><span><b>Shankar R. и соавторы</b>систематический обзор, 2026</span></figcaption>
+      </figure>
+      <div class="stats" style="flex-direction:column;gap:22px">
+        <div class="stat md t-red"><b>60–74 %</b><span>ошибок – пропуски</span></div>
+        <div class="stat md t-gray"><b>0,08–6 %</b><span>доля выдуманных значений</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shankar R. et al. Journal of Biomedical Informatics, 2026 · doi.org/10.1016/j.jbi.2026.105086</p>
+</section>
+
+<section class="slide" data-at="186" data-steps="187,189,191">
+  <p class="kick">Пропуски и искажения · деталь из того же обзора</p>
+  <h2>Числа извлекаются хуже текста</h2>
+  <div class="body" style="gap:22px">
+    <p class="note">Надёжность извлечения, %</p>
+    <div class="st t-teal" data-s="1" style="display:grid;grid-template-columns:330px 1fr 180px;gap:22px;align-items:center;font-size:29px">
+      <span style="text-align:right;line-height:1.15">Категориальные и текстовые данные</span>
+      <span style="position:relative;display:block;height:56px;background:var(--surface2);border-radius:12px"><span style="position:absolute;left:74%;width:22%;top:0;bottom:0;background:var(--c);border-radius:12px"></span></span>
+      <b style="font-size:40px;color:var(--c);white-space:nowrap">74–96 %</b>
+    </div>
+    <div class="st t-red" data-s="2" style="display:grid;grid-template-columns:330px 1fr 180px;gap:22px;align-items:center;font-size:29px">
+      <span style="text-align:right;line-height:1.15">Числовые данные</span>
+      <span style="position:relative;display:block;height:56px;background:var(--surface2);border-radius:12px"><span style="position:absolute;left:47%;width:41%;top:0;bottom:0;background:var(--c);border-radius:12px"></span></span>
+      <b style="font-size:40px;color:var(--c);white-space:nowrap">47–88 %</b>
+    </div>
+    <div style="display:grid;grid-template-columns:330px 1fr 180px;gap:22px;margin-top:-12px;font-size:20px;color:var(--muted)">
+      <span></span>
+      <span style="display:flex;justify-content:space-between"><span>0</span><span>50</span><span>100</span></span>
+      <span></span>
+    </div>
+    <div class="rule sm t-orange st" data-s="3"><svg class="i"><use href="#i-ruler"/></svg><div><p><b>Для инженера это важно:</b> в ТЗ и программах испытаний главное – именно&nbsp;числа</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shankar R. et al. Journal of Biomedical Informatics, 2026 · doi.org/10.1016/j.jbi.2026.105086</p>
+</section>
+
+<section class="slide dark" data-at="193" data-title="Модель – помощник с проверкой человеком">
+  <p class="kick t-orange">Вывод авторов обзора</p>
+  <div class="body">
+    <p class="say md">Модель – <b>помощник</b> при двойном извлечении данных с <em>проверкой человеком</em></p>
+    <p class="sub">А не самостоятельный инструмент</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shankar R. et al. Journal of Biomedical Informatics, 2026 · doi.org/10.1016/j.jbi.2026.105086</p>
+</section>
+
+<section class="slide" data-at="197">
+  <p class="kick">Пропуски и искажения · крупное исследование 2026 года</p>
+  <h2>Одна модель, 664 статьи</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat sm"><b>664</b><span>статьи</span></div>
+      <div class="stat sm"><b>&gt; 23 тыс.</b><span>ячеек всего</span></div>
+      <div class="stat sm t-orange st todo"><b style="visibility:hidden">6,6 %</b><span>общая доля ошибок</span></div>
+    </div>
+    <div class="st todo" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note">Среди ошибок преобладал другой вид, чем в обзоре</p>
+      <div class="bars" style="--max:100;--lbw:420px">
+        <div class="bar t-red" style="--v:0"><span class="lb">Значение записано не в то поле</span><i></i><b style="visibility:hidden">57,1 %</b></div>
+        <div class="bar t-red" style="--v:0"><span class="lb">Значение пропущено</span><i></i><b style="visibility:hidden">23,2 %</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Fan S. et al. BMJ Evidence-Based Medicine, 2026 · doi.org/10.1136/bmjebm-2025-114044</p>
+</section>
+
+<section class="slide" data-at="201">
+  <p class="kick">Пропуски и искажения · крупное исследование 2026 года</p>
+  <h2>Одна модель, 664 статьи</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat sm"><b>664</b><span>статьи</span></div>
+      <div class="stat sm"><b>&gt; 23 тыс.</b><span>ячеек всего</span></div>
+      <div class="stat sm t-orange"><b>6,6 %</b><span>общая доля ошибок</span></div>
+    </div>
+    <div class="st todo" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note">Среди ошибок преобладал другой вид, чем в обзоре</p>
+      <div class="bars" style="--max:100;--lbw:420px">
+        <div class="bar t-red" style="--v:0"><span class="lb">Значение записано не в то поле</span><i></i><b style="visibility:hidden">57,1 %</b></div>
+        <div class="bar t-red" style="--v:0"><span class="lb">Значение пропущено</span><i></i><b style="visibility:hidden">23,2 %</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Fan S. et al. BMJ Evidence-Based Medicine, 2026 · doi.org/10.1136/bmjebm-2025-114044</p>
+</section>
+
+<section class="slide" data-at="205">
+  <p class="kick">Пропуски и искажения · крупное исследование 2026 года</p>
+  <h2>Одна модель, 664 статьи</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat sm"><b>664</b><span>статьи</span></div>
+      <div class="stat sm"><b>&gt; 23 тыс.</b><span>ячеек всего</span></div>
+      <div class="stat sm t-orange"><b>6,6 %</b><span>общая доля ошибок</span></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <p class="note">Среди ошибок преобладал другой вид, чем в обзоре</p>
+      <div class="bars" style="--max:100;--lbw:420px">
+        <div class="bar t-red" style="--v:57.1"><span class="lb">Значение записано не в то поле</span><i></i><b>57,1 %</b></div>
+        <div class="bar t-red" style="--v:23.2"><span class="lb">Значение пропущено</span><i></i><b>23,2 %</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Fan S. et al. BMJ Evidence-Based Medicine, 2026 · doi.org/10.1136/bmjebm-2025-114044</p>
+</section>
+
+<section class="slide" data-at="207">
+  <p class="kick">Пропуски и искажения · таблицы</p>
+  <h2>С таблицами похожая картина</h2>
+  <div class="body">
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p><b>Вывод авторов крупного исследования:</b> результаты модели нужно тщательно&nbsp;проверять</p></div></div>
+    <div class="split s46">
+      <div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;width:100%">
+          <span style="height:40px;border-radius:9px;background:var(--graphite)"></span><span style="height:40px;border-radius:9px;background:var(--graphite)"></span><span style="height:40px;border-radius:9px;background:var(--graphite)"></span>
+          <span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--surface2)"></span>
+          <span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--red_t);border:3.8px solid var(--red)"></span>
+          <span style="grid-column:1/-1;height:40px;border-radius:9px;border:3.8px dashed var(--red);display:flex;align-items:center;justify-content:center;font-size:21px;font-weight:700;color:var(--red)">строка пропущена</span>
+          <span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--surface2)"></span><span style="height:40px;border-radius:9px;background:var(--surface2)"></span>
+        </div>
+      </div>
+      <div>
+        <ul class="list">
+          <li class="t-teal"><b>Структуру</b> таблицы модели понимают</li>
+          <li class="t-red"><b>Значения</b> берут неверно</li>
+          <li class="t-red"><b>Строки</b> пропускают</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg><span>Fan S. et al. BMJ Evidence-Based Medicine, 2026 · doi.org/10.1136/bmjebm-2025-114044<br>Yang Y. et al. Proceedings of ACL 2026 · doi.org/10.18653/v1/2026.acl-long.762</span></p>
+</section>
+
+<section class="slide" data-at="213" data-steps="214,218">
+  <p class="kick t-red">Оговорка</p>
+  <h2>Что из исследований переносить на ТЗ</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red st">
+        <h3><svg class="i"><use href="#i-x"/></svg>Проценты – нельзя</h3>
+        <ul>
+          <li>Исследования выполнены на медицинских и научных текстах, не на технических заданиях</li>
+          <li>Это не частоты ошибок для наших&nbsp;заданий</li>
+        </ul>
+      </div>
+      <div class="col t-teal st">
+        <h3><svg class="i"><use href="#i-check"/></svg>Виды ошибок – можно</h3>
+        <ul>
+          <li>Пропуск строки</li>
+          <li>Значение не в той графе</li>
+          <li>Потерянное условие измерения</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="222">
+  <p class="kick t-red">Виды ошибок</p>
+  <h2>Частые ошибки при извлечении</h2>
+  <div class="body">
+    <div class="picts c3 t-red">
+      <div class="pict"><svg class="i"><use href="#i-list-x"/></svg><b>Пропуск</b></div>
+      <div class="pict"><svg class="i"><use href="#i-columns-3"/></svg><b>Значение не в той графе</b></div>
+      <div class="pict"><svg class="i"><use href="#i-replace"/></svg><b>Искажение значения</b></div>
+    </div>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-scale"/></svg><div><p>Их соотношение зависит от задачи и модели</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="225" data-steps="228,233,236,239,242">
+  <p class="kick t-orange">Как с этим работать</p>
+  <h2>Пять шагов</h2>
+  <div class="body">
+    <div class="split top">
+      <div>
+        <p class="note" style="font-weight:700;color:var(--teal);display:flex;gap:12px;align-items:center"><svg class="i"><use href="#i-message-square-text"/></svg>В запросе</p>
+        <ol class="list num sm">
+          <li class="st">Таблица с фиксированными столбцами<small>Обязательно «пункт» и «условия»: пустую графу видно&nbsp;сразу</small></li>
+          <li class="st">Явно разрешить «не указано»<small>Для пустых граф, чтобы модель не досочиняла</small></li>
+          <li class="st">Каждое требование пункта – отдельной строкой<small>В одном пункте бывает больше одного&nbsp;требования</small></li>
+        </ol>
+      </div>
+      <div class="t-orange">
+        <p class="note" style="font-weight:700;color:var(--orange);display:flex;gap:12px;align-items:center"><svg class="i"><use href="#i-search-check"/></svg>После ответа</p>
+        <ol class="list num sm" style="counter-reset:n 3">
+          <li class="st">Сверить таблицу с каждым пунктом документа<small>Все требования перенесены, ни одно не&nbsp;потерялось</small></li>
+          <li class="st">Проверить по тексту каждую строку с&nbsp;числом<small>Не выборочно</small></li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="244">
+  <p class="kick t-orange">Практика · задание 1</p>
+  <h2>Ровно это – в первом задании практики</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step" style="padding:32px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-file-text"/></svg></span><h3 style="font-size:34px">Редакция 2 ТЗ&nbsp;ЭС-24</h3><p style="font-size:28px">Раздел 4, требования</p></li>
+      <li class="step" style="padding:32px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:34px">Таблица с&nbsp;дословными фразами</h3><p style="font-size:28px">Для каждой строки – фраза из пункта в&nbsp;кавычках</p></li>
+      <li class="step t-orange" style="padding:32px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:34px">Сверка</h3><p style="font-size:28px">Строк, чисел и условий</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide sect" data-at="249">
+  <span class="no">3</span>
+  <p class="kick">Ограничение 3</p>
+  <h1>Путаница версий</h1>
+  <p class="lead">У технического документа может быть несколько редакций, и модель легко их смешивает</p>
+</section>
+
+<section class="slide" data-at="252" data-steps="253,256">
+  <p class="kick t-red">Путаница версий · как это бывает</p>
+  <h2>Два случая</h2>
+  <div class="body">
+    <div class="docs st" style="align-items:center;margin-bottom:12px">
+      <div class="doc t-teal"><h4>Редакция 1</h4><i class="t"></i><i class="t s"></i><i class="t"></i><i class="t s"></i><b class="stamp">была в чате</b></div>
+      <span style="font-size:64px;font-weight:700;color:var(--muted);line-height:1">+</span>
+      <div class="doc t-orange"><h4>Редакция 2</h4><i class="hl"></i><i class="hl s"></i><i class="hl"></i><i class="hl s"></i><b class="stamp">вставили потом</b></div>
+      <span style="font-size:64px;font-weight:700;color:var(--muted);line-height:1">=</span>
+      <div class="doc t-red"><h4>Ответ модели</h4><i class="t"></i><i class="hl s"></i><i class="t s"></i><i class="hl"></i><b class="stamp">значения из обеих</b></div>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-brain"/></svg><div><p><b>Другой случай:</b> модель знает вариант документа из обучения и отвечает по нему, а не по тексту, который вы ей дали</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="260" data-steps="262,263">
+  <p class="kick">Путаница версий · исследование 2026 года</p>
+  <h2>Официальные документы, которые много раз изменялись</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat md t-gray st"><b>68,5 %</b><span>лучшая точность</span></div>
+      <div class="stat t-red st" style="flex:1.7"><b>26,7 %</b><span>случаев: модели заметили, что предоставленная редакция к вопросу не относится</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sobhani M. et al. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2608.08512</p>
+</section>
+
+<section class="slide dark" data-at="266" data-title="Модели чаще находят правильную редакцию, чем отвергают неправильную">
+  <p class="kick">Путаница версий · слова авторов</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Модели чаще находят правильную редакцию, чем <b>отвергают неправильную</b>, и склонны уверенно отвечать на основе сведений, усвоенных при обучении, а не предоставленного официального текста</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Sobhani M. и соавторы</b>препринт arXiv, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sobhani M. et al. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2608.08512</p>
+</section>
+
+<section class="slide" data-at="270">
+  <p class="kick t-red">Путаница версий · учебный кейс ЭС-24</p>
+  <h2>Две редакции одного ТЗ</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-file-text"/></svg>Редакция 1 · День 1</h3><p class="muted" style="font-size:26px">п. 4.2: напряжение, которое поддерживает регулятор</p><p style="font-size:54px;font-weight:700;color:var(--c);line-height:1.05">28,2&nbsp;±&nbsp;0,3&nbsp;В</p></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-file-text"/></svg>Редакция 2 · День 2</h3><p class="muted" style="font-size:26px">п. 4.2: напряжение, которое поддерживает регулятор</p><p style="font-size:54px;font-weight:700;color:var(--c);line-height:1.05">28,2&nbsp;±&nbsp;0,2&nbsp;В</p></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Обе в одном чате <b>без подписей</b> – в ответе могут оказаться значения из&nbsp;обеих</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="275" data-title="Подписывайте редакции">
+  <p class="kick t-orange">Правило</p>
+  <div class="body">
+    <p class="say"><b>Подписывайте</b> редакции и сравнивайте обе в <em>одном новом чате</em></p>
+  </div>
+</section>

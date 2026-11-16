@@ -1,0 +1,354 @@
+<!-- Лекция 2.1, строки 5–125 (00:00–06:59): начало второго дня, что вспоминаем из первого дня, план, куда уходит запрос и условия четырёх сервисов -->
+
+<section class="slide sect" data-at="5" data-title="День 2. Модуль 2">
+  <p class="kick">День 2 · модуль 2</p>
+  <span class="no">2</span>
+  <h1>Безопасная работа с ИИ и техническая документация</h1>
+  <p class="lead">Первая тема дня – защита информации при работе с сервисами искусственного интеллекта</p>
+</section>
+
+<section class="slide cover" data-at="10">
+  <p class="kick">Модуль 2 · тема 2.1</p>
+  <h1>Защита информации при работе с ИИ-сервисами</h1>
+  <p class="lead">Что происходит с данными, что нельзя отправлять, как обезличивать и почему чужой документ может управлять моделью</p>
+  <p class="meta">День 2 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-steps="11,15">
+  <p class="kick">Вспоминаем день 1 · тема 1.1</p>
+  <h2>С каким инструментом имеем дело</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-text"/></svg></span><h3>Правдоподобный текст</h3><p>Модель составляет его, а не достаёт проверенный ответ из базы</p></div>
+      <div class="card t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверяем всегда</h3><p>Ссылки, номера документов, числа и расчёты. Разные ответы на один вопрос – повод проверить, а не выбрать понравившийся</p></div>
+      <div class="card t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-key-round"/></svg></span><h3>Доступ – только законным путём</h3><p>Через подразделение, которое его выдаёт</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="20,23">
+  <p class="kick">Вспоминаем день 1 · тема 1.2</p>
+  <h2>Запросы</h2>
+  <div class="body">
+    <p class="say sm st" data-s="1">Модель отвечает на тот вопрос, который ей задали. Всё, чего в запросе нет, она <em>додумает</em></p>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note" style="color:var(--ink);font-weight:700">Шесть частей запроса</p>
+      <div class="picts sm" style="grid-template-columns:repeat(6,1fr)">
+        <div class="pict"><svg class="i"><use href="#i-layers"/></svg><span>Контекст</span></div>
+        <div class="pict"><svg class="i"><use href="#i-target"/></svg><span>Задача</span></div>
+        <div class="pict"><svg class="i"><use href="#i-database"/></svg><span>Исходные данные</span></div>
+        <div class="pict"><svg class="i"><use href="#i-ban"/></svg><span>Ограничения</span></div>
+        <div class="pict"><svg class="i"><use href="#i-layout-template"/></svg><span>Формат</span></div>
+        <div class="pict"><svg class="i"><use href="#i-list-checks"/></svg><span>Критерии проверки</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="25,28">
+  <p class="kick">Вспоминаем день 1</p>
+  <h2>Проверка ответа и карточки задач</h2>
+  <div class="body">
+    <div class="split" style="align-items:stretch">
+      <div class="card st" data-s="1" style="justify-content:center">
+        <h3>Чек-лист проверки ответа</h3>
+        <ul class="list check">
+          <li>Цифры</li>
+          <li>Расчёты</li>
+          <li>Ссылки</li>
+          <li>Утверждения без источника</li>
+        </ul>
+        <p class="note" style="color:var(--orange);font-weight:700;margin-top:6px">Сегодня он ещё понадобится</p>
+      </div>
+      <div>
+        <div class="card row t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><div><h3>На практике</h3><p>Один и тот же запрос – в разные сервисы, поиск ошибок в готовом ответе</p></div></div>
+        <div class="card row t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-notebook-pen"/></svg></span><div><h3>Дома</h3><p>Карточки своих рабочих задач: исходные данные, ожидаемый результат, критерии приёмки, ограничения</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="32,34" data-title="Только учебные и открытые материалы">
+  <p class="kick t-orange">Правило, которое повторяли весь день</p>
+  <div class="body">
+    <p class="say md st" data-s="1">В сервисы ИИ отправляем только <b>учебные и открытые</b> материалы</p>
+    <p class="sub st" data-s="2">Сегодня разберём, почему правило такое строгое и как работать с данными разного уровня</p>
+  </div>
+</section>
+
+<section class="slide" data-at="37" data-steps="40">
+  <p class="kick">Контрольная точка модуля 1</p>
+  <h2>Титул и первый раздел рабочей тетради</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div class="doc" style="width:300px"><h4>Рабочая тетрадь</h4><i></i><i class="s"></i><i class="t"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-teal">титул и раздел 1</b></div>
+      </div>
+      <div>
+        <p class="note">В задании было условие</p>
+        <div class="rule sm t-orange st" data-s="1"><svg class="i"><use href="#i-eye-off"/></svg><div><p>Описать задачу так, чтобы нельзя было установить <b>изделие, заказчика, поставщика или сотрудника</b></p></div></div>
+        <div class="rule sm t-red st" data-s="1"><svg class="i"><use href="#i-file-x"/></svg><div><p>Не вставлять рабочие документы, переписку, фамилии, номера изделий и внутренние обозначения</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="42" data-title="Перечитайте свои описания задач">
+  <p class="kick t-orange">Перечитайте свои описания задач</p>
+  <div class="body">
+    <div class="split s64">
+      <div>
+        <p class="say sm">Остались названия изделий или <em>внутренние обозначения</em>?</p>
+        <p class="sub">Не расстраивайтесь: ровно об этом сегодняшняя тема</p>
+      </div>
+      <div style="align-items:center">
+        <div class="doc t-orange" style="width:300px"><h4>Описание задачи</h4><i></i><i class="hl"></i><i class="s"></i><i></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp">перечитать</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="47" data-steps="47,50">
+  <p class="kick">Сегодня</p>
+  <h2>Как пройдёт день</h2>
+  <div class="body">
+    <ol class="flow nonum sm">
+      <li class="step st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-presentation"/></svg></span><h3>Лекция 2.1</h3><p>Сейчас: защита информации при работе с ИИ-сервисами</p></li>
+      <li class="step st t-orange" data-s="1"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><h3>Практика</h3><p>По первой теме</p></li>
+      <li class="step st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-presentation"/></svg></span><h3>Лекция 2.2</h3><p>Работа с технической документацией</p></li>
+      <li class="step st t-orange" data-s="2"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><h3>Практика</h3><p>По второй теме</p></li>
+      <li class="step st t-gray" data-s="2"><span class="bdg"><svg class="i"><use href="#i-notebook-pen"/></svg></span><h3>После занятия</h3><p>Памятка по первой теме и контрольная точка модуля 2</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="54" data-steps="54,57,59">
+  <p class="kick">План лекции</p>
+  <h2>Что разберём</h2>
+  <div class="body">
+    <ol class="list num">
+      <li class="st" data-s="1">Что происходит с данными, когда вы нажимаете «Отправить»</li>
+      <li class="st" data-s="1">Что нельзя передавать во внешние сервисы и что говорит закон</li>
+      <li class="st" data-s="2">Уровни данных и маршруты: куда какой материал можно отправить</li>
+      <li class="st" data-s="2">Обезличивание и чего оно не даёт</li>
+      <li class="st t-orange" data-s="3">Тексты, которые сами пытаются управлять моделью<small>Самая необычная часть темы: на практике проверите её своими руками</small></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-message-circle"/></svg>Вопросы обсудим после лекции</p>
+</section>
+
+<section class="slide" data-at="65">
+  <p class="kick">Куда уходит запрос</p>
+  <h2>Вы нажимаете «Отправить»</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-send"/></svg></span><h3>Отправить</h3><p>Текст запроса и прикреплённые файлы</p></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-server"/></svg></span><h3>Серверы оператора сервиса</h3><p>Туда уходят запрос и файлы</p></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Модель составляет ответ</h3><p>Там же, на серверах оператора</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="68">
+  <p class="kick">Дальше всё зависит от условий</p>
+  <h2>Условия сервиса и вида доступа</h2>
+  <div class="body">
+    <div class="cards c4">
+      <div class="card" style="padding:32px 26px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-history"/></svg></span><h3 style="font-size:33px">Где хранится история?</h3></div>
+      <div class="card" style="padding:32px 26px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-hourglass"/></svg></span><h3 style="font-size:33px">Сколько она хранится?</h3></div>
+      <div class="card t-red" style="padding:32px 26px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-brain-circuit"/></svg></span><h3 style="font-size:33px">Используется ли диалог для улучшения моделей?</h3></div>
+      <div class="card t-orange" style="padding:32px 26px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-toggle-left"/></svg></span><h3 style="font-size:33px">Можно ли от этого отказаться?</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="73">
+  <p class="kick">Четыре сервиса курса</p>
+  <h2>Четыре сервиса – четыре набора условий</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict"><i class="logo">G</i><b>GigaChat</b></div>
+      <div class="pict"><i class="logo">А</i><b>Алиса AI</b></div>
+      <div class="pict"><i class="logo">D</i><b>DeepSeek</b></div>
+      <div class="pict"><i class="logo">Q</i><b>Qwen</b></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:25px">
+      <div class="rule sm t-gray"><svg class="i"><use href="#i-scroll-text"/></svg><div><p>Сведения взяты из соглашений, политик и справки сервисов. Страницы открыты <b>10.11.2026</b></p></div></div>
+      <div class="rule sm t-orange"><svg class="i"><use href="#i-refresh-cw"/></svg><div><p>Условия меняются, поэтому перед работой их стоит перечитать</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="77">
+  <p class="kick">Те же сервисы, что в первый день</p>
+  <h2>Взгляд с другой стороны</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray" style="padding:40px 44px;gap:26px">
+        <span class="bdg lg"><svg class="i"><use href="#i-settings"/></svg></span>
+        <h3 style="font-size:40px">День 1</h3>
+        <p style="font-size:42px;line-height:1.16;font-weight:600">Как сервисы устроены и что умеют</p>
+      </div>
+      <div class="col t-orange" style="padding:40px 44px;gap:26px">
+        <span class="bdg lg"><svg class="i"><use href="#i-send"/></svg></span>
+        <h3 style="font-size:40px">Сегодня</h3>
+        <p style="font-size:42px;line-height:1.16;font-weight:600">Куда уходят <em>ваши данные</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="81" data-steps="81,85,88" data-title="GigaChat">
+  <p class="kick">Куда уходят данные · сервис 1 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">G</i><h3>GigaChat</h3><p>Пользовательское соглашение и справка</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div class="st" data-s="1"><dt>Данные</dt><dd>Запросы обрабатываются на сервере банка, применяется российское право</dd></div>
+        <div class="st t-red" data-s="1"><dt>Запрет</dt><dd>Соглашение запрещает передавать в запросах <b>персональные данные</b> – и свои, и третьих лиц (п. 7.2.1)</dd></div>
+        <div class="st" data-s="2"><dt>История</dt><dd>Видит только пользователь. Диалоги удаляются по одному, массовое удаление в документах не описано</dd></div>
+        <div class="st t-orange" data-s="3"><dt>Обучение</dt><dd>Прямого упоминания в соглашении нет. Возможность отказаться не установлена</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="90" data-steps="90,93">
+  <p class="kick">Куда уходят данные · сервис 2 из 4</p>
+  <h2>Алиса AI</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="stats st" data-s="2"><div class="stat t-orange"><b>14 дней</b><span>хранится история без опции «Алиса Плюс»</span></div></div>
+      <div>
+        <ul class="list">
+          <li class="st" data-s="1">Персональные данные граждан России хранятся в базах на территории России<small>для российских пользователей</small></li>
+          <li class="st t-red" data-s="2">Запросы могут использоваться для улучшения сервисов Яндекса</li>
+          <li class="st t-orange" data-s="2">Отказаться можно в настройках Яндекс&nbsp;ID</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DeepSeek и Qwen – раскрытие отдельными секциями: шаги короче порога 8 с сборка склеила бы раньше фразы; ещё не прозвучавшие строки скрыты (visibility:hidden) -->
+<section class="slide" data-at="95" data-title="DeepSeek">
+  <p class="kick">Куда уходят данные · сервис 3 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">D</i><h3>DeepSeek</h3><p>Privacy Policy и Terms of Use</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div><dt>Данные</dt><dd>Собираются, обрабатываются и хранятся в КНР, применяется право КНР</dd></div>
+        <div style="visibility:hidden"><dt>История</dt><dd>Можно удалить в настройках</dd></div>
+        <div class="t-red" style="visibility:hidden"><dt>Обучение</dt><dd>Данные <b>используются для обучения</b></dd></div>
+        <div class="t-orange" style="visibility:hidden"><dt>Отказ</dt><dd>Отдельный переключатель в настройках: «Improve the model for everyone»</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="98" data-steps="98" data-title="DeepSeek: история и обучение">
+  <p class="kick">Куда уходят данные · сервис 3 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">D</i><h3>DeepSeek</h3><p>Privacy Policy и Terms of Use</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div><dt>Данные</dt><dd>Собираются, обрабатываются и хранятся в КНР, применяется право КНР</dd></div>
+        <div class="st" data-s="1"><dt>История</dt><dd>Можно удалить в настройках</dd></div>
+        <div class="st t-red" data-s="1"><dt>Обучение</dt><dd>Данные <b>используются для обучения</b></dd></div>
+        <div class="st t-orange" data-s="1"><dt>Отказ</dt><dd>Отдельный переключатель в настройках: «Improve the model for everyone»</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="101" data-steps="101" data-title="Qwen">
+  <p class="kick">Куда уходят данные · сервис 4 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">Q</i><h3>Qwen</h3><p>Политика конфиденциальности и соглашение об оказании услуг</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div class="st" data-s="1"><dt>Данные</dt><dd>Хранятся в Сингапуре, применяется право Сингапура</dd></div>
+        <div class="st" data-s="1"><dt>История</dt><dd>Удаление отдельных чатов в документах не описано</dd></div>
+        <div style="visibility:hidden"><dt>Обучение</dt><dd>Сервис может использовать обезличенный контент</dd></div>
+        <div class="t-orange" style="visibility:hidden"><dt>Отказ</dt><dd>Письмом на адрес, указанный в соглашении</dd></div>
+        <div class="t-red" style="visibility:hidden"><dt>Отзывы</dt><dd>Отзывы об ответах используются для обучения <b>в любом случае</b></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="104" data-steps="104" data-title="Qwen: обучение и отказ">
+  <p class="kick">Куда уходят данные · сервис 4 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">Q</i><h3>Qwen</h3><p>Политика конфиденциальности и соглашение об оказании услуг</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div><dt>Данные</dt><dd>Хранятся в Сингапуре, применяется право Сингапура</dd></div>
+        <div><dt>История</dt><dd>Удаление отдельных чатов в документах не описано</dd></div>
+        <div class="st" data-s="1"><dt>Обучение</dt><dd>Сервис может использовать обезличенный контент</dd></div>
+        <div class="st t-orange" data-s="1"><dt>Отказ</dt><dd>Письмом на адрес, указанный в соглашении</dd></div>
+        <div class="t-red" style="visibility:hidden"><dt>Отзывы</dt><dd>Отзывы об ответах используются для обучения <b>в любом случае</b></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="106" data-steps="106" data-title="Qwen: отзывы об ответах">
+  <p class="kick">Куда уходят данные · сервис 4 из 4</p>
+  <div class="body">
+    <div class="svc" style="grid-template-columns:340px 1fr">
+      <div class="svc-hd"><i class="logo">Q</i><h3>Qwen</h3><p>Политика конфиденциальности и соглашение об оказании услуг</p></div>
+      <dl class="kv" style="--kw:165px">
+        <div><dt>Данные</dt><dd>Хранятся в Сингапуре, применяется право Сингапура</dd></div>
+        <div><dt>История</dt><dd>Удаление отдельных чатов в документах не описано</dd></div>
+        <div><dt>Обучение</dt><dd>Сервис может использовать обезличенный контент</dd></div>
+        <div class="t-orange"><dt>Отказ</dt><dd>Письмом на адрес, указанный в соглашении</dd></div>
+        <div class="st t-red" data-s="1"><dt>Отзывы</dt><dd>Отзывы об ответах используются для обучения <b>в любом случае</b></dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="107">
+  <p class="kick">Сервисы устроены по-разному</p>
+  <h2>Что пишут сами сервисы</h2>
+  <div class="body" style="gap:12px">
+    <table class="tbl sm" style="line-height:1.15">
+      <thead><tr><th style="width:13%">Сервис</th><th style="width:31%">Где данные</th><th style="width:21%">История</th><th>Обучение и улучшение</th></tr></thead>
+      <tbody>
+        <tr><td style="padding-top:7px;padding-bottom:7px">GigaChat</td><td style="padding-top:7px;padding-bottom:7px">Сервер банка, право РФ</td><td style="padding-top:7px;padding-bottom:7px">Удаление по одному диалогу</td><td style="padding-top:7px;padding-bottom:7px">Прямо не сказано, отказ не установлен</td></tr>
+        <tr><td style="padding-top:7px;padding-bottom:7px">Алиса AI</td><td style="padding-top:7px;padding-bottom:7px">Персональные данные граждан РФ – в&nbsp;базах РФ; для российских пользователей</td><td style="padding-top:7px;padding-bottom:7px">14 дней без «Алисы Плюс»</td><td style="padding-top:7px;padding-bottom:7px">Могут использоваться, отказ в Яндекс&nbsp;ID</td></tr>
+        <tr><td style="padding-top:7px;padding-bottom:7px">DeepSeek</td><td style="padding-top:7px;padding-bottom:7px">КНР, право КНР</td><td style="padding-top:7px;padding-bottom:7px">Можно удалить</td><td style="padding-top:7px;padding-bottom:7px">Используются, отключается переключателем</td></tr>
+        <tr><td style="padding-top:7px;padding-bottom:7px">Qwen</td><td style="padding-top:7px;padding-bottom:7px">Сингапур, право Сингапура</td><td style="padding-top:7px;padding-bottom:7px">Удаление отдельных чатов не описано</td><td style="padding-top:7px;padding-bottom:7px">Обезличенный контент; отказ письмом. Отзывы используются для обучения в&nbsp;любом случае</td></tr>
+      </tbody>
+    </table>
+    <div class="rule sm t-red" style="padding:10px 30px"><svg class="i"><use href="#i-cloud-off"/></svg><div><p><b>«Облако ничего не хранит» – неверно для каждого из них.</b> Выводы делаем по действующим условиям конкретного сервиса и вида доступа</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="112,115" data-title="Корпоративный договор и бесплатная версия">
+  <p class="kick t-orange">И ещё одно</p>
+  <div class="body">
+    <p class="say sm st" data-s="1">Корпоративный договор организации с оператором может отличаться от соглашения <em>бесплатной версии</em></p>
+    <div class="vs sm st" data-s="2">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-user"/></svg>Бесплатная версия</h3><p>Пользовательское соглашение</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-building-2"/></svg>Доступ по корпоративному договору</h3><p>Если организация заключила договор с&nbsp;оператором</p></div>
+    </div>
+    <p class="sub st" data-s="2">Написанное для бесплатной версии не обязательно относится к доступу на работе. И наоборот</p>
+  </div>
+</section>
+
+<section class="slide" data-steps="119,123">
+  <p class="kick t-orange">До начала работы с сервисом</p>
+  <h2>Два шага</h2>
+  <div class="body">
+    <div class="ask t-orange">
+      <span class="q">?</span>
+      <ul>
+        <li class="st" data-s="1">Открыть соглашение сервиса</li>
+        <li class="st" data-s="2">Узнать, сколько хранится история в сервисе, которым вы пользуетесь чаще всего</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-message-circle"/></svg>Где это посмотреть – в соглашении и справке сервиса</p>
+</section>

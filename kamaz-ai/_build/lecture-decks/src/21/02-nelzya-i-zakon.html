@@ -1,0 +1,336 @@
+<!-- Лекция 2.1, строки 128–263 (06:59–14:24): почему опасна сама возможность обучения на диалогах, что нельзя передавать во внешние сервисы, что говорит закон -->
+
+<section class="slide" data-at="128">
+  <p class="kick">Обучение на диалогах</p>
+  <h2>Почему для организации важна сама возможность обучения на диалогах</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step" style="padding:40px 36px 46px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-brain"/></svg></span><h3 style="font-size:44px">Модели запоминают часть данных, на&nbsp;которых обучались</h3></li>
+      <li class="step t-red" style="padding:40px 36px 46px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-search-code"/></svg></span><h3 style="font-size:44px">Эту часть иногда удаётся извлечь запросами</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="131" data-steps="131,133" data-title="Исследование 2023 года: извлекли гигабайты обучающих данных">
+  <p class="kick">Исследование 2023 года</p>
+  <div class="body">
+    <p class="say sm st">Из открытых и закрытых моделей извлекли <b>гигабайты</b> обучающих данных</p>
+    <figure class="quote sm st">
+      <blockquote>Наши методы показывают, что практические атаки позволяют восстановить гораздо больше данных, чем считалось раньше, и что нынешние способы настройки поведения моделей <b>не&nbsp;устраняют&nbsp;запоминание</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Nasr M., Carlini N. и соавторы</b>авторы исследования, препринт arXiv, 2023</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Nasr M. et al. Scalable Extraction of Training Data from (Production) Language Models, 2023, препринт arXiv · doi.org/10.48550/arXiv.2311.17035</p>
+</section>
+
+<section class="slide" data-at="136">
+  <p class="kick t-red">Что из этого следует для нас</p>
+  <h2>Текст попал в обучающие данные чужой модели</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-red" style="padding:36px 32px"><span class="bdg lg"><svg class="i"><use href="#i-lock-open"/></svg></span><h3 style="font-size:38px">Вы его уже не&nbsp;контролируете</h3></div>
+      <div class="card t-red" style="padding:36px 32px"><span class="bdg lg"><svg class="i"><use href="#i-undo-2"/></svg></span><h3 style="font-size:38px">Его нельзя отозвать</h3></div>
+      <div class="card t-red" style="padding:36px 32px"><span class="bdg lg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3 style="font-size:38px">Неизвестно, в каком ответе и кому он&nbsp;всплывёт</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="141">
+  <p class="kick">Обратите внимание</p>
+  <h2>Речь о сервисах, где диалоги могут идти на обучение</h2>
+  <div class="body">
+    <div class="tree" style="--n:3">
+      <div class="root">Условия сервисов об обучении</div>
+      <div class="kids">
+        <div class="kid t-red" style="padding:26px 26px 30px"><h3 style="font-size:36px">У одних</h3><p style="font-size:31px">Так прямо и написано</p></div>
+        <div class="kid t-orange" style="padding:26px 26px 30px"><h3 style="font-size:36px">У других</h3><p style="font-size:31px">Отказ возможен</p></div>
+        <div class="kid t-gray" style="padding:26px 26px 30px"><h3 style="font-size:36px">У третьих</h3><p style="font-size:31px">В документах об этом прямо не&nbsp;сказано</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="144" data-title="А. Морозов: к облачным моделям – как к интернету">
+  <p class="kick">Мысль из первого дня</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>К внешним облачным моделям относиться так же, как к интернету: <b>что туда попало, там и&nbsp;остаётся</b></blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>А. Морозов</b>доклад «AI в безопасности и безопасность в AI», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="148" data-title="Готов ли я выложить этот текст в интернет">
+  <p class="kick t-orange">Для повседневной работы</p>
+  <div class="body">
+    <p class="sub">Это позиция докладчика, а не результат исследования.<br>Но для работы она удобна</p>
+    <p class="say">Перед отправкой спросите себя: готов ли я выложить этот текст <em>в&nbsp;интернет</em>?</p>
+  </div>
+</section>
+
+<section class="slide" data-at="153" data-title="Люди отправляют в чат больше, чем думают">
+  <p class="kick">Как это выглядит в жизни</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-messages-square"/></svg></div>
+      <div>
+        <p class="say md">Люди отправляют в чат <em>больше</em>, чем думают</p>
+        <p class="sub" style="font-size:32px">Исследователи разобрали реальные диалоги пользователей с чат-ботом. Персональные данные чаще всего появлялись там, где их никто не&nbsp;ждёт</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="158" data-title="Персональные данные в неожиданных контекстах">
+  <p class="kick">Реальные диалоги с чат-ботом · авторы пишут</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Персональные данные появляются <b>в неожиданных контекстах</b>, например при переводе или правке программного кода</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Mireshghallah N., Antoniak M. и соавторы</b>препринт arXiv, 2024</span></figcaption>
+    </figure>
+    <div style="display:flex;flex-direction:column;gap:12px;visibility:hidden">
+      <p class="note">В скольких случаях появлялись персональные данные</p>
+      <div class="bars t-red" style="--max:100;--lbw:300px">
+        <div class="bar" style="--v:48"><span class="lb">При переводе</span><i></i><b>48 %</b></div>
+        <div class="bar" style="--v:16"><span class="lb">При правке кода</span><i></i><b>16 %</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mireshghallah N. et al. Trust No Bot, 2024, препринт arXiv · doi.org/10.48550/arXiv.2407.11438</p>
+</section>
+
+<section class="slide" data-at="161" data-title="Персональные данные: 48 % при переводе, 16 % при правке кода">
+  <p class="kick">Реальные диалоги с чат-ботом · авторы пишут</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Персональные данные появляются <b>в неожиданных контекстах</b>, например при переводе или правке программного кода</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Mireshghallah N., Antoniak M. и соавторы</b>препринт arXiv, 2024</span></figcaption>
+    </figure>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="note">В скольких случаях появлялись персональные данные</p>
+      <div class="bars t-red" style="--max:100;--lbw:300px">
+        <div class="bar" style="--v:48"><span class="lb">При переводе</span><i></i><b>48 %</b></div>
+        <div class="bar" style="--v:16"><span class="lb">При правке кода</span><i></i><b>16 %</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mireshghallah N. et al. Trust No Bot, 2024, препринт arXiv · doi.org/10.48550/arXiv.2407.11438</p>
+</section>
+
+<section class="slide" data-at="163">
+  <p class="kick t-orange">Инженерный аналог</p>
+  <h2>Задача кажется чисто технической</h2>
+  <div class="body">
+    <div class="chat" style="flex-direction:row;justify-content:center;gap:32px">
+      <div class="msg user" style="align-self:auto;font-size:34px"><span class="who">Запрос</span><p>Переведи письмо поставщику</p></div>
+      <div class="msg user" style="align-self:auto;font-size:34px"><span class="who">Запрос</span><p>Сделай таблицу из протокола</p></div>
+    </div>
+    <p class="note" style="text-align:center;font-size:30px;color:var(--ink)">А в тексте</p>
+    <div class="picts c4 sm t-red">
+      <div class="pict"><svg class="i"><use href="#i-user-round"/></svg><b>Фамилии</b></div>
+      <div class="pict"><svg class="i"><use href="#i-phone"/></svg><b>Телефоны</b></div>
+      <div class="pict"><svg class="i"><use href="#i-receipt-text"/></svg><b>Номера договоров</b></div>
+      <div class="pict"><svg class="i"><use href="#i-gauge"/></svg><b>Результаты испытаний</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="167">
+  <p class="kick">Ещё одно исследование · интервью</p>
+  <h2>О рисках знают, а правил почти нет</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="stats"><div class="stat"><b>15</b><span>организаций: интервью с&nbsp;их&nbsp;сотрудниками</span></div></div>
+      <div>
+        <div class="rule t-teal"><svg class="i"><use href="#i-eye"/></svg><div><p>О рисках люди в&nbsp;целом знают</p></div></div>
+        <div class="rule t-red"><svg class="i"><use href="#i-list-x"/></svg><div><p>Правил на этот счёт в организациях почти нет, и каждый придумывает свои</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kimbel A., Glas M., Pernul G. IFIP Advances in Information and Communication Technology, Springer, 2025 · doi.org/10.1007/978-3-031-72563-0_13</p>
+</section>
+
+<section class="slide dark" data-at="172" data-title="В организации нужны общие правила и понятный порядок">
+  <p class="kick t-orange">Отсюда вывод</p>
+  <div class="body">
+    <p class="say md">В организации нужны <b>общие правила</b> и&nbsp;<em>понятный порядок</em></p>
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i"><use href="#i-circle-check-big"/></svg><b>Что можно</b></div>
+      <div class="pict"><svg class="i"><use href="#i-ban"/></svg><b>Что нельзя</b></div>
+      <div class="pict"><svg class="i"><use href="#i-message-circle-question"/></svg><b>К кому идти с вопросом</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="178" data-steps="178,184,188">
+  <p class="kick t-red">Групп пять</p>
+  <h2>Что нельзя передавать во внешние сервисы</h2>
+  <div class="body">
+    <ul class="list num sm t-red">
+      <li class="st" data-s="1"><b>Персональные данные</b><small>ФИО, телефоны, адреса, номера документов, а также сведения, по которым человека можно&nbsp;определить&nbsp;<em>косвенно</em></small></li>
+      <li class="st" data-s="2"><b>Сведения, составляющие коммерческую тайну</b></li>
+      <li class="st" data-s="2"><b>Конструкторская и технологическая документация</b><small>Чертежи, спецификации, технологические карты, программы испытаний реальных изделий</small></li>
+      <li class="st" data-s="3"><b>Сведения о заказчиках и поставщиках</b><small>Договоры, цены, условия, переписка</small></li>
+      <li class="st" data-s="3"><b>Пароли и учётные данные</b><small>Не отправляются ни в какой сервис, включая внутренние</small></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="194" data-title="Что закрыто, определяют перечни и правила организации">
+  <p class="kick">Закрытые сведения</p>
+  <div class="body" style="justify-content:space-between">
+    <div style="display:flex;gap:44px;align-items:center;flex:1">
+      <svg class="i big-ic" style="font-size:150px"><use href="#i-list-checks"/></svg>
+      <p class="say sm">Что именно относится к закрытым сведениям, определяют <b>перечни и&nbsp;правила вашей организации</b></p>
+    </div>
+    <div class="rule t-orange">
+      <svg class="i"><use href="#i-file-warning"/></svg>
+      <div><h3>Пример</h3><p>Данные о массовых дефектах изделия могут относиться к коммерческой тайне, хотя в них нет ни одной фамилии</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="199">
+  <p class="kick t-red">Пример: сводка дефектов</p>
+  <h2>Закрытыми бывают не только сведения о людях</h2>
+  <div class="body">
+    <div class="docs" style="align-items:center;gap:56px">
+      <div class="doc t-gray" style="width:380px;gap:14px"><h4 style="font-size:30px">Список сотрудников</h4><i class="hl"></i><i></i><i class="hl"></i><i class="s"></i><i class="hl"></i><i></i><b class="stamp">фамилии</b></div>
+      <svg class="i" style="font-size:96px;color:var(--muted)"><use href="#i-scale"/></svg>
+      <div class="doc t-red" style="width:380px;gap:14px"><h4 style="font-size:30px">Сводка дефектов</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><b class="stamp">ни одного человека</b></div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-file-lock"/></svg><div><p>Сводка дефектов может оказаться закрытой не меньше, чем список&nbsp;сотрудников</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="202">
+  <p class="kick t-orange">Коммерческая тайна · для памятки</p>
+  <h2>Перечень сведений, составляющих коммерческую тайну</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:200px 1fr;gap:44px;align-items:center">
+      <span class="center t-orange"><svg class="i big-ic" style="font-size:170px;color:var(--c)"><use href="#i-file-lock"/></svg></span>
+      <ul class="list check big t-orange">
+        <li>Полезно знать, есть ли такой перечень в&nbsp;подразделении</li>
+        <li>Он пригодится для памятки в&nbsp;самостоятельной работе</li>
+        <li>Если перечень есть – откройте его</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-message-circle"/></svg>Перечень сведений, составляющих коммерческую тайну, определяет обладатель информации</p>
+</section>
+
+<section class="slide" data-at="215" data-steps="215,219,221" data-title="152-ФЗ: определение персональных данных">
+  <p class="kick">Что говорит закон · персональные данные</p>
+  <div class="body">
+    <div class="st" style="display:flex;align-items:center;gap:30px">
+      <span class="bdg lg"><svg class="i"><use href="#i-scale"/></svg></span>
+      <div>
+        <p style="font-size:42px;font-weight:700;line-height:1.1">Федеральный закон «О персональных данных»</p>
+        <p style="font-size:31px;color:var(--muted);margin-top:8px"><b style="color:var(--teal)">№ 152-ФЗ</b> от 27.07.2006 · <b style="color:var(--ink)">статья 3, пункт 1</b></p>
+      </div>
+    </div>
+    <div class="term st"><dfn style="font-size:46px">Персональные данные</dfn><p style="font-size:34px">любая информация, относящаяся к прямо или <b>косвенно</b> определенному или <b>определяемому</b> физическому лицу (субъекту персональных данных)</p></div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-user-search"/></svg><div><p><b>Главное – два слова: «косвенно» и «определяемому».</b> Фамилия&nbsp;не&nbsp;обязательна</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="225" data-steps="225,229" data-title="Табельный номер без фамилии">
+  <p class="kick t-orange">Пример · по определению закона</p>
+  <h2>Табельный номер без фамилии</h2>
+  <div class="body">
+    <div class="rule sm t-orange st" data-s="1" style="padding:20px 32px"><svg class="i"><use href="#i-id-card"/></svg><div><p><b>Может быть персональными данными</b>, если по нему можно понять, о&nbsp;ком&nbsp;речь</p></div></div>
+    <div class="picts sm st" data-s="2" style="grid-template-columns:repeat(5,1fr)">
+      <div class="pict"><svg class="i"><use href="#i-phone"/></svg><b style="font-size:26px">Номер телефона</b></div>
+      <div class="pict"><svg class="i"><use href="#i-car-front"/></svg><b style="font-size:26px">Госномер автомобиля</b></div>
+      <div class="pict"><svg class="i"><use href="#i-scan-barcode"/></svg><b style="font-size:26px">VIN</b></div>
+      <div class="pict"><svg class="i"><use href="#i-id-card"/></svg><b style="font-size:26px">Табельный номер</b></div>
+      <div class="pict"><svg class="i"><use href="#i-briefcase-business"/></svg><b style="font-size:26px">Должность в маленьком подразделении</b></div>
+    </div>
+    <div class="rule sm t-orange st" data-s="2" style="padding:20px 32px"><svg class="i"><use href="#i-user-search"/></svg><div><p>Всё это может указывать на конкретного человека</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="233" data-title="Простое правило о персональных данных">
+  <p class="kick t-orange">Простое правило</p>
+  <div class="body">
+    <p class="say">Если по тексту можно понять, <em>о ком речь</em>, в нём есть <b>персональные данные</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="237" data-steps="237,240" data-title="98-ФЗ: состав коммерческой тайны определяет обладатель">
+  <p class="kick">Что говорит закон · коммерческая тайна</p>
+  <div class="body">
+    <div class="st" style="display:flex;align-items:center;gap:30px">
+      <span class="bdg lg"><svg class="i"><use href="#i-scale"/></svg></span>
+      <div>
+        <p style="font-size:42px;font-weight:700;line-height:1.1">Федеральный закон «О коммерческой тайне»</p>
+        <p style="font-size:31px;color:var(--muted);margin-top:8px"><b style="color:var(--teal)">№ 98-ФЗ</b> от 29.07.2004 · <b style="color:var(--ink)">статья 4, часть 1</b></p>
+        <p style="font-size:31px;margin-top:6px">Решение, что относится к коммерческой тайне, – за <b style="color:var(--orange)">обладателем&nbsp;информации</b></p>
+      </div>
+    </div>
+    <figure class="quote xs st">
+      <blockquote>Право на отнесение информации к информации, составляющей коммерческую тайну, и на определение перечня и состава такой информации принадлежит <b>обладателю такой информации</b> с учетом положений настоящего Федерального&nbsp;закона</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-scale"/></svg></i><span><b>Дословно</b>статья 4, часть 1 Федерального закона «О коммерческой тайне»</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="245">
+  <p class="kick t-orange">Коммерческая тайна</p>
+  <h2>На вопрос «это коммерческая тайна?» ответ один</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:40px 40px 48px;gap:24px"><h3 style="font-size:38px"><svg class="i"><use href="#i-list-checks"/></svg>Правильный ответ</h3><p style="font-size:42px;font-weight:600">Смотрим перечень нашей организации</p></div>
+      <div class="col t-orange" style="padding:40px 40px 48px;gap:24px"><h3 style="font-size:38px"><svg class="i"><use href="#i-file-lock"/></svg>Перечня под рукой нет</h3><p style="font-size:42px;font-weight:600">Считаем сведения закрытыми, пока не выяснили обратное</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="250">
+  <p class="kick">Ещё один частый вопрос</p>
+  <h2>А если попросить модель ничего не разглашать?</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-gray"><svg class="i big-ic"><use href="#i-message-square-lock"/></svg></div>
+      <div class="chat">
+        <div class="msg user" style="max-width:100%;font-size:42px;padding:26px 32px"><span class="who" style="font-size:22px">Запрос</span><p>Это конфиденциально, никому&nbsp;не&nbsp;показывай</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="253" data-title="OWASP: раскрытие конфиденциальных сведений – второй пункт">
+  <p class="kick t-red">Перечень рисков для приложений на языковых моделях</p>
+  <div class="body">
+    <div class="svc t-red">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-shield-alert"/></svg></i>
+        <h3 style="font-size:46px">OWASP Top 10 for LLM Applications</h3>
+        <div class="tags"><span class="tag">редакция 2025 года</span></div>
+      </div>
+      <dl class="kv" style="--kw:190px">
+        <div style="font-size:32px"><dt>Второй пункт</dt><dd><b>LLM02:2025</b> Раскрытие конфиденциальных сведений<small style="display:block;color:var(--muted);font-size:24px;margin-top:4px">Sensitive Information Disclosure</small></dd></div>
+        <div style="font-size:32px"><dt>Там же</dt><dd>Ограничения, записанные в инструкции модели, <b>могут не соблюдаться</b></dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>OWASP Top 10 for LLM Applications 2025 · LLM02:2025 Sensitive Information Disclosure</p>
+</section>
+
+<section class="slide" data-at="256" data-steps="256,259" data-title="OWASP: ограничения в инструкции соблюдаются не всегда">
+  <p class="kick t-red">OWASP, LLM02:2025 · цитата в переводе</p>
+  <div class="body">
+    <figure class="quote sm t-red">
+      <blockquote><span class="st">Ограничения на типы данных, которые модель может возвращать, записанные в системной инструкции, могут снизить риск раскрытия конфиденциальных сведений.</span> <span class="st">Однако такие ограничения <b>соблюдаются не всегда</b>, и их можно обойти с помощью внедрения команд или другими способами</span></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-shield-alert"/></svg></i><span><b>OWASP Top 10 for LLM Applications 2025</b>пункт LLM02:2025, раскрытие конфиденциальных сведений</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="261" data-title="Защита начинается до отправки">
+  <p class="kick t-orange">Вывод</p>
+  <div class="body">
+    <p class="say">Защита начинается <em>до отправки</em></p>
+    <p class="sub">Не отправлять то, что не должно уйти.<br>Всё, что уже ушло, просьбой не&nbsp;вернёшь</p>
+  </div>
+</section>

@@ -1,0 +1,519 @@
+<!-- Лекция 2.2, строки 617–828 (29:48–41:31): проверяемые требования – способы проверки, формула готовности, критерий приёмки, кодекс качества из десяти критериев, союз «и», ГОСТ 34.602-2020, ГОСТ Р 2.105-2019, ГОСТ Р 71752-2024 -->
+
+<section class="slide sect" data-at="617">
+  <span class="no"><svg class="i"><use href="#i-clipboard-check"/></svg></span>
+  <p class="kick">Ещё одна часть темы</p>
+  <h1>Проверяемые требования</h1>
+  <p class="lead">Всё, что мы делали с техническим заданием, исходит из того, что требования в нём написаны хорошо. Так бывает не всегда</p>
+</section>
+
+<section class="slide" data-at="621" data-steps="624" data-title="Можно ли сказать «выполнено» или «не выполнено»">
+  <p class="kick">Сначала – сами формулировки</p>
+  <div class="body">
+    <p class="say">Можно ли по формулировке сказать <b>«выполнено»</b> или <em>«не&nbsp;выполнено»</em>?</p>
+    <p class="sub">Это полезно проверить до извлечения требований и сравнения редакций</p>
+    <div class="vs st">
+      <div class="col t-teal"><h3 style="font-size:38px"><svg class="i"><use href="#i-bot"/></svg>Языковая модель</h3><p style="font-size:33px">Ищет слабые места в&nbsp;формулировках</p></div>
+      <div class="col t-orange"><h3 style="font-size:38px"><svg class="i"><use href="#i-user-check"/></svg>Инженер</h3><p style="font-size:33px">Проверяет результат</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="626" data-title="Главный признак требования – проверка">
+  <p class="kick">Главный признак требования – проверка</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>У каждого требования должен быть способ проверки. Проверка может быть тестом, демонстрацией, измерением, анализом или инспекцией.<br><b>Без проверки это не требование, а&nbsp;пожелание</b></blockquote>
+      <figcaption><i class="ava">ВП</i><span><b>Виталий Пиков</b>авторский курс по техническим заданиям · tz.pikov.expert</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="631" data-steps="632,635,639,641,643">
+  <p class="kick">Пять способов проверки · учебный узел ЭС-24</p>
+  <h2>Как способы проверки выглядят на нашем узле</h2>
+  <div class="body">
+    <table class="tbl sm">
+      <thead><tr><th style="width:24%">Способ</th><th style="width:33%">Когда</th><th>Пример на ЭС-24</th></tr></thead>
+      <tbody>
+        <tr class="st"><td><svg class="i"><use href="#i-monitor-play"/></svg> Демонстрация</td><td>Поведение видно в работе</td><td>Двигатель запускается после стоянки, видно, с&nbsp;какой попытки</td></tr>
+        <tr class="st"><td><svg class="i"><use href="#i-list-ordered"/></svg> Тест</td><td>Поведение воспроизводится по&nbsp;шагам</td><td>Пуск по методике: стоянка 14 суток в камере, попытки не более 10 с</td></tr>
+        <tr class="st"><td><svg class="i"><use href="#i-gauge"/></svg> Измерение</td><td>Нужны численные показатели</td><td>Ток покоя через 60 мин после выключения&nbsp;зажигания</td></tr>
+        <tr class="st"><td><svg class="i"><use href="#i-calculator"/></svg> Анализ</td><td>Проверяются расчёт, схема,&nbsp;модель</td><td>Расчёт энергобаланса стоянки</td></tr>
+        <tr class="st"><td><svg class="i"><use href="#i-scan-search"/></svg> Инспекция</td><td>Проверяются документы, маркировка, настройки</td><td>Отдельный предохранитель тахографа – по схеме и маркировке блока</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide dark" data-at="645" data-title="Формула готовности требования">
+  <p class="kick t-orange">Формула готовности</p>
+  <div class="body">
+    <p class="say md">Если требование нельзя одинаково <b>понять, реализовать, проверить и&nbsp;принять</b>, оно ещё <em>не готово</em> для технического задания</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Авторский курс В. А. Пикова по техническим заданиям · tz.pikov.expert</p>
+</section>
+
+<section class="slide" data-at="648">
+  <p class="kick">Формула готовности · по словам</p>
+  <h2>Что значит каждое слово</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row"><span class="bdg"><svg class="i"><use href="#i-users"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">Понять</h3><p style="font-size:30px">Одна трактовка у всех участников</p></div></div>
+      <div class="card row"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">Реализовать</h3><p style="font-size:30px">Есть техническая возможность и границы</p></div></div>
+      <div class="card row"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">Проверить</h3><p style="font-size:30px">Есть метод и ожидаемый результат</p></div></div>
+      <div class="card row t-orange"><span class="bdg"><svg class="i"><use href="#i-stamp"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">Принять</h3><p style="font-size:30px">Есть пункт программы и методики испытаний и артефакт приёмки</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="654">
+  <p class="kick t-orange">Для инженера-испытателя</p>
+  <h2>Пункт задания – пункт программы испытаний</h2>
+  <div class="body">
+    <div class="docs" style="flex-wrap:nowrap;gap:64px;align-items:center;padding-bottom:14px">
+      <div class="doc" style="width:300px"><h4 style="font-size:25px">Техническое задание</h4><i></i><i class="t"></i><i></i><i class="s"></i><i></i><b class="stamp t-teal">пункт</b></div>
+      <svg class="i" style="font-size:72px;color:var(--muted)"><use href="#i-link-2"/></svg>
+      <div class="doc" style="width:300px"><h4 style="font-size:25px">Программа и методика испытаний</h4><i></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp t-orange" style="white-space:nowrap">«годен» – известно заранее</b></div>
+    </div>
+    <p class="say sm" style="text-align:center;max-width:none">У каждого пункта задания – пункт программы испытаний, где заранее известно, какой результат означает <em>«годен»</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="658" data-steps="659,661" data-title="Критерий приёмки">
+  <p class="kick t-orange">Для инженера-испытателя</p>
+  <div class="body">
+    <div class="term t-orange"><dfn>Критерий приёмки</dfn><p>Однозначный признак выполнения</p></div>
+    <div class="vs">
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-gauge"/></svg>Измеряемая величина</h3><ul><li>Допуск или предел</li><li>Условия проверки</li></ul></div>
+      <div class="col t-orange st"><h3><svg class="i"><use href="#i-eye"/></svg>Остальное – что увидит проверяющий</h3><ul><li>Смазка нанесена</li><li>Предохранитель отдельный</li><li>Маркировка на месте</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="665">
+  <p class="kick">Авторский курс по техническим заданиям</p>
+  <h2>Кодекс качества требований: 10 критериев</h2>
+  <div class="body">
+    <ol class="list num" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(5,auto);grid-auto-flow:column;gap:18px 60px;font-size:34px">
+      <li>Требование как требование</li>
+      <li>Атомарность</li>
+      <li>Однозначность</li>
+      <li>Проверяемость</li>
+      <li>Реализуемость</li>
+      <li>Обоснованность</li>
+      <li>Полнота и неизбыточность</li>
+      <li>Непротиворечивость</li>
+      <li>Трассируемость</li>
+      <li>Приоритизация</li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Пиков В. А. Авторский курс по техническим заданиям, блок «Кодекс качества требований» · tz.pikov.expert</p>
+</section>
+
+<section class="slide" data-steps="668,671,674">
+  <p class="kick">Критерий 1 из 10</p>
+  <h2>Требование как требование</h2>
+  <div class="body">
+    <p class="say sm st">Формулировка задаёт <b>обязанность</b> – «должен», а не описывает состояние или пожелание</p>
+    <div class="split st" style="grid-template-columns:3fr 2fr;gap:36px">
+      <div class="chat"><div class="msg bad" style="max-width:100%"><span class="who">Плохой пример</span><p>«<mark>Желательно</mark> предусмотреть индикацию разряда аккумуляторных батарей»</p></div></div>
+      <p class="note" style="font-size:29px;color:var(--ink)">Если функция действительно необязательна, это пишут прямо</p>
+    </div>
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-scale"/></svg><div><p>Не путайте обязательность с приоритетом. Приоритет говорит о важности требования и задаётся отдельно – это <b>критерий 10</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="677">
+  <p class="kick">Критерий 2 из 10</p>
+  <h2>Атомарность</h2>
+  <div class="body">
+    <p class="sub" style="color:var(--ink)">Один пункт – одна функция, одно свойство или одно ограничение</p>
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-cog"/></svg><b>Одна функция</b></div>
+      <div class="pict"><svg class="i"><use href="#i-tag"/></svg><b>Одно свойство</b></div>
+      <div class="pict"><svg class="i"><use href="#i-ban"/></svg><b>Одно ограничение</b></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-split"/></svg><div><h3>Уточнение курса</h3><p>Если пункт нельзя проверить одним тестом или одной группой связанных проверок, его надо разделить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="682">
+  <p class="kick">Критерий 3 из 10</p>
+  <h2>Однозначность</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Одна трактовка у заказчика, разработчика и испытателя. Термины определены</p>
+    <div class="chat"><div class="msg bad" style="max-width:100%"><span class="who">Плохой пример</span><p>«Генератор должен <mark>быстро</mark> восстанавливать заряд батарей после пуска двигателя»</p></div></div>
+    <div class="ask t-red" style="grid-template-columns:150px 1fr;gap:44px">
+      <span class="q" style="width:150px;height:150px;font-size:105px">?</span>
+      <ul style="font-size:36px;gap:16px"><li>Насколько быстро?</li><li>До какого состояния?</li><li>В каком режиме двигателя?</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="690">
+  <p class="kick">Критерий 3 · удачный пример из кейса</p>
+  <h2>Пункт 4.6: термин сразу уточнён числом</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:stretch">
+      <div class="card t-teal" style="justify-content:center;gap:20px"><span class="n">П. 4.6 · РЕДАКЦИЯ 2</span><p style="font-size:40px;line-height:1.3">Ток отдачи генератора на <mark>холостом ходу двигателя (600&nbsp;мин⁻¹)</mark> – не менее 45 А</p></div>
+      <div class="stats"><div class="stat md t-teal" style="justify-content:center;gap:18px"><b>600 мин⁻¹</b><span>«Холостой ход» задан числом – спорить о нём не придётся</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="694">
+  <p class="kick">Критерий 4 из 10</p>
+  <h2>Проверяемость</h2>
+  <div class="body">
+    <p class="say md">Есть <b>объективный</b> способ проверки</p>
+    <div class="picts">
+      <div class="pict"><svg class="i"><use href="#i-list-ordered"/></svg><b>Тест</b></div>
+      <div class="pict"><svg class="i"><use href="#i-monitor-play"/></svg><b>Демонстрация</b></div>
+      <div class="pict"><svg class="i"><use href="#i-gauge"/></svg><b>Измерение</b></div>
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b>Анализ</b></div>
+      <div class="pict"><svg class="i"><use href="#i-scan-search"/></svg><b>Инспекция</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="697" data-steps="699,702">
+  <p class="kick">Критерий 5 из 10</p>
+  <h2>Реализуемость</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink);display:flex;flex-wrap:wrap;gap:10px;align-items:center">Требование выполнимо при заданных <span class="tag">технологиях</span><span class="tag">сроках</span><span class="tag">бюджете</span><span class="tag">ограничениях</span></p>
+    <div class="vs">
+      <div class="col t-red st"><h3><svg class="i"><use href="#i-x"/></svg>Плохо</h3><p>«<mark>Все возможные</mark> аварийные режимы должны отрабатываться без повреждения узла»</p><p class="muted" style="font-size:26px">Перечислить и проверить все возможные режимы нельзя</p></div>
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-check"/></svg>Лучше</h3><ul><li>Перечень конкретных аварийных ситуаций, например короткое замыкание в цепи тахографа</li><li>Для каждой – реакция узла и критерий приёмки</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="705">
+  <p class="kick">Критерий 6 из 10</p>
+  <h2>Обоснованность: у требования есть источник</h2>
+  <div class="body">
+    <div class="tree" style="--n:4">
+      <div class="root">Источник требования</div>
+      <div class="kids">
+        <div class="kid"><h3 style="font-size:32px">Цель</h3></div>
+        <div class="kid"><h3 style="font-size:32px">Сценарий</h3></div>
+        <div class="kid"><h3 style="font-size:32px">Нормативный документ</h3></div>
+        <div class="kid"><h3 style="font-size:32px">Ограничение</h3></div>
+      </div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-circle-help"/></svg><div><p>Источник объясняет, зачем требование нужно и кто вправе его&nbsp;изменить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="710" data-steps="710,713">
+  <p class="kick">Критерий 6 · учебное задание</p>
+  <h2>Источники не записаны: что делать</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-file-search"/></svg></span><h3>Сопоставить</h3><p>Задание и замечания по испытаниям</p></li>
+      <li class="step st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-link-2"/></svg></span><h3>Проверить связь</h3><p>Есть ли связь между требованием и замечанием</p></li>
+      <li class="step st t-orange" data-s="2"><span class="bdg"><svg class="i"><use href="#i-file-pen"/></svg></span><h3>Указать основание</h3><p>Отдельно – на чём основан такой вывод</p></li>
+    </ol>
+    <div class="rule t-red st" data-s="2"><svg class="i"><use href="#i-bot"/></svg><div><p>Модель источник не придумывает. Если его нет в документах, в поле пишут «источник не указан»</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="716">
+  <p class="kick">Критерий 7 из 10</p>
+  <h2>Полнота и неизбыточность</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Нет пробелов, и одно и то же не повторяется в нескольких местах</p>
+    <figure class="quote md">
+      <blockquote>Если одно требование повторяется в трёх местах, через месяц <b>в одном месте его изменят, а в двух забудут</b></blockquote>
+      <figcaption><i class="ava">ВП</i><span><b>Виталий Пиков</b>авторский курс по техническим заданиям · tz.pikov.expert</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="722">
+  <p class="kick">Критерий 7 · условный пример</p>
+  <h2>Одно значение – в двух местах</h2>
+  <div class="body">
+    <div class="docs" style="flex-wrap:nowrap;gap:64px;padding-bottom:10px">
+      <div class="doc" style="width:330px;gap:9px;padding:18px 22px 22px"><h4 style="font-size:24px">Требования к генератору</h4><i class="hl"></i><i class="s"></i><b class="stamp t-orange" style="white-space:nowrap">напряжение регулятора</b></div>
+      <div class="doc" style="width:330px;gap:9px;padding:18px 22px 22px"><h4 style="font-size:24px">Требования к бортовой сети</h4><i></i><i class="hl"></i><b class="stamp t-orange" style="white-space:nowrap">напряжение регулятора</b></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>При выпуске новой редакции одно место поправили, второе забыли</p></div></div>
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-check"/></svg><div><p><b>Правильно:</b> записать значение в одном пункте, а остальным пунктам ссылаться на него</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="728">
+  <p class="kick">Критерий 8 из 10</p>
+  <h2>Непротиворечивость</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Требования не конфликтуют между собой. Пример из кейса – письмо поставщика</p>
+    <div class="stats">
+      <div class="stat md t-red"><b>40 А</b><span>Письмо поставщика ссылается на п. 4.6: «не менее 40 А». Это значение из редакции 1</span></div>
+      <div class="stat md t-teal"><b>45 А</b><span>П. 4.6 в редакции 2: не менее 45 А</span></div>
+    </div>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-git-compare-arrows"/></svg><div><p>Такой конфликт между документами разных редакций находится только сверкой редакций</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="736">
+  <p class="kick">Критерий 9 из 10</p>
+  <h2>Трассируемость</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-book-open-text"/></svg></span><h3>Источник</h3></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-hash"/></svg></span><h3>Требование с постоянным номером</h3></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверка</h3></li>
+      <li class="step"><span class="bdg"><svg class="i"><use href="#i-file-check"/></svg></span><h3>Протокол</h3></li>
+    </ol>
+    <div class="prompt"><p class="part t-teal" style="--tw:230px"><span class="tg">Хороший пример</span><span>Пункты программы и методики испытаний ЭС-24 ссылаются на пункты задания: <b>«5.4. Ток покоя (п. 4.3 ТЗ)»</b></span></p></div>
+  </div>
+</section>
+
+<section class="slide" data-at="742">
+  <p class="kick t-red">Критерий 9 · оговорка</p>
+  <h2>Ссылка ещё не доказывает полноту</h2>
+  <div class="body">
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Сама по себе ссылка не доказывает, что проверены <b>все требования внутри пункта</b>. Полноту проверяют отдельным сопоставлением</p></div></div>
+    <table class="tbl sm">
+      <thead><tr><th style="width:52%">Требование задания</th><th>Проверка, которая его подтверждает</th></tr></thead>
+      <tbody>
+        <tr><td>П. 4.7: момент затяжки клемм – 7 ± 1 Н·м</td><td>П. 5.8 программы испытаний: динамометрический ключ</td></tr>
+        <tr><td>П. 4.7: защитная смазка клемм</td><td>П. 5.8 программы испытаний: осмотр</td></tr>
+      </tbody>
+    </table>
+    <p class="note">В одном пункте задания два требования – и проверки должны найтись для обоих</p>
+  </div>
+</section>
+
+<section class="slide dark" data-at="746">
+  <p class="kick">Критерий 10 из 10</p>
+  <h2>Приоритизация</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Указано, насколько требование важно. В учебном задании приоритетов нет, хотя последствия невыполнения у пунктов разные</p>
+    <div class="cards">
+      <div class="card row t-red"><span class="bdg"><svg class="i"><use href="#i-battery-low"/></svg></span><div><span class="n">П. 4.4</span><h3>Пуск после стоянки</h3></div></div>
+      <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-droplet"/></svg></span><div><span class="n">П. 4.7</span><h3>Смазка клемм</h3></div></div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-users"/></svg><div><p>Приоритет назначает команда вместе с заказчиком, а не модель</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="752" data-title="Несколько «и» в одном требовании">
+  <p class="kick">Наблюдение из курса по техническим заданиям</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-ampersand"/></svg></div>
+      <div><p class="say sm">Сложное требование с несколькими «и» часто прячет несколько разных <b>работ</b>, разных <b>владельцев</b> и разные <b>способы проверки</b></p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Авторский курс В. А. Пикова по техническим заданиям · tz.pikov.expert</p>
+</section>
+
+<section class="slide" data-at="755">
+  <p class="kick">Но не каждое «и» делает требование составным</p>
+  <h2>Пункт 4.9 редакции 2</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:stretch">
+      <div class="card t-gray" style="justify-content:center;gap:18px"><span class="n">П. 4.9 · РЕДАКЦИЯ 2</span><p style="font-size:35px;line-height:1.32">На холостом ходу двигателя (600 мин⁻¹) при одновременно включённых <mark>фарах дальнего света, обогреве зеркал и отопителе кабины</mark> напряжение бортовой сети – <b style="color:var(--teal);visibility:hidden">не&nbsp;ниже 27,0&nbsp;В</b></p></div>
+      <div style="justify-content:center">
+        <div class="rule t-orange" style="flex:1"><div><p><b>Фары, обогрев зеркал, отопитель</b> – условия одного измерения</p></div></div>
+        <div class="rule t-teal" style="flex:1;visibility:hidden"><div><p><b>Требование одно:</b> напряжение не&nbsp;ниже&nbsp;27,0&nbsp;В</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="760">
+  <p class="kick">Но не каждое «и» делает требование составным</p>
+  <h2>Пункт 4.9 редакции 2</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:stretch">
+      <div class="card t-gray" style="justify-content:center;gap:18px"><span class="n">П. 4.9 · РЕДАКЦИЯ 2</span><p style="font-size:35px;line-height:1.32">На холостом ходу двигателя (600 мин⁻¹) при одновременно включённых <mark>фарах дальнего света, обогреве зеркал и отопителе кабины</mark> напряжение бортовой сети – <b style="color:var(--teal)">не&nbsp;ниже 27,0&nbsp;В</b></p></div>
+      <div style="justify-content:center">
+        <div class="rule t-orange" style="flex:1"><div><p><b>Фары, обогрев зеркал, отопитель</b> – условия одного измерения</p></div></div>
+        <div class="rule t-teal" style="flex:1"><div><p><b>Требование одно:</b> напряжение не&nbsp;ниже&nbsp;27,0&nbsp;В</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="761" data-steps="763">
+  <p class="kick">Похожий набор свойств – в стандартах</p>
+  <h2>ГОСТ 34.602-2020, п. 3.4</h2>
+  <div class="body">
+    <p class="note">Техническое задание на создание автоматизированной системы</p>
+    <div class="st" style="display:flex;flex-direction:column;gap:22px">
+      <p style="font-size:32px">Требования должны обладать следующими характеристиками:</p>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">единичность</span>
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">непротиворечивость</span>
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">актуальность</span>
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">выполнимость</span>
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">проверяемость</span>
+        <span class="tag" style="font-size:30px;padding:12px 20px;text-align:center">однозначность</span>
+      </div>
+      <p style="font-size:32px">Требования по возможности должны быть <b>максимально детализированы</b></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="766" data-steps="766,768">
+  <p class="kick">ГОСТ 34.602-2020 · где применим</p>
+  <h2>Опора для инженерного задания</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-file-text"/></svg>Область стандарта</h3><p style="font-size:35px">Техническое задание на автоматизированные системы, а не на узел автомобиля</p></div>
+      <div class="col t-orange st"><h3><svg class="i"><use href="#i-wrench"/></svg>Для инженерного задания</h3><p style="font-size:35px">Формулировки стандарта – удобная опора, а не обязательная норма</p><p class="muted" style="font-size:26px;margin-top:auto">Вывод автора курса</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="770" data-steps="772,774">
+  <p class="kick">ГОСТ 34.602-2020 · п. 5.3</p>
+  <h2>Правило для числовых значений</h2>
+  <div class="body">
+    <div class="rule t-teal st"><svg class="i"><use href="#i-quote"/></svg><div><h3>С оговоркой «как правило»</h3><p>Значения показателей, норм и требований указывают, <mark>как&nbsp;правило</mark>, с предельными отклонениями или максимальным и минимальным значениями</p></div></div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-circle-dashed"/></svg><div><h3>Если значение пока установить нельзя</h3><p>Стандарт предлагает запись о порядке его установления и согласования: «Окончательное требование (значение) уточняется… и согласовывается…»</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="777">
+  <p class="kick">ГОСТ 34.602-2020 · об изменениях</p>
+  <h2>Изменения оформляют дополнением</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div class="doc t-teal" style="width:310px"><h4 style="font-size:25px">Дополнение № … к ТЗ на АС</h4><i></i><i></i><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp" style="white-space:nowrap">неотъемлемая часть ТЗ</b></div>
+      </div>
+      <div>
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-quote"/></svg><div><h3>П. 3.5</h3><p>Изменения к ТЗ на АС оформляют дополнением. Дополнение является неотъемлемой частью ТЗ на АС</p></div></div>
+        <p class="note" style="font-size:28px">Титульный лист дополнения – как у самого задания, только с наименованием дополнения и его номером</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="782">
+  <p class="kick">ГОСТ 34.602-2020 · пп. 5.7, 5.8</p>
+  <h2>Что указывают в дополнении</h2>
+  <div class="body">
+    <dl class="kv" style="--kw:150px">
+      <div style="font-size:35px"><dt>П. 5.7</dt><dd>Основание и содержание изменения</dd></div>
+      <div style="font-size:35px"><dt>П. 5.8</dt><dd>Номера пунктов основного задания и слова:</dd></div>
+    </dl>
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-replace"/></svg><b>«заменить»</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-plus"/></svg><b>«дополнить»</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-minus"/></svg><b>«исключить»</b></div>
+      <div class="pict"><svg class="i"><use href="#i-pencil-line"/></svg><b>«изложить в новой редакции»</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="785">
+  <p class="kick t-orange">Как в кейсе и как у вас</p>
+  <h2>Порядок изменения задания</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-graduation-cap"/></svg>Учебный кейс</h3><p style="font-size:36px">Для простоты редакция 2 выпущена целиком, взамен редакции 1</p></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-building-2"/></svg>Ваша организация</h3><p style="font-size:36px">Порядок изменения технического задания задают её правила</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="788" data-title="ГОСТ Р 2.105-2019, п. 5.2.2">
+  <p class="kick">Для конструкторских документов</p>
+  <div class="body">
+    <div class="term"><dfn>ГОСТ Р 2.105-2019</dfn><p>Единая система конструкторской документации. Общие требования к текстовым документам</p></div>
+    <p class="note" style="font-size:30px">Пункт 5.2.2 начинается так:</p>
+    <p class="say md">Текст документа должен быть <b>кратким, чётким</b> и <em>не допускать различных толкований</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="791" data-steps="792,796">
+  <p class="kick">ГОСТ Р 2.105-2019 · п. 5.2.2</p>
+  <h2>Слова для двух видов положений</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-circle-check"/></svg>Обязательные требования</h3>
+        <div class="tags"><span class="tag" style="font-size:26px">должен</span><span class="tag" style="font-size:26px">следует</span><span class="tag" style="font-size:26px">необходимо</span><span class="tag" style="font-size:26px">требуется</span><span class="tag" style="font-size:26px">разрешается только</span><span class="tag" style="font-size:26px">не допускается</span><span class="tag" style="font-size:26px">запрещается</span><span class="tag" style="font-size:26px">не должен</span><span class="tag" style="font-size:26px">не следует</span><span class="tag" style="font-size:26px">не подлежит</span><span class="tag" style="font-size:26px">не могут быть</span></div>
+      </div>
+      <div class="col t-gray st"><h3><svg class="i"><use href="#i-circle-dashed"/></svg>Другие положения</h3>
+        <div class="tags"><span class="tag" style="font-size:26px">могут быть</span><span class="tag" style="font-size:26px">как правило</span><span class="tag" style="font-size:26px">при необходимости</span><span class="tag" style="font-size:26px">допускается</span><span class="tag" style="font-size:26px">разрешается</span></div>
+        <p class="t-red" style="margin-top:auto;font-size:27px;display:flex;flex-wrap:wrap;gap:12px;align-items:center"><span class="tag" style="font-size:26px;text-decoration:line-through">желательно</span>нет ни в одном из перечней</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="799" data-steps="801,803">
+  <p class="kick t-orange">Вывод 1 из 2 · ГОСТ Р 2.105-2019</p>
+  <h2>Есть ли обязанность и её условия</h2>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:170px 1fr;gap:44px">
+      <span class="q" style="width:170px;height:170px;font-size:120px">?</span>
+      <ul style="font-size:33px;gap:22px">
+        <li class="st" data-s="1">Установлена ли обязанность и однозначно ли определены условия её применения?</li>
+        <li class="st" data-s="2">«Как правило», «при необходимости»: когда именно «необходимо»? Кто это решает?</li>
+        <li class="st" data-s="2">Такое место пометить и решить, так ли задумано</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="808">
+  <p class="kick">Вывод 2 из 2 · ГОСТ Р 2.105-2019</p>
+  <h2>Повествовательная форма допустима</h2>
+  <div class="body">
+    <div class="split s46">
+      <div>
+        <p class="note" style="font-size:34px;color:var(--ink)">Тот же пункт стандарта разрешает, например:</p>
+        <div class="tags" style="gap:16px"><span class="tag" style="font-size:38px;padding:12px 30px">применяют</span><span class="tag" style="font-size:38px;padding:12px 30px">указывают</span></div>
+      </div>
+      <div>
+        <div class="card t-teal"><span class="n">П. 4.3 · РЕДАКЦИЯ 2</span><p style="font-size:27px">Ток, потребляемый от аккумуляторных батарей при выключенном зажигании и включённом выключателе массы (ток покоя), – не более 30 мА. <mark>Измеряется через 60 мин после выключения&nbsp;зажигания</mark></p></div>
+        <div class="rule t-teal"><svg class="i"><use href="#i-circle-check"/></svg><div><p><b>Не дефект</b>, хотя слова «должен» в этой фразе нет</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="814" data-steps="816,819">
+  <p class="kick t-orange">Если будете заказывать работы в области ИИ</p>
+  <h2>ГОСТ Р 71752-2024, п. 4.4</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:360px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-file-text"/></svg></i>
+        <h3 style="font-size:44px">ГОСТ Р<br>71752-2024</h3>
+        <p>Искусственный интеллект. Техническое задание. Требования к содержанию</p>
+      </div>
+      <dl class="kv" style="--kw:150px">
+        <div class="st"><dt>Текст ТЗ</dt><dd>Должен быть кратким, точным, не допускающим различных толкований, логически последовательным, необходимым и достаточным</dd></div>
+        <div class="st"><dt>Для чего</dt><dd>Понимание целей и требований, определение требований к процессу и проверка соответствия</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="823">
+  <p class="kick">ГОСТ Р 71752-2024 · п. 4.5</p>
+  <h2>Для каждого требования задания</h2>
+  <div class="body" style="gap:18px">
+    <p class="note" style="font-size:30px;color:var(--ink);margin-top:-6px">должны предусматриваться:</p>
+    <div class="cards">
+      <div class="card row t-teal"><span class="bdg"><svg class="i"><use href="#i-file-check"/></svg></span><h3>Отчётность о выполнении требования</h3></div>
+      <div class="card row t-orange"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверка соответствия результата установленному требованию</h3></div>
+    </div>
+    <p class="note" style="font-size:30px;color:var(--ink)">например, путём:</p>
+    <div class="picts sm">
+      <div class="pict"><svg class="i"><use href="#i-badge-check"/></svg><span>валидации</span></div>
+      <div class="pict"><svg class="i"><use href="#i-check-check"/></svg><span>верификации</span></div>
+      <div class="pict"><svg class="i"><use href="#i-flask-conical"/></svg><span>испытаний</span></div>
+      <div class="pict"><svg class="i"><use href="#i-scan-search"/></svg><span>экспертизы</span></div>
+      <div class="pict"><svg class="i"><use href="#i-ellipsis"/></svg><span>иных способов проверки&nbsp;соответствия</span></div>
+    </div>
+  </div>
+</section>

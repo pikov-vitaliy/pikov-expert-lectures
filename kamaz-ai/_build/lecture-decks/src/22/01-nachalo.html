@@ -1,0 +1,336 @@
+<!-- Лекция 2.2, строки 5–129 (00:00–06:09): переход от практики 2.1, что ИИ делает с документами, когда хватает и не самой сильной модели, на сложной инженерной документации результат хуже -->
+
+<section class="slide cover" data-at="5">
+  <p class="kick">Модуль 2 · тема 2.2</p>
+  <h1>Работа с технической документацией</h1>
+  <p class="lead">Сводки, требования, редакции, ссылки на пункт, помощники по документам и распознавание снимков</p>
+  <p class="meta">День 2 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-at="8">
+  <p class="kick">Вторая тема дня</p>
+  <h2>От сервисов – к самим документам</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray"><span class="bdg lg"><svg class="i"><use href="#i-shield-check"/></svg></span><h3 style="font-size:40px">Тема 2.1</h3><p style="font-size:31px">Что можно отправлять в сервисы, а что нельзя</p></li>
+      <li class="step"><span class="bdg lg"><svg class="i"><use href="#i-file-text"/></svg></span><h3 style="font-size:40px">Тема 2.2</h3><p style="font-size:31px;color:var(--ink)">Что модель делает с самими документами</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="10">
+  <p class="kick">Документы в работе инженера</p>
+  <h2>Инженер много времени тратит на документы</h2>
+  <div class="body">
+    <div class="docs" style="flex-wrap:nowrap;gap:26px;align-items:stretch">
+      <div class="doc" style="width:198px"><h4 style="font-size:24px">Техническое задание</h4><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp">прочитать</b></div>
+      <div class="doc" style="width:198px"><h4 style="font-size:24px">Требования</h4><i class="t"></i><i></i><i class="t"></i><i class="s"></i><i class="t"></i><i></i><i class="t"></i><i class="s"></i><b class="stamp">выписать</b></div>
+      <div class="doc" style="width:198px"><h4 style="font-size:24px">Новая и старая редакции</h4><i></i><i class="hl"></i><i class="s"></i><i></i><i></i><i class="hl"></i><i class="s"></i><b class="stamp">сравнить</b></div>
+      <div class="doc" style="width:198px"><h4 style="font-size:24px">Что сказано про ток покоя?</h4><i></i><i class="s"></i><i></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp">ответить</b></div>
+      <div class="doc" style="width:198px"><h4 style="font-size:24px">Служебная записка</h4><i></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp">написать</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="16" data-title="Ошибки модели выглядят как текст документа">
+  <p class="kick t-red">Ошибки в документах</p>
+  <div class="body">
+    <div class="split s64">
+      <div>
+        <p class="say sm">С документами модели помогают заметно. Но здесь их ошибки <em>особенно опасны</em></p>
+        <p class="sub">Они выглядят как текст документа</p>
+      </div>
+      <div class="center t-red"><svg class="i big-ic"><use href="#i-file-warning"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="19">
+  <p class="kick">Тема 2.2</p>
+  <h2>Что разберём сегодня</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal"><span class="bdg lg"><svg class="i"><use href="#i-thumbs-up"/></svg></span><h3 style="font-size:36px">Что модель делает с документами хорошо</h3></div>
+      <div class="card t-red"><span class="bdg lg"><svg class="i"><use href="#i-search-x"/></svg></span><h3 style="font-size:36px">Где она пропускает и путает</h3></div>
+      <div class="card t-orange"><span class="bdg lg"><svg class="i"><use href="#i-link"/></svg></span><h3 style="font-size:36px">Как требовать ссылку на пункт</h3><p>Такую, которую можно проверить</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="22">
+  <p class="kick t-orange">Правило темы 2.1 действует и здесь</p>
+  <h2>Что и куда можно отправлять</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-cloud"/></svg>Разрешённые внешние сервисы</h3><p style="font-size:38px;font-weight:600">Только учебные<br>и открытые документы</p></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-route"/></svg>Рабочая документация</h3><p style="font-size:38px;font-weight:600">Только по тому маршруту, который разрешают правила вашей организации</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="27">
+  <p class="kick">План лекции</p>
+  <h2>О чём пойдёт речь</h2>
+  <div class="body">
+    <ol class="timeline">
+      <li><svg class="i" style="font-size:58px;color:var(--teal);margin:30px auto 8px"><use href="#i-list-checks"/></svg><span style="font-size:27px">Сводки и требования</span></li>
+      <li><svg class="i" style="font-size:58px;color:var(--teal);margin:30px auto 8px"><use href="#i-git-compare"/></svg><span style="font-size:27px">Редакции и ссылки на пункт</span></li>
+      <li><svg class="i" style="font-size:58px;color:var(--teal);margin:30px auto 8px"><use href="#i-folder-search"/></svg><span style="font-size:27px">Помощники по&nbsp;документам</span></li>
+      <li><svg class="i" style="font-size:58px;color:var(--teal);margin:30px auto 8px"><use href="#i-scan-text"/></svg><span style="font-size:27px">Распознавание снимков</span></li>
+      <li><svg class="i" style="font-size:58px;color:var(--orange);margin:30px auto 8px"><use href="#i-mail"/></svg><span style="font-size:27px">Черновики писем и записок</span></li>
+      <li><svg class="i" style="font-size:58px;color:var(--orange);margin:30px auto 8px"><use href="#i-search-check"/></svg><span style="font-size:27px">Какое требование можно проверить</span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="34" data-title="Цифры на слайдах, важнее виды ошибок">
+  <p class="kick">Исследований сегодня будет много</p>
+  <div class="body">
+    <p class="say md">Цифры – на слайдах, запоминать их не нужно. Важнее <b>виды ошибок</b>, которые за ними стоят</p>
+    <div class="rule t-orange"><svg class="i"><use href="#i-wrench"/></svg><div><p>На практике всё это попробуем руками</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="40">
+  <p class="kick">Что ИИ делает с документами</p>
+  <h2>Пять задач и три вопроса к каждой</h2>
+  <div class="body">
+    <div class="picts" style="grid-template-columns:repeat(5,1fr)">
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b>Сводка</b></div>
+      <div class="pict"><svg class="i"><use href="#i-table"/></svg><b>Извлечение требований</b></div>
+      <div class="pict"><svg class="i"><use href="#i-git-compare"/></svg><b>Сравнение версий</b></div>
+      <div class="pict"><svg class="i"><use href="#i-message-circle-question"/></svg><b>Ответы на вопросы по тексту</b></div>
+      <div class="pict"><svg class="i"><use href="#i-mail"/></svg><b>Черновики писем, записок, отчётов</b></div>
+    </div>
+    <div class="tags" style="justify-content:center;gap:22px">
+      <span class="tag t-teal" style="font-size:30px;padding:10px 28px">Что вы получаете</span>
+      <span class="tag t-teal" style="font-size:30px;padding:10px 28px">Где модель полезна</span>
+      <span class="tag t-orange" style="font-size:30px;padding:10px 28px">Что проверять всегда</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="46">
+  <p class="kick">Задача 1 из 5</p>
+  <h2>Сводка</h2>
+  <div class="body">
+    <div class="split s46">
+      <div>
+        <div class="docs" style="flex-wrap:nowrap;align-items:center;gap:30px">
+          <div class="doc" style="width:215px"><h4 style="font-size:24px">Документ</h4><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp">40 страниц</b></div>
+          <div class="doc" style="width:170px;border-color:var(--teal)"><h4 style="font-size:24px">Сводка</h4><i class="t"></i><i class="s"></i><i class="t"></i></div>
+        </div>
+      </div>
+      <div>
+        <dl class="kv" style="--kw:190px">
+          <div><dt>Что получаете</dt><dd>Короткий пересказ документа или раздела</dd></div>
+          <div><dt>Где полезна</dt><dd>Быстро понять, о чём 40&nbsp;страниц</dd></div>
+        </dl>
+        <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><h3>Проверять всегда</h3><p>Не потеряно ли главное и нет ли выводов, которых в документе нет</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="51">
+  <p class="kick">Задача 2 из 5</p>
+  <h2>Извлечение требований</h2>
+  <div class="body">
+    <p class="note" style="margin-bottom:-12px!important">На выходе – таблица</p>
+    <table class="tbl sm">
+      <thead><tr><th style="width:16%">Пункт</th><th style="width:40%">Требование</th><th style="width:22%">Параметр</th><th>Значение</th></tr></thead>
+      <tbody>
+        <tr><td><i style="display:block;height:13px;width:55%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:90%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:70%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:60%;margin:8px 0;border-radius:7px;background:var(--orange)"></i></td></tr>
+        <tr><td><i style="display:block;height:13px;width:55%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:75%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:60%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:45%;margin:8px 0;border-radius:7px;background:var(--orange)"></i></td></tr>
+        <tr><td><i style="display:block;height:13px;width:55%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:85%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:75%;margin:8px 0;border-radius:7px;background:var(--line)"></i></td><td><i style="display:block;height:13px;width:65%;margin:8px 0;border-radius:7px;background:var(--orange)"></i></td></tr>
+      </tbody>
+    </table>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:27px">
+      <div class="rule sm t-teal"><svg class="i"><use href="#i-list-checks"/></svg><div><h3>Где полезна</h3><p>Перенести требования в проверочный перечень</p></div></div>
+      <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><h3>Проверять всегда</h3><p>Каждую строку по тексту. Особенно числа, допуски и&nbsp;условия</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="57">
+  <p class="kick">Задача 3 из 5</p>
+  <h2>Сравнение версий</h2>
+  <div class="body">
+    <div class="docs" style="flex-wrap:nowrap;align-items:center;gap:36px;margin-bottom:8px">
+      <div class="doc" style="width:205px"><h4 style="font-size:24px">Редакция 1</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i></div>
+      <div class="doc" style="width:205px"><h4 style="font-size:24px">Редакция 2</h4><i></i><i class="hl"></i><i></i><i class="hl"></i><i class="s"></i></div>
+      <div class="doc t-teal" style="width:250px;border-color:var(--teal)"><h4 style="font-size:24px">Перечень изменений</h4><i class="t"></i><i class="s"></i><i class="t"></i><i class="s"></i><b class="stamp">даёт модель</b></div>
+    </div>
+    <div class="vs sm">
+      <div class="col t-teal"><h3>Где модель полезна</h3><p style="font-size:27px">Найти, что поменялось, и объяснить, что это значит</p></div>
+      <div class="col t-orange"><h3>Проверять всегда</h3><p style="font-size:27px">Полноту: не пропущены ли изменения.<br>И ложные изменения</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="64">
+  <p class="kick">Задача 4 из 5</p>
+  <h2>Ответы на вопросы по тексту</h2>
+  <div class="body">
+    <div class="split s64">
+      <div class="chat">
+        <div class="msg user" style="max-width:92%"><span class="who">Вопрос</span><p>Что в документе сказано про ток покоя?</p></div>
+        <div class="msg bot" style="max-width:92%;width:92%"><span class="who">Ответ модели</span>
+          <p><i style="display:block;height:13px;width:95%;margin:9px 0;border-radius:7px;background:var(--line)"></i><i style="display:block;height:13px;width:80%;margin:9px 0;border-radius:7px;background:var(--line)"></i><i style="display:block;height:13px;width:60%;margin:9px 0 14px;border-radius:7px;background:var(--line)"></i><mark>ссылка на пункт</mark></p>
+        </div>
+      </div>
+      <div>
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-search"/></svg><div><h3>Где полезна</h3><p>Найти нужное место в длинном документе</p></div></div>
+        <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><h3>Проверять всегда</h3><p>Есть ли такой пункт и говорит ли он то, что утверждает модель</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="69">
+  <p class="kick">Задача 5 из 5</p>
+  <h2>Черновики писем, записок, отчётов</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step"><span class="bdg lg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:34px">Ваши данные</h3><p style="font-size:28px">Модель пишет по ним связный текст</p></li>
+      <li class="step"><span class="bdg lg"><svg class="i"><use href="#i-clock"/></svg></span><h3 style="font-size:34px">Первый вариант</h3><p style="font-size:28px">За минуты</p></li>
+      <li class="step t-orange"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:34px">Проверять всегда</h3><p style="font-size:28px;color:var(--ink)">Каждое утверждение – по документу.<br>Лишние слова и выдуманные причины</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="74">
+  <p class="kick">Что ИИ делает с документами</p>
+  <h2>Строка «что проверять» есть у каждой задачи</h2>
+  <div class="body">
+    <table class="tbl">
+      <thead><tr><th style="width:40%">Задача</th><th style="background:var(--orange);color:var(--chip-ink)">Что проверять всегда</th></tr></thead>
+      <tbody>
+        <tr><td>Сводка</td><td style="background:var(--orange_t);color:var(--orange_ink)">Не потеряно ли главное, нет ли лишних выводов</td></tr>
+        <tr><td>Извлечение требований</td><td style="background:var(--orange_t);color:var(--orange_ink)">Каждую строку: числа, допуски, условия</td></tr>
+        <tr><td>Сравнение версий</td><td style="background:var(--orange_t);color:var(--orange_ink)">Пропуски и ложные изменения</td></tr>
+        <tr><td>Ответы на вопросы по тексту</td><td style="background:var(--orange_t);color:var(--orange_ink)">Есть ли такой пункт и говорит ли он это</td></tr>
+        <tr><td>Черновики писем,<br>записок, отчётов</td><td style="background:var(--orange_t);color:var(--orange_ink)">Каждое утверждение – по документу</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide dark" data-at="76" data-title="В конце стоит проверка">
+  <p class="kick t-orange">Главная мысль лекции</p>
+  <div class="body">
+    <p class="say">Что бы модель ни делала с документом, <em>в конце стоит проверка</em></p>
+  </div>
+</section>
+
+
+<section class="slide" data-at="83" data-steps="83,85" data-title="Простая задача, понятный образец и человек на выходе">
+  <p class="kick">ИИ-митап ЦГУ · доклад А. Субботина</p>
+  <div class="body">
+    <p class="say sm st" data-s="1">Для таких задач часто хватает<br>и <b>не самой сильной модели</b></p>
+    <figure class="quote md st" data-s="2">
+      <blockquote>Везде простая задача, понятный образец<br>и <b>человек на выходе</b></blockquote>
+      <figcaption><i class="ava">АС</i><span><b>А. Субботин</b>«Платформы для совместной работы с ИИ-агентами», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="87">
+  <p class="kick">Простая задача, образец, человек</p>
+  <h2>Когда хватает и не самой сильной модели</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card"><span class="bdg lg"><svg class="i"><use href="#i-list-todo"/></svg></span><h3 style="font-size:38px">Простая задача</h3></div>
+      <div class="card"><span class="bdg lg"><svg class="i"><use href="#i-file-check"/></svg></span><h3 style="font-size:38px">Понятный образец</h3><p style="font-size:30px">Что должно получиться</p></div>
+      <div class="card t-orange"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><h3 style="font-size:38px">Человек на выходе</h3><p style="font-size:30px">Принимает результат</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="90" data-steps="90,94" data-title="Модель показывает, откуда ответ, человек проверяет">
+  <p class="kick">Поиск по документам · слайд доклада А. Субботина</p>
+  <div class="body">
+    <figure class="quote md st" data-s="1">
+      <blockquote>Модель находит ответ во внутренних документах и <b>показывает, откуда он</b>. <b>Человек проверяет</b> источник</blockquote>
+      <figcaption><i class="ava">АС</i><span><b>А. Субботин</b>«Платформы для совместной работы с ИИ-агентами», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+    <div class="rule t-orange st" data-s="2"><svg class="i"><use href="#i-search-check"/></svg><div><p>Показывает, откуда он. Человек проверяет. К этим двум словам сегодня будем возвращаться не раз</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="98" data-steps="99,101,102">
+  <p class="kick">Машиностроение · статья 2024 года</p>
+  <h2>Такие помощники уже пробуют</h2>
+  <div class="body">
+    <div class="svc t-teal">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-car"/></svg></i>
+        <h3 style="font-size:42px">Помощник по документам требований</h3>
+      </div>
+      <dl class="kv" style="--kw:205px">
+        <div class="st"><dt>Отрасль</dt><dd>Автомобилестроение</dd></div>
+        <div class="st"><dt>Модели</dt><dd>Локальные</dd></div>
+        <div class="st"><dt>Вывод авторов</dt><dd>Подход заметно упрощает анализ требований и работу со сложными документами</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Uygun Y., Momodu V. Production &amp; Manufacturing Research, 2024 · doi.org/10.1080/21693277.2024.2375296</p>
+</section>
+
+<section class="slide h-sm" data-at="106" data-steps="107,109">
+  <p class="kick">Исследование DesignQA · препринт 2024 года</p>
+  <h2>На сложной инженерной документации результаты скромнее</h2>
+  <div class="body">
+    <div class="rule sm t-gray st" data-s="1"><svg class="i"><use href="#i-users"/></svg><div><p>Исследователи <b>MIT и Autodesk</b> собрали набор вопросов и проверили на нём несколько моделей</p></div></div>
+    <div class="picts c3">
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-book-open-text"/></svg><b>Правила студенческих соревнований Formula SAE</b></div>
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-drafting-compass"/></svg><b>Чертежи</b></div>
+      <div class="pict st" data-s="2"><svg class="i"><use href="#i-box"/></svg><b>CAD-модели</b></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="112" data-steps="112,115" data-title="Вывод авторов DesignQA">
+  <p class="kick">DesignQA · вывод авторов в русском переводе</p>
+  <div class="body">
+    <figure class="quote sm t-red">
+      <blockquote><span class="st" data-s="1">Проверенные мультимодальные модели <b style="color:var(--teal)">выглядят многообещающе</b>,</span> <span class="st" data-s="2">но <b>не могут надёжно находить</b> нужные правила в документации Formula SAE, <b>с трудом распознают</b> технические компоненты на изображениях CAD-моделей и <b>испытывают затруднения</b> при анализе чертежей</span></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Doris и соавт.</b>DesignQA, 2024, препринт arXiv</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="118">
+  <p class="kick">DesignQA · препринт 2024 года</p>
+  <h2>Что собрали и что получилось</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-gray"><span class="n">СОБРАЛИ</span><span class="bdg"><svg class="i"><use href="#i-file-question"/></svg></span><h3 style="font-size:29px">Набор вопросов</h3><p style="font-size:25px">По правилам Formula SAE, чертежам и&nbsp;CAD-моделям</p></div>
+      <div class="card t-red"><span class="n">ПОЛУЧИЛОСЬ</span><span class="bdg"><svg class="i"><use href="#i-search-x"/></svg></span><h3 style="font-size:29px">Правила</h3><p style="font-size:25px">Модели ненадёжно находят нужные правила в&nbsp;документации</p></div>
+      <div class="card t-red"><span class="n">ПОЛУЧИЛОСЬ</span><span class="bdg"><svg class="i"><use href="#i-scan-eye"/></svg></span><h3 style="font-size:29px">CAD-модели и&nbsp;чертежи</h3><p style="font-size:25px">С трудом распознают компоненты на изображениях CAD-моделей и анализируют чертежи</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Doris A. C. et al. DesignQA, 2024, препринт arXiv · doi.org/10.48550/arXiv.2404.07917</p>
+</section>
+
+<section class="slide" data-at="120" data-title="Обзор: вывод сдержанный">
+  <p class="kick">Обзор применения моделей в инженерии требований</p>
+  <div class="body">
+    <p class="say md">Обработку естественного языка давно считают <b>перспективной</b> для инженерии требований, но <em>существенной пользы</em> она пока не показала</p>
+    <p class="sub">Вывод обзора сдержанный</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Norheim J. et al. Design Science, 2024 · doi.org/10.1017/dsj.2024.8</p>
+</section>
+
+<section class="slide dark" data-at="124">
+  <p class="kick t-orange">Вывод</p>
+  <h2>Что из этого следует для нас</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-bot"/></svg>Модель</h3><ul style="font-size:37px"><li>Хорошо делает черновую работу с документом</li><li>Ускоряет работу с документом</li></ul></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-user-check"/></svg>Инженер</h3><ul style="font-size:37px"><li>Проверяет результат</li><li>Всё равно читает документ</li></ul></div>
+    </div>
+  </div>
+</section>

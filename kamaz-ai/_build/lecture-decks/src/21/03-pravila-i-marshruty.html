@@ -1,0 +1,330 @@
+<!-- Лекция 2.1, строки 266–405 (14:24–21:33): правила организации, уровни данных и маршруты, пять шагов перед отправкой, схема маршрутов -->
+
+<section class="slide" data-at="266" data-steps="271">
+  <p class="kick">Правила организации</p>
+  <h2>Что обычно определяют правила</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-badge-check"/></svg><b>Какие сервисы разрешены</b></div>
+      <div class="pict"><svg class="i"><use href="#i-database"/></svg><b>С какими данными в&nbsp;каждом можно&nbsp;работать</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-pen-line"/></svg><b>Как согласовать исключение</b></div>
+    </div>
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-info"/></svg><div><p>Названия уровней и сервисов в каждой организации свои. В курсе – обобщённая схема</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="273" data-steps="273,276">
+  <p class="kick">Обобщённая схема · уровни 1 и 2</p>
+  <h2>Открытые и служебные сведения</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st">
+        <h3><svg class="i"><use href="#i-book-open-text"/></svg>1 · Открытые и учебные</h3>
+        <ul>
+          <li>Опубликованные стандарты и&nbsp;законы</li>
+          <li>Учебный кейс курса</li>
+          <li>Общие технические вопросы</li>
+        </ul>
+        <p style="margin-top:auto;background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px;font-size:26px;font-weight:600">Разрешённые внешние сервисы</p>
+      </div>
+      <div class="col t-gray st">
+        <h3><svg class="i"><use href="#i-briefcase"/></svg>2 · Служебные</h3>
+        <ul>
+          <li>Без персональных данных и&nbsp;без&nbsp;тайн</li>
+          <li>Черновик письма без названий и цифр, структура отчёта</li>
+        </ul>
+        <p style="margin-top:auto;background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px;font-size:26px;font-weight:600">По правилам организации: часто внешний разрешённый сервис, иногда только внутренний</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="281" data-steps="283">
+  <p class="kick t-orange">Уровень 3</p>
+  <h2>Коммерческая тайна и документация</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Коммерческая тайна, конструкторская и технологическая документация, сведения о&nbsp;заказчиках и поставщиках</p>
+    <div class="docs st" data-s="1" style="align-items:stretch">
+      <div class="doc t-orange" style="width:240px"><h4>Протокол испытаний изделия</h4><i></i><i class="hl"></i><i class="s"></i></div>
+      <div class="doc t-orange" style="width:240px"><h4>Сводка рекламаций</h4><i></i><i class="hl"></i><i class="s"></i></div>
+      <div class="doc t-orange" style="width:240px"><h4>Чертёж</h4><i></i><i class="hl"></i><i class="s"></i></div>
+      <div class="doc t-orange" style="width:240px"><h4>Договор</h4><i></i><i class="hl"></i><i class="s"></i></div>
+    </div>
+    <div class="rule t-orange st" data-s="1"><svg class="i"><use href="#i-server"/></svg><div><p>Только внутренний сервис, если он есть и правила разрешают его для таких сведений. Иначе – никуда</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="286">
+  <p class="kick t-orange">Уровень 4</p>
+  <h2>Персональные данные</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 2.4fr">
+      <div class="center t-orange"><svg class="i big-ic"><use href="#i-id-card"/></svg></div>
+      <div>
+        <dl class="kv t-orange" style="--kw:265px">
+          <div><dt>Примеры</dt><dd>Акты с фамилиями и телефонами, списки сотрудников</dd></div>
+          <div><dt>Правила</dt><dd>Отдельные</dd></div>
+          <div><dt>Во внешний сервис</dt><dd><b style="color:var(--red)">Нет</b></dd></div>
+          <div><dt>После обезличивания и согласования</dt><dd>По порядку, принятому в&nbsp;организации</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="291" data-title="Уровень 5: государственная тайна">
+  <p class="kick t-red">Уровень 5</p>
+  <div class="body">
+    <p class="say sm">Сведения, составляющие государственную тайну, в&nbsp;сервисах ИИ <b style="color:var(--red)">не обрабатываются</b></p>
+    <p class="sub">Документы с грифом секретности</p>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-key-round"/></svg><div><p>Пароли, как мы уже говорили, тоже не уходят никуда</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="296" data-title="Уровни данных: где работать">
+  <p class="kick">Обобщённая схема · обратите внимание на уровни 3 и 4</p>
+  <div class="body">
+    <table class="tbl sm">
+      <thead><tr><th style="width:44%">Уровень</th><th>Где работать</th></tr></thead>
+      <tbody>
+        <tr><td>1 · Открытые и учебные</td><td>Разрешённые внешние сервисы</td></tr>
+        <tr><td>2 · Служебные, без персональных данных и&nbsp;тайн</td><td>По правилам организации</td></tr>
+        <tr class="hl t-orange"><td>3 · Коммерческая тайна, КД, заказчики и&nbsp;поставщики</td><td>Только внутренний, если он есть и разрешён. <span style="white-space:nowrap">Иначе – никуда</span></td></tr>
+        <tr class="hl t-orange"><td>4 · Персональные данные</td><td>Во внешний – нет. После обезличивания и согласования – по порядку, принятому в организации</td></tr>
+        <tr><td>5 · Государственная тайна</td><td>В сервисах ИИ не обрабатывается</td></tr>
+      </tbody>
+    </table>
+    <div class="rule xs t-teal"><svg class="i"><use href="#i-server-cog"/></svg><div><p>Для таких данных во многих организациях развёртывают <b>внутренний чат на локальных моделях</b> на собственных серверах. Если он у вас есть – это первый кандидат для рабочих материалов</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="301" data-title="Внутренний – не значит «всё можно»">
+  <p class="kick t-orange">Правила допуска</p>
+  <div class="body">
+    <p class="say md">Внутренний – не значит <em>«всё можно»</em></p>
+    <p class="sub">Кто и какие документы вправе туда загружать, по-прежнему решают&nbsp;правила</p>
+  </div>
+</section>
+
+<section class="slide" data-at="308">
+  <p class="kick t-orange">Оговорка о курсе</p>
+  <h2>Для курса правила строже</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray">
+        <h3><svg class="i"><use href="#i-briefcase"/></svg>Рабочие задачи</h3>
+        <p style="font-size:38px;line-height:1.2">Для них – схема уровней и правила вашей организации</p>
+      </div>
+      <div class="col t-orange">
+        <h3><svg class="i"><use href="#i-graduation-cap"/></svg>Занятия курса</h3>
+        <p style="font-size:38px;line-height:1.2">В сервисы отправляем только <b>учебные и&nbsp;открытые</b>&nbsp;материалы</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="312" data-steps="315,317">
+  <p class="kick t-orange">Итоговая работа курса</p>
+  <h2>Паспорт сценария</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div class="doc t-orange" style="width:300px"><h4>Паспорт сценария</h4><i></i><i class="s"></i><i></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp">День 5</b></div>
+        <p class="note" style="text-align:center;margin-top:14px">и приложения к нему</p>
+      </div>
+      <div>
+        <div class="rule t-orange"><div><h3>Правило</h3><p>Только учебные или придуманные&nbsp;данные</p></div></div>
+        <div class="rule sm t-gray st"><svg class="i"><use href="#i-shield-alert"/></svg><div><p>Даже если правила вашей организации разрешают отправлять настоящие сведения в выбранный сервис</p></div></div>
+        <div class="rule sm t-teal st"><svg class="i"><use href="#i-users"/></svg><div><p><b>Почему:</b> паспорт читают другие люди</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="319">
+  <p class="kick t-orange">Прикиньте для себя · уровни 3 и 4</p>
+  <h2>Ваши документы по уровням</h2>
+  <div class="body">
+    <div class="docs" style="align-items:stretch">
+      <div class="doc t-orange" style="width:250px"><h4>Протокол испытаний изделия</h4><i></i><i class="hl"></i><i class="s"></i><b class="stamp">уровень 3</b></div>
+      <div class="doc t-orange" style="width:250px"><h4>Чертёж</h4><i></i><i class="hl"></i><i class="s"></i><b class="stamp">уровень 3</b></div>
+      <div class="doc t-red" style="width:250px"><h4>Акт с ФИО и&nbsp;телефонами</h4><i></i><i class="hl"></i><i class="s"></i><b class="stamp">уровень 4</b></div>
+      <div class="doc t-red" style="width:250px"><h4>Список сотрудников</h4><i></i><i class="hl"></i><i class="s"></i><b class="stamp">уровень 4</b></div>
+    </div>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-user-check"/></svg><div><p>Где уровень документа неочевиден – пятый шаг: <b>спросить ответственного до отправки</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="325" data-steps="327,330,332,335,338">
+  <p class="kick">Как превратить это в привычку</p>
+  <h2>Перед отправкой – пять шагов</h2>
+  <div class="body">
+    <ol class="list num" style="font-size:30px;gap:16px">
+      <li class="st">Определить, какие сведения есть в тексте<small>Открытые, служебные, тайна, персональные данные</small></li>
+      <li class="st">Найти, что говорят правила организации для этого уровня</li>
+      <li class="st">Внешний сервис не разрешён – искать внутренний или не использовать ИИ</li>
+      <li class="st">Нужно обезличивание – обезличить и согласовать в установленном порядке</li>
+      <li class="st t-orange">Не уверены – спросить ответственного. <b>До отправки, а не после</b></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="342" data-steps="344,348,350,352">
+  <p class="kick">Пять шагов на примере</p>
+  <h2>Просьба «сделай таблицу из протокола»</h2>
+  <div class="body">
+    <dl class="kv" style="--kw:320px">
+      <div class="st" data-s="1"><dt>Шаг 1 · что за сведения?</dt><dd>Протокол испытаний изделия – по таблице уровень 3. Есть фамилии и телефоны – ещё и уровень 4</dd></div>
+      <div class="st" data-s="2"><dt>Шаг 2 · что в правилах?</dt><dd>Только внутренний сервис, если правила разрешают его для таких сведений</dd></div>
+      <div class="st" data-s="3"><dt>Шаг 3 · внешний не&nbsp;разрешён</dt><dd>Значит, внутренний сервис или работа без ИИ</dd></div>
+      <div class="st t-orange" data-s="4"><dt>Шаг 5 · не уверены</dt><dd>К ответственному – до того, как нажали «Отправить»</dd></div>
+    </dl>
+    <p class="note st" data-s="4"><svg class="i"><use href="#i-list-checks"/></svg> Эти шаги понадобятся в первом задании практики: маршруты для фрагментов текста</p>
+  </div>
+</section>
+
+<section class="slide" data-at="357" data-title="Обезличивание – четвёртый шаг">
+  <p class="kick">Посмотрите на порядок</p>
+  <div class="body">
+    <p class="say sm">Обезличивание – только <em>четвёртый</em> шаг, а не первый</p>
+    <div class="segbar">
+      <i class="t-teal" style="flex:1">1 · Какие сведения</i><i class="t-teal" style="flex:1">2 · Что в правилах</i><i class="t-teal" style="flex:1">3 · Какой сервис</i><i class="t-orange solid" style="flex:1">4 · Обезличить</i><i class="t-gray" style="flex:1">5 · Спросить</i>
+    </div>
+    <p class="sub">Сначала выясняем, что за сведения и куда их можно отправить. Только потом решаем, что с ними делать</p>
+  </div>
+</section>
+
+<section class="slide" data-at="361" data-title="Пятый шаг – самый простой">
+  <p class="kick t-orange">Пятый шаг – самый простой</p>
+  <div class="body">
+    <div class="stats">
+      <div class="stat md t-teal"><span style="font-size:34px;font-weight:700;color:var(--c)"><svg class="i"><use href="#i-message-circle-question"/></svg> Спросить до отправки</span><b>несложно</b></div>
+      <div class="stat md t-red"><span style="font-size:34px;font-weight:700;color:var(--c)"><svg class="i"><use href="#i-undo-2"/></svg> Отозвать то, что уже ушло</span><b>уже нельзя</b></div>
+    </div>
+    <p class="note" style="text-align:center">Мы видели это на слайде про запоминание</p>
+  </div>
+</section>
+
+<section class="slide" data-at="368" data-title="Маршруты данных: схема">
+  <p class="kick">Та же логика – схемой</p>
+  <div class="body">
+    <figure class="fig">
+      <img src="@day/08-Схемы/d2-marshruty.png" alt="Маршруты данных: куда можно отправить материал" style="object-view-box:inset(21.5% 6% 17.5% 6%)">
+      <figcaption>Маршруты данных: куда можно отправить материал</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="370" data-steps="370,374,379,384,387,390,394">
+  <p class="kick">Маршруты данных</p>
+  <h2>Куда можно отправить материал</h2>
+  <div class="body">
+    <svg viewBox="0 0 1135 472" style="width:1135px;height:472px;display:block" role="img" aria-label="Схема маршрутов: инженер определяет уровень данных, правила организации решают, куда можно отправить материал">
+      <g class="st">
+        <rect x="1" y="1" width="1133" height="125" rx="16" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+        <text x="20" y="25" font-size="19" font-weight="700" letter-spacing="1" fill="var(--muted)">01 · ИНЖЕНЕР</text>
+        <rect x="1" y="142" width="1133" height="148" rx="16" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+        <text x="20" y="166" font-size="19" font-weight="700" letter-spacing="1" fill="var(--muted)">02 · ПРАВИЛА ОРГАНИЗАЦИИ</text>
+        <rect x="1" y="306" width="1133" height="165" rx="16" fill="var(--surface)" stroke="var(--line)" stroke-width="2"/>
+        <text x="20" y="330" font-size="19" font-weight="700" letter-spacing="1" fill="var(--muted)">03 · КУДА МОЖНО</text>
+      </g>
+      <g class="st">
+        <rect x="14" y="34" width="210" height="78" rx="14" fill="var(--surface2)" stroke="var(--muted)" stroke-width="2.5"/>
+        <text x="119" y="66" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Рабочий материал</text>
+        <text x="119" y="94" text-anchor="middle" font-size="18" fill="var(--muted)">текст, файл, снимок</text>
+        <path d="M224 73 H288" stroke="var(--muted)" stroke-width="3.5" fill="none"/>
+        <polygon points="300,73 287,65 287,81" fill="var(--muted)"/>
+        <rect x="300" y="34" width="210" height="78" rx="14" fill="var(--orange_t)" stroke="var(--orange)" stroke-width="2.5"/>
+        <text x="405" y="66" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Какие сведения?</text>
+        <text x="405" y="94" text-anchor="middle" font-size="18" fill="var(--orange_ink)">уровень данных</text>
+      </g>
+      <g class="st">
+        <path d="M330 112 V178" stroke="var(--orange)" stroke-width="3.5" stroke-dasharray="9 7" fill="none"/>
+        <polygon points="330,190 322,177 338,177" fill="var(--orange)"/>
+        <rect x="342" y="128" width="106" height="26" rx="13" fill="var(--bg)" stroke="var(--orange)" stroke-width="1.5"/>
+        <text x="395" y="147" text-anchor="middle" font-size="17" font-weight="700" fill="var(--orange_ink)">проверить</text>
+        <rect x="300" y="190" width="210" height="82" rx="14" fill="var(--graphite)"/>
+        <text x="405" y="224" text-anchor="middle" font-size="23" font-weight="700" fill="var(--on_graphite)">Что разрешено</text>
+        <text x="405" y="252" text-anchor="middle" font-size="18" fill="var(--on_graphite)">перечни и правила</text>
+      </g>
+      <g class="st">
+        <path d="M420 272 V384 H627" stroke="var(--teal)" stroke-width="4.5" fill="none"/>
+        <polygon points="640,384 626,375 626,393" fill="var(--teal)"/>
+        <rect x="446" y="350" width="172" height="26" rx="13" fill="var(--bg)" stroke="var(--teal)" stroke-width="1.5"/>
+        <text x="532" y="369" text-anchor="middle" font-size="17" font-weight="700" fill="var(--teal_ink)">открытое, учебное</text>
+        <rect x="640" y="344" width="210" height="80" rx="14" fill="var(--bg)" stroke="var(--teal)" stroke-width="2.5"/>
+        <text x="745" y="377" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Внешний сервис</text>
+        <text x="745" y="405" text-anchor="middle" font-size="18" fill="var(--teal_ink)">только разрешённый</text>
+      </g>
+      <g class="st">
+        <path d="M330 272 V448 H1020 V437" stroke="var(--muted)" stroke-width="3.5" fill="none"/>
+        <polygon points="1020,424 1012,437 1028,437" fill="var(--muted)"/>
+        <rect x="496" y="435" width="100" height="26" rx="13" fill="var(--bg)" stroke="var(--muted)" stroke-width="1.5"/>
+        <text x="546" y="454" text-anchor="middle" font-size="17" font-weight="700" fill="var(--muted)">тайна, КД</text>
+        <rect x="915" y="344" width="210" height="80" rx="14" fill="var(--teal_t)" stroke="var(--teal)" stroke-width="2.5"/>
+        <text x="1020" y="377" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Внутренний сервис</text>
+        <text x="1020" y="405" text-anchor="middle" font-size="18" fill="var(--teal_ink)">если есть и разрешён</text>
+      </g>
+      <g class="st">
+        <path d="M510 231 H627" stroke="var(--muted)" stroke-width="3.5" fill="none"/>
+        <polygon points="640,231 626,223 626,239" fill="var(--muted)"/>
+        <rect x="518" y="183" width="112" height="43" rx="12" fill="var(--bg)" stroke="var(--muted)" stroke-width="1.5"/>
+        <text x="574" y="201" text-anchor="middle" font-size="16" font-weight="700" fill="var(--muted)">персональные</text>
+        <text x="574" y="219" text-anchor="middle" font-size="16" font-weight="700" fill="var(--muted)">данные</text>
+        <rect x="640" y="190" width="210" height="82" rx="14" fill="var(--orange_t)" stroke="var(--orange)" stroke-width="2.5"/>
+        <text x="745" y="224" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Обезличить</text>
+        <text x="745" y="252" text-anchor="middle" font-size="18" fill="var(--orange_ink)">и согласовать</text>
+        <path d="M745 272 V331" stroke="var(--muted)" stroke-width="3" stroke-dasharray="8 6" fill="none"/>
+        <polygon points="745,344 737,330 753,330" fill="var(--muted)"/>
+        <rect x="604" y="295" width="132" height="26" rx="13" fill="var(--bg)" stroke="var(--muted)" stroke-width="1.5"/>
+        <text x="670" y="314" text-anchor="middle" font-size="17" font-weight="700" fill="var(--muted)">если разрешено</text>
+        <path d="M850 231 H882 V298 H990 V331" stroke="var(--muted)" stroke-width="3" stroke-dasharray="8 6" fill="none"/>
+        <polygon points="990,344 982,330 998,330" fill="var(--muted)"/>
+        <rect x="1002" y="308" width="104" height="26" rx="13" fill="var(--bg)" stroke="var(--muted)" stroke-width="1.5"/>
+        <text x="1054" y="327" text-anchor="middle" font-size="17" font-weight="700" fill="var(--muted)">по порядку</text>
+      </g>
+      <g class="st">
+        <path d="M490 190 V170 H1020 V177" stroke="var(--red)" stroke-width="3.5" stroke-dasharray="10 7" fill="none"/>
+        <polygon points="1020,190 1012,176 1028,176" fill="var(--red)"/>
+        <rect x="706" y="158" width="108" height="25" rx="12.5" fill="var(--bg)" stroke="var(--red)" stroke-width="1.5"/>
+        <text x="760" y="176" text-anchor="middle" font-size="17" font-weight="700" fill="var(--red_ink)">запрещено</text>
+        <rect x="915" y="190" width="210" height="82" rx="14" fill="var(--red_t)" stroke="var(--red)" stroke-width="2.5"/>
+        <text x="1020" y="224" text-anchor="middle" font-size="23" font-weight="700" fill="var(--ink)">Никуда</text>
+        <text x="1020" y="252" text-anchor="middle" font-size="18" fill="var(--red_ink)">гостайна, пароли</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<section class="slide dark" data-at="398" data-title="Каждый путь – через правила">
+  <p class="kick t-orange">Что запомнить со схемы</p>
+  <div class="body">
+    <p class="say md">Ни одна стрелка не идёт от рабочего материала <em>прямо в&nbsp;сервис</em></p>
+    <p class="sub">Каждый путь проходит через правила организации</p>
+  </div>
+</section>
+
+<section class="slide" data-at="400">
+  <p class="kick">И ещё</p>
+  <h2>Внешний сервис на схеме – всегда разрешённый</h2>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div style="width:420px;border:2.5px solid var(--line);border-radius:16px;background:var(--bg);box-shadow:0 7.5px 20px var(--shadow)">
+          <div style="display:flex;gap:9px;align-items:center;padding:13px 16px;background:var(--surface2);border-radius:14px 14px 0 0">
+            <i style="width:14px;height:14px;border-radius:50%;background:var(--line)"></i><i style="width:14px;height:14px;border-radius:50%;background:var(--line)"></i><i style="width:14px;height:14px;border-radius:50%;background:var(--line)"></i>
+            <i style="flex:1;margin-left:10px;height:26px;border-radius:13px;background:var(--bg)"></i>
+          </div>
+          <div style="padding:34px 20px 38px;display:flex;flex-direction:column;align-items:center;gap:14px">
+            <svg class="i" style="font-size:96px;color:var(--teal)"><use href="#i-globe"/></svg>
+            <span style="font-size:28px;color:var(--muted)">Сайт открывается</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <p class="say sm">Если сайт открывается, это ещё не значит, что он <b style="color:var(--red)">разрешён</b></p>
+        <div class="rule sm t-gray"><svg class="i"><use href="#i-notebook-pen"/></svg><div><p>Об этом говорилось ещё в домашнем задании первого модуля</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>

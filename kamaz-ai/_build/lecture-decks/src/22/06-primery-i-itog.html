@@ -1,0 +1,457 @@
+<!-- Лекция 2.2, строки 831–1018 (41:31–51:23): примеры требований – плохо и хорошо, модель как первый фильтр и что показывают исследования, порядок работы, повторение главного, практика 2.2 после обеда -->
+
+<section class="slide dark" data-at="831" data-title="Как плохо и как хорошо">
+  <p class="kick">Примеры требований</p>
+  <div class="body" style="text-wrap:balance">
+    <p class="say">Как <span style="color:var(--red)">плохо</span> и как <b>хорошо</b></p>
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-file-check"/></svg><div><p>Хорошие примеры взяты из редакции 2 технического задания ЭС-24</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="833,838">
+  <p class="kick">Пример 1 · проверяемость и однозначность</p>
+  <h2>Пуск двигателя зимой</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="vs">
+      <div class="col t-red st">
+        <h3><svg class="i"><use href="#i-thumbs-down"/></svg>Плохо</h3>
+        <p>«Система электроснабжения должна <mark>надёжно</mark> обеспечивать пуск двигателя <mark>в зимний период</mark>»</p>
+        <ul>
+          <li>Что значит «надёжно»?</li>
+          <li>С какого по какое число «зимний период»?</li>
+        </ul>
+        <p style="font-weight:700;color:var(--c)">Проверить такое нельзя</p>
+      </div>
+      <div class="col t-teal st">
+        <h3><svg class="i"><use href="#i-thumbs-up"/></svg>Хорошо · п. 4.4 редакции 2</h3>
+        <p>«После стоянки <b>14&nbsp;суток</b> при температуре окружающего воздуха <b>до&nbsp;−30&nbsp;°C</b> двигатель должен запускаться штатным стартером без внешнего источника питания <b>не более чем с трёх попыток</b> продолжительностью <b>до&nbsp;10&nbsp;с</b> каждая»</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="842,845">
+  <p class="kick">Пример 2 · число без допуска и условий</p>
+  <h2>Напряжение, которое поддерживает регулятор</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="st t-red" style="display:grid;grid-template-columns:1fr 430px;gap:35px;align-items:center">
+      <div class="rule sm"><svg class="i"><use href="#i-thumbs-down"/></svg><div><h3>Плохо</h3><p>«Напряжение, которое поддерживает регулятор, – 28,2&nbsp;В». Число есть, но нет ни допуска, ни условий</p></div></div>
+      <svg viewBox="0 0 430 150" style="width:430px;height:150px;display:block" role="img" aria-label="Одно значение 28,2 В без допуска и условий">
+        <line x1="20" y1="88" x2="410" y2="88" stroke="var(--line)" stroke-width="6" stroke-linecap="round"/>
+        <circle cx="215" cy="88" r="17" fill="var(--red)"/>
+        <text x="215" y="48" text-anchor="middle" font-size="36" font-weight="700" fill="var(--red)">28,2 В</text>
+        <text x="215" y="138" text-anchor="middle" font-size="25" fill="var(--muted)">без допуска и условий</text>
+      </svg>
+    </div>
+    <div class="st t-teal" style="display:grid;grid-template-columns:1fr 430px;gap:35px;align-items:center">
+      <div class="rule sm"><svg class="i"><use href="#i-thumbs-up"/></svg><div><h3>Хорошо · п. 4.2 редакции 2</h3><p>«Напряжение, которое поддерживает регулятор при температуре <b>+25&nbsp;°C</b>, – <b>28,2&nbsp;±&nbsp;0,2&nbsp;В</b>»</p></div></div>
+      <svg viewBox="0 0 430 150" style="width:430px;height:150px;display:block" role="img" aria-label="Значение 28,2 В с допуском плюс-минус 0,2 В при температуре +25 °C">
+        <line x1="20" y1="88" x2="410" y2="88" stroke="var(--line)" stroke-width="6" stroke-linecap="round"/>
+        <rect x="125" y="64" width="180" height="48" rx="14" fill="var(--teal_t)" stroke="var(--teal)" stroke-width="3"/>
+        <line x1="215" y1="64" x2="215" y2="112" stroke="var(--teal)" stroke-width="3"/>
+        <text x="215" y="44" text-anchor="middle" font-size="34" font-weight="700" fill="var(--teal)">28,2 ± 0,2 В</text>
+        <text x="215" y="140" text-anchor="middle" font-size="25" fill="var(--muted)">при +25 °C</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="848,851">
+  <p class="kick">Пример 3 · атомарность</p>
+  <h2>Плохо – три функции в одном пункте</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="tree" style="--n:3">
+      <div class="root st" data-s="1" style="font-size:31px;font-weight:600;line-height:1.22;text-align:center;max-width:1080px;padding:20px 36px">«Система должна обеспечивать контроль напряжения бортовой сети, защиту цепей от короткого замыкания и сигнализацию разряда батарей»</div>
+      <div class="kids">
+        <div class="kid st t-teal" data-s="2" style="padding:24px 24px"><h3 style="font-size:31px">Контроль напряжения бортовой сети</h3></div>
+        <div class="kid st t-teal" data-s="2" style="padding:24px 24px"><h3 style="font-size:31px">Защита цепей от короткого замыкания</h3></div>
+        <div class="kid st t-teal" data-s="2" style="padding:24px 24px"><h3 style="font-size:31px">Сигнализация разряда батарей</h3></div>
+      </div>
+    </div>
+    <div class="rule sm t-teal st" data-s="2"><svg class="i"><use href="#i-thumbs-up"/></svg><div><p><b>Хорошо – три отдельных пункта</b>, у каждого своё значение и свой способ проверки. Значения задаёт разработчик ТЗ</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="859" data-steps="860,862,865,867">
+  <p class="kick">Пример 1 и сам кейс ЭС-24</p>
+  <h2>Пуск после стоянки: что изменилось</h2>
+  <div class="body" style="gap:20px;text-wrap:balance">
+    <div class="cards c3">
+      <div class="card t-gray st" data-s="1" style="padding:22px 26px"><span class="n">РЕДАКЦИЯ 1 · П. 4.4</span><h3>Только «должен запускаться»</h3><p>Сколько попыток допустимо, не задано</p></div>
+      <div class="card t-red st" data-s="2" style="padding:22px 26px"><span class="n">ЗАМЕЧАНИЕ З-1</span><h3>«Запустился только со второй попытки»</h3><p>По п.&nbsp;4.4 редакции 1 формально не оценить</p>
+        <p class="st" data-s="3" style="margin-top:auto;background:var(--ct);color:var(--ci);border-radius:12px;padding:8px 14px;font-size:23px;font-weight:600">Стоянка 9&nbsp;суток при <span style="white-space:nowrap">−18…−22&nbsp;°C</span>, а не 14&nbsp;суток в условиях п.&nbsp;4.4</p></div>
+      <div class="card t-teal st" data-s="4" style="padding:22px 26px"><span class="n">РЕДАКЦИЯ 2 · П. 4.4</span><h3>Не более чем с трёх попыток до&nbsp;10&nbsp;с каждая</h3><p>Критерий появился</p></div>
+    </div>
+    <div class="rule xs t-orange st" data-s="4" style="padding:18px 30px"><svg class="i" style="font-size:44px"><use href="#i-scale"/></svg><div><p style="text-wrap:balance">Даже при совпадении условий редакция 1 не позволила бы сказать, годен ли пуск со второй попытки</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="870">
+  <p class="kick">Как здесь помогает модель</p>
+  <h2>Модель – первый фильтр</h2>
+  <div class="body" style="text-wrap:balance">
+    <p class="say sm">Она быстро размечает</p>
+    <div class="picts c4">
+      <div class="pict"><svg class="i" style="width:140px;height:140px;font-size:80px"><use href="#i-cloud-fog"/></svg><b style="font-size:32px">Расплывчатые слова</b><span class="muted" style="font-size:27px">«надёжно», «быстро», «в&nbsp;полном объёме»</span></div>
+      <div class="pict"><svg class="i" style="width:140px;height:140px;font-size:80px"><use href="#i-layers"/></svg><b style="font-size:32px">Составные формулировки</b></div>
+      <div class="pict"><svg class="i" style="width:140px;height:140px;font-size:80px"><use href="#i-ruler"/></svg><b style="font-size:32px">Числа без допуска и условий</b></div>
+      <div class="pict"><svg class="i" style="width:140px;height:140px;font-size:80px"><use href="#i-hand"/></svg><b style="font-size:32px">Пожелания вместо обязанностей</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="877,881">
+  <p class="kick">Исследование 2026 года · критерии INCOSE</p>
+  <h2>Где этот фильтр работает, а где нет</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-users"/></svg><div><p>Модель оценивала качество требований к условной технической системе по критериям INCOSE. Результат сравнивали с оценкой экспертов</p></div></div>
+    <div class="vs st">
+      <div class="col t-red">
+        <h3><svg class="i"><use href="#i-eye-off"/></svg>Находит плохо</h3>
+        <p class="muted">Нужно суждение системного инженера:</p>
+        <p style="font-weight:700">правильность, необходимость, ограниченность</p>
+      </div>
+      <div class="col t-teal">
+        <h3><svg class="i"><use href="#i-search-check"/></svg>Находит надёжнее</h3>
+        <p class="muted">Видно по формулировке:</p>
+        <p style="font-weight:700">неоднозначность и проверяемость</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shefa J. et al. INCOSE International Symposium, 2026 · doi.org/10.1002/iis2.70245</p>
+</section>
+
+<section class="slide" data-steps="885,888">
+  <p class="kick">Та же работа</p>
+  <h2>Главная слабость модели – пропуски</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards st">
+      <div class="card t-teal row"><span class="bdg lg"><svg class="i"><use href="#i-bell-off"/></svg></span><div><h3>Избегать ложных тревог</h3><p>Получалось заметно лучше</p></div></div>
+      <div class="card t-red row"><span class="bdg lg"><svg class="i"><use href="#i-eye-off"/></svg></span><div><h3>Надёжно находить настоящие проблемы</h3><p>Получалось хуже: главная слабость в этой работе – пропуски</p></div></div>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-user-check"/></svg><div><h3>Вывод авторов</h3><p>Модели из коробки пока не годятся для самостоятельной оценки качества требований, но могут помогать экспертам</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shefa J. et al. INCOSE International Symposium, 2026 · doi.org/10.1002/iis2.70245</p>
+</section>
+
+<section class="slide" data-at="891">
+  <p class="kick">Промышленная спецификация ПО · исследование 2024 года</p>
+  <h2>Точность находок модели невысокая</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="stat t-red st todo" style="flex:none;flex-direction:row;align-items:center;gap:40px;padding:26px 35px"><b style="font-size:72px;visibility:hidden">меньше 2/3</b><span style="visibility:hidden">Из того, что модель назвала дефектом, дефектом действительно было меньше двух третей</span></div>
+    <div class="st todo" style="display:flex;flex-direction:column;gap:16px">
+      <p class="note">Точность по видам находок</p>
+      <div class="bars" style="--max:1;--lbw:330px">
+        <div class="bar t-teal" style="--v:0"><span class="lb">Неполные требования</span><i></i><b style="visibility:hidden">0,61</b></div>
+        <div class="bar t-orange" style="--v:0"><span class="lb">Противоречия</span><i></i><b style="visibility:hidden">0,43</b></div>
+        <div class="bar t-red" style="--v:0"><span class="lb">Неоднозначности</span><i></i><b style="visibility:hidden">0,39</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mahbub T. et al. IEEE Access, 2024 · doi.org/10.1109/access.2024.3464242</p>
+</section>
+
+<section class="slide" data-at="894">
+  <p class="kick">Промышленная спецификация ПО · исследование 2024 года</p>
+  <h2>Точность находок модели невысокая</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="stat t-red" style="flex:none;flex-direction:row;align-items:center;gap:40px;padding:26px 35px"><b style="font-size:72px">меньше 2/3</b><span>Из того, что модель назвала дефектом, дефектом действительно было меньше двух третей</span></div>
+    <div class="st todo" style="display:flex;flex-direction:column;gap:16px">
+      <p class="note">Точность по видам находок</p>
+      <div class="bars" style="--max:1;--lbw:330px">
+        <div class="bar t-teal" style="--v:0"><span class="lb">Неполные требования</span><i></i><b style="visibility:hidden">0,61</b></div>
+        <div class="bar t-orange" style="--v:0"><span class="lb">Противоречия</span><i></i><b style="visibility:hidden">0,43</b></div>
+        <div class="bar t-red" style="--v:0"><span class="lb">Неоднозначности</span><i></i><b style="visibility:hidden">0,39</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mahbub T. et al. IEEE Access, 2024 · doi.org/10.1109/access.2024.3464242</p>
+</section>
+
+<section class="slide" data-at="897">
+  <p class="kick">Промышленная спецификация ПО · исследование 2024 года</p>
+  <h2>Точность находок модели невысокая</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="stat t-red" style="flex:none;flex-direction:row;align-items:center;gap:40px;padding:26px 35px"><b style="font-size:72px">меньше 2/3</b><span>Из того, что модель назвала дефектом, дефектом действительно было меньше двух третей</span></div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <p class="note">Точность по видам находок</p>
+      <div class="bars" style="--max:1;--lbw:330px">
+        <div class="bar t-teal" style="--v:0.61"><span class="lb">Неполные требования</span><i></i><b>0,61</b></div>
+        <div class="bar t-orange" style="--v:0.43"><span class="lb">Противоречия</span><i></i><b>0,43</b></div>
+        <div class="bar t-red" style="--v:0.39"><span class="lb">Неоднозначности</span><i></i><b>0,39</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mahbub T. et al. IEEE Access, 2024 · doi.org/10.1109/access.2024.3464242</p>
+</section>
+
+<section class="slide" data-at="899">
+  <p class="kick">Те же авторы</p>
+  <h2>Чего модель не умеет</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46">
+      <div class="center t-red"><div class="doc" style="width:300px"><h4>Спецификация</h4><i class="r"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="r"></i><i class="s"></i></div></div>
+      <div>
+        <ul class="list cross" style="text-wrap:balance">
+          <li>Не умеет сопоставлять места по всему документу</li>
+          <li>Слабо понимает специальный контекст</li>
+        </ul>
+        <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p><b>Для поиска противоречий между пунктами это существенно</b></p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mahbub T. et al. IEEE Access, 2024 · doi.org/10.1109/access.2024.3464242</p>
+</section>
+
+<section class="slide" data-steps="902,907">
+  <p class="kick t-red">Работа 2026 года о поиске неоднозначностей</p>
+  <h2>Ложные тревоги – отдельная проблема</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-scan-text"/></svg><div><p>Существующие автоматические средства и многие новые подходы на основе ИИ смотрят на требование как на <b>отдельную фразу</b></p></div></div>
+    <figure class="quote sm t-red st">
+      <blockquote>Эти методы находят потенциально неоднозначные требования, но ценой <b>большой доли ложных срабатываний</b>, которые ложатся на инженеров большим объёмом ложных тревог</blockquote>
+      <figcaption><span><b>Авторы работы</b>Proceedings of the Design Society, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Poulsen V. V. et al. Proceedings of the Design Society, 2026 · doi.org/10.1017/pds.2026.10607</p>
+</section>
+
+<section class="slide" data-at="911">
+  <p class="kick">Та же работа</p>
+  <h2>Сведения о проекте помогают модели</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46">
+      <div class="center t-red">
+        <div class="doc" style="width:280px"><h4 style="font-size:25px">Требование</h4><i class="hl"></i><b class="stamp">одна фраза</b></div>
+        <p class="note" style="text-align:center;margin-top:12px">Много ложных тревог</p>
+      </div>
+      <div class="center t-teal">
+        <div class="docs" style="gap:20px;align-items:stretch">
+          <div class="doc" style="width:200px"><h4 style="font-size:24px">Описание узла</h4><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:200px"><h4 style="font-size:24px">Пункт ТЗ</h4><i class="t"></i><i class="s"></i><i></i></div>
+          <div class="doc" style="width:200px"><h4 style="font-size:24px">Соседние пункты</h4><i></i><i></i><i class="s"></i></div>
+        </div>
+        <p class="note" style="text-align:center;margin-top:12px">Модель лучше отличает действительно неоднозначные требования от&nbsp;приемлемых</p>
+      </div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-lightbulb"/></svg><div><p><b>Практический приём:</b> давать модели не одну фразу, а описание узла и соседние пункты</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Poulsen V. V. et al. Proceedings of the Design Society, 2026 · doi.org/10.1017/pds.2026.10607</p>
+</section>
+
+<section class="slide" data-steps="915,919">
+  <p class="kick">Бывает и обратное · повторение эксперимента</p>
+  <h2>Модель находит слишком мало</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-users"/></svg><div><p style="text-wrap:balance">В повторении эксперимента по инспекции требований модель сравнивали с людьми-проверяющими</p></div></div>
+    <div class="picts c3 t-red st">
+      <div class="pict"><svg class="i"><use href="#i-list-minus"/></svg><span>Сообщают лишь об ограниченном числе недостатков, хотя объёма ответа им хватает</span></div>
+      <div class="pict"><svg class="i"><use href="#i-repeat"/></svg><span>Мало меняют результат при разных запросах</span></div>
+      <div class="pict"><svg class="i"><use href="#i-target"/></svg><span>Редко совпадают с эталонным решением</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Seifert D. et al. PROFES 2024, Lecture Notes in Computer Science · doi.org/10.1007/978-3-031-78386-9_3</p>
+</section>
+
+<section class="slide" data-at="923">
+  <p class="kick">Оговорка</p>
+  <h2>На каких требованиях выполнены эти исследования</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="tree" style="--n:3">
+      <div class="root">Требования</div>
+      <div class="kids">
+        <div class="kid t-gray" style="align-items:center;text-align:center;gap:12px;padding:24px 20px"><svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-code-xml"/></svg><h3 style="font-size:31px">К программному обеспечению</h3></div>
+        <div class="kid t-gray" style="align-items:center;text-align:center;gap:12px;padding:24px 20px"><svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-telescope"/></svg><h3 style="font-size:31px">К космическому телескопу</h3></div>
+        <div class="kid t-gray" style="align-items:center;text-align:center;gap:12px;padding:24px 20px"><svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-cog"/></svg><h3 style="font-size:31px">К условной технической системе</h3></div>
+      </div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-truck"/></svg><div><p>Не к электрооборудованию автомобиля</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="927" data-title="Проценты не переносятся, вывод переносится">
+  <p class="kick t-orange">Что из этого взять</p>
+  <div class="body" style="text-wrap:balance">
+    <p class="say md">Проценты переносить <span style="color:var(--red)">нельзя</span></p>
+    <p class="sub" style="color:var(--ink)">Переносится вывод: у модели бывают и <em>ложные находки</em>, и <em>пропуски</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="930" data-steps="931,936">
+  <p class="kick t-orange">Порядок работы · первое и второе</p>
+  <h2>Что дать модели и о чём попросить</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="prompt" style="font-size:34px;gap:18px">
+      <p class="part st t-teal" data-s="1" style="--tw:215px"><span class="tg">1 · Дать</span><span>Перечень критериев, описание узла и пункты ТЗ</span></p>
+      <p class="part st t-teal" data-s="1" style="--tw:215px"><span class="tg">1 · Попросить</span><span>Для каждой находки: номер пункта, дословное слово или фразу и название нарушенного критерия</span></p>
+      <p class="part st t-orange" data-s="2" style="--tw:215px"><span class="tg">2 · Запретить</span><span>Придумывать числа. Где значения нет, пусть пишет: «значение задаёт разработчик»</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="939">
+  <p class="kick t-orange">Порядок работы · третье</p>
+  <h2>Каждую находку проверить</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p><b>Ложные срабатывания встречаются часто</b></p></div></div>
+    <div class="cards c3">
+      <div class="card t-gray"><h3>Повествовательная форма</h3><p>«Измеряется через 60&nbsp;мин после выключения зажигания» в п.&nbsp;4.3 – не дефект</p></div>
+      <div class="card t-gray"><h3>Союз «и» в перечне условий</h3><p>«…фары дальнего света, обогрев зеркал и отопитель кабины» в п.&nbsp;4.9 – условия одного измерения</p></div>
+      <div class="card t-gray"><h3>«Допускается»</h3><p>В пункте, который действительно что-то разрешает</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="945">
+  <p class="kick t-orange">Порядок работы · четвёртое</p>
+  <h2>Пройти пункты самому по короткой проверке</h2>
+  <div class="body" style="text-wrap:balance">
+    <ul class="list check" style="display:grid;grid-auto-flow:column;grid-template-rows:repeat(4,auto);grid-template-columns:1fr 1fr;gap:14px 30px;font-size:33px;text-wrap:balance">
+      <li>Есть постоянный номер</li>
+      <li>Есть источник</li>
+      <li>Формулировка задаёт обязанность</li>
+      <li>Термины определены</li>
+      <li>Требование атомарно</li>
+      <li>Есть критерий приёмки</li>
+      <li>Есть метод проверки</li>
+      <li>Нет конфликта с другими требованиями</li>
+    </ul>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p><b>Так находятся пропуски модели</b></p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Короткая проверка из авторского курса В. А. Пикова по техническим заданиям · tz.pikov.expert</p>
+</section>
+
+<section class="slide" data-at="956" data-title="Слабое требование дешевле исправить до постановки задач">
+  <p class="kick">К этой проверке – слова из курса по ТЗ</p>
+  <div class="body" style="text-wrap:balance">
+    <figure class="quote t-orange">
+      <blockquote style="text-wrap:balance">Не надо ждать конца проекта. <b>Слабое требование дешевле исправить до постановки задач</b></blockquote>
+      <figcaption><i class="ava">ВП</i><span><b>Виталий Пиков</b>авторский курс по техническим заданиям</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="959">
+  <p class="kick">Учебник того же курса</p>
+  <h2>Аналитик обязан проверить результат</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46">
+      <div class="center t-red"><svg class="i big-ic"><use href="#i-satellite"/></svg></div>
+      <div>
+        <div class="chat">
+          <div class="msg bot bad" style="max-width:100%;padding:24px 30px"><span class="who" style="font-size:21px">Модель может предложить</span><p style="font-size:38px;font-weight:600;text-wrap:balance">«…отправку уведомлений через спутник»</p></div>
+        </div>
+        <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Что «будет стоить дороже самой фуры апельсинов»</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Пиков В. А. Искусство написания ТЗ: большой учебник системного аналитика, 2026</p>
+</section>
+
+<section class="slide dark" data-at="964" data-title="Модель предлагает, решает человек">
+  <p class="kick t-orange">Для инженера то же самое</p>
+  <div class="body" style="text-wrap:balance">
+    <p class="say">Модель <b>предлагает</b>.<br>Решает и отвечает за ТЗ <em>человек</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="967" data-steps="969,972">
+  <p class="kick t-orange">Итог проверки ТЗ с моделью</p>
+  <h2>Перечень вместо исправленного моделью текста</h2>
+  <div class="body" style="text-wrap:balance">
+    <table class="tbl st">
+      <thead><tr><th style="width:15%">Пункт ТЗ</th><th style="width:20%">Находка</th><th style="width:31%">Решение</th><th style="width:16%">Кто решил</th><th>Что изменено</th></tr></thead>
+      <tbody>
+        <tr><td><span style="display:block;height:12px;width:60%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:85%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td style="color:var(--teal);font-weight:700">принято</td><td><span style="display:block;height:12px;width:70%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:80%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td></tr>
+        <tr><td><span style="display:block;height:12px;width:60%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:75%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td style="color:var(--muted);font-weight:700">отклонено как ложное срабатывание</td><td><span style="display:block;height:12px;width:70%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:40%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td></tr>
+        <tr><td><span style="display:block;height:12px;width:60%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:90%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td style="color:var(--orange);font-weight:700">отложено</td><td><span style="display:block;height:12px;width:70%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td><td><span style="display:block;height:12px;width:55%;margin:10px 0;border-radius:6px;background:var(--line)"></span></td></tr>
+      </tbody>
+    </table>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-file-check"/></svg><div><p><b>Отклонённые находки тоже записывают:</b> по ним видно, что проверка была</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="975">
+  <p class="kick">Подробнее</p>
+  <h2>Дополнительный материал дня</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split" style="grid-template-columns:2fr 3.4fr">
+      <div class="center"><div class="doc" style="width:330px;gap:13px"><h4 style="font-size:25px">Проверяемые требования: кодекс качества и работа с ИИ</h4><i></i><i class="t"></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp">тема 2.2</b></div></div>
+      <div>
+        <ul class="list big" style="font-size:39px">
+          <li><b>Полный разбор</b> десяти критериев</li>
+          <li><b>Короткая проверка</b></li>
+          <li><b>Три готовых запроса</b> к модели</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="978">
+  <p class="kick">Три запроса из дополнительного материала</p>
+  <h2>Готовые запросы к модели</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards c3">
+      <div class="card" style="padding:22px 26px"><span class="n">ЗАПРОС 1</span><h3 style="font-size:30px">Разобрать исходные материалы до ТЗ</h3><p class="muted" style="font-size:24px">Цели, состав и границы узла, функции, названные значения и условия, открытые вопросы</p></div>
+      <div class="card" style="padding:22px 26px"><span class="n">ЗАПРОС 2</span><h3 style="font-size:30px">Проверить атомарность и проверяемость</h3><p class="muted" style="font-size:24px">Ответ таблицей: пункт – находка – дословная фраза – предложение</p></div>
+      <div class="card t-orange" style="padding:22px 26px"><span class="n">ЗАПРОС 3</span><h3 style="font-size:30px">Предложить формулировку требования с критерием приёмки</h3><p class="muted" style="font-size:24px">Три варианта, для каждого – критерий приёмки и метод проверки</p></div>
+    </div>
+    <div class="rule xs t-orange" style="padding:18px 30px"><svg class="i" style="font-size:44px"><use href="#i-dumbbell"/></svg><div><p>Потренироваться – в упражнении по желанию «Десять формулировок» в конце практики 2.2</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="985" data-steps="986,989,991">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Что запомнить: работа с документом</h2>
+  <div class="body" style="text-wrap:balance">
+    <ul class="list check">
+      <li class="st">Модель хорошо делает черновую работу с документом: сводку, таблицу требований, перечень изменений, черновик. <b>Проверяет результат инженер</b></li>
+      <li class="st">Частые ошибки при извлечении – пропуск и значение не в той графе. <b>Сверяйте число строк и каждую строку с числом</b></li>
+      <li class="st">Версии путаются. <b>Подписывайте редакции</b>, сравнивайте обе в одном новом чате и сверяйте со списком различий редактора</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="995">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Что запомнить: ответы со ссылкой на документ</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards c3">
+      <div class="card" style="gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-quote"/></svg></span><h3 style="font-size:35px">Номер пункта и дословная цитата</h3><p style="font-size:29px">Требуйте их. Проверяйте цитату поиском по документу</p></div>
+      <div class="card" style="gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:35px">RAG отвечает тем, что нашёл в базе</h3><p style="font-size:29px">Ответ помощника – указатель на первоисточник</p></div>
+      <div class="card" style="gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-scan-text"/></svg></span><h3 style="font-size:35px">Распознанное с изображения</h3><p style="font-size:29px">Проверяется по исходнику: числа, знаки, единицы</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="1001" data-title="Когда требование готово">
+  <p class="kick t-orange">И о требованиях</p>
+  <div class="body" style="text-wrap:balance">
+    <p class="say md" style="text-wrap:balance">Требование готово, если его можно одинаково <b>понять, реализовать, проверить и принять</b></p>
+    <p class="sub">Модель помогает найти непроверяемые и составные формулировки. Её находки, ложные срабатывания и пропуски проверяет <em>инженер</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="1005" data-steps="1011">
+  <p class="kick t-orange">Дальше</p>
+  <h2>Практика 2.2</h2>
+  <div class="body" style="text-wrap:balance">
+    <ol class="timeline" style="padding-top:42.5px">
+      <li class="now"><b>Задание 1</b><span>Требования редакции 2 – в таблицу</span></li>
+      <li class="now"><b>Задание 2</b><span>Сравнение редакций</span></li>
+      <li class="now"><b>Задание 3</b><span>Приёмка пакета документации и&nbsp;нормоконтроль</span></li>
+      <li class="now"><b>Задание 4</b><span>Снимок таблицы</span></li>
+      <li class="now t-orange"><b>Задание 5</b><span>Документ по вашей роли</span></li>
+    </ol>
+    <div class="st" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note">Понадобятся</p>
+      <div class="picts c4 sm">
+        <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><span>Кейс первого дня</span></div>
+        <div class="pict"><svg class="i"><use href="#i-file-plus"/></svg><span>Дополнение ко второму дню</span></div>
+        <div class="pict"><svg class="i"><use href="#i-message-square-text"/></svg><span>Один-два сервиса</span></div>
+        <div class="pict"><svg class="i"><use href="#i-smartphone"/></svg><span>Телефон или программа для снимков экрана</span></div>
+      </div>
+    </div>
+  </div>
+</section>
