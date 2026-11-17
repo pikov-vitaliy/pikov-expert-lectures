@@ -15,6 +15,13 @@
 .kind-лекция { color: var(--cyan); border-color: var(--cyan); }
 .kind-практика { color: var(--good); border-color: var(--good); }
 .kind-контроль { color: var(--amber); border-color: var(--amber); }
+/* Лекции заметнее практик (17.11.2026): цвет курса, плотнее заголовок,
+   залитая плашка. Подсветка «идёт сейчас» (--live) остаётся отдельной. */
+.tag-kind.kind-лекция { color: var(--cyan); background: color-mix(in srgb, var(--cyan) 14%, transparent); font-weight: 700; letter-spacing: .02em; }
+.timeline-item.is-lecture .timeline-body { margin: .25rem 0 .9rem; padding: .55rem .9rem .75rem; border-left: 3px solid var(--cyan); border-radius: 0 12px 12px 0; background: color-mix(in srgb, var(--cyan) 7%, transparent); }
+.timeline-item.is-lecture .timeline-body h3 { color: var(--cyan); font-weight: 800; }
+.timeline-item.is-lecture .timeline-dot { background: var(--cyan); }
+.plan-list li.is-lecture .plan-what { color: var(--cyan); font-weight: 700; }
 .author-card { padding: 1.3rem 1.4rem; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-card, var(--panel)); max-width: 640px; }
 .author-card h3 { margin: .2rem 0 .5rem; font-size: 1.4rem; }
 .author-reg { list-style: none; margin: 0 0 .8rem; padding: 0; color: var(--text-soft, var(--text)); }
