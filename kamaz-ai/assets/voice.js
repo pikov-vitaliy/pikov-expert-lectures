@@ -306,6 +306,7 @@
   segs.forEach(function (s) {
     var b = document.createElement('button');
     b.type = 'button'; b.dataset.id = s.id;
+    if (/^лекция/i.test(s.kind)) b.className = 'is-lecture';
     b.innerHTML = '<span class="vp-time">' + esc(s.time) + '</span><span class="vp-kind">' + esc(s.kind) + '</span><span class="vp-title">' + esc(s.title) + '</span><span class="vp-dur">' + (s.duration < 60 ? Math.round(s.duration) + ' с' : Math.round(s.duration / 60) + ' мин') + '</span>';
     b.addEventListener('click', function () { var pos = store(true)[s.id] || 0; load(s, pos, true); });
     var li = document.createElement('li'); li.appendChild(b); list.appendChild(li);
