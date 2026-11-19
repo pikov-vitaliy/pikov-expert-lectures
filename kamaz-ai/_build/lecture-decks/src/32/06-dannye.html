@@ -1,0 +1,382 @@
+<!-- Лекция 3.2, строки 548–705 (25:45–34:18): третья часть – как получить конкретный ответ: что дать модели в запросе (состав узла и границы, требования, условия, известные данные), подсказка ГОСТ 34.602-2020, одна функция по шагам, пример запроса, «нет данных – так и скажи»; откуда брать данные лучше учебных и по какому маршруту -->
+
+<section class="slide sect" data-at="549">
+  <span class="no">3</span>
+  <p class="kick">Третья часть</p>
+  <h1>Как получить конкретный ответ вместо общих слов</h1>
+  <p class="lead">Что дать модели в&nbsp;запросе и&nbsp;где взять данные получше учебных</p>
+</section>
+
+<section class="slide dark" data-at="551" data-title="Модель не знает ваш узел">
+  <p class="kick t-orange">Без описания узла</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 290px;gap:40px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:44px">
+        <p class="say" style="font-size:80px">Модель <em>не&nbsp;знает</em> ваш&nbsp;узел</p>
+        <ul class="list cross" style="font-size:42px;gap:26px">
+          <li>Список для «автомобиля вообще»</li>
+          <li style="text-wrap:balance">Системы и&nbsp;компоненты, которых в&nbsp;вашем узле нет</li>
+        </ul>
+      </div>
+      <div class="center t-teal" style="display:flex;justify-content:center"><svg class="i big-ic" style="font-size:250px"><use href="#i-bot"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="554">
+  <p class="kick t-orange">Что дать модели в запросе</p>
+  <h2>Всё, что известно об узле</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange" style="box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><span class="bdg lg"><svg class="i"><use href="#i-boxes"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:34px;text-wrap:balance">Состав узла и&nbsp;границы анализа</h3><p style="font-size:28px;text-wrap:balance">Что входит в&nbsp;узел, а&nbsp;что смежное</p></div></div>
+      <div class="card row t-orange" style="opacity:.55"><span class="bdg lg"><svg class="i"><use href="#i-file-text"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:34px">Требования</h3><p style="font-size:28px;text-wrap:balance">Пункты ТЗ, на&nbsp;которых держится функция</p></div></div>
+      <div class="card row t-orange" style="opacity:.55"><span class="bdg lg"><svg class="i"><use href="#i-thermometer-snowflake"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:34px">Условия эксплуатации</h3><p style="font-size:28px;text-wrap:balance">Температура, стоянки, вибрация, влага и&nbsp;реагенты</p></div></div>
+      <div class="card row t-orange" style="opacity:.55"><span class="bdg lg"><svg class="i"><use href="#i-clipboard-list"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:34px">Известные данные</h3><p style="font-size:28px">Учебные замечания и&nbsp;замеры</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="558" data-steps="560,564,567">
+  <p class="kick">Документ 3.4 · функция Ф-1</p>
+  <h2>Границы анализа</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:stretch">
+      <div class="card st t-orange" data-s="1" style="border:4px dashed var(--c);background:var(--ct);gap:16px;padding:24px 30px;justify-content:center">
+        <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">В узле</p>
+        <ul style="display:flex;flex-direction:column;gap:14px;font-size:31px;line-height:1.15;font-weight:600;color:var(--ci)">
+          <li style="display:flex;align-items:center;gap:16px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-battery-full"/></svg>Батареи</li>
+          <li style="display:flex;align-items:center;gap:16px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-power"/></svg>Выключатель массы</li>
+          <li style="display:flex;align-items:center;gap:16px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-circuit-board"/></svg>Блок предохранителей и&nbsp;реле</li>
+          <li style="display:flex;align-items:center;gap:16px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-zap"/></svg>Генератор с&nbsp;регулятором</li>
+          <li style="display:flex;align-items:center;gap:16px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-cable"/></svg>Силовые провода и&nbsp;соединения узла</li>
+        </ul>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="card st t-gray" data-s="2" style="flex:1;gap:10px;padding:22px 28px;justify-content:center">
+          <h3 style="font-size:31px">Потребители – только нагрузка</h3>
+          <p style="font-size:26px">Тахограф, охранная система, головное устройство, блок управления двигателем</p>
+          <p class="muted" style="font-size:24px;text-wrap:balance">Ток, который они берут, и&nbsp;питание, которое им&nbsp;нужно</p>
+        </div>
+        <div class="card st t-gray" data-s="3" style="gap:10px;padding:22px 28px">
+          <h3 style="font-size:29px">Внутренние отказы потребителей, отказы стартера и&nbsp;двигателя</h3>
+          <p style="font-size:26px">В анализ не входят – только причины или последствия <b>на&nbsp;границе</b></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="569">
+  <p class="kick t-orange">Что дать модели в запросе</p>
+  <h2>Требования и условия эксплуатации</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-file-text"/></svg>Требования</h3>
+        <p style="font-size:33px;text-wrap:balance">Пункты технического задания, на&nbsp;которых держится функция</p>
+        <div class="tags" style="gap:14px;margin-top:auto"><span class="tag" style="font-size:28px;padding:8px 22px">п. 4.3</span><span class="tag" style="font-size:28px;padding:8px 22px">п. 4.4</span><span class="tag" style="font-size:28px;padding:8px 22px">п. 4.5</span></div>
+        <p class="muted" style="font-size:24px">для функции Ф-1, документ 3.4</p>
+      </div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-thermometer-snowflake"/></svg>Условия эксплуатации</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+          <div style="display:flex;align-items:center;gap:14px;font-size:30px;background:var(--bg);border-radius:14px;padding:14px 16px"><svg class="i" style="font-size:40px;color:var(--c)"><use href="#i-thermometer-snowflake"/></svg>Температура</div>
+          <div style="display:flex;align-items:center;gap:14px;font-size:30px;background:var(--bg);border-radius:14px;padding:14px 16px"><svg class="i" style="font-size:40px;color:var(--c)"><use href="#i-square-parking"/></svg>Стоянки</div>
+          <div style="display:flex;align-items:center;gap:14px;font-size:30px;background:var(--bg);border-radius:14px;padding:14px 16px"><svg class="i" style="font-size:40px;color:var(--c)"><use href="#i-vibrate"/></svg>Вибрация</div>
+          <div style="display:flex;align-items:center;gap:14px;font-size:30px;background:var(--bg);border-radius:14px;padding:14px 16px"><svg class="i" style="font-size:40px;color:var(--c)"><use href="#i-droplets"/></svg>Влага и&nbsp;реагенты</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="573">
+  <p class="kick t-orange">Что дать модели в запросе</p>
+  <h2>Известные данные: учебные замечания и&nbsp;замеры</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-gray"><span class="n">ЗАМЕЧАНИЕ</span><h3 style="font-size:66px;line-height:1">З-1</h3><p>После 9&nbsp;суток стоянки при&nbsp;−18…−22&nbsp;°C двигатель запустился только со&nbsp;второй попытки</p></div>
+      <div class="card t-gray"><span class="n">ЗАМЕЧАНИЕ</span><h3 style="font-size:66px;line-height:1">З-2</h3><p>Ток покоя через 30&nbsp;мин – 85&nbsp;мА, через 2&nbsp;ч – 62&nbsp;мА</p></div>
+      <div class="card t-gray"><span class="n">ТАБЛИЦА</span><h3 style="font-size:66px;line-height:1">Д-1</h3><p>Ток покоя по&nbsp;потребителям</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="576" data-steps="578">
+  <p class="kick">Для анализа отказов · подсказку даёт стандарт</p>
+  <h2>Где в ТЗ искать исходные данные?</h2>
+  <div class="body">
+    <div class="term"><dfn>ГОСТ 34.602-2020</dfn><p>Техническое задание на&nbsp;создание автоматизированной системы</p></div>
+    <div class="st" style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+      <div class="rule sm t-gray"><svg class="i"><use href="#i-file-text"/></svg><div><h3>Область стандарта</h3><p>Автоматизированные системы</p></div></div>
+      <div class="rule sm t-teal"><svg class="i"><use href="#i-list-checks"/></svg><div><h3>Для узла автомобиля</h3><p style="text-wrap:balance">Перечень сведений годится как&nbsp;образец</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="581" data-steps="582,586,591">
+  <p class="kick">ГОСТ 34.602-2020 · три места</p>
+  <h2>Три места в стандарте</h2>
+  <div class="body">
+    <dl class="kv" style="--kw:240px">
+      <div class="st" style="font-size:28px;padding:16px 18px"><dt><span style="display:block;font-size:30px;color:var(--ink)">П. 4.6.2</span>требования к&nbsp;функциям</dt><dd>При необходимости указывают «перечень и&nbsp;<mark>критерии отказов</mark> для каждой функции, по&nbsp;которой задаются требования по&nbsp;надежности»</dd></div>
+      <div class="st" style="font-size:28px;padding:16px 18px"><dt><span style="display:block;font-size:30px;color:var(--ink)">П. 4.6.4.3</span>требования к&nbsp;надёжности</dt><dd>Включают «перечень <mark>аварийных ситуаций</mark>, по&nbsp;которым должны быть регламентированы требования к&nbsp;надежности, и&nbsp;значения соответствующих показателей»</dd></div>
+      <div class="st" style="font-size:28px;padding:16px 18px"><dt><span style="display:block;font-size:30px;color:var(--ink)">П. 4.6.4.9</span>сохранность информации</dt><dd>Перечень событий: «аварий, отказов технических средств (в&nbsp;том числе – <mark>потеря питания</mark>) и&nbsp;т.&nbsp;п., при&nbsp;которых должна быть обеспечена сохранность информации в&nbsp;АС»</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="slide" data-at="595">
+  <p class="kick t-orange">Для анализа отказов</p>
+  <h2>Три вопроса к техническому заданию</h2>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:200px 1fr;gap:50px">
+      <span class="q" style="width:200px;height:200px;font-size:140px">?</span>
+      <ul style="font-size:39px;gap:26px">
+        <li>Что считается отказом функции?</li>
+        <li>Какие аварийные ситуации названы?</li>
+        <li>Какие события, например потерю питания, должен пережить узел?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="599" data-steps="599,601">
+  <p class="kick">Учебное ТЗ ЭС-24 · раздела о&nbsp;надёжности нет</p>
+  <h2>Критерий отказа Ф-1 выводим из&nbsp;п.&nbsp;4.4</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:3fr 2fr;gap:36px;align-items:stretch">
+      <div class="card t-gray st" data-s="1" style="justify-content:center;gap:18px;padding:30px 34px"><span class="n">П. 4.4 · РЕДАКЦИЯ 1</span><p style="font-size:34px;line-height:1.3;text-wrap:balance">После стоянки 14&nbsp;суток при&nbsp;температуре окружающего воздуха до&nbsp;−25&nbsp;°C двигатель <mark>должен запускаться</mark> штатным стартером без&nbsp;внешнего источника питания</p></div>
+      <div class="st t-red" data-s="2" style="background:var(--ct);border-radius:20px;padding:30px 32px;display:flex;flex-direction:column;justify-content:center;gap:14px;border-left:11px solid var(--c)">
+        <b style="font-size:110px;line-height:.9;color:var(--c)">?</b>
+        <p style="font-size:38px;line-height:1.15;font-weight:700;color:var(--ci)">Со скольких попыток&nbsp;– не&nbsp;сказано</p>
+        <p style="font-size:27px;color:var(--ci)">В редакции&nbsp;1 критерий отказа&nbsp;неполон</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="604" data-title="Нет критерия отказа – вопрос к составителю задания">
+  <p class="kick t-orange">Если критерия отказа в ТЗ нет</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-file-question"/></svg></div>
+      <p class="say md">Это вопрос <em>к&nbsp;составителю задания</em>, а&nbsp;не&nbsp;место для догадки модели</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="607" data-title="Одна функция на запрос, по шагам">
+  <p class="kick t-orange">Следующий пункт запроса</p>
+  <div class="body" style="gap:50px">
+    <p class="say" style="font-size:82px">Одна функция на&nbsp;запрос, <b>по&nbsp;шагам</b></p>
+    <div class="rule t-red"><svg class="i"><use href="#i-shuffle"/></svg><div><h3>Анализ для всей системы электроснабжения</h3><p style="font-size:38px;text-wrap:balance">Ответ смешает все функции, и&nbsp;половина строк окажется ни&nbsp;к&nbsp;чему</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="611">
+  <p class="kick t-orange">По шагам</p>
+  <h2>Разбирайте одну функцию за&nbsp;раз</h2>
+  <div class="body">
+    <div class="ladder t-orange">
+      <div class="rung"><span class="n">Сначала</span><h3 style="font-size:34px">Виды отказов</h3></div>
+      <div class="rung"><span class="n">Затем</span><h3 style="font-size:34px">Причины каждого из&nbsp;них</h3></div>
+      <div class="rung"><span class="n">Отдельным шагом</span><h3 style="font-size:34px">Меры</h3></div>
+    </div>
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-search-check"/></svg><div><p>Так легче проверить каждый шаг</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="616" data-steps="616,619,622" data-title="Запрос по функции Ф-1: роль, узел, функция, границы">
+  <p class="kick">Как выглядит такой запрос</p>
+  <div class="body">
+    <div class="prompt" style="--tw:170px;font-size:30px;line-height:1.3;gap:14px;padding:24px 28px">
+      <p class="part st t-gray" data-s="1"><span class="tg">Роль</span><span>Ты помогаешь составить черновик DFMEA.</span></p>
+      <p class="part st t-teal" data-s="2"><span class="tg">Узел</span><span>Узел – система электроснабжения 24&nbsp;В грузового автомобиля, описание ниже.</span></p>
+      <p class="part st t-orange" data-s="2"><span class="tg">Функция</span><span>Разбираем только функцию: «обеспечить пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;−25&nbsp;°C».</span></p>
+      <p class="part st t-orange" data-s="3"><span class="tg">Границы</span><span>Границы анализа: батареи, выключатель массы, блок предохранителей и&nbsp;реле, генератор с&nbsp;регулятором, силовые провода и&nbsp;соединения. Стартер – смежная система, потребители учитываются только как нагрузка.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="626">
+  <p class="kick">Как выглядит такой запрос · что вставить</p>
+  <h2>В квадратных скобках – исходные данные</h2>
+  <div class="body">
+    <p class="mono" style="font-size:31px;line-height:1.35;background:var(--surface);border:1.9px solid var(--line);border-radius:18px;padding:18px 28px">[описание узла, пп.&nbsp;4.3–4.5 ТЗ (редакция&nbsp;1), замечания З-1, З-2, З-4, таблица&nbsp;Д-1]</p>
+    <div class="docs" style="gap:44px;flex-wrap:nowrap;align-items:stretch;padding-bottom:16px">
+      <div class="doc" style="width:232px"><h4 style="font-size:25px">Описание узла</h4><i></i><i class="s"></i><i></i><i class="t"></i><i class="s"></i><b class="stamp t-teal">ЭС-24</b></div>
+      <div class="doc" style="width:232px"><h4 style="font-size:25px">ТЗ, пп.&nbsp;4.3–4.5</h4><i></i><i class="hl"></i><i class="hl"></i><i class="hl"></i><i class="s"></i><b class="stamp t-orange">редакция 1</b></div>
+      <div class="doc" style="width:232px"><h4 style="font-size:25px">Замечания З-1, З-2, З-4</h4><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-gray">учебные</b></div>
+      <div class="doc" style="width:232px"><h4 style="font-size:25px">Таблица Д-1</h4><i class="t"></i><i></i><i></i><i></i><i class="s"></i><b class="stamp t-gray">ток покоя</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="631" data-steps="631,635">
+  <p class="kick">Как выглядит такой запрос</p>
+  <h2>И сами шаги</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:150px;font-size:32px;line-height:1.3;gap:16px;padding:26px 30px">
+      <p class="part st t-teal" data-s="1"><span class="tg">Шаг 1</span><span>Перечисли виды отказа этой функции.</span></p>
+      <p class="part st t-teal" data-s="1"><span class="tg">Шаг 2</span><span>Для каждого вида отказа – возможные причины в&nbsp;пределах узла. <b>В&nbsp;одной строке одна причина.</b></span></p>
+      <p class="part st t-orange" data-s="2"><span class="tg">Шаг 3</span><span>Для каждой причины укажи, на&nbsp;какие из&nbsp;моих данных она опирается. Если причина не&nbsp;следует из&nbsp;данных, пометь&nbsp;её&nbsp;<b>«предположение»</b>.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="637">
+  <p class="kick">Как выглядит такой запрос · конец</p>
+  <h2>Запрет, вопросы и&nbsp;вид ответа</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+      <div class="rule t-red"><svg class="i"><use href="#i-ban"/></svg><div><p>Оценки S, O, D не&nbsp;ставь</p></div></div>
+      <div class="rule t-teal"><svg class="i"><use href="#i-message-circle-question"/></svg><div><p>Если данных не&nbsp;хватает, задай вопросы</p></div></div>
+    </div>
+    <p class="note" style="font-size:30px;color:var(--ink)">Ответ – таблицей:</p>
+    <table class="tbl" style="font-size:30px;table-layout:fixed">
+      <thead><tr><th style="padding:18px 22px">Вид отказа</th><th style="padding:18px 22px">Последствие</th><th style="padding:18px 22px">Причина</th><th style="padding:18px 22px">На что опирается</th></tr></thead>
+      <tbody><tr><td class="muted" style="padding:20px 22px;font-weight:400">…</td><td class="muted" style="padding:20px 22px">…</td><td class="muted" style="padding:20px 22px">…</td><td class="muted" style="padding:20px 22px">…</td></tr></tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide dark" data-at="641" data-title="Оценки S, O, D не ставь">
+  <p class="kick t-orange">Обратите внимание на строку</p>
+  <div class="body" style="gap:40px">
+    <p class="say">«Оценки S, O, D <em>не&nbsp;ставь</em>»</p>
+    <p class="sub" style="font-size:38px">Модель охотно их поставит, если не&nbsp;запретить. А&nbsp;вы потом потратите время, чтобы от&nbsp;них избавиться</p>
+  </div>
+</section>
+
+<section class="slide" data-at="644" data-title="Нет данных – так и скажи">
+  <p class="kick">Ещё один пункт запроса</p>
+  <h2>«Нет данных – так и скажи»</h2>
+  <div class="body">
+    <p class="note" style="font-size:30px;color:var(--ink)">Стоп-условия ИИ-агента в&nbsp;контактном центре:</p>
+    <figure class="quote">
+      <blockquote><b>Нет данных, конфликт или&nbsp;риск</b></blockquote>
+      <figcaption><i class="ava">СС</i><span><b>С. Скидан</b>доклад «Как создать Агента-оператора», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-user-check"/></svg><div><p>Значит, передать человеку</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="650">
+  <p class="kick">Хорошее правило и&nbsp;для черновика анализа отказов</p>
+  <h2>Для строки нет основания в&nbsp;исходных данных</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red"><h3><svg class="i"><use href="#i-x"/></svg>Не так</h3><p style="font-size:34px;text-wrap:balance">Модель дописывает правдоподобную причину</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-check"/></svg>Так</h3><p style="font-size:34px;text-wrap:balance">Модель говорит, что основания в&nbsp;данных нет</p></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-message-circle-question"/></svg><div><p>Для этого в&nbsp;запросе есть пометка <b>«предположение»</b> и&nbsp;просьба задать вопросы</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="656" data-steps="656,660">
+  <p class="kick t-orange">Соберём всё вместе</p>
+  <h2>Что нужно в запросе</h2>
+  <div class="body">
+    <div class="cards" style="grid-auto-flow:column;grid-template-rows:repeat(3,auto);gap:22px 30px">
+      <div class="card row t-orange st" data-s="1" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-boxes"/></svg></span><h3 style="font-size:31px;text-wrap:balance">Описание узла и&nbsp;границы анализа</h3></div>
+      <div class="card row t-orange st" data-s="1" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><h3 style="font-size:31px;text-wrap:balance">Требования и&nbsp;условия эксплуатации</h3></div>
+      <div class="card row t-orange st" data-s="1" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-clipboard-list"/></svg></span><h3 style="font-size:31px">Известные данные</h3></div>
+      <div class="card row t-orange st" data-s="2" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3 style="font-size:31px;text-wrap:balance">Одна функция и&nbsp;работа по&nbsp;шагам</h3></div>
+      <div class="card row t-orange st" data-s="2" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-ban"/></svg></span><h3 style="font-size:31px">Запрет ставить оценки</h3></div>
+      <div class="card row t-orange st" data-s="2" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-message-circle-question"/></svg></span><h3 style="font-size:31px;text-wrap:balance">Разрешение сказать «не&nbsp;знаю» и&nbsp;задать вопрос</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="665">
+  <p class="kick">Где взять данные получше учебных</p>
+  <h2>Самые ценные данные для анализа отказов</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-chart-column"/></svg><b>Статистика отказов</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-warning"/></svg><b>Рекламации</b></div>
+      <div class="pict"><svg class="i"><use href="#i-flask-conical"/></svg><b>Результаты испытаний предыдущих изделий</b></div>
+    </div>
+    <div class="rule t-teal"><svg class="i"><use href="#i-scale"/></svg><div><p>Именно они дают основание для оценок <b>O&nbsp;и&nbsp;D</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="671" data-title="Реальные отказы и рекламации – только по разрешённому маршруту">
+  <p class="kick t-orange">Правило, которое прошу запомнить</p>
+  <div class="body" style="gap:30px">
+    <div class="rule sm t-red"><svg class="i"><use href="#i-lock"/></svg><div><p><b>Это служебные сведения</b></p></div></div>
+    <p class="say md">Реальные отказы и&nbsp;рекламации – <em>только по&nbsp;маршруту</em>, разрешённому правилами&nbsp;организации</p>
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-graduation-cap"/></svg><div><p>На занятии – только учебные данные кейса</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="676" data-steps="676,680">
+  <p class="kick">Реальные отказы и рекламации</p>
+  <h2>Каким путём их можно передать в&nbsp;сервис ИИ</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st"><h3><svg class="i"><use href="#i-route"/></svg>Только разрешённым путём</h3><p style="font-size:32px">Тем, который разрешают правила вашей организации</p><p class="muted" style="font-size:27px">Например, во&nbsp;внутренний сервис, если он есть и&nbsp;разрешён для таких данных</p></div>
+      <div class="col t-red st"><h3><svg class="i"><use href="#i-cloud-off"/></svg>Во внешние сервисы – нет</h3><p style="font-size:32px">Даже обезличенные, если правила этого прямо не&nbsp;разрешают</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="683">
+  <p class="kick t-teal">С учебным кейсом проще</p>
+  <h2>Учебный кейс можно отправлять целиком</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><div class="doc t-teal" style="width:340px;gap:16px;padding:28px 28px 34px"><h4 style="font-size:30px">Учебный кейс ЭС-24</h4><i style="height:13px"></i><i class="s" style="height:13px"></i><i style="height:13px"></i><i class="t" style="height:13px"></i><i style="height:13px"></i><i class="s" style="height:13px"></i><i style="height:13px"></i><i class="s" style="height:13px"></i><b class="stamp" style="font-size:22px">условный</b></div></div>
+      <ul class="list check" style="font-size:39px;gap:34px">
+        <li>Узел условный, значения подобраны для упражнений</li>
+        <li>Кейс можно целиком отправлять в&nbsp;любой из&nbsp;сервисов, с&nbsp;которыми мы работаем на&nbsp;занятиях</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="687" data-steps="689,691">
+  <p class="kick">Исследования · 2025 и 2026 годы</p>
+  <h2>Системы автоматизации анализа отказов</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-gray st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Bahr L. и&nbsp;соавт., 2025</h3><p class="muted" style="text-wrap:balance">Journal of Industrial Information Integration</p></div></div>
+      <div class="card row t-gray st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Charan K. V. и&nbsp;соавт., 2026</h3><p class="muted" style="text-wrap:balance">International Journal of System Assurance Engineering and Management</p></div></div>
+    </div>
+    <div class="rule t-orange st" data-s="2"><svg class="i"><use href="#i-user-check"/></svg><div><h3>Надёжные результаты получаются</h3><p>Когда модель работает по&nbsp;проверенной базе документов организации и&nbsp;под&nbsp;контролем эксперта</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Bahr L. et al. Journal of Industrial Information Integration, 2025 · doi.org/10.1016/j.jii.2025.100807; Charan K. V. et al. International Journal of System Assurance Engineering and Management, 2026 · doi.org/10.1007/s13198-026-03171-6</p>
+</section>
+
+<section class="slide" data-at="694" data-steps="694,698">
+  <p class="kick">Системы автоматизации анализа отказов</p>
+  <h2>Что в проверенной базе документов</h2>
+  <div class="body" style="gap:30px">
+    <div class="tree st" data-s="1" style="--n:3">
+      <div class="root">База документов организации</div>
+      <div class="kids">
+        <div class="kid t-teal" style="justify-content:center"><h3 style="font-size:30px;text-align:center">Стандарты</h3></div>
+        <div class="kid t-teal" style="justify-content:center"><h3 style="font-size:30px;text-align:center;text-wrap:balance">Прошлые анализы отказов</h3></div>
+        <div class="kid t-teal" style="justify-content:center"><h3 style="font-size:30px;text-align:center">Данные испытаний</h3></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+      <div class="rule sm t-teal st" data-s="1"><svg class="i"><use href="#i-building-2"/></svg><div><p>Такие системы строят на&nbsp;внутренних решениях организации, не&nbsp;на&nbsp;внешних чат-сервисах</p></div></div>
+      <div class="rule sm t-red st" data-s="2"><svg class="i"><use href="#i-lock"/></svg><div><p>Данные о&nbsp;реальных отказах, рекламациях и&nbsp;испытаниях наружу отправлять нельзя</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="700">
+  <p class="kick t-orange">Подумайте</p>
+  <h2>Сведения об отказах в вашем подразделении</h2>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:180px 1fr;gap:48px">
+      <span class="q" style="width:180px;height:180px;font-size:128px">?</span>
+      <ul style="font-size:38px;gap:24px">
+        <li>Какие сведения об отказах есть у&nbsp;вашего&nbsp;подразделения?</li>
+        <li>Каким путём их разрешено обрабатывать?</li>
+      </ul>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-circle-alert"/></svg><div><p>Не знаете ответа на второй вопрос – значит, в&nbsp;сервис эти сведения пока не&nbsp;идут</p></div></div>
+  </div>
+</section>

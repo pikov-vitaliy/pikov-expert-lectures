@@ -1,0 +1,403 @@
+<!-- Лекция 3.1, строки 362–516 (15:43–23:36): второй раздел – матрица выбора: устройство, семь критериев К-1, три уязвимых места, отсев, проверяемый критерий и формула П. Гагарина, пример на числах и проверка устойчивости, пять проверок таблицы, примеры В. Малаканова и Н. Галкина -->
+
+<section class="slide sect" data-at="363">
+  <span class="no">2</span>
+  <p class="kick">Второй раздел</p>
+  <h1>Сравнение вариантов</h1>
+  <p class="lead">Когда варианты есть, их нужно сравнить. Для&nbsp;этого есть <span style="white-space:nowrap">матрица выбора</span></p>
+</section>
+
+<section class="slide" data-at="366">
+  <p class="kick">Матрица выбора</p>
+  <h2>По строкам – критерии, по столбцам – варианты</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:25%;padding:16px 22px">Критерий</th><th style="width:15%;padding:16px 22px">Вес</th><th style="width:20%;padding:16px 22px">Вариант 1</th><th style="width:20%;padding:16px 22px">Вариант 2</th><th style="padding:16px 22px">Вариант 3</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:16px 22px">Критерий 1</td><td style="padding:16px 22px;color:var(--orange);font-weight:700">вес</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td></tr>
+        <tr><td style="padding:16px 22px">Критерий 2</td><td style="padding:16px 22px;color:var(--orange);font-weight:700">вес</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td></tr>
+        <tr><td style="padding:16px 22px">Критерий 3</td><td style="padding:16px 22px;color:var(--orange);font-weight:700">вес</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td><td class="muted" style="padding:16px 22px">оценка</td></tr>
+        <tr class="hl"><td style="padding:16px 22px">Итог</td><td style="padding:16px 22px"></td><td style="padding:16px 22px;font-weight:700">сумма</td><td style="padding:16px 22px;font-weight:700">сумма</td><td style="padding:16px 22px;font-weight:700">сумма</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="font-size:31px;color:var(--ink)">Каждому критерию – <b style="color:var(--orange)">вес</b>, каждому варианту – <b>оценка</b> по&nbsp;каждому критерию.<br>Итог – <b style="color:var(--teal)">взвешенная сумма</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="370">
+  <p class="kick">Задача К-1</p>
+  <h2>Семь критериев сравнения</h2>
+  <div class="body">
+    <div class="cards" style="gap:18px 26px">
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-weight"/></svg></span><h3 style="font-size:34px">Масса</h3></div>
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-banknote"/></svg></span><h3 style="font-size:34px">Стоимость</h3></div>
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-factory"/></svg></span><h3 style="font-size:34px">Технологичность</h3></div>
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-shield-check"/></svg></span><h3 style="font-size:34px">Надёжность</h3></div>
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-wrench"/></svg></span><h3 style="font-size:34px">Ремонтопригодность</h3></div>
+      <div class="card row" style="padding:13px 26px"><span class="bdg"><svg class="i"><use href="#i-key-round"/></svg></span><h3 style="font-size:34px">Влияние на&nbsp;пуск</h3></div>
+      <div class="card row" style="padding:13px 26px;grid-column:1/-1"><span class="bdg"><svg class="i"><use href="#i-plug"/></svg></span><h3 style="font-size:34px">Совместимость с&nbsp;потребителями стоянки</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="374" data-steps="374,378">
+  <p class="kick">Три уязвимых места матрицы · 1 из 3</p>
+  <h2>Шкала</h2>
+  <div class="body">
+    <div class="split" style="align-items:stretch;gap:50px">
+      <div class="st" data-s="1" style="justify-content:center;gap:24px">
+        <p style="font-size:36px;font-weight:700;line-height:1.2">Что значит 5 и&nbsp;что значит 1?</p>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px">
+          <span style="height:100px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700">1</span>
+          <span style="height:100px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700">2</span>
+          <span style="height:100px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700">3</span>
+          <span style="height:100px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700">4</span>
+          <span style="height:100px;border-radius:16px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:56px;font-weight:700">5</span>
+        </div>
+        <p style="font-size:30px;line-height:1.25">Договориться заранее. Особенно для массы и&nbsp;стоимости, где <b style="white-space:nowrap">«больше» – это хуже</b></p>
+      </div>
+      <div class="st t-teal" data-s="2" style="background:var(--ct);border-radius:20px;padding:32px 36px;justify-content:center;gap:24px">
+        <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Задача К-1</p>
+        <p style="font-size:38px;font-weight:700;line-height:1.2;color:var(--ci)">У всех критериев<br>5&nbsp;– «лучше»</p>
+        <div style="display:grid;grid-template-columns:auto 1fr auto;gap:18px 20px;align-items:center;font-size:33px;color:var(--ci)">
+          <svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-weight"/></svg><span>Масса</span><b style="white-space:nowrap">5&nbsp;– «легче»</b>
+          <svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-banknote"/></svg><span>Стоимость</span><b style="white-space:nowrap">5&nbsp;– «дешевле»</b>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="380">
+  <p class="kick">Три уязвимых места матрицы · 2 из 3</p>
+  <h2>Распределение весов</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch">
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;align-items:center;text-align:center;gap:18px;min-height:330px"><b style="font-size:120px">Σ = 1</b><span style="font-size:32px">сумма весов</span></div></div>
+      <div style="justify-content:center;gap:28px">
+        <div class="rule t-gray"><svg class="i"><use href="#i-list-ordered"/></svg><div><p>Распределение отражает приоритеты задачи</p></div></div>
+        <div class="rule t-orange"><svg class="i"><use href="#i-user-check"/></svg><div><p>Веса определяет инженер или команда, а&nbsp;не&nbsp;модель</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="384" data-title="Оценка без обоснования – это мнение">
+  <p class="kick t-orange">Три уязвимых места матрицы · 3 из 3 · обоснование оценок</p>
+  <div class="body">
+    <p class="say md">Оценка без обоснования – это <em>мнение</em></p>
+    <p class="sub">Каждая оценка должна опираться на</p>
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b>Расчёт</b></div>
+      <div class="pict"><svg class="i"><use href="#i-gauge"/></svg><b>Измерение</b></div>
+      <div class="pict"><svg class="i"><use href="#i-history"/></svg><b>Опыт</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-pen-line"/></svg><b>Или хотя&nbsp;бы<br>явное допущение</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="389">
+  <p class="kick t-red">До матрицы – отсев</p>
+  <h2>Сначала отсев, потом матрица</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-list"/></svg></span><h3 style="font-size:38px">Все варианты</h3></li>
+      <li class="step t-red" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-filter-x"/></svg></span><h3 style="font-size:38px">Отсев</h3><p style="font-size:28px;color:var(--ink)">Нарушает жёсткое ограничение или физику – в&nbsp;матрицу не&nbsp;попадает</p></li>
+      <li class="step t-orange" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:38px">Матрица выбора</h3><p style="font-size:28px;color:var(--ink)">Сравнивает только <span style="white-space:nowrap">допустимые варианты</span></p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide dark" data-at="393" data-title="Недопустимый вариант баллы не спасают">
+  <p class="kick t-orange">Отсев до матрицы</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:230px"><use href="#i-ban"/></svg></div>
+      <div>
+        <p class="say md">Недопустимый вариант <em>баллы не&nbsp;спасают</em></p>
+        <p class="sub">Матрица сравнивает допустимые варианты, а&nbsp;не&nbsp;все подряд</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="397" data-title="П. Гагарин: критерий успеха">
+  <p class="kick">Теперь о самих критериях</p>
+  <div class="body">
+    <p class="sub" style="color:var(--ink)">Удобно формулировать критерии так, чтобы их можно было проверить</p>
+    <figure class="quote">
+      <blockquote style="font-size:60px">Критерий успеха = <b>сценарий + результат</b><br><span style="font-size:46px">«Код написан» – не&nbsp;критерий</span></blockquote>
+      <figcaption><i class="ava">ПГ</i><span><b>П. Гагарин</b>вебинар «Разработка с&nbsp;агентами: от&nbsp;постановки задачи до&nbsp;деплоя», 28.07.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="403">
+  <p class="kick t-orange">Для инженерной задачи</p>
+  <h2>Критерий, который можно проверить испытанием</h2>
+  <div class="body">
+    <div class="rule sm t-red" style="padding:20px 32px"><svg class="i"><use href="#i-x"/></svg><div><h3>Не так</h3><p style="font-size:36px;font-weight:600">«Надёжность пуска»</p></div></div>
+    <div class="prompt" style="--tw:220px;font-size:36px;line-height:1.25;padding:26px 30px;gap:16px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);padding-left:10px">А так</p>
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 10px">Сценарий</span><span>После 14&nbsp;суток стоянки при&nbsp;−25&nbsp;°C</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 10px">Результат</span><span>двигатель запускается штатным стартером <span style="white-space:nowrap">с первой попытки</span></span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="409" data-steps="411,414">
+  <p class="kick">Простой тест · в любой работе с моделью</p>
+  <h2>Можно&nbsp;ли до&nbsp;начала работы записать, по&nbsp;какому признаку вы&nbsp;примете результат?</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" data-s="1" style="padding:26px 32px;gap:16px">
+        <h3><svg class="i"><use href="#i-check"/></svg>Признак есть</h3>
+        <p>Результат модели можно проверить</p>
+        <div class="stat" style="flex:none;flex-direction:row;align-items:center;gap:20px;padding:14px 22px"><b style="font-size:44px">40&nbsp;мА</b><span style="font-size:25px">ток покоя через 30&nbsp;мин – не&nbsp;более</span></div>
+        <div class="stat" style="flex:none;flex-direction:row;align-items:center;gap:20px;padding:14px 22px"><b style="font-size:44px">13,3&nbsp;А·ч</b><span style="font-size:25px">расход на&nbsp;потребители за&nbsp;336&nbsp;ч – не&nbsp;больше</span></div>
+      </div>
+      <div class="col t-red st" data-s="2" style="padding:26px 32px;gap:18px">
+        <h3><svg class="i"><use href="#i-x"/></svg>Признака нет</h3>
+        <div class="tags" style="gap:12px"><span class="tag" style="font-size:28px;padding:8px 20px">«хорошее решение»</span><span class="tag" style="font-size:28px;padding:8px 20px">«полная таблица»</span></div>
+        <p>Модель выдаст правдоподобный объём текста</p>
+        <p><b>Отличить хороший ответ от&nbsp;плохого будет нечем</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="417">
+  <p class="kick t-red">Отдельная ловушка</p>
+  <h2>Модель сама придумывает и&nbsp;решение, и&nbsp;критерий его&nbsp;проверки</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 290px 1fr;gap:20px;align-items:center">
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-lightbulb"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:38px">Решение</h3><p class="muted">от модели</p></div></div>
+      <div class="t-red" style="display:flex;flex-direction:column;align-items:center;gap:8px;color:var(--c);text-align:center">
+        <svg class="i" style="font-size:92px"><use href="#i-refresh-cw"/></svg>
+        <span style="font-size:26px;font-weight:700;line-height:1.2">критерий подгоняется под&nbsp;готовое решение</span>
+      </div>
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-list-checks"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:38px">Критерий</h3><p class="muted">тоже от модели</p></div></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Проверка теряет смысл</p></div></div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-user-check"/></svg><div><p>Критерий задаёт инженер – до&nbsp;того, как увидел ответ</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="422" data-title="Попробуйте сами: критерий по формуле">
+  <p class="kick t-orange">Попробуйте сами</p>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:200px 1fr;gap:44px">
+      <span class="q" style="width:200px;height:200px;font-size:140px">?</span>
+      <ul>
+        <li>Как записать критерий «Совместимость с&nbsp;потребителями стоянки» по&nbsp;формуле «сценарий + результат»?</li>
+        <li style="font-size:32px;font-weight:400;color:var(--muted)">Подумайте про&nbsp;себя</li>
+      </ul>
+    </div>
+    <div class="prompt" style="--tw:220px;font-size:34px;padding:22px 28px;gap:14px">
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 10px">Сценарий</span><span class="muted">…</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 10px">Результат</span><span class="muted">…</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="429" data-steps="431,434">
+  <p class="kick">Как матрица работает на числах</p>
+  <h2>Условный пример: три критерия, два варианта</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:38px">
+      <thead><tr><th style="width:40%;padding:18px 26px">Критерий</th><th style="width:20%;padding:18px 26px">Вес</th><th style="width:20%;padding:18px 26px">Вариант А</th><th style="padding:18px 26px">Вариант Б</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:18px 26px">Влияние на пуск</td><td class="st" data-s="1" style="padding:18px 26px;color:var(--orange);font-weight:700">0,5</td><td class="st" data-s="2" style="padding:18px 26px">4</td><td class="st" data-s="2" style="padding:18px 26px">5</td></tr>
+        <tr><td style="padding:18px 26px">Стоимость</td><td class="st" data-s="1" style="padding:18px 26px;color:var(--orange);font-weight:700">0,3</td><td class="st" data-s="2" style="padding:18px 26px">4</td><td class="st" data-s="2" style="padding:18px 26px">2</td></tr>
+        <tr><td style="padding:18px 26px">Масса</td><td class="st" data-s="1" style="padding:18px 26px;color:var(--orange);font-weight:700">0,2</td><td class="st" data-s="2" style="padding:18px 26px">5</td><td class="st" data-s="2" style="padding:18px 26px">4</td></tr>
+      </tbody>
+    </table>
+    <div class="rule sm t-teal st" data-s="2"><svg class="i"><use href="#i-sigma"/></svg><div><p><b>Итог</b> – сумма произведений «вес × оценка»</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="437" data-steps="437,442">
+  <p class="kick">Условный пример · итог</p>
+  <h2>Сумма произведений «вес × оценка»</h2>
+  <div class="body" style="gap:26px">
+    <div class="st" data-s="1" style="display:grid;grid-template-columns:96px 1fr 124px;gap:24px;align-items:end">
+      <b style="font-size:60px;line-height:84px">А</b>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p style="font-size:31px;color:var(--muted)">0,5&nbsp;×&nbsp;4 + 0,3&nbsp;×&nbsp;4 + 0,2&nbsp;×&nbsp;5</p>
+        <div class="segbar" style="height:84px;font-size:31px"><i class="t-teal solid" style="flex:2">2,0</i><i class="t-orange solid" style="flex:1.2">1,2</i><i class="t-gray solid" style="flex:1">1,0</i><i style="flex:.8;background:none"></i></div>
+      </div>
+      <b style="font-size:60px;line-height:84px;color:var(--teal)">4,2</b>
+    </div>
+    <div class="st" data-s="2" style="display:grid;grid-template-columns:96px 1fr 124px;gap:24px;align-items:end">
+      <b style="font-size:60px;line-height:84px">Б</b>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <p style="font-size:31px;color:var(--muted)">0,5&nbsp;×&nbsp;5 + 0,3&nbsp;×&nbsp;2 + 0,2&nbsp;×&nbsp;4</p>
+        <div class="segbar" style="height:84px;font-size:31px"><i class="t-teal solid" style="flex:2.5">2,5</i><i class="t-orange solid" style="flex:.6">0,6</i><i class="t-gray solid" style="flex:.8">0,8</i><i style="flex:1.1;background:none"></i></div>
+      </div>
+      <b style="font-size:60px;line-height:84px;color:var(--muted)">3,9</b>
+    </div>
+    <div style="display:grid;grid-template-columns:96px 1fr 124px;gap:24px">
+      <span></span>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;justify-content:space-between;font-size:24px;color:var(--muted);border-top:2.5px solid var(--line);padding-top:6px"><span>0</span><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:12px 34px;font-size:27px">
+          <span style="display:inline-flex;align-items:center;gap:12px"><i style="width:28px;height:28px;border-radius:7px;background:var(--teal)"></i>влияние на пуск</span>
+          <span style="display:inline-flex;align-items:center;gap:12px"><i style="width:28px;height:28px;border-radius:7px;background:var(--orange)"></i>стоимость</span>
+          <span style="display:inline-flex;align-items:center;gap:12px"><i style="width:28px;height:28px;border-radius:7px;background:var(--gray)"></i>масса</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="449" data-steps="450,452,455,457">
+  <p class="kick">Условный пример · проверка устойчивости</p>
+  <h2>Переносим вес со стоимости на&nbsp;пуск</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:29px">
+      <thead><tr><th style="width:27%;padding:11px 18px">Критерий</th><th style="width:9%;padding:11px 18px">А</th><th style="width:9%;padding:11px 18px">Б</th><th style="width:18%;padding:11px 18px">Вес</th><th style="width:18%;padding:11px 18px">Сдвиг 0,1</th><th style="padding:11px 18px">Сдвиг 0,2</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:11px 18px">Влияние на пуск</td><td style="padding:11px 18px">4</td><td style="padding:11px 18px">5</td><td style="padding:11px 18px">0,5</td><td class="st" data-s="1" style="padding:11px 18px">0,6</td><td class="st" data-s="3" style="padding:11px 18px">0,7</td></tr>
+        <tr><td style="padding:11px 18px">Стоимость</td><td style="padding:11px 18px">4</td><td style="padding:11px 18px">2</td><td style="padding:11px 18px">0,3</td><td class="st" data-s="1" style="padding:11px 18px">0,2</td><td class="st" data-s="3" style="padding:11px 18px">0,1</td></tr>
+        <tr><td style="padding:11px 18px">Масса</td><td style="padding:11px 18px">5</td><td style="padding:11px 18px">4</td><td style="padding:11px 18px">0,2</td><td class="st" data-s="1" style="padding:11px 18px">0,2</td><td class="st" data-s="3" style="padding:11px 18px">0,2</td></tr>
+        <tr class="hl"><td colspan="3" style="padding:11px 18px">Итог, А&nbsp;:&nbsp;Б</td><td style="padding:11px 18px;font-weight:700">4,2&nbsp;:&nbsp;3,9</td><td class="st" data-s="2" style="padding:11px 18px;font-weight:700">4,2&nbsp;:&nbsp;4,2</td><td class="st" data-s="4" style="padding:11px 18px;font-weight:700">4,2&nbsp;:&nbsp;4,5</td></tr>
+        <tr><td colspan="3" style="padding:11px 18px">Впереди</td><td class="yes" style="padding:11px 18px">А</td><td class="st" data-s="2" style="padding:11px 18px;color:var(--muted);font-weight:700">ничья</td><td class="st yes" data-s="4" style="padding:11px 18px">Б</td></tr>
+      </tbody>
+    </table>
+    <div class="rule sm t-orange st" data-s="4" style="padding:18px 30px"><svg class="i"><use href="#i-arrow-left-right"/></svg><div><p>Сдвиг 0,2 веса со&nbsp;стоимости на&nbsp;пуск <b>меняет лидера</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="461" data-title="Решать расчётом или испытанием">
+  <p class="kick t-orange">Что из этого следует</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:220px"><use href="#i-flask-conical"/></svg></div>
+      <div>
+        <p class="sub" style="color:var(--ink)">Выбор зависит от того, насколько пуск важнее стоимости</p>
+        <p class="say md">Решать надо не&nbsp;арифметикой, а&nbsp;<em>расчётом или испытанием</em> по&nbsp;влиянию на&nbsp;пуск</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="466" data-title="Разница в 0,1 балла – в пределах точности">
+  <p class="kick">Теперь о точности</p>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch">
+      <div class="stats"><div class="stat t-gray" style="justify-content:center;gap:18px;min-height:390px"><b style="font-size:150px">0,1</b><span style="font-size:31px">балла – разница между двумя вариантами при&nbsp;оценках по&nbsp;пятибалльной шкале</span></div></div>
+      <div style="justify-content:center"><p class="say md">Это в&nbsp;пределах <b>точности самих оценок</b></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="470" data-steps="471,474,477,480">
+  <p class="kick t-orange">Если разница в пределах точности</p>
+  <h2>Три вещи, которые полезно сделать</h2>
+  <div class="body">
+    <ol class="flow">
+      <li class="step t-orange st" style="padding:22px 24px 26px;gap:12px"><h3 style="font-size:33px">Проверить устойчивость</h3><p style="font-size:26px;color:var(--ink)">Поменять веса<br>в&nbsp;разумных пределах:<br>сменится ли лидер?</p></li>
+      <li class="step t-orange st" style="padding:22px 24px 26px;gap:12px"><h3 style="font-size:33px">Вернуться к&nbsp;ограничениям</h3><p style="font-size:26px;color:var(--ink)">Выполняет&nbsp;ли лидер требование с&nbsp;запасом?</p><p style="font-size:24px">В задаче К-1 – энергобаланс в&nbsp;таблице Д-2</p></li>
+      <li class="step t-orange st" style="padding:22px 24px 26px;gap:12px"><h3 style="font-size:33px">Записать обоснование словами</h3><p style="font-size:26px;color:var(--ink)">Почему выбран этот вариант и&nbsp;что придётся проверить испытанием</p></li>
+    </ol>
+    <div class="rule t-teal st" style="padding:20px 34px"><svg class="i"><use href="#i-compass"/></svg><div><p>Матрица помогает думать, но&nbsp;не&nbsp;решает за&nbsp;вас</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="482" data-steps="484,487">
+  <p class="kick">Для самой таблицы</p>
+  <h2>Пять проверок, которые должны выполняться всегда</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-teal st" data-s="1" style="gap:20px;padding:26px 30px">
+        <p class="st" data-s="2" style="display:flex;gap:14px;align-items:center;font-size:23px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)"><svg class="i" style="font-size:36px"><use href="#i-sheet"/></svg>Формулами – за&nbsp;минуту</p>
+        <ol class="list num" style="font-size:30px;gap:14px">
+          <li>Сумма весов равна 1</li>
+          <li>Все оценки в&nbsp;пределах шкалы</li>
+          <li>Итог каждого варианта равен сумме произведений «вес&nbsp;×&nbsp;оценка»</li>
+        </ol>
+      </div>
+      <div class="card t-orange st" data-s="2" style="gap:20px;padding:26px 30px">
+        <p style="display:flex;gap:14px;align-items:center;font-size:23px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)"><svg class="i" style="font-size:36px"><use href="#i-list-checks"/></svg>Вручную, по&nbsp;списку</p>
+        <ol class="list num" style="font-size:30px;gap:14px;counter-reset:n 3">
+          <li>Ни один вариант в&nbsp;матрице не&nbsp;нарушает жёстких ограничений</li>
+          <li>У каждой оценки есть обоснование</li>
+        </ol>
+      </div>
+    </div>
+    <div class="rule sm t-gray st" data-s="2" style="padding:18px 30px"><svg class="i"><use href="#i-clipboard-check"/></svg><div><p>Держите этот список рядом: для&nbsp;чужой матрицы и&nbsp;для своей</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="494" data-steps="497,500">
+  <p class="kick">Как подавать результат другим людям</p>
+  <h2>Пример из доклада В.&nbsp;Малаканова</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center">
+      <div style="align-items:center;gap:30px">
+        <div class="doc" style="width:420px;gap:14px;padding:24px 26px 36px">
+          <h4 style="font-size:27px">Матрица выбора</h4>
+          <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:9px 8px">
+            <i class="t"></i><i class="t"></i><i class="t"></i><i class="t"></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <i class="hl s"></i>
+          <b class="stamp t-orange">с оговоркой</b>
+        </div>
+        <p class="note" style="font-size:27px;text-align:center;color:var(--ink)">Сравнивала способы обработки вопросов пользователей</p>
+      </div>
+      <div style="gap:20px">
+        <div class="rule sm t-gray st" data-s="1" style="padding:20px 28px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Оговорка рядом с таблицей</h3><p>Реальная стоимость и&nbsp;эффект зависят от&nbsp;проекта</p></div></div>
+        <div class="rule sm t-gray st" data-s="1" style="padding:20px 28px"><svg class="i"><use href="#i-tag"/></svg><div><h3>Цифры производителя</h3><p>Прямо помечены как его <span style="white-space:nowrap">собственные данные</span></p></div></div>
+      </div>
+    </div>
+    <div class="rule t-orange st" data-s="2" style="padding:22px 34px"><svg class="i"><use href="#i-clipboard-check"/></svg><div><p>Так и подавать результат:<br>что измерено, что оценено и&nbsp;на&nbsp;чьих данных</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Малаканов В. «Код, Jev, LLM, WebMCP». Доклад на ИИ-митапе ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide" data-at="503">
+  <p class="kick">Ещё один пример матрицы – из совсем другой отрасли</p>
+  <h2>Как решают, где ИИ нужен, а&nbsp;где нет</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:440px 1fr;gap:46px">
+      <div class="svc-hd" style="padding:40px 38px;gap:20px">
+        <i class="logo" style="width:130px;height:130px;font-size:72px"><svg class="i"><use href="#i-coffee"/></svg></i>
+        <h3 style="font-size:54px">«Кофемания»</h3>
+        <p style="font-size:32px">сеть ресторанов</p>
+      </div>
+      <dl class="kv" style="--kw:120px">
+        <div style="font-size:37px;padding:26px 15px"><dt>Кто</dt><dd><b>Н.&nbsp;Галкин</b>, директор департамента&nbsp;ИТ</dd></div>
+        <div style="font-size:37px;padding:26px 15px"><dt>Где</dt><dd>Онлайн-конференция форума <span style="white-space:nowrap">All-over-IP</span>, ноябрь 2026</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="507">
+  <p class="kick">Матрица «Кофемании»</p>
+  <h2>Каждую идею оценивают по&nbsp;шести критериям, до&nbsp;5&nbsp;баллов за&nbsp;каждый</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Сумма баллов</p>
+      <div class="segbar" style="height:120px;font-size:46px"><i class="t-red" style="flex:15">меньше 15</i><i class="t-orange" style="flex:9">15–23</i><i class="t-teal solid" style="flex:7">24–30</i></div>
+    </div>
+    <ul class="list" style="font-size:36px;gap:18px">
+      <li class="t-teal"><b>24–30</b> – внедряют</li>
+      <li class="t-orange"><b>15–23</b> – сначала дорабатывают данные или подключения</li>
+      <li class="t-red"><b>Меньше 15</b> – отказываются</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide dark" data-at="511" data-title="Матрица учит говорить «нет»">
+  <p class="kick t-orange">Заголовок слайда с этой матрицей</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:100px;line-height:1.1">Матрица учит<br>говорить <b>«нет»</b></blockquote>
+      <figcaption><i class="ava">НГ</i><span><b>Н. Галкин</b>директор департамента ИТ сети ресторанов «Кофемания» · онлайн-конференция форума All-over-IP, ноябрь 2026</span></figcaption>
+    </figure>
+  </div>
+</section>

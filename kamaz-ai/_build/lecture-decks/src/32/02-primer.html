@@ -1,0 +1,260 @@
+<!-- Лекция 3.2, строки 106–204 (04:11–09:44): пример из учебного узла – функция Ф-1, откуда она и условия эксплуатации, цепочка от видов отказа к причинам и мерам, замечания З-1 и З-2; документы, на которые опирается метод – ГОСТ Р 27.303-2021, руководство AIAG & VDA, семь шагов, приоритет действий вместо ПЧР -->
+
+<section class="slide" data-at="107" data-title="Пример: функция Ф-1">
+  <p class="kick">Пример из учебного узла ЭС-24</p>
+  <div class="body">
+    <div class="term t-orange"><dfn>Функция Ф-1</dfn><p>Обеспечить пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;температуре до&nbsp;−25&nbsp;°C</p></div>
+    <div class="stats">
+      <div class="stat md t-gray" style="flex-direction:row;align-items:center;gap:30px"><svg class="i" style="font-size:84px;color:var(--c)"><use href="#i-calendar-clock"/></svg><div style="display:flex;flex-direction:column;gap:6px"><b>до 14 суток</b><span>стоянка</span></div></div>
+      <div class="stat md t-gray" style="flex-direction:row;align-items:center;gap:30px"><svg class="i" style="font-size:84px;color:var(--c)"><use href="#i-thermometer-snowflake"/></svg><div style="display:flex;flex-direction:column;gap:6px"><b>до −25 °C</b><span>температура воздуха</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="111" data-steps="111,114">
+  <p class="kick">Документ 3.4 дополнения к кейсу</p>
+  <h2>Откуда функция Ф-1</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center st" data-s="1">
+        <div class="doc t-teal" style="width:340px;gap:13px"><h4 style="font-size:26px">Функции узла ЭС-24 для&nbsp;анализа отказов</h4><i></i><i class="t"></i><i class="s"></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp">документ 3.4</b></div>
+      </div>
+      <div>
+        <p class="note" style="font-size:30px;color:var(--ink)">Её задают:</p>
+        <dl class="kv" style="--kw:200px">
+          <div class="st" data-s="1"><dt>П. 4.3 ТЗ</dt><dd>Ток покоя</dd></div>
+          <div class="st" data-s="1"><dt>П. 4.4 ТЗ</dt><dd>Пуск после стоянки без&nbsp;внешнего источника</dd></div>
+          <div class="st" data-s="1"><dt>П. 4.5 ТЗ</dt><dd>Напряжение батарей после&nbsp;стоянки</dd></div>
+          <div class="st" data-s="2"><dt>Таблица Д-2</dt><dd>Энергобаланс стоянки</dd></div>
+        </dl>
+        <p class="st" data-s="2"><span class="tag" style="font-size:25px;padding:6px 20px">ТЗ – редакция 1</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="116">
+  <p class="kick">Документ 3.4 · учебные условия</p>
+  <h2>Условия эксплуатации</h2>
+  <div class="body">
+    <div class="picts" style="gap:18px;align-items:stretch">
+      <div class="pict" style="font-size:28px;gap:22px;padding:32px 8px 34px;background:var(--surface)"><svg class="i" style="width:132px;height:132px;font-size:76px;border-radius:30px"><use href="#i-calendar-range"/></svg><span>Круглый год</span></div>
+      <div class="pict" style="font-size:28px;gap:22px;padding:32px 8px 34px;background:var(--surface)"><svg class="i" style="width:132px;height:132px;font-size:76px;border-radius:30px"><use href="#i-cloud-snow"/></svg><span>Стоянки под&nbsp;открытым небом</span></div>
+      <div class="pict" style="font-size:28px;gap:22px;padding:32px 8px 34px;background:var(--surface)"><svg class="i" style="width:132px;height:132px;font-size:76px;border-radius:30px"><use href="#i-route"/></svg><span>Короткие поездки между стоянками</span></div>
+      <div class="pict" style="font-size:28px;gap:22px;padding:32px 8px 34px;background:var(--surface)"><svg class="i" style="width:132px;height:132px;font-size:76px;border-radius:30px"><use href="#i-vibrate"/></svg><span>Вибрация</span></div>
+      <div class="pict" style="font-size:28px;gap:22px;padding:32px 8px 34px;background:var(--surface)"><svg class="i" style="width:132px;height:132px;font-size:76px;border-radius:30px"><use href="#i-droplets"/></svg><span>Влага и&nbsp;реагенты</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="120" data-steps="120,122">
+  <p class="kick">Задача К-1 и функция Ф-1</p>
+  <h2>Та же функция – с другой стороны</h2>
+  <div class="body">
+    <div class="rule t-gray st" data-s="2"><svg class="i"><use href="#i-target"/></svg><div><h3>Одна и та же функция Ф-1</h3><p>Пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;−25&nbsp;°C</p></div></div>
+    <div class="vs">
+      <div class="col t-gray st" data-s="1" style="padding:32px 40px;gap:18px"><h3 style="font-size:38px"><svg class="i"><use href="#i-lightbulb"/></svg>Поиск решения</h3><p style="font-size:33px">Задача К-1: как не&nbsp;допустить глубокого разряда батарей на&nbsp;стоянке до&nbsp;14&nbsp;суток</p></div>
+      <div class="col t-orange st" data-s="2" style="padding:32px 40px;gap:18px"><h3 style="font-size:38px"><svg class="i"><use href="#i-search-x"/></svg>Анализ отказов</h3><p style="font-size:33px">Как эта функция может <b>не&nbsp;выполниться</b></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="125" data-steps="126,130,133">
+  <p class="kick">Пройдём по цепочке</p>
+  <h2>Функция Ф-1: от вида отказа к&nbsp;причине</h2>
+  <div class="body">
+    <ol class="flow" style="gap:40px">
+      <li class="step t-gray" style="gap:14px"><h3>Функция</h3><p style="font-size:25px;color:var(--ink)">Пуск после стоянки до&nbsp;14&nbsp;суток при&nbsp;−25&nbsp;°C</p></li>
+      <li class="step t-red st" style="gap:14px"><h3>Виды отказа</h3><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Двигатель не&nbsp;запускается</p><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Запускается не&nbsp;с&nbsp;первой попытки</p><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Запускается только от&nbsp;внешнего источника</p></li>
+      <li class="step t-red st" style="gap:14px"><h3>Последствие</h3><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Автомобиль не&nbsp;выходит на&nbsp;линию</p><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Нужен внешний источник пуска или&nbsp;эвакуация</p></li>
+      <li class="step t-orange st" style="gap:14px"><h3>Причина в&nbsp;конструкции</h3><p style="font-size:25px;color:var(--ink);border-left:5px solid var(--c);padding-left:12px">Например, повышенный ток&nbsp;покоя</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="135" data-steps="135,140,142">
+  <p class="kick">Почему причин несколько</p>
+  <h2>Откуда взялась задача К-1</h2>
+  <div class="body" style="gap:24px">
+    <div class="rule sm t-gray st"><svg class="i"><use href="#i-thermometer-snowflake"/></svg><div><p><b>З-1.</b> После 9&nbsp;суток стоянки при&nbsp;−18…−22&nbsp;°C двигатель запустился только со&nbsp;второй попытки</p></div></div>
+    <div class="st" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note" style="font-size:28px"><b style="color:var(--ink)">З-2.</b> Ток покоя через 30&nbsp;мин после выключения зажигания</p>
+      <div class="bars" style="--max:100;--lbw:300px">
+        <div class="bar t-red" style="--v:85"><span class="lb">Замер</span><i></i><b>85&nbsp;мА</b></div>
+        <div class="bar t-teal" style="--v:40"><span class="lb">Не&nbsp;более, п.&nbsp;4.3&nbsp;ТЗ</span><i></i><b>40&nbsp;мА</b></div>
+      </div>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-circle-help"/></svg><div><p>Но причина затруднённого пуска испытаниями <b>не&nbsp;установлена</b>. Задача К-1 не&nbsp;утверждает, что всё дело в&nbsp;токе покоя</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="144" data-title="Один вид отказа – разные причины">
+  <p class="kick t-orange">Почему причин несколько</p>
+  <div class="body">
+    <p class="say md">Один и тот же вид отказа может иметь <em>разные причины</em></p>
+    <div class="cards c3">
+      <div class="card t-red"><span class="n">Строка 1</span><h3>Повышенный ток&nbsp;покоя</h3></div>
+      <div class="card t-red"><span class="n">Строка 2</span><h3>Ослабление клеммы</h3></div>
+      <div class="card t-red"><span class="n">Строка 3</span><h3>Разбаланс батарей в&nbsp;последовательной цепочке</h3></div>
+    </div>
+    <p class="sub">Анализ отказов перебирает их все – по&nbsp;одной на&nbsp;строку</p>
+  </div>
+</section>
+
+<section class="slide" data-at="146">
+  <p class="kick">Функция Ф-1 · меры</p>
+  <h2>Как предупредить причину и как её&nbsp;обнаружить</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-shield-check"/></svg>Меры предупреждения</h3><p class="muted" style="font-size:26px">Что в конструкции уже снижает вероятность причины</p><ul style="font-size:33px"><li>Расчёт энергобаланса</li><li>Выбор компонента</li></ul></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-search-check"/></svg>Меры обнаружения</h3><p class="muted" style="font-size:26px">Как причину выявят до&nbsp;выпуска&nbsp;конструкции</p><ul style="font-size:33px"><li>Расчёт</li><li>Испытание на&nbsp;стоянку в&nbsp;климатической камере</li><li>Измерение тока покоя</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="153">
+  <p class="kick">Из одной фразы функции</p>
+  <h2>Как разворачивается цепочка</h2>
+  <div class="body">
+    <div class="ladder">
+      <div class="rung t-gray" style="min-height:130px"><span class="n">Функция</span><h3 style="font-size:34px">Одна</h3></div>
+      <div class="rung t-red" style="min-height:190px"><span class="n">Виды отказа</span><h3 style="font-size:34px">Несколько</h3><p style="font-size:26px">у одной функции</p></div>
+      <div class="rung t-red" style="min-height:250px"><span class="n">Причины</span><h3 style="font-size:34px">Свои</h3><p style="font-size:26px">у каждого вида</p></div>
+      <div class="rung t-orange" style="min-height:310px"><span class="n">Меры</span><h3 style="font-size:34px">Свои</h3><p style="font-size:26px">у каждой причины</p></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-rows-3"/></svg><div><p><b>Таблица растёт очень быстро</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="158">
+  <p class="kick">Поэтому</p>
+  <h2>Одна функция за раз</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-orange" style="padding:36px 38px;gap:18px;box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><span class="bdg lg"><svg class="i"><use href="#i-battery-charging"/></svg></span><span class="n">Ф-1 · разбираем в примере</span><h3 style="font-size:36px">Обеспечить пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;−25&nbsp;°C</h3></div>
+      <div class="card t-gray" style="padding:36px 38px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-split"/></svg></span><span class="n">Ф-2 · вторая функция узла</span><h3 style="font-size:36px">Распределить питание потребителям и&nbsp;защитить&nbsp;цепи</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="163" data-steps="166,168,170">
+  <p class="kick">В России</p>
+  <h2>Документы, на которые опирается метод</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:360px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-landmark"/></svg></i>
+        <h3 style="font-size:48px">ГОСТ Р<br>27.303-2021</h3>
+        <p>В России метод описан в&nbsp;этом стандарте</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div class="st" data-s="1"><dt>Название</dt><dd>Надежность в технике. Анализ видов и&nbsp;последствий отказов</dd></div>
+        <div class="st" data-s="1"><dt>Введён в&nbsp;действие</dt><dd>С 1 января 2022 года</dd></div>
+        <div class="st" data-s="2"><dt>Основа</dt><dd>Международный стандарт МЭК&nbsp;60812:2018</dd></div>
+        <div class="st" data-s="2"><dt>Заменил</dt><dd>ГОСТ Р 51901.12-2007</dd></div>
+        <div class="st t-orange" data-s="3"><dt>Статус</dt><dd>Проверять по&nbsp;каталогу, прежде чем&nbsp;ссылаться</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Даты и замена стандарта – по сведениям каталога стандартов</p>
+</section>
+
+<section class="slide" data-at="171">
+  <p class="kick">ГОСТ Р 27.303-2021 · карточка в каталоге</p>
+  <h2>Область применения</h2>
+  <div class="body">
+    <div class="card t-teal" style="padding:40px 48px;gap:24px">
+      <span class="n">Так сказано в&nbsp;карточке стандарта</span>
+      <p style="font-size:42px;line-height:1.3">В настоящем стандарте приведено описание <mark>планирования, выполнения, документирования и&nbsp;поддержки</mark> применения метода анализа видов и&nbsp;последствий отказов (FMEA), включая анализ видов, последствий и&nbsp;критичности отказов (FMECA)</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="175" data-steps="175,178">
+  <p class="kick">В автомобильной отрасли</p>
+  <h2>Руководство AIAG &amp; VDA FMEA Handbook</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 80px 1.15fr;gap:22px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="card row t-gray st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-book-open"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">AIAG</h3><p style="font-size:30px">Американская ассоциация</p></div></div>
+        <div class="card row t-gray st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-book-open"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:36px">VDA</h3><p style="font-size:30px">Немецкая ассоциация</p></div></div>
+      </div>
+      <svg class="i" style="font-size:64px;color:var(--muted);justify-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card t-teal st" data-s="1" style="padding:34px 38px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-book-marked"/></svg></span><h3 style="font-size:40px">AIAG &amp; VDA FMEA Handbook</h3><p style="font-size:30px">Первое издание – июнь 2019&nbsp;года</p></div>
+      <p class="st" data-s="2" style="grid-column:1/-1;display:flex;align-items:center;gap:18px;font-size:31px;font-weight:600;line-height:1.2;color:var(--ink)"><svg class="i" style="font-size:42px;color:var(--teal)"><use href="#i-merge"/></svg>AIAG и VDA свели свои прежние руководства в&nbsp;одно</p>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>AIAG. Объявление о выходе руководства AIAG &amp; VDA FMEA Handbook, 03.06.2019</p>
+</section>
+
+<section class="slide" data-at="180">
+  <p class="kick">Что известно о руководстве</p>
+  <h2>Руководство платное, объявление открытое</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:40px">
+        <div class="doc t-gray" style="width:370px;height:290px;gap:13px"><h4 style="font-size:26px">AIAG &amp; VDA FMEA Handbook</h4><i></i><i class="s"></i><svg class="i" style="font-size:72px;color:var(--muted);align-self:center;margin:8px 0"><use href="#i-lock-keyhole"/></svg><i></i><i class="s"></i><b class="stamp">платное</b></div>
+        <p style="font-size:32px;text-align:center;line-height:1.25">Содержание руководства не&nbsp;пересказываем</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:40px">
+        <div class="doc t-teal" style="width:370px;height:290px;gap:13px"><h4 style="font-size:26px">Объявление AIAG о&nbsp;выходе руководства</h4><i></i><i class="t"></i><i class="s"></i><i></i><i class="t"></i><i class="s"></i><b class="stamp">открытое</b></div>
+        <p style="font-size:32px;text-align:center;line-height:1.25">Из объявления видно <b style="color:var(--teal)">две вещи</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="183">
+  <p class="kick">Объявление AIAG · факт 1</p>
+  <h2>Работа делится на семь шагов</h2>
+  <div class="body" style="gap:34px">
+    <ol class="flow sm">
+      <li class="step"><h3 style="font-size:28px">Планирование и&nbsp;подготовка</h3></li>
+      <li class="step"><h3 style="font-size:28px">Анализ структуры</h3></li>
+      <li class="step"><h3 style="font-size:28px">Анализ функций</h3></li>
+      <li class="step"><h3 style="font-size:28px">Анализ отказов</h3></li>
+    </ol>
+    <ol class="flow sm" style="counter-reset:f 4;width:843px;align-self:center">
+      <li class="step"><h3 style="font-size:28px">Анализ риска</h3></li>
+      <li class="step"><h3 style="font-size:28px">Оптимизация</h3></li>
+      <li class="step"><h3 style="font-size:28px">Документирование результатов</h3></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>AIAG. Объявление о выходе руководства AIAG &amp; VDA FMEA Handbook, 03.06.2019</p>
+</section>
+
+<section class="slide" data-at="192" data-steps="192,194">
+  <p class="kick">Объявление AIAG · факт 2</p>
+  <h2>Вместо ПЧР – приоритет действий</h2>
+  <div class="body">
+    <div class="vs sm st" data-s="1">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-calculator"/></svg>Приоритетное число риска</h3><p>ПЧР, по-английски RPN</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-table-2"/></svg>Приоритет действий</h3><p>Action Priority, AP: методика со&nbsp;своими таблицами</p></div>
+    </div>
+    <figure class="quote sm st" data-s="2">
+      <blockquote>Ассоциация AIAG и ассоциация VDA выпустили руководство по FMEA, в котором <b>приоритет действий (AP) определяется сочетанием оценок значимости, возникновения и&nbsp;обнаружения</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Fabis-Domagala J., Domagala M.</b>научная статья, 2022</span></figcaption>
+    </figure>
+  </div>
+  <p class="src st" data-s="2"><svg class="i"><use href="#i-info"/></svg>Fabis-Domagala J., Domagala M. Energies, 2022 · doi.org/10.3390/en15176180</p>
+</section>
+
+<section class="slide" data-at="198">
+  <p class="kick">О содержании руководства</p>
+  <h2>Сверх двух фактов – только по самому руководству</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal" style="padding:32px 30px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-list-ordered"/></svg></span><span class="n">Факт 1</span><h3 style="font-size:34px">Семь шагов работы</h3></div>
+      <div class="card t-teal" style="padding:32px 30px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-table-2"/></svg></span><span class="n">Факт 2</span><h3 style="font-size:34px">Приоритет действий вместо&nbsp;ПЧР</h3></div>
+      <div class="card t-gray" style="padding:32px 30px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-lock-keyhole"/></svg></span><span class="n">Остальное</span><h3 style="font-size:34px">Только по&nbsp;самому руководству</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="200" data-title="Документ и шкалы – по правилам вашей организации">
+  <p class="kick t-orange">Что из этого следует для вас</p>
+  <div class="body">
+    <p class="say md">Какой документ и&nbsp;какие шкалы применяются у&nbsp;вас, определяют <em>правила вашей&nbsp;организации</em></p>
+    <p class="sub">В учебном примере – учебная шкала</p>
+  </div>
+</section>

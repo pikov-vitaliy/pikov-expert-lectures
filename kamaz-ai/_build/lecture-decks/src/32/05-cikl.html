@@ -1,0 +1,305 @@
+<!-- Лекция 3.2, строки 449–547 (21:49–25:45): схема цикла анализа отказов – полосы, путь черновика, оценки и меры, пересмотр, цвета; соблазн самопроверки (Yu и соавт.), вторая модель и полный пакет для нового чата, вторая ловушка (Klingbeil и соавт.), оценки S, O, D стираем и ставим заново -->
+
+<section class="slide" data-at="450">
+  <p class="kick">Всё это собрано на одной схеме</p>
+  <h2 style="font-size:40px">Цикл DFMEA: что предлагает модель и&nbsp;что решает инженер</h2>
+  <div class="body">
+    <div style="position:relative;width:974px;height:490px;margin:0 auto;flex:none">
+      <svg viewBox="270 455 3150 1585" width="974" height="490" style="display:block" role="img" aria-label="Схема цикла анализа отказов: полосы инженера, модели и проверки">
+        <foreignObject x="0" y="0" width="3664" height="2728"><img src="@day/08-Схемы/d3-cikl-dfmea.png" width="3664" height="2728" alt="" style="display:block"></foreignObject>
+      </svg>
+      <span class="tag t-orange" style="position:absolute;left:44px;top:50px;font-size:26px;padding:5px 18px">Инженер</span>
+      <span class="tag t-teal" style="position:absolute;left:44px;top:203px;font-size:26px;padding:5px 18px">Модель</span>
+      <span class="tag t-red" style="position:absolute;left:44px;top:357px;font-size:26px;padding:5px 18px">Проверка</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="456">
+  <p class="kick">Схема · начало цикла</p>
+  <h2>Начинается всё у инженера</h2>
+  <div class="body">
+    <div style="position:relative;height:420px;flex:none">
+      <div style="position:absolute;left:0;right:0;top:0;height:190px;background:var(--surface);border-radius:22px"></div>
+      <div style="position:absolute;left:0;right:0;top:230px;height:190px;background:var(--surface);border-radius:22px"></div>
+      <span style="position:absolute;left:28px;top:16px;font-size:21px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--orange)">Инженер</span>
+      <span style="position:absolute;left:28px;top:246px;font-size:21px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)">Модель</span>
+      <svg width="1135" height="420" viewBox="0 0 1135 420" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M500 112H760V266" fill="none" stroke="var(--teal)" stroke-width="5" stroke-linejoin="round"/>
+        <path d="M745 264L760 290L775 264Z" fill="var(--teal)"/>
+      </svg>
+      <div class="t-gray" style="position:absolute;left:28px;top:54px;width:472px;height:116px;background:var(--bg);border:3px solid var(--c);border-radius:18px;padding:12px 26px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <h3 style="font-size:36px;line-height:1.1">Функция и условия</h3>
+        <p style="font-size:27px;color:var(--muted)">одна функция на&nbsp;запрос</p>
+      </div>
+      <span class="tag t-teal" style="position:absolute;left:580px;top:58px;font-size:24px">запрос</span>
+      <div class="t-teal" style="position:absolute;left:520px;top:290px;width:590px;height:116px;background:var(--bg);border:3px solid var(--c);border-radius:18px;padding:12px 26px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <h3 style="font-size:34px;line-height:1.1;color:var(--ci)">Отказы, последствия, причины</h3>
+        <p style="font-size:27px;color:var(--muted)">черновик таблицы</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="461" data-title="Схема: сверка с узлом, затем к оценкам">
+  <p class="kick t-red">Схема · нижняя полоса&nbsp;– проверка</p>
+  <div class="body">
+    <svg viewBox="270 455 3150 1585" width="876" height="441" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема цикла: черновик идёт на сверку с узлом, затем к оценкам">
+      <foreignObject x="0" y="0" width="3664" height="2728"><img src="@day/08-Схемы/d3-cikl-dfmea.png" width="3664" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M270 455H3420V2040H270Z M716 1264H1491V1495H716Z M1491 1270H1866V1368H1491Z M1491 1368H1600V1396H1491Z M1568 1396H1600V1760H1568Z M1664 900H1696V1270H1664Z M1664 1368H1696V1760H1664Z M1664 860H1868V900H1664Z M1868 768H2259V999H1868Z M1316 1760H1851V1991H1316Z"/>
+      <rect x="1304" y="1748" width="559" height="255" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="1856" y="756" width="415" height="255" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:29px">Черновик идёт вниз, на&nbsp;<b>сверку с&nbsp;узлом</b>: ищут лишнее, повторы и&nbsp;пропуски. После ручных исправлений таблица поднимается наверх, <b>к&nbsp;оценкам</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="465">
+  <p class="kick t-orange">Схема · снова наверху</p>
+  <h2>Оценки, приоритет, меры и&nbsp;сроки</h2>
+  <div class="body">
+    <ol class="flow nonum" style="grid-template-columns:1.3fr 1fr 1fr">
+      <li class="step t-orange" style="padding:30px 30px 34px;gap:14px">
+        <div style="display:flex;gap:12px">
+          <b style="width:70px;height:70px;border-radius:16px;background:var(--ct);color:var(--c);font-size:44px;display:flex;align-items:center;justify-content:center">S</b>
+          <b style="width:70px;height:70px;border-radius:16px;background:var(--ct);color:var(--c);font-size:44px;display:flex;align-items:center;justify-content:center">O</b>
+          <b style="width:70px;height:70px;border-radius:16px;background:var(--ct);color:var(--c);font-size:44px;display:flex;align-items:center;justify-content:center">D</b>
+        </div>
+        <h3 style="font-size:34px">Оценивает команда</h3>
+        <p style="font-size:27px;color:var(--ink)">Значимость, возникновение и&nbsp;обнаружение</p>
+      </li>
+      <li class="step t-orange" style="padding:30px 30px 34px;gap:14px"><span class="bdg lg" style="width:70px;height:70px;font-size:36px"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3 style="font-size:34px">Приоритет</h3><p style="font-size:27px;color:var(--ink)">Определяют по&nbsp;этим&nbsp;оценкам</p></li>
+      <li class="step t-orange" style="padding:30px 30px 34px;gap:14px"><span class="bdg lg" style="width:70px;height:70px;font-size:36px"><svg class="i"><use href="#i-calendar-check"/></svg></span><h3 style="font-size:34px">Меры и&nbsp;сроки</h3><p style="font-size:27px;color:var(--ink)">По значимым отказам</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="468">
+  <p class="kick">Схема · варианты мер</p>
+  <h2>Варианты мер можно спросить у&nbsp;модели</h2>
+  <div class="body">
+    <div style="position:relative;height:420px;flex:none">
+      <div style="position:absolute;left:0;right:0;top:0;height:190px;background:var(--surface);border-radius:22px"></div>
+      <div style="position:absolute;left:0;right:0;top:230px;height:190px;background:var(--surface);border-radius:22px"></div>
+      <span style="position:absolute;left:28px;top:16px;font-size:21px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--orange)">Инженер</span>
+      <span style="position:absolute;left:28px;top:246px;font-size:21px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)">Модель</span>
+      <svg width="1135" height="420" viewBox="0 0 1135 420" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M400 170V266" fill="none" stroke="var(--muted)" stroke-width="5"/>
+        <path d="M385 264L400 290L415 264Z" fill="var(--muted)"/>
+      </svg>
+      <div class="t-gray" style="position:absolute;left:170px;top:54px;width:460px;height:116px;background:var(--bg);border:3px solid var(--c);border-radius:18px;padding:12px 26px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <h3 style="font-size:36px;line-height:1.1">Меры и сроки</h3>
+        <p style="font-size:27px;color:var(--muted)">по значимым отказам</p>
+      </div>
+      <span class="tag t-gray" style="position:absolute;left:422px;top:189px;font-size:24px">спросить варианты</span>
+      <div class="t-teal" style="position:absolute;left:170px;top:290px;width:460px;height:116px;background:var(--bg);border:3px solid var(--c);border-radius:18px;padding:12px 26px;display:flex;flex-direction:column;justify-content:center;gap:6px">
+        <h3 style="font-size:36px;line-height:1.1;color:var(--ci)">Варианты мер</h3>
+        <p style="font-size:27px;color:var(--muted)">предупреждение и&nbsp;обнаружение</p>
+      </div>
+      <div class="rule t-orange" style="position:absolute;left:670px;right:28px;top:44px;padding:20px 26px;gap:20px"><svg class="i" style="font-size:48px"><use href="#i-user-check"/></svg><div><p style="font-size:30px">Решение о&nbsp;мерах остаётся наверху</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="472" data-title="Схема: пересмотр и возврат к началу">
+  <p class="kick">Схема · цикл не заканчивается</p>
+  <div class="body">
+    <svg viewBox="270 455 3150 1585" width="876" height="441" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема цикла: после испытаний пересмотр, с новой редакцией возврат к функции и условиям">
+      <foreignObject x="0" y="0" width="3664" height="2728"><img src="@day/08-Схемы/d3-cikl-dfmea.png" width="3664" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M270 455H3420V2040H270Z M324 768H859V999H324Z M324 999H378V1985H324Z M324 1985H1890V2030H324Z M930 1925H1295V1985H930Z M1862 1862H1890V1985H1862Z M1890 1862H2385V1906H1890Z M2385 1760H2968V1991H2385Z M2968 598H3034V1991H2968Z M2640 465H3034V598H2640Z M2650 598H2710V768H2650Z M2481 768H2872V999H2481Z"/>
+      <rect x="2381" y="1756" width="591" height="239" rx="36" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="384" y="764" width="479" height="239" rx="36" fill="none" stroke="var(--ink)" stroke-width="10"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:29px">После доработки и&nbsp;испытаний таблицу <b>пересматривают</b>. С&nbsp;новой редакцией всё возвращается к&nbsp;началу&nbsp;– <b>к&nbsp;функции и&nbsp;условиям</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="476" data-title="Схема: цвета">
+  <p class="kick">Схема · посмотрите на цвета</p>
+  <div class="body">
+    <svg viewBox="270 455 3150 1770" width="847" height="476" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема цикла: черновики модели и решения инженера, легенда">
+      <foreignObject x="0" y="0" width="3664" height="2728"><img src="@day/08-Схемы/d3-cikl-dfmea.png" width="3664" height="2728" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M270 455H3420V2225H270Z M716 1264H1491V1495H716Z M2377 1264H2976V1495H2377Z M1868 768H2259V999H1868Z M2481 768H2872V999H2481Z M279 2075H495V2136H279Z M276 2156H670V2215H276Z M776 2156H1152V2215H776Z"/>
+      <rect x="706" y="1254" width="795" height="251" rx="36" fill="none" stroke="var(--ink)" stroke-width="8"/>
+      <rect x="2367" y="1254" width="619" height="251" rx="36" fill="none" stroke="var(--ink)" stroke-width="8"/>
+      <rect x="1858" y="758" width="411" height="251" rx="36" fill="none" stroke="var(--ink)" stroke-width="8"/>
+      <rect x="2471" y="758" width="411" height="251" rx="36" fill="none" stroke="var(--ink)" stroke-width="8"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Зелёным&nbsp;– <b>черновик модели</b>, голубым&nbsp;– <b>решения инженера</b></p>
+  </div>
+</section>
+
+<section class="slide dark" data-at="479" data-title="Ни одного решения модель не принимает">
+  <p class="kick">Модель на схеме появляется дважды&nbsp;– и оба раза с черновиком</p>
+  <div class="body" style="gap:46px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+      <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:26px 28px;display:flex;align-items:center;gap:20px;border-left:10px solid var(--c)">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-bot"/></svg>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><b style="font-size:29px;line-height:1.12;color:var(--ci)">Отказы, последствия, причины</b><span class="tag t-teal" style="font-size:22px">черновик</span></div>
+      </div>
+      <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:26px 28px;display:flex;align-items:center;gap:20px;border-left:10px solid var(--c)">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-bot"/></svg>
+        <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><b style="font-size:29px;line-height:1.12;color:var(--ci)">Варианты мер</b><span class="tag t-teal" style="font-size:22px">черновик</span></div>
+      </div>
+    </div>
+    <p class="say md">Ни одного решения на&nbsp;этой схеме модель <em>не&nbsp;принимает</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="495">
+  <p class="kick t-red">Соблазн, который возникает почти у&nbsp;каждого</p>
+  <h2>Попросить модель проверить собственную таблицу</h2>
+  <div class="body" style="gap:34px">
+    <div class="rule t-teal" style="padding:42px 48px;gap:36px"><svg class="i" style="font-size:76px"><use href="#i-scan-eye"/></svg><div><p style="font-size:48px;font-weight:700;line-height:1.12">Полезно как дополнительный взгляд</p></div></div>
+    <div class="rule t-red" style="padding:42px 48px;gap:36px"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg><div><p style="font-size:48px;font-weight:700;line-height:1.12">Но&nbsp;не как проверка</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="499">
+  <p class="kick">Исследование 2024 года</p>
+  <h2>Модель проверяла собственный программный код</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:40px">
+      <div class="svc-hd t-teal" style="justify-content:center">
+        <i class="logo"><svg class="i"><use href="#i-file-code"/></svg></i>
+        <h3 style="font-size:40px">Yu, Liu, Hu и&nbsp;соавт.</h3>
+        <p>IEEE Transactions on Software Engineering, 2024</p>
+      </div>
+      <div style="justify-content:center;gap:12px">
+        <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-code-xml"/></svg></span><h3 style="font-size:31px">ChatGPT пишет и&nbsp;исправляет&nbsp;код</h3></div>
+        <svg class="i" style="font-size:46px;color:var(--muted);align-self:center"><use href="#i-arrow-down"/></svg>
+        <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:31px">Затем сам проверяет свой&nbsp;результат</h3></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Yu X. et al. IEEE Transactions on Software Engineering, 2024 · doi.org/10.1109/tse.2024.3492204</p>
+</section>
+
+<section class="slide" data-at="502" data-title="Yu и соавт.: что показала самопроверка">
+  <p class="kick">Результат · как его описывают авторы</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>При самопроверке ChatGPT часто ошибочно признаёт свой <b>неверный код правильным</b>, <b>уязвимый код&nbsp;– безопасным</b>, а&nbsp;<b>неудачные исправления&nbsp;– успешными</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Yu X. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Yu X. et al. IEEE Transactions on Software Engineering, 2024 · doi.org/10.1109/tse.2024.3492204</p>
+</section>
+
+<section class="slide dark" data-at="505">
+  <p class="kick t-orange">Вывод из исследования</p>
+  <h2 style="font-size:64px">Самопроверка модели не&nbsp;работает</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-red"><svg class="i big-ic"><use href="#i-shield-x"/></svg></div>
+      <p class="say sm">Модель плохо ловит <em>собственные ошибки</em></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="508">
+  <p class="kick t-orange">Вывод для таблицы анализа отказов</p>
+  <h2><svg class="i" style="color:var(--orange);margin-right:16px"><use href="#i-user-check"/></svg>Проверяет её человек</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:420px 1fr;align-items:stretch;gap:40px">
+      <div class="card t-teal" style="justify-content:center;gap:16px;padding:32px 32px"><span class="bdg lg"><svg class="i"><use href="#i-messages-square"/></svg></span><h3 style="font-size:34px">Вторая модель или та&nbsp;же в&nbsp;новом чате</h3><p style="font-size:27px">может дать дополнительные&nbsp;замечания</p></div>
+      <div class="chat" style="justify-content:center"><div class="msg user" style="max-width:100%;font-size:36px;padding:26px 32px"><span class="who" style="font-size:21px">Например, по запросу</span><p>Найди в&nbsp;таблице строки, которые не&nbsp;относятся к&nbsp;узлу, и&nbsp;пропущенные&nbsp;причины</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="514" data-steps="514,519">
+  <p class="kick">Если у вас доступно несколько сервисов</p>
+  <h2>Черновик и&nbsp;замечания&nbsp;– от&nbsp;разных моделей</h2>
+  <div class="body" style="gap:22px">
+    <ol class="flow nonum">
+      <li class="step t-teal st" data-s="1" style="padding:22px 24px 24px;gap:8px"><h3 style="display:flex;gap:12px;align-items:center;font-size:31px;color:var(--c)"><svg class="i"><use href="#i-bot"/></svg>Одна модель</h3><p style="font-size:26px;color:var(--ink)">составляет черновик</p></li>
+      <li class="step t-teal st" data-s="1" style="padding:22px 24px 24px;gap:8px"><h3 style="display:flex;gap:12px;align-items:center;font-size:31px;color:var(--c)"><svg class="i"><use href="#i-bot-message-square"/></svg>Другая модель</h3><p style="font-size:26px;color:var(--ink)">ищет в&nbsp;нём лишние строки и&nbsp;пропуски</p></li>
+      <li class="step t-orange st" data-s="2" style="padding:22px 24px 24px;gap:8px"><h3 style="display:flex;gap:12px;align-items:center;font-size:31px;color:var(--c)"><svg class="i"><use href="#i-user-check"/></svg>Инженер</h3><p style="font-size:26px;color:var(--ink)">сверяет каждое замечание с&nbsp;кейсом, расчётами и&nbsp;документами</p><span class="tag t-orange" style="align-self:flex-start;font-size:22px">решение за&nbsp;ним</span></li>
+    </ol>
+    <div class="rule sm t-gray st" data-s="1" style="padding:20px 30px"><svg class="i" style="font-size:48px"><use href="#i-git-compare-arrows"/></svg><div><p>Модели разных разработчиков ошибаются по-разному: вторая иногда замечает то, что пропустила первая</p></div></div>
+    <div class="rule sm t-red st" data-s="2" style="padding:20px 30px"><svg class="i" style="font-size:48px"><use href="#i-triangle-alert"/></svg><div><p><b>Но это подсказки, а&nbsp;не&nbsp;независимая проверка</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="522" data-steps="522,526">
+  <p class="kick">Одна практическая деталь</p>
+  <h2>Новый чат не видит прежнего обсуждения</h2>
+  <div class="body">
+    <p class="note" style="font-size:31px;color:var(--ink)">Поэтому в&nbsp;него вставляют полный пакет:</p>
+    <div class="docs" style="flex-wrap:nowrap;gap:24px;padding-bottom:6px">
+      <div class="doc st" data-s="1" style="width:166px;height:172px"><h4>Определение функции</h4><i></i><i class="s"></i><i></i></div>
+      <div class="doc st" data-s="1" style="width:166px;height:172px"><h4>Границы анализа</h4><i></i><i></i><i class="s"></i></div>
+      <div class="doc st" data-s="1" style="width:166px;height:172px"><h4>Пункты технического задания</h4><i class="s"></i><i></i></div>
+      <div class="doc st" data-s="2" style="width:166px;height:172px"><h4>Замечания</h4><i></i><i class="s"></i><i></i><i class="s"></i></div>
+      <div class="doc st" data-s="2" style="width:166px;height:172px"><h4>Таблицы</h4><i></i><i class="t"></i><i></i><i class="s"></i></div>
+      <div class="doc st" data-s="2" style="width:166px;height:172px;border-color:var(--orange)"><h4>Проверяемая таблица</h4><i class="hl"></i><i></i><i class="hl"></i></div>
+    </div>
+    <div class="rule sm t-red st" data-s="2"><svg class="i"><use href="#i-eye-off"/></svg><div><p>Иначе вторая модель будет судить о&nbsp;вашем узле <b>вслепую</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="529">
+  <p class="kick t-red">Вторая ловушка&nbsp;– не в модели, а в нас</p>
+  <h2>Почему так легко согласиться с&nbsp;моделью</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 390px;gap:40px;align-items:center">
+      <div style="gap:12px">
+        <p class="note" style="font-size:24px">Учебный черновик DFMEA «от модели», фрагмент</p>
+        <table class="tbl sm" style="font-size:25px">
+          <thead><tr><th style="width:8%">№</th><th>Вид отказа</th><th style="width:9%">S</th><th style="width:9%">O</th><th style="width:9%">D</th><th style="width:14%">ПЧР</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Двигатель не&nbsp;запускается после стоянки</td><td>8</td><td>6</td><td>5</td><td>240</td></tr>
+            <tr><td>2</td><td>Двигатель не&nbsp;запускается</td><td>8</td><td>6</td><td>5</td><td>240</td></tr>
+            <tr><td>9</td><td>Повышенное сопротивление в&nbsp;цепи пуска</td><td>8</td><td>5</td><td>5</td><td>200</td></tr>
+          </tbody>
+        </table>
+        <p class="note" style="font-size:24px;color:var(--ink)"><b>Вывод модели:</b> наиболее критичны строки 1 и&nbsp;2 (ПЧР&nbsp;240) и&nbsp;строка&nbsp;9&nbsp;(ПЧР&nbsp;200)</p>
+      </div>
+      <div style="gap:18px">
+        <p style="font-size:31px;font-weight:700;line-height:1.15">Таблица модели выглядит&nbsp;законченной</p>
+        <ul class="list check" style="font-size:32px">
+          <li>Пустых ячеек нет</li>
+          <li>Оценки расставлены</li>
+          <li>Вывод сформулирован</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="536">
+  <p class="kick t-orange">Эксперимент 2024 года · Klingbeil и соавт.</p>
+  <h2>Людям было достаточно знать, откуда совет</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="padding:30px 34px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:34px">Люди узнают, что совет дал искусственный&nbsp;интеллект</h3></li>
+      <li class="step t-red" style="padding:30px 34px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-user-round"/></svg></span><h3 style="font-size:34px">И следуют совету</h3><p style="font-size:30px;color:var(--ink)">вопреки собственной оценке и&nbsp;имеющимся сведениям</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Klingbeil A., Grützner C., Schreck P. Computers in Human Behavior, 2024 · doi.org/10.1016/j.chb.2024.108352</p>
+</section>
+
+<section class="slide" data-at="543">
+  <p class="kick t-orange">Порядок работы с черновиком модели</p>
+  <h2>S, O, D сначала стираем, потом ставим заново</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 360px;gap:40px;align-items:center">
+      <div style="gap:12px">
+        <p class="note" style="font-size:24px">Учебный черновик DFMEA «от модели», фрагмент</p>
+        <table class="tbl sm" style="font-size:25px">
+          <thead><tr><th style="width:8%">№</th><th>Вид отказа</th><th style="width:12%">S</th><th style="width:12%">O</th><th style="width:12%">D</th><th style="width:10%;opacity:.45">ПЧР</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Двигатель не&nbsp;запускается после стоянки</td><td><s style="color:var(--muted)">8</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">6</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">5</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td style="opacity:.35">240</td></tr>
+            <tr><td>2</td><td>Двигатель не&nbsp;запускается</td><td><s style="color:var(--muted)">8</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">6</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">5</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td style="opacity:.35">240</td></tr>
+            <tr><td>9</td><td>Повышенное сопротивление в&nbsp;цепи&nbsp;пуска</td><td><s style="color:var(--muted)">8</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">5</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td><s style="color:var(--muted)">5</s> <span style="display:inline-block;width:30px;height:30px;border:2.5px dashed var(--orange);border-radius:7px;vertical-align:-6px"></span></td><td style="opacity:.35">200</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="gap:22px">
+        <div class="rule sm t-red"><svg class="i"><use href="#i-eraser"/></svg><div><p><b>Стираем все до&nbsp;одной</b></p></div></div>
+        <div class="rule sm t-orange"><svg class="i"><use href="#i-pencil-line"/></svg><div><p><b>Ставим свои, с&nbsp;основанием</b></p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
