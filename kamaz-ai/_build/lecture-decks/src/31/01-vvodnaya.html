@@ -1,0 +1,151 @@
+<!-- Лекция 3.1, строки 4–115 (00:00–03:45): начало лекции, модель хорошо придумывает варианты и плохо отвечает за выбор, план лекции, сквозная задача дня К-1 -->
+
+<section class="slide sect" data-at="5" data-title="День 3. Модуль 3">
+  <p class="kick">День 3 · модуль 3</p>
+  <span class="no">3</span>
+  <h1>Поиск технических решений и потенциальных отказов</h1>
+  <p class="lead">Первая тема дня – поиск и сравнение технических решений</p>
+</section>
+
+<section class="slide cover" data-at="10">
+  <p class="kick">Модуль 3 · тема 3.1</p>
+  <h1>Поиск и сравнение<br>технических решений</h1>
+  <p class="lead">Языковая модель хорошо придумывает варианты и плохо отвечает за выбор</p>
+  <p class="meta">День 3 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-steps="47,49">
+  <p class="kick">Конструкторская задача · варианты от модели</p>
+  <h2>Десять способов решить задачу за&nbsp;минуту</h2>
+  <div class="body">
+    <div class="cards c3 st" data-s="1">
+      <div class="card t-teal" style="padding:30px 28px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-circle-check"/></svg></span><h3 style="font-size:38px">Дельные</h3></div>
+      <div class="card t-gray" style="padding:30px 28px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-copy"/></svg></span><h3 style="font-size:38px">Банальные</h3></div>
+      <div class="card t-red" style="padding:30px 28px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-ban"/></svg></span><h3 style="font-size:38px">Физически невозможные</h3></div>
+    </div>
+    <div class="rule t-red st" data-s="2"><svg class="i"><use href="#i-file-question"/></svg><div><p>Ссылки на стандарты и патенты выглядят одинаково убедительно – и&nbsp;настоящие, и&nbsp;выдуманные</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="51" data-title="Варианты – у модели, выбор решения – за инженером">
+  <p class="kick t-orange">Сегодня разберём</p>
+  <div class="body">
+    <p class="say">Как брать у модели <b>варианты</b> и&nbsp;оставить <em>выбор решения</em> за&nbsp;инженером</p>
+  </div>
+</section>
+
+<section class="slide" data-steps="61,64">
+  <p class="kick">План лекции</p>
+  <h2>Что разберём</h2>
+  <div class="body">
+    <ol class="list num">
+      <li class="st" data-s="1">Сквозная задача дня</li>
+      <li class="st" data-s="1">Модель как помощник в поиске идей и где она ошибается</li>
+      <li class="st" data-s="2">Матрица выбора: как сравнивать варианты и кто ставит оценки</li>
+      <li class="st t-orange" data-s="2">Проверка источников<small>Пожалуй, самая практичная часть: модель умеет выдумывать стандарты, патенты и&nbsp;статьи, похожие на&nbsp;настоящие</small></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-steps="71,74">
+  <p class="kick t-orange">Сквозная задача дня</p>
+  <h2>Задача К-1</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center st" data-s="1">
+        <div class="doc t-orange" style="width:320px"><h4 style="font-size:24px">Дополнение к&nbsp;учебному кейсу ЭС-24</h4><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp">документ 3.1</b></div>
+      </div>
+      <div class="st" data-s="2">
+        <p class="say sm">Как не допустить глубокого разряда батарей ЭС-24 на&nbsp;стоянке до&nbsp;<em>14&nbsp;суток</em> при&nbsp;<em>−25&nbsp;°C</em>?</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="76,81">
+  <p class="kick">Откуда задача · испытания опытного образца</p>
+  <h2>Выросла из замечаний З-1 и З-2</h2>
+  <div class="body">
+    <div class="rule t-red st" data-s="1"><svg class="i"><use href="#i-thermometer-snowflake"/></svg><div><h3>З-1</h3><p>После 9&nbsp;суток стоянки при −18…−22&nbsp;°C двигатель запустился только со&nbsp;второй попытки</p></div></div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note"><b style="color:var(--ink)">З-2</b> · ток покоя после выключения зажигания</p>
+      <div class="bars" style="--max:100;--lbw:330px">
+        <div class="bar t-red" style="--v:85"><span class="lb">Через 30 мин</span><i></i><b>85&nbsp;мА</b></div>
+        <div class="bar t-teal" style="--v:40"><span class="lb">Предел по п.&nbsp;4.3 ТЗ</span><i></i><b>40&nbsp;мА</b></div>
+        <div class="bar t-gray" style="--v:62"><span class="lb">Через 2 ч<small style="display:block;font-size:20px;color:var(--muted)">для этого замера требования в ТЗ нет</small></span><i></i><b>62&nbsp;мА</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-steps="85,88" data-title="Задача К-1 – о конструктивных мерах">
+  <p class="kick t-orange">Оговорка в документе</p>
+  <div class="body">
+    <p class="say sm st" data-s="1">Причина затруднённого пуска испытаниями <em>не&nbsp;установлена</em></p>
+    <div class="vs" style="grid-template-columns:2fr 3fr">
+      <div class="col t-gray st" data-s="1"><h3><svg class="i"><use href="#i-circle-x"/></svg>К-1 не утверждает</h3><p>что всё дело в токе покоя</p></div>
+      <div class="col t-orange st" data-s="2"><h3><svg class="i"><use href="#i-wrench"/></svg>К-1 – о другом</h3><p>Какие конструктивные меры не дадут батареям разрядиться на стоянке настолько, что пуск станет невозможен</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="92,96,99">
+  <p class="kick">Задача К-1 · документ 3.1</p>
+  <h2>Ограничения задачи</h2>
+  <div class="body">
+    <div class="cards c3 sm">
+      <div class="card row st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-plug-zap"/></svg></span><div><h3>Тахограф и охрана</h3><p>Должны получать питание всю стоянку</p></div></div>
+      <div class="card row st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-battery"/></svg></span><div><h3>Батареи</h3><p>Тип и номинальная ёмкость не меняются: 2&nbsp;×&nbsp;12&nbsp;В, 190&nbsp;А·ч, последовательно</p></div></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-zap"/></svg></span><div><h3>Генератор</h3><p>Не меняется</p></div></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-weight"/></svg></span><div><h3>Масса узла</h3><p>Растёт не больше чем на&nbsp;2&nbsp;кг</p></div></div>
+      <div class="card row st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-truck"/></svg></span><div><h3>Кабина и рама</h3><p>Не меняются</p></div></div>
+      <div class="card row st" data-s="3"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><div><h3>Пункты 4.1–4.6 ТЗ</h3><p>Остаются в силе</p></div></div>
+    </div>
+    <div class="rule sm t-gray st" data-s="3"><svg class="i"><use href="#i-files"/></svg><div><p>ТЗ в днях 3–5 – редакция 1 из кейса первого дня</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-steps="104,107">
+  <p class="kick">Задача К-1 · документ 3.1</p>
+  <h2>Две таблицы с исходными данными</h2>
+  <div class="body">
+    <div class="docs st" data-s="1" style="flex-wrap:nowrap;gap:64px;align-items:stretch">
+      <div class="doc" style="width:340px"><h4 style="font-size:25px">Ток покоя по&nbsp;потребителям</h4><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-teal">таблица Д-1</b></div>
+      <div class="doc" style="width:340px"><h4 style="font-size:25px">Энергобаланс стоянки</h4><i></i><i class="s"></i><i></i><i class="hl"></i><b class="stamp t-teal">таблица Д-2</b></div>
+    </div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note" style="color:var(--ink)">Допустимый расход заряда за 14&nbsp;суток стоянки – не более 19,0&nbsp;А·ч</p>
+      <div class="segbar"><i class="t-gray" style="flex:5.7">Саморазряд батарей 5,7&nbsp;А·ч</i><i class="t-teal solid" style="flex:13.3">Остаётся на&nbsp;все потребители стоянки – 13,3&nbsp;А·ч</i></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="110">
+  <p class="kick">Задача К-1 · документ 3.1</p>
+  <h2>Семь критериев сравнения</h2>
+  <div class="body">
+    <div class="picts" style="display:flex;flex-wrap:wrap;justify-content:center;gap:14px 24px">
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-weight"/></svg><span>Масса</span></div>
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-banknote"/></svg><span>Стоимость</span></div>
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-factory"/></svg><span>Технологичность</span></div>
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-shield-check"/></svg><span>Надёжность</span></div>
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-wrench"/></svg><span>Ремонтопригодность</span></div>
+      <div class="pict" style="width:262px"><svg class="i"><use href="#i-key-round"/></svg><span>Влияние на&nbsp;пуск</span></div>
+      <div class="pict" style="width:360px"><svg class="i"><use href="#i-plug"/></svg><span>Совместимость с&nbsp;потребителями стоянки</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="111" data-title="Всё это учебные условия">
+  <p class="kick">Учебный кейс ЭС-24</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-graduation-cap"/></svg></div>
+      <div>
+        <p class="say sm">Всё это <b>учебные условия</b></p>
+        <p class="sub">Узел условный, значения подобраны для&nbsp;упражнений</p>
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-send"/></svg><div><p>Поэтому кейс можно целиком отправлять в&nbsp;любой из&nbsp;сервисов курса</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>

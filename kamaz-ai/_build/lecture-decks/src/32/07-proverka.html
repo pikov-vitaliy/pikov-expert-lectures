@@ -1,0 +1,382 @@
+<!-- Лекция 3.2, строки 706–886 (34:18–42:39): как проверять таблицу – правило А. Цымлова «генератор + детерминированные проверки», проверки к задаче К-1 и матрице, семь инвариантов строки DFMEA, оракул для меры обнаружения и формула П. Гагарина; четвёртая часть – меры, четыре вопроса к мере, запрос мер двумя списками; одна разобранная строка для функции Ф-1 и учебные столбцы шаблона -->
+
+<section class="slide dark" data-at="707" data-title="А. Цымлов: генератор и проверки">
+  <p class="kick t-orange">Как проверять таблицу</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:66px;line-height:1.18">Вероятностный генератор<br>+ детерминированные проверки<br>= <b>надёжная система</b></blockquote>
+      <figcaption><i class="ava">АЦ</i><span><b>А. Цымлов</b>вебинар «Агенты пишут код, а&nbsp;кто его проверяет?», 28.08.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="712">
+  <p class="kick">Генератор и проверка</p>
+  <h2>Таблицу модели проверяют независимо от&nbsp;модели</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:32px 38px"><h3 style="font-size:38px"><svg class="i"><use href="#i-bot"/></svg>Модель</h3><p style="font-size:35px">Генератор вариантов</p></div>
+      <div class="col t-orange" style="padding:32px 38px"><h3 style="font-size:38px"><svg class="i"><use href="#i-list-checks"/></svg>Проверка</h3><p style="font-size:35px">По&nbsp;заранее составленному списку</p></div>
+    </div>
+    <div class="rule t-gray"><svg class="i"><use href="#i-repeat"/></svg><div><h3>Детерминированные проверки</h3><p>Работают одинаково при каждом запуске и&nbsp;не&nbsp;зависят от&nbsp;того, что решила модель</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="717" data-steps="719,721,722">
+  <p class="kick">Детерминированные проверки</p>
+  <h2>Чем проверяют то, что выдала модель</h2>
+  <div class="body" style="gap:24px">
+    <div class="picts c4 sm">
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b>Расчёт</b></div>
+      <div class="pict"><svg class="i"><use href="#i-sheet"/></svg><b>Таблица с&nbsp;формулами</b></div>
+      <div class="pict"><svg class="i"><use href="#i-book-open"/></svg><b>Справочник</b></div>
+      <div class="pict"><svg class="i"><use href="#i-flask-conical"/></svg><b>Испытание</b></div>
+    </div>
+    <table class="tbl" style="font-size:27px">
+      <thead><tr><th style="width:40%">Что генерирует модель</th><th>Чем проверяем</th></tr></thead>
+      <tbody>
+        <tr class="st"><td>Варианты решения задачи К-1</td><td>Расчёт энергобаланса по&nbsp;таблице Д-2 и&nbsp;список ограничений</td></tr>
+        <tr class="st"><td>Оценки в&nbsp;матрице выбора</td><td>Пересчёт итогов и&nbsp;проверка суммы весов</td></tr>
+        <tr class="st"><td>Ссылки</td><td>Адрес статьи, каталог стандартов, реестр патентов</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="723">
+  <p class="kick">Матрица выбора</p>
+  <h2>По сути, это проверка инвариантами</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal" style="padding:30px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-sigma"/></svg></span><h3 style="font-size:34px">Сумма весов равна&nbsp;1</h3></div>
+      <div class="card t-teal" style="padding:30px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-ruler"/></svg></span><h3 style="font-size:34px">Все оценки в&nbsp;пределах шкалы</h3><p style="font-size:29px">от&nbsp;1 до&nbsp;5</p></div>
+      <div class="card t-teal" style="padding:30px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:34px">Итог варианта – сумма произведений «вес&nbsp;×&nbsp;оценка»</h3></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-sheet"/></svg><div><p>Эти три проверки делаются <b>формулами в&nbsp;электронной таблице</b> за&nbsp;минуту</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="728" data-title="Инвариант">
+  <p class="kick">Для строк анализа отказов – свой список</p>
+  <div class="body">
+    <div class="split s64">
+      <div class="term"><dfn style="font-size:84px">Инвариант</dfn><p style="font-size:44px">Утверждение, которое должно выполняться для&nbsp;<b>каждой строки</b> таблицы</p></div>
+      <div class="center"><svg class="i big-ic" style="font-size:230px"><use href="#i-list-checks"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="730">
+  <p class="kick">Таблица DFMEA · семь инвариантов</p>
+  <h2>Что проверяем в&nbsp;каждой строке</h2>
+  <div class="body">
+    <ol class="list num" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,auto);grid-auto-flow:column;gap:16px 70px;font-size:30px;line-height:1.18">
+      <li class="st on">Причина – внутри границ анализа или помечена как граница</li>
+      <li class="st on">В&nbsp;строке одна причина</li>
+      <li class="st todo">Значимость S – по&nbsp;последствию, а&nbsp;не&nbsp;по&nbsp;причине</li>
+      <li class="st todo">Вид отказа – невыполнение именно анализируемой функции</li>
+      <li class="st todo">Нет компонентов и&nbsp;систем, которых в&nbsp;узле нет</li>
+      <li class="st todo">Физика не&nbsp;нарушена<small>каждый элемент работает в&nbsp;режиме, о&nbsp;котором идёт речь в&nbsp;функции</small></li>
+      <li class="st todo">Меры конкретны: какое испытание, с&nbsp;каким критерием</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="736">
+  <p class="kick">Инвариант 3 из 7</p>
+  <h2>Значимость определяется последствием, а&nbsp;не&nbsp;причиной</h2>
+  <div class="body">
+    <p class="sub" style="color:var(--ink)">У&nbsp;строк с&nbsp;одинаковым последствием значимость одинакова. Так описана и&nbsp;шкала:</p>
+    <table class="tbl" style="font-size:33px">
+      <thead><tr><th style="width:17%;padding:18px 26px">S</th><th style="padding:18px 26px">Последствие · учебная шкала</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:20px 26px">9–10</td><td style="padding:20px 26px"><mark>Угроза безопасности людей</mark></td></tr>
+        <tr><td style="padding:20px 26px">5–8</td><td style="padding:20px 26px">Автомобиль <mark>не&nbsp;выполняет задачу</mark>, нужен внешний источник или эвакуация</td></tr>
+        <tr><td style="padding:20px 26px">1–4</td><td style="padding:20px 26px"><mark>Неудобство</mark>, автомобиль выполняет задачу</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="742">
+  <p class="kick">Инвариант 4 из 7</p>
+  <h2>Вид отказа – невыполнение именно анализируемой функции, а&nbsp;не&nbsp;другой</h2>
+  <div class="body">
+    <p class="note" style="font-size:28px">Функции узла ЭС-24 · документ 3.4</p>
+    <div class="cards">
+      <div class="card t-orange" style="padding:32px 34px;gap:16px;box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><span class="n">Ф-1 · анализируемая функция</span><h3 style="font-size:36px">Обеспечить пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;температуре до&nbsp;−25&nbsp;°C</h3></div>
+      <div class="card t-gray" style="padding:32px 34px;gap:16px;opacity:.6"><span class="n">Ф-2 · другая функция узла</span><h3 style="font-size:36px">Распределить питание потребителям и&nbsp;защитить цепи</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="746" data-steps="746,751">
+  <p class="kick">Таблица DFMEA · семь инвариантов</p>
+  <h2>Что проверяем в&nbsp;каждой строке</h2>
+  <div class="body">
+    <ol class="list num" style="display:grid;grid-template-columns:1fr 1fr;grid-template-rows:repeat(4,auto);grid-auto-flow:column;gap:16px 70px;font-size:30px;line-height:1.18">
+      <li>Причина – внутри границ анализа или помечена как граница</li>
+      <li>В&nbsp;строке одна причина</li>
+      <li>Значимость S – по&nbsp;последствию, а&nbsp;не&nbsp;по&nbsp;причине</li>
+      <li>Вид отказа – невыполнение именно анализируемой функции</li>
+      <li class="st" data-s="1">Нет компонентов и&nbsp;систем, которых в&nbsp;узле нет</li>
+      <li class="st" data-s="1">Физика не&nbsp;нарушена<small>каждый элемент работает в&nbsp;режиме, о&nbsp;котором идёт речь в&nbsp;функции</small></li>
+      <li class="st" data-s="2">Меры конкретны: какое испытание, с&nbsp;каким критерием</li>
+    </ol>
+    <div class="rule xs t-gray st" data-s="2" style="padding:16px 30px"><svg class="i" style="font-size:44px"><use href="#i-sheet"/></svg><div><p>Проверять – вручную по&nbsp;списку или формулами в&nbsp;электронной таблице</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="756" data-steps="760" data-title="Оракул">
+  <p class="kick">Инвариант 7 подробнее · мера обнаружения</p>
+  <div class="body" style="gap:34px">
+    <div class="term"><dfn style="font-size:76px">Оракул</dfn><p style="font-size:40px">В&nbsp;программировании – то, что заранее говорит, какой результат правильный</p></div>
+    <p class="sub">Хороший тест для меры обнаружения похож на&nbsp;оракул</p>
+    <div class="ask t-orange st" style="grid-template-columns:150px 1fr;gap:40px">
+      <span class="q" style="width:150px;height:150px;font-size:105px">?</span>
+      <ul style="font-size:36px"><li>Можно&nbsp;ли заранее сказать, какой результат испытания будет означать «причина есть», а&nbsp;какой – «причины нет»?</li></ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="763" data-steps="763,767">
+  <p class="kick">Пример</p>
+  <h2>Есть&nbsp;ли у&nbsp;меры оракул</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" style="padding:34px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-circle-check"/></svg>Оракул есть</h3><p style="font-size:35px;line-height:1.25">«Ток покоя через 30&nbsp;мин после выключения зажигания не&nbsp;более 40&nbsp;мА по&nbsp;п.&nbsp;4.3»</p></div>
+      <div class="col t-red st" style="padding:34px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-circle-x"/></svg>Оракула нет</h3><p style="font-size:35px">«Провести испытания»</p><p class="muted" style="font-size:28px;line-height:1.25;margin-top:auto">Модель выдаст правдоподобный объём текста, и&nbsp;отличить хороший ответ от&nbsp;плохого будет нечем</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="772" data-title="Критерий задаёт инженер">
+  <p class="kick t-red">Отдельная ловушка</p>
+  <div class="body" style="gap:46px">
+    <ol class="flow nonum" style="grid-auto-flow:row;grid-template-columns:1.5fr 1fr 1fr">
+      <li class="step t-red"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Модель сама придумывает и&nbsp;решение, и&nbsp;критерий его проверки</h3></li>
+      <li class="step t-red"><span class="bdg"><svg class="i"><use href="#i-magnet"/></svg></span><h3>Критерий подгоняется под готовое решение</h3></li>
+      <li class="step t-red"><span class="bdg"><svg class="i"><use href="#i-ban"/></svg></span><h3>Проверка теряет смысл</h3></li>
+    </ol>
+    <p class="say md">Критерий задаёт <em>инженер</em>. До&nbsp;того, как увидел ответ</p>
+  </div>
+</section>
+
+<section class="slide" data-at="778" data-title="П. Гагарин: критерий успеха">
+  <p class="kick">Похожая формула</p>
+  <div class="body" style="gap:34px">
+    <figure class="quote">
+      <blockquote style="font-size:58px">Критерий успеха = <b>сценарий + результат</b></blockquote>
+      <figcaption><i class="ava">ПГ</i><span><b>П. Гагарин</b>вебинар «Разработка с&nbsp;агентами: от&nbsp;постановки задачи до&nbsp;деплоя», 28.07.2026</span></figcaption>
+    </figure>
+    <div class="cards">
+      <div class="card row t-gray" style="padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-route"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3>Сценарий</h3><p>что делаем</p></div></div>
+      <div class="card row t-gray" style="padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-target"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3>Результат</h3><p>что должно получиться и&nbsp;как&nbsp;это&nbsp;проверить</p></div></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p><b>Оракул</b> – та&nbsp;же мысль, только для&nbsp;одной меры обнаружения</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="783" data-title="Diwakaruni и Krishnamurthy: новые меры обнаружения">
+  <p class="kick">Автомобильное исследование · 2026</p>
+  <div class="body" style="gap:44px">
+    <div class="rule t-red"><svg class="i"><use href="#i-file-text"/></svg><div><h3>Diwakaruni и&nbsp;Krishnamurthy</h3><p style="font-size:38px">Надёжно придумывать новые меры обнаружения модели не&nbsp;умели</p></div></div>
+    <div class="split" style="grid-template-columns:220px 1fr;gap:40px">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:170px"><use href="#i-search-check"/></svg></div>
+      <p class="say sm">Поэтому меру обнаружения от&nbsp;модели проверяем на&nbsp;<em>оракул</em> особенно внимательно</p>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Diwakaruni S. S. K., Krishnamurthy A. SAE Technical Paper Series, 2026 · doi.org/10.4271/2026-01-0106</p>
+</section>
+
+<section class="slide sect" data-at="789">
+  <span class="no">4</span>
+  <p class="kick">Четвёртая часть</p>
+  <h1>Меры по&nbsp;наиболее значимым отказам</h1>
+  <p class="lead">После исправления таблицы и&nbsp;выставления оценок команда выбирает строки для&nbsp;работы и&nbsp;назначает меры</p>
+</section>
+
+<section class="slide" data-at="793">
+  <p class="kick">Модель снова полезна как генератор вариантов</p>
+  <h2>Но&nbsp;с&nbsp;той&nbsp;же оговоркой. Мера:</h2>
+  <div class="body">
+    <div class="picts c3 t-orange">
+      <div class="pict" style="font-size:40px;gap:22px"><svg class="i" style="width:200px;height:200px;font-size:112px;border-radius:44px"><use href="#i-target"/></svg><span>Конкретная</span></div>
+      <div class="pict" style="font-size:40px;gap:22px"><svg class="i" style="width:200px;height:200px;font-size:112px;border-radius:44px"><use href="#i-search-check"/></svg><span>Проверяемая</span></div>
+      <div class="pict" style="font-size:40px;gap:22px"><svg class="i" style="width:200px;height:200px;font-size:112px;border-radius:44px"><use href="#i-shield-check"/></svg><span>Не&nbsp;противоречит ограничениям узла</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="797" data-steps="799,801,804,806">
+  <p class="kick t-orange">Хорошая мера</p>
+  <h2>Отвечает на&nbsp;четыре вопроса</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange st" style="padding:30px 32px"><span class="bdg lg" style="font-weight:700;font-size:44px">1</span><h3 style="font-size:34px">Что меняется в&nbsp;конструкции или документации?</h3></div>
+      <div class="card row t-orange st" style="padding:30px 32px"><span class="bdg lg" style="font-weight:700;font-size:44px">2</span><h3 style="font-size:34px">Какую причину она предупреждает или какой вид отказа позволяет обнаружить?</h3></div>
+      <div class="card row t-orange st" style="padding:30px 32px"><span class="bdg lg" style="font-weight:700;font-size:44px">3</span><h3 style="font-size:34px">Как будет проверено, что мера сработала?</h3></div>
+      <div class="card row t-orange st" style="padding:30px 32px"><span class="bdg lg" style="font-weight:700;font-size:44px">4</span><h3 style="font-size:34px">Кто и&nbsp;когда это сделает?</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="811" data-steps="813,817,819">
+  <p class="kick">Как попросить меры у&nbsp;модели</p>
+  <h2>Меры просят двумя списками</h2>
+  <div class="body">
+    <div class="prompt" style="font-size:28px;gap:14px;padding:24px 28px">
+      <p class="part st t-teal" data-s="1" style="--tw:250px"><span class="tg">Текущие меры</span><span>Только те, что прямо следуют из&nbsp;моих данных (пункт ТЗ, замечание, таблица), со&nbsp;ссылкой на&nbsp;источник. Если в&nbsp;данных их нет, пиши «не&nbsp;установлено», не&nbsp;придумывай</span></p>
+      <p class="part st t-orange" data-s="2" style="--tw:250px"><span class="tg">Предлагаемые: предупреждение</span><span>Что изменить в&nbsp;конструкции или документации</span></p>
+      <p class="part st t-orange" data-s="3" style="--tw:250px"><span class="tg">Предлагаемые: обнаружение</span><span>Каким расчётом или испытанием причину выявят до&nbsp;выпуска конструкции</span></p>
+      <p class="part st t-red" data-s="3" style="--tw:250px"><span class="tg">Критерий</span><span>Мера обнаружения должна содержать критерий: какой результат означает «причина есть»</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="822" data-title="Таблица становится планом работы">
+  <p class="kick t-orange">Вопросы 3 и 4 к&nbsp;мере</p>
+  <div class="body" style="gap:42px">
+    <div class="cards">
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg" style="font-weight:700">3</span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:30px">Как будет проверено, что мера сработала?</h3><p style="font-size:27px">Снова оракул, только для&nbsp;меры</p></div></div>
+      <div class="card row t-orange" style="padding:24px 28px"><span class="bdg" style="font-weight:700">4</span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:30px">Кто и&nbsp;когда это сделает?</h3><p style="font-size:27px">Превращает таблицу в&nbsp;план</p></div></div>
+    </div>
+    <p class="say sm">Чтобы анализ отказов стал <em>планом работы</em>, укажите ответственных и&nbsp;сроки</p>
+  </div>
+</section>
+
+<section class="slide" data-at="839" data-steps="842,843">
+  <p class="kick">Разобранная строка · Ф-1</p>
+  <h2>Одна строка таблицы для&nbsp;функции Ф-1</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:30%;padding:18px 26px">Столбец</th><th style="padding:18px 26px">Содержание</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:20px 26px">Функция</td><td style="padding:20px 26px">Ф-1: пуск двигателя после стоянки до&nbsp;14&nbsp;суток при&nbsp;−25&nbsp;°C</td></tr>
+        <tr class="st"><td style="padding:20px 26px">Вид отказа</td><td style="padding:20px 26px">Двигатель не&nbsp;запускается после 14&nbsp;суток стоянки</td></tr>
+        <tr class="st"><td style="padding:20px 26px">Последствие</td><td style="padding:20px 26px">Нужен внешний источник пуска</td></tr>
+        <tr><td style="padding:20px 26px">S, O, D</td><td class="muted" style="padding:20px 26px">Не&nbsp;проставлены</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="844" data-steps="844,848">
+  <p class="kick">Разобранная строка · Ф-1 · Причина</p>
+  <h2>Ток покоя выше допустимого</h2>
+  <div class="body" style="gap:30px">
+    <div class="st" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note" style="font-size:29px;color:var(--ink)"><b>Через 30&nbsp;мин</b> после выключения зажигания</p>
+      <div class="bars" style="--max:90">
+        <div class="bar t-red" style="--v:85;grid-template-columns:390px 1fr 170px"><span class="lb">Замер, замечание З-2</span><i></i><b>85&nbsp;мА</b></div>
+        <div class="bar t-teal" style="--v:40;grid-template-columns:390px 1fr 170px"><span class="lb">Не&nbsp;более, п.&nbsp;4.3 редакции&nbsp;1</span><i></i><b>40&nbsp;мА</b></div>
+      </div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:14px">
+      <p class="note" style="font-size:29px;color:var(--ink)"><b>Через 2&nbsp;ч</b> – для оценки энергобаланса, отдельного требования ТЗ нет</p>
+      <div class="bars" style="--max:90">
+        <div class="bar t-red" style="--v:62;grid-template-columns:390px 1fr 170px"><span class="lb">Замер, замечание З-2</span><i></i><b>62&nbsp;мА</b></div>
+        <div class="bar t-teal" style="--v:39.6;grid-template-columns:390px 1fr 170px"><span class="lb">Допустимый средний ток, таблица Д-2</span><i></i><b>≈&nbsp;39,6&nbsp;мА</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="853" data-steps="857" data-title="Как написана причина">
+  <p class="kick">Разобранная строка · Ф-1 · Причина</p>
+  <div class="body" style="gap:22px">
+    <div class="card t-gray" style="padding:20px 28px;gap:6px"><span class="n">ПРИЧИНА · КАК ОНА ЗАПИСАНА</span><p style="font-size:27px;line-height:1.3">Ток покоя выше допустимого (<mark>З-2</mark>): 85&nbsp;мА через 30&nbsp;мин превышает 40&nbsp;мА по&nbsp;<mark>п.&nbsp;4.3 редакции&nbsp;1</mark>. Замер 62&nbsp;мА через 2&nbsp;ч используется для оценки энергобаланса: отдельного требования ТЗ для этого момента нет, но&nbsp;62&nbsp;мА больше допустимого среднего ≈&nbsp;39,6&nbsp;мА (<mark>таблица&nbsp;Д-2</mark>). Больше всего берёт головное устройство (<mark>таблица&nbsp;Д-1</mark>)</p></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <p class="note" style="font-size:25px">Таблица Д-1 · ток покоя через 30&nbsp;мин, мА</p>
+      <div class="segbar" style="height:80px;font-size:23px">
+        <i class="t-gray" style="flex:18">Тахограф 18</i>
+        <i class="t-gray" style="flex:12;line-height:1.05">Охранная система 12</i>
+        <i class="t-gray" style="flex:6">6</i>
+        <i class="t-orange solid" style="flex:46">Головное устройство 46</i>
+        <i class="t-gray" style="flex:3;padding:0">3</i>
+      </div>
+      <p class="note" style="font-size:22px">6 – блок управления двигателем, 3 – прочее: реле, утечки в&nbsp;жгуте · итого 85</p>
+    </div>
+    <div class="rule sm t-teal st" style="padding:18px 32px"><svg class="i" style="font-size:48px"><use href="#i-link-2"/></svg><div><h3>У&nbsp;каждого числа есть источник: замечание, пункт, таблица</h3><p>Это и&nbsp;просим от&nbsp;модели: на&nbsp;какие данные опирается причина</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="860">
+  <p class="kick">Разобранная строка · Ф-1 · Текущие меры предупреждения</p>
+  <h2>Расчёт энергобаланса стоянки</h2>
+  <div class="body" style="gap:26px">
+    <p class="note" style="font-size:27px">Таблица Д-2 · учебные условия</p>
+    <ol class="flow nonum" style="gap:40px">
+      <li class="step t-gray"><h3 style="font-size:36px">19,0&nbsp;А·ч</h3><p>допустимый расход за&nbsp;стоянку 14&nbsp;суток</p></li>
+      <li class="step t-gray"><h3 style="font-size:36px">−&nbsp;5,7&nbsp;А·ч</h3><p>саморазряд батарей</p></li>
+      <li class="step t-gray"><h3 style="font-size:36px">=&nbsp;13,3&nbsp;А·ч</h3><p>остаётся на&nbsp;потребители стоянки</p></li>
+      <li class="step t-teal" style="box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><h3 style="font-size:36px;color:var(--c)">≈&nbsp;39,6&nbsp;мА</h3><p>допустимый средний ток: 13,3&nbsp;А·ч на&nbsp;336&nbsp;ч</p></li>
+    </ol>
+    <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Расчёт есть, но&nbsp;конструкция его пока не&nbsp;выполняет</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="865">
+  <p class="kick">Разобранная строка · Ф-1 · Текущие меры обнаружения</p>
+  <h2>Замер тока покоя</h2>
+  <div class="body">
+    <div class="split" style="align-items:stretch;grid-template-columns:2fr 1fr">
+      <div class="card t-teal" style="justify-content:center;padding:26px 30px">
+        <dl class="kv" style="--kw:190px">
+          <div style="font-size:31px;padding:18px 10px"><dt>Что измеряют</dt><dd>Ток покоя через 30&nbsp;мин после выключения зажигания</dd></div>
+          <div style="font-size:31px;padding:18px 10px"><dt>Критерий</dt><dd>Не&nbsp;более 40&nbsp;мА по&nbsp;п.&nbsp;4.3 редакции&nbsp;1</dd></div>
+        </dl>
+      </div>
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;align-items:center;text-align:center;gap:18px"><svg class="i" style="font-size:130px;color:var(--c)"><use href="#i-circle-check"/></svg><span style="font-size:36px;font-weight:700">Оракул у&nbsp;этой меры&nbsp;есть</span></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="869" data-steps="869,872,873" data-title="Рекомендуемые действия и ответственный">
+  <p class="kick t-orange">Разобранная строка · Ф-1 · Рекомендуемые действия, ответственный, срок</p>
+  <div class="body">
+    <div class="svc t-orange" style="grid-template-columns:330px 1fr;gap:34px">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-power-off"/></svg></i>
+        <h3 style="font-size:40px">Реле отключения головного устройства</h3>
+        <div class="tags"><span class="tag">вариант из&nbsp;задачи К-1</span></div>
+      </div>
+      <dl class="kv" style="--kw:190px">
+        <div class="st" data-s="1" style="font-size:30px;padding:16px 15px"><dt>Мера</dt><dd>Реле, отключающее головное устройство после выключения&nbsp;зажигания</dd></div>
+        <div class="st" data-s="2" style="font-size:30px;padding:16px 15px"><dt>Проверка</dt><dd>После доработки – повторить замер с&nbsp;учётом собственного потребления&nbsp;реле</dd></div>
+        <div class="st" data-s="3" style="font-size:30px;padding:16px 15px"><dt>Ответственный</dt><dd>Конструктор электрооборудования, то&nbsp;есть&nbsp;роль</dd></div>
+        <div class="st" data-s="3" style="font-size:30px;padding:16px 15px"><dt>Срок</dt><dd>Назначает команда</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="875" data-title="Главное правило этой строки">
+  <p class="kick t-orange">Разобранная строка · главное правило</p>
+  <div class="body" style="gap:40px">
+    <p class="say sm">В&nbsp;текущие меры попадает только то, что <em>уже есть в&nbsp;документах</em></p>
+    <div class="vs">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-file-question"/></svg>Документы молчат</h3><ul><li>Пишут «не&nbsp;установлено»</li><li>Тогда оценка O или D&nbsp;– допущение</li></ul></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-lightbulb"/></svg>Предложение из&nbsp;задачи К-1</h3><ul><li>Стоит в&nbsp;рекомендуемых действиях, пока его не&nbsp;выполнили и&nbsp;не&nbsp;проверили</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="881">
+  <p class="kick">Учебный шаблон · конец строки</p>
+  <h2>В&nbsp;конце строки – ещё два столбца</h2>
+  <div class="body" style="gap:48px">
+    <table class="tbl" style="font-size:28px;table-layout:fixed">
+      <thead><tr>
+        <th style="padding:20px 22px">Рекомендуемые действия</th>
+        <th style="padding:20px 22px">Ответственный, срок</th>
+        <th style="padding:20px 22px;background:var(--orange);color:var(--chip-ink)">Кто предложил строку</th>
+        <th style="padding:20px 22px;background:var(--orange);color:var(--chip-ink)">Что исправлено вручную и&nbsp;почему</th>
+      </tr></thead>
+    </table>
+    <div class="split" style="grid-template-columns:250px 1fr;gap:40px">
+      <div class="center" style="flex-direction:row;justify-content:center;gap:22px"><span class="bdg lg t-teal"><svg class="i"><use href="#i-bot"/></svg></span><span class="bdg lg t-orange"><svg class="i"><use href="#i-user-check"/></svg></span></div>
+      <p class="say sm">Учебные столбцы: видно, где поработала <b>модель</b>, а&nbsp;где <em>инженер</em></p>
+    </div>
+  </div>
+</section>

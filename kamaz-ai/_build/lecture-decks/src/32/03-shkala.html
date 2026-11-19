@@ -1,0 +1,215 @@
+<!-- Лекция 3.2, строки 205–307 (09:44–14:50): учебная шкала и оценки S, O, D, правила к оценкам; почему от приоритетного числа риска отходят -->
+
+<section class="slide" data-at="206" data-steps="206,210">
+  <p class="kick">Документ 3.5 дополнения к кейсу</p>
+  <h2>Учебная шкала</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center st" data-s="1">
+        <div class="doc" style="width:430px;gap:18px;padding:26px 30px 40px">
+          <h4 style="font-size:27px">Шкала S, O, D</h4>
+          <div style="display:grid;grid-template-columns:78px repeat(3,1fr);gap:11px 10px;align-items:center;font-size:24px;font-weight:700;text-align:center">
+            <span></span>
+            <span style="background:var(--graphite);color:var(--on_graphite);border-radius:8px;padding:5px 0">S</span>
+            <span style="background:var(--graphite);color:var(--on_graphite);border-radius:8px;padding:5px 0">O</span>
+            <span style="background:var(--graphite);color:var(--on_graphite);border-radius:8px;padding:5px 0">D</span>
+            <span style="color:var(--red)">9–10</span><i style="height:26px;background:var(--red_t)"></i><i style="height:26px;background:var(--red_t)"></i><i style="height:26px;background:var(--red_t)"></i>
+            <span style="color:var(--orange)">5–8</span><i style="height:26px;background:var(--orange_t)"></i><i style="height:26px;background:var(--orange_t)"></i><i style="height:26px;background:var(--orange_t)"></i>
+            <span style="color:var(--muted)">1–4</span><i style="height:26px"></i><i style="height:26px"></i><i style="height:26px"></i>
+          </div>
+          <b class="stamp t-teal">учебная</b>
+        </div>
+      </div>
+      <div style="gap:26px">
+        <div class="rule sm t-gray st" data-s="1"><svg class="i"><use href="#i-git-compare-arrows"/></svg><div><p>Есть своя шкала в&nbsp;подразделении – сравните её с&nbsp;учебной</p></div></div>
+        <div class="rule sm t-teal st" data-s="2"><svg class="i"><use href="#i-graduation-cap"/></svg><div><p>Составлена для курса и&nbsp;не&nbsp;воспроизводит шкалы стандартов или отраслевых руководств</p></div></div>
+        <div class="rule sm t-orange st" data-s="2"><svg class="i"><use href="#i-building-2"/></svg><div><p>На работе – шкалы вашей организации</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="213" data-steps="216,222,226">
+  <p class="kick">Учебная шкала · документ 3.5</p>
+  <h2>Три оценки, каждая – от 1 до 10</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:25px">
+      <thead><tr><th style="width:10%;font-size:23px;padding:13px 17px">Оценка</th><th style="width:30%;font-size:23px;padding:13px 17px">S – значимость последствия</th><th style="width:29%;font-size:23px;padding:13px 17px">O – возникновение причины</th><th style="font-size:23px;padding:13px 17px">D – обнаружение<br>до&nbsp;выпуска конструкции</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--red);padding:13px 17px">9–10</td><td class="st" data-s="1" style="padding:13px 17px">Угроза безопасности людей</td><td class="st" data-s="2" style="padding:13px 17px">Почти наверняка проявится в&nbsp;эксплуатации</td><td class="st" data-s="3" style="padding:13px 17px">Ни расчёт, ни&nbsp;испытание причину не&nbsp;выявят</td></tr>
+        <tr><td style="color:var(--orange);padding:13px 17px">5–8</td><td class="st" data-s="1" style="padding:13px 17px">Автомобиль не&nbsp;выполняет задачу, нужен внешний источник или&nbsp;эвакуация</td><td class="st" data-s="2" style="padding:13px 17px">Проявляется у&nbsp;заметной части автомобилей</td><td class="st" data-s="3" style="padding:13px 17px">Выявится только на&nbsp;поздних&nbsp;испытаниях</td></tr>
+        <tr><td style="color:var(--muted);padding:13px 17px">1–4</td><td class="st" data-s="1" style="padding:13px 17px">Неудобство, автомобиль задачу&nbsp;выполняет</td><td class="st" data-s="2" style="padding:13px 17px">Маловероятна</td><td class="st" data-s="3" style="padding:13px 17px">Надёжно выявляется расчётом или ранней&nbsp;проверкой</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="230" data-steps="230,234">
+  <p class="kick">Во всех трёх столбцах</p>
+  <h2>Большая оценка – это плохо</h2>
+  <div class="body">
+    <div class="st" data-s="1" style="display:grid;grid-template-columns:68px 1fr 1fr;gap:24px 28px;align-items:center">
+      <span class="bdg t-red" style="font-weight:700">S</span>
+      <span style="display:flex;justify-content:space-between;align-items:center;height:52px;border-radius:12px;padding:0 20px;background:linear-gradient(90deg,var(--surface2),var(--red));font-size:27px;font-weight:700"><span style="color:var(--muted)">1</span><span style="color:var(--chip-ink)">10</span></span>
+      <span style="font-size:31px;line-height:1.2">Высокая значимость – <b>тяжелее&nbsp;последствие</b></span>
+      <span class="bdg t-red" style="font-weight:700">O</span>
+      <span style="display:flex;justify-content:space-between;align-items:center;height:52px;border-radius:12px;padding:0 20px;background:linear-gradient(90deg,var(--surface2),var(--red));font-size:27px;font-weight:700"><span style="color:var(--muted)">1</span><span style="color:var(--chip-ink)">10</span></span>
+      <span style="font-size:31px;line-height:1.2">Высокое возникновение – <b>причина проявляется чаще</b></span>
+      <span class="bdg t-red" style="font-weight:700">D</span>
+      <span style="display:flex;justify-content:space-between;align-items:center;height:52px;border-radius:12px;padding:0 20px;background:linear-gradient(90deg,var(--surface2),var(--red));font-size:27px;font-weight:700"><span style="color:var(--muted)">1</span><span style="color:var(--chip-ink)">10</span></span>
+      <span style="font-size:31px;line-height:1.2">Высокое обнаружение – <b>причину труднее поймать до&nbsp;выпуска</b></span>
+    </div>
+    <div class="rule sm t-orange st" data-s="2"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p><b>Здесь легко запутаться:</b> слово «обнаружение» звучит как&nbsp;что-то хорошее, а&nbsp;высокая оценка значит, что&nbsp;обнаружение плохое</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="237" data-steps="237,241">
+  <p class="kick">Документ 3.5 · правило 1</p>
+  <h2>O и D ставят по текущим мерам</h2>
+  <div class="body">
+    <table class="tbl sm" style="font-size:25px;line-height:1.15">
+      <thead><tr>
+        <th style="width:23%;text-align:center;background:var(--teal_t);color:var(--teal_ink)">Текущие меры предупреждения</th>
+        <th style="width:7%;text-align:center;background:var(--teal);color:var(--chip-ink);font-size:32px">O</th>
+        <th style="width:23%;text-align:center;background:var(--teal_t);color:var(--teal_ink)">Текущие меры обнаружения</th>
+        <th style="width:7%;text-align:center;background:var(--teal);color:var(--chip-ink);font-size:32px">D</th>
+        <th style="width:15%;text-align:center;background:var(--surface2);color:var(--muted)">Приоритет</th>
+        <th class="st" data-s="2" style="text-align:center;background:var(--gray);color:var(--chip-ink)">Рекомендуемые действия</th>
+      </tr></thead>
+    </table>
+    <div class="rule t-teal st" data-s="1"><svg class="i"><use href="#i-wrench"/></svg><div><h3>Текущие меры</h3><p>То, что в&nbsp;конструкции уже есть</p></div></div>
+    <div class="rule sm t-gray st" data-s="2"><svg class="i"><use href="#i-hourglass"/></svg><div><h3>Предложенные, но не выполненные</h3><p>Это ещё не текущие меры. Оценки после выполнения действий ставят отдельно, при&nbsp;пересмотре таблицы</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="244">
+  <p class="kick">Документ 3.5 · правило 2</p>
+  <h2>Сведений о мерах нет</h2>
+  <div class="body">
+    <ol class="flow nonum" style="grid-template-columns:1fr 1fr 1.2fr">
+      <li class="step t-gray" style="gap:12px"><span class="bdg"><svg class="i"><use href="#i-circle-help"/></svg></span><p style="font-size:27px">В столбце мер пишут</p><h3 style="font-size:33px">«не&nbsp;установлено»</h3></li>
+      <li class="step t-orange" style="gap:12px"><span class="bdg"><svg class="i"><use href="#i-pencil-line"/></svg></span><p style="font-size:27px">Оценку</p><h3 style="font-size:33px">всё&nbsp;равно&nbsp;ставят</h3></li>
+      <li class="step t-orange" style="gap:12px"><span class="bdg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><p style="font-size:27px">В основании пишут</p><h3 style="font-size:33px">«допущение: сведений о&nbsp;мерах&nbsp;нет»</h3></li>
+    </ol>
+    <div class="rule t-teal"><svg class="i"><use href="#i-rotate-ccw"/></svg><div><p>К строке возвращаются, когда сведения появятся</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="250" data-steps="250,254">
+  <p class="kick">Документ 3.5 · правило 3</p>
+  <h2>«Не установлено» или «нет»</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray st" data-s="2" style="padding:40px 44px;gap:24px"><h3 style="font-size:46px"><svg class="i"><use href="#i-circle-help"/></svg>«Не установлено»</h3><p style="font-size:38px;line-height:1.22">Мы не&nbsp;знаем, есть&nbsp;ли мера</p><p class="muted" style="font-size:32px;margin-top:auto">Оценку ставят как&nbsp;допущение</p></div>
+      <div class="col t-red st" data-s="1" style="padding:40px 44px;gap:24px"><h3 style="font-size:46px"><svg class="i"><use href="#i-circle-x"/></svg>«Нет»</h3><p style="font-size:38px;line-height:1.22">Мы знаем, что меры нет: это показывают документы</p><p style="font-size:32px;color:var(--c);font-weight:700;margin-top:auto">Это основание для высокой&nbsp;оценки</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="257" data-title="Основание каждой оценки">
+  <p class="kick t-orange">И последнее</p>
+  <div class="body">
+    <p class="say md">У каждой оценки – <em>основание</em> одной фразой</p>
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b>Документ</b></div>
+      <div class="pict"><svg class="i"><use href="#i-message-square-warning"/></svg><b>Замечание</b></div>
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b>Расчёт</b></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Оценка без основания – ничем не&nbsp;подкреплённая цифра</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="264">
+  <p class="kick">Приоритетное число риска · ПЧР, RPN</p>
+  <h2>Почему от ПЧР отходят</h2>
+  <div class="body">
+    <p class="say sm">Классический ПЧР – произведение <b>трёх оценок</b></p>
+    <div style="display:flex;align-items:center;justify-content:center;gap:16px">
+      <div style="background:var(--graphite);color:var(--on_graphite);border-radius:24px;padding:42px 30px;font-size:92px;font-weight:700;line-height:1">ПЧР</div>
+      <span style="font-size:76px;font-weight:700;color:var(--muted)">=</span>
+      <div class="t-teal" style="background:var(--ct);border-radius:24px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:206px"><b style="font-size:110px;line-height:1;color:var(--c)">S</b><span style="font-size:27px;color:var(--ci)">значимость</span></div>
+      <span style="font-size:76px;font-weight:700;color:var(--muted)">×</span>
+      <div class="t-teal" style="background:var(--ct);border-radius:24px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:206px"><b style="font-size:110px;line-height:1;color:var(--c)">O</b><span style="font-size:27px;color:var(--ci)">возникновение</span></div>
+      <span style="font-size:76px;font-weight:700;color:var(--muted)">×</span>
+      <div class="t-teal" style="background:var(--ct);border-radius:24px;padding:28px 20px;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:206px"><b style="font-size:110px;line-height:1;color:var(--c)">D</b><span style="font-size:27px;color:var(--ci)">обнаружение</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="267" data-steps="267,272" data-title="Недостатки ПЧР">
+  <p class="kick t-red">У ПЧР давно известные недостатки</p>
+  <div class="body">
+    <figure class="quote sm t-red">
+      <blockquote><span class="st">В традиционном анализе видов, последствий и критичности отказов виды отказов ранжируют по ПЧР, однако метод не раз критиковали за многочисленные недостатки:</span> <span class="st"><b>пропуски</b> в диапазоне возможных значений, <b>одинаковые значения</b> при разных сочетаниях исходных оценок и&nbsp;<b>сильную чувствительность</b> к&nbsp;небольшим изменениям</span></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Ciani L., Guidi G., Patrizi G.</b>авторы исследования, 2019</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ciani L., Guidi G., Patrizi G. IEEE Access, 2019 · doi.org/10.1109/access.2019.2928120</p>
+</section>
+
+<section class="slide" data-at="275" data-steps="275,280,283">
+  <p class="kick">Пример по учебной шкале</p>
+  <h2>Две строки – один и тот же ПЧР</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-gray st" data-s="1" style="gap:16px;padding:28px 34px">
+        <span style="font-size:28px;color:var(--muted)">Первая строка · S&nbsp;9, O&nbsp;2, D&nbsp;5</span>
+        <b style="font-size:74px;color:var(--ink)">9 × 2 × 5 = 90</b>
+        <span class="st t-red" data-s="3" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px;font-weight:700">S&nbsp;9 – угроза безопасности людей</span>
+      </div>
+      <div class="stat t-gray st" data-s="2" style="gap:16px;padding:28px 34px">
+        <span style="font-size:28px;color:var(--muted)">Вторая строка · S&nbsp;3, O&nbsp;6, D&nbsp;5</span>
+        <b style="font-size:74px;color:var(--ink)">3 × 6 × 5 = 90</b>
+        <span class="st t-teal" data-s="3" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px;font-weight:700">S&nbsp;3 – неудобство, автомобиль задачу&nbsp;выполняет</span>
+      </div>
+    </div>
+    <div class="rule sm t-orange st" data-s="3"><svg class="i"><use href="#i-equal-not"/></svg><div><p>По одному числу эти две строки не&nbsp;различить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="288" data-title="Какую строку разбирать первой">
+  <p class="kick t-orange">Вопрос</p>
+  <div class="body">
+    <div class="ask t-orange">
+      <span class="q">?</span>
+      <ul><li>Какую из двух строк вы бы разбирали&nbsp;первой?</li></ul>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-shield-alert"/></svg><div><p>Первую, где угроза безопасности. А&nbsp;произведение их уравняло</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="292" data-steps="295">
+  <p class="kick t-orange">Учебное правило приоритета</p>
+  <h2>ПЧР не считаем, первыми – строки с&nbsp;высокой&nbsp;значимостью</h2>
+  <div class="body">
+    <ol class="flow st" data-s="1">
+      <li class="step t-red"><h3>Сначала строки с&nbsp;S&nbsp;9–10</h3><p>независимо от&nbsp;O и&nbsp;D</p></li>
+      <li class="step t-orange"><h3>Затем строки, где одновременно высоки S&nbsp;и&nbsp;O</h3></li>
+    </ol>
+    <div class="rule sm t-gray st" data-s="1"><svg class="i"><use href="#i-building-2"/></svg><div><p>В вашей организации порядок приоритета может быть другим. Ориентируйтесь&nbsp;на&nbsp;него</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="300" data-title="Оценки субъективны">
+  <p class="kick">Ещё одна особенность метода</p>
+  <div class="body">
+    <div class="split s64">
+      <p class="say md">Все оценки <b>субъективны</b> и&nbsp;зависят от&nbsp;опыта&nbsp;команды</p>
+      <div class="center"><svg class="i big-ic"><use href="#i-users"/></svg></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Fabis-Domagala J., Domagala M. Energies, 2022 · doi.org/10.3390/en15176180</p>
+</section>
+
+<section class="slide dark" data-at="303" data-title="Оценки – инженерное решение">
+  <p class="kick t-orange">Модель это не исправит</p>
+  <div class="body">
+    <p class="say">Оценки – <em>инженерное решение</em></p>
+    <p class="sub">За ним стоят</p>
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i"><use href="#i-cog"/></svg><b>Знания об узле</b></div>
+      <div class="pict"><svg class="i"><use href="#i-flask-conical"/></svg><b>Данные испытаний</b></div>
+      <div class="pict"><svg class="i"><use href="#i-truck"/></svg><b>Данные эксплуатации</b></div>
+    </div>
+  </div>
+</section>

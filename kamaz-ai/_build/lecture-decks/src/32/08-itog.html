@@ -1,0 +1,153 @@
+<!-- Лекция 3.2, строки 887–967 (42:39–44:56): жизнь одной строки таблицы по схеме – черновик модели, проверка инженером, исключение и объединение, оценка, меры, закрытие и возврат к оценке, зачем мере обнаружения оракул; коротко главное по лекции -->
+
+<section class="slide" data-at="888">
+  <p class="kick">Последняя схема · жизнь одной строки таблицы</p>
+  <h2>От черновика модели до&nbsp;закрытия</h2>
+  <div class="body">
+    <svg viewBox="280 470 4580 970" width="1135" height="240" style="display:block;flex:none;border-radius:14px;box-shadow:0 0 0 2px var(--line)" role="img" aria-label="Схема: строка таблицы от черновика модели до закрытия">
+      <foreignObject x="0" y="0" width="5240" height="1920"><img src="@day/08-Схемы/d3-stroka-dfmea.png" width="5240" height="1920" alt="" style="display:block"></foreignObject>
+    </svg>
+    <div class="rule t-teal"><svg class="i"><use href="#i-bot"/></svg><div><p>Строка появляется в&nbsp;черновике модели: <b>отказ и&nbsp;причина</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="892">
+  <p class="kick t-orange">После сверки строку проверяет инженер</p>
+  <h2>Вопрос один – относится ли строка к&nbsp;узлу</h2>
+  <div class="body">
+    <svg viewBox="280 470 2170 970" width="1004" height="449" style="display:block;flex:none;margin:0 auto;border-radius:14px;box-shadow:0 0 0 2px var(--line)" role="img" aria-label="Схема: инженер проверяет строку, неприменимую исключают, повтор объединяют с похожей строкой">
+      <foreignObject x="0" y="0" width="5240" height="1920"><img src="@day/08-Схемы/d3-stroka-dfmea.png" width="5240" height="1920" alt="" style="display:block"></foreignObject>
+      <path style="fill:var(--on_graphite)" fill-opacity=".72" fill-rule="evenodd" d="M280 470H2450V1440H280Z M1042 540H1318V700H1042Z M1318 505H2077V792H1318Z M1395 792H1990V1090H1395Z M1008 1090H1694V1416H1008Z M1836 1090H2430V1416H1836Z"/>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-at="897" data-steps="897,904">
+  <p class="kick t-orange">Годная строка идёт дальше</p>
+  <h2>От оценки до закрытия</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column">
+      <ol class="flow" style="counter-reset:f 2">
+        <li class="step t-orange st" data-s="1"><h3 style="font-size:32px">Оценена командой</h3><p style="font-size:26px">S, O, D и&nbsp;приоритет</p></li>
+        <li class="step t-orange st" data-s="1"><h3 style="font-size:32px">Меры назначены</h3><p style="font-size:26px">Ответственный и&nbsp;срок</p></li>
+        <li class="step t-teal st" data-s="1"><h3 style="font-size:32px">Закрыта</h3><p style="font-size:26px">Меры проверены</p></li>
+      </ol>
+      <div class="st" data-s="2" style="height:96px">
+        <svg width="1135" height="96" viewBox="0 0 1135 96" style="display:block" aria-hidden="true">
+          <path d="M567.5 0V76" style="fill:none;stroke:var(--red)" stroke-width="4" stroke-dasharray="10 8"/>
+          <path d="M556 74L567.5 96L579 74Z" style="fill:var(--red)"/>
+          <path d="M175 96V20" style="fill:none;stroke:var(--muted)" stroke-width="4"/>
+          <path d="M163.5 22L175 0L186.5 22Z" style="fill:var(--muted)"/>
+          <text x="158" y="57" text-anchor="end" style="fill:var(--muted);font-size:25px;font-weight:700">новая оценка</text>
+          <text x="585" y="57" style="fill:var(--red);font-size:25px;font-weight:700">отказ на испытании</text>
+        </svg>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);column-gap:42.5px">
+        <div class="card row t-red st" data-s="2" style="grid-column:1 / 3;justify-self:center;width:640px;padding:22px 28px">
+          <span class="bdg"><svg class="i"><use href="#i-circle-x"/></svg></span>
+          <div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:31px">Мера не сработала на&nbsp;испытании</h3><p style="font-size:27px">Строка возвращается к&nbsp;оценке</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="908">
+  <p class="kick">Зачем мере обнаружения оракул</p>
+  <h2>Критерий задан заранее</h2>
+  <div class="body">
+    <div class="split">
+      <div class="center">
+        <div class="doc t-teal" style="width:480px;gap:14px;padding:28px 32px 38px;text-align:left">
+          <h4 style="font-size:24px;color:var(--muted)">Пример меры обнаружения</h4>
+          <p style="font-size:28px;line-height:1.22">Замер тока покоя через 30&nbsp;мин после выключения зажигания</p>
+          <p style="font-size:32px;font-weight:700"><mark>не&nbsp;более 40&nbsp;мА</mark></p>
+          <p style="font-size:23px;color:var(--muted)">п.&nbsp;4.3 редакции&nbsp;1</p>
+          <b class="stamp">оракул есть</b>
+        </div>
+      </div>
+      <div>
+        <p class="say xs">По результату испытания сразу понятно, куда пошла строка</p>
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-circle-check"/></svg><div><p><b>К закрытию</b></p></div></div>
+        <div class="rule sm t-red"><svg class="i"><use href="#i-undo-2"/></svg><div><p><b>Назад к&nbsp;оценке</b></p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="915" data-title="Строка закрыта, только когда меру проверили">
+  <p class="kick t-orange">И ещё одна деталь</p>
+  <div class="body">
+    <p class="say sm">Закрытой строка становится, только когда <em>меру&nbsp;проверили</em></p>
+    <div class="vs">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-lightbulb"/></svg>Меру придумали и&nbsp;назначили</h3><p>Для закрытия этого мало</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-badge-check"/></svg>Меру проверили</h3><p>Строка закрыта</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="928">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Анализ отказов идёт от&nbsp;функции</h2>
+  <div class="body">
+    <ol class="timeline" style="padding-top:42.5px">
+      <li class="now t-orange" style="padding:47.5px 2px 0"><b style="font-size:27px">Функция</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Вид отказа</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Последствие</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Причина</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Меры</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Оценки</b></li>
+      <li style="padding:47.5px 2px 0"><b style="font-size:27px">Действия</b></li>
+    </ol>
+    <div class="cards">
+      <div class="card row t-teal" style="padding:32px 30px"><span class="bdg"><svg class="i"><use href="#i-list-plus"/></svg></span><h3 style="font-size:35px">Модель хорошо расширяет перечень отказов и&nbsp;мер</h3></div>
+      <div class="card row t-red" style="padding:32px 30px"><span class="bdg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:35px">Но в&nbsp;черновике будут лишние, повторяющиеся и&nbsp;пропущенные строки</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="933">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Оценки и меры в&nbsp;таблице</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:43%;padding:18px 24px">Столбцы</th><th style="padding:18px 24px">Правило</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:20px 24px"><svg class="i" style="color:var(--orange)"><use href="#i-users"/></svg> Оценки S, O, D</td><td style="padding:20px 24px">Ставит команда.<br>Оценки модели в&nbsp;черновике стираем</td></tr>
+        <tr><td style="padding:20px 24px"><svg class="i" style="color:var(--orange)"><use href="#i-file-check"/></svg> Текущие меры</td><td style="padding:20px 24px">Только из&nbsp;документов, иначе «не&nbsp;установлено»</td></tr>
+        <tr><td style="padding:20px 24px"><svg class="i" style="color:var(--teal)"><use href="#i-lightbulb"/></svg> Рекомендуемые действия</td><td style="padding:20px 24px">Сюда – предложения модели</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="937">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Запрос – по одной функции</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-boxes"/></svg><b>Описание узла</b></div>
+      <div class="pict"><svg class="i"><use href="#i-scan"/></svg><b>Границы анализа</b></div>
+      <div class="pict"><svg class="i"><use href="#i-list-checks"/></svg><b>Требования</b></div>
+      <div class="pict"><svg class="i"><use href="#i-thermometer-snowflake"/></svg><b>Условия эксплуатации</b></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-lock"/></svg><div><p><b>Реальные отказы и&nbsp;рекламации</b> – только по&nbsp;маршруту, разрешённому правилами организации. На&nbsp;занятии – учебные данные</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="942">
+  <p class="kick">Коротко повторим главное</p>
+  <h2>Как проверять таблицу</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red" style="justify-content:center"><h3><svg class="i"><use href="#i-repeat"/></svg>Самопроверка модели</h3><p style="font-size:40px;font-weight:700">не&nbsp;проверка</p></div>
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-list-checks"/></svg>Проверка</h3>
+        <ul>
+          <li>Замечания второй модели сверяет&nbsp;инженер</li>
+          <li>Таблицу – по&nbsp;списку инвариантов</li>
+          <li>Меры обнаружения – по&nbsp;наличию&nbsp;оракула</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,247 @@
+<!-- Лекция 3.1, строки 812–986 (38:54–45:00): шаги проверки ссылки и шесть итогов, самые коварные итоги, информированный скептицизм (Faker и Toker), эксперимент Klingbeil и соавт., парадокс надзора (К. Овчинников), куда это ведёт в организации, что запомнить, вся лекция в одной фразе -->
+
+<section class="slide" data-at="813" data-steps="813,817,819,823,827,832">
+  <p class="kick">Проверка идёт по шагам</p>
+  <h2>Четыре шага и шесть итогов</h2>
+  <div class="body" style="padding-top:14px">
+    <div style="position:relative;display:grid;grid-template-columns:1fr 1.15fr 1fr 1.15fr 1fr;grid-template-rows:192px 60px 192px;column-gap:30px">
+      <div class="card t-gray st" data-s="1" style="grid-row:1;grid-column:1;padding:14px 13px 16px;gap:7px"><span class="n" style="font-size:18px">ШАГ 1</span><h3 style="font-size:23px">Существует ли документ?</h3></div>
+      <div class="card t-gray st" data-s="1" style="grid-row:1;grid-column:2;padding:14px 13px 16px;gap:7px"><span class="n" style="font-size:18px">ШАГ 2</span><h3 style="font-size:23px">Совпадают ли данные?</h3><p style="font-size:19px;line-height:1.2;color:var(--muted)">название, авторы или правообладатель, год</p></div>
+      <div class="card t-gray st" data-s="2" style="grid-row:1;grid-column:3;padding:14px 13px 16px;gap:7px"><span class="n" style="font-size:18px">ШАГ 3</span><h3 style="font-size:23px">Действует ли документ?</h3></div>
+      <div class="card t-gray st" data-s="2" style="grid-row:1;grid-column:4;padding:14px 13px 16px;gap:7px"><span class="n" style="font-size:18px">ШАГ 4</span><h3 style="font-size:23px">Подтверждает ли текст?</h3><p style="font-size:19px;line-height:1.2;color:var(--muted)">то, что модель ему приписала</p></div>
+      <div class="card t-teal st" data-s="3" style="grid-row:1;grid-column:5;padding:14px 13px 16px;gap:7px"><span class="n" style="font-size:18px">ИТОГ</span><h3 style="font-size:23px;color:var(--c)">Подтверждено</h3><p style="font-size:19px;line-height:1.2">найден, данные совпадают, текст подтверждает</p></div>
+      <div class="card t-red st" data-s="4" style="grid-row:3;grid-column:1;padding:14px 13px 16px;gap:7px"><h3 style="font-size:23px;color:var(--c)">Не найдено</h3><p style="font-size:19px;line-height:1.2">документа нет ни&nbsp;по&nbsp;номеру, ни&nbsp;по&nbsp;названию</p></div>
+      <div class="card t-red st" data-s="4" style="grid-row:3;grid-column:2;padding:14px 13px 16px;gap:7px"><h3 style="font-size:23px;color:var(--c)">Документ другой</h3><p style="font-size:19px;line-height:1.2">номер существует, но&nbsp;принадлежит другому документу</p></div>
+      <div class="card t-orange st" data-s="5" style="grid-row:3;grid-column:3;padding:14px 13px 16px;gap:7px"><h3 style="font-size:23px;color:var(--c)">Заменён</h3><p style="font-size:19px;line-height:1.2">действует новая редакция, вывод сверить по&nbsp;ней</p></div>
+      <div class="card t-red st" data-s="5" style="grid-row:3;grid-column:4;padding:14px 13px 16px;gap:7px"><h3 style="font-size:23px;color:var(--c)">Не подтверждает</h3><p style="font-size:19px;line-height:1.2">документ настоящий, но&nbsp;приписанного утверждения в&nbsp;нём&nbsp;нет</p></div>
+      <div class="card t-gray st" data-s="6" style="grid-row:3;grid-column:5;padding:14px 13px 16px;gap:7px"><h3 style="font-size:23px;color:var(--c)">Содержание не&nbsp;проверено</h3><p style="font-size:19px;line-height:1.2">полный текст недоступен, ссылку подтверждённой не&nbsp;считать</p></div>
+      <svg width="1135" height="444" viewBox="0 0 1135 444" style="position:absolute;left:0;top:0;overflow:visible;pointer-events:none;font-family:inherit" role="img" aria-label="Связи шагов и итогов: «да» ведёт к следующему шагу, «нет» – к итогу под шагом">
+        <g class="st" data-s="1"><path d="M194.5 96H209.5" fill="none" stroke-width="4" style="stroke:var(--teal)"/><polygon points="207.5,88 219.5,96 207.5,104" style="fill:var(--teal)"/><text x="206.5" y="78" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--teal)">да</text></g>
+        <g class="st" data-s="2"><path d="M444.75 96H459.75" fill="none" stroke-width="4" style="stroke:var(--teal)"/><polygon points="457.75,88 469.75,96 457.75,104" style="fill:var(--teal)"/><text x="456.75" y="78" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--teal)">да</text><path d="M666.25 96H681.25" fill="none" stroke-width="4" style="stroke:var(--teal)"/><polygon points="679.25,88 691.25,96 679.25,104" style="fill:var(--teal)"/><text x="678.25" y="78" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--teal)">да</text></g>
+        <g class="st" data-s="3"><path d="M916.5 96H931.5" fill="none" stroke-width="4" style="stroke:var(--teal)"/><polygon points="929.5,88 941.5,96 929.5,104" style="fill:var(--teal)"/><text x="928.5" y="78" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--teal)">да</text></g>
+        <g class="st" data-s="4"><path d="M95.75 196V237" fill="none" stroke-width="4" stroke-dasharray="7 6" style="stroke:var(--red)"/><polygon points="87.75,236 95.75,249 103.75,236" style="fill:var(--red)"/><text x="106.75" y="228" font-size="18" font-weight="700" style="fill:var(--red)">нет</text><path d="M331.63 196V237" fill="none" stroke-width="4" stroke-dasharray="7 6" style="stroke:var(--red)"/><polygon points="323.63,236 331.63,249 339.63,236" style="fill:var(--red)"/><text x="342.6" y="228" font-size="18" font-weight="700" style="fill:var(--red)">нет</text></g>
+        <g class="st" data-s="5"><path d="M567.5 196V237" fill="none" stroke-width="4" stroke-dasharray="7 6" style="stroke:var(--orange)"/><polygon points="559.5,236 567.5,249 575.5,236" style="fill:var(--orange)"/><text x="578.5" y="228" font-size="18" font-weight="700" style="fill:var(--orange)">заменён</text><path d="M763.4 196V237" fill="none" stroke-width="4" stroke-dasharray="7 6" style="stroke:var(--red)"/><polygon points="755.4,236 763.4,249 771.4,236" style="fill:var(--red)"/><text x="774.4" y="228" font-size="18" font-weight="700" style="fill:var(--red)">нет</text></g>
+        <g class="st" data-s="6"><path d="M865.4 196V216H1039.25V237" fill="none" stroke-width="4" stroke-dasharray="7 6" style="stroke:var(--muted)"/><polygon points="1031.25,236 1039.25,249 1047.25,236" style="fill:var(--muted)"/><text x="952" y="239" text-anchor="middle" font-size="18" font-weight="700" style="fill:var(--muted)">текста нет</text></g>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="837">
+  <p class="kick t-red">Самые коварные итоги</p>
+  <h2>«Документ другой» и&nbsp;«не&nbsp;подтверждает»</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red" style="gap:16px"><span class="tag t-teal" style="align-self:flex-start;font-size:25px;padding:6px 18px;display:inline-flex;gap:10px;align-items:center"><svg class="i"><use href="#i-check"/></svg>номер существует</span><h3 style="font-size:40px">Документ другой</h3><p style="font-size:32px">Но номер принадлежит другому&nbsp;документу</p></div>
+      <div class="col t-red" style="gap:16px"><span class="tag t-teal" style="align-self:flex-start;font-size:25px;padding:6px 18px;display:inline-flex;gap:10px;align-items:center"><svg class="i"><use href="#i-check"/></svg>документ настоящий</span><h3 style="font-size:40px">Не подтверждает</h3><p style="font-size:32px">Но приписанного утверждения в&nbsp;нём нет</p></div>
+    </div>
+    <div class="rule sm t-gray"><svg class="i"><use href="#i-eye-off"/></svg><div><p>Номер «проходит проверку», если смотреть только на&nbsp;то, существует ли он</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="841">
+  <p class="kick t-orange">Поэтому</p>
+  <h2>Мало убедиться, что номер есть в&nbsp;реестре</h2>
+  <div class="body">
+    <p class="note" style="font-size:32px;color:var(--ink)">Надо прочитать:</p>
+    <div class="picts c3 t-orange" style="position:relative">
+      <div class="pict"><svg class="i"><use href="#i-type"/></svg><b style="font-size:32px">Название</b></div>
+      <div class="pict"><svg class="i"><use href="#i-building-2"/></svg><b style="font-size:32px">Правообладатель</b></div>
+      <span style="position:absolute;left:calc((100% - 40px) * 2 / 3 + 30px);top:80px;transform:translate(-50%,-50%);font-size:30px;font-weight:700;color:var(--muted)">или</span>
+      <div class="pict"><svg class="i"><use href="#i-target"/></svg><b style="font-size:32px">Область применения</b></div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-git-compare-arrows"/></svg><div><p>И сравнить с тем, что приписала модель</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="847" data-title="Подумайте про себя: сколько ссылок вы открывали сами">
+  <p class="kick t-orange">Подумайте про себя</p>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:290px 1fr;gap:56px">
+      <span class="q" style="width:290px;height:290px;font-size:200px">?</span>
+      <ul style="font-size:46px;gap:34px">
+        <li>Сколько ссылок было в&nbsp;последнем отчёте или записке, которую вы&nbsp;готовили?</li>
+        <li>И сколько из них вы открывали сами?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="879" data-title="Информированный скептицизм">
+  <p class="kick">Последнее в лекции · отношение к&nbsp;ответам модели</p>
+  <div class="body">
+    <div class="split s64">
+      <div class="term"><dfn>Информированный скептицизм</dfn><p>Название из&nbsp;концептуальной работы 2026 года о&nbsp;проверке программного кода, написанного моделями</p><span class="tag" style="align-self:flex-start;font-size:26px;padding:6px 20px">Informed Skepticism</span></div>
+      <div class="center"><svg class="i big-ic"><use href="#i-search-check"/></svg></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Faker O., Toker S. Informed Skepticism. IISEC, 2026 · doi.org/10.1109/iisec69317.2026.11418436</p>
+</section>
+
+<section class="slide" data-at="883" data-title="Faker и Toker: «доверяй, но проверяй» уже недостаточно">
+  <p class="kick">Авторы работы пишут так</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Ошибки ИИ так хорошо маскируются, что прежнего подхода «доверяй, но&nbsp;проверяй» <b>уже&nbsp;недостаточно</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Faker O., Toker S.</b>авторы концептуальной работы</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Faker O., Toker S. Informed Skepticism. IISEC, 2026 · doi.org/10.1109/iisec69317.2026.11418436</p>
+</section>
+
+<section class="slide" data-at="887" data-title="Три опоры информированного скептицизма">
+  <p class="kick">Подход держится на трёх опорах</p>
+  <div class="body" style="gap:0">
+    <div style="width:1060px;margin:0 auto;display:flex;flex-direction:column">
+      <div style="background:var(--graphite);color:var(--on_graphite);clip-path:polygon(0 100%,4% 0,96% 0,100% 100%);text-align:center;font-size:32px;font-weight:700;padding:18px 0 16px">Информированный скептицизм</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:44px;padding:0 50px">
+        <div class="t-teal" style="background:var(--ct);border-top:9px solid var(--c);border-bottom:9px solid var(--c);padding:24px 26px;display:flex;flex-direction:column;gap:14px;min-height:268px"><span style="font-size:22px;font-weight:700;letter-spacing:.08em;color:var(--c)">ОПОРА 1</span><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-bot"/></svg><h3 style="font-size:31px;line-height:1.16;color:var(--ci)">Понимать, как ошибаются модели</h3></div>
+        <div class="t-orange" style="background:var(--ct);border-top:9px solid var(--c);border-bottom:9px solid var(--c);padding:24px 26px;display:flex;flex-direction:column;gap:14px;min-height:268px"><span style="font-size:22px;font-weight:700;letter-spacing:.08em;color:var(--c)">ОПОРА 2</span><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-triangle-alert"/></svg><h3 style="font-size:31px;line-height:1.16;color:var(--ci)">Оценивать риск по&nbsp;тому, где будет использован результат</h3></div>
+        <div class="t-orange" style="background:var(--ct);border-top:9px solid var(--c);border-bottom:9px solid var(--c);padding:24px 26px;display:flex;flex-direction:column;gap:14px;min-height:268px"><span style="font-size:22px;font-weight:700;letter-spacing:.08em;color:var(--c)">ОПОРА 3</span><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-search-check"/></svg><h3 style="font-size:31px;line-height:1.16;color:var(--ci)">Выбирать способ проверки под&nbsp;этот риск</h3></div>
+      </div>
+      <div style="height:20px;background:var(--graphite);border-radius:4px"></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Faker O., Toker S. Informed Skepticism. IISEC, 2026 · doi.org/10.1109/iisec69317.2026.11418436</p>
+</section>
+
+<section class="slide h-sm" data-at="891">
+  <p class="kick">Работа написана о программном коде</p>
+  <h2>На конструкторскую работу переносится почти дословно</h2>
+  <div class="body" style="gap:40px">
+    <div class="docs" style="flex-wrap:nowrap;gap:60px;align-items:stretch;padding-bottom:16px">
+      <div class="doc t-orange" style="width:390px;gap:13px;padding:24px 30px 36px"><h4 style="font-size:29px">Пояснительная записка к&nbsp;выбору решения</h4><i></i><i></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp" style="font-size:22px">ссылка</b></div>
+      <svg class="i" style="font-size:84px;color:var(--muted);align-self:center"><use href="#i-equal-not"/></svg>
+      <div class="doc t-gray" style="width:390px;gap:13px;padding:24px 30px 36px"><h4 style="font-size:29px">Рабочая переписка</h4><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><b class="stamp" style="font-size:22px">ссылка</b></div>
+    </div>
+    <p class="say xs" style="text-align:center;max-width:none;text-wrap:balance">Ссылка в&nbsp;записке требует <em>другой&nbsp;проверки</em>, чем ссылка в&nbsp;переписке</p>
+  </div>
+</section>
+
+<section class="slide" data-at="896" data-steps="897,899">
+  <p class="kick">Эксперимент 2024 года · Klingbeil A. и&nbsp;соавт.</p>
+  <h2>Людям сообщали, что совет подготовил ИИ</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch">
+      <div class="card t-teal st" data-s="1" style="align-items:center;justify-content:center;text-align:center;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-message-square-text"/></svg></span><h3 style="font-size:42px">Совет</h3><span class="tag" style="font-size:27px;padding:6px 22px">подготовил ИИ</span></div>
+      <div class="st" data-s="2" style="justify-content:center;gap:24px">
+        <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Одно это знание заставляло людей следовать совету</p></div></div>
+        <p class="note" style="font-size:31px;color:var(--ink)">даже когда совет противоречил</p>
+        <div class="tags" style="gap:16px"><span class="tag t-red" style="font-size:30px;padding:8px 24px">имеющимся сведениям</span><span class="tag t-red" style="font-size:30px;padding:8px 24px">их собственной оценке</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Klingbeil A., Grützner C., Schreck P. Computers in Human Behavior, 2024 · doi.org/10.1016/j.chb.2024.108352</p>
+</section>
+
+<section class="slide dark" data-at="902" data-title="Модель пишет уверенно и гладко">
+  <p class="kick t-orange">Отсюда риск</p>
+  <div class="body">
+    <p class="say">Модель пишет <em>уверенно и&nbsp;гладко</em></p>
+    <p class="sub">Инженер, который устал или торопится, рискует принять это за&nbsp;проверенный результат</p>
+  </div>
+</section>
+
+<section class="slide" data-at="906" data-title="Парадокс надзора: К. Овчинников">
+  <p class="kick">Парадокс надзора</p>
+  <div class="body">
+    <div class="split s64">
+      <figure class="quote">
+        <blockquote>Проверить работу ИИ может только тот, кто <b>умеет делать её&nbsp;сам</b></blockquote>
+        <figcaption><i class="ava">КО</i><span><b>К. Овчинников</b>доклад «Инженер после AI»,<br>ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+      </figure>
+      <div class="center"><svg class="i big-ic"><use href="#i-drafting-compass"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="910" data-steps="910,913">
+  <p class="kick">Для выбора технических решений · задача К-1</p>
+  <h2>Укладывается ли вариант в энергобаланс стоянки?</h2>
+  <div class="body" style="gap:22px">
+    <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:grid;grid-template-columns:1.25fr 58px 1fr 58px 1fr;align-items:stretch">
+        <div class="stat t-orange" style="padding:20px 26px;justify-content:center;gap:8px"><b style="font-size:40px;line-height:1.05;white-space:normal">Средний ток покоя</b><span style="font-size:25px">с&nbsp;этим вариантом</span></div>
+        <b style="align-self:center;text-align:center;font-size:60px;color:var(--muted)">×</b>
+        <div class="stat t-gray" style="padding:20px 26px;justify-content:center;gap:8px"><b style="font-size:58px">336 ч</b><span style="font-size:25px">14 суток стоянки</span></div>
+        <b style="align-self:center;text-align:center;font-size:60px;color:var(--muted)">≤</b>
+        <div class="stat t-teal" style="padding:20px 26px;justify-content:center;gap:8px"><b style="font-size:58px">13,3 А·ч</b><span style="font-size:25px">остаётся на&nbsp;потребители стоянки</span></div>
+      </div>
+      <p class="note" style="font-size:24px">Учебные условия кейса, таблица Д-2: средний ток покоя – не&nbsp;больше ≈&nbsp;39,6&nbsp;мА</p>
+    </div>
+    <div class="rule sm t-red st" data-s="2" style="padding:20px 32px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Модель может предложить вариант, который на&nbsp;этом простом расчёте не&nbsp;выдерживает проверки, и&nbsp;не&nbsp;заметить этого</p></div></div>
+    <div class="rule xs t-orange st" data-s="2" style="padding:16px 32px"><svg class="i" style="font-size:46px"><use href="#i-calculator"/></svg><div><p><b>Калькулятор или таблица</b> нужны не&nbsp;меньше, чем сервис</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="918">
+  <p class="kick">Куда это ведёт в организации · анализ отказов</p>
+  <h2>Исследования сходятся на одном устройстве</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-library"/></svg></span><h3 style="font-size:33px">Проверенная база документов организации</h3><p style="font-size:26px">Стандарты, прошлые FMEA, данные испытаний</p></li>
+      <li class="step t-teal" style="gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:33px">Модель</h3><p style="font-size:26px">Работает по&nbsp;этой базе</p></li>
+      <li class="step t-orange" style="gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><h3 style="font-size:33px">Эксперт</h3><p style="font-size:26px">Проверяет результат</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Bahr L. et al. Journal of Industrial Information Integration, 2025 · doi.org/10.1016/j.jii.2025.100807; Charan K. V. et al. International Journal of System Assurance Engineering and Management, 2026 · doi.org/10.1007/s13198-026-03171-6</p>
+</section>
+
+<section class="slide" data-at="925">
+  <p class="kick">Похожее предлагают для многокритериального выбора</p>
+  <h2>Основу готовит модель, расчёт ведёт программа</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:0.8fr 56px 1fr 56px 1fr;gap:16px;align-items:center">
+      <div class="doc" style="width:auto;gap:12px;padding:22px 26px 30px"><h4 style="font-size:30px">Тексты</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i></div>
+      <svg class="i" style="font-size:52px;color:var(--muted);justify-self:center"><use href="#i-chevrons-right"/></svg>
+      <div class="card t-teal" style="align-self:stretch;justify-content:center;gap:14px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:33px">Модель</h3><p style="font-size:28px">Готовит основу решения из&nbsp;текстов</p></div>
+      <svg class="i" style="font-size:52px;color:var(--muted);justify-self:center"><use href="#i-chevrons-right"/></svg>
+      <div class="card t-gray" style="align-self:stretch;justify-content:center;gap:14px"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:30px">Специализированная программа</h3><p style="font-size:28px">Ведёт расчёт по&nbsp;явным&nbsp;правилам</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Bohanec M., Rajkovič U., Rajkovič V. Informatica, 2025 · doi.org/10.31449/inf.v49i4.12884; Danielson M. Electronics, 2026 · doi.org/10.3390/electronics15194519</p>
+</section>
+
+<section class="slide dark" data-at="928" data-title="Внутренние решения: данные нельзя отправлять наружу">
+  <p class="kick t-orange">Где строят такие системы</p>
+  <div class="body">
+    <p class="say sm">Такие системы строятся на <b>внутренних решениях</b> организации, а&nbsp;не&nbsp;на&nbsp;внешних чат-сервисах</p>
+    <div class="rule t-red"><svg class="i"><use href="#i-lock"/></svg><div><p>Данные о&nbsp;реальных отказах, рекламациях и&nbsp;испытаниях нельзя отправлять наружу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="935" data-steps="937,940">
+  <p class="kick">Подведём итог · что запомнить</p>
+  <h2>Варианты и выбор</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal st" data-s="1" style="padding:22px 26px 24px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-telescope"/></svg></span><h3 style="font-size:31px">Модель хороша для&nbsp;широты поиска</h3><p style="font-size:25px">Аналоги, принципы действия, доводы против</p><p class="muted" style="font-size:25px">В эксперименте 2023 года самые новые идеи чаще давали люди</p></div>
+      <div class="card t-orange st" data-s="2" style="padding:22px 26px 24px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-filter"/></svg></span><h3 style="font-size:31px">Сначала отсев, потом&nbsp;матрица</h3><p style="font-size:25px">Отсев по&nbsp;физике и&nbsp;ограничениям. Недопустимый вариант не&nbsp;спасают баллы</p></div>
+      <div class="card t-orange st" data-s="2" style="padding:22px 26px 24px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-scale"/></svg></span><h3 style="font-size:31px">Веса и оценки ставит инженер</h3><p style="font-size:25px">Сумма весов равна 1, у&nbsp;каждой оценки есть обоснование. Небольшой сдвиг весов может сменить лидера – проверяйте</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ma K. et al. 2023, препринт arXiv · doi.org/10.48550/arXiv.2306.01779</p>
+</section>
+
+<section class="slide" data-at="945">
+  <p class="kick">Что запомнить</p>
+  <h2>Оценки модели и ссылки</h2>
+  <div class="body">
+    <ul class="list check big" style="gap:40px">
+      <li>Оценки модели зависят от порядка и длины описаний<small>Переставьте варианты и спросите ещё раз</small></li>
+      <li>Каждая ссылка – гипотеза, пока документ не&nbsp;открыт<small>Номер может существовать и принадлежать другому документу</small></li>
+      <li>Режим поиска не гарантирует настоящих ссылок</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide dark" data-at="951" data-steps="954" data-title="Модель – для широты поиска, решение за инженером">
+  <p class="kick t-orange">Вся лекция в одной фразе</p>
+  <div class="body">
+    <p class="say md">Модель – для широты поиска, <em>решение за&nbsp;инженером</em></p>
+    <div class="vs sm">
+      <div class="col t-teal st" data-s="1"><h3><svg class="i"><use href="#i-bot"/></svg>Модель</h3><ul><li>Предлагает варианты</li><li>Проверяет таблицу</li><li>Пишет черновики</li></ul></div>
+      <div class="col t-orange st" data-s="1"><h3><svg class="i"><use href="#i-user-round"/></svg>Вы</h3><ul><li>Задаёте ограничения, отсеиваете</li><li>Ставите веса и оценки</li><li>Открываете каждый документ</li><li>Отвечаете за выбор</li></ul></div>
+    </div>
+  </div>
+</section>
