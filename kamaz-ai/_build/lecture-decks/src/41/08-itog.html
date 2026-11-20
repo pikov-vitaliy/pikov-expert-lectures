@@ -1,0 +1,346 @@
+<!-- Лекция 4.1, строки 775–850 (40:51–45:00): последний раздел – формулы для электронных таблиц (как просить формулу, условная формула, как проверять, Thorne 2025), итог лекции: что отдаём модели, постановка, проверка, схема и единицы, формулы для таблиц, утверждённый расчёт, вся лекция в одной фразе -->
+
+<section class="slide sect" data-at="775" data-title="Формулы для электронных таблиц">
+  <span class="no"><svg class="i"><use href="#i-sheet"/></svg></span>
+  <p class="kick">Последний раздел</p>
+  <h1>Формулы<br>для&nbsp;электронных таблиц</h1>
+  <p class="lead" style="text-wrap:balance">Модель может написать формулы для&nbsp;расчёта, который вы делаете регулярно</p>
+  <div style="display:flex;flex-wrap:wrap;gap:16px;margin-top:38px;align-items:center">
+    <span style="font-size:27px;color:var(--muted);margin-right:8px">Табличный редактор на&nbsp;рабочем месте:</span>
+    <span class="tag" style="font-size:30px;padding:8px 26px">Excel</span>
+    <span class="tag" style="font-size:30px;padding:8px 26px">Р7-Офис</span>
+    <span class="tag" style="font-size:30px;padding:8px 26px">LibreOffice</span>
+  </div>
+</section>
+
+<section class="slide dark" data-at="778" data-title="Проверенная формула: считает редактор, проверяет инженер">
+  <p class="kick t-orange">Формулы для таблиц</p>
+  <div class="body" style="gap:40px">
+    <p class="say sm" style="text-wrap:balance">Проверенной формулой пользуются для&nbsp;повторных расчётов, но&nbsp;<em>только&nbsp;в&nbsp;тех&nbsp;условиях</em>, на&nbsp;которых её&nbsp;проверили</p>
+    <div class="cards" style="gap:32px">
+      <div class="card row t-gray" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:35px">Табличный редактор</h3><p style="font-size:29px">Выполняет вычисления</p></div></div>
+      <div class="card row t-orange" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:35px">Инженер</h3><p style="font-size:29px">Проверяет формулу, входные данные и&nbsp;ссылки на&nbsp;ячейки</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="781">
+  <p class="kick">Как просить формулу · 1 из 4</p>
+  <h2>Опишите расположение данных</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:540px 1fr;gap:64px">
+      <div style="gap:0">
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:9px">
+          <span style="text-align:center;font-size:23px;font-weight:700;color:var(--muted)">A</span>
+          <span style="text-align:center;font-size:23px;font-weight:700;color:var(--muted)">B</span>
+          <span style="text-align:center;font-size:23px;font-weight:700;color:var(--muted)">C</span>
+          <span style="text-align:center;font-size:23px;font-weight:700;color:var(--muted)">D</span>
+          <span class="t-teal" style="background:var(--ct);color:var(--ci);border:3px solid var(--c);border-radius:11px;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:24px;font-weight:700;line-height:1.1">величина<span class="t-gray" style="background:var(--bg);color:var(--ci);border:2px solid var(--c);border-radius:999px;padding:2px 14px;font-size:21px">ед.</span></span>
+          <span class="t-teal" style="background:var(--ct);color:var(--ci);border:3px solid var(--c);border-radius:11px;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:24px;font-weight:700;line-height:1.1">величина<span class="t-gray" style="background:var(--bg);color:var(--ci);border:2px solid var(--c);border-radius:999px;padding:2px 14px;font-size:21px">ед.</span></span>
+          <span class="t-teal" style="background:var(--ct);color:var(--ci);border:3px solid var(--c);border-radius:11px;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:24px;font-weight:700;line-height:1.1">величина<span class="t-gray" style="background:var(--bg);color:var(--ci);border:2px solid var(--c);border-radius:999px;padding:2px 14px;font-size:21px">ед.</span></span>
+          <span class="t-teal" style="background:var(--ct);color:var(--ci);border:3px solid var(--c);border-radius:11px;padding:10px 4px 12px;display:flex;flex-direction:column;align-items:center;gap:8px;font-size:24px;font-weight:700;line-height:1.1">величина<span class="t-gray" style="background:var(--bg);color:var(--ci);border:2px solid var(--c);border-radius:999px;padding:2px 14px;font-size:21px">ед.</span></span>
+          <span class="t-orange" style="height:58px;border:3.5px solid var(--c);background:var(--ct);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:70%;border-radius:6px;background:var(--c);opacity:.45"></i></span>
+          <span class="t-orange" style="height:58px;border:3.5px solid var(--c);background:var(--ct);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:55%;border-radius:6px;background:var(--c);opacity:.45"></i></span>
+          <span class="t-orange" style="height:58px;border:3.5px solid var(--c);background:var(--ct);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:65%;border-radius:6px;background:var(--c);opacity:.45"></i></span>
+          <span class="t-orange" style="height:58px;border:3.5px solid var(--c);background:var(--ct);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:50%;border-radius:6px;background:var(--c);opacity:.45"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:60%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:70%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:50%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:65%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:55%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:60%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:70%;border-radius:6px;background:var(--line)"></i></span>
+          <span style="height:58px;border:2px solid var(--line);background:var(--surface);border-radius:11px;display:flex;align-items:center;padding:0 14px"><i style="display:block;height:12px;width:50%;border-radius:6px;background:var(--line)"></i></span>
+        </div>
+      </div>
+      <ol class="list num" style="font-size:36px;gap:36px">
+        <li class="t-teal" style="text-wrap:balance">В каком столбце какая величина</li>
+        <li class="t-orange" style="text-wrap:balance">С какой строки начинаются данные</li>
+        <li class="t-gray" style="text-wrap:balance">Какие единицы</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="784">
+  <p class="kick">Как просить формулу · 2 из 4</p>
+  <h2>Укажите редактор и&nbsp;язык интерфейса</h2>
+  <div class="body" style="gap:34px">
+    <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:18px 20px;align-items:center">
+      <div class="card row t-gray" style="padding:18px 26px"><span class="bdg"><svg class="i"><use href="#i-sheet"/></svg></span><h3>Редактор</h3></div>
+      <svg class="i" style="grid-row:span 2;font-size:60px;color:var(--muted);justify-self:center"><use href="#i-chevrons-right"/></svg>
+      <div class="card row t-teal" style="padding:18px 26px"><span class="bdg"><svg class="i"><use href="#i-square-function"/></svg></span><h3>Названия функций</h3></div>
+      <div class="card row t-gray" style="padding:18px 26px"><span class="bdg"><svg class="i"><use href="#i-languages"/></svg></span><h3>Язык интерфейса</h3></div>
+      <div class="card row t-teal" style="padding:18px 26px"><span class="bdg" style="font-size:42px;font-weight:700;font-family:Consolas,'Cascadia Mono',monospace">;</span><h3>Разделитель аргументов</h3></div>
+    </div>
+    <div class="t-orange" style="background:var(--ct);border-radius:20px;border-left:11px solid var(--c);padding:22px 32px;display:grid;grid-template-columns:auto auto 1fr auto 1fr;gap:20px;align-items:center">
+      <span style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c);line-height:1.25">Excel,<br>русский интерфейс</span>
+      <code style="font-family:Consolas,'Cascadia Mono',monospace;font-size:50px;font-weight:700;background:var(--bg);color:var(--ink);border-radius:12px;padding:4px 20px;line-height:1.2">ЕСЛИ</code>
+      <span style="font-size:28px;color:var(--ci);line-height:1.2">функция условия</span>
+      <code style="font-family:Consolas,'Cascadia Mono',monospace;font-size:50px;font-weight:700;background:var(--bg);color:var(--ink);border-radius:12px;padding:4px 24px;line-height:1.2">;</code>
+      <span style="font-size:28px;color:var(--ci);line-height:1.2">разделитель аргументов</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="788">
+  <p class="kick">Условная формула</p>
+  <h2>Заранее опишите условие и&nbsp;оба исхода</h2>
+  <div class="body" style="gap:34px">
+    <div class="tree" style="--n:2">
+      <div class="root" style="font-size:34px;padding:14px 48px">Условие</div>
+      <div class="kids" style="width:840px;gap:40px">
+        <div class="kid t-teal" style="padding:18px 28px;align-items:center;text-align:center"><h3 style="font-size:32px">Выполнено</h3><p style="font-size:27px">что выводить</p></div>
+        <div class="kid t-gray" style="padding:18px 28px;align-items:center;text-align:center"><h3 style="font-size:32px">Не выполнено</h3><p style="font-size:27px">что выводить</p></div>
+      </div>
+    </div>
+    <div class="rule t-orange" style="padding:14px 34px;gap:36px">
+      <svg viewBox="0 0 380 104" style="width:380px;height:104px;flex:none" role="img" aria-label="Числовая ось: значение меньше границы, точно на границе и больше границы">
+        <line x1="14" y1="60" x2="366" y2="60" stroke-width="4" stroke-linecap="round" style="stroke:var(--muted)"/>
+        <line x1="190" y1="34" x2="190" y2="86" stroke-width="5" stroke-linecap="round" style="stroke:var(--c)"/>
+        <text x="190" y="24" text-anchor="middle" font-size="22" font-weight="700" style="fill:var(--c)">граница</text>
+        <circle cx="88" cy="60" r="11" style="fill:var(--muted)"/>
+        <circle cx="292" cy="60" r="11" style="fill:var(--muted)"/>
+        <circle cx="190" cy="60" r="16" stroke-width="4" style="fill:var(--c);stroke:var(--ct)"/>
+        <text x="88" y="99" text-anchor="middle" font-size="20" style="fill:var(--muted)">меньше</text>
+        <text x="292" y="99" text-anchor="middle" font-size="20" style="fill:var(--muted)">больше</text>
+      </svg>
+      <div><h3>Проверьте отдельно</h3><p>Значение точно равно границе</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="790">
+  <p class="kick">Редактор на рабочем месте</p>
+  <h2>Если редактор другой или&nbsp;его нет</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:30px;align-items:stretch">
+      <div class="card t-gray" style="gap:14px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-sheet"/></svg></span><div style="display:flex;flex-direction:column;gap:2px"><h3 style="font-size:35px">Excel</h3><p class="muted" style="font-size:25px">русский интерфейс</p></div><p style="font-size:29px">Функция условия <code style="font-family:Consolas,'Cascadia Mono',monospace;font-weight:700;background:var(--bg)">ЕСЛИ</code></p><p style="font-size:29px">Разделитель аргументов <code style="font-family:Consolas,'Cascadia Mono',monospace;font-weight:700;background:var(--bg);padding:0 .4em">;</code></p></div>
+      <div class="card t-teal" style="gap:14px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-book-open-text"/></svg></span><div style="display:flex;flex-direction:column;gap:2px"><h3 style="font-size:35px">Другой редактор</h3><p class="muted" style="font-size:25px">проверьте по&nbsp;справке</p></div><ul class="list sm" style="font-size:29px;gap:10px"><li style="padding-left:34px">Название функции</li><li style="padding-left:34px">Разделитель аргументов</li><li style="padding-left:34px">Десятичный знак</li></ul></div>
+      <div class="card t-orange" style="gap:14px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-pencil"/></svg></span><div style="display:flex;flex-direction:column;gap:2px"><h3 style="font-size:35px">Редактора нет</h3><p class="muted" style="font-size:25px">на&nbsp;рабочем месте</p></div><p style="font-size:29px;text-wrap:balance">Формулы проверяют <b>подстановкой вручную</b></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="794">
+  <p class="kick">Как просить формулу · 3 и 4 из 4</p>
+  <h2>Запрос на формулу целиком</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:200px;font-size:31px;line-height:1.25;padding:26px 30px;gap:16px">
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Данные</span><span class="muted">Что в&nbsp;каком столбце, с&nbsp;какой строки данные, единицы</span></p>
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Редактор</span><span class="muted">Редактор и&nbsp;язык интерфейса</span></p>
+      <p class="part t-teal" style="align-items:center;background:var(--ct)"><span class="tg" style="font-size:20px;padding:8px 10px">Формулы</span><span>Для каждой ячейки отдельно&nbsp;– и&nbsp;пояснение, что она считает</span></p>
+      <p class="part t-orange" style="align-items:center;background:var(--ct)"><span class="tg" style="font-size:20px;padding:8px 10px">Контроль</span><span>Контрольные значения или&nbsp;пример от&nbsp;модели, который вы&nbsp;пересчитаете в&nbsp;уме</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="798">
+  <p class="kick t-orange">Как проверять формулу · 1 и 2 из 4</p>
+  <h2>Контрольная строка и&nbsp;одно изменённое значение</h2>
+  <div class="body">
+    <div class="cards" style="gap:34px;align-items:stretch">
+      <div class="card t-teal" style="gap:14px;padding:26px 30px 30px">
+        <span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span>
+        <h3>Контрольная строка</h3>
+        <p>Введите её и&nbsp;сравните результат с&nbsp;ожидаемым</p>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr auto;gap:14px;align-items:center;margin-top:auto">
+          <span style="background:var(--bg);border:2.5px solid var(--line);border-radius:12px;padding:16px 8px;text-align:center;font-size:27px">результат</span>
+          <b style="font-size:52px;line-height:1;color:var(--c)">=</b>
+          <span style="background:var(--bg);border:2.5px solid var(--line);border-radius:12px;padding:16px 8px;text-align:center;font-size:27px">ожидаемое</span>
+          <svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-circle-check"/></svg>
+        </div>
+      </div>
+      <div class="card t-orange" style="gap:14px;padding:26px 30px 30px">
+        <span class="bdg"><svg class="i"><use href="#i-arrow-left-right"/></svg></span>
+        <h3>Одно исходное значение</h3>
+        <p>Измените его: меняется&nbsp;ли результат так, как&nbsp;должен?</p>
+        <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:16px;align-items:center;margin-top:auto">
+          <span style="background:var(--bg);border:2.5px solid var(--c);border-radius:12px;padding:10px 8px;text-align:center;font-size:26px;line-height:1.15">длина<br><b style="font-size:42px;color:var(--c)">×&nbsp;2</b></span>
+          <svg class="i" style="font-size:52px;color:var(--muted)"><use href="#i-chevrons-right"/></svg>
+          <span style="background:var(--bg);border:2.5px solid var(--c);border-radius:12px;padding:10px 8px;text-align:center;font-size:26px;line-height:1.15">падение<br><b style="font-size:42px;color:var(--c)">×&nbsp;2</b></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="802">
+  <p class="kick t-orange">Как проверять формулу · 3 из 4</p>
+  <h2>Проверьте ссылки на&nbsp;ячейки</h2>
+  <div class="body" style="gap:22px">
+    <svg viewBox="0 0 1135 300" style="width:100%;height:300px;display:block" role="img" aria-label="Формула скопирована вниз на три строки: каждая ссылается на исходные данные своей строки, а постоянную величину все три берут из одной и той же ячейки">
+      <text x="190" y="26" text-anchor="middle" font-size="24" font-weight="700" style="fill:var(--muted)">исходные данные</text>
+      <text x="480" y="26" text-anchor="middle" font-size="24" font-weight="700" style="fill:var(--teal)">формула</text>
+      <g>
+        <rect x="8" y="44" width="572" height="74" rx="16" fill="none" stroke-width="3" stroke-dasharray="9 7" style="stroke:var(--teal)"/>
+        <rect x="24" y="54" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="200" y="54" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="390" y="54" width="176" height="54" rx="10" stroke-width="3" style="fill:var(--teal_t);stroke:var(--teal)"/>
+        <rect x="44" y="75" width="96" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="220" y="75" width="110" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="410" y="75" width="120" height="12" rx="6" style="fill:var(--teal)" opacity=".55"/>
+      </g>
+      <g>
+        <rect x="8" y="132" width="572" height="74" rx="16" fill="none" stroke-width="3" stroke-dasharray="9 7" style="stroke:var(--teal)"/>
+        <rect x="24" y="142" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="200" y="142" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="390" y="142" width="176" height="54" rx="10" stroke-width="3" style="fill:var(--teal_t);stroke:var(--teal)"/>
+        <rect x="44" y="163" width="110" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="220" y="163" width="90" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="410" y="163" width="120" height="12" rx="6" style="fill:var(--teal)" opacity=".55"/>
+      </g>
+      <g>
+        <rect x="8" y="220" width="572" height="74" rx="16" fill="none" stroke-width="3" stroke-dasharray="9 7" style="stroke:var(--teal)"/>
+        <rect x="24" y="230" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="200" y="230" width="160" height="54" rx="10" stroke-width="2.5" style="fill:var(--surface);stroke:var(--line)"/>
+        <rect x="390" y="230" width="176" height="54" rx="10" stroke-width="3" style="fill:var(--teal_t);stroke:var(--teal)"/>
+        <rect x="44" y="251" width="90" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="220" y="251" width="104" height="12" rx="6" style="fill:var(--line)"/>
+        <rect x="410" y="251" width="120" height="12" rx="6" style="fill:var(--teal)" opacity=".55"/>
+      </g>
+      <path d="M582 81 C 700 81, 720 169, 826 169" fill="none" stroke-width="4" style="stroke:var(--orange)"/>
+      <path d="M582 169 L 826 169" fill="none" stroke-width="4" style="stroke:var(--orange)"/>
+      <path d="M582 257 C 700 257, 720 169, 826 169" fill="none" stroke-width="4" style="stroke:var(--orange)"/>
+      <polygon points="822,159 842,169 822,179" style="fill:var(--orange)"/>
+      <rect x="846" y="112" width="270" height="114" rx="16" stroke-width="4" style="fill:var(--orange_t);stroke:var(--orange)"/>
+      <text x="981" y="160" text-anchor="middle" font-size="27" font-weight="700" style="fill:var(--orange_ink)">постоянная</text>
+      <text x="981" y="194" text-anchor="middle" font-size="27" font-weight="700" style="fill:var(--orange_ink)">величина</text>
+      <text x="981" y="96" text-anchor="middle" font-size="24" font-weight="700" style="fill:var(--orange)">одна ячейка</text>
+    </svg>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+      <div class="rule xs t-teal" style="padding:14px 26px"><svg class="i" style="font-size:44px"><use href="#i-copy"/></svg><div><p style="font-size:26px">Формула, скопированная вниз, ссылается на&nbsp;<b>свою строку</b></p></div></div>
+      <div class="rule xs t-orange" style="padding:14px 26px"><svg class="i" style="font-size:44px"><use href="#i-pin"/></svg><div><p style="font-size:26px">Постоянные величины&nbsp;– на&nbsp;<b>одну и&nbsp;ту&nbsp;же ячейку</b></p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="805">
+  <p class="kick t-orange">Как проверять формулу · 4 из 4</p>
+  <h2>Граничные случаи</h2>
+  <div class="body">
+    <div class="picts c3 t-orange" style="gap:44px">
+      <div class="pict" style="gap:24px"><svg class="i" style="width:176px;height:176px;font-size:100px;padding:38px;border-radius:40px"><use href="#i-square-dashed"/></svg><b style="font-size:40px">Пустая ячейка</b></div>
+      <div class="pict" style="gap:24px"><span style="width:176px;height:176px;border-radius:40px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:118px;font-weight:700;line-height:1">0</span><b style="font-size:40px">Ноль</b></div>
+      <div class="pict" style="gap:24px"><svg class="i" style="width:176px;height:176px;font-size:100px;padding:38px;border-radius:40px"><use href="#i-circle-minus"/></svg><b style="font-size:40px">Отрицательное значение</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="807" data-steps="814" data-title="Thorne: правдоподобные, но неверные результаты">
+  <p class="kick">Исследования формул, которые модели пишут для&nbsp;таблиц</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:360px 1fr;gap:64px;align-items:center">
+      <div style="align-items:center">
+        <div class="doc t-teal" style="width:340px;gap:12px;padding:26px 28px 40px">
+          <h4 style="font-size:26px">Large Language Models for&nbsp;Spreadsheets</h4>
+          <p style="font-size:19px;line-height:1.2;color:var(--muted)">Benchmarking Progress and Evaluating Performance with FLARE</p>
+          <i></i><i class="s"></i><i class="t"></i><i></i><i class="s"></i>
+          <b class="stamp" style="font-size:21px">Thorne S. · 2025</b>
+        </div>
+      </div>
+      <figure class="quote sm st">
+        <blockquote style="text-wrap:balance">Языковые модели уверенно справляются с&nbsp;простыми задачами, но&nbsp;часто сбиваются на&nbsp;сложных многошаговых операциях и&nbsp;нередко выдают <b>правдоподобные, но&nbsp;неверные результаты</b></blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Thorne S.</b>препринт arXiv, 2025</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Thorne S. Large Language Models for Spreadsheets. Препринт arXiv, 2025 · doi.org/10.48550/arXiv.2506.17330</p>
+</section>
+
+<section class="slide" data-at="829">
+  <p class="kick">Подведём итог</p>
+  <h2>Что отдаём модели, а&nbsp;что нет</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="note" style="font-weight:700;color:var(--teal);letter-spacing:.06em;text-transform:uppercase;font-size:24px">Модели</p>
+      <div class="cards c4">
+        <div class="card t-teal" style="padding:22px 24px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-book-open-text"/></svg></span><h3 style="font-size:30px">Объяснение формул</h3></div>
+        <div class="card t-teal" style="padding:22px 24px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-git-branch"/></svg></span><h3 style="font-size:30px">Выбор схемы</h3></div>
+        <div class="card t-teal" style="padding:22px 24px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-list"/></svg></span><h3 style="font-size:30px">Перечень допущений</h3></div>
+        <div class="card t-teal" style="padding:22px 24px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:30px">Черновик формулы</h3></div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Арифметика и&nbsp;итог</h3><p>Калькулятору, таблице, утверждённой программе</p></div></div>
+      <div class="card row t-orange"><span class="bdg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Решение</h3><p>Инженеру</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="833">
+  <p class="kick">Подведём итог · постановка</p>
+  <h2>Расчётную задачу ставят полностью</h2>
+  <div class="body">
+    <div class="picts c3" style="gap:14px 40px">
+      <div class="pict" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-database"/></svg><b>Данные с&nbsp;единицами</b></div>
+      <div class="pict" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-git-fork"/></svg><b>Схема</b></div>
+      <div class="pict" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-file-pen-line"/></svg><b>Допущения</b></div>
+      <div class="pict" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-brackets"/></svg><b>Границы</b></div>
+      <div class="pict" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-equal"/></svg><b>Формат «подстановка с&nbsp;единицами»</b></div>
+      <div class="pict t-red" style="padding:10px 10px;gap:12px"><svg class="i" style="width:100px;height:100px;font-size:56px;padding:22px;border-radius:24px"><use href="#i-ban"/></svg><b>Запрет додумывать</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="836" data-title="Что считается проверкой расчёта">
+  <p class="kick t-orange">Подведём итог · проверка</p>
+  <div class="body">
+    <div class="vs" style="grid-template-columns:1.3fr 1fr;gap:36px;align-items:stretch">
+      <div class="col t-teal" style="gap:18px;padding:30px 34px 34px"><h3 style="font-size:36px"><svg class="i"><use href="#i-circle-check"/></svg>Проверка&nbsp;– это</h3>
+        <ul style="font-size:31px;gap:14px"><li>Контрольный пример</li><li>Независимый пересчёт другим&nbsp;инструментом</li><li>Анализ размерностей</li><li>Порядок величины</li><li>Сверка каждого числа с&nbsp;условием</li></ul></div>
+      <div class="col t-red" style="gap:24px;padding:30px 34px 34px;justify-content:center"><h3 style="font-size:36px"><svg class="i"><use href="#i-circle-x"/></svg>Не&nbsp;проверка</h3>
+        <p style="font-size:46px;font-weight:700;line-height:1.15">«Проверь себя» той&nbsp;же модели</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="840">
+  <p class="kick">Подведём итог · схема и единицы</p>
+  <h2>Схема, единицы и&nbsp;справочные значения</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:30px;align-items:stretch">
+      <div class="card t-orange" style="gap:16px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-git-fork"/></svg></span><h3 style="font-size:36px">Схема</h3><p style="font-size:29px;text-wrap:balance">Задаёт инженер, а&nbsp;модель называет, какую схему приняла</p></div>
+      <div class="card t-gray" style="gap:16px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-ruler"/></svg></span><h3 style="font-size:36px">Единицы</h3><p style="font-size:29px;text-wrap:balance">Величины одного рода сначала приводят к&nbsp;одним единицам. Перевод&nbsp;– отдельной строкой</p></div>
+      <div class="card t-orange" style="gap:16px;padding:28px 28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-book-open"/></svg></span><h3 style="font-size:36px">Справочное значение</h3><p style="font-size:29px;text-wrap:balance">Тоже допущение: его источник открывают</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="843">
+  <p class="kick">Подведём итог</p>
+  <h2>Формулы для&nbsp;таблиц</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:340px 80px 1fr;align-items:center">
+      <div class="card t-teal" style="align-items:center;text-align:center;gap:12px;padding:34px 26px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:36px">Модель</h3><p style="font-size:31px">пишет формулу</p></div>
+      <svg class="i" style="font-size:60px;color:var(--muted);justify-self:center"><use href="#i-chevrons-right"/></svg>
+      <div class="card t-orange" style="gap:18px;padding:30px 34px 34px"><h3 style="font-size:34px">Проверяют</h3>
+        <ul class="list check" style="font-size:34px;gap:16px"><li>на&nbsp;контрольных строках</li><li>удвоением</li><li>граничными случаями</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="845" data-title="Ответ модели не заменяет утверждённый инженерный расчёт">
+  <p class="kick t-orange">Подведём итог · утверждённый расчёт</p>
+  <h2>Ответ модели не&nbsp;заменяет<br>утверждённый инженерный расчёт</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:grid;grid-template-columns:1fr 130px 1fr;align-items:center;justify-items:center;padding-bottom:14px">
+      <div class="chat" style="width:420px"><div class="msg bot" style="max-width:100%;width:100%;padding:24px 30px 30px"><span class="who" style="font-size:22px">Ответ модели</span><div style="display:flex;flex-direction:column;gap:14px;margin-top:12px"><i style="display:block;height:16px;border-radius:8px;background:var(--surface2);width:92%"></i><i style="display:block;height:16px;border-radius:8px;background:var(--surface2);width:76%"></i><i style="display:block;height:16px;border-radius:8px;background:var(--surface2);width:84%"></i><i style="display:block;height:16px;border-radius:8px;background:var(--teal);width:40%"></i></div></div></div>
+      <svg class="i" style="font-size:96px;color:var(--muted)"><use href="#i-equal-not"/></svg>
+      <div class="doc t-orange" style="width:380px;gap:12px;padding:24px 28px 38px"><h4 style="font-size:27px">Утверждённый инженерный расчёт</h4><i></i><i class="s"></i><i></i><i class="hl"></i><i class="s"></i><b class="stamp" style="font-size:21px">подпись инженера</b></div>
+    </div>
+    <div class="rule t-orange" style="padding:20px 34px"><svg class="i"><use href="#i-signature"/></svg><div><p>Подпись под&nbsp;расчётом ставит инженер</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="848" data-title="Модель предлагает, проверка решает">
+  <p class="kick t-orange">Вся лекция в одной фразе</p>
+  <div class="body" style="gap:34px">
+    <div style="display:grid;grid-template-columns:150px 1fr;gap:26px 40px;align-items:center">
+      <span class="t-teal" style="width:150px;height:150px;border-radius:40px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:88px"><use href="#i-bot"/></svg></span>
+      <p class="say" style="font-size:96px;line-height:1.05">Модель <b>предлагает</b>,</p>
+      <span class="t-orange" style="width:150px;height:150px;border-radius:40px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:88px"><use href="#i-search-check"/></svg></span>
+      <p class="say" style="font-size:96px;line-height:1.05">проверка <em>решает</em></p>
+    </div>
+  </div>
+</section>

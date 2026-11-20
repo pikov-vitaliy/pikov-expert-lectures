@@ -1,0 +1,205 @@
+<!-- Лекция 4.2, строки 6–83 (00:00–04:09): начало лекции, что модель быстро делает с таблицей и где ошибается, главная мысль, план, правило модуля, сквозной пример – учебная таблица испытаний 1 и её требования, начало раздела «Как передать модели таблицу» – правило данных -->
+
+<section class="slide sect" data-at="6" data-title="День 4. Модуль 4">
+  <p class="kick">День 4 · модуль 4</p>
+  <span class="no">4</span>
+  <h1>Инженерные расчёты<br>и&nbsp;данные испытаний<br>без&nbsp;программирования</h1>
+  <p class="lead">Тема 4.2 – анализ результатов испытаний и&nbsp;измерений</p>
+</section>
+
+<section class="slide cover" data-at="8">
+  <p class="kick">Модуль 4 · тема 4.2</p>
+  <h1>Анализ результатов <br>испытаний и&nbsp;измерений</h1>
+  <p class="lead">Модель быстро разбирает таблицу.<br>Ошибки модели в&nbsp;отчёт не&nbsp;попадают</p>
+  <p class="meta">День 4 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-at="10">
+  <p class="kick">Таблица испытаний – удобный материал для&nbsp;модели</p>
+  <h2>Что модель сделает быстро</h2>
+  <div class="body">
+    <div class="picts" style="grid-template-columns:repeat(5,1fr);gap:18px">
+      <div class="pict" style="gap:22px"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px;border-radius:34px"><use href="#i-file-text"/></svg><b style="font-size:33px;line-height:1.15">Опишет данные</b></div>
+      <div class="pict" style="gap:22px"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px;border-radius:34px"><use href="#i-ruler"/></svg><b style="font-size:33px;line-height:1.15">Найдёт значения за&nbsp;допуском</b></div>
+      <div class="pict" style="gap:22px"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px;border-radius:34px"><use href="#i-git-compare-arrows"/></svg><b style="font-size:33px;line-height:1.15">Сравнит серии</b></div>
+      <div class="pict" style="gap:22px"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px;border-radius:34px"><use href="#i-chart-line"/></svg><b style="font-size:33px;line-height:1.15">Предложит график</b></div>
+      <div class="pict" style="gap:22px"><svg class="i" style="width:150px;height:150px;padding:30px;font-size:90px;border-radius:34px"><use href="#i-file-pen-line"/></svg><b style="font-size:33px;line-height:1.15">Напишет черновик вывода</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="14">
+  <p class="kick t-red">И в той же таблице</p>
+  <h2>Модель может ошибиться</h2>
+  <div class="body">
+    <div class="cards" style="gap:28px 30px">
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-list-x"/></svg></span><h3 style="font-size:37px">Пропустить строку</h3></div>
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-wand-sparkles"/></svg></span><h3 style="font-size:37px">Придумать значение, которого нет</h3></div>
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-sigma"/></svg></span><h3 style="font-size:37px">Посчитать среднее не&nbsp;по&nbsp;тем данным</h3></div>
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-eraser"/></svg></span><h3 style="font-size:37px">Молча «поправить» подозрительное число</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="18" data-title="Модель быстро разбирает таблицу, ошибки модели в отчёт не попадают">
+  <p class="kick t-orange">Главная мысль темы</p>
+  <div class="body">
+    <div class="split s73">
+      <p class="say" style="font-size:80px;line-height:1.1">Модель <b>быстро<br>разбирает</b> таблицу.<br>Ошибки модели<br><em>в&nbsp;отчёт не&nbsp;попадают</em></p>
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:250px"><use href="#i-shield-check"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="21">
+  <p class="kick">Сегодня разберём</p>
+  <h2>Как пользоваться моделью и&nbsp;как проверить её&nbsp;ответ</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:30px 26px 36px;gap:18px;align-items:center;text-align:center;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:35px">Таблица испытаний</h3></li>
+      <li class="step t-teal" style="padding:30px 26px 36px;gap:18px;align-items:center;text-align:center;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:35px">Анализ с&nbsp;моделью</h3></li>
+      <li class="step t-orange" style="padding:30px 26px 36px;gap:18px;align-items:center;text-align:center;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:35px">Проверка ответа</h3><p style="font-size:26px;color:var(--ink)">прежде чем он войдёт в&nbsp;отчёт</p></li>
+      <li class="step t-gray" style="padding:30px 26px 36px;gap:18px;align-items:center;text-align:center;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-file-check"/></svg></span><h3 style="font-size:35px">Отчёт</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="23">
+  <p class="kick">План лекции</p>
+  <h2>Четыре части</h2>
+  <div class="body">
+    <ol class="list num big" style="gap:34px">
+      <li>Как передать модели таблицу</li>
+      <li>Что модель умеет и&nbsp;где ошибается</li>
+      <li>Выборочная проверка</li>
+      <li>Честная подача результатов и&nbsp;раздел отчёта</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide dark" data-at="28" data-steps="30,31" data-title="Модель предлагает, проверка решает">
+  <p class="kick t-orange">Правило всего модуля – то&nbsp;же, что для&nbsp;расчётов</p>
+  <div class="body">
+    <p class="say md">Модель <b>предлагает</b>, проверка <em>решает</em></p>
+    <div class="vs">
+      <div class="col t-teal st" data-s="1" style="padding:32px 36px;gap:20px"><h3><svg class="i"><use href="#i-bot"/></svg>Модели</h3><p style="font-size:34px;line-height:1.22">Объяснения, допущения, черновик формулы и&nbsp;вывода</p></div>
+      <div class="col t-orange st" data-s="2" style="padding:32px 36px;gap:20px"><h3><svg class="i"><use href="#i-calculator"/></svg>Числа, которые пойдут в&nbsp;работу</h3><p style="font-size:34px;line-height:1.22">Калькулятору, таблице, утверждённой расчётной программе и&nbsp;инженеру</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="35,38">
+  <p class="kick t-orange">Сквозной пример лекции</p>
+  <h2>Учебная таблица испытаний 1</h2>
+  <div class="body">
+    <div class="split s46">
+      <div class="center st" data-s="1" style="gap:30px">
+        <div class="doc t-orange" style="width:360px;gap:13px;padding:26px 28px 40px">
+          <h4 style="font-size:25px">Дополнение к&nbsp;учебному кейсу ЭС-24</h4>
+          <i></i><i class="s"></i>
+          <span style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:8px">
+            <i class="hl"></i><i class="hl"></i><i class="hl"></i><i class="hl"></i><i class="hl"></i>
+            <i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i><i></i>
+          </span>
+          <b class="stamp">таблица 1</b>
+        </div>
+        <p style="font-size:31px;font-weight:700;line-height:1.2">Ток покоя<br>и&nbsp;напряжение батарей</p>
+      </div>
+      <div class="st" data-s="2" style="gap:26px">
+        <div style="display:flex;align-items:center;gap:28px">
+          <b style="font-size:168px;line-height:.9;color:var(--teal);letter-spacing:-.02em">10</b>
+          <p style="font-size:38px;font-weight:700;line-height:1.16">опытных образцов узла ЭС-24 после доработки</p>
+        </div>
+        <div style="display:flex;gap:10px;color:var(--teal)">
+          <svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg><svg class="i" style="font-size:52px"><use href="#i-package"/></svg>
+        </div>
+        <div class="rule sm t-gray"><svg class="i"><use href="#i-info"/></svg><div><p>Отдельная учебная серия: десять новых образцов, не&nbsp;тот, по&nbsp;которому составлены замечания З&#8209;1…З&#8209;5</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="42,44,46">
+  <p class="kick">Учебная таблица 1 · что измеряли</p>
+  <h2>Ток покоя, стоянка, напряжение батарей</h2>
+  <div class="body" style="gap:16px">
+    <div class="rule sm t-gray st" data-s="1" style="padding:13px 30px"><svg class="i"><use href="#i-key-round"/></svg><div><p>Ток покоя – при&nbsp;выключенном зажигании и&nbsp;включённом выключателе массы. Время отсчитывают от&nbsp;выключения зажигания</p></div></div>
+    <ol class="timeline" style="padding-top:42.5px">
+      <li class="st" data-s="1"><b style="font-size:37px">30 мин</b><span style="font-size:27px">ток покоя</span></li>
+      <li class="st" data-s="1"><b style="font-size:37px">2 ч</b><span style="font-size:27px">ток покоя</span></li>
+      <li class="st" data-s="2"><b style="font-size:37px">14 сут</b><span style="font-size:27px">стоянка, воздух от&nbsp;−15 до&nbsp;−25&nbsp;°C</span></li>
+      <li class="st" data-s="3"><b style="font-size:37px;white-space:nowrap">После стоянки</b><span style="font-size:27px">напряжение разомкнутой цепи каждой батареи</span></li>
+    </ol>
+    <div class="card row t-teal st" data-s="3" style="padding:14px 30px"><span class="bdg"><svg class="i"><use href="#i-battery-full"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:31px">Две батареи по&nbsp;12&nbsp;В, соединены последовательно</h3><p style="font-size:27px">Поэтому в&nbsp;таблице два столбца напряжения</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="49" data-steps="51,53,55,58">
+  <p class="kick">Учебная таблица 1 · требования</p>
+  <h2>Какие требования применимы</h2>
+  <div class="body" style="gap:20px">
+    <table class="tbl" style="font-size:29px">
+      <thead><tr><th style="width:47%">Столбец таблицы</th><th>Требование ТЗ, редакция 1</th></tr></thead>
+      <tbody>
+        <tr class="st" data-s="1"><td>Ток покоя через 30&nbsp;мин, мА</td><td>п.&nbsp;4.3: <b>не более 40&nbsp;мА</b></td></tr>
+        <tr class="st" data-s="2"><td>Ток покоя через 2&nbsp;ч, мА</td><td>требований нет, столбец справочный</td></tr>
+        <tr class="st" data-s="3"><td>Напряжение батарей № 1 и&nbsp;№ 2 после 14&nbsp;сут, В</td><td>п.&nbsp;4.5: <b>каждая батарея не ниже 12,2&nbsp;В</b></td></tr>
+      </tbody>
+    </table>
+    <p class="note st" data-s="3" style="font-size:28px">Других допусков у&nbsp;этой таблицы нет</p>
+    <div class="rule sm t-orange st" data-s="4" style="padding:18px 30px"><svg class="i"><use href="#i-file-check"/></svg><div><p><b>Значения перенесены из&nbsp;учебного протокола без&nbsp;исправлений.</b> Если в&nbsp;протоколе что-то выглядит странно, в&nbsp;таблице оно так и&nbsp;осталось</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="63" data-title="Значения учебные, подобраны для упражнений">
+  <p class="kick">Учебный кейс ЭС-24</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-graduation-cap"/></svg></div>
+      <div>
+        <p class="say sm">Значения <b>учебные</b>, подобраны для&nbsp;упражнений</p>
+        <div class="rule sm t-teal"><svg class="i"><use href="#i-send"/></svg><div><p>Поэтому таблицу можно отправлять в&nbsp;сервисы, выбранные для&nbsp;занятия с&nbsp;учётом правил доступа</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="69">
+  <span class="no">1</span>
+  <p class="kick">Первый вопрос</p>
+  <h1>Как передать модели таблицу</h1>
+  <p class="lead">Сначала – правило данных. Оно остаётся прежним</p>
+</section>
+
+<section class="slide" data-steps="72,77">
+  <p class="kick">Правило данных</p>
+  <h2>Какую таблицу и&nbsp;в&nbsp;какой сервис</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" data-s="1" style="gap:18px;padding:26px 32px"><h3><svg class="i"><use href="#i-graduation-cap"/></svg>Учебные таблицы</h3><p style="font-size:31px">В&nbsp;сервисах, выбранных для&nbsp;занятия с&nbsp;учётом правил доступа</p></div>
+      <div class="col t-red st" data-s="1" style="gap:18px;padding:26px 32px"><h3><svg class="i"><use href="#i-file-lock"/></svg>Реальные результаты испытаний</h3><p style="font-size:31px">Только в&nbsp;сервис, который соответствует уровню данных по&nbsp;правилам вашей организации</p></div>
+    </div>
+    <div class="rule t-orange st" data-s="2" style="padding:22px 34px"><svg class="i"><use href="#i-circle-help"/></svg><div><h3>Такого сервиса нет?</h3><p>Приёмы – на&nbsp;учебных таблицах,<br>свои данные – в&nbsp;разрешённых инструментах</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="80">
+  <p class="kick t-orange">Обратите внимание</p>
+  <h2>В сервис уходит не&nbsp;только таблица</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 210px;gap:36px;align-items:center">
+      <div class="prompt" style="--tw:250px;font-size:29px;padding:24px 28px;gap:14px">
+        <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Условия испытаний</span><span>Ток покоя через 30&nbsp;мин и&nbsp;2&nbsp;ч, стоянка 14&nbsp;сут при&nbsp;−15…−25&nbsp;°C</span></p>
+        <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Пункты требований</span><span>п.&nbsp;4.3 и&nbsp;п.&nbsp;4.5 ТЗ, редакция&nbsp;1</span></p>
+        <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Таблица</span><span class="mono">Образец;Ток через 30 мин, мА;…</span></p>
+      </div>
+      <div class="center t-orange" style="display:flex;flex-direction:column;gap:14px;color:var(--c)">
+        <svg class="i" style="font-size:150px"><use href="#i-cloud-upload"/></svg>
+        <span style="font-size:28px;font-weight:700;line-height:1.2">всё это – в&nbsp;сервис</span>
+      </div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-shield-check"/></svg><div><p>Правило данных относится ко&nbsp;всему, что вы вставляете в&nbsp;запрос</p></div></div>
+  </div>
+</section>

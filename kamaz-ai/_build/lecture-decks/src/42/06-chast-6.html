@@ -1,0 +1,384 @@
+<!-- Лекция 4.2, строки 618–731 (28:33–34:19): выборочная проверка ответа модели по исходной таблице – шесть шагов, строка «Как проверено», вставка 20.11 о второй модели-проверяющем (Panickssery и соавт., 2024; Kim и соавт., 2025) -->
+
+<section class="slide sect" data-at="618" data-title="Как проверять ответ модели">
+  <span class="no"><svg class="i"><use href="#i-search-check"/></svg></span>
+  <p class="kick">Проверка выводов по&nbsp;исходной таблице</p>
+  <h1>Как&nbsp;же проверять<br>ответ модели?</h1>
+  <p class="lead" style="text-wrap:balance;">Пересчитывать всё заново не&nbsp;нужно, иначе модель не&nbsp;сэкономит время</p>
+</section>
+
+<section class="slide" data-at="621">
+  <p class="kick">Выборочная проверка</p>
+  <h2>Шесть шагов, и&nbsp;каждый ловит свой вид ошибки</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-list-ordered"/></svg><b style="font-size:36px;color:var(--c)">1</b></span><b style="font-size:31px;line-height:1.15">Число строк и&nbsp;идентификаторы</b></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-file-search"/></svg><b style="font-size:36px;color:var(--c)">2</b></span><b style="font-size:31px;line-height:1.15">Каждое число из&nbsp;вывода</b></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-calculator"/></svg><b style="font-size:36px;color:var(--c)">3</b></span><b style="font-size:31px;line-height:1.15">Пересчёт двух-трёх статистик</b></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-file-check"/></svg><b style="font-size:36px;color:var(--c)">4</b></span><b style="font-size:31px;line-height:1.15">Каждое «вне допуска» и&nbsp;«соответствует»</b></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-scan-search"/></svg><b style="font-size:36px;color:var(--c)">5</b></span><b style="font-size:31px;line-height:1.15">Подозрительные значения</b></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:22px 26px 26px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:14px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:48px;color:var(--c)"><use href="#i-strikethrough"/></svg><b style="font-size:36px;color:var(--c)">6</b></span><b style="font-size:31px;line-height:1.15">Формулировки выводов</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="624">
+  <p class="kick">Шаг 1 из 6</p>
+  <h2>Число строк и&nbsp;идентификаторы</h2>
+  <div class="body" style="gap:34px">
+    <div style="display:grid;grid-template-columns:1fr 70px 1fr;gap:20px;align-items:center">
+      <div class="card row t-teal" style="padding:24px 30px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:36px">Строки<br>в&nbsp;ответе модели</h3></div>
+      <b style="font-size:64px;text-align:center;color:var(--muted)">=</b>
+      <div class="card row t-orange" style="padding:24px 30px"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:36px">Строки<br>вашей таблицы</h3></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <p style="font-size:26px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Каждый идентификатор на&nbsp;месте · таблица&nbsp;1</p>
+      <div class="t-teal" style="display:grid;grid-template-columns:repeat(10,1fr);gap:12px">
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-01</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-02</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-03</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-04</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-05</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-06</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-07</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-08</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-09</span>
+        <span style="background:var(--ct);color:var(--ci);border-radius:12px;padding:12px 0;text-align:center;font-size:28px;font-weight:700">О-10</span>
+      </div>
+    </div>
+    <div class="rule sm t-teal" style="padding:18px 30px"><svg class="i"><use href="#i-crosshair"/></svg><div><p>Этот шаг ловит пропуски</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="629" data-title="Числа – из исходной таблицы">
+  <p class="kick t-orange">Правило для всех следующих шагов</p>
+  <div class="body">
+    <div class="split s64" style="gap:56px;align-items:center">
+      <div style="gap:26px">
+        <p class="say md">Числа берите из&nbsp;<b>исходной таблицы</b></p>
+        <p class="sub" style="font-size:36px">Не&nbsp;из&nbsp;таблицы в&nbsp;ответе модели: там они могут быть уже «поправлены»</p>
+      </div>
+      <div style="align-items:center">
+        <svg class="i" style="font-size:230px;color:var(--orange)"><use href="#i-table"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="632">
+  <p class="kick">Шаг 2 из 6</p>
+  <h2>Каждое число из&nbsp;вывода: откуда оно?</h2>
+  <div class="body" style="gap:34px">
+    <div class="cards c3">
+      <div class="card t-teal" style="padding:28px 28px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:36px">Замер</h3><p style="font-size:29px;text-wrap:balance;">сверить<br>с&nbsp;исходной таблицей</p></div>
+      <div class="card t-teal" style="padding:28px 28px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:36px">Расчётное число</h3><p style="font-size:29px">проверить пересчётом</p></div>
+      <div class="card t-teal" style="padding:28px 28px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-file-check"/></svg></span><h3 style="font-size:36px">Предел допуска</h3><p style="font-size:29px;text-wrap:balance;">сверить с&nbsp;пунктом<br>технического задания</p></div>
+    </div>
+    <div class="rule t-red" style="padding:22px 34px"><svg class="i"><use href="#i-circle-alert"/></svg><div><p>Числа нет ни&nbsp;там, ни&nbsp;там – это выдумка. Так ловятся выдуманные замеры и&nbsp;длительности</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="638" data-steps="639,642,646">
+  <p class="kick">Шаг 3 из 6</p>
+  <h2>Пересчёт двух-трёх статистик</h2>
+  <div class="body" style="gap:22px">
+    <div class="picts c4 sm st" data-s="1">
+      <div class="pict"><svg class="i"><use href="#i-sigma"/></svg><b>Среднее</b></div>
+      <div class="pict"><svg class="i"><use href="#i-arrow-up-to-line"/></svg><b>Наибольшее</b></div>
+      <div class="pict"><svg class="i"><use href="#i-arrow-down-to-line"/></svg><b>Наименьшее</b></div>
+      <div class="pict"><svg class="i"><use href="#i-hash"/></svg><b>Число значений за&nbsp;допуском</b></div>
+    </div>
+    <div class="vs" style="gap:34px">
+      <div class="col t-teal st" data-s="2" style="padding:22px 32px 24px;gap:10px">
+        <h3><svg class="i"><use href="#i-sheet"/></svg>Табличный редактор · Excel</h3>
+        <p style="font-size:30px"><code style="font-weight:700;color:var(--c)">СРЗНАЧ</code> – среднее</p>
+        <p style="font-size:30px"><code style="font-weight:700;color:var(--c)">СЧЁТЕСЛИ</code> – число значений за&nbsp;допуском</p>
+        <p class="muted" style="font-size:23px">В&nbsp;других редакторах названия – по&nbsp;справке</p>
+      </div>
+      <div class="col t-orange st" data-s="3" style="padding:22px 32px 24px;gap:10px">
+        <h3><svg class="i"><use href="#i-calculator"/></svg>Нет редактора</h3>
+        <p style="font-size:30px">Две-три статистики считают на&nbsp;калькуляторе</p>
+        <p style="font-size:30px">Медиану находят вручную</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="649" data-steps="650,652,654">
+  <p class="kick">Шаг 3 · ловит неверные средние и&nbsp;подсчёты</p>
+  <h2>Не&nbsp;совпало с&nbsp;ответом модели – выясните почему</h2>
+  <div class="body" style="gap:30px">
+    <div class="ask t-orange" style="grid-template-columns:200px 1fr;gap:44px">
+      <span class="q" style="width:200px;height:200px;font-size:140px">?</span>
+      <ul>
+        <li class="st">Ваше среднее не&nbsp;совпало со&nbsp;средним модели?</li>
+        <li class="st">По&nbsp;скольким строкам считала модель?</li>
+        <li class="st" style="text-wrap:balance">Не&nbsp;совпало стандартное отклонение? Какое она считала: выборочное или по&nbsp;генеральной совокупности?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="655">
+  <p class="kick">Шаг 4 из 6</p>
+  <h2>Каждое «вне допуска» и&nbsp;каждое «соответствует» сверьте с&nbsp;пунктом требований</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict" style="font-size:36px;gap:22px"><svg class="i" style="width:170px;height:170px;padding:36px;font-size:98px;border-radius:34px"><use href="#i-columns-3"/></svg><b>Тот&nbsp;ли столбец</b></div>
+      <div class="pict" style="font-size:36px;gap:22px"><svg class="i" style="width:170px;height:170px;padding:36px;font-size:98px;border-radius:34px"><use href="#i-thermometer"/></svg><b>Те&nbsp;ли условия</b></div>
+      <div class="pict" style="font-size:36px;gap:22px"><svg class="i" style="width:170px;height:170px;padding:36px;font-size:98px;border-radius:34px"><use href="#i-ruler"/></svg><b>Та&nbsp;ли граница</b></div>
+      <div class="pict" style="font-size:36px;gap:22px"><svg class="i" style="width:170px;height:170px;padding:36px;font-size:98px;border-radius:34px"><use href="#i-scale"/></svg><b>Строгое&nbsp;ли неравенство</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="661">
+  <p class="kick">Шаг 4 · строгое&nbsp;ли неравенство</p>
+  <h2>Ровно на&nbsp;границе – ещё в&nbsp;допуске</h2>
+  <div class="body" style="gap:30px">
+    <div class="vs" style="gap:36px">
+      <div class="col t-teal" style="padding:28px 36px 30px;gap:12px">
+        <p class="muted" style="font-size:28px">п.&nbsp;4.3 ТЗ</p>
+        <p style="font-size:44px;font-weight:700;line-height:1.1">«не&nbsp;более 40&nbsp;мА»</p>
+        <svg viewBox="0 0 520 96" style="width:100%;height:auto;margin-top:6px" aria-hidden="true">
+          <rect x="10" y="34" width="330" height="22" rx="11" style="fill:var(--c);opacity:.35"/>
+          <line x1="10" y1="45" x2="510" y2="45" style="stroke:var(--line);stroke-width:4"/>
+          <circle cx="340" cy="45" r="17" style="fill:var(--c)"/>
+          <text x="340" y="88" text-anchor="middle" dy="4" style="font-size:34px;font-weight:700;fill:var(--c)">40</text>
+        </svg>
+        <p style="font-size:32px"><b style="color:var(--c)">Ровно 40&nbsp;мА</b> – в&nbsp;допуске</p>
+      </div>
+      <div class="col t-teal" style="padding:28px 36px 30px;gap:12px">
+        <p class="muted" style="font-size:28px">п.&nbsp;4.5 ТЗ</p>
+        <p style="font-size:44px;font-weight:700;line-height:1.1">«не&nbsp;ниже 12,2&nbsp;В»</p>
+        <svg viewBox="0 0 520 96" style="width:100%;height:auto;margin-top:6px" aria-hidden="true">
+          <rect x="180" y="34" width="330" height="22" rx="11" style="fill:var(--c);opacity:.35"/>
+          <line x1="10" y1="45" x2="510" y2="45" style="stroke:var(--line);stroke-width:4"/>
+          <circle cx="180" cy="45" r="17" style="fill:var(--c)"/>
+          <text x="180" y="88" text-anchor="middle" dy="4" style="font-size:34px;font-weight:700;fill:var(--c)">12,2</text>
+        </svg>
+        <p style="font-size:32px"><b style="color:var(--c)">Ровно 12,2&nbsp;В</b> – тоже в&nbsp;допуске</p>
+      </div>
+    </div>
+    <div class="rule sm t-orange" style="padding:18px 30px"><svg class="i"><use href="#i-crosshair"/></svg><div><p>Этот шаг ловит неверный допуск</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="666">
+  <p class="kick">Шаг 5 из 6</p>
+  <h2>Подозрительные значения</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:56px">
+      <div style="align-items:center;gap:14px">
+        <svg viewBox="0 0 460 260" style="width:100%;height:auto" aria-hidden="true">
+          <line x1="10" y1="236" x2="450" y2="236" style="stroke:var(--line);stroke-width:4;stroke-linecap:round"/>
+          <circle cx="40" cy="70" r="13" style="fill:var(--teal)"/>
+          <circle cx="85" cy="62" r="13" style="fill:var(--teal)"/>
+          <circle cx="130" cy="76" r="13" style="fill:var(--teal)"/>
+          <circle cx="175" cy="66" r="13" style="fill:var(--teal)"/>
+          <circle cx="220" cy="196" r="15" style="fill:var(--orange)"/>
+          <circle cx="220" cy="196" r="36" style="fill:none;stroke:var(--orange);stroke-width:4;stroke-dasharray:10 8"/>
+          <circle cx="265" cy="72" r="13" style="fill:var(--teal)"/>
+          <circle cx="310" cy="64" r="13" style="fill:var(--teal)"/>
+          <circle cx="355" cy="74" r="13" style="fill:var(--teal)"/>
+          <circle cx="400" cy="68" r="13" style="fill:var(--teal)"/>
+          <circle cx="440" cy="71" r="13" style="fill:var(--teal)"/>
+        </svg>
+        <p class="note" style="font-size:27px;text-align:center">значение сильно отличается от&nbsp;соседних</p>
+      </div>
+      <div style="gap:26px">
+        <p class="say xs" style="font-size:40px;text-wrap:balance;">Найдите их в&nbsp;исходной таблице и&nbsp;посмотрите, что о&nbsp;них сказала модель</p>
+        <ul class="list cross" style="font-size:34px">
+          <li>«Исправила»</li>
+          <li>Пропустила молча</li>
+        </ul>
+        <p style="font-size:32px;font-weight:700;color:var(--red)">И&nbsp;то и&nbsp;другое – ошибка</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="670">
+  <p class="kick">Шаг 6 из 6 · формулировки выводов</p>
+  <h2>Вычеркните из&nbsp;вывода всё, что не&nbsp;следует из&nbsp;таблицы</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-red" style="padding:48px 34px 56px;gap:30px"><span class="bdg lg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3 style="font-size:46px;text-decoration:line-through;text-decoration-thickness:4px;text-decoration-color:var(--c)">Причины</h3></div>
+      <div class="card t-red" style="padding:48px 34px 56px;gap:30px"><span class="bdg lg"><svg class="i"><use href="#i-trending-up"/></svg></span><h3 style="font-size:46px;text-decoration:line-through;text-decoration-thickness:4px;text-decoration-color:var(--c)">Прогнозы</h3></div>
+      <div class="card t-red" style="padding:48px 34px 56px;gap:30px"><span class="bdg lg"><svg class="i"><use href="#i-badge-check"/></svg></span><h3 style="font-size:46px;text-decoration:line-through;text-decoration-thickness:4px;text-decoration-color:var(--c)">«Стабильно», «надёжно»</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="676">
+  <p class="kick">Выборочная проверка</p>
+  <h2>Шесть шагов и&nbsp;строка для отчёта</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:18px 50px">
+      <ol class="list num" style="font-size:30px;gap:16px;text-wrap:balance;">
+        <li>Сосчитать строки и&nbsp;сверить идентификаторы</li>
+        <li>Найти в&nbsp;таблице каждое число вывода</li>
+        <li>Пересчитать две-три статистики</li>
+      </ol>
+      <ol class="list num" start="4" style="font-size:30px;gap:16px;counter-reset:n 3;text-wrap:balance;">
+        <li>Сверить каждое «вне допуска» с&nbsp;пунктом ТЗ</li>
+        <li>Посмотреть, что стало с&nbsp;подозрительными значениями</li>
+        <li>Вычеркнуть выводы шире данных</li>
+      </ol>
+    </div>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-file-pen-line"/></svg><div><p>В&nbsp;отчёт – строка «Как проверено»: что пересчитано и&nbsp;сверено</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="678">
+  <p class="kick">Строка «Как проверено»</p>
+  <h2>Конкретная строка стоит больше общей фразы</h2>
+  <div class="body">
+    <div class="vs" style="grid-template-columns:1.6fr 1fr;gap:36px">
+      <div class="col t-orange" style="padding:30px 38px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-check-check"/></svg>Так</h3>
+        <p style="font-size:33px;line-height:1.3">Пересчитаны среднее и&nbsp;максимум тока через 30&nbsp;мин, число образцов вне допуска по&nbsp;п.&nbsp;4.3 и&nbsp;п.&nbsp;4.5, сверены все числа вывода с&nbsp;протоколом</p>
+      </div>
+      <div class="col t-gray" style="padding:30px 38px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-circle-help"/></svg>Слабее</h3>
+        <p style="font-size:40px;font-weight:700;line-height:1.15">Результаты проверены</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="683">
+  <p class="kick">Если проверка ошибок не&nbsp;нашла</p>
+  <h2>Чистый ответ модели – тоже результат</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:60px">
+      <div class="docs">
+        <div class="doc" style="width:440px;padding:36px 36px 46px;gap:20px"><h4 style="font-size:32px">Раздел отчёта</h4><i style="height:14px"></i><i style="height:14px"></i><i class="s" style="height:14px"></i><i style="height:14px"></i><i class="hl" style="height:14px"></i><i class="hl s" style="height:14px"></i><b class="stamp t-teal" style="font-size:22px">Как проверено</b></div>
+      </div>
+      <div style="gap:24px">
+        <p class="say xs" style="font-size:44px">Его тоже записывают</p>
+        <ul class="list" style="font-size:33px">
+          <li>что именно проверено</li>
+          <li>почему есть уверенность</li>
+        </ul>
+        <p class="muted" style="font-size:29px">Тогда читателю отчёта понятен объём проверки</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="690" data-steps="691,693">
+  <p class="kick">Шесть шагов проверки</p>
+  <h2>К&nbsp;каждой ошибке – своя проверка</h2>
+  <div class="body" style="gap:26px">
+    <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:12px">
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">1</b><span>Строки и идентификаторы</span></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">2</b><span>Числа вывода</span></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">3</b><span>Две-три статистики</span></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">4</b><span>Допуски</span></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">5</b><span>Подозрительные значения</span></div>
+      <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:12px;padding:10px 16px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;font-size:21px;min-width:0;font-weight:700;line-height:1.12"><b style="font-size:26px;color:var(--c)">6</b><span>Формулировки выводов</span></div>
+    </div>
+    <table class="tbl" style="font-size:32px">
+      <thead><tr><th style="width:42%;padding:18px 30px">Если</th><th style="padding:18px 30px">Проверка</th></tr></thead>
+      <tbody>
+        <tr class="st" data-s="1"><td style="padding:18px 28px">Подозреваете пропуск</td><td style="padding:18px 28px">Сверьте идентификаторы строк</td></tr>
+        <tr class="st" data-s="1"><td style="padding:18px 28px">Сомневаетесь в&nbsp;среднем</td><td style="padding:18px 28px">Пересчитайте его по&nbsp;исходным данным</td></tr>
+        <tr class="st" data-s="2"><td style="padding:18px 28px">Число похоже на&nbsp;опечатку</td><td style="padding:18px 28px">Оставьте его как есть и&nbsp;сверьте с&nbsp;протоколом</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="711">
+  <p class="kick">Вторая модель как проверяющий</p>
+  <h2>А&nbsp;если поручить проверку второй модели?</h2>
+  <div class="body" style="gap:34px">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="flex-direction:row;align-items:center;gap:24px;padding:30px 30px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:38px">Одна модель</h3><p style="font-size:30px;color:var(--ink)">делает</p></div></li>
+      <li class="step t-orange" style="flex-direction:row;align-items:center;gap:24px;padding:30px 30px"><span class="bdg lg"><svg class="i"><use href="#i-scan-eye"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:38px;text-wrap:balance;">Модель другого разработчика</h3><p style="font-size:30px;color:var(--ink);text-wrap:balance;">проверяет в&nbsp;роли жёсткого критика</p></div></li>
+    </ol>
+    <div style="display:flex;justify-content:center"><span class="tag t-gray" style="font-size:28px;padding:10px 26px">Об&nbsp;этом приёме нужно знать две вещи</span></div>
+  </div>
+</section>
+
+<section class="slide" data-at="714">
+  <p class="kick">Первое · группа исследователей, 2024</p>
+  <h2>Модели предпочитают собственные тексты</h2>
+  <div class="body" style="gap:32px">
+    <div class="card row t-teal" style="padding:30px 34px;align-items:flex-start"><span class="bdg lg"><svg class="i"><use href="#i-newspaper"/></svg></span><div style="display:flex;flex-direction:column;gap:10px"><p class="muted" style="font-size:26px">Опыты с&nbsp;пересказами новостей · GPT-3.5 Turbo, GPT-4, Llama&nbsp;2</p><p style="font-size:36px;line-height:1.22;text-wrap:balance;">Модели-судьи чаще отдавали предпочтение собственным пересказам</p></div></div>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-users"/></svg><div><p>Нужен второй отзыв – можно поручить его другой модели</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Panickssery A., Bowman S. R., Feng S. NeurIPS 2024 · doi.org/10.52202/079017-2197</p>
+</section>
+
+<section class="slide" data-at="718">
+  <p class="kick t-red">Второе · другая модель тоже может ошибиться точно так&nbsp;же</p>
+  <h2>Kim и&nbsp;соавторы, 2025</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:400px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-git-compare"/></svg></i>
+        <h3 style="font-size:40px">Kim, Garg,<br>Peng, Garg</h3>
+        <p>ICML 2025</p>
+      </div>
+      <dl class="kv" style="--kw:230px">
+        <div style="font-size:34px;padding:20px 15px"><dt>Охват</dt><dd>Больше 350 моделей</dd></div>
+        <div style="font-size:34px;padding:20px 15px"><dt>Одно из&nbsp;сравнений</dt><dd>Ответы моделей на&nbsp;вопросы с&nbsp;выбором варианта</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kim E., Garg A., Peng K., Garg N. Correlated Errors in Large Language Models. ICML 2025 · doi.org/10.48550/arXiv.2506.07962</p>
+</section>
+
+<section class="slide" data-at="722">
+  <p class="kick">Kim и&nbsp;соавт., 2025 · вопросы с&nbsp;выбором варианта, рейтинг HELM</p>
+  <h2 style="text-wrap:balance;">Когда обе модели ошибались, неверные ответы совпадали</h2>
+  <div class="body" style="gap:34px">
+    <div class="bars" style="--max:100;--lbw:390px;gap:30px">
+      <div class="bar t-red" style="--v:60;grid-template-columns:var(--lbw) 1fr 260px"><span class="lb" style="font-size:29px">Совпадение неверных ответов, в&nbsp;среднем</span><i style="height:56px"></i><b style="font-size:36px">примерно 60&nbsp;%</b></div>
+      <div class="bar t-gray" style="--v:33.3;grid-template-columns:var(--lbw) 1fr 260px"><span class="lb" style="font-size:29px">При случайном выборе среди неверных вариантов</span><i style="height:56px"></i><b style="font-size:36px">около трети</b></div>
+    </div>
+    <div class="rule sm t-gray" style="padding:18px 30px"><svg class="i"><use href="#i-info"/></svg><div><p>На&nbsp;инженерных таблицах частоту таких совпадений авторы не&nbsp;измеряли</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kim E., Garg A., Peng K., Garg N. Correlated Errors in Large Language Models. ICML 2025 · doi.org/10.48550/arXiv.2506.07962</p>
+</section>
+
+<section class="slide" data-at="725">
+  <p class="kick">Kim и&nbsp;соавт., 2025 · что показали опыты</p>
+  <h2>Ошибки более точных моделей совпадали чаще</h2>
+  <div class="body" style="gap:30px">
+    <div class="cards" style="gap:34px">
+      <div class="card t-teal" style="padding:34px 34px 40px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-git-compare"/></svg></span><p style="font-size:34px;line-height:1.25;text-wrap:balance;">Совпадали и&nbsp;у&nbsp;моделей <b>разных разработчиков</b></p></div>
+      <div class="card t-red" style="padding:34px 34px 40px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-scale"/></svg></span><p style="font-size:34px;line-height:1.25;text-wrap:balance;"><b>Модель-судья</b> засчитывала неверный ответ как верный, если сама ошибалась так&nbsp;же</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kim E., Garg A., Peng K., Garg N. Correlated Errors in Large Language Models. ICML 2025 · doi.org/10.48550/arXiv.2506.07962</p>
+</section>
+
+<section class="slide" data-at="727">
+  <p class="kick t-orange">Отсюда два правила · первое</p>
+  <h2>Второй модели – ответ первой и&nbsp;исходную таблицу</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:50px">
+      <div class="docs" style="gap:34px">
+        <div class="doc" style="width:300px;gap:16px"><h4 style="font-size:25px">Ответ первой модели</h4><i style="height:13px"></i><i style="height:13px"></i><i class="s" style="height:13px"></i><b class="stamp t-teal">ответ</b></div>
+        <div class="doc" style="width:300px;gap:16px"><h4 style="font-size:25px">Исходная таблица</h4><i class="t" style="height:13px"></i><i style="height:13px"></i><i style="height:13px"></i><i class="s" style="height:13px"></i><b class="stamp t-orange">таблица</b></div>
+      </div>
+      <div class="chat">
+        <div class="msg user" style="font-size:34px;padding:28px 34px;max-width:100%">
+          <span class="who">Запрос второй модели</span>
+          <p>Из&nbsp;какой ячейки взят замер? Если число расчётное, какие строки вошли в&nbsp;расчёт и&nbsp;как ты его выполнил?</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="730" data-title="Согласие двух моделей ничего не доказывает">
+  <p class="kick t-orange">Второе правило</p>
+  <div class="body">
+    <p class="say md">Согласие двух моделей <b>ещё ничего не&nbsp;доказывает</b></p>
+    <p class="sub" style="font-size:38px">Там, где они разошлись, и&nbsp;начинайте свою выборочную проверку</p>
+  </div>
+</section>

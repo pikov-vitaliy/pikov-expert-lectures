@@ -1,0 +1,282 @@
+<!-- Лекция 4.2, строки 237–300 (10:37–14:29): что модель может с таблицей испытаний – пять пунктов: описать данные, найти значения за допуском, найти выбросы (Li и соавт., Zhou и Yu; О-07 и О-05 в таблице 1), сравнить серии и вид графика, черновик вывода -->
+
+<section class="slide sect" data-at="237" data-title="Что модель может с таблицей испытаний">
+  <span class="no"><svg class="i"><use href="#i-bot"/></svg></span>
+  <p class="kick">Таблица испытаний</p>
+  <h1>Что модель может<br>с&nbsp;такой таблицей</h1>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:16px;margin-top:30px">
+    <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-database"/></svg><b style="font-size:32px;color:var(--c)">1</b></span><b style="font-size:27px;line-height:1.15">Описать данные</b></div>
+    <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-gauge"/></svg><b style="font-size:32px;color:var(--c)">2</b></span><b style="font-size:27px;line-height:1.15">Найти значения за&nbsp;допуском</b></div>
+    <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-chart-scatter"/></svg><b style="font-size:32px;color:var(--c)">3</b></span><b style="font-size:27px;line-height:1.15">Найти выбросы</b></div>
+    <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-trending-down"/></svg><b style="font-size:32px;color:var(--c)">4</b></span><b style="font-size:27px;line-height:1.15">Сравнить серии, назвать тенденцию</b></div>
+    <div class="t-teal" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><span style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-file-pen-line"/></svg><b style="font-size:32px;color:var(--c)">5</b></span><b style="font-size:27px;line-height:1.15">Написать черновик вывода</b></div>
+  </div>
+</section>
+
+<section class="slide" data-at="240">
+  <p class="kick">Пункт 1 из 5</p>
+  <h2>Описать данные</h2>
+  <div class="body" style="gap:30px">
+    <div class="picts c4 sm">
+      <div class="pict"><svg class="i"><use href="#i-hash"/></svg><b>Сколько образцов</b></div>
+      <div class="pict"><svg class="i"><use href="#i-ruler"/></svg><b>Какие величины</b></div>
+      <div class="pict"><svg class="i"><use href="#i-move-vertical"/></svg><b>В каких пределах</b></div>
+      <div class="pict"><svg class="i"><use href="#i-square-dashed"/></svg><b>Есть ли пропуски</b></div>
+    </div>
+    <div style="display:grid;grid-template-columns:auto 1fr 1fr 1fr;gap:22px;align-items:stretch">
+      <div class="t-gray" style="display:flex;align-items:center;gap:14px;padding-right:6px"><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-table"/></svg><b style="font-size:32px;line-height:1.1">Таблица&nbsp;1</b></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:18px;padding:16px 24px"><b style="font-size:72px">10</b><span style="font-size:27px">образцов</span></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:18px;padding:16px 24px"><b style="font-size:72px">2</b><span style="font-size:27px">замера тока у&nbsp;каждого</span></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:18px;padding:16px 24px"><b style="font-size:72px">2</b><span style="font-size:27px">значения напряжения у&nbsp;каждого</span></div>
+    </div>
+    <div class="rule sm t-teal" style="padding:20px 32px"><svg class="i"><use href="#i-scan-eye"/></svg><div><p>Быстрый способ увидеть таблицу целиком –<br>особенно чужую, которую видите впервые</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="244">
+  <p class="kick">Пункт 2 из 5</p>
+  <h2>Найти значения за&nbsp;допуском</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1.25fr 64px 1fr;gap:26px;align-items:center">
+      <div class="chat"><div class="msg user" style="max-width:100%;align-self:stretch;font-size:36px;padding:32px 36px">
+        <span class="who" style="font-size:22px;margin-bottom:14px">Только если в&nbsp;запросе указано</span>
+        <p style="display:flex;align-items:center;gap:20px;color:var(--on_graphite)"><svg class="i" style="font-size:44px"><use href="#i-file-check"/></svg>пункт требований</p>
+        <p style="display:flex;align-items:center;gap:20px;color:var(--on_graphite);margin-top:20px"><svg class="i" style="font-size:44px"><use href="#i-columns-3"/></svg>к какому столбцу он&nbsp;относится</p>
+        <p style="display:flex;align-items:center;gap:20px;color:var(--on_graphite);margin-top:20px"><svg class="i" style="font-size:44px"><use href="#i-thermometer"/></svg>при каких условиях&nbsp;измерения</p>
+      </div></div>
+      <svg class="i" style="font-size:56px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+      <div class="card t-teal" style="padding:34px 34px 38px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-gauge"/></svg></span><h3 style="font-size:42px">Модель отметит<br>строки за&nbsp;допуском</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="248">
+  <p class="kick t-orange">Пункт 2 · таблица 1</p>
+  <h2>Проверьте, к&nbsp;тому&nbsp;ли столбцу и&nbsp;к&nbsp;тем&nbsp;ли условиям модель применила допуск</h2>
+  <div class="body">
+    <div class="vs" style="gap:36px">
+      <div class="col t-orange" style="padding:34px 38px 38px;gap:20px;min-height:320px;justify-content:center">
+        <h3><svg class="i"><use href="#i-timer"/></svg>Ток покоя через 30&nbsp;мин, мА</h3>
+        <p class="muted" style="font-size:31px">п.&nbsp;4.3 ТЗ, редакция&nbsp;1</p>
+        <p style="font-size:62px;font-weight:700;line-height:1.05;color:var(--c)">не более 40&nbsp;мА</p>
+      </div>
+      <div class="col t-gray" style="padding:34px 38px 38px;gap:20px;min-height:320px;justify-content:center">
+        <h3><svg class="i"><use href="#i-timer"/></svg>Ток покоя через 2&nbsp;ч, мА</h3>
+        <p class="muted" style="font-size:31px">столбец справочный</p>
+        <p style="font-size:52px;font-weight:700;line-height:1.08">требований в&nbsp;ТЗ&nbsp;нет</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="252">
+  <p class="kick">Пункт 3 из 5</p>
+  <h2>Найти выбросы</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:56px">
+      <div style="align-items:center;gap:14px">
+        <svg viewBox="0 0 460 300" style="width:100%;height:auto" aria-hidden="true">
+          <rect x="10" y="168" width="440" height="66" rx="16" style="fill:var(--surface2)"/>
+          <line x1="10" y1="276" x2="450" y2="276" style="stroke:var(--line);stroke-width:4;stroke-linecap:round"/>
+          <circle cx="40" cy="198" r="12" style="fill:var(--teal)"/>
+          <circle cx="80" cy="190" r="12" style="fill:var(--teal)"/>
+          <circle cx="120" cy="206" r="12" style="fill:var(--teal)"/>
+          <circle cx="160" cy="194" r="12" style="fill:var(--teal)"/>
+          <circle cx="200" cy="203" r="12" style="fill:var(--teal)"/>
+          <circle cx="240" cy="188" r="12" style="fill:var(--teal)"/>
+          <circle cx="280" cy="60" r="14" style="fill:var(--red)"/>
+          <circle cx="280" cy="60" r="36" style="fill:none;stroke:var(--red);stroke-width:4;stroke-dasharray:10 8"/>
+          <circle cx="320" cy="200" r="12" style="fill:var(--teal)"/>
+          <circle cx="360" cy="192" r="12" style="fill:var(--teal)"/>
+          <circle cx="400" cy="205" r="12" style="fill:var(--teal)"/>
+          <circle cx="430" cy="196" r="12" style="fill:var(--teal)"/>
+        </svg>
+        <p class="note" style="font-size:27px;text-align:center">значение выбивается из&nbsp;ряда</p>
+      </div>
+      <div style="gap:28px">
+        <p class="say xs" style="font-size:42px">Модели умеют замечать значения, которые выбиваются из&nbsp;ряда</p>
+        <div class="card row t-teal" style="padding:24px 28px;align-items:flex-start"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><p class="muted" style="font-size:25px">Li и&nbsp;соавт., 2024, препринт</p><p style="font-size:30px;line-height:1.22">Без дополнительного обучения модели находили выбросы в&nbsp;наборах табличных данных</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Li A. et al. Anomaly Detection of Tabular Data Using LLMs, 2024, препринт arXiv · doi.org/10.48550/arXiv.2406.16308</p>
+</section>
+
+<section class="slide" data-at="256" data-title="Li и соавт.: скрытые выбросы без подгонки под распределение">
+  <p class="kick">Li и соавт., 2024 · о&nbsp;языковых моделях</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:47px">Без дополнительной подгонки под конкретное распределение они могут <b>находить скрытые выбросы в&nbsp;наборе данных</b>, что показывает их способность выделять области с&nbsp;низкой плотностью&nbsp;данных</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Li A. и соавт.</b>авторы исследования, препринт arXiv</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Li A. et al. Anomaly Detection of Tabular Data Using LLMs, 2024, препринт arXiv · doi.org/10.48550/arXiv.2406.16308</p>
+</section>
+
+<section class="slide" data-at="260" data-title="Zhou и Yu: простые и тонкие аномалии">
+  <p class="kick t-red">Но находят не&nbsp;всякие выбросы · Zhou и&nbsp;Yu, 2024</p>
+  <div class="body" style="gap:34px">
+    <div style="display:flex;gap:16px;align-items:center"><span class="tag t-gray" style="font-size:27px;padding:8px 22px;display:inline-flex;align-items:center;gap:12px"><svg class="i"><use href="#i-chart-line"/></svg>Проверка на&nbsp;временных рядах</span></div>
+    <figure class="quote md t-red">
+      <blockquote>Наши результаты говорят о&nbsp;том, что языковые модели способны распознавать <b>простые аномалии</b> во&nbsp;временных рядах, но&nbsp;у&nbsp;нас нет данных о&nbsp;том, что они распознают <b>более тонкие аномалии</b> реальных данных</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Zhou Z., Yu R.</b>авторы исследования, препринт arXiv</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhou Z., Yu R. Can LLMs Understand Time Series Anomalies?, 2024, препринт arXiv · doi.org/10.48550/arXiv.2410.05440</p>
+</section>
+
+<section class="slide dark" data-at="267" data-title="Явные выбросы модель находит надёжнее, чем тонкие">
+  <p class="kick t-orange">Коротко</p>
+  <div class="body">
+    <div class="split s46" style="gap:56px">
+      <div style="gap:44px">
+        <div class="t-teal" style="display:grid;grid-template-columns:1fr 72px;gap:18px;align-items:center">
+          <svg viewBox="0 0 400 150" style="width:100%;height:auto" aria-hidden="true"><polyline points="0,122 40,117 80,125 120,116 160,123 200,12 240,120 280,124 320,116 360,122 400,118" style="fill:none;stroke:var(--c);stroke-width:7;stroke-linejoin:round;stroke-linecap:round"/></svg>
+          <svg class="i" style="font-size:64px;color:var(--c)"><use href="#i-circle-check"/></svg>
+        </div>
+        <div class="t-red" style="display:grid;grid-template-columns:1fr 72px;gap:18px;align-items:center">
+          <svg viewBox="0 0 400 150" style="width:100%;height:auto" aria-hidden="true"><polyline points="0,122 40,117 80,125 120,116 160,123 200,104 240,98 280,105 320,116 360,122 400,118" style="fill:none;stroke:var(--c);stroke-width:7;stroke-linejoin:round;stroke-linecap:round"/></svg>
+          <svg class="i" style="font-size:64px;color:var(--c)"><use href="#i-circle-help"/></svg>
+        </div>
+      </div>
+      <div>
+        <p class="say" style="font-size:66px"><b>Явные</b> выбросы модель находит надёжнее, чем&nbsp;<em>тонкие</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="270">
+  <p class="kick t-red">Таблица 1 · два выброса, и&nbsp;они разного рода</p>
+  <h2>О-07 выделяется по&nbsp;всем величинам</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:30px">
+      <thead><tr><th style="width:16%;padding:14px 22px">Образец</th><th style="width:21%;padding:14px 22px">Ток через<br>30&nbsp;мин, мА</th><th style="width:21%;padding:14px 22px">Ток через<br>2&nbsp;ч, мА</th><th style="width:21%;padding:14px 22px">Батарея №&nbsp;1<br>после 14&nbsp;сут, В</th><th style="padding:14px 22px">Батарея №&nbsp;2<br>после 14&nbsp;сут, В</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:14px 22px">О-06</td><td style="padding:14px 22px">35,4</td><td style="padding:14px 22px">28,4</td><td style="padding:14px 22px">12,54</td><td style="padding:14px 22px">12,55</td></tr>
+        <tr class="hl t-red"><td style="padding:14px 22px;box-shadow:inset 7.5px 0 0 var(--c)">О-07</td><td style="padding:14px 22px;font-weight:700">84,7</td><td style="padding:14px 22px;font-weight:700">61,9</td><td style="padding:14px 22px;font-weight:700">12,15</td><td style="padding:14px 22px;font-weight:700">12,08</td></tr>
+        <tr><td style="padding:14px 22px">О-08</td><td style="padding:14px 22px">32,7</td><td style="padding:14px 22px">26,3</td><td style="padding:14px 22px">12,59</td><td style="padding:14px 22px">12,57</td></tr>
+      </tbody>
+    </table>
+    <div class="rule t-red" style="padding:22px 34px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Выходит за&nbsp;допуски: образец не&nbsp;соответствует требованиям. Нужно выяснить, в&nbsp;чём причина</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="275">
+  <p class="kick t-orange">Таблица 1 · второй выброс</p>
+  <h2>О-05, батарея №&nbsp;2: записано 1,257&nbsp;В</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <p style="font-size:24px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Напряжение батареи №&nbsp;2 после 14&nbsp;сут, В</p>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:14px;align-items:end;height:250px;border-bottom:3.8px solid var(--line)">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,55</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,53</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,58</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,46</span><i style="display:block;width:100%;height:198px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div class="t-orange" style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:30px;font-weight:700;color:var(--c)">1,257</span><i style="display:block;width:100%;height:20px;background:var(--c);border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,55</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,08</span><i style="display:block;width:100%;height:192px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,57</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,50</span><i style="display:block;width:100%;height:199px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="font-size:22px;color:var(--muted)">12,56</span><i style="display:block;width:100%;height:200px;background:var(--teal);opacity:.55;border-radius:8px 8px 0 0"></i></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(10,1fr);gap:14px;font-size:23px;text-align:center;color:var(--muted)"><span>О-01</span><span>О-02</span><span>О-03</span><span>О-04</span><span style="color:var(--orange);font-weight:700">О-05</span><span>О-06</span><span>О-07</span><span>О-08</span><span>О-09</span><span>О-10</span></div>
+    </div>
+    <div class="rule sm t-orange" style="padding:18px 30px"><svg class="i"><use href="#i-circle-help"/></svg><div><p>При остальных значениях около 12,5&nbsp;В. Скорее всего, при&nbsp;записи потерялся знак</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="279">
+  <p class="kick">Два выброса разного рода</p>
+  <h2>Решение о&nbsp;каждом принимает инженер</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="flex-direction:row;align-items:center;gap:26px;padding:42px 34px;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:44px">Модель должна</h3><p style="font-size:33px;color:var(--ink)">отметить оба случая<br>и&nbsp;объяснить разницу</p></div></li>
+      <li class="step t-orange" style="flex-direction:row;align-items:center;gap:26px;padding:42px 34px;border-top:7px solid var(--c)"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:44px">Инженер решает</h3><p style="font-size:33px;color:var(--ink)">что делать с&nbsp;каждым</p></div></li>
+    </ol>
+    <div style="display:flex;gap:22px;justify-content:center">
+      <span class="tag t-red" style="font-size:30px;padding:10px 26px">О-07 – несоответствие</span>
+      <span class="tag t-orange" style="font-size:30px;padding:10px 26px">О-05 – вероятная ошибка записи</span>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="281" data-steps="281,283">
+  <p class="kick">Пункт 4 из 5</p>
+  <h2>Сравнить серии и&nbsp;назвать тенденцию</h2>
+  <div class="body">
+    <div class="cards" style="gap:34px">
+      <div class="card t-teal st" data-s="1" style="padding:24px 30px 28px;gap:12px">
+        <p style="font-size:24px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)">Таблица 1 · ток покоя</p>
+        <svg viewBox="0 0 420 150" style="width:100%;height:auto" aria-hidden="true">
+          <line x1="14" y1="4" x2="14" y2="146" style="stroke:var(--line);stroke-width:4"/>
+          <line x1="406" y1="4" x2="406" y2="146" style="stroke:var(--line);stroke-width:4"/>
+          <g style="stroke:var(--c);stroke-width:4;opacity:.8">
+            <line x1="14" y1="12" x2="406" y2="72"/><line x1="14" y1="19" x2="406" y2="78"/><line x1="14" y1="25" x2="406" y2="86"/><line x1="14" y1="32" x2="406" y2="91"/><line x1="14" y1="38" x2="406" y2="99"/>
+            <line x1="14" y1="45" x2="406" y2="104"/><line x1="14" y1="51" x2="406" y2="112"/><line x1="14" y1="58" x2="406" y2="117"/><line x1="14" y1="64" x2="406" y2="125"/><line x1="14" y1="71" x2="406" y2="130"/>
+          </g>
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-size:24px;color:var(--muted)"><span>через 30&nbsp;мин</span><span style="font-size:21px;font-style:italic">условная схема</span><span>через 2&nbsp;ч</span></div>
+        <p style="font-size:29px;line-height:1.22">Ток через 2&nbsp;ч <b>у&nbsp;всех образцов</b> ниже, чем через 30&nbsp;мин</p>
+      </div>
+      <div class="card t-teal st" data-s="2" style="padding:24px 30px 28px;gap:12px">
+        <p style="font-size:24px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)">Таблица 2 · напряжение регулятора</p>
+        <svg viewBox="0 0 420 150" style="width:100%;height:auto" aria-hidden="true">
+          <line x1="14" y1="4" x2="14" y2="146" style="stroke:var(--line);stroke-width:4"/>
+          <line x1="406" y1="4" x2="406" y2="146" style="stroke:var(--line);stroke-width:4"/>
+          <g style="stroke:var(--c);stroke-width:4;opacity:.8">
+            <line x1="14" y1="14" x2="406" y2="76"/><line x1="14" y1="22" x2="406" y2="83"/><line x1="14" y1="30" x2="406" y2="92"/><line x1="14" y1="38" x2="406" y2="99"/>
+            <line x1="14" y1="46" x2="406" y2="108"/><line x1="14" y1="54" x2="406" y2="115"/><line x1="14" y1="62" x2="406" y2="124"/><line x1="14" y1="70" x2="406" y2="131"/>
+          </g>
+        </svg>
+        <div style="display:flex;justify-content:space-between;font-size:24px;color:var(--muted)"><span>−25&nbsp;°C</span><span style="font-size:21px;font-style:italic">условная схема</span><span>+25&nbsp;°C</span></div>
+        <p style="font-size:29px;line-height:1.22">Напряжение при +25&nbsp;°C <b>у&nbsp;всех восьми генераторов</b> ниже, чем при&nbsp;−25&nbsp;°C</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="286" data-steps="289" data-title="Закономерности и причины">
+  <p class="kick">Пункт 4 · что можно сказать по&nbsp;одной таблице</p>
+  <div class="body" style="gap:34px">
+    <div class="vs" style="gap:36px">
+      <div class="col t-teal" style="padding:30px 36px 34px;gap:14px"><h3 style="font-size:29px"><svg class="i"><use href="#i-bot"/></svg>Модель называет быстро</h3><p style="font-size:54px;font-weight:700;line-height:1.08">Закономерности</p><p style="font-size:29px">Например, ток через 2&nbsp;ч у&nbsp;всех образцов ниже, чем через 30&nbsp;мин</p></div>
+      <div class="col t-red" style="padding:30px 36px 34px;gap:14px"><h3 style="font-size:29px"><svg class="i"><use href="#i-x"/></svg>По&nbsp;одной таблице не&nbsp;объяснит</h3><p style="font-size:54px;font-weight:700;line-height:1.08">Причины</p><p style="font-size:29px">Это гипотезы, их&nbsp;проверяют отдельно</p></div>
+    </div>
+    <div class="rule t-orange st" style="padding:22px 34px"><svg class="i"><use href="#i-file-search"/></svg><div><p>По&nbsp;ячейке с&nbsp;подозрительным значением тенденцию не&nbsp;оценивают, пока значение не&nbsp;сверено с&nbsp;протоколом</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="291" data-steps="295">
+  <p class="kick">Пункт 4 · вид графика</p>
+  <h2>Какой график подойдёт</h2>
+  <div class="body" style="gap:30px">
+    <div class="cards" style="gap:30px">
+      <div class="card row t-teal" style="padding:26px 30px;align-items:flex-start"><span class="bdg lg"><svg class="i"><use href="#i-chart-scatter"/></svg></span><div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><p class="muted" style="font-size:25px">Таблица 1</p><h3 style="font-size:33px">Точечный график по&nbsp;образцам</h3><span class="tag t-orange" style="font-size:24px;padding:6px 18px">с&nbsp;линией допуска</span></div></div>
+      <div class="card row t-teal" style="padding:26px 30px;align-items:flex-start"><span class="bdg lg"><svg class="i"><use href="#i-chart-line"/></svg></span><div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start"><p class="muted" style="font-size:25px">Таблица 2</p><h3 style="font-size:33px">Линии «напряжение от&nbsp;температуры» для&nbsp;каждого генератора</h3><span class="tag t-orange" style="font-size:24px;padding:6px 18px">отметка допуска при&nbsp;+25&nbsp;°C</span></div></div>
+    </div>
+    <div class="st" data-s="1" style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:stretch">
+      <div class="card row t-gray" style="padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-sheet"/></svg></span><p style="font-size:28px">Модель может написать и&nbsp;формулы для&nbsp;построения графика в&nbsp;табличном редакторе</p></div>
+      <div class="rule t-orange" style="padding:22px 30px"><svg class="i"><use href="#i-user-check"/></svg><div><p style="font-size:31px">Подходит&nbsp;ли график к&nbsp;вашей задаче, <span style="white-space:nowrap">решаете вы</span></p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="297" data-title="Черновик вывода легко принять целиком">
+  <p class="kick t-orange">Пункт 5 из 5 · черновик вывода</p>
+  <div class="body">
+    <div class="split s46" style="gap:60px">
+      <div class="center">
+        <div class="doc t-teal" style="width:330px;gap:14px;padding:26px 26px 36px">
+          <h4 style="font-size:26px">Вывод</h4>
+          <i></i><i></i><i></i><i class="s"></i><i></i><i></i><i></i><i class="s"></i>
+          <b class="stamp">черновик</b>
+        </div>
+      </div>
+      <div style="gap:26px">
+        <p class="sub" style="color:var(--ink)">Черновик вывода полезен</p>
+        <p class="say md">Но из-за гладкого изложения его легко <em>принять целиком</em></p>
+      </div>
+    </div>
+  </div>
+</section>

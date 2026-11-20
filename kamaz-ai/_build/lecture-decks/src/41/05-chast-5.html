@@ -1,0 +1,462 @@
+<!-- Лекция 4.1, строки 434–574 (21:35–28:39): расчётная схема важнее арифметики – двухпроводная цепь и ловушка обратного провода, схему задаёт инженер; справочное значение как допущение и «Таблицы медных проводов»; пять приёмов проверки – контрольный пример и слова Э. Дейкстры в докладе В. Филатова, независимый пересчёт, размерности, обратное умножение и предельные случаи, сверка с условием; что ловит каждый приём; схема постановки и проверки расчёта -->
+
+<section class="slide dark" data-at="434" data-title="Расчётная схема решает больше арифметики">
+  <p class="kick t-orange">Есть то, что важнее арифметики</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-route"/></svg></div>
+      <div>
+        <p class="say md">Расчётная схема<br>решает <em>больше</em></p>
+        <p class="sub">Ошибка в&nbsp;схеме даёт неверный ответ при&nbsp;безупречных вычислениях</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="437">
+  <p class="kick">В нашей задаче цепь двухпроводная</p>
+  <h2>Напряжение теряется на&nbsp;обоих проводах</h2>
+  <div class="body">
+    <div style="position:relative;height:270px;flex:none">
+      <svg width="1135" height="270" viewBox="0 0 1135 270" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M283 80H832" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <path d="M826 64L852 80L826 96Z" fill="var(--ink)"/>
+        <path d="M852 196H309" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <path d="M309 180L283 196L309 212Z" fill="var(--ink)"/>
+      </svg>
+      <div class="t-gray" style="position:absolute;left:0;top:5px;width:280px;height:260px;background:var(--ct);border:3px solid var(--c);border-radius:20px;padding:20px 20px;display:flex;flex-direction:column;gap:10px">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-circuit-board"/></svg>
+        <b style="font-size:28px;line-height:1.12;color:var(--ci)">Блок предохранителей</b>
+        <span style="margin-top:auto;font-size:23px;line-height:1.15;color:var(--ci)">точка массы у&nbsp;блока</span>
+      </div>
+      <div class="t-gray" style="position:absolute;right:0;top:5px;width:280px;height:260px;background:var(--ct);border:3px solid var(--c);border-radius:20px;padding:20px 20px;display:flex;flex-direction:column;gap:10px">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-lightbulb"/></svg>
+        <b style="font-size:28px;line-height:1.12;color:var(--ci)">Фары</b>
+      </div>
+      <span style="position:absolute;left:300px;width:535px;top:8px;text-align:center;font-size:26px;color:var(--muted)">прямой провод, длина <var style="font-family:Cambria,Georgia,serif">L</var></span>
+      <span class="tag t-orange" style="position:absolute;left:526px;top:56px;font-size:30px;padding:4px 22px;background:var(--bg)">Δ<var style="font-family:Cambria,Georgia,serif">U</var></span>
+      <span class="tag t-orange" style="position:absolute;left:526px;top:172px;font-size:30px;padding:4px 22px;background:var(--bg)">Δ<var style="font-family:Cambria,Georgia,serif">U</var></span>
+      <span style="position:absolute;left:300px;width:535px;top:228px;text-align:center;font-size:26px;color:var(--muted)">обратный провод, длина <var style="font-family:Cambria,Georgia,serif">L</var></span>
+    </div>
+    <div class="rule sm t-teal" style="padding:20px 32px"><svg class="i"><use href="#i-ruler"/></svg><div><p>В расчёт входит суммарная длина прямого и&nbsp;обратного провода: <b><var style="font-family:Cambria,Georgia,serif">l</var> = 2<var style="font-family:Cambria,Georgia,serif">L</var></b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="439">
+  <p class="kick t-red">Типичная ловушка</p>
+  <h2>Учесть только путь тока от&nbsp;блока до&nbsp;фар</h2>
+  <div class="body">
+    <div style="position:relative;height:270px;flex:none">
+      <svg width="1135" height="270" viewBox="0 0 1135 270" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M283 80H832" fill="none" stroke="var(--ink)" stroke-width="6"/>
+        <path d="M826 64L852 80L826 96Z" fill="var(--ink)"/>
+        <path d="M852 196H309" fill="none" stroke="var(--red)" stroke-width="6" stroke-dasharray="18 14" opacity=".75"/>
+        <path d="M309 180L283 196L309 212Z" fill="var(--red)" opacity=".75"/>
+      </svg>
+      <div class="t-gray" style="position:absolute;left:0;top:5px;width:280px;height:260px;background:var(--ct);border:3px solid var(--c);border-radius:20px;padding:20px 20px;display:flex;flex-direction:column;gap:10px">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-circuit-board"/></svg>
+        <b style="font-size:28px;line-height:1.12;color:var(--ci)">Блок предохранителей</b>
+        <span style="margin-top:auto;font-size:23px;line-height:1.15;color:var(--ci)">точка массы у&nbsp;блока</span>
+      </div>
+      <div class="t-gray" style="position:absolute;right:0;top:5px;width:280px;height:260px;background:var(--ct);border:3px solid var(--c);border-radius:20px;padding:20px 20px;display:flex;flex-direction:column;gap:10px">
+        <svg class="i" style="font-size:50px;color:var(--c)"><use href="#i-lightbulb"/></svg>
+        <b style="font-size:28px;line-height:1.12;color:var(--ci)">Фары</b>
+      </div>
+      <span style="position:absolute;left:300px;width:535px;top:8px;text-align:center;font-size:26px;color:var(--muted)">прямой провод – учтён</span>
+      <span class="tag t-orange" style="position:absolute;left:526px;top:56px;font-size:30px;padding:4px 22px;background:var(--bg)">Δ<var style="font-family:Cambria,Georgia,serif">U</var></span>
+      <span class="tag t-red" style="position:absolute;left:484px;top:172px;font-size:28px;padding:5px 22px;background:var(--bg);display:inline-flex;align-items:center;gap:10px"><svg class="i"><use href="#i-x"/></svg>не учтён</span>
+      <span style="position:absolute;left:300px;width:535px;top:228px;text-align:center;font-size:26px;color:var(--red)">обратный провод</span>
+    </div>
+    <div class="rule t-red" style="padding:20px 32px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>У обратного провода тоже есть сопротивление</h3><p style="font-size:29px;font-weight:400">Если его пропустить, расчёт занизит потери напряжения, и&nbsp;на&nbsp;выбранном проводе падение может превысить допустимое</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="447" data-steps="447,452">
+  <p class="kick">В таком расчёте все действия могут быть выполнены верно</p>
+  <h2>Неверна только схема</h2>
+  <div class="body">
+    <div class="cards c3 sm st" data-s="1">
+      <div class="card row t-red" style="padding:20px 22px"><span class="bdg"><svg class="i"><use href="#i-shuffle"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3>Без описания цепи</h3><p>модель может выбрать любую из&nbsp;схем</p></div></div>
+      <div class="card row t-orange" style="padding:20px 22px"><span class="bdg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3>Инженер</h3><p>задаёт схему</p></div></div>
+      <div class="card row t-teal" style="padding:20px 22px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3>Модель</h3><p>называет принятую схему</p></div></div>
+    </div>
+    <div class="prompt st" data-s="2" style="--tw:300px;font-size:31px;padding:20px 26px;gap:12px">
+      <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);padding-left:10px">В запросе схему называют прямо</p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Схема</span><span>Цепь двухпроводная</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Возврат тока</span><span>По отдельному проводу к&nbsp;точке массы у&nbsp;блока</span></p>
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Не рассматривается</span><span>Возврат через раму</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="455" data-steps="457,461,466">
+  <p class="kick">Ещё одна тонкость – справочные значения</p>
+  <h2>Справочное значение – тоже допущение</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-gray st" style="gap:12px;padding:26px 32px"><span style="font-size:26px">Удельное сопротивление отожжённой меди по&nbsp;международному стандарту, 20&nbsp;°C</span><b style="font-size:92px">0,017241</b><span style="font-size:28px">Ом·мм²/м</span></div>
+      <div class="stat t-orange st" style="gap:12px;padding:26px 32px"><span style="font-size:26px">Для учебного расчёта в&nbsp;условии задано другое значение</span><b style="font-size:92px">0,0175</b><span style="font-size:28px">Ом·мм²/м</span></div>
+    </div>
+    <div class="rule t-red st" style="padding:20px 32px"><svg class="i"><use href="#i-thermometer-sun"/></svg><div><p>Если провод в&nbsp;жгуте под капотом нагревается, удельное сопротивление растёт. Это нужно учитывать отдельно</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="471" data-steps="471,474" data-title="«Таблицы медных проводов»: таблица и измерение">
+  <p class="kick">Справочник напоминает, чем таблица отличается от измерения</p>
+  <div class="body">
+    <figure class="quote md st">
+      <blockquote>Когда важна точность, инженер-электрик не&nbsp;обращается к&nbsp;таблице проводов, а&nbsp;<b>измеряет образцы той меди, которая используется</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-book-open"/></svg></i><span><b>«Таблицы медных проводов»</b>справочник Copper wire tables, 1966</span></figcaption>
+    </figure>
+    <div class="rule t-orange st" style="padding:20px 32px"><svg class="i"><use href="#i-file-search"/></svg><div><p>Для значения, которое модель «вспомнила», тоже нужно найти и&nbsp;открыть источник</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Copper wire tables. National Bureau of Standards Handbook 100. Washington, 1966 · doi.org/10.6028/NBS.HB.100</p>
+</section>
+
+<section class="slide sect" data-at="477" data-title="Как проверять расчёт модели">
+  <span class="no"><svg class="i"><use href="#i-shield-check"/></svg></span>
+  <p class="kick">Контроль расчёта</p>
+  <h1>Как проверять<br>расчёт модели</h1>
+  <p class="lead" style="font-size:33px">Каждый приём ловит свой вид ошибки, поэтому одного обычно мало</p>
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-top:30px">
+    <div class="t-orange" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:14px 16px 16px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-target"/></svg><b style="font-size:34px;line-height:1;color:var(--c)">1</b></div><b style="font-size:24px;line-height:1.15">Контрольный пример</b></div>
+    <div class="t-orange" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:14px 16px 16px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-calculator"/></svg><b style="font-size:34px;line-height:1;color:var(--c)">2</b></div><b style="font-size:24px;line-height:1.15">Независимый пересчёт</b></div>
+    <div class="t-orange" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:14px 16px 16px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-ruler"/></svg><b style="font-size:34px;line-height:1;color:var(--c)">3</b></div><b style="font-size:24px;line-height:1.15">Размерности</b></div>
+    <div class="t-orange" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:14px 16px 16px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-scale"/></svg><b style="font-size:34px;line-height:1;color:var(--c)">4</b></div><b style="font-size:24px;line-height:1.15">Порядок величины и&nbsp;граничные случаи</b></div>
+    <div class="t-orange" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:14px 16px 16px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><div style="display:flex;align-items:center;justify-content:space-between"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-list-checks"/></svg><b style="font-size:34px;line-height:1;color:var(--c)">5</b></div><b style="font-size:24px;line-height:1.15">Сверка с&nbsp;условием</b></div>
+  </div>
+</section>
+
+<section class="slide" data-at="481" data-title="Приём 1: контрольный пример">
+  <p class="kick t-orange">Приём 1 из 5</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-target"/></svg></div>
+      <div class="term t-orange"><dfn>Контрольный пример</dfn><p>Пример с&nbsp;заранее известным ответом. Его дают модели или формуле до&nbsp;своей задачи</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="484" data-steps="484,486,488">
+  <p class="kick t-orange">Приём 1 · контрольный пример для нашей формулы</p>
+  <h2>Пример, который считается в&nbsp;уме</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:6fr 5fr;gap:40px;align-items:stretch">
+      <div class="st" data-s="1" style="background:var(--surface);border-radius:20px;padding:22px 30px;justify-content:center;gap:8px">
+        <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Дано</p>
+        <dl class="kv" style="--kw:160px">
+          <div style="font-size:33px;padding:12px 6px"><dt>Ток</dt><dd><var style="font-family:Cambria,Georgia,serif">I</var> = 10&nbsp;А</dd></div>
+          <div style="font-size:33px;padding:12px 6px"><dt>Длина цепи</dt><dd><var style="font-family:Cambria,Georgia,serif">l</var> = 10&nbsp;м</dd></div>
+          <div style="font-size:33px;padding:12px 6px"><dt>Сечение</dt><dd><var style="font-family:Cambria,Georgia,serif">S</var> = 1&nbsp;мм²</dd></div>
+          <div style="font-size:33px;padding:12px 6px"><dt>Медь</dt><dd style="white-space:nowrap"><var style="font-family:Cambria,Georgia,serif">ρ</var> = 0,0175&nbsp;Ом·мм²/м</dd></div>
+        </dl>
+      </div>
+      <div style="gap:24px;justify-content:center">
+        <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:22px 30px;display:flex;flex-direction:column;gap:10px">
+          <p class="st" data-s="2" style="font-size:62px;font-weight:700;line-height:1.05;color:var(--c);white-space:nowrap"><var style="font-family:Cambria,Georgia,serif">R</var> = 0,175&nbsp;Ом</p>
+          <p class="st" data-s="3" style="font-size:31px;color:var(--ci)"><var style="font-family:Cambria,Georgia,serif">ρ</var>&nbsp;·&nbsp;<var style="font-family:Cambria,Georgia,serif">l</var>&nbsp;/&nbsp;<var style="font-family:Cambria,Georgia,serif">S</var> = 0,0175&nbsp;×&nbsp;10&nbsp;/&nbsp;1</p>
+        </div>
+        <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:22px 30px;display:flex;flex-direction:column;gap:10px">
+          <p class="st" data-s="2" style="font-size:62px;font-weight:700;line-height:1.05;color:var(--c);white-space:nowrap">Δ<var style="font-family:Cambria,Georgia,serif">U</var> = 1,75&nbsp;В</p>
+          <p class="st" data-s="3" style="font-size:31px;color:var(--ci)"><var style="font-family:Cambria,Georgia,serif">I</var>&nbsp;·&nbsp;<var style="font-family:Cambria,Georgia,serif">R</var> = 10&nbsp;×&nbsp;0,175</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="492" data-title="Другое число – дальше можно не смотреть">
+  <p class="kick t-red">Если формула или модель дают другое число</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:30px;align-items:stretch">
+      <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:22px 30px;display:flex;flex-direction:column;justify-content:center;gap:6px"><span style="font-size:26px;color:var(--ci)">Ответ контрольного примера</span><b style="font-size:62px;line-height:1.05;color:var(--c)">1,75&nbsp;В</b></div>
+      <svg class="i" style="font-size:96px;color:var(--red);align-self:center"><use href="#i-equal-not"/></svg>
+      <div class="t-red" style="background:var(--ct);border-radius:20px;padding:22px 30px;display:flex;flex-direction:column;justify-content:center;gap:6px"><span style="font-size:26px;color:var(--ci)">Ответ формулы или модели</span><b style="font-size:50px;line-height:1.12;color:var(--c)">другое число</b></div>
+    </div>
+    <p class="say md">Дальше можно <em>не&nbsp;смотреть</em></p>
+    <div class="rule t-teal" style="padding:20px 32px"><svg class="i"><use href="#i-history"/></svg><div><h3>Удачный контрольный пример у&nbsp;вас уже есть</h3><p>Любая прошлая задача, решение которой проверено</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="496" data-title="Э. Дейкстра о тестировании программ">
+  <p class="kick t-orange">В разработке программ для этого пишут тесты</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Тестирование может показать наличие дефектов в&nbsp;программе, но&nbsp;<b>не&nbsp;доказать их&nbsp;отсутствие</b></blockquote>
+      <figcaption><i class="ava">ЭД</i><span><b>Э. Дейкстра</b>слова привёл В.&nbsp;Филатов в&nbsp;докладе «Искусственный автор, привычный контроль» на&nbsp;вебинаре о&nbsp;проверке кода, написанного с&nbsp;ИИ</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Филатов В. «Искусственный автор, привычный контроль». Доклад на&nbsp;вебинаре УЦ «МАСКОМ» и&nbsp;PVS-Studio, 28.08.2026</p>
+</section>
+
+<section class="slide" data-at="501">
+  <p class="kick">С контрольным примером так же</p>
+  <h2>Что показывает один пример</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray" style="padding:34px 40px 40px;gap:22px"><svg class="i" style="font-size:96px;color:var(--c)"><use href="#i-circle-check"/></svg><h3 style="font-size:44px">Совпадение</h3><p style="font-size:36px;line-height:1.22">на&nbsp;одном примере не&nbsp;доказывает, что расчёт верен всегда</p></div>
+      <div class="col t-red" style="padding:34px 40px 40px;gap:22px"><svg class="i" style="font-size:96px;color:var(--c)"><use href="#i-circle-x"/></svg><h3 style="font-size:44px">Расхождение</h3><p style="font-size:36px;line-height:1.22">сразу показывает ошибку</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="505" data-steps="509">
+  <p class="kick">Приём 2 из 5 · другим способом и другим инструментом</p>
+  <h2>Независимый пересчёт</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b>Калькулятор</b></div>
+      <div class="pict"><svg class="i"><use href="#i-sheet"/></svg><b>Электронная таблица</b></div>
+      <div class="pict"><svg class="i"><use href="#i-app-window"/></svg><b>Утверждённая расчётная программа вашей организации</b></div>
+      <div class="pict"><svg class="i"><use href="#i-pencil-line"/></svg><b>Вручную</b></div>
+    </div>
+    <div class="rule t-red st" style="padding:20px 32px"><svg class="i"><use href="#i-ban"/></svg><div><h3>«Независимый» – значит</h3><p>Не той же моделью и&nbsp;не&nbsp;в&nbsp;том&nbsp;же чате. Числа – на&nbsp;калькуляторе, не&nbsp;глядя в&nbsp;ответ модели</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="511" data-steps="511,512" data-title="Приёмы 3 и 4: размерности, порядок величины">
+  <p class="kick">Пять приёмов проверки</p>
+  <div class="body">
+    <ol class="list num big" style="gap:24px">
+      <li style="color:var(--muted)">Контрольный пример</li>
+      <li style="color:var(--muted)">Независимый пересчёт</li>
+      <li class="st"><span>Размерности <span style="font-weight:400;color:var(--muted)">– сходятся&nbsp;ли единицы</span></span></li>
+      <li class="st"><span>Порядок величины и&nbsp;граничные случаи</span></li>
+      <li style="opacity:.3">Сверка с&nbsp;условием</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="513">
+  <p class="kick">Приём 4 · прикиньте ответ</p>
+  <h2>Проверка обратным умножением</h2>
+  <div class="body" style="gap:24px">
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Если в расчёте есть деление</p>
+      <div style="display:flex;align-items:center;gap:22px;font-size:46px;font-weight:700;color:var(--muted)">
+        <span class="tag t-gray" style="font-size:38px;padding:10px 28px">делимое</span><span>:</span><span class="tag t-gray" style="font-size:38px;padding:10px 28px">делитель</span><span>=</span><span class="tag t-teal" style="font-size:38px;padding:10px 28px">частное</span>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--orange)">Умножьте частное на делитель и сравните с делимым</p>
+      <div style="display:flex;align-items:center;gap:22px;font-size:46px;font-weight:700;color:var(--muted)">
+        <span class="tag t-teal" style="font-size:38px;padding:10px 28px">частное</span><span>×</span><span class="tag t-gray" style="font-size:38px;padding:10px 28px">делитель</span><span>=</span><span class="tag t-orange" style="font-size:38px;padding:10px 28px">делимое?</span>
+      </div>
+    </div>
+    <div class="rule sm t-gray" style="padding:18px 30px"><svg class="i"><use href="#i-info"/></svg><div><p>Если частное округлили, небольшое расхождение возможно: повторите деление без&nbsp;промежуточного округления</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="527">
+  <p class="kick">Приём 4 · прикидка</p>
+  <h2>Два числа, между которыми лежит частное</h2>
+  <div class="body" style="gap:22px">
+    <svg width="1135" height="130" viewBox="0 0 1135 130" style="display:block;flex:none" aria-hidden="true">
+      <path d="M40 70H1080" stroke="var(--muted)" stroke-width="5" fill="none"/>
+      <path d="M1072 56L1098 70L1072 84Z" fill="var(--muted)"/>
+      <rect x="330" y="52" width="470" height="36" rx="18" fill="var(--teal_t)"/>
+      <path d="M330 44V96M800 44V96" stroke="var(--teal)" stroke-width="7" stroke-linecap="round"/>
+      <circle cx="575" cy="70" r="15" fill="var(--orange)"/>
+      <text x="330" y="126" text-anchor="middle" font-size="38" font-style="italic" font-family="Cambria,Georgia,serif" fill="var(--ink)">a</text>
+      <text x="800" y="126" text-anchor="middle" font-size="38" font-style="italic" font-family="Cambria,Georgia,serif" fill="var(--ink)">b</text>
+      <text x="575" y="32" text-anchor="middle" font-size="30" font-weight="700" fill="var(--orange)">частное</text>
+    </svg>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+      <div class="rule sm t-teal" style="padding:18px 28px"><svg class="i"><use href="#i-arrow-down"/></svg><div><p><b><var style="font-family:Cambria,Georgia,serif">a</var>&nbsp;×&nbsp;делитель</b> меньше делимого</p></div></div>
+      <div class="rule sm t-teal" style="padding:18px 28px"><svg class="i"><use href="#i-arrow-up"/></svg><div><p><b><var style="font-family:Cambria,Georgia,serif">b</var>&nbsp;×&nbsp;делитель</b> больше делимого</p></div></div>
+    </div>
+    <div class="rule t-orange" style="padding:20px 32px"><svg class="i"><use href="#i-check"/></svg><div><h3>При положительном делителе</h3><p>Частное действительно лежит между <var style="font-family:Cambria,Georgia,serif">a</var> и&nbsp;<var style="font-family:Cambria,Georgia,serif">b</var></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="530">
+  <p class="kick">Приём 4 · проверьте и предельные случаи</p>
+  <h2>Как должна вести себя формула</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-teal" style="gap:18px;padding:24px 28px">
+        <h3 style="display:flex;align-items:center;gap:14px"><svg class="i" style="color:var(--c)"><use href="#i-ruler"/></svg>Длину удвоили</h3>
+        <div class="bars" style="--max:100;gap:14px">
+          <div class="bar t-gray" style="--v:42;grid-template-columns:120px 1fr 110px;font-size:30px"><span class="lb"><var style="font-family:Cambria,Georgia,serif">L</var></span><i></i><b>Δ<var style="font-family:Cambria,Georgia,serif">U</var></b></div>
+          <div class="bar t-teal" style="--v:84;grid-template-columns:120px 1fr 110px;font-size:30px"><span class="lb">2<var style="font-family:Cambria,Georgia,serif">L</var></span><i></i><b>2Δ<var style="font-family:Cambria,Georgia,serif">U</var></b></div>
+        </div>
+        <p style="font-size:29px">Падение должно удвоиться</p>
+      </div>
+      <div class="card t-teal" style="gap:18px;padding:24px 28px">
+        <h3 style="display:flex;align-items:center;gap:14px"><svg class="i" style="color:var(--c)"><use href="#i-diameter"/></svg>Сечение увеличили</h3>
+        <div class="bars" style="--max:100;gap:14px">
+          <div class="bar t-gray" style="--v:84;grid-template-columns:120px 1fr 110px;font-size:30px"><span class="lb"><var style="font-family:Cambria,Georgia,serif">S</var></span><i></i><b>Δ<var style="font-family:Cambria,Georgia,serif">U</var></b></div>
+          <div class="bar t-teal" style="--v:46;grid-template-columns:120px 1fr 110px;font-size:30px"><span class="lb"><var style="font-family:Cambria,Georgia,serif">S</var>&nbsp;больше</span><i></i><b>меньше</b></div>
+        </div>
+        <p style="font-size:29px">Падение должно уменьшиться</p>
+      </div>
+    </div>
+    <div class="rule t-red" style="padding:20px 32px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Формула, которая ведёт себя иначе, неверна</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="535" data-steps="535,538">
+  <p class="kick">Приём 5 из 5</p>
+  <h2>Сверка каждого числа с&nbsp;условием</h2>
+  <div class="body" style="gap:22px">
+    <div class="st" data-s="1" style="position:relative;height:225px;flex:none">
+      <svg width="1135" height="225" viewBox="0 0 1135 225" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <path d="M262 100H420" stroke="var(--teal)" stroke-width="6" fill="none"/>
+        <path d="M414 84L440 100L414 116Z" fill="var(--teal)"/>
+        <path d="M873 100H715" stroke="var(--red)" stroke-width="6" stroke-dasharray="16 12" fill="none"/>
+        <path d="M721 84L695 100L721 116Z" fill="var(--red)"/>
+      </svg>
+      <div class="doc" style="position:absolute;left:0;top:10px;width:250px;gap:13px"><h4 style="font-size:24px">Условие задачи</h4><i class="t"></i><i></i><i class="t s"></i><i></i></div>
+      <div class="doc" style="position:absolute;left:442px;top:10px;width:250px;gap:13px"><h4 style="font-size:24px">Ответ модели</h4><i class="t"></i><i></i><i class="r s"></i><i></i><b class="stamp t-red">не из условия</b></div>
+      <div class="doc" style="position:absolute;right:0;top:10px;width:250px;gap:13px"><h4 style="font-size:24px">Контекст</h4><i></i><i class="hl s"></i><i></i><i></i><span style="font-size:20px;line-height:1.15;color:var(--muted)">к задаче не&nbsp;относится</span></div>
+      <span class="tag t-teal" style="position:absolute;left:276px;top:122px;font-size:22px;background:var(--bg)">из условия</span>
+      <span class="tag t-red" style="position:absolute;left:722px;top:122px;font-size:22px;background:var(--bg)">«похожее»</span>
+    </div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:14px">
+      <div class="rule t-orange" style="padding:18px 32px"><svg class="i"><use href="#i-list-checks"/></svg><div><h3>Правило</h3><p>Каждое число – из&nbsp;условия, а&nbsp;не&nbsp;«похожее»</p></div></div>
+      <p style="font-size:28px;line-height:1.25">Такую ошибку не&nbsp;поймают ни&nbsp;размерности, ни&nbsp;порядок величины. <b style="color:var(--orange)">Только сверка</b></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="541">
+  <p class="kick">Приёмы дополняют друг друга</p>
+  <h2>Что ловит каждый приём</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:32%;padding:16px 22px">Приём</th><th style="width:15%;padding:16px 14px;text-align:center">Формула</th><th style="width:15%;padding:16px 14px;text-align:center">Единицы</th><th style="width:17%;padding:16px 14px;text-align:center">Арифметика</th><th style="padding:16px 14px;text-align:center">Число не&nbsp;из&nbsp;условия</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:16px 22px">Контрольный пример</td><td class="yes" style="text-align:center;padding:12px"><svg class="i" style="font-size:42px"><use href="#i-check"/></svg></td><td></td><td></td><td></td></tr>
+        <tr><td style="padding:16px 22px">Размерности</td><td class="yes" style="text-align:center;padding:12px"><svg class="i" style="font-size:42px"><use href="#i-check"/></svg></td><td class="yes" style="text-align:center;padding:12px"><svg class="i" style="font-size:42px"><use href="#i-check"/></svg></td><td></td><td></td></tr>
+        <tr><td style="padding:16px 22px">Прикидка и&nbsp;пересчёт</td><td></td><td></td><td class="yes" style="text-align:center;padding:12px"><svg class="i" style="font-size:42px"><use href="#i-check"/></svg></td><td></td></tr>
+        <tr><td style="padding:16px 22px">Сверка с&nbsp;условием</td><td></td><td></td><td></td><td class="yes" style="text-align:center;padding:12px"><svg class="i" style="font-size:42px"><use href="#i-check"/></svg></td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide dark" data-at="546" data-title="Проверяют каждый шаг, а не только итог">
+  <p class="kick t-orange">Поэтому</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-list-checks"/></svg></div>
+      <div>
+        <p class="say md">Проверяют <em>каждый шаг</em>, а&nbsp;не&nbsp;только итог</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="549" data-title="Схема: постановка и проверка расчёта">
+  <p class="kick">Все эти проверки собраны на схеме</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:720px 1fr;gap:30px;align-items:center">
+      <svg viewBox="320 455 3075 2080" width="720" height="487" style="display:block;flex:none" role="img" aria-label="Схема постановки и проверки расчёта: полосы инженера, модели, проверок и инструментов">
+        <foreignObject x="0" y="0" width="3648" height="3224"><img src="@day/08-Схемы/d4-proverka-rascheta.png" width="3648" height="3224" alt="" style="display:block"></foreignObject>
+      </svg>
+      <div style="position:relative;height:487px">
+        <div class="t-orange" style="position:absolute;left:0;right:0;top:54px;height:64px;display:flex;align-items:center;gap:16px;background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:0 20px"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-user-check"/></svg><b style="font-size:32px;color:var(--ci)">Инженер</b></div>
+        <div class="t-teal" style="position:absolute;left:0;right:0;top:170px;height:64px;display:flex;align-items:center;gap:16px;background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:0 20px"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-bot"/></svg><b style="font-size:32px;color:var(--ci)">Модель</b></div>
+        <div class="t-red" style="position:absolute;left:0;right:0;top:287px;height:64px;display:flex;align-items:center;gap:16px;background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:0 20px"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-shield-check"/></svg><b style="font-size:32px;color:var(--ci)">Проверки</b></div>
+        <div class="t-gray" style="position:absolute;left:0;right:0;top:403px;height:64px;display:flex;align-items:center;gap:16px;background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:0 20px"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-calculator"/></svg><b style="font-size:32px;color:var(--ci)">Инструменты</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="555" data-steps="555,559" data-title="Схема: от постановки до независимого пересчёта">
+  <p class="kick">Схема · путь расчёта</p>
+  <div class="body">
+    <div style="position:relative;height:516px;flex:none">
+      <div style="position:absolute;left:0;right:0;top:0;height:120px;background:var(--surface);border-radius:18px"></div>
+      <div style="position:absolute;left:0;right:0;top:132px;height:120px;background:var(--surface);border-radius:18px"></div>
+      <div style="position:absolute;left:0;right:0;top:264px;height:120px;background:var(--surface);border-radius:18px"></div>
+      <div style="position:absolute;left:0;right:0;top:396px;height:120px;background:var(--surface);border-radius:18px"></div>
+      <span style="position:absolute;left:20px;top:8px;font-size:19px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--orange)">Инженер</span>
+      <span style="position:absolute;left:20px;top:140px;font-size:19px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--teal)">Модель</span>
+      <span style="position:absolute;left:20px;top:272px;font-size:19px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--red)">Проверки</span>
+      <span style="position:absolute;left:20px;top:404px;font-size:19px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--muted)">Инструменты</span>
+      <svg width="1135" height="516" viewBox="0 0 1135 516" style="position:absolute;left:0;top:0" aria-hidden="true">
+        <g class="st" data-s="1">
+          <path d="M320 74H470V150" fill="none" stroke="var(--teal)" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M455 148L470 170L485 148Z" fill="var(--teal)"/>
+        </g>
+        <g class="st" data-s="2">
+          <path d="M470 244V338H520" fill="none" stroke="var(--muted)" stroke-width="5" stroke-linejoin="round"/>
+          <path d="M518 323L540 338L518 353Z" fill="var(--muted)"/>
+          <path d="M780 338H800" fill="none" stroke="var(--muted)" stroke-width="5"/>
+          <path d="M798 323L820 338L798 353Z" fill="var(--muted)"/>
+          <path d="M975 376V412" fill="none" stroke="var(--red)" stroke-width="5" stroke-dasharray="10 8"/>
+          <path d="M960 410L975 432L990 410Z" fill="var(--red)"/>
+        </g>
+      </svg>
+      <div class="t-gray st" data-s="1" style="position:absolute;left:20px;top:36px;width:300px;height:76px;background:var(--bg);border:3px solid var(--c);border-radius:16px;padding:6px 20px;display:flex;flex-direction:column;justify-content:center;gap:2px">
+        <h3 style="font-size:28px;line-height:1.1">Постановка</h3>
+        <p style="font-size:20px;color:var(--muted)">данные, схема, допущения</p>
+      </div>
+      <span class="tag t-teal st" data-s="1" style="position:absolute;left:345px;top:30px;font-size:20px;background:var(--bg)">запрос</span>
+      <div class="t-teal st" data-s="1" style="position:absolute;left:330px;top:170px;width:280px;height:76px;background:var(--bg);border:3px solid var(--c);border-radius:16px;padding:6px 20px;display:flex;flex-direction:column;justify-content:center;gap:2px">
+        <h3 style="font-size:28px;line-height:1.1;color:var(--ci)">Расчёт моделью</h3>
+        <p style="font-size:20px;color:var(--muted)">шаги с&nbsp;единицами</p>
+      </div>
+      <span class="tag t-gray st" data-s="2" style="position:absolute;left:372px;top:318px;font-size:20px;background:var(--bg)">ответ</span>
+      <div class="t-red st" data-s="2" style="position:absolute;left:540px;top:300px;width:240px;height:76px;background:var(--bg);border:3px solid var(--c);border-radius:16px;padding:6px 20px;display:flex;flex-direction:column;justify-content:center;gap:2px">
+        <h3 style="font-size:28px;line-height:1.1;color:var(--ci)">Размерности</h3>
+        <p style="font-size:20px;color:var(--muted)">сходятся&nbsp;ли единицы</p>
+      </div>
+      <div class="t-red st" data-s="2" style="position:absolute;left:820px;top:300px;width:315px;height:76px;background:var(--bg);border:3px solid var(--c);border-radius:16px;padding:6px 20px;display:flex;flex-direction:column;justify-content:center;gap:2px">
+        <h3 style="font-size:28px;line-height:1.1;color:var(--ci)">Контрольный пример</h3>
+        <p style="font-size:20px;color:var(--muted)">ответ известен заранее</p>
+      </div>
+      <div class="t-gray st" data-s="2" style="position:absolute;left:800px;top:432px;width:335px;height:76px;background:var(--bg);border:3px solid var(--c);border-radius:16px;padding:6px 20px;display:flex;flex-direction:column;justify-content:center;gap:2px">
+        <h3 style="font-size:28px;line-height:1.1">Независимый пересчёт</h3>
+        <p style="font-size:20px;color:var(--muted)">калькулятором или в&nbsp;таблице</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="563" data-steps="563,564,566" data-title="Схема: совпало или расхождение">
+  <p class="kick">Схема · итог пересчёта</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:720px 1fr;gap:30px;align-items:center">
+      <svg viewBox="320 455 3075 2080" width="720" height="487" style="display:block;flex:none" role="img" aria-label="Схема: после пересчёта путь ведёт к решению инженера или к уточнению задачи и новой попытке">
+        <foreignObject x="0" y="0" width="3648" height="3224"><img src="@day/08-Схемы/d4-proverka-rascheta.png" width="3648" height="3224" alt="" style="display:block"></foreignObject>
+        <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M320 455H3395V2535H320Z M2598 935H2628V2258H2598Z M2598 798H2898V935H2598Z M2898 766H3341V1001H2898Z M2366 2258H2913V2490H2366Z M2913 2345H3135V2395H2913Z M3095 2205H3145V2345H3095Z M2985 2128H3255V2205H2985Z M3095 1991H3145V2128H3095Z M2916 1756H3323V1991H2916Z M3323 1855H3392V1895H3323Z M3355 568H3392V1855H3355Z M322 538H3392V568H322Z M1700 462H2012V538H1700Z M322 568H352V855H322Z M322 855H388V912H322Z M388 766H907V1001H388Z"/>
+        <rect x="2896" y="764" width="447" height="239" rx="36" fill="none" stroke="var(--ink)" stroke-width="12"/>
+        <rect x="2912" y="1756" width="415" height="239" rx="36" fill="none" stroke="var(--ink)" stroke-width="12"/>
+        <rect x="384" y="764" width="527" height="239" rx="36" fill="none" stroke="var(--ink)" stroke-width="12"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:18px">
+        <div class="st t-teal" style="background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><b style="font-size:30px;color:var(--c);display:flex;align-items:center;gap:12px"><svg class="i"><use href="#i-circle-check"/></svg>Совпало</b><span style="font-size:24px;line-height:1.2;color:var(--ci)">вверх, к решению инженера по утверждённой методике</span></div>
+        <div class="st t-orange" style="background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><b style="font-size:30px;color:var(--c);display:flex;align-items:center;gap:12px"><svg class="i"><use href="#i-circle-x"/></svg>Расхождение</b><span style="font-size:24px;line-height:1.2;color:var(--ci)">«Уточнить задачу»: схема, данные, условие</span></div>
+        <div class="st t-gray" style="background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:14px 20px;display:flex;flex-direction:column;gap:6px"><b style="font-size:30px;color:var(--c);display:flex;align-items:center;gap:12px"><svg class="i"><use href="#i-undo-2"/></svg>Новая попытка</b><span style="font-size:24px;line-height:1.2;color:var(--ci)">пунктир ведёт обратно к&nbsp;постановке</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="570" data-title="Схема: к решению ведёт одна стрелка">
+  <p class="kick">Посмотрите внимательно</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:720px 1fr;gap:30px;align-items:center">
+      <svg viewBox="320 455 3075 2080" width="720" height="487" style="display:block;flex:none" role="img" aria-label="Схема: к решению инженера ведёт только стрелка от независимого пересчёта">
+        <foreignObject x="0" y="0" width="3648" height="3224"><img src="@day/08-Схемы/d4-proverka-rascheta.png" width="3648" height="3224" alt="" style="display:block"></foreignObject>
+        <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M320 455H3395V2535H320Z M2366 2258H2913V2490H2366Z M2598 935H2628V2258H2598Z M2598 798H2898V935H2598Z M2898 766H3341V1001H2898Z"/>
+        <rect x="2362" y="2254" width="555" height="240" rx="36" fill="none" stroke="var(--ink)" stroke-width="12"/>
+        <rect x="2894" y="762" width="451" height="243" rx="36" fill="none" stroke="var(--ink)" stroke-width="12"/>
+      </svg>
+      <div style="display:flex;flex-direction:column;justify-content:center;gap:22px">
+        <div class="t-teal" style="background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:8px"><b style="font-size:30px;line-height:1.15;color:var(--c)">К решению инженера ведёт одна стрелка</b><span style="font-size:25px;line-height:1.2;color:var(--ci)">она выходит из независимого пересчёта</span></div>
+        <div class="t-red" style="background:var(--ct);border-left:9px solid var(--c);border-radius:14px;padding:16px 20px;display:flex;flex-direction:column;gap:8px"><b style="font-size:30px;line-height:1.15;color:var(--c)">Ни ответ модели, ни&nbsp;одна проверка</b><span style="font-size:25px;line-height:1.2;color:var(--ci)">сами по&nbsp;себе к&nbsp;решению не&nbsp;ведут</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="574" data-title="Модель предлагает, проверка решает">
+  <p class="kick t-orange">Главное</p>
+  <div class="body">
+    <p class="say" style="font-size:88px;line-height:1.12">Модель <b>предлагает</b>,<br>проверка <em>решает</em></p>
+  </div>
+</section>

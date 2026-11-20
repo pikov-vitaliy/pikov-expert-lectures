@@ -1,0 +1,337 @@
+<!-- Лекция 4.1, строки 5–110 (00:00–06:02): начало лекции, модель хорошо объясняет формулу и плохо считает по ней, план, что отдаём модели, сквозной пример – цепь фар ЭС-24 и его условие -->
+
+<section class="slide sect" data-at="5" data-title="День 4. Модуль 4">
+  <p class="kick">День 4 · модуль 4</p>
+  <span class="no">4</span>
+  <h1>Инженерные расчёты<br>и&nbsp;данные испытаний<br>без&nbsp;программирования</h1>
+  <p class="lead">Первая тема дня – инженерные расчёты с&nbsp;помощью ИИ</p>
+</section>
+
+<section class="slide cover" data-at="7">
+  <p class="kick">Модуль 4 · тема 4.1</p>
+  <h1>Инженерные расчёты<br>с&nbsp;помощью ИИ</h1>
+  <p class="lead">Модель хорошо объясняет формулу и&nbsp;плохо считает по&nbsp;ней</p>
+  <p class="meta">День 4 · Виталий Пиков · архитектор информационной безопасности · pikov.expert</p>
+</section>
+
+<section class="slide" data-at="10">
+  <p class="kick">Расчёт в ответе модели</p>
+  <h2>Ответ выглядит убедительно</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg user" style="min-width:360px"><span class="who">Просьба посчитать</span><p><i style="display:block;width:300px;height:16px;border-radius:8px;background:var(--on_graphite);opacity:.4"></i></p></div>
+      <div class="msg bot" style="max-width:none;width:920px;padding:24px 34px">
+        <span class="who">Ответ модели</span>
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:18px 26px;align-items:center;margin-top:10px">
+          <span class="tag" style="justify-self:start;font-size:26px">Формула</span><i style="display:block;height:18px;border-radius:9px;background:var(--surface2);width:58%"></i>
+          <span class="tag" style="justify-self:start;font-size:26px">Подстановка</span><i style="display:block;height:18px;border-radius:9px;background:var(--surface2);width:90%"></i>
+          <span class="tag" style="justify-self:start;font-size:26px">Итог</span><i style="display:block;height:18px;border-radius:9px;background:var(--teal);width:30%"></i>
+          <span class="tag" style="justify-self:start;font-size:26px">Таблица</span>
+          <span style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:66%"><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="13">
+  <p class="kick t-red">Расчёт в ответе модели</p>
+  <h2>Число может оказаться неверным</h2>
+  <div class="body">
+    <div class="chat">
+      <div class="msg bot" style="max-width:none;width:920px;padding:24px 34px">
+        <span class="who">Ответ модели</span>
+        <div style="display:grid;grid-template-columns:240px 1fr;gap:18px 26px;align-items:center;margin-top:10px">
+          <span class="tag" style="justify-self:start;font-size:26px">Формула</span><i style="display:block;height:18px;border-radius:9px;background:var(--surface2);width:58%"></i>
+          <span class="tag" style="justify-self:start;font-size:26px">Подстановка</span><i style="display:block;height:18px;border-radius:9px;background:var(--surface2);width:90%"></i>
+          <span class="tag t-red" style="justify-self:start;font-size:26px">Итог</span><span style="display:flex;align-items:center;gap:18px"><i style="display:block;height:18px;border-radius:9px;background:var(--red);width:30%"></i><b style="display:flex;width:46px;height:46px;border-radius:50%;background:var(--red);color:var(--chip-ink);align-items:center;justify-content:center;font-size:32px">?</b></span>
+          <span class="tag" style="justify-self:start;font-size:26px">Таблица</span>
+          <span style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;width:66%"><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--line)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i><i style="height:22px;border-radius:5px;background:var(--surface2)"></i></span>
+        </div>
+      </div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-eye-off"/></svg><div><p>По&nbsp;внешнему виду ответа этого не&nbsp;понять</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="16" data-title="Сегодня разберём">
+  <p class="kick">Сегодня разберём</p>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal" style="padding:34px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-thumbs-up"/></svg></span><h3 style="font-size:36px">Где модель в&nbsp;расчётах помогает</h3></div>
+      <div class="card t-red" style="padding:34px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:36px">Почему она ошибается в&nbsp;вычислениях</h3></div>
+      <div class="card t-orange" style="padding:34px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:36px">Как проверять её ответ, чтобы ошибка не&nbsp;ушла в&nbsp;работу</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="19" data-title="Модель предлагает, проверка решает">
+  <p class="kick t-orange">Главное правило</p>
+  <div class="body">
+    <p class="say" style="font-size:96px;line-height:1.1">Модель <b>предлагает</b>,<br>проверка <em>решает</em></p>
+  </div>
+</section>
+
+<section class="slide" data-steps="23,26,29">
+  <p class="kick">План лекции</p>
+  <h2>Что разберём</h2>
+  <div class="body">
+    <ol class="list num">
+      <li class="st" data-s="1">Что модель делает в&nbsp;расчётах хорошо</li>
+      <li class="st" data-s="1">Почему она ошибается в&nbsp;вычислениях<small>и&nbsp;что об&nbsp;этом говорят исследования</small></li>
+      <li class="st" data-s="2">Как поставить расчётную задачу<small>почему схема и&nbsp;единицы измерения решают больше, чем арифметика</small></li>
+      <li class="st" data-s="2">Приёмы проверки и&nbsp;инструменты, которые считают вместо модели</li>
+      <li class="st" data-s="3">Чем подсказка модели отличается от&nbsp;утверждённого расчёта<small>и&nbsp;как просить у&nbsp;модели формулы для&nbsp;электронных таблиц</small></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="31" data-title="Сквозной пример и ваши расчёты">
+  <p class="kick">Пока слушаете</p>
+  <div class="body">
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-car-front"/></svg><div><p>Всё это – на&nbsp;сквозном примере из&nbsp;учебного кейса: цепь фар</p></div></div>
+    <div class="split s46">
+      <div class="center"><svg class="i big-ic"><use href="#i-notebook-pen"/></svg></div>
+      <div>
+        <p class="say sm">Держите в&nbsp;голове расчёты, которые вы делаете <b>регулярно</b></p>
+        <p class="sub">К концу лекции станет понятно, какие из&nbsp;них можно перевести на&nbsp;проверенные&nbsp;формулы</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="36" data-steps="38,41">
+  <p class="kick">Разделение работы</p>
+  <h2>Что отдаём модели, а&nbsp;что нет</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <p class="note st" data-s="1" style="font-weight:700;color:var(--teal);letter-spacing:.06em;text-transform:uppercase;font-size:24px">Модели</p>
+      <div class="cards c3">
+        <div class="card row t-teal st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-book-open-text"/></svg></span><h3>Объяснение формулы и&nbsp;методики</h3></div>
+        <div class="card row t-teal st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-git-branch"/></svg></span><h3>Варианты расчётной схемы и&nbsp;допущения</h3></div>
+        <div class="card row t-teal st" data-s="1"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3>Черновик формулы для&nbsp;таблицы</h3></div>
+      </div>
+    </div>
+    <div class="cards">
+      <div class="card row t-gray st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Арифметика и&nbsp;итог</h3><p>Калькулятору, таблице или утверждённой расчётной программе</p></div></div>
+      <div class="card row t-orange st" data-s="2"><span class="bdg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3>Решение</h3><p>Инженеру</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="44">
+  <p class="kick">Разделение работы</p>
+  <h2>Почему граница проходит именно здесь?</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-book-open-text"/></svg>Работа с&nbsp;текстом и&nbsp;знаниями</h3>
+        <ul><li>Объяснить методику</li><li>Перечислить допущения</li><li>Подсказать, о&nbsp;чём вы забыли</li></ul>
+        <p style="font-weight:700;color:var(--c);margin-top:auto">Здесь модель сильна</p></div>
+      <div class="col t-red"><h3><svg class="i"><use href="#i-calculator"/></svg>Вычисление</h3>
+        <ul><li>Точная работа с&nbsp;числами</li></ul>
+        <p style="font-weight:700;color:var(--c);margin-top:auto">Здесь модель ошибается, и&nbsp;ошибается так, что этого не&nbsp;видно</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="50">
+  <p class="kick">Разделение работы</p>
+  <h2>И для простых расчётов порядок тот&nbsp;же</h2>
+  <div class="body">
+    <div class="picts c3">
+      <div class="pict" style="font-size:31px"><svg class="i"><use href="#i-cable"/></svg><span>Сечение провода</span></div>
+      <div class="pict" style="font-size:31px"><svg class="i"><use href="#i-battery-low"/></svg><span>Расход заряда батарей на&nbsp;стоянке</span></div>
+      <div class="pict" style="font-size:31px"><svg class="i"><use href="#i-cog"/></svg><span>Посадка вала во&nbsp;втулке</span></div>
+    </div>
+    <div class="rule t-teal"><svg class="i"><use href="#i-book-open-text"/></svg><div><p>С&nbsp;методикой каждого из&nbsp;них модель может помочь</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="53" data-title="Число для документа считает инструмент, проверяет и подписывает инженер">
+  <p class="kick t-orange">Кто отвечает за число</p>
+  <div class="body">
+    <p class="say md">Число, которое пойдёт в&nbsp;документ,<br>считает <b>инструмент</b>,<br>а&nbsp;проверяет и&nbsp;подписывает <em>инженер</em></p>
+  </div>
+</section>
+
+<section class="slide" data-steps="57,62">
+  <p class="kick t-orange">Сквозной пример лекции</p>
+  <h2>Цепь фар дальнего света учебного узла ЭС-24</h2>
+  <div class="body">
+    <div class="split s46 st" data-s="1">
+      <div class="center"><div class="doc t-orange" style="width:320px"><h4 style="font-size:24px">Дополнение к&nbsp;учебному кейсу ЭС-24</h4><i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><i></i><b class="stamp">раздел 1</b></div></div>
+      <div><p class="say sm">Какое сечение провода нужно, чтобы падение напряжения не&nbsp;превысило заданного?</p></div>
+    </div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:12px">
+      <p class="note" style="color:var(--ink);font-weight:700">Формулы простые, а&nbsp;ошибиться можно</p>
+      <div class="cards c3 sm">
+        <div class="card row t-red"><span class="bdg"><svg class="i"><use href="#i-git-fork"/></svg></span><h3>В&nbsp;схеме</h3></div>
+        <div class="card row t-red"><span class="bdg"><svg class="i"><use href="#i-ruler"/></svg></span><h3>В&nbsp;единицах</h3></div>
+        <div class="card row t-red"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><h3>В&nbsp;арифметике</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="65,68">
+  <p class="kick">Сквозной пример · условие</p>
+  <h2>Ток, расстояние и&nbsp;схема цепи</h2>
+  <div class="body">
+    <svg viewBox="0 0 1135 300" style="width:100%;height:300px;display:block" role="img" aria-label="Двухпроводная цепь: от блока предохранителей к фарам идёт прямой провод, обратно к точке массы у блока – обратный провод того же сечения и той же длины; расстояние от блока до фар 6 м, ток цепи 6 А">
+      <g class="st" data-s="1">
+        <rect x="8" y="66" width="262" height="150" rx="18" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/>
+        <text x="139" y="133" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)">Блок</text>
+        <text x="139" y="167" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)">предохранителей</text>
+        <rect x="865" y="66" width="262" height="150" rx="18" fill="var(--surface)" stroke="var(--line)" stroke-width="3"/>
+        <circle cx="996" cy="110" r="25" fill="none" stroke="var(--ink)" stroke-width="4"/>
+        <line x1="978" y1="92" x2="1014" y2="128" stroke="var(--ink)" stroke-width="4"/>
+        <line x1="1014" y1="92" x2="978" y2="128" stroke="var(--ink)" stroke-width="4"/>
+        <text x="996" y="170" text-anchor="middle" font-size="28" font-weight="700" fill="var(--ink)">Фары</text>
+        <text x="996" y="202" text-anchor="middle" font-size="27" font-weight="700" fill="var(--teal)">I = 6 А</text>
+        <line x1="270" y1="28" x2="865" y2="28" stroke="var(--muted)" stroke-width="3"/>
+        <line x1="270" y1="8" x2="270" y2="48" stroke="var(--muted)" stroke-width="3"/>
+        <line x1="865" y1="8" x2="865" y2="48" stroke="var(--muted)" stroke-width="3"/>
+        <path d="M272 28 l20 -10 v20 z" fill="var(--muted)"/>
+        <path d="M863 28 l-20 -10 v20 z" fill="var(--muted)"/>
+        <rect x="447" y="6" width="240" height="44" fill="var(--bg)"/>
+        <text x="567" y="39" text-anchor="middle" font-size="32" font-weight="700" fill="var(--ink)">L = 6 м</text>
+      </g>
+      <g class="st" data-s="2">
+        <line x1="270" y1="98" x2="865" y2="98" stroke="var(--teal)" stroke-width="7" stroke-linecap="round"/>
+        <path d="M800 98 l-24 -13 v26 z" fill="var(--teal)"/>
+        <text x="567" y="84" text-anchor="middle" font-size="27" font-weight="700" fill="var(--teal)">прямой провод</text>
+        <polyline points="865,178 330,178 330,236" fill="none" stroke="var(--orange)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M776 178 l24 -13 v26 z" fill="var(--orange)"/>
+        <line x1="300" y1="238" x2="360" y2="238" stroke="var(--orange)" stroke-width="6" stroke-linecap="round"/>
+        <line x1="311" y1="252" x2="349" y2="252" stroke="var(--orange)" stroke-width="6" stroke-linecap="round"/>
+        <line x1="322" y1="266" x2="338" y2="266" stroke="var(--orange)" stroke-width="6" stroke-linecap="round"/>
+        <text x="580" y="158" text-anchor="middle" font-size="27" font-weight="700" fill="var(--orange)">обратный провод</text>
+        <text x="600" y="212" text-anchor="middle" font-size="25" fill="var(--ink)">того же сечения и&#160;той же длины</text>
+        <text x="376" y="262" font-size="24" fill="var(--muted)">точка массы у&#160;блока</text>
+      </g>
+    </svg>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px">
+      <div class="rule xs t-teal st" data-s="1"><svg class="i"><use href="#i-zap"/></svg><div><p>Ток считаем постоянным и&nbsp;не&nbsp;зависящим от&nbsp;напряжения</p></div></div>
+      <div class="rule xs t-red st" data-s="2"><svg class="i"><use href="#i-ban"/></svg><div><p>Возврат тока через раму в&nbsp;этой задаче не&nbsp;рассматривается</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="72,74">
+  <p class="kick">Сквозной пример · условие</p>
+  <h2>Провод, сеть и&nbsp;допустимое падение</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal st" data-s="1"><b style="font-size:80px">0,0175</b><span><strong>Ом·мм²/м</strong><br>удельное сопротивление, провод&nbsp;медный</span></div>
+      <div class="stat t-teal st" data-s="2"><b style="font-size:80px">24 В</b><span>номинальное напряжение бортовой сети, п.&nbsp;4.1&nbsp;ТЗ</span></div>
+      <div class="stat t-gray st" data-s="2"><b style="font-size:80px">≤ 3 %</b><span>допустимое падение в&nbsp;проводах от&nbsp;номинального напряжения сети</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="76,82">
+  <p class="kick">Сквозной пример · условие</p>
+  <h2>Ряд сечений и&nbsp;допустимый ток провода</h2>
+  <div class="body">
+    <div class="st" data-s="1" style="display:flex;align-items:center;gap:26px">
+      <p class="note" style="color:var(--ink);font-weight:700;font-size:30px;width:280px;flex:none">Ряд сечений, мм²</p>
+      <div style="display:flex;gap:18px">
+        <span style="font-size:46px;font-weight:700;padding:10px 26px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">0,75</span>
+        <span style="font-size:46px;font-weight:700;padding:10px 26px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">1,0</span>
+        <span style="font-size:46px;font-weight:700;padding:10px 26px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">1,5</span>
+        <span style="font-size:46px;font-weight:700;padding:10px 26px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">2,5</span>
+        <span style="font-size:46px;font-weight:700;padding:10px 26px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">4,0</span>
+      </div>
+    </div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:16px">
+      <p class="note" style="color:var(--ink);font-weight:700;font-size:30px">Допустимый длительный ток провода по&nbsp;условию задачи</p>
+      <div class="bars" style="--max:25;--lbw:230px">
+        <div class="bar t-teal" style="--v:15;font-size:30px"><span class="lb">1,5 мм²</span><i></i><b>15 А</b></div>
+        <div class="bar t-teal" style="--v:20;font-size:30px"><span class="lb">2,5 мм²</span><i></i><b>20 А</b></div>
+        <div class="bar t-teal" style="--v:25;font-size:30px"><span class="lb">4,0 мм²</span><i></i><b>25 А</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="88,93">
+  <p class="kick">Сквозной пример · учебное правило</p>
+  <h2>Выбор предохранителя</h2>
+  <div class="body">
+    <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:22px">
+      <div style="display:flex;align-items:center;gap:26px">
+        <p class="note" style="color:var(--ink);font-weight:700;font-size:30px;width:280px;flex:none">Ряд номиналов, А</p>
+        <div style="display:flex;gap:18px">
+          <span style="font-size:46px;font-weight:700;padding:10px 30px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">5</span>
+          <span style="font-size:46px;font-weight:700;padding:10px 30px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">7,5</span>
+          <span style="font-size:46px;font-weight:700;padding:10px 30px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">10</span>
+          <span style="font-size:46px;font-weight:700;padding:10px 30px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">15</span>
+          <span style="font-size:46px;font-weight:700;padding:10px 30px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line)">20</span>
+        </div>
+      </div>
+      <div class="rule t-teal"><svg class="i"><use href="#i-scale"/></svg><div><h3>Берут ближайший номинал</h3><p>не меньше 1,25&nbsp;×&nbsp;I и&nbsp;не больше допустимого тока провода</p></div></div>
+    </div>
+    <div class="rule sm t-orange st" data-s="2"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Правило придумано для упражнения</h3><p>В работе номинал выбирают по&nbsp;документации изготовителя и&nbsp;методикам вашей организации, с&nbsp;учётом пускового тока ламп и&nbsp;условий прокладки</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="96">
+  <p class="kick">Сквозной пример · что найти</p>
+  <h2>Что нужно найти</h2>
+  <div class="body">
+    <ol class="flow sm" style="grid-auto-columns:minmax(0,1fr);gap:24px">
+      <li class="step" style="min-height:280px;padding:20px 12px 22px"><h3 style="font-size:25.5px">Минимальное сечение</h3><p style="font-size:23px">по&nbsp;допустимому падению напряжения</p></li>
+      <li class="step" style="min-height:280px;padding:20px 12px 22px"><h3 style="font-size:25.5px">Сечение из&nbsp;ряда</h3></li>
+      <li class="step" style="min-height:280px;padding:20px 12px 22px"><h3 style="font-size:25.5px">Сопротивление проводов и&nbsp;падение напряжения</h3><p style="font-size:23px">при&nbsp;выбранном сечении</p></li>
+      <li class="step" style="min-height:280px;padding:20px 12px 22px"><h3 style="font-size:25.5px">Мощность потерь</h3><p style="font-size:23px">в&nbsp;проводах</p></li>
+      <li class="step" style="min-height:280px;padding:20px 12px 22px"><h3 style="font-size:25.5px">Номинал предохранителя</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="100">
+  <p class="kick">Обратите внимание на подпись</p>
+  <h2>Сквозной пример: цепь фар ЭС-24</h2>
+  <p class="note" style="font-size:30px;margin-top:12px"><mark>Значения учебные. Допуск 3 % – условие задачи, а&nbsp;не пункт ТЗ</mark></p>
+  <div class="body">
+    <table class="tbl">
+      <thead><tr><th style="width:40%">Что</th><th>Значение</th></tr></thead>
+      <tbody>
+        <tr><td>Ток цепи</td><td>6 А</td></tr>
+        <tr><td>Расстояние до фар</td><td>6 м, цепь двухпроводная</td></tr>
+        <tr><td>Медь, ρ</td><td>0,0175 Ом·мм²/м</td></tr>
+        <tr><td>Допустимое падение</td><td>не более 3 % от 24 В</td></tr>
+        <tr><td>Ряд сечений</td><td>0,75; 1,0; 1,5; 2,5; 4,0 мм²</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="103">
+  <p class="kick">Условие задачи и ТЗ</p>
+  <h2>Условие упражнения и&nbsp;требование документа</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-graduation-cap"/></svg>Условие упражнения</h3>
+        <p>Если в&nbsp;задаче написано</p>
+        <div style="display:flex;flex-wrap:wrap;gap:14px"><span class="tag" style="font-size:30px;padding:8px 22px">«3 %»</span><span class="tag" style="font-size:30px;padding:8px 22px">«по учебному правилу»</span></div></div>
+      <div class="col t-orange"><h3><svg class="i"><use href="#i-file-text"/></svg>Требование документа</h3>
+        <ul><li>ТЗ во&nbsp;всех задачах дополнения – редакция 1 из&nbsp;кейса первого дня</li><li>Новых пунктов ТЗ в&nbsp;дополнении&nbsp;нет</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-steps="107,109">
+  <p class="kick">Учебный кейс ЭС-24</p>
+  <h2>Что можно отправить модели</h2>
+  <div class="body">
+    <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:26px;align-items:center">
+      <p class="note" style="font-size:30px">Узел условный, значения подобраны для&nbsp;упражнений</p>
+      <div class="docs" style="gap:90px;flex-wrap:nowrap">
+        <div class="doc" style="width:340px"><h4 style="font-size:25px">Раздел 1 дополнения: задача о&nbsp;цепи фар</h4><i></i><i class="s"></i><i class="t"></i><i></i><b class="stamp t-teal">можно</b></div>
+        <div class="doc" style="width:340px"><h4 style="font-size:25px">Весь файл дополнения к&nbsp;учебному кейсу</h4><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-red">нет</b></div>
+      </div>
+    </div>
+    <div class="rule t-red st" data-s="2"><svg class="i"><use href="#i-file-lock"/></svg><div><p>Рабочие расчёты, чертежи и&nbsp;данные изделий – только по&nbsp;правилам вашей организации</p></div></div>
+  </div>
+</section>

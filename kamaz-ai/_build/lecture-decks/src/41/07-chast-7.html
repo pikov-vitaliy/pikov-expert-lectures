@@ -1,0 +1,314 @@
+<!-- Лекция 4.1, строки 695–772 (35:49–40:51): принцип А. Цымлова, вставка 20.11 о трёхмерных моделях через код (Zhang и соавт., Barkley и соавт.), подсказка модели не заменяет утверждённый расчёт, предвзятость автоматизации (Lyell и Coiera, Romeo и Conti), парадокс надзора К. Овчинникова, вопросы к внутреннему помощнику для расчётов -->
+
+<section class="slide dark" data-at="695" data-title="А. Цымлов: вероятностный генератор и детерминированные проверки">
+  <p class="kick t-orange">Принцип одной строкой</p>
+  <div class="body">
+    <figure class="quote t-orange">
+      <blockquote style="font-size:66px;line-height:1.14">Вероятностный генератор<br>+&nbsp;детерминированные проверки<br>=&nbsp;<b>надёжная система</b></blockquote>
+      <figcaption><i class="ava">АЦ</i><span><b>А. Цымлов</b>доклад на&nbsp;вебинаре по&nbsp;разработке с&nbsp;ИИ, УЦ «МАСКОМ» и&nbsp;PVS-Studio, 28.08.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="698">
+  <p class="kick">Принцип по частям</p>
+  <h2>Из чего складывается надёжная система</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 54px 1.55fr 54px 0.95fr;gap:12px;align-items:stretch">
+      <div class="card t-teal" style="gap:18px;padding:28px 26px">
+        <p style="font-size:21px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c);line-height:1.2">Вероятностный генератор</p>
+        <span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span>
+        <h3 style="font-size:44px">Модель</h3>
+        <p style="font-size:31px">предлагает</p>
+      </div>
+      <b style="align-self:center;text-align:center;font-size:76px;line-height:1;color:var(--muted)">+</b>
+      <div class="card t-orange" style="gap:18px;padding:28px 26px">
+        <p style="font-size:21px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c);line-height:1.2">Детерминированные проверки</p>
+        <div style="display:flex;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><span class="bdg lg"><svg class="i"><use href="#i-sheet"/></svg></span><span class="bdg lg"><svg class="i"><use href="#i-list-checks"/></svg></span></div>
+        <h3 style="font-size:33px">Калькулятор, таблица, контрольный пример</h3>
+        <p style="font-size:29px">Один и&nbsp;тот&nbsp;же результат при&nbsp;тех&nbsp;же данных</p>
+      </div>
+      <b style="align-self:center;text-align:center;font-size:76px;line-height:1;color:var(--muted)">=</b>
+      <div class="t-teal" style="background:var(--ct);border-radius:18.8px;padding:28px 24px;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:22px;border-top:6.2px solid var(--c)">
+        <span class="bdg lg" style="background:var(--bg)"><svg class="i"><use href="#i-shield-check"/></svg></span>
+        <h3 style="font-size:38px;line-height:1.12;color:var(--ci)">Надёжная система</h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="706">
+  <p class="kick">Тот же принцип · трёхмерные модели</p>
+  <h2>Модель пишет программу, ядро строит тело</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 56px 1.1fr 56px 1fr;gap:12px;align-items:stretch">
+      <div class="card t-teal" style="align-items:center;text-align:center;justify-content:center;gap:18px;padding:30px 24px">
+        <span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span>
+        <h3 style="font-size:38px">Модель</h3>
+        <p style="font-size:29px">пишет короткую программу на&nbsp;Python</p>
+      </div>
+      <svg class="i" style="font-size:52px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div style="background:var(--graphite);border-radius:18.8px;padding:26px 28px;display:flex;flex-direction:column;gap:15px;justify-content:center;box-shadow:0 3.8px 12.5px var(--shadow)">
+        <p style="font-size:21px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--on_graphite);margin-bottom:6px!important">Программа на Python</p>
+        <i style="display:block;height:13px;width:58%;border-radius:7px;background:var(--teal)"></i>
+        <i style="display:block;height:13px;width:72%;margin-left:30px;border-radius:7px;background:var(--orange)"></i>
+        <i style="display:block;height:13px;width:62%;margin-left:30px;border-radius:7px;background:var(--gray)"></i>
+        <i style="display:block;height:13px;width:68%;margin-left:30px;border-radius:7px;background:var(--teal)"></i>
+        <i style="display:block;height:13px;width:44%;border-radius:7px;background:var(--gray)"></i>
+      </div>
+      <svg class="i" style="font-size:52px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card t-orange" style="align-items:center;text-align:center;justify-content:center;gap:18px;padding:30px 24px">
+        <span class="bdg lg"><svg class="i"><use href="#i-cuboid"/></svg></span>
+        <h3 style="font-size:36px">Геометрическое ядро</h3>
+        <p style="font-size:29px">строит тело по&nbsp;программе</p>
+      </div>
+    </div>
+    <div class="rule sm t-gray" style="padding:18px 32px"><svg class="i"><use href="#i-pencil-off"/></svg><div><p>Модель здесь не&nbsp;рисует деталь</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="709">
+  <p class="kick">Исследователи трёх американских университетов · 2026</p>
+  <h2>Программы для промышленных деталей</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:28px;padding:24px 34px"><b style="font-size:100px">17&nbsp;900</b><span style="font-size:32px">программ</span></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:28px;padding:24px 34px"><b style="font-size:100px">106</b><span style="font-size:32px">семейств промышленных деталей</span></div>
+    </div>
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-cog"/></svg><b>Зубчатые колёса</b></div>
+      <div class="pict"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12M6 21h12"/><path d="M8 3l8 3-8 3 8 3-8 3 8 3-8 3"/></svg><b>Пружины</b></div>
+      <div class="pict"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2h4v5h-4z"/><path d="M9 7h6v10l-3 5-3-5z"/><path d="M9 9.5l6 2.5M9 13l6 2.5"/></svg><b>Свёрла</b></div>
+      <div class="pict"><svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h5v11h11v5H4z"/><circle cx="6.5" cy="8" r="0.6"/><circle cx="15" cy="17.5" r="0.6"/></svg><b>Кронштейны</b></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhang H. et al. BenchCAD, 2026, препринт arXiv · doi.org/10.48550/arXiv.2605.10865</p>
+</section>
+
+<section class="slide" data-at="712">
+  <p class="kick t-red">Больше десяти сильных моделей</p>
+  <h2>Общую форму узнают часто, подробности теряют</h2>
+  <div class="body">
+    <p style="font-size:30px">Пример из&nbsp;работы: пружина с&nbsp;поджатыми по&nbsp;стандарту концами</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:36px">
+      <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:24px 30px 26px;display:flex;flex-direction:column;gap:16px;border-top:7px solid var(--c)">
+        <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Задано</p>
+        <svg viewBox="0 0 420 110" style="width:100%;height:auto;color:var(--c)" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><polyline points="10,98 18,12 26,98 34,12 78,98 122,12 166,98 210,12 254,98 298,12 342,98 386,12 394,98 402,12 410,98"/></svg>
+        <p style="font-size:31px;font-weight:700;color:var(--ci)">Концы поджаты</p>
+      </div>
+      <div class="t-red" style="background:var(--ct);border-radius:20px;padding:24px 30px 26px;display:flex;flex-direction:column;gap:16px;border-top:7px solid var(--c)">
+        <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Построила модель</p>
+        <svg viewBox="0 0 420 110" style="width:100%;height:auto;color:var(--c)" fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><polyline points="10,98 38.6,12 67.1,98 95.7,12 124.3,98 152.9,12 181.4,98 210,12 238.6,98 267.1,12 295.7,98 324.3,12 352.9,98 381.4,12 410,98"/></svg>
+        <p style="font-size:31px;font-weight:700;color:var(--ci)">Ровная спираль</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhang H. et al. BenchCAD, 2026, препринт arXiv · doi.org/10.48550/arXiv.2605.10865</p>
+</section>
+
+<section class="slide" data-at="714" data-title="Zhang и соавт.: на глаз и штангенциркулем">
+  <p class="kick">Точная фраза авторов, в переводе</p>
+  <div class="body">
+    <div class="split s73" style="gap:44px">
+      <figure class="quote">
+        <blockquote style="font-size:56px">Геометрия проходит проверку <b>на&nbsp;глаз</b>, но&nbsp;не&nbsp;проходит проверку <b>штангенциркулем</b></blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Zhang H. и соавт.</b>авторы исследования, 2026</span></figcaption>
+      </figure>
+      <div style="gap:26px;align-items:center">
+        <div class="t-teal" style="display:flex;align-items:center;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-eye"/></svg></span><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-check"/></svg></div>
+        <div class="t-red" style="display:flex;align-items:center;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-ruler"/></svg></span><svg class="i" style="font-size:52px;color:var(--c)"><use href="#i-x"/></svg></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhang H. et al. BenchCAD, 2026, препринт arXiv · doi.org/10.48550/arXiv.2605.10865</p>
+</section>
+
+<section class="slide h-sm" data-at="717" data-steps="717,719">
+  <p class="kick">Университет Карнеги – Меллон · 2026</p>
+  <h2>Агент построил раму квадрокоптера</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:280px 1fr;gap:44px;align-items:center">
+      <svg viewBox="0 0 300 300" style="width:280px;height:280px" fill="none">
+        <g style="color:var(--teal)" stroke="currentColor">
+          <line x1="58" y1="58" x2="110" y2="110" stroke-width="18"/>
+          <line x1="242" y1="58" x2="190" y2="110" stroke-width="18"/>
+          <line x1="58" y1="242" x2="110" y2="190" stroke-width="18"/>
+          <line x1="242" y1="242" x2="190" y2="190" stroke-width="18"/>
+          <circle cx="58" cy="58" r="40" stroke-width="5"/>
+          <circle cx="242" cy="58" r="40" stroke-width="5"/>
+          <circle cx="58" cy="242" r="40" stroke-width="5"/>
+          <circle cx="242" cy="242" r="40" stroke-width="5"/>
+        </g>
+        <circle cx="150" cy="150" r="46" style="fill:var(--teal)"/>
+        <g class="st" data-s="2" style="stroke:var(--red)" stroke-width="5" stroke-dasharray="8 6">
+          <circle cx="114" cy="114" r="19"/>
+          <circle cx="186" cy="114" r="19"/>
+          <circle cx="114" cy="186" r="19"/>
+          <circle cx="186" cy="186" r="19"/>
+        </g>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="card row t-teal st" data-s="1" style="padding:12px 22px;gap:18px"><span class="bdg" style="width:48px;height:48px;font-size:26px"><svg class="i"><use href="#i-check"/></svg></span><h3 style="font-size:29px">Геометрическое ядро проверило раму</h3></div>
+        <div class="card row t-teal st" data-s="1" style="padding:12px 22px;gap:18px"><span class="bdg" style="width:48px;height:48px;font-size:26px"><svg class="i"><use href="#i-check"/></svg></span><h3 style="font-size:29px">Отдельная модель оценила её по&nbsp;изображениям</h3></div>
+        <div class="card row t-red st" data-s="2" style="padding:12px 22px;gap:18px"><span class="bdg" style="width:48px;height:48px;font-size:26px"><svg class="i"><use href="#i-x"/></svg></span><h3 style="font-size:29px">Небольшие зазоры между лучами и&nbsp;центром</h3></div>
+      </div>
+    </div>
+    <div class="rule sm t-orange st" data-s="2" style="padding:14px 30px"><svg class="i"><use href="#i-scan-search"/></svg><div><h3>Инженеру – проверить именно место соединения</h3><p>Габариты и&nbsp;объём сами по&nbsp;себе не&nbsp;показывают,<br>соединены&nbsp;ли части так, как задумано</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Barkley J. et al. CADSmith, 2026, препринт arXiv · doi.org/10.48550/arXiv.2603.26512</p>
+</section>
+
+<section class="slide sect" data-at="724" data-steps="726" data-title="Подсказка модели не заменяет утверждённый расчёт">
+  <span class="no"><svg class="i"><use href="#i-signature"/></svg></span>
+  <p class="kick">Отдельно</p>
+  <h1 style="font-size:68px">Подсказка модели<br>не&nbsp;заменяет<br>утверждённый расчёт</h1>
+  <p class="lead" style="font-size:34px">Расчёт, по&nbsp;которому принимают решение о&nbsp;конструкции:</p>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-top:24px">
+    <div class="t-orange st" data-s="1" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:16px 22px 18px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><p style="display:flex;align-items:center;gap:12px;font-size:21px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)"><svg class="i" style="font-size:32px"><use href="#i-book-open-check"/></svg>Оформляют</p><b style="font-size:27px;line-height:1.18">по&nbsp;утверждённой в&nbsp;организации методике</b></div>
+    <div class="t-orange st" data-s="1" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:16px 22px 18px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><p style="display:flex;align-items:center;gap:12px;font-size:21px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)"><svg class="i" style="font-size:32px"><use href="#i-monitor-cog"/></svg>Выполняют</p><b style="font-size:27px;line-height:1.18">в&nbsp;принятых инструментах</b></div>
+    <div class="t-orange st" data-s="1" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:16px 22px 18px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:8px"><p style="display:flex;align-items:center;gap:12px;font-size:21px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--c)"><svg class="i" style="font-size:32px"><use href="#i-clipboard-check"/></svg>Проверяют</p><b style="font-size:27px;line-height:1.18">в&nbsp;установленном порядке</b></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="729">
+  <p class="kick">Ответ модели</p>
+  <h2>Ответ модели сам по&nbsp;себе в&nbsp;этот порядок не&nbsp;входит</h2>
+  <div class="body">
+    <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Он может стать</p>
+    <div class="picts c4" style="align-items:start">
+      <div class="pict"><svg class="i"><use href="#i-file-pen-line"/></svg><b>черновиком</b></div>
+      <div class="pict"><svg class="i"><use href="#i-lightbulb"/></svg><b>подсказкой</b></div>
+      <div class="pict"><svg class="i"><use href="#i-messages-square"/></svg><b>вторым мнением</b></div>
+      <div class="pict"><svg class="i"><use href="#i-search-check"/></svg><b>способом быстро найти ошибку в&nbsp;своём расчёте</b></div>
+    </div>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-signature"/></svg><div><p>Ответственность остаётся на&nbsp;инженере, который подписывает&nbsp;документ</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="734">
+  <p class="kick t-red">Опасность</p>
+  <h2>Гладкий ответ с&nbsp;формулами и&nbsp;таблицей<br>выглядит как готовый расчёт</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:56px">
+      <div style="align-items:center">
+        <div class="doc t-red" style="width:390px;gap:14px;padding:26px 28px 44px">
+          <h4 style="font-size:26px">Расчёт</h4>
+          <div style="display:flex;align-items:center;gap:14px"><svg class="i" style="font-size:34px;color:var(--teal)"><use href="#i-square-function"/></svg><i class="t" style="flex:1"></i></div>
+          <div style="display:flex;align-items:center;gap:14px"><svg class="i" style="font-size:34px;color:var(--teal)"><use href="#i-sigma"/></svg><i class="t" style="width:58%"></i></div>
+          <div style="display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:9px 8px;margin-top:6px">
+            <i class="t"></i><i class="t"></i><i class="t"></i><i class="t"></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <i></i><i class="s"></i>
+          <b class="stamp">ответ модели</b>
+        </div>
+      </div>
+      <div>
+        <div class="term t-red"><dfn style="font-size:52px">Предвзятость автоматизации</dfn><p style="font-size:35px">Склонность принимать предложение автоматической системы без&nbsp;достаточной проверки</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="737" data-steps="737,740">
+  <p class="kick">Lyell и Coiera · систематический обзор, 2017</p>
+  <h2>Предвзятость автоматизации сильнее<br>там, где проверка сложна</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:340px 1fr;gap:44px;align-items:stretch">
+      <div class="stat t-teal st" data-s="1" style="justify-content:center;gap:12px;padding:28px 34px"><b style="font-size:130px">40</b><span style="font-size:29px">исследований о&nbsp;предвзятости автоматизации и&nbsp;сложности проверки</span></div>
+      <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:18px;justify-content:center">
+        <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Проявляется</p>
+        <div class="card row t-gray" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-layers"/></svg></span><h3 style="font-size:32px">не&nbsp;только при&nbsp;многозадачности</h3></div>
+        <div class="card row t-red" style="padding:20px 26px"><span class="bdg"><svg class="i"><use href="#i-scan-search"/></svg></span><h3 style="font-size:32px">но и&nbsp;в&nbsp;отдельных задачах с&nbsp;высокой сложностью проверки</h3></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Lyell D., Coiera E. Journal of the American Medical Informatics Association, 2017 · doi.org/10.1093/jamia/ocw105</p>
+</section>
+
+<section class="slide h-sm" data-at="742" data-steps="742,744">
+  <p class="kick">Romeo и Conti · обзор, 2025</p>
+  <h2>Что помогает против предвзятости автоматизации</h2>
+  <div class="body">
+    <div class="card row t-gray st" data-s="1" style="padding:20px 30px"><span class="bdg lg"><svg class="i"><use href="#i-book-open-text"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><p class="muted" style="font-size:27px">Обзор посвящён</p><h3 style="font-size:38px">современным системам ИИ</h3></div></div>
+    <div class="vs">
+      <div class="col t-red st" data-s="2" style="padding:28px 34px;gap:16px"><h3 style="font-size:34px"><svg class="i"><use href="#i-message-square-text"/></svg><span>Объяснения<br>в&nbsp;ответе системы</span></h3><p style="font-size:33px;font-weight:700">сами по&nbsp;себе предвзятость не&nbsp;снимают</p></div>
+      <div class="col t-orange st" data-s="2" style="padding:28px 34px;gap:16px"><h3 style="font-size:34px"><svg class="i"><use href="#i-search-check"/></svg><span>Активная<br>самостоятельная проверка</span></h3><p style="font-size:33px;font-weight:700">помогает</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Romeo G., Conti D. AI &amp; SOCIETY, 2025 · doi.org/10.1007/s00146-025-02422-7</p>
+</section>
+
+<section class="slide" data-at="747" data-title="К. Овчинников: парадокс надзора">
+  <p class="kick t-orange">Обратная сторона · парадокс надзора</p>
+  <div class="body">
+    <figure class="quote md t-orange">
+      <blockquote style="font-size:46px">Проверить агента может только тот, <b>кто умеет сам</b>. А&nbsp;новичок сразу попадает в&nbsp;роль эксперта: проверяет код за&nbsp;ИИ, не&nbsp;успев накопить свой опыт</blockquote>
+      <figcaption><i class="ava">КО</i><span><b>К. Овчинников</b>доклад «Инженер после AI», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="753" data-title="Проверить расчёт модели может тот, кто умеет считать сам">
+  <p class="kick t-orange">Для расчётов это значит</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:220px"><use href="#i-calculator"/></svg></div>
+      <div>
+        <p class="say md">Проверить расчёт модели может тот, кто <em>умеет считать сам</em></p>
+        <p class="sub">Поэтому методику и&nbsp;порядок величин инженер должен знать без&nbsp;модели</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="757" data-title="Внутренние помощники для расчётов">
+  <p class="kick t-orange">Внутренние помощники для расчётов на&nbsp;основе ИИ</p>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:270px 1fr;gap:52px">
+      <span class="q" style="width:270px;height:270px;font-size:190px">?</span>
+      <ul style="gap:30px">
+        <li style="font-size:48px">Во многих организациях появляются внутренние помощники для&nbsp;расчётов</li>
+        <li style="font-size:38px;font-weight:400;color:var(--muted)">Если такого помощника предлагают и&nbsp;вам, полезно задать разработчикам несколько&nbsp;вопросов</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="761" data-steps="761,762,763,764,765,766">
+  <p class="kick t-orange">Внутренний помощник для расчётов</p>
+  <h2>Шесть вопросов разработчикам</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:20px 22px">
+      <div class="card t-teal st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">1</span><h3 style="font-size:28px">Кто считает</h3></div><p style="font-size:27px">Модель или программа?</p></div>
+      <div class="card t-teal st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">2</span><h3 style="font-size:28px">Что видно пользователю</h3></div><p style="font-size:27px">Подставленные значения и&nbsp;формулы или только&nbsp;итог?</p></div>
+      <div class="card t-teal st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">3</span><h3 style="font-size:28px">Не хватает данных</h3></div><p style="font-size:27px">Спрашивает или подставляет значение&nbsp;сам?</p></div>
+      <div class="card t-teal st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">4</span><h3 style="font-size:28px">Подозрительные значения</h3></div><p style="font-size:27px">Отмечает или исправляет?</p></div>
+      <div class="card t-teal st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">5</span><h3 style="font-size:28px">Контрольные примеры</h3></div><p style="font-size:27px">Какие, сколько их было и&nbsp;где результаты проверки?</p></div>
+      <div class="card t-orange st" style="padding:20px 24px 22px;gap:10px"><div style="display:flex;align-items:center;gap:14px"><span class="bdg" style="width:50px;height:50px;font-size:26px;font-weight:700">6</span><h3 style="font-size:28px">Роль инженера</h3></div><p style="font-size:27px">Что он подтверждает и&nbsp;что подписывает?</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="767">
+  <p class="kick">Внутренний помощник для расчётов</p>
+  <h2>Самопроверки помощника недостаточно</h2>
+  <div class="body">
+    <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)">Помощник должен показывать</p>
+    <ol class="flow nonum" style="grid-auto-columns:minmax(0,1fr)">
+      <li class="step t-teal" style="align-items:center;text-align:center;gap:16px;padding:28px 24px 30px"><span class="bdg lg"><svg class="i"><use href="#i-square-function"/></svg></span><h3 style="font-size:40px">Формулу</h3></li>
+      <li class="step t-teal" style="align-items:center;text-align:center;gap:16px;padding:28px 24px 30px"><span class="bdg lg"><svg class="i"><use href="#i-text-cursor-input"/></svg></span><h3 style="font-size:40px">Подстановку</h3></li>
+      <li class="step t-teal" style="align-items:center;text-align:center;gap:16px;padding:28px 24px 30px"><span class="bdg lg"><svg class="i"><use href="#i-square-equal"/></svg></span><h3 style="font-size:40px">Результат</h3></li>
+    </ol>
+    <div class="rule t-orange" style="padding:24px 34px"><svg class="i"><use href="#i-user-check"/></svg><div><p>Инженер сверяет их и&nbsp;принимает решение</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="772" data-title="Модель предлагает, проверка решает">
+  <p class="kick t-orange">Главное правило</p>
+  <div class="body">
+    <p class="say" style="font-size:96px;line-height:1.1">Модель <b>предлагает</b>,<br>проверка <em>решает</em></p>
+  </div>
+</section>
