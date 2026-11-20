@@ -71,11 +71,29 @@ function rel(value) {
   return path.relative(rootDir, value).replaceAll(path.sep, "/");
 }
 
+// Windows PowerShell 5.1 не должен подхватывать модули PowerShell 7 из унаследованного PSModulePath:
+// иначе Expand-Archive падает с «Cannot find an overload for "ExtractToDirectory"» (CI 20.11.2026).
+function windowsPowerShellEnvironment() {
+  const userProfile = process.env.USERPROFILE || "C:\\Users\\Default";
+  const programFiles = process.env.ProgramFiles || "C:\\Program Files";
+  const windowsRoot = process.env.WINDIR || "C:\\Windows";
+  return {
+    ...process.env,
+    PSModulePath: [
+      path.join(userProfile, "Documents", "WindowsPowerShell", "Modules"),
+      path.join(programFiles, "WindowsPowerShell", "Modules"),
+      path.join(windowsRoot, "System32", "WindowsPowerShell", "v1.0", "Modules"),
+    ].join(path.delimiter),
+  };
+}
+
 function shell(command, args, options = {}) {
+  const env = /^powershell(?:\.exe)?$/i.test(command) ? windowsPowerShellEnvironment() : process.env;
   const result = spawnSync(command, args, {
     cwd: rootDir,
     encoding: "utf8",
     windowsHide: true,
+    env,
     ...options,
   });
   if (result.error) throw result.error;
