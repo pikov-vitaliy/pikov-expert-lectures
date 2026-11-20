@@ -1,0 +1,277 @@
+<!-- Лекция 4.1, строки 113–191 (06:11–10:52): что модель делает хорошо (объясняет методику, помогает выбрать расчётную схему, перечисляет допущения), Kodathala и Vunnam – модель составляет уравнение, считает метод Ньютона; почему модель ошибается в вычислениях, арифметика внутри текста задачи (Shrestha, Kim, Ross) -->
+
+<section class="slide sect" data-at="113">
+  <span class="no"><svg class="i"><use href="#i-thumbs-up"/></svg></span>
+  <p class="kick">Сильные стороны модели</p>
+  <h1>Что модель делает хорошо</h1>
+  <p class="lead">Объясняет формулы и&nbsp;методики, помогает выбрать расчётную схему, перечисляет допущения</p>
+</section>
+
+<section class="slide" data-at="115" data-steps="117,119">
+  <p class="kick">Что модель делает хорошо · 1 из 3</p>
+  <h2>Объясняет формулы и&nbsp;методики</h2>
+  <div class="body">
+    <div class="chat" style="gap:20px">
+      <div class="msg user" style="font-size:31px;padding:16px 28px"><span class="who">Запрос</span><p>Откуда берётся формула падения напряжения в&nbsp;проводе?</p></div>
+      <div class="msg bot" style="max-width:100%;align-self:stretch;padding:20px 30px 26px"><span class="who">Модель толково расскажет</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px 44px;margin-top:10px">
+          <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:4px"><b style="font-family:Cambria,'Times New Roman',serif;font-size:42px;line-height:1.15;color:var(--teal);white-space:nowrap">R&nbsp;=&nbsp;ρ&nbsp;·&nbsp;l&nbsp;/&nbsp;S</b><span style="font-size:27px">Сопротивление пропорционально длине и&nbsp;обратно пропорционально сечению</span></div>
+          <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:4px"><b style="font-family:Cambria,'Times New Roman',serif;font-size:42px;line-height:1.15;color:var(--teal);white-space:nowrap">ΔU&nbsp;=&nbsp;I&nbsp;·&nbsp;R</b><span style="font-size:27px">Падение напряжения – по&nbsp;закону Ома</span></div>
+          <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:4px"><b style="font-family:Cambria,'Times New Roman',serif;font-size:42px;line-height:1.15;color:var(--teal)">ρ</b><span style="font-size:27px">Удельное сопротивление зависит от&nbsp;материала и&nbsp;температуры</span></div>
+          <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:4px"><b style="font-family:Cambria,'Times New Roman',serif;font-size:42px;line-height:1.15;color:var(--teal)">l</b><span style="font-size:27px">Длина: для двухпроводной цепи – прямой и&nbsp;обратный провод вместе</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="121" data-title="Быстрый способ вспомнить методику">
+  <p class="kick">Что модель делает хорошо · 1 из 3</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-teal"><svg class="i big-ic" style="font-size:290px"><use href="#i-book-open-text"/></svg></div>
+      <div style="gap:30px">
+        <p class="sub" style="color:var(--ink);font-size:40px;line-height:1.25">Инженеру, который давно не&nbsp;открывал учебник по&nbsp;электротехнике,</p>
+        <p class="say" style="font-size:64px">это быстрый способ <b>вспомнить методику</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="124">
+  <p class="kick">Что модель делает хорошо · 2 из 3</p>
+  <h2>Помогает выбрать расчётную схему</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:330px 1fr 70px 1fr;gap:18px 18px;align-items:center">
+      <div style="display:flex;align-items:center;gap:18px;font-size:34px;font-weight:700"><span class="bdg"><svg class="i"><use href="#i-cable"/></svg></span>Провод</div>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">по одной длине</span>
+      <span class="muted" style="text-align:center;font-size:27px">или</span>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">по двум</span>
+      <div style="display:flex;align-items:center;gap:18px;font-size:34px;font-weight:700"><span class="bdg"><svg class="i"><use href="#i-zap"/></svg></span>Ток</div>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">постоянный</span>
+      <span class="muted" style="text-align:center;font-size:27px">или</span>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">с пусковым броском</span>
+      <div style="display:flex;align-items:center;gap:18px;font-size:34px;font-weight:700"><span class="bdg"><svg class="i"><use href="#i-thermometer"/></svg></span>Температура</div>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">нормальная</span>
+      <span class="muted" style="text-align:center;font-size:27px">или</span>
+      <span style="display:flex;align-items:center;justify-content:center;text-align:center;min-height:74px;padding:8px 20px;border-radius:16px;background:var(--surface);border:2.5px solid var(--line);font-size:31px;line-height:1.15">рабочая</span>
+    </div>
+    <div class="chat"><div class="msg user" style="font-size:31px;padding:18px 28px"><span class="who">Хороший запрос</span><p>Перечисли варианты расчётной схемы и&nbsp;скажи, какие данные нужны для&nbsp;каждого</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="130">
+  <p class="kick">Сквозной пример · цепь фар</p>
+  <h2>Обратный путь тока задан в&nbsp;условии</h2>
+  <div class="body">
+    <svg viewBox="0 0 1135 230" style="width:100%;height:auto;display:block" role="img" aria-label="Двухпроводная цепь: прямой провод от блока предохранителей к фарам, обратный провод к точке массы у блока">
+      <rect x="2" y="20" width="262" height="190" rx="18" style="fill:var(--surface);stroke:var(--line);stroke-width:3"/>
+      <text x="133" y="106" text-anchor="middle" style="fill:var(--ink);font-size:29px;font-weight:700">Блок</text>
+      <text x="133" y="142" text-anchor="middle" style="fill:var(--ink);font-size:29px;font-weight:700">предохранителей</text>
+      <rect x="871" y="20" width="262" height="190" rx="18" style="fill:var(--surface);stroke:var(--line);stroke-width:3"/>
+      <use href="#i-lightbulb" x="967" y="44" width="70" height="70" style="color:var(--orange)"/>
+      <text x="1002" y="164" text-anchor="middle" style="fill:var(--ink);font-size:31px;font-weight:700">Фары</text>
+      <line x1="264" y1="72" x2="871" y2="72" style="stroke:var(--teal);stroke-width:10;stroke-linecap:round"/>
+      <text x="567" y="54" text-anchor="middle" style="fill:var(--teal);font-size:28px;font-weight:700">прямой провод</text>
+      <text x="567" y="126" text-anchor="middle" style="fill:var(--muted);font-size:26px">оба провода – одного сечения и&#160;одной длины</text>
+      <line x1="871" y1="160" x2="264" y2="160" style="stroke:var(--orange);stroke-width:10;stroke-linecap:round"/>
+      <text x="567" y="200" text-anchor="middle" style="fill:var(--orange);font-size:28px;font-weight:700">обратный провод – к точке массы у блока</text>
+    </svg>
+    <p class="note" style="display:flex;align-items:center;gap:14px;font-size:29px"><svg class="i" style="color:var(--red);font-size:34px"><use href="#i-ban"/></svg>Возврат тока через раму в&nbsp;этой задаче не&nbsp;рассматривается</p>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-git-fork"/></svg><div><p>Если схему меняют, сначала выясняют, какие исходные данные придётся&nbsp;изменить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="132" data-steps="135">
+  <p class="kick">Что модель делает хорошо · 3 из 3</p>
+  <h2>Перечисляет допущения и&nbsp;проверяет единицы</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="padding:28px 26px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:34px">Перечисляет допущения</h3></li>
+      <li class="step t-teal" style="padding:28px 26px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-ruler"/></svg></span><h3 style="font-size:34px">Выписывает все величины&nbsp;с&nbsp;единицами</h3></li>
+      <li class="step t-teal" style="padding:28px 26px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-equal"/></svg></span><h3 style="font-size:34px">Проверяет, сходятся&nbsp;ли они в&nbsp;формуле</h3></li>
+    </ol>
+    <div class="rule t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Это полезно, но&nbsp;проверять нужно и&nbsp;это</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="138">
+  <p class="kick">Исследование · 2026 год</p>
+  <h2>Могут&nbsp;ли языковые модели решать инженерные&nbsp;уравнения?</h2>
+  <div class="body">
+    <figure class="quote xs">
+      <blockquote>Современные языковые модели хорошо выполняют символьные преобразования и&nbsp;находят сведения по&nbsp;предметной области, но&nbsp;испытывают трудности с&nbsp;итерационными арифметическими вычислениями, требующими точности. Поэтому их лучше применять как <b>умный интерфейс к&nbsp;классическим численным методам</b>, а&nbsp;не&nbsp;как самостоятельное вычислительное средство</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Kodathala S. V., Vunnam R.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kodathala S. V., Vunnam R. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2601.01774</p>
+</section>
+
+<section class="slide" data-at="141" data-steps="144">
+  <p class="kick">Kodathala и Vunnam · два способа</p>
+  <h2>Кто считает: модель или метод Ньютона</h2>
+  <div class="body">
+    <div class="vs" style="grid-template-columns:minmax(0,1fr) minmax(0,1.25fr)">
+      <div class="col t-red" style="padding:28px 34px;gap:18px"><h3><svg class="i"><use href="#i-bot"/></svg>Способ 1</h3><p style="font-size:36px;font-weight:700;line-height:1.18">Модель сама выдаёт&nbsp;число</p></div>
+      <div class="col t-teal" style="padding:28px 34px;gap:18px"><h3><svg class="i"><use href="#i-square-function"/></svg>Способ 2</h3><p style="font-size:31px;line-height:1.2">Модель записывает уравнение и&nbsp;начальное приближение</p><p style="font-size:31px;line-height:1.2"><b>Решает его классический метод&nbsp;Ньютона</b></p></div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:14px">
+      <p style="font-size:29px;font-weight:700">Задачи, где решение ищут подбором:</p>
+      <div style="display:flex;gap:18px;flex-wrap:wrap">
+        <span class="tag t-gray" style="font-size:28px;padding:10px 24px;display:inline-flex;align-items:center;gap:12px"><svg class="i"><use href="#i-droplets"/></svg>уравнения трения в&nbsp;трубах</span>
+        <span class="tag t-gray" style="font-size:28px;padding:10px 24px;display:inline-flex;align-items:center;gap:12px"><svg class="i"><use href="#i-cpu"/></svg>экспоненциальные зависимости в&nbsp;электронике</span>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kodathala S. V., Vunnam R. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2601.01774</p>
+</section>
+
+<section class="slide" data-at="146">
+  <p class="kick">Kodathala и Vunnam · способ 2</p>
+  <h2>Средняя относительная ошибка снизилась</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:stretch">
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;gap:18px;min-height:330px"><b style="font-size:96px">67,9–81,8&nbsp;%</b><span style="font-size:31px">по&nbsp;сравнению со&nbsp;способом&nbsp;1, в&nbsp;зависимости от&nbsp;модели</span></div></div>
+      <div style="justify-content:center">
+        <div class="card t-orange" style="align-items:flex-start;gap:18px;padding:32px 32px"><span class="bdg lg"><svg class="i"><use href="#i-cpu"/></svg></span><p class="muted" style="font-size:28px">Сильнее всего</p><h3 style="font-size:38px">в&nbsp;задачах электроники</h3><p style="font-size:27px">где зависимости экспоненциальные</p></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kodathala S. V., Vunnam R. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2601.01774</p>
+</section>
+
+<section class="slide" data-at="151" data-steps="153,156" data-title="Kodathala и Vunnam: вывод авторов">
+  <p class="kick">Вывод авторов · в русском переводе</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote><span class="st" data-s="1">Современные языковые модели хорошо выполняют символьные преобразования и&nbsp;находят сведения по&nbsp;предметной области, но&nbsp;испытывают трудности с&nbsp;итерационными арифметическими вычислениями, требующими точности.</span> <span class="st" data-s="2">Поэтому их лучше применять как <b>умный интерфейс к&nbsp;классическим численным методам</b>, а&nbsp;не&nbsp;как самостоятельное вычислительное средство</span></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Kodathala S. V., Vunnam R.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kodathala S. V., Vunnam R. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2601.01774</p>
+</section>
+
+<section class="slide dark" data-at="158" data-title="Модель составляет уравнение, а считает инструмент">
+  <p class="kick t-orange">Вывод, который описывает всю тему</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:280px 1fr;gap:56px">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:240px"><use href="#i-calculator"/></svg></div>
+      <div style="gap:30px">
+        <p class="sub" style="color:var(--ink)">Работа опубликована как препринт, но&nbsp;её вывод хорошо описывает всю тему</p>
+        <p class="say md">Модель составляет уравнение,<br>а&nbsp;считает <em>инструмент</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect t-orange" data-at="163">
+  <span class="no"><svg class="i"><use href="#i-triangle-alert"/></svg></span>
+  <p class="kick">Ограничения</p>
+  <h1>Почему модель ошибается в&nbsp;вычислениях</h1>
+  <p class="lead">Число в&nbsp;ответе – тоже текст.<br>Иногда оно правдоподобно, но&nbsp;неверно</p>
+</section>
+
+<section class="slide" data-at="167">
+  <p class="kick">Модель и калькулятор</p>
+  <h2>Модель составляет текст</h2>
+  <div class="body">
+    <div class="cards" style="gap:36px">
+      <div class="card t-gray" style="padding:26px 34px 30px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:38px">Калькулятор</h3><p style="font-size:31px">Выполняет арифметику</p></div>
+      <div class="card t-teal" style="padding:26px 34px 30px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:38px">Модель</h3><p style="font-size:31px">Составляет текст, ответ выдаёт по&nbsp;частям</p></div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-type"/></svg><div><p style="font-size:35px">Для модели число – такая&nbsp;же последовательность знаков, как&nbsp;слово</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="171">
+  <p class="kick">Модель и арифметика</p>
+  <h2>Когда модель попадает, а&nbsp;когда ошибается</h2>
+  <div class="body">
+    <div class="vs" style="gap:36px;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr)">
+      <div class="col t-teal" style="padding:34px 32px 40px;gap:26px;min-height:360px"><h3 style="font-size:34px;gap:12px"><svg class="i"><use href="#i-circle-check"/></svg>Почти всегда попадает</h3><ul style="font-size:35px;gap:22px"><li>Арифметика простая</li><li>Часто встречалась в&nbsp;обучающих&nbsp;текстах</li></ul></div>
+      <div class="col t-red" style="padding:34px 32px 40px;gap:26px;min-height:360px"><h3 style="font-size:34px;gap:12px"><svg class="i"><use href="#i-triangle-alert"/></svg><span style="white-space:nowrap">Вероятность ошибки растёт</span></h3><ul style="font-size:35px;gap:22px"><li>Числа необычные</li><li>Вычисление встроено в&nbsp;длинный текст&nbsp;задачи</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="175" data-title="Свойство самого способа работы">
+  <p class="kick t-orange">Откуда берутся ошибки в числах</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:280px 1fr;gap:56px">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:240px"><use href="#i-bot"/></svg></div>
+      <div style="gap:30px">
+        <p class="t-red" style="display:flex;align-items:center;gap:16px;font-size:32px;line-height:1.2;color:var(--muted)"><svg class="i" style="flex:none;font-size:44px;color:var(--c)"><use href="#i-circle-x"/></svg><span style="text-decoration:line-through">Случайный сбой, который исправят в&nbsp;следующей&nbsp;версии</span></p>
+        <p class="say md">Свойство самого <em>способа&nbsp;работы</em></p>
+        <p class="sub">Новые модели ошибаются реже, но&nbsp;ошибаются</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="181">
+  <p class="kick">Закономерность из исследований</p>
+  <h2>Арифметика внутри задачи хуже, чем отдельно</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch">
+      <div class="card t-teal" style="align-items:center;justify-content:center;text-align:center;gap:20px;padding:30px 30px 34px">
+        <p class="muted" style="font-size:29px">Голый пример</p>
+        <b style="font-size:100px;line-height:1;color:var(--c);white-space:nowrap">36&nbsp;×&nbsp;6</b>
+        <p style="font-size:31px;display:flex;gap:12px;align-items:center;font-weight:700;color:var(--c)"><svg class="i"><use href="#i-check"/></svg>модели решают хорошо</p>
+      </div>
+      <div class="card t-red" style="align-items:center;justify-content:center;text-align:center;gap:20px;padding:30px 30px 34px">
+        <p class="muted" style="font-size:29px">То же действие в&nbsp;тексте задачи</p>
+        <div class="doc" style="width:100%;gap:12px;padding:20px 24px 24px">
+          <i></i>
+          <i class="s"></i>
+          <div style="display:flex;gap:12px;align-items:center"><i style="flex:1"></i><b style="flex:none;font-size:30px;line-height:1.1;background:var(--ct);color:var(--ci);border-radius:8px;padding:2px 12px;white-space:nowrap">36&nbsp;×&nbsp;6</b><i style="flex:1.6"></i></div>
+          <i></i>
+          <i class="s"></i>
+        </div>
+        <p style="font-size:31px;display:flex;gap:12px;align-items:center;font-weight:700;color:var(--c)"><svg class="i"><use href="#i-x"/></svg>ошибаются чаще</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="183">
+  <p class="kick">Исследование · 2025 год</p>
+  <h2>Математические рассуждения языковых моделей</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:360px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-binary"/></svg></i>
+        <h3 style="font-size:42px">Shrestha,<br>Kim, Ross</h3>
+        <p>препринт arXiv, 2025</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div style="font-size:34px;padding:24px 15px"><dt>Что разбирали</dt><dd>Логические и&nbsp;арифметические ошибки моделей</dd></div>
+        <div style="font-size:34px;padding:24px 15px"><dt>Числа</dt><dd>Самого разного порядка</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shrestha S., Kim M., Ross K. W. Препринт arXiv, 2025 · doi.org/10.48550/arXiv.2502.08680</p>
+</section>
+
+<section class="slide" data-at="185" data-title="Shrestha, Kim, Ross: вывод авторов">
+  <p class="kick">Вывод авторов · в русском переводе</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Кроме того, хотя модели показывают высокую точность на&nbsp;отдельных арифметических примерах, их результаты <b>заметно ухудшаются</b>, когда вычисления встроены в&nbsp;текстовые задачи</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Shrestha S., Kim M., Ross K. W.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shrestha S., Kim M., Ross K. W. Препринт arXiv, 2025 · doi.org/10.48550/arXiv.2502.08680</p>
+</section>
+
+<section class="slide dark" data-at="189" data-title="Инженерная задача – всегда текстовая">
+  <p class="kick t-orange">Что это значит для расчёта</p>
+  <div class="body">
+    <p class="say md">Инженерная задача – <em>всегда текстовая</em></p>
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-clipboard-list"/></svg><b>Условие</b></div>
+      <div class="pict"><svg class="i"><use href="#i-ruler"/></svg><b>Единицы</b></div>
+      <div class="pict"><svg class="i"><use href="#i-asterisk"/></svg><b>Оговорки</b></div>
+    </div>
+    <p class="sub">Значит, вывод исследования относится к&nbsp;ней напрямую</p>
+  </div>
+</section>

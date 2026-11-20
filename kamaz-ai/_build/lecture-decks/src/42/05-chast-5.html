@@ -1,0 +1,361 @@
+<!-- Лекция 4.2, строки 437–609 (20:43–28:26): шесть видов ошибок модели с таблицами, почему модель досочиняет значение (Kalai и соавт., Nature, 2026), одна серия – три средних, два вида стандартного отклонения, исследования о таблицах (Tian и соавт.; Jiang и соавт.; TableBench; Ordak) -->
+
+<section class="slide" data-at="437" data-title="Ошибка 1: пропущенная строка">
+  <p class="kick t-red">Шесть видов ошибок · 1 из 6</p>
+  <h2>Пропущенная строка</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:44px;align-items:stretch">
+      <div class="t-teal" style="display:flex;flex-direction:column;gap:18px;background:var(--surface);border:1.9px solid var(--line);border-radius:18.8px;padding:28px 32px">
+        <p class="note" style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Модель пишет</p>
+        <p style="font-size:38px;line-height:1.2;font-weight:700">«Проанализированы все образцы»</p>
+      </div>
+      <div class="t-red" style="display:flex;flex-direction:column;gap:10px;background:var(--surface);border:1.9px solid var(--line);border-radius:18.8px;padding:28px 32px">
+        <p class="note" style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">А в её таблице</p>
+        <i style="display:block;height:30px;border-radius:8px;background:var(--surface2)"></i>
+        <i style="display:block;height:30px;border-radius:8px;background:var(--surface2)"></i>
+        <i style="display:block;height:30px;border-radius:8px;border:2.5px dashed var(--c);background:var(--ct)"></i>
+        <i style="display:block;height:30px;border-radius:8px;background:var(--surface2)"></i>
+        <p style="font-size:30px;font-weight:700;color:var(--c)">строк меньше</p>
+      </div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Пропасть может как раз строка с&nbsp;отклонением. Тогда <b>вывод о&nbsp;соответствии&nbsp;ложный</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="446" data-steps="456">
+  <p class="kick t-red">Шесть видов ошибок · 2 из 6</p>
+  <h2>Выдуманное значение</h2>
+  <div class="body">
+    <p style="font-size:32px">Модель добавляет величину, которой в&nbsp;таблице нет:</p>
+    <div class="picts c3 t-red">
+      <div class="pict"><svg class="i"><use href="#i-gauge"/></svg><span>замер, которого не&nbsp;делали</span></div>
+      <div class="pict"><svg class="i"><use href="#i-thermometer"/></svg><span>температуру, которой нет в&nbsp;протоколе</span></div>
+      <div class="pict"><svg class="i"><use href="#i-timer"/></svg><span>длительность процесса, которую никто не&nbsp;измерял</span></div>
+    </div>
+    <div class="rule sm t-orange st"><svg class="i"><use href="#i-eye-off"/></svg><div><p>Такие значения обычно <b>правдоподобны</b> и&nbsp;хорошо встраиваются в&nbsp;текст. Поэтому их трудно заметить при&nbsp;чтении</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="459" data-steps="464">
+  <p class="kick t-red">Шесть видов ошибок · 3 из 6</p>
+  <h2>Неверное среднее или отклонение</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:center">
+      <div>
+        <ul class="list cross" style="font-size:34px;gap:22px">
+          <li>Среднее посчитано <b>не&nbsp;по&nbsp;всем строкам</b></li>
+          <li>С&nbsp;<b>ошибкой в&nbsp;арифметике</b></li>
+          <li>По&nbsp;<b>другому определению</b></li>
+        </ul>
+      </div>
+      <div class="st">
+        <div class="t-red" style="display:flex;flex-direction:column;gap:16px;background:var(--ct);border-radius:18.8px;padding:30px 32px"><svg class="i" style="font-size:64px;color:var(--c)"><use href="#i-sigma"/></svg><p style="font-size:32px;line-height:1.25;color:var(--ci)">Такое число может выглядеть <strong style="color:var(--c)">спокойно</strong>, с&nbsp;запасом до&nbsp;допуска</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="471" data-title="Ошибка 4: тихая правка данных">
+  <p class="kick t-red">Шесть видов ошибок · 4 из 6</p>
+  <h2>Тихая правка данных</h2>
+  <div class="body">
+    <p style="font-size:32px">Модель «исправляет» подозрительное значение <b>без&nbsp;пометки</b></p>
+    <div style="display:grid;grid-template-columns:1fr 90px 1fr;gap:20px;align-items:center">
+      <div class="t-orange" style="display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;background:var(--surface);border:1.9px solid var(--line);border-radius:18.8px;padding:26px">
+        <svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-circle-help"/></svg>
+        <p style="font-size:31px;font-weight:700">Число, похожее на&nbsp;опечатку</p>
+      </div>
+      <svg class="i" style="font-size:60px;color:var(--muted);justify-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="t-red" style="display:flex;flex-direction:column;gap:10px;align-items:center;text-align:center;background:var(--ct);border:1.9px solid var(--c);border-radius:18.8px;padding:26px">
+        <svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-pencil-off"/></svg>
+        <p style="font-size:31px;font-weight:700">Молча стало «правильным»</p>
+      </div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-user-check"/></svg><div><p>Возможно, исправление верное. Но&nbsp;это <b>решение инженера</b>, а&nbsp;не&nbsp;модели</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="479">
+  <p class="kick t-red">Тихая правка данных</p>
+  <h2>Ошибка – в&nbsp;том, что правка молчаливая</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3>Полезная подсказка</h3><ul><li>«Значение похоже на&nbsp;ошибку и&nbsp;требует сверки»</li></ul></div>
+      <div class="col t-red"><h3>Ошибка</h3><ul><li>Значение заменено, в&nbsp;ответе об&nbsp;этом ни&nbsp;слова</li></ul></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-stamp"/></svg><div><h3>В&nbsp;отчёте</h3><p>Такое значение помечается и&nbsp;сверяется с&nbsp;первичным протоколом</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="484" data-steps="487">
+  <p class="kick t-red">Шесть видов ошибок · 5 из 6</p>
+  <h2>Не&nbsp;тот допуск</h2>
+  <div class="body">
+    <p style="font-size:32px">Требование, заданное для одних условий, применено к&nbsp;другим</p>
+    <table class="tbl" style="font-size:34px">
+      <thead><tr><th style="padding:18px 24px">Допуск задан для</th><th style="width:44%;padding:18px 24px">Применён к</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:22px 24px">Тока покоя <b>через 30&nbsp;мин</b></td><td class="no" style="padding:22px 24px">замеру через 2&nbsp;ч</td></tr>
+        <tr class="st t-red"><td style="padding:22px 24px">Напряжения регулятора <b>при +25&nbsp;°C</b></td><td class="no" style="padding:22px 24px">всем температурам</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="489" data-steps="497">
+  <p class="kick t-red">Шесть видов ошибок · 6 из 6</p>
+  <h2>Вывод шире данных</h2>
+  <div class="body">
+    <div class="picts c3 sm t-red">
+      <div class="pict"><svg class="i"><use href="#i-trending-up"/></svg><span>Слова о&nbsp;стабильности процесса</span></div>
+      <div class="pict"><svg class="i"><use href="#i-circle-help"/></svg><span>Объяснение причин</span></div>
+      <div class="pict"><svg class="i"><use href="#i-hand"/></svg><span>Советы, что делать с&nbsp;образцами</span></div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:16px">
+      <div class="rule xs t-gray"><svg class="i"><use href="#i-table"/></svg><div><p>Из таблицы это не&nbsp;следует. Причину отклонения таблица не&nbsp;показывает, её проверяют отдельно</p></div></div>
+      <div class="rule xs t-orange"><svg class="i"><use href="#i-search-check"/></svg><div><p>Образец за&nbsp;допуском – <b>несоответствие</b>, причину которого нужно выяснить</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="505" data-title="Откуда берутся выдуманные значения">
+  <p class="kick t-orange">Почему модель досочиняет значение</p>
+  <div class="body">
+    <p class="say md">Откуда берутся <b>выдуманные значения</b>?</p>
+    <p class="sub" style="font-size:36px">Почему модель не&nbsp;напишет просто: «в&nbsp;таблице этого нет»?</p>
+  </div>
+</section>
+
+<section class="slide" data-at="507">
+  <p class="kick">Объяснение · Nature, 2026</p>
+  <h2>Kalai и&nbsp;соавторы</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:400px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-file-text"/></svg></i>
+        <h3 style="font-size:40px">Kalai, Nachum, Vempala, Zhang</h3>
+        <p>Nature, 2026</p>
+      </div>
+      <dl class="kv" style="--kw:220px">
+        <div style="font-size:32px;padding:20px 15px"><dt>Авторы</dt><dd>Исследователи OpenAI, компании, которая делает ChatGPT, и&nbsp;Технологического института Джорджии</dd></div>
+        <div style="font-size:32px;padding:20px 15px"><dt>Вопрос</dt><dd>Почему модель угадывает, а&nbsp;не&nbsp;отвечает «не&nbsp;знаю»</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kalai A. T., Nachum O., Vempala S. S., Zhang E. Nature, 2026 · doi.org/10.1038/s41586-026-10549-w</p>
+</section>
+
+<section class="slide" data-at="509" data-title="Модель как студент на экзамене">
+  <p class="kick">Kalai и соавт. · объяснение</p>
+  <div class="body" style="gap:44px">
+    <div style="display:flex;align-items:center;gap:40px">
+      <span class="t-teal" style="flex:none;width:150px;height:150px;border-radius:50%;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:84px"><use href="#i-graduation-cap"/></svg></span>
+      <p class="say md">Как студент на экзамене: <b>угадать выгоднее</b>, чем промолчать</p>
+    </div>
+    <div>
+      <p style="font-size:29px;color:var(--muted);margin-bottom:14px">Как оценивают ответ большинство тестов, по&nbsp;которым модели сравнивают и&nbsp;отбирают</p>
+      <div class="cards c3">
+        <div class="card row t-teal" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-check"/></svg></span><h3 style="font-size:32px">Верно</h3></div>
+        <div class="card row t-red" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-x"/></svg></span><h3 style="font-size:32px">Неверно – ноль</h3></div>
+        <div class="card row t-red" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3 style="font-size:32px">«Не&nbsp;знаю» – тот&nbsp;же&nbsp;ноль</h3></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kalai A. T., Nachum O., Vempala S. S., Zhang E. Nature, 2026 · doi.org/10.1038/s41586-026-10549-w</p>
+</section>
+
+<section class="slide" data-at="513">
+  <p class="kick">Пример из статьи</p>
+  <h2>Что означает PGGB?</h2>
+  <div class="body">
+    <p style="font-size:30px">Вопрос задали трём популярным моделям</p>
+    <div class="picts c3 t-red">
+      <div class="pict"><svg class="i"><use href="#i-bot"/></svg><b>Модель 1</b><span>уверенно и&nbsp;неверно</span></div>
+      <div class="pict"><svg class="i"><use href="#i-bot"/></svg><b>Модель 2</b><span>уверенно и&nbsp;неверно</span></div>
+      <div class="pict"><svg class="i"><use href="#i-bot"/></svg><b>Модель 3</b><span>уверенно и&nbsp;неверно</span></div>
+    </div>
+    <div class="rule sm t-red"><svg class="i"><use href="#i-circle-slash"/></svg><div><p>Ни&nbsp;одна модель не&nbsp;сказала «не&nbsp;знаю» и&nbsp;не&nbsp;попросила уточнить</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kalai A. T., Nachum O., Vempala S. S., Zhang E. Nature, 2026 · doi.org/10.1038/s41586-026-10549-w</p>
+</section>
+
+<section class="slide" data-at="517" data-steps="519">
+  <p class="kick t-orange">Что предлагают авторы</p>
+  <h2>Правила оценки – прямо в&nbsp;вопросе</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-scale"/></svg></span><h3 style="font-size:34px">Сколько стоит ошибка</h3></div>
+      <div class="card row t-orange" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-circle-help"/></svg></span><h3 style="font-size:34px">«Не&nbsp;знаю» – допустимый&nbsp;ответ</h3></div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:14px">
+      <div class="rule sm t-teal"><svg class="i"><use href="#i-flask-conical"/></svg><div><p>В&nbsp;опытах при&nbsp;более высокой цене ошибки модели обычно <b>чаще воздерживались</b> от&nbsp;ответа</p></div></div>
+      <p class="note" style="font-size:27px">Опыты – на&nbsp;вопросах о&nbsp;фактах (набор SimpleQA), таблиц там не&nbsp;было</p>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kalai A. T., Nachum O., Vempala S. S., Zhang E. Nature, 2026 · doi.org/10.1038/s41586-026-10549-w</p>
+</section>
+
+<section class="slide dark" data-at="521">
+  <p class="kick t-orange">Фраза для запроса</p>
+  <h2>Добавьте в&nbsp;запрос к&nbsp;таблице</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:270px;font-size:40px;gap:22px;padding:34px 34px">
+      <p class="part t-teal"><span class="tg">Если значения нет</span><span>«Если значения нет в&nbsp;таблице, пиши:&nbsp;<b>нет в&nbsp;таблице</b>.</span></p>
+      <p class="part t-orange"><span class="tg">Цена ошибки</span><span>Это правильный ответ, а&nbsp;выдуманное число&nbsp;– <b>грубая&nbsp;ошибка</b>»</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="524" data-steps="527">
+  <p class="kick t-red">Гарантией эта фраза не&nbsp;будет</p>
+  <h2>Даже при&nbsp;высокой цене ошибки</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center">
+      <div class="stats"><div class="stat t-red" style="justify-content:center;gap:10px"><b style="font-size:150px">4 из&nbsp;4</b><span style="font-size:32px">сильные модели оставались самоуверенными</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:26px;justify-content:center">
+        <p style="font-size:32px">Им было бы выгоднее вообще не&nbsp;отвечать</p>
+        <div class="rule t-orange st"><svg class="i"><use href="#i-search-check"/></svg><div><p>Для каждого числа в&nbsp;выводе проверяем, <b>откуда оно взялось</b></p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kalai A. T., Nachum O., Vempala S. S., Zhang E. Nature, 2026 · doi.org/10.1038/s41586-026-10549-w</p>
+</section>
+
+<section class="slide" data-at="531" data-steps="535,539,543">
+  <p class="kick t-red">Неверное среднее · подробнее</p>
+  <h2>Одна серия – три средних</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:36px;align-items:center">
+      <table class="tbl" style="font-size:32px">
+        <thead><tr><th style="padding:16px 22px">По&nbsp;каким строкам считали</th><th style="width:40%;padding:16px 22px">Результат</th></tr></thead>
+        <tbody>
+          <tr class="st" data-s="1"><td style="padding:18px 22px">Набор строк 1</td><td style="padding:18px 22px"><b>среднее 1</b></td></tr>
+          <tr class="st" data-s="1"><td style="padding:18px 22px">Набор строк 2</td><td style="padding:18px 22px"><b>среднее 2</b></td></tr>
+          <tr class="st" data-s="1"><td style="padding:18px 22px">Набор строк 3</td><td style="padding:18px 22px"><b>среднее 3</b></td></tr>
+        </tbody>
+      </table>
+      <div class="rule t-orange st" data-s="2"><svg class="i"><use href="#i-list-checks"/></svg><div><p>Все три «правильные», но&nbsp;для разных наборов строк. В&nbsp;отчёте сказано, <b>по&nbsp;какому набору&nbsp;считали</b></p></div></div>
+    </div>
+    <div class="rule t-red st" data-s="3"><svg class="i"><use href="#i-crosshair"/></svg><div><p>Требование проверяется <b>у&nbsp;каждого образца</b>, не&nbsp;по&nbsp;среднему</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="549" data-steps="551,553,555,556">
+  <p class="kick">С&nbsp;отклонением та&nbsp;же история</p>
+  <h2>Два стандартных отклонения</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" data-s="1"><h3>Выборочное</h3><ul><li>Деление на&nbsp;<b>n&nbsp;−&nbsp;1</b></li></ul></div>
+      <div class="col t-orange st" data-s="2"><h3>По&nbsp;генеральной совокупности</h3><ul><li>Деление на&nbsp;<b>n</b></li></ul></div>
+    </div>
+    <div class="st" data-s="3" style="display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center">
+      <p class="mono" style="font-size:32px;text-align:center;background:var(--surface);border:1.9px solid var(--line);border-radius:14px;padding:12px">СТАНДОТКЛОН.В</p>
+      <p class="mono" style="font-size:32px;text-align:center;background:var(--surface);border:1.9px solid var(--line);border-radius:14px;padding:12px">СТАНДОТКЛОН.Г</p>
+    </div>
+    <div class="rule sm t-orange st" data-s="4"><svg class="i"><use href="#i-search-check"/></svg><div><p>Число модели не&nbsp;совпало с&nbsp;вашим? Сначала выясните, <b>какое отклонение</b> она&nbsp;считала</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка Microsoft Excel: функции СТАНДОТКЛОН.В и&nbsp;СТАНДОТКЛОН.Г</p>
+</section>
+
+<section class="slide dark" data-at="566" data-title="Таблицы – трудный материал для моделей">
+  <p class="kick t-orange">Что говорят исследования</p>
+  <div class="body">
+    <p class="say">Таблицы – <b>трудный материал</b> для&nbsp;моделей</p>
+    <p class="sub" style="font-size:38px">особенно неполные и&nbsp;«грязные»</p>
+  </div>
+</section>
+
+<section class="slide" data-at="569" data-steps="574" data-title="Tian и соавт., 2026">
+  <p class="kick">Tian и соавт., 2026</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Например, такие применения, как бизнес-аналитика, требуют не&nbsp;только многошаговых вычислений по&nbsp;таблицам, но&nbsp;и&nbsp;<b>устойчивости к&nbsp;неполным или противоречивым данным</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Tian S.-Y., Zhou Z. и&nbsp;соавт.</b>авторы исследования TabularMath</span></figcaption>
+    </figure>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Среди выводов той же работы</h3><p>Таблицы низкого качества создают серьёзный риск для надёжности рассуждений современных моделей</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Tian S.-Y., Zhou Z., et al. Findings of ACL, 2026 · doi.org/10.18653/v1/2026.findings-acl.759</p>
+</section>
+
+<section class="slide" data-at="577" data-title="Jiang и соавт., 2025">
+  <p class="kick">Jiang и соавт., 2025 · причины слабых результатов</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Сложные рассуждения по&nbsp;таблицам необходимы при&nbsp;анализе данных на&nbsp;практике, однако языковые модели часто справляются с&nbsp;ними плохо из-за <b>сложных запросов, зашумлённых данных и&nbsp;ограниченных вычислительных способностей</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Jiang C., Yu F. и&nbsp;соавт.</b>авторы системы TabDSR</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Jiang C., Yu F., et al. Findings of EMNLP, 2025 · doi.org/10.18653/v1/2025.findings-emnlp.169</p>
+</section>
+
+<section class="slide" data-at="583">
+  <p class="kick">Jiang и соавт. · система TabDSR</p>
+  <h2>Три шага системы</h2>
+  <div class="body">
+    <ol class="flow">
+      <li class="step t-teal"><span class="bdg"><svg class="i"><use href="#i-split"/></svg></span><h3>Разбить</h3><p>Сложный вопрос – на&nbsp;простые</p></li>
+      <li class="step t-teal"><span class="bdg"><svg class="i"><use href="#i-brush"/></svg></span><h3>Почистить</h3><p>Убрать из&nbsp;таблицы шум и&nbsp;лишнее</p></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-code"/></svg></span><h3>Посчитать программой</h3><p>Ответ – выполнением программы по&nbsp;очищенной&nbsp;таблице</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Jiang C., Yu F., et al. Findings of EMNLP, 2025 · doi.org/10.18653/v1/2025.findings-emnlp.169</p>
+</section>
+
+<section class="slide" data-at="587" data-steps="591">
+  <p class="kick t-orange">Для инженера это знакомо</p>
+  <h2>Прежде чем считать статистику по&nbsp;протоколу</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-orange" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px">Инженер</h3><p style="font-size:27px">Проверяет, все&nbsp;ли строки на&nbsp;месте и&nbsp;нет&nbsp;ли явных ошибок в&nbsp;значениях</p></div></div>
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:32px">Такая система</h3><p style="font-size:27px">Ту&nbsp;же работу делает модель</p></div></div>
+    </div>
+    <div class="rule sm t-red st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Проверять, как любой вывод модели</h3><p>Особенно то, что «вычищено» как шум: выброс может оказаться несоответствующим образцом, а&nbsp;не&nbsp;ошибкой данных</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="595" data-title="Задачи из промышленных сценариев">
+  <p class="kick">Исследование 2025 года</p>
+  <h2>Задачи по&nbsp;таблицам из&nbsp;промышленных сценариев</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 150px 1fr;align-items:start;gap:20px">
+      <div class="t-teal" style="display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+        <span style="width:170px;height:170px;border-radius:50%;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:90px"><use href="#i-bot"/></svg></span>
+        <p style="font-size:32px;font-weight:700">Сильнейшая модель из&nbsp;проверенных</p>
+      </div>
+      <span style="font-size:120px;font-weight:700;color:var(--red);text-align:center;line-height:1;margin-top:20px">&lt;</span>
+      <div class="t-orange" style="display:flex;flex-direction:column;align-items:center;gap:18px;text-align:center">
+        <span style="width:170px;height:170px;border-radius:50%;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:90px"><use href="#i-users"/></svg></span>
+        <p style="font-size:32px;font-weight:700">Люди</p>
+      </div>
+    </div>
+    <p class="center" style="font-size:31px">Модель <b>заметно уступала</b> людям</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wu X., Yang J., et al. TableBench. AAAI, 2025 · doi.org/10.1609/aaai.v39i24.34739</p>
+</section>
+
+<section class="slide" data-at="597" data-title="Ordak, 2023">
+  <p class="kick">Ordak, 2023 · проверка ответов на&nbsp;статистические вопросы</p>
+  <div class="body">
+    <p style="font-size:31px">Модель не&nbsp;упоминала условия применимости статистических методов</p>
+    <figure class="quote md t-red">
+      <blockquote><b>Допущения</b>, необходимые для применения конкретных статистических критериев, <b>не&nbsp;были указаны</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Ordak M.</b>автор исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ordak M. Healthcare, 2023 · doi.org/10.3390/healthcare11182554</p>
+</section>
+
+<section class="slide" data-at="603" data-steps="606,608">
+  <p class="kick t-orange">Для испытаний</p>
+  <h2>Модель предлагает критерий или говорит о&nbsp;«значимом» различии серий</h2>
+  <div class="body">
+    <div class="ask t-orange">
+      <span class="q">?</span>
+      <ul>
+        <li class="st" data-s="1">Какие условия у&nbsp;этого критерия?</li>
+        <li class="st" data-s="1">Выполняются&nbsp;ли они на&nbsp;ваших данных?</li>
+      </ul>
+    </div>
+    <div class="rule sm t-red st" data-s="2"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>По&nbsp;десяти образцам с&nbsp;одним сильным выбросом многие привычные критерии <b>нельзя применять без&nbsp;оговорок</b></p></div></div>
+  </div>
+</section>

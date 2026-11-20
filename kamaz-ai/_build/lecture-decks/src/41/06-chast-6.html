@@ -1,0 +1,366 @@
+<!-- Лекция 4.1, строки 577–691 (28:39–35:49): «проверь себя» – не проверка (Huang, Kamoi); «Пусть считает инструмент» – Gao, Chen, Goodell, три вопроса к расчёту программой, режим выполнения кода; вставка 20.11 – агент прогоняет расчёт на контрольных примерах (Zhou, препринт 2026 о сгенерированных тестах) -->
+
+<section class="slide" data-at="577" data-title="Почему бы не попросить модель проверить саму себя?">
+  <p class="kick t-red">Проверка той же моделью</p>
+  <div class="body" style="gap:44px">
+    <div class="ask t-gray" style="grid-template-columns:220px 1fr;gap:48px">
+      <span class="q" style="width:220px;height:220px;font-size:156px">?</span>
+      <ul><li style="font-size:54px;line-height:1.14">А почему бы не&nbsp;попросить модель проверить саму себя?</li></ul>
+    </div>
+    <div class="rule t-red" style="padding:30px 38px"><svg class="i"><use href="#i-circle-x"/></svg><div><p style="font-size:38px">Просьба «проверь себя» к&nbsp;той&nbsp;же модели – это не&nbsp;независимая проверка</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="579" data-title="Huang и соавт.: без внешней обратной связи модели исправляют себя с трудом">
+  <p class="kick">Вывод Huang и соавт. · препринт 2023, конференция ICLR 2024</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>В задачах на&nbsp;рассуждение языковые модели <b>с&nbsp;трудом исправляют свои ответы без&nbsp;внешней обратной связи</b>, а&nbsp;иногда после самоисправления их результаты даже ухудшаются</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Huang J. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Huang J. et al. Large Language Models Cannot Self-Correct Reasoning Yet, ICLR 2024 · doi.org/10.48550/arXiv.2310.01798</p>
+</section>
+
+<section class="slide" data-at="585" data-title="Kamoi и соавт.: свои ошибки модели исправляют при надёжной внешней обратной связи">
+  <p class="kick">Обзор Kamoi и соавт., 2024 · тот же вывод</p>
+  <div class="body">
+    <p class="say xs" style="font-size:44px">Свои ошибки модели исправляют, когда есть надёжная <em>внешняя обратная связь</em></p>
+    <div class="vs" style="gap:40px">
+      <div class="col t-red" style="padding:30px 36px;gap:20px"><h3 style="font-size:33px"><svg class="i"><use href="#i-x"/></svg>Без внешней обратной связи</h3><p style="font-size:35px;font-weight:600;line-height:1.2">Исправляют свои ответы с&nbsp;трудом</p></div>
+      <div class="col t-teal" style="padding:30px 36px;gap:20px"><h3 style="font-size:33px"><svg class="i"><use href="#i-check"/></svg>С надёжной внешней обратной связью</h3><p style="font-size:35px;font-weight:600;line-height:1.2">Хорошо исправляют собственные ошибки</p>
+        <p style="font-size:26px;color:var(--muted)">например, результат вычисления или&nbsp;проверки</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kamoi R. et al. When Can LLMs Actually Correct Their Own Mistakes?, TACL 2024 · doi.org/10.1162/tacl_a_00713</p>
+</section>
+
+<section class="slide dark" data-at="590" data-title="Инструмент даёт и модели, и человеку проверяемый результат">
+  <p class="kick t-orange">Для нас внешняя обратная связь – это</p>
+  <div class="body" style="gap:40px">
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-calculator"/></svg><b style="font-size:34px">Калькулятор</b></div>
+      <div class="pict"><svg class="i"><use href="#i-sheet"/></svg><b style="font-size:34px">Таблица</b></div>
+      <div class="pict"><svg class="i"><use href="#i-list-checks"/></svg><b style="font-size:34px">Контрольный пример</b></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <p class="say sm">Инструмент даёт и&nbsp;модели, и&nbsp;человеку <em>проверяемый&nbsp;результат</em></p>
+      <p class="sub">Его ценность не&nbsp;только в&nbsp;том, что он считает</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="594">
+  <p class="kick t-red">Менее очевидная подмена</p>
+  <h2>Программа модели проверяет сама себя</h2>
+  <div class="body" style="gap:34px">
+    <div class="tree" style="--n:2">
+      <div class="root" style="font-size:36px;padding:18px 40px">Ошибка в&nbsp;понимании задачи</div>
+      <div class="kids" style="gap:40px">
+        <div class="kid t-red" style="flex-direction:row;align-items:center;gap:22px;padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Попадёт в&nbsp;расчёт</h3><p style="font-size:26px">его делает программа, которую написала модель</p></div></div>
+        <div class="kid t-red" style="flex-direction:row;align-items:center;gap:22px;padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Попадёт в&nbsp;проверку</h3><p style="font-size:26px">её делает та&nbsp;же программа</p></div></div>
+      </div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Это тоже не&nbsp;независимая проверка</p></div></div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="600" data-title="Пусть считает инструмент">
+  <span class="no"><svg class="i"><use href="#i-calculator"/></svg></span>
+  <p class="kick">Раз так</p>
+  <h1>Пусть считает<br>инструмент</h1>
+  <p class="lead">Программировать для этого не&nbsp;нужно. Речь о&nbsp;том, как устроены сервисы, которыми вы пользуетесь</p>
+  <div style="display:grid;grid-template-columns:1fr 64px 1fr;gap:18px;align-items:center;margin-top:40px">
+    <div class="t-teal" style="background:var(--ct);border-radius:16px;padding:22px 26px;border-top:6px solid var(--c);display:flex;align-items:center;gap:22px;align-self:stretch"><svg class="i" style="font-size:58px;color:var(--c)"><use href="#i-bot"/></svg><div style="display:flex;flex-direction:column;gap:6px"><b style="font-size:32px;color:var(--ci)">Модель</b><span style="font-size:26px;line-height:1.2;color:var(--ci)">разбирает задачу, составляет выражение или&nbsp;пишет код</span></div></div>
+    <svg class="i" style="font-size:52px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+    <div class="t-orange" style="background:var(--ct);border-radius:16px;padding:22px 26px;border-top:6px solid var(--c);display:flex;align-items:center;gap:22px;align-self:stretch"><svg class="i" style="font-size:58px;color:var(--c)"><use href="#i-square-terminal"/></svg><div style="display:flex;flex-direction:column;gap:6px"><b style="font-size:32px;color:var(--ci)">Программа</b><span style="font-size:26px;line-height:1.2;color:var(--ci)">выполняет вычисления</span></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="606" data-title="Gao и соавт.: вывод авторов">
+  <p class="kick">Эту идею проверили давно · Gao и соавт.</p>
+  <div class="body" style="gap:40px">
+    <div style="display:flex;gap:20px;align-items:center">
+      <span class="tag t-gray" style="font-size:27px;padding:9px 22px">2022 · препринт</span>
+      <svg class="i" style="font-size:40px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+      <span class="tag t-teal" style="font-size:27px;padding:9px 22px">2023 · международная конференция по&nbsp;машинному обучению ICML</span>
+    </div>
+    <figure class="quote md">
+      <blockquote>Хотя языковые модели, похоже, хорошо разбивают задачу на&nbsp;шаги, при решении они часто допускают <b>логические и&nbsp;арифметические ошибки</b>, даже если разбиение выполнено правильно</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Gao L. и соавт.</b>вывод авторов</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Gao L. et al. PAL: Program-aided Language Models, ICML 2023 · doi.org/10.48550/arXiv.2211.10435</p>
+</section>
+
+<section class="slide" data-at="613" data-title="Gao и соавт.: разделение труда">
+  <p class="kick">Разделение труда · как его описывают авторы</p>
+  <div class="body" style="gap:34px">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="flex-direction:row;align-items:center;padding:18px 20px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-message-square-text"/></svg></span><h3 style="font-size:28px">Задача, записанная обычным языком</h3></li>
+      <li class="step t-teal" style="flex-direction:row;align-items:center;padding:18px 20px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:28px">Модель раскладывает её на&nbsp;выполнимые&nbsp;шаги</h3></li>
+      <li class="step t-orange" style="flex-direction:row;align-items:center;padding:18px 20px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-square-terminal"/></svg></span><h3 style="font-size:28px">Решение поручается интерпретатору</h3></li>
+    </ol>
+    <figure class="quote sm">
+      <blockquote style="font-size:34px">При таком подходе единственной задачей модели остаётся <b>разложить задачу</b>, записанную обычным языком, <b>на&nbsp;выполнимые шаги</b>, а&nbsp;решение поручается интерпретатору</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Gao L. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Gao L. et al. PAL: Program-aided Language Models, ICML 2023 · doi.org/10.48550/arXiv.2211.10435</p>
+</section>
+
+<section class="slide" data-at="617">
+  <p class="kick">Gao и соавт. · результат</p>
+  <h2>Точность на&nbsp;наборах математических задач</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:stretch">
+      <div class="card t-teal" style="padding:32px 36px;gap:22px;justify-content:space-between">
+        <div style="display:flex;align-items:flex-end;gap:16px;color:var(--c)"><svg class="i" style="font-size:72px"><use href="#i-bot"/></svg><span style="font-size:44px;font-weight:700;line-height:1">+</span><svg class="i" style="font-size:72px"><use href="#i-square-terminal"/></svg></div>
+        <h3 style="font-size:36px">Модель пишет программу на&nbsp;Python, вычисление выполняет интерпретатор</h3>
+        <span class="tag t-teal" style="align-self:flex-start;font-size:30px;padding:9px 24px"><svg class="i"><use href="#i-arrow-up"/></svg> точность выше</span>
+      </div>
+      <div class="card t-gray" style="padding:32px 36px;gap:22px;justify-content:space-between">
+        <svg class="i" style="font-size:150px;color:var(--c)"><use href="#i-bot"/></svg>
+        <h3 style="font-size:36px">Гораздо более крупные модели, которые считали&nbsp;сами</h3>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Gao L. et al. PAL: Program-aided Language Models, ICML 2023 · doi.org/10.48550/arXiv.2211.10435</p>
+</section>
+
+<section class="slide" data-at="620">
+  <p class="kick">Chen и соавт., 2023</p>
+  <h2>Близкий подход – «программа мыслей»</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch">
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;gap:16px;min-height:330px"><b style="font-size:120px"><span style="font-size:.42em;letter-spacing:0">около</span> 12&nbsp;%</b><span style="font-size:31px">прирост в&nbsp;среднем по&nbsp;сравнению с&nbsp;пошаговым рассуждением</span></div></div>
+      <div style="justify-content:center;gap:20px">
+        <div class="card row t-teal" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-file-code"/></svg></span><h3 style="font-size:33px">Рассуждение записывается как программа</h3></div>
+        <svg class="i" style="font-size:44px;color:var(--muted);align-self:center"><use href="#i-arrow-down"/></svg>
+        <div class="card row t-orange" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:33px">Вычисление выполняет внешний компьютер</h3></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Chen W. et al. Program of Thoughts Prompting, TMLR 2023 · doi.org/10.48550/arXiv.2211.12588</p>
+</section>
+
+<section class="slide" data-at="624">
+  <p class="kick">Цифры из медицины · Goodell и соавт., 2025</p>
+  <h2>Три способа помочь модели в&nbsp;клинических расчётах</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:30px">
+      <div class="card t-gray" style="padding:32px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-book-open-text"/></svg></span><h3 style="font-size:35px">Поиск по&nbsp;справочным материалам</h3></div>
+      <div class="card t-gray" style="padding:32px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-square-terminal"/></svg></span><h3 style="font-size:35px">Общий интерпретатор кода</h3></div>
+      <div class="card t-teal" style="padding:32px 30px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:35px">Набор специальных калькуляторов под&nbsp;каждую формулу</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Goodell A. J. et al. Large language model agents can use tools to perform clinical calculations. npj Digital Medicine, 2025 · doi.org/10.1038/s41746-025-01475-8</p>
+</section>
+
+<section class="slide" data-at="629">
+  <p class="kick">Goodell и соавт. · лучше всего сработали специальные калькуляторы</p>
+  <h2>Неверных ответов стало меньше</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:30px;padding:34px 38px"><svg class="i" style="font-size:96px;color:var(--c)"><use href="#i-calculator"/></svg><div style="display:flex;flex-direction:column;gap:8px"><b style="font-size:104px"><span style="font-size:.45em">в</span> 5,5 <span style="font-size:.45em">раза</span></b><span style="font-size:30px">одно семейство моделей</span></div></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:30px;padding:34px 38px"><svg class="i" style="font-size:96px;color:var(--c)"><use href="#i-calculator"/></svg><div style="display:flex;flex-direction:column;gap:8px"><b style="font-size:104px"><span style="font-size:.45em">в</span> 13 <span style="font-size:.45em">раз</span></b><span style="font-size:30px">другое семейство моделей</span></div></div>
+    </div>
+    <p class="note" style="font-size:30px;color:var(--ink)">По сравнению с&nbsp;работой без&nbsp;калькуляторов</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Goodell A. J. et al. Large language model agents can use tools to perform clinical calculations. npj Digital Medicine, 2025 · doi.org/10.1038/s41746-025-01475-8</p>
+</section>
+
+<section class="slide" data-at="632" data-steps="635">
+  <p class="kick t-orange">Аналог для инженера</p>
+  <h2>Утверждённые расчётные программы и&nbsp;методики</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:grid;grid-template-columns:1fr 60px 1fr;gap:16px;align-items:stretch">
+      <div class="card row t-teal" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:29px">Система на&nbsp;основе модели вызывает их, а&nbsp;не&nbsp;считает сама</h3></div>
+      <svg class="i" style="font-size:48px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card row t-teal" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-trending-down"/></svg></span><h3 style="font-size:29px">Риск ошибок вычисления снижается</h3></div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:30px;font-weight:700;color:var(--orange)">Проверять при этом всё равно нужно</p>
+      <div class="picts c4 sm">
+        <div class="pict t-orange"><svg class="i"><use href="#i-square-function"/></svg><span style="font-size:24px">Верно&nbsp;ли формула реализована в&nbsp;программе</span></div>
+        <div class="pict t-orange"><svg class="i"><use href="#i-database"/></svg><span style="font-size:24px">Те&nbsp;ли входные данные</span></div>
+        <div class="pict t-orange"><svg class="i"><use href="#i-sliders-horizontal"/></svg><span style="font-size:24px">Какие заданы настройки метода</span></div>
+        <div class="pict t-orange"><svg class="i"><use href="#i-ruler"/></svg><span style="font-size:24px">Допустимая численная погрешность</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="639" data-steps="639,644">
+  <p class="kick t-red">Три вопроса к&nbsp;расчёту программой</p>
+  <h2>Ошибки постановки инструмент тоже не&nbsp;убирает</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:26px">
+      <div class="card t-red st" data-s="1" style="padding:26px 26px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-target"/></svg></span><h3 style="font-size:31px">Та&nbsp;ли задача посчитана?</h3><p style="font-size:24.5px">Модель учла только путь от&nbsp;блока до&nbsp;фар – программа посчитает неверную задачу. Результат будет выглядеть таким&nbsp;же надёжным, как&nbsp;верный</p></div>
+      <div class="card t-red st" data-s="2" style="padding:26px 26px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:31px">Те&nbsp;ли данные?</h3><p style="font-size:24.5px">Модель может перенести в&nbsp;программу не&nbsp;то число из&nbsp;условия</p></div>
+      <div class="card t-red st" data-s="2" style="padding:26px 26px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-square-function"/></svg></span><h3 style="font-size:31px">Тот&nbsp;ли метод?</h3><p style="font-size:24.5px">Программа посчитает по&nbsp;тому определению, которое выбрала модель</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="648" data-title="Тот же результат при тех же данных – воспроизводимость">
+  <p class="kick t-orange">Детерминированный расчёт</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:220px"><use href="#i-repeat"/></svg></div>
+      <div>
+        <p class="say md">Тот&nbsp;же результат при&nbsp;тех&nbsp;же данных – это <em>воспроизводимость</em></p>
+        <p class="sub">Правильность расчёта она не&nbsp;доказывает</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="651" data-steps="651,656">
+  <p class="kick">Как применить · в&nbsp;некоторых чат-сервисах</p>
+  <h2>Режим, в&nbsp;котором модель пишет и&nbsp;выполняет код</h2>
+  <div class="body" style="gap:24px">
+    <div class="vs" style="gap:36px">
+      <div class="col t-teal st" data-s="1" style="padding:28px 34px"><h3><svg class="i"><use href="#i-check"/></svg>Режим есть</h3><ul style="font-size:30px;gap:16px"><li>Модель показывает код и&nbsp;результат его выполнения</li><li>Проверяйте и&nbsp;код, и&nbsp;то, что он считает именно вашу задачу</li></ul></div>
+      <div class="col t-orange st" data-s="2" style="padding:28px 34px"><h3><svg class="i"><use href="#i-x"/></svg>Режима нет</h3><ul style="font-size:30px;gap:16px"><li>Тот&nbsp;же принцип вы реализуете сами</li><li>Модель даёт формулу, вы считаете по&nbsp;ней в&nbsp;калькуляторе или&nbsp;в&nbsp;таблице</li></ul></div>
+    </div>
+    <div class="rule sm t-gray st" data-s="1" style="padding:16px 30px"><svg class="i"><use href="#i-circle-help"/></svg><div><p>Есть&nbsp;ли такой режим в&nbsp;разрешённом вам сервисе и&nbsp;как он называется, проверьте заранее</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="658">
+  <p class="kick t-orange">Итог расчёта</p>
+  <h2>Итог – в&nbsp;утверждённой расчётной программе вашей организации</h2>
+  <div class="body">
+    <div class="split" style="align-items:center;gap:56px">
+      <div class="card t-teal" style="padding:32px 36px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:36px">Модель может помочь</h3><ul class="list check" style="font-size:32px;gap:14px"><li>понять методику</li><li>подготовить исходные&nbsp;данные</li></ul></div>
+      <div style="align-items:center;gap:26px">
+        <div class="docs" style="gap:34px">
+          <div class="doc t-orange" style="width:240px"><h4 style="font-size:25px">Утверждённая методика</h4><i></i><i class="hl"></i><i></i><i class="s"></i></div>
+          <div class="doc t-orange" style="width:240px"><h4 style="font-size:25px">Принятая расчётная программа</h4><i></i><i class="s"></i><i class="hl"></i><b class="stamp">итог</b></div>
+        </div>
+        <p style="font-size:31px;font-weight:600;text-align:center;line-height:1.2">Сам расчёт выполняют<br>по&nbsp;утверждённой методике<br>в&nbsp;принятой программе</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="664">
+  <p class="kick">На компьютере</p>
+  <h2>Агентные программы идут дальше чата</h2>
+  <div class="body" style="gap:40px">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="align-items:center;text-align:center;padding:30px 24px 32px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-file-code"/></svg></span><h3 style="font-size:36px">Сами пишут код</h3></li>
+      <li class="step t-teal" style="align-items:center;text-align:center;padding:30px 24px 32px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-play"/></svg></span><h3 style="font-size:36px">Запускают его</h3></li>
+      <li class="step t-teal" style="align-items:center;text-align:center;padding:30px 24px 32px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-scan-eye"/></svg></span><h3 style="font-size:36px">Читают результат</h3></li>
+    </ol>
+    <div class="rule t-orange"><svg class="i"><use href="#i-calculator"/></svg><div><p>С&nbsp;расчётом можно так&nbsp;же, но&nbsp;с&nbsp;одним условием</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="667" data-steps="670" data-title="Агент останавливается, когда работа выглядит готовой">
+  <p class="kick">Документация агентной программы</p>
+  <div class="body" style="gap:30px">
+    <div style="display:flex;flex-direction:column;gap:18px">
+      <p class="say sm">Агент останавливается, когда работа <em>выглядит</em> готовой</p>
+      <p class="sub" style="color:var(--ink)">Если ему нечем проверить, готова&nbsp;ли она на&nbsp;самом деле, проверкой становитесь вы</p>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-list-checks"/></svg><div><h3>Поэтому</h3><p>Дайте агенту проверку с&nbsp;ответом «да» или «нет». Для&nbsp;расчёта – контрольные примеры с&nbsp;заранее известным ответом</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Документация агентной программы, страница Best practices, открыта 20.11.2026</p>
+</section>
+
+<section class="slide" data-at="673" data-steps="675">
+  <p class="kick">Zhou и соавт. · препринт 2023, ICLR 2024</p>
+  <h2>Проверка словами и&nbsp;проверка кодом</h2>
+  <div class="body" style="gap:30px">
+    <p style="font-size:30px;line-height:1.25">Модель с&nbsp;интерпретатором кода решала задачи из&nbsp;набора MATH. Её&nbsp;просили проверить свой ответ словами или с&nbsp;помощью кода</p>
+    <div class="st" style="display:grid;grid-template-columns:270px 1fr;gap:24px 30px;align-items:center">
+      <div class="t-gray" style="display:flex;align-items:center;gap:18px;color:var(--c)"><svg class="i" style="font-size:54px"><use href="#i-message-square-text"/></svg><b style="font-size:34px;color:var(--ink)">Словами</b></div>
+      <div class="t-gray" style="background:var(--ct);border-radius:16px;padding:20px 28px;display:flex;align-items:center;gap:20px;border-left:10px solid var(--c)"><svg class="i" style="font-size:46px;color:var(--c)"><use href="#i-minus"/></svg><span style="font-size:31px;font-weight:600;color:var(--ci)">общая точность не&nbsp;выросла</span></div>
+      <div class="t-teal" style="display:flex;align-items:center;gap:18px;color:var(--c)"><svg class="i" style="font-size:54px"><use href="#i-square-terminal"/></svg><b style="font-size:34px;color:var(--ink)">Кодом</b></div>
+      <div class="t-teal" style="background:var(--ct);border-radius:16px;padding:18px 28px;display:flex;flex-direction:column;gap:12px;border-left:10px solid var(--c)">
+        <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:10px">
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+          <i style="height:50px;border-radius:10px;background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center;font-style:normal"><svg class="i" style="font-size:32px"><use href="#i-arrow-up"/></svg></i>
+        </div>
+        <span style="font-size:29px;font-weight:600;color:var(--ci)">точность выросла во&nbsp;всех семи разделах набора по&nbsp;сравнению с&nbsp;ответом без&nbsp;проверки</span>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhou A. et al. Solving Challenging Math Word Problems Using GPT-4 Code Interpreter with Code-based Self-Verification, ICLR&nbsp;2024 · doi.org/10.48550/arXiv.2308.07921</p>
+</section>
+
+<section class="slide h-sm" data-at="678">
+  <p class="kick t-red">Подвох проверки кодом</p>
+  <h2>Тесты, которые модель пишет по&nbsp;готовому коду, могут повторить его ошибку</h2>
+  <div class="body" style="gap:24px">
+    <div style="display:grid;grid-template-columns:1fr 44px 1fr 44px 1fr;gap:12px;align-items:stretch">
+      <div class="card row t-red" style="padding:18px 22px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-bug"/></svg></span><h3 style="font-size:28px">Код с&nbsp;ошибкой</h3></div>
+      <svg class="i" style="font-size:40px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card row t-teal" style="padding:18px 22px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:28px">Модель пишет тесты по&nbsp;этому&nbsp;коду</h3></div>
+      <svg class="i" style="font-size:40px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card row t-red" style="padding:18px 22px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-circle-check"/></svg></span><h3 style="font-size:28px">Тест закрепляет ошибочное поведение</h3></div>
+    </div>
+    <div class="rule sm t-gray" style="padding:18px 30px"><svg class="i"><use href="#i-flask-conical"/></svg><div><h3>Препринт 2026 года</h3><p>Три открытых проекта – SciPy, Qiskit, pandas. Исследователи специально внесли ошибки в&nbsp;код и&nbsp;сгенерировали для&nbsp;него тесты</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Charoosaei M., Richter C., Papadakis M. On the Risks of using LLM-Generated Tests for Regression Testing, 2026, препринт arXiv&nbsp;· doi.org/10.48550/arXiv.2610.11835</p>
+</section>
+
+<section class="slide" data-at="682">
+  <p class="kick">Препринт 2026 · в&nbsp;зависимости от&nbsp;проекта</p>
+  <h2>Что показали сгенерированные тесты</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:330px 1fr 230px;gap:30px 28px;align-items:center">
+      <span style="font-size:31px;text-align:right;line-height:1.15;font-weight:600">Закрепляли ошибочное поведение</span>
+      <div style="position:relative;height:64px;background:var(--surface2);border-radius:12px"><i style="position:absolute;left:40%;width:45%;top:0;bottom:0;background:var(--red);border-radius:12px"></i></div>
+      <b style="font-size:52px;color:var(--red);white-space:nowrap">8–17&nbsp;%</b>
+      <span style="font-size:31px;text-align:right;line-height:1.15;font-weight:600">Находили внесённую ошибку</span>
+      <div style="position:relative;height:64px;background:var(--surface2);border-radius:12px"><i style="position:absolute;left:12%;width:12%;top:0;bottom:0;background:var(--teal);border-radius:12px"></i></div>
+      <b style="font-size:52px;color:var(--teal);white-space:nowrap">2,4–4,8&nbsp;%</b>
+      <span></span>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-top:-14px">
+        <div style="position:relative;height:40px;font-size:25px;color:var(--muted);border-top:2.5px solid var(--line)"><span style="position:absolute;top:6px;left:0;transform:translateX(-50%)">0</span><span style="position:absolute;top:6px;left:25%;transform:translateX(-50%)">5</span><span style="position:absolute;top:6px;left:50%;transform:translateX(-50%)">10</span><span style="position:absolute;top:6px;left:75%;transform:translateX(-50%)">15</span><span style="position:absolute;top:6px;left:100%;transform:translateX(-50%)">20</span></div>
+        <span style="font-size:25px;color:var(--muted);text-align:center">доля тестов, %</span>
+      </div>
+      <span></span>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Charoosaei M., Richter C., Papadakis M. On the Risks of using LLM-Generated Tests for Regression Testing, 2026, препринт arXiv&nbsp;· doi.org/10.48550/arXiv.2610.11835</p>
+</section>
+
+<section class="slide dark" data-at="684" data-steps="686" data-title="Контрольные примеры с ответами даёт инженер">
+  <p class="kick t-orange">Значит</p>
+  <div class="body" style="gap:30px">
+    <p class="say sm">Контрольные примеры с&nbsp;ответами даёт <em>инженер</em></p>
+    <div class="picts c3 sm t-orange">
+      <div class="pict"><svg class="i"><use href="#i-book-open"/></svg><b style="font-size:29px">Справочник</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b style="font-size:29px">Методика</b></div>
+      <div class="pict"><svg class="i"><use href="#i-history"/></svg><b style="font-size:29px">Прошлая проверенная задача</b></div>
+    </div>
+    <div class="chat st">
+      <div class="msg user" style="max-width:100%;align-self:stretch;font-size:33px;padding:22px 30px"><span class="who" style="font-size:21px">Скажите агенту</span><p style="color:var(--on_graphite)">Прогони расчёт на&nbsp;этих примерах, покажи команду и&nbsp;её вывод целиком. Только потом считай мою задачу</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="689" data-title="«Все тесты пройдены» само по себе говорит очень мало">
+  <p class="kick">В той&nbsp;же документации</p>
+  <div class="body" style="gap:34px">
+    <div style="display:grid;grid-template-columns:auto 1fr;gap:34px;align-items:center">
+      <div class="chat"><div class="msg bot" style="max-width:100%;font-size:38px;padding:22px 32px"><span class="who" style="font-size:21px">Короткий отчёт агента</span><p style="font-weight:700">Все тесты пройдены</p></div></div>
+      <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Само по&nbsp;себе это говорит очень&nbsp;мало</p></div></div>
+    </div>
+    <div class="cards" style="gap:30px">
+      <div class="card row t-teal" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-graduation-cap"/></svg></span><h3 style="font-size:33px">Для пробы возьмите учебные данные</h3></div>
+      <div class="card row t-orange" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-shield-check"/></svg></span><h3 style="font-size:31px">На рабочем компьютере – только инструменты, разрешённые вашей организацией</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Документация агентной программы, страница Best practices, открыта 20.11.2026</p>
+</section>

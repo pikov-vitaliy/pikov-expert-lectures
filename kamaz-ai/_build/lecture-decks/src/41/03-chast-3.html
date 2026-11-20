@@ -1,0 +1,346 @@
+<!-- Лекция 4.1, строки 194–302 (10:52–16:08): что показывают исследования о расчётах моделей – Herambourg и соавт. (45–63 % верных, ошибка на последнем шаге, 33,4 и 34,7 %), Boye и Moëll, Shin и Ramanathan, вставка 20.11 о рассуждении по шагам (Sprague и соавт.), Farajalla и соавт. и правило курса -->
+
+<section class="slide" data-at="194" data-steps="197">
+  <p class="kick">Что показывают исследования · Herambourg и соавт., 2025</p>
+  <h2>Проверка на практических расчётных задачах</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:28px;padding:24px 34px"><b style="font-size:100px">5</b><span style="font-size:32px">сильных систем решали&nbsp;задачи</span></div>
+      <div class="stat t-teal" style="flex-direction:row;align-items:center;gap:28px;padding:24px 34px"><b style="font-size:100px">500</b><span style="font-size:32px">практических расчётных задач</span></div>
+    </div>
+    <div class="picts c4 st">
+      <div class="pict"><svg class="i"><use href="#i-banknote"/></svg><b>Финансы</b></div>
+      <div class="pict"><svg class="i"><use href="#i-atom"/></svg><b>Физика</b></div>
+      <div class="pict"><svg class="i"><use href="#i-stethoscope"/></svg><b>Медицина</b></div>
+      <div class="pict"><svg class="i"><use href="#i-chart-column"/></svg><b>Статистика</b></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="199">
+  <p class="kick">Herambourg и соавт. · итог проверки</p>
+  <h2>Сколько задач решено верно</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;gap:40px">
+      <div style="display:grid;grid-template-columns:300px 1fr 250px;gap:30px;align-items:center">
+        <span style="font-size:36px;font-weight:700;text-align:right;line-height:1.1">Верный ответ</span>
+        <div style="position:relative;height:76px;background:var(--surface2);border-radius:14px"><i class="t-teal" style="position:absolute;left:45%;width:18%;top:0;bottom:0;background:var(--c);border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;font-style:normal;font-size:24px;font-weight:700;color:var(--chip-ink)"><span>45</span><span>63</span></i></div>
+        <b style="font-size:66px;line-height:1;color:var(--teal);white-space:nowrap">45–63&nbsp;%</b>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 1fr 250px;gap:30px;align-items:center">
+        <span style="font-size:36px;font-weight:700;text-align:right;line-height:1.1">Неверный итог</span>
+        <div style="position:relative;height:76px;background:var(--surface2);border-radius:14px"><i class="t-red" style="position:absolute;left:37%;width:18%;top:0;bottom:0;background:var(--c);border-radius:14px;display:flex;align-items:center;justify-content:space-between;padding:0 9px;font-style:normal;font-size:24px;font-weight:700;color:var(--chip-ink)"><span>37</span><span>55</span></i></div>
+        <b style="font-size:66px;line-height:1;color:var(--red);white-space:nowrap">37–55&nbsp;%</b>
+      </div>
+      <div style="display:grid;grid-template-columns:300px 1fr 250px;gap:30px">
+        <span></span>
+        <div style="position:relative;height:34px;border-top:3px solid var(--line);font-size:25px;color:var(--muted)">
+          <span style="position:absolute;left:0;top:4px">0&nbsp;%</span>
+          <span style="position:absolute;left:50%;top:4px;transform:translateX(-50%)">50&nbsp;%</span>
+          <span style="position:absolute;right:0;top:4px">100&nbsp;%</span>
+        </div>
+        <span></span>
+      </div>
+    </div>
+    <p class="note" style="font-size:29px;text-align:center">Доля задач у&nbsp;пяти сильных систем</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="202">
+  <p class="kick">Herambourg и соавт. · разбор ошибок</p>
+  <h2>Путь чаще верный, а&nbsp;ошибка – на&nbsp;последнем&nbsp;шаге</h2>
+  <div class="body" style="gap:34px">
+    <div style="position:relative;display:grid;grid-template-columns:repeat(3,1fr);align-items:start">
+      <i style="position:absolute;left:16.7%;right:16.7%;top:64px;height:8px;background:var(--line);border-radius:4px"></i>
+      <div class="t-teal" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px"><span style="width:136px;height:136px;border-radius:50%;background:var(--ct);border:7px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:70px"><svg class="i"><use href="#i-check"/></svg></span></div>
+      <div class="t-teal" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px"><span style="width:136px;height:136px;border-radius:50%;background:var(--ct);border:7px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:70px"><svg class="i"><use href="#i-check"/></svg></span></div>
+      <div class="t-red" style="position:relative;display:flex;flex-direction:column;align-items:center;gap:16px"><span style="width:136px;height:136px;border-radius:50%;background:var(--ct);border:7px solid var(--c);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:70px"><svg class="i"><use href="#i-x"/></svg></span></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:26px">
+      <div class="t-teal" style="background:var(--ct);border-top:7px solid var(--c);border-radius:0 0 18px 18px;padding:20px 26px;text-align:center;font-size:32px;line-height:1.2;color:var(--ci)"><b>Путь решения</b>: модели чаще выбирают&nbsp;правильный</div>
+      <div class="t-red" style="background:var(--ct);border-top:7px solid var(--c);border-radius:0 0 18px 18px;padding:20px 26px;text-align:center;font-size:32px;line-height:1.2;color:var(--ci)"><b>Последний шаг</b>: здесь&nbsp;ошибаются</div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="206" data-steps="206,208" data-title="Boye и Moëll: верный ответ неверным путём">
+  <p class="kick">Ещё одна находка · Boye и Moëll, 2025</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:380px 1fr;gap:56px;align-items:center">
+      <div class="st" data-s="1" style="display:flex;flex-direction:column;gap:24px">
+        <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-check"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><p class="muted" style="font-size:27px">Ответ</p><h3 style="font-size:42px">верный</h3></div></div>
+        <div class="card row t-red" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-x"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><p class="muted" style="font-size:27px">Путь к&nbsp;ответу</p><h3 style="font-size:42px">неверный</h3></div></div>
+      </div>
+      <figure class="quote sm st" data-s="2">
+        <blockquote>Все модели допускают ошибки в&nbsp;пространственных рассуждениях, планировании решения и&nbsp;арифметике, иногда получая <b>правильный ответ с&nbsp;помощью ошибочной логики</b></blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Boye J., Moëll B.</b>авторы исследования</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Boye J., Moëll B. Large Language Models and Mathematical Reasoning Failures, 2025, препринт arXiv · doi.org/10.48550/arXiv.2502.11574</p>
+</section>
+
+<section class="slide dark" data-at="211" data-title="Проверять нужно шаги, а не только ответ">
+  <p class="kick t-orange">Отсюда правило</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-list-checks"/></svg></div>
+      <div>
+        <p class="sub" style="color:var(--ink)">Такую ошибку по&nbsp;итоговому числу не&nbsp;видно</p>
+        <p class="say md">Проверять нужно <em>шаги</em>, а&nbsp;не&nbsp;только ответ</p>
+        <p class="sub">Ответ совпал с&nbsp;ожидаемым – это ещё не&nbsp;значит, что метод верен и&nbsp;сработает на&nbsp;других числах</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="216">
+  <p class="kick">Shin и Ramanathan, 2024</p>
+  <h2>Подсказки в&nbsp;запросе помогают, но&nbsp;не&nbsp;спасают</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:440px 1fr">
+      <div class="svc-hd" style="padding:44px 38px;gap:22px">
+        <i class="logo" style="width:130px;height:130px;font-size:72px"><svg class="i"><use href="#i-pill"/></svg></i>
+        <h3 style="font-size:46px">Фармакокинетика</h3>
+      </div>
+      <dl class="kv" style="--kw:250px">
+        <div style="font-size:37px;padding:28px 15px"><dt>Что проверяли</dt><dd>Справится&nbsp;ли модель с&nbsp;расчётами</dd></div>
+        <div style="font-size:37px;padding:28px 15px"><dt>Особенность</dt><dd>Много экспонент</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shin E., Ramanathan M. Journal of Pharmacokinetics and Pharmacodynamics, 2024 · doi.org/10.1007/s10928-023-09892-6</p>
+</section>
+
+<section class="slide" data-at="220">
+  <p class="kick">Shin и Ramanathan · что дали подсказки</p>
+  <h2>Ошибок стало меньше, но&nbsp;они остались</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 64px 400px;gap:26px;align-items:center">
+      <div class="prompt" style="--tw:200px;font-size:34px;gap:18px;padding:26px 28px">
+        <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding-left:10px">Подсказки в запросе</p>
+        <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Подсказка 1</span><span>Пошаговое рассуждение</span></p>
+        <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Подсказка 2</span><span>Разбиение задачи на&nbsp;части</span></p>
+      </div>
+      <svg class="i" style="font-size:60px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div class="rule t-teal" style="padding:24px 28px"><svg class="i"><use href="#i-trending-down"/></svg><div><p>Число ошибок снизилось</p></div></div>
+        <div class="rule t-red" style="padding:24px 28px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Но ошибки остались</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Shin E., Ramanathan M. Journal of Pharmacokinetics and Pharmacodynamics, 2024 · doi.org/10.1007/s10928-023-09892-6</p>
+</section>
+
+<section class="slide" data-at="237" data-title="Помогает ли модели рассуждать по шагам?">
+  <p class="kick">Рассуждение по шагам</p>
+  <div class="body">
+    <div class="ask t-teal" style="grid-template-columns:180px 1fr;gap:44px">
+      <span class="q" style="width:180px;height:180px;font-size:128px">?</span>
+      <ul>
+        <li>Помогает&nbsp;ли модели рассуждать по&nbsp;шагам?</li>
+        <li>В&nbsp;каких задачах это нужно?</li>
+      </ul>
+    </div>
+    <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Два способа задать один и&nbsp;тот&nbsp;же вопрос</p>
+    <div class="cards">
+      <div class="card row t-gray" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-zap"/></svg></span><h3 style="font-size:38px">Сразу дать ответ</h3></div>
+      <div class="card row t-teal" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3 style="font-size:38px">Расписать решение по&nbsp;шагам</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="241">
+  <p class="kick">Sprague и соавт. · ICLR 2025</p>
+  <h2>Обзор статей и&nbsp;собственная проверка</h2>
+  <div class="body">
+    <div class="stats">
+      <div class="stat t-teal" style="justify-content:center;gap:12px;min-height:300px"><b><small style="font-size:.42em;margin-right:12px">более</small>100</b><span style="font-size:31px">статей обобщили</span></div>
+      <div class="stat t-teal" style="justify-content:center;gap:12px;min-height:300px"><b>14</b><span style="font-size:31px">моделей испытали&nbsp;сами</span></div>
+      <div class="stat t-teal" style="justify-content:center;gap:12px;min-height:300px"><b>20</b><span style="font-size:31px">наборов задач</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sprague Z. et al. To CoT or not to CoT?, ICLR 2025 · doi.org/10.48550/arXiv.2409.12183</p>
+</section>
+
+<section class="slide" data-at="245">
+  <p class="kick">Sprague и соавт. · где помогает рассуждение</p>
+  <h2>Выигрыш – в&nbsp;математике и&nbsp;логике</h2>
+  <div class="body">
+    <div class="vs" style="gap:40px">
+      <div class="col t-teal" style="padding:44px 40px;gap:26px;min-height:330px;justify-content:center"><h3 style="font-size:40px"><svg class="i"><use href="#i-sigma"/></svg>Математика и&nbsp;логика</h3><p style="font-size:48px;font-weight:700;line-height:1.12">Рассуждение заметно&nbsp;помогает</p></div>
+      <div class="col t-gray" style="padding:44px 40px;gap:26px;min-height:330px;justify-content:center"><h3 style="font-size:40px"><svg class="i"><use href="#i-book-open-text"/></svg>Остальные задачи</h3><p style="font-size:48px;font-weight:700;line-height:1.12">Выигрыш небольшой</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sprague Z. et al. To CoT or not to CoT?, ICLR 2025 · doi.org/10.48550/arXiv.2409.12183</p>
+</section>
+
+<section class="slide" data-at="247">
+  <p class="kick">Sprague и соавт. · набор вопросов MMLU</p>
+  <h2>Выигрыш там, где есть знак «=»</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:40px">
+      <div class="stat t-teal" style="justify-content:center;gap:12px"><b style="font-size:116px"><small style="font-size:.4em;margin-right:14px">до</small>95&nbsp;%</b><span style="font-size:31px">всего выигрыша на&nbsp;этом&nbsp;наборе</span></div>
+      <div class="card row t-teal" style="padding:30px 34px;gap:28px"><span class="bdg lg"><svg class="i"><use href="#i-equal"/></svg></span><h3 style="font-size:38px">Знак равенства был в&nbsp;вопросе или появился в&nbsp;ответе модели</h3></div>
+    </div>
+    <div class="rule sm t-gray" style="padding:22px 32px"><svg class="i"><use href="#i-info"/></svg><div><p>Это результат про способ запроса: встроенные режимы рассуждения в&nbsp;сервисах здесь не&nbsp;сравнивали</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sprague Z. et al. To CoT or not to CoT?, ICLR 2025 · doi.org/10.48550/arXiv.2409.12183</p>
+</section>
+
+<section class="slide" data-at="251">
+  <p class="kick">Но заметьте, что было дальше</p>
+  <h2>План составляет модель, решает программа</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:200px 290px 50px 1fr;gap:24px 20px;align-items:stretch">
+      <span style="align-self:center;font-size:27px;font-weight:700;line-height:1.15;color:var(--muted)">Модель считает&nbsp;сама</span>
+      <div class="card row t-gray" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:32px">План</h3></div>
+      <svg class="i" style="font-size:46px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card row t-gray" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:32px">Считает сама, по&nbsp;шагам</h3></div>
+      <span style="align-self:center;font-size:27px;font-weight:700;line-height:1.15;color:var(--teal)">Модель и&nbsp;программа</span>
+      <div class="card row t-teal" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:32px">План</h3></div>
+      <svg class="i" style="font-size:46px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="card row t-orange" style="padding:20px 24px"><span class="bdg"><svg class="i"><use href="#i-square-terminal"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:32px">Решает программа</h3><p style="font-size:24px">интерпретатор Python или логический решатель</p></div></div>
+    </div>
+    <div class="rule sm t-teal" style="padding:18px 30px"><svg class="i"><use href="#i-circle-check"/></svg><div><p>С&nbsp;программой результат в&nbsp;большинстве проверок был лучше</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sprague Z. et al. To CoT or not to CoT?, ICLR 2025 · doi.org/10.48550/arXiv.2409.12183</p>
+</section>
+
+<section class="slide" data-at="254" data-title="Sprague и соавт.: вывод авторов">
+  <p class="kick">Вывод авторов</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Рассуждение по&nbsp;шагам выглядит <b>плохим, хотя и&nbsp;универсальным,</b> приближением к&nbsp;таким&nbsp;решателям</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Sprague Z. и соавт.</b>авторы исследования, ICLR 2025</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sprague Z. et al. To CoT or not to CoT?, ICLR 2025 · doi.org/10.48550/arXiv.2409.12183</p>
+</section>
+
+<section class="slide dark" data-at="256" data-title="Приём: план – модели, арифметика – программе">
+  <p class="kick t-orange">Для инженерного расчёта</p>
+  <div class="body" style="gap:46px">
+    <p class="say md">Попросите модель составить <b>план</b>, а&nbsp;арифметику поручите <em>программе</em></p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:30px">
+      <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:26px 32px;display:flex;align-items:center;gap:24px;border-left:10px solid var(--c)"><svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-bot"/></svg><span style="font-size:34px;color:var(--ci);font-weight:700;white-space:nowrap">Модель – план</span></div>
+      <div class="t-orange" style="background:var(--ct);border-radius:20px;padding:26px 32px;display:flex;align-items:center;gap:24px;border-left:10px solid var(--c)"><svg class="i" style="font-size:56px;color:var(--c)"><use href="#i-square-terminal"/></svg><span style="font-size:34px;color:var(--ci);font-weight:700;white-space:nowrap">Программа – арифметика</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="260">
+  <p class="kick t-red">Ошибка на последнем шаге · Herambourg и соавт.</p>
+  <h2>Откуда неверные ответы</h2>
+  <div class="body">
+    <p class="note" style="font-size:29px">Доля среди всех неверных ответов</p>
+    <div class="bars" style="--max:100;gap:30px">
+      <div class="bar t-red" style="--v:33.4;grid-template-columns:420px 1fr 200px;font-size:36px"><span class="lb">Ошибки вычисления</span><i style="height:72px"></i><b style="font-size:56px">33,4&nbsp;%</b></div>
+      <div class="bar t-red" style="--v:34.7;grid-template-columns:420px 1fr 200px;font-size:36px"><span class="lb">Ошибки точности или&nbsp;округления</span><i style="height:72px"></i><b style="font-size:56px">34,7&nbsp;%</b></div>
+    </div>
+    <div class="rule sm t-red" style="padding:20px 30px"><svg class="i"><use href="#i-calculator"/></svg><div><p>Вместе это большинство неверных ответов</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="266" data-title="Herambourg и соавт.: вывод авторов">
+  <p class="kick t-red">Вывод авторов · Herambourg и соавт.</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Даже когда модель идёт правильным путём рассуждения, она часто <b>ошибается на&nbsp;последнем этапе</b> – при выполнении вычисления или округлении</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Herambourg C. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="274">
+  <p class="kick t-gray">Сразу оговорка</p>
+  <h2>Считать эти цифры постоянными нельзя</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:330px 1fr;gap:44px;align-items:stretch">
+      <div style="display:flex;flex-direction:column;gap:22px">
+        <div class="stat t-gray" style="flex:1;justify-content:center;gap:4px;padding:20px 30px"><b style="font-size:76px">33,4&nbsp;%</b><span style="font-size:25px">ошибки вычисления</span></div>
+        <div class="stat t-gray" style="flex:1;justify-content:center;gap:4px;padding:20px 30px"><b style="font-size:76px">34,7&nbsp;%</b><span style="font-size:25px">ошибки точности или&nbsp;округления</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:22px;justify-content:center">
+        <p style="font-size:30px;color:var(--muted)">Эти цифры получены:</p>
+        <div class="card row t-gray" style="padding:28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-list"/></svg></span><h3 style="font-size:40px">на одном наборе задач</h3></div>
+        <div class="card row t-gray" style="padding:28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:40px">для одного поколения моделей</h3></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Herambourg C. et al. The ORCA Benchmark, 2025, препринт arXiv · doi.org/10.48550/arXiv.2511.02589</p>
+</section>
+
+<section class="slide" data-at="277" data-title="Правильный ход решения не гарантирует правильного числа">
+  <p class="kick t-orange">Важен вывод</p>
+  <div class="body">
+    <p class="say md">Правильный ход решения <em>не&nbsp;гарантирует</em> правильного числа</p>
+    <div class="cards">
+      <div class="card row t-red" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-calculator"/></svg></span><h3 style="font-size:32px">Ошибки чаще в&nbsp;исполнении, чем в&nbsp;методе</h3></div>
+      <div class="card row t-gray" style="padding:24px 28px"><span class="bdg"><svg class="i"><use href="#i-eye-off"/></svg></span><h3 style="font-size:32px">По виду ответа этого не&nbsp;понять</h3></div>
+    </div>
+    <div class="rule t-orange" style="padding:22px 32px"><svg class="i"><use href="#i-list-checks"/></svg><div><p>Поэтому проверяем шаги</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="282" data-steps="282,285,287">
+  <p class="kick">Модели при этом различаются · Farajalla и соавт., 2026</p>
+  <h2>Три модели считали дозировки лекарств</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:270px 1fr;gap:40px;align-items:stretch">
+      <div class="stat t-gray st" data-s="1" style="justify-content:center;gap:10px"><b>90</b><span style="font-size:30px">стандартных задач</span></div>
+      <div class="bars" style="--max:100;gap:18px;justify-content:center">
+        <div class="bar t-teal st" data-s="2" style="--v:100;grid-template-columns:330px 1fr 160px;font-size:30px"><span class="lb">DeepSeek</span><i style="height:46px"></i><b style="font-size:30px">все верно</b></div>
+        <div class="bar t-teal st" data-s="2" style="--v:100;grid-template-columns:330px 1fr 160px;font-size:30px"><span class="lb">Ещё одна модель</span><i style="height:46px"></i><b style="font-size:30px">все верно</b></div>
+        <div class="bar t-orange st" data-s="2" style="--v:83.3;grid-template-columns:330px 1fr 160px;font-size:30px"><span class="lb">Третья модель</span><i style="height:46px"></i><b style="font-size:38px">83,3&nbsp;%</b></div>
+        <div class="bar t-red st" data-s="3" style="--v:53.3;grid-template-columns:330px 1fr 160px;font-size:30px"><span class="lb">Третья, сложные задачи</span><i style="height:46px"></i><b style="font-size:38px">53,3&nbsp;%</b></div>
+      </div>
+    </div>
+    <div class="rule sm t-gray st" data-s="3" style="padding:18px 30px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Это не&nbsp;повод доверять «лучшей» модели: на&nbsp;других задачах порядок может оказаться другим</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Farajalla F. et al. Scientific Reports, 2026 · doi.org/10.1038/s41598-026-69321-9</p>
+</section>
+
+<section class="slide" data-at="290" data-title="Farajalla и соавт.: вывод авторов">
+  <p class="kick t-orange">Вывод авторов годится и для инженерного расчёта</p>
+  <div class="body">
+    <figure class="quote md t-orange">
+      <blockquote>Все расчёты, выполненные с&nbsp;помощью ИИ, должны <b>независимо проверяться</b> квалифицированными врачами до&nbsp;применения в&nbsp;лечении, особенно для&nbsp;препаратов повышенного риска и&nbsp;сложных схем дозирования</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Farajalla F. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Farajalla F. et al. Scientific Reports, 2026 · doi.org/10.1038/s41598-026-69321-9</p>
+</section>
+
+<section class="slide" data-at="294">
+  <p class="kick t-orange">Из медицины – в&nbsp;инженерный расчёт</p>
+  <h2>Правило нашего курса</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1.2fr 56px 1.1fr;gap:22px 24px;align-items:stretch;font-size:35px;line-height:1.2">
+      <div style="background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:18px 26px;display:flex;align-items:center;color:var(--muted);text-decoration:line-through">врачи</div>
+      <svg class="i" style="font-size:46px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="t-orange" style="background:var(--ct);border-left:9px solid var(--c);border-radius:16px;padding:18px 26px;display:flex;align-items:center;color:var(--ci);font-weight:700">инженеры</div>
+      <div style="background:var(--surface);border:2px solid var(--line);border-radius:16px;padding:18px 26px;display:flex;align-items:center;color:var(--muted);text-decoration:line-through">препараты повышенного риска</div>
+      <svg class="i" style="font-size:46px;color:var(--muted);align-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="t-orange" style="background:var(--ct);border-left:9px solid var(--c);border-radius:16px;padding:18px 26px;display:flex;align-items:center;color:var(--ci);font-weight:700">расчёты, от&nbsp;которых зависит&nbsp;безопасность</div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-user-check"/></svg><div><p>Все расчёты, выполненные с&nbsp;помощью ИИ, должны независимо проверяться квалифицированными инженерами. Особенно расчёты, от&nbsp;которых зависит безопасность</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="298" data-title="Проверка расчёта модели обязательна">
+  <p class="kick t-orange">И оговорка, без которой нельзя</p>
+  <div class="body" style="gap:40px">
+    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:16px;font-size:31px;color:var(--ink);background:var(--surface);border-radius:16px;padding:14px 26px"><svg class="i" style="font-size:50px;color:var(--muted)"><use href="#i-hospital"/></svg>Медицинские задачи</div>
+      <div style="display:flex;align-items:center;gap:16px;font-size:31px;color:var(--ink);background:var(--surface);border-radius:16px;padding:14px 26px"><svg class="i" style="font-size:50px;color:var(--muted)"><use href="#i-graduation-cap"/></svg>Учебные задачи</div>
+    </div>
+    <p class="sub">На них проведены многие из&nbsp;этих исследований. На&nbsp;инженерные расчёты их цифры переносятся с&nbsp;осторожностью</p>
+    <p class="say">Но вывод тот же: проверка расчёта модели <em>обязательна</em></p>
+  </div>
+</section>

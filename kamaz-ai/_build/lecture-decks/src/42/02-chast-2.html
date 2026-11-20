@@ -1,0 +1,323 @@
+<!-- Лекция 4.2, строки 86–233 (04:09–10:37): как передать модели таблицу – вставка текстом и пять правил подготовки, пример запроса, дата-контракт (Н. Галимова) и паспорт таблицы, загрузка файла и объём по справке GigaChat и Алисы AI, середина длинного текста (Liu и соавт.), форма подачи таблицы (Sui и соавт.; Liu, Wang, Chen), практический вывод -->
+
+<section class="slide dark" data-at="86" data-title="Основной способ – вставка текстом">
+  <p class="kick t-orange">Как передать модели таблицу</p>
+  <div class="body" style="gap:60px">
+    <p class="say">Основной способ – <em>вставка текстом</em></p>
+    <div class="picts t-teal" style="grid-template-columns:1fr 70px 1fr 70px 1fr;align-items:start">
+      <div class="pict"><svg class="i"><use href="#i-sheet"/></svg><b>Таблица в&nbsp;редакторе</b></div>
+      <svg class="i" style="font-size:54px;color:var(--muted);margin-top:53px"><use href="#i-arrow-right"/></svg>
+      <div class="pict"><svg class="i"><use href="#i-copy"/></svg><b>Скопировать</b></div>
+      <svg class="i" style="font-size:54px;color:var(--muted);margin-top:53px"><use href="#i-arrow-right"/></svg>
+      <div class="pict"><svg class="i"><use href="#i-message-square-text"/></svg><b>Вставить в&nbsp;окно чата</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="88">
+  <p class="kick">Вставка текстом · надёжнее всего такой вид</p>
+  <h2>Строка таблицы – отдельная строка текста</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:40px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:10px;min-width:0">
+        <p class="note" style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase">Учебная таблица 1 текстом</p>
+        <div class="mono t-orange" style="display:flex;flex-direction:column;gap:6px;background:var(--surface);border:1.9px solid var(--line);border-radius:18.8px;padding:16px 18px;font-size:25px;line-height:1.42">
+          <span style="background:var(--surface2);border-radius:9px;padding:3px 12px">Образец<b class="c">;</b>Ток через 30 мин, мА<b class="c">;</b>Ток через 2 ч, мА<b class="c">;</b><br>U батареи 1 после 14 сут, В<b class="c">;</b><br>U батареи 2 после 14 сут, В</span>
+          <span style="background:var(--bg);border-radius:9px;padding:3px 12px">О-01<b class="c">;</b>34,2<b class="c">;</b>27,5<b class="c">;</b>12,56<b class="c">;</b>12,55</span>
+          <span style="background:var(--bg);border-radius:9px;padding:3px 12px">О-02<b class="c">;</b>36,8<b class="c">;</b>29,1<b class="c">;</b>12,52<b class="c">;</b>12,53</span>
+          <span style="background:var(--bg);border-radius:9px;padding:3px 12px">О-03<b class="c">;</b>31,5<b class="c">;</b>25,8<b class="c">;</b>12,60<b class="c">;</b>12,58</span>
+          <span class="muted" style="padding:0 12px">…</span>
+          <span style="background:var(--bg);border-radius:9px;padding:3px 12px">О-10<b class="c">;</b>35,0<b class="c">;</b>28,0<b class="c">;</b>12,55<b class="c">;</b>12,56</span>
+        </div>
+      </div>
+      <div class="t-orange" style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:24px">
+        <span class="mono" style="width:160px;height:160px;border-radius:50%;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:120px;font-weight:700;line-height:1">;</span>
+        <p style="font-size:31px;line-height:1.22">Столбцы разделены одним и&nbsp;тем&nbsp;же знаком, например <b class="c">точкой с&nbsp;запятой</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="94" data-steps="95,100,104,107,111">
+  <p class="kick">Вставка текстом · правила подготовки</p>
+  <h2>Как подготовить таблицу</h2>
+  <div class="body">
+    <ol class="list num" style="font-size:31px;gap:16px">
+      <li class="st"><span><b>Одна строка – один образец</b>, у&nbsp;каждого свой идентификатор</span><small>О-01, О-02 … О-10: по&nbsp;ним проверяют, не&nbsp;пропала&nbsp;ли строка</small></li>
+      <li class="st"><span><b>В заголовке столбца – величина и&nbsp;единица</b></span><small>«Ток через 30&nbsp;мин, мА», а&nbsp;не&nbsp;«I1»</small></li>
+      <li class="st"><span><b>Перед таблицей</b> – условия испытаний и&nbsp;требования с&nbsp;номерами пунктов</span></li>
+      <li class="st"><span><b>Один десятичный знак на&nbsp;всю таблицу</b></span><small>Запятая и&nbsp;точка вперемешку – таблицу сначала готовят к&nbsp;анализу</small></li>
+      <li class="st"><span><b>Без объединённых ячеек и&nbsp;многоэтажных заголовков</b></span></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="115" data-steps="116,120,123,124,128">
+  <p class="kick">Пример</p>
+  <h2>Запрос с&nbsp;такой таблицей</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:240px;font-size:26px;gap:10px;padding:16px 22px">
+      <p class="part st t-gray"><span class="tg">Кто вы и&nbsp;что испытано</span><span>Я инженер, разбираю результаты испытаний системы электроснабжения грузового автомобиля 24&nbsp;В. Испытано 10&nbsp;образцов.</span></p>
+      <p class="part st t-teal"><span class="tg">Условия и&nbsp;требования</span><span><span class="muted">Условия замеров, требования п.&nbsp;4.3 и&nbsp;п.&nbsp;4.5.</span> Для тока через 2&nbsp;ч требований&nbsp;нет.</span></p>
+      <p class="part st t-gray"><span class="tg">Таблица</span><span class="muted">[таблица 1 текстом]</span></p>
+      <p class="part st t-orange"><span class="tg">Задача по&nbsp;шагам</span><span>1. Перепиши таблицу и&nbsp;проверь, что в&nbsp;ней 10&nbsp;строк. <span class="muted">…</span> Укажи, по&nbsp;каким образцам считал.</span></p>
+      <p class="part st t-red"><span class="tg">Ограничения</span><span>Не добавляй значений, которых нет в&nbsp;таблице, и&nbsp;не&nbsp;объясняй причины отклонений: только то, что следует из&nbsp;данных.</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="132" data-title="Дата-контракт">
+  <p class="kick">Приём из мира данных</p>
+  <div class="body" style="gap:46px">
+    <div class="term"><dfn>Дата-контракт</dfn><p>В&nbsp;больших компаниях в&nbsp;него записывают условия передачи данных между командами</p></div>
+    <div class="picts" style="grid-template-columns:repeat(5,1fr);gap:16px">
+      <div class="pict"><svg class="i"><use href="#i-box"/></svg><b>Что за&nbsp;объект</b></div>
+      <div class="pict"><svg class="i"><use href="#i-layout-list"/></svg><b>Его структура</b></div>
+      <div class="pict"><svg class="i"><use href="#i-user-round"/></svg><b>Владелец</b></div>
+      <div class="pict"><svg class="i"><use href="#i-wrench"/></svg><b>Кто разбирает сбои</b></div>
+      <div class="pict"><svg class="i"><use href="#i-refresh-cw"/></svg><b>Как часто обновляются данные</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="138" data-title="Н. Галимова: дата-контракт снижает риски на стороне данных">
+  <p class="kick t-orange">Когда данные начинают читать агенты</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Дата-контракт не&nbsp;гарантирует правильность решения агента, но&nbsp;он <b>снижает риски на&nbsp;стороне&nbsp;данных</b></blockquote>
+      <figcaption><i class="ava">НГ</i><span><b>Н. Галимова</b>онлайн-конференция «Данные для&nbsp;AI и&nbsp;автоматизации»,<br>форум All-over-IP&nbsp;&amp;&nbsp;AI&nbsp;2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Галимова Н. «Архитектура доверия: дата-контракты». Онлайн-конференция «Данные для AI и автоматизации: как собрать управляемый контур данных предприятия», форум All-over-IP &amp; AI 2026, 11.11.2026</p>
+</section>
+
+<section class="slide h-sm" data-at="144" data-steps="150">
+  <p class="kick t-orange">Для таблицы испытаний</p>
+  <h2>Короткий паспорт в&nbsp;несколько строк над&nbsp;таблицей</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:40px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="t-orange" style="background:var(--surface);border-radius:18.8px;border-left:10px solid var(--c);padding:20px 26px;display:flex;flex-direction:column;gap:12px;box-shadow:0 3.8px 12.5px var(--shadow)">
+          <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Паспорт таблицы</p>
+          <p style="display:flex;gap:18px;align-items:center;font-size:30px;line-height:1.2"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-user-round"/></svg>Чья таблица и&nbsp;какая версия</p>
+          <p style="display:flex;gap:18px;align-items:center;font-size:30px;line-height:1.2"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-columns-3"/></svg><span>Что в&nbsp;каждом столбце<br>и&nbsp;в&nbsp;каких единицах</span></p>
+          <p style="display:flex;gap:18px;align-items:center;font-size:30px;line-height:1.2"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-calendar"/></svg>Когда обновлялась</p>
+          <p style="display:flex;gap:18px;align-items:center;font-size:30px;line-height:1.2"><svg class="i" style="font-size:36px;color:var(--c)"><use href="#i-message-circle-question"/></svg>К&nbsp;кому идти с&nbsp;вопросом</p>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:7px;padding:0 8px">
+          <i style="height:18px;border-radius:5px;background:var(--gray)"></i><i style="height:18px;border-radius:5px;background:var(--gray)"></i><i style="height:18px;border-radius:5px;background:var(--gray)"></i><i style="height:18px;border-radius:5px;background:var(--gray)"></i><i style="height:18px;border-radius:5px;background:var(--gray)"></i>
+          <i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i>
+          <i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i><i style="height:18px;border-radius:5px;background:var(--surface2)"></i>
+        </div>
+        <p class="note" style="font-size:24px;padding-left:8px">Таблица испытаний</p>
+      </div>
+      <div style="display:grid;grid-template-rows:1fr 1fr;gap:26px">
+        <div class="card row t-teal st" data-s="1" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><p class="muted" style="font-size:26px">Модели</p><h3 style="font-size:36px">Контекст</h3></div></div>
+        <div class="card row t-orange st" data-s="1" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><p class="muted" style="font-size:26px">Вам</p><h3 style="font-size:32px">Уверенность, что&nbsp;разбирается нужная версия</h3></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="161" data-title="Можно ли вместо вставки загрузить файл">
+  <p class="kick">Другой способ</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-teal"><svg class="i big-ic" style="font-size:220px"><use href="#i-file-up"/></svg></div>
+      <div>
+        <p class="say md">Можно&nbsp;ли вместо вставки <b>загрузить файл</b>?</p>
+        <p class="sub">Если сервис это поддерживает – можно</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="163">
+  <p class="kick">Что сказано в справке сервисов</p>
+  <h2>Какие файлы принимают</h2>
+  <div class="body">
+    <div class="cards" style="gap:34px">
+      <div class="card t-teal" style="padding:30px 36px;gap:22px">
+        <div style="display:flex;gap:24px;align-items:center"><i class="logo" style="width:96px;height:96px;font-size:52px;border-radius:26px">G</i><h3 style="font-size:44px">GigaChat</h3></div>
+        <p style="font-size:29px">Анализирует прикреплённые файлы</p>
+        <div class="tags" style="gap:14px"><span class="tag" style="font-size:30px;padding:6px 22px">DOCX</span><span class="tag" style="font-size:30px;padding:6px 22px">PDF</span><span class="tag" style="font-size:30px;padding:6px 22px">TXT</span></div>
+      </div>
+      <div class="card t-teal" style="padding:30px 36px;gap:22px">
+        <div style="display:flex;gap:24px;align-items:center"><i class="logo" style="width:96px;height:96px;font-size:52px;border-radius:26px">А</i><h3 style="font-size:44px">Алиса AI</h3></div>
+        <p style="font-size:29px">Один файл в&nbsp;одном сообщении, <b>до&nbsp;100&nbsp;МБ</b></p>
+        <div class="tags" style="gap:14px"><span class="tag" style="font-size:30px;padding:6px 22px">DOC</span><span class="tag" style="font-size:30px;padding:6px 22px">DOCX</span><span class="tag" style="font-size:30px;padding:6px 22px">PDF</span><span class="tag" style="font-size:30px;padding:6px 22px">TXT</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка GigaChat, работа с документами · giga.chat/help/articles/work-with-docs; справка Алисы AI, файлы в чате · alice.yandex.ru/support/ru/assistant/chat/files. Страницы открыты 10.11.2026</p>
+</section>
+
+<section class="slide" data-at="168" data-steps="171">
+  <p class="kick t-red">Электронные таблицы</p>
+  <h2>XLSX и&nbsp;CSV в&nbsp;этих разделах справки не&nbsp;названы</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:40px">
+      <div class="t-gray" style="background:var(--ct);border-radius:20px;flex-direction:row;align-items:center;justify-content:center;gap:34px;padding:30px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--c)"><svg class="i" style="font-size:120px"><use href="#i-file-question"/></svg><b style="font-size:36px;color:var(--ci)">XLSX</b></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;color:var(--c)"><svg class="i" style="font-size:120px"><use href="#i-file-question"/></svg><b style="font-size:36px;color:var(--ci)">CSV</b></div>
+      </div>
+      <div style="justify-content:center;gap:26px">
+        <div class="rule t-orange"><svg class="i"><use href="#i-clipboard-paste"/></svg><div><h3>Надёжнее</h3><p>Вставить таблицу текстом или сохранить в&nbsp;файл TXT</p></div></div>
+        <div class="rule t-teal st"><svg class="i"><use href="#i-list-checks"/></svg><div><h3>Проверить на учебной таблице</h3><p>Все&nbsp;ли строки сервис прочитал</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка GigaChat, работа с документами; справка Алисы AI, файлы в чате. Страницы открыты 10.11.2026</p>
+</section>
+
+<section class="slide" data-at="174" data-steps="182">
+  <p class="kick">Теперь объём</p>
+  <h2>Допустимый объём запроса в&nbsp;GigaChat</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:40px">
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;align-items:center;text-align:center;gap:14px"><b style="font-size:130px">4000</b><span style="font-size:33px">символов</span></div></div>
+      <div style="justify-content:center;gap:20px">
+        <p style="font-size:30px;line-height:1.22">Более длинный текст справка советует перенести в&nbsp;файл TXT или&nbsp;PDF</p>
+        <div class="rule sm t-teal st" data-s="1" style="padding:20px 28px"><svg class="i"><use href="#i-check"/></svg><div><p><b>Учебная таблица 1</b> вместе с&nbsp;запросом в&nbsp;предел укладывается</p></div></div>
+        <div class="rule sm t-red st" data-s="1" style="padding:20px 28px"><svg class="i"><use href="#i-x"/></svg><div><p><b>Таблица из&nbsp;сотен строк</b> – уже нет</p></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Справка GigaChat, частые вопросы · giga.chat/help/articles/faq. Страница открыта 10.11.2026</p>
+</section>
+
+<section class="slide h-sm" data-at="187">
+  <p class="kick">И дело не только в лимите · Liu и соавт., 2024</p>
+  <h2>В&nbsp;длинном тексте модель хуже использует середину</h2>
+  <div class="body" style="gap:22px">
+    <div style="display:grid;grid-template-columns:110px 1fr;gap:26px;align-items:end">
+      <span></span>
+      <div style="display:grid;grid-template-columns:1fr 2fr 1fr;font-size:28px;font-weight:700;color:var(--muted);text-align:center"><span>Начало</span><span>Середина</span><span>Конец</span></div>
+      <svg class="i" style="font-size:100px;color:var(--muted)"><use href="#i-file-text"/></svg>
+      <div class="segbar" style="height:110px;font-size:32px"><i class="t-teal solid" style="flex:1">лучше</i><i class="t-red" style="flex:2">хуже</i><i class="t-teal solid" style="flex:1">лучше</i></div>
+    </div>
+    <p class="note" style="font-size:28px;padding-left:136px">Как модель использует сведения в&nbsp;зависимости от&nbsp;того, где они во&nbsp;входном тексте</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu N. F., Lin K., et al. Transactions of the Association for Computational Linguistics, 2024 · doi.org/10.1162/tacl_a_00638</p>
+</section>
+
+<section class="slide" data-at="189" data-steps="190,192" data-title="Liu и соавт.: середина длинного текста">
+  <p class="kick">Цитата в переводе</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote><span class="st">Модели обычно работают лучше всего, когда нужные сведения находятся в&nbsp;начале или&nbsp;конце входного текста.</span> <span class="st">Если сведения находятся в&nbsp;середине длинного текста, результаты <b>заметно ухудшаются</b>, даже у&nbsp;моделей, специально рассчитанных на&nbsp;длинный контекст</span></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Liu N. F., Lin K. и&nbsp;соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu N. F., Lin K., et al. Transactions of the Association for Computational Linguistics, 2024 · doi.org/10.1162/tacl_a_00638</p>
+</section>
+
+<section class="slide" data-at="195">
+  <p class="kick t-orange">Сразу честная оговорка</p>
+  <h2>На&nbsp;чём проводилось исследование</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal"><h3><svg class="i"><use href="#i-check"/></svg>Проверяли</h3><ul><li>Ответы по&nbsp;набору документов</li><li>Поиск значения по&nbsp;ключу</li></ul></div>
+      <div class="col t-gray"><h3><svg class="i"><use href="#i-x"/></svg>Не проверяли</h3><ul><li>Инженерные таблицы</li></ul></div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Но оно указывает на риск</h3><p>Сведения из&nbsp;середины длинного ввода модель может использовать хуже</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu N. F., Lin K., et al. Transactions of the Association for Computational Linguistics, 2024 · doi.org/10.1162/tacl_a_00638</p>
+</section>
+
+<section class="slide dark" data-at="201" data-title="Строка из середины может выпасть из ответа">
+  <p class="kick t-orange">Для таблицы это значит</p>
+  <div class="body">
+    <div class="split s46">
+      <div style="align-items:center">
+        <div style="display:flex;flex-direction:column;gap:12px;width:330px">
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+          <i style="display:flex;align-items:center;justify-content:center;height:34px;border-radius:9px;border:3.8px dashed var(--red);color:var(--red);font-style:normal;font-size:30px;font-weight:700;line-height:1">?</i>
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+          <i style="display:block;height:34px;border-radius:9px;background:var(--surface2)"></i>
+        </div>
+      </div>
+      <div>
+        <p class="say md">Строка из&nbsp;середины может <em>выпасть из&nbsp;ответа</em></p>
+        <p class="sub">А&nbsp;по&nbsp;гладкому тексту ответа этого не&nbsp;видно</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="203">
+  <p class="kick t-orange">Строка из середины может выпасть из ответа</p>
+  <h2>Отсюда три приёма</h2>
+  <div class="body">
+    <div class="cards" style="grid-template-columns:1fr;gap:20px">
+      <div class="card row t-orange" style="padding:18px 30px;gap:26px"><span class="bdg" style="width:84px;height:84px;font-size:42px"><svg class="i"><use href="#i-list-checks"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Проверка по&nbsp;идентификаторам</h3><p style="font-size:29px">Полноту обработки таблицы проверяют по&nbsp;идентификаторам строк</p></div></div>
+      <div class="card row t-orange" style="padding:18px 30px;gap:26px"><span class="bdg" style="width:84px;height:84px;font-size:42px"><svg class="i"><use href="#i-split"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Таблица по&nbsp;частям</h3><p style="font-size:29px">Большую таблицу разбивают на&nbsp;части с&nbsp;сохранением идентификаторов</p></div></div>
+      <div class="card row t-orange" style="padding:18px 30px;gap:26px"><span class="bdg" style="width:84px;height:84px;font-size:42px"><svg class="i"><use href="#i-calculator"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Статистика в&nbsp;табличном редакторе</h3><p style="font-size:29px">Считают в&nbsp;редакторе, а&nbsp;модели дают уже итоги</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="215">
+  <p class="kick">И ещё одно наблюдение · Sui и соавт., 2024</p>
+  <h2>Форма подачи таблицы влияет на&nbsp;результат</h2>
+  <div class="body">
+    <p class="sub" style="color:var(--ink);font-size:40px">Ответы моделей по&nbsp;таблицам зависят&nbsp;от</p>
+    <div class="picts c3">
+      <div class="pict" style="gap:20px"><svg class="i" style="width:156px;height:156px;font-size:88px;border-radius:34px;padding:34px"><use href="#i-file-type"/></svg><b style="font-size:34px;white-space:nowrap">Формата ввода</b></div>
+      <div class="pict" style="gap:20px"><svg class="i" style="width:156px;height:156px;font-size:88px;border-radius:34px;padding:34px"><use href="#i-list-ordered"/></svg><b style="font-size:34px;white-space:nowrap">Порядка содержимого</b></div>
+      <div class="pict" style="gap:20px"><svg class="i" style="width:156px;height:156px;font-size:88px;border-radius:34px;padding:34px"><use href="#i-tags"/></svg><b style="font-size:34px;white-space:nowrap">Разметки</b></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sui Y., Zhou M., et al. Proceedings of the 17th ACM International Conference on Web Search and Data Mining, 2024 · doi.org/10.1145/3616855.3635752</p>
+</section>
+
+<section class="slide h-sm" data-at="220" data-steps="222">
+  <p class="kick">Другая работа того же года · Liu, Wang, Chen</p>
+  <h2>Та&nbsp;же таблица в&nbsp;другой раскладке – результат заметно хуже</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:44px">
+      <div style="flex-direction:row;align-items:center;justify-content:center;gap:26px">
+        <div class="t-teal" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="display:grid;grid-template-columns:repeat(4,38px);gap:6px;height:162px;align-content:center">
+            <i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--c)"></i>
+            <i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+            <i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+          </div>
+          <b style="font-size:26px;color:var(--c);text-align:center;line-height:1.15">Одна<br>раскладка</b>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--muted)"><svg class="i" style="font-size:60px"><use href="#i-arrow-left-right"/></svg><span style="font-size:22px;text-align:center;line-height:1.15">то&nbsp;же<br>содержание</span></div>
+        <div class="t-red" style="display:flex;flex-direction:column;align-items:center;gap:14px">
+          <div style="display:grid;grid-template-columns:repeat(3,38px);gap:6px;height:162px;align-content:center">
+            <i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+            <i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+            <i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+            <i style="height:30px;border-radius:6px;background:var(--c)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i><i style="height:30px;border-radius:6px;background:var(--ct)"></i>
+          </div>
+          <b style="font-size:26px;color:var(--c);text-align:center;line-height:1.15">Другая<br>раскладка</b>
+        </div>
+      </div>
+      <figure class="quote xs st" style="align-self:center">
+        <blockquote>Мы обнаружили, что при изменении структуры таблиц с&nbsp;тем&nbsp;же содержанием результаты <b>заметно ухудшаются</b>, особенно в&nbsp;задачах с&nbsp;символьными рассуждениями</blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Liu T., Wang F., Chen M.</b>их слова в&nbsp;переводе</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Liu T., Wang F., Chen M. NAACL 2024 · doi.org/10.18653/v1/2024.naacl-long.26</p>
+</section>
+
+<section class="slide dark" data-at="230" data-title="Практический вывод для подготовки таблицы">
+  <p class="kick t-orange">Практический вывод для подготовки таблицы</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:118px 1fr;gap:34px 36px;align-items:center">
+      <span class="t-teal" style="width:118px;height:118px;border-radius:28px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:66px"><svg class="i"><use href="#i-rows-3"/></svg></span>
+      <p style="font-size:50px;font-weight:700;line-height:1.1">Одна строка – <em>один образец</em></p>
+      <span class="t-teal" style="width:118px;height:118px;border-radius:28px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:66px"><svg class="i"><use href="#i-columns-3"/></svg></span>
+      <p style="font-size:50px;font-weight:700;line-height:1.1">Один столбец – <em>одна величина</em></p>
+      <span class="t-teal" style="width:118px;height:118px;border-radius:28px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center;font-size:66px"><svg class="i"><use href="#i-table-cells-merge"/></svg></span>
+      <p style="font-size:50px;font-weight:700;line-height:1.1">Без <em>объединённых ячеек</em><br>и&nbsp;<em>многоэтажных заголовков</em></p>
+    </div>
+  </div>
+</section>

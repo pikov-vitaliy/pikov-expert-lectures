@@ -1,0 +1,393 @@
+<!-- Лекция 4.2, строки 303–433 (14:29–20:43): считает ли модель – Ruta и соавт. (описательная статистика в пределах 1 %, критерии 32,5–92,5 %), Li и соавт. о числовых навыках, пересчёт по исходной таблице и три вопроса разработчикам; вставка 20.11 – папка протоколов для агента, SpreadsheetBench 2 (Zhu и соавт.), опись; начало раздела «Где модель ошибается с таблицами» и короткий запрос -->
+
+<section class="slide" data-at="303" data-title="А считает ли модель?">
+  <p class="kick">Что может модель</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-teal">
+        <span style="position:relative;display:inline-flex;align-items:center;justify-content:center;width:310px;height:310px;border-radius:50%;background:var(--ct);color:var(--c)"><svg class="i" style="font-size:170px"><use href="#i-calculator"/></svg><b style="position:absolute;right:0;top:0;width:104px;height:104px;border-radius:50%;background:var(--c);color:var(--chip-ink);font-size:68px;display:flex;align-items:center;justify-content:center">?</b></span>
+      </div>
+      <div>
+        <p class="say">А&nbsp;считает&nbsp;ли модель?</p>
+        <p class="sub">Данные исследований не&nbsp;так однозначны, как&nbsp;кажется</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="305" data-steps="305,307">
+  <p class="kick">Первая проверка · Ruta и соавт., 2025</p>
+  <h2>Как ChatGPT считает статистику</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:380px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-heart-pulse"/></svg></i>
+        <h3 style="font-size:40px">Ruta, Gaidici и&nbsp;соавт.</h3>
+        <p>Journal of Medical Internet Research, 2025</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div class="st" data-s="1" style="font-size:33px;padding:20px 15px"><dt>Сервис</dt><dd>ChatGPT на&nbsp;модели GPT-4 с&nbsp;выполнением кода на&nbsp;Python</dd></div>
+        <div class="st" data-s="2" style="font-size:33px;padding:20px 15px"><dt>Что считал</dt><dd>Средние, стандартные отклонения, медианы, межквартильный размах</dd></div>
+        <div class="st" data-s="2" style="font-size:33px;padding:20px 15px"><dt>Данные</dt><dd>Медицинский набор данных</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide" data-at="309">
+  <p class="kick">Ruta и соавт. · как засчитывали ответ</p>
+  <h2>Верно – если значение отклоняется от&nbsp;контрольного не&nbsp;больше чем на&nbsp;1&nbsp;%</h2>
+  <div class="body" style="gap:40px">
+    <div style="position:relative;padding-top:78px">
+      <div style="position:absolute;left:50%;top:0;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:28px;font-weight:700;white-space:nowrap">контрольное значение<i style="display:block;width:7px;height:30px;background:var(--ink);border-radius:4px"></i></div>
+      <div style="display:grid;grid-template-columns:1fr 1.15fr 1fr;height:116px;border-radius:20px;font-size:36px;font-weight:700">
+        <span class="t-red" style="background:var(--ct);color:var(--ci);display:flex;align-items:center;justify-content:center;border-radius:20px 0 0 20px">неверно</span>
+        <span class="t-teal" style="background:var(--c);color:var(--chip-ink);display:flex;align-items:center;justify-content:center">верно: ±1&nbsp;%</span>
+        <span class="t-red" style="background:var(--ct);color:var(--ci);display:flex;align-items:center;justify-content:center;border-radius:0 20px 20px 0">неверно</span>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:22px;flex-wrap:wrap;font-size:33px">
+      <span>Контрольные значения посчитаны в&nbsp;трёх статистических программах:</span>
+      <span class="tag t-gray" style="font-size:32px;padding:6px 24px">Python</span>
+      <span class="tag t-gray" style="font-size:32px;padding:6px 24px">SAS</span>
+      <span class="tag t-gray" style="font-size:32px;padding:6px 24px">R</span>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide" data-at="312" data-title="Ruta и соавт.: описательная статистика – в пределах 1 %">
+  <p class="kick">Ruta и соавт. · результаты</p>
+  <div class="body" style="gap:24px">
+    <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:26px 36px;display:grid;grid-template-columns:420px 1fr;gap:36px;align-items:center;box-shadow:0 0 0 3.8px var(--c)">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <b style="font-size:56px;line-height:1;color:var(--c);white-space:nowrap">в пределах 1&nbsp;%</b>
+        <span style="font-size:30px;font-weight:700;color:var(--ci)">Описательная статистика</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;color:var(--ci)"><b style="font-size:32px">Во&nbsp;всех попытках</b><span style="font-size:29px;line-height:1.22">средние, стандартные отклонения, медианы, межквартильные размахи</span></div>
+    </div>
+    <div class="t-orange" style="background:var(--ct);border-radius:20px;padding:26px 36px;display:flex;align-items:center;opacity:.3;filter:saturate(.4)">
+      <span style="font-size:30px;font-weight:700;color:var(--ci)">Статистические критерии</span>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide" data-at="314" data-steps="318" data-title="Ruta и соавт.: слова авторов">
+  <p class="kick">Ruta и соавт. · слова авторов в&nbsp;переводе</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>При расчёте описательной статистики он во&nbsp;всех попытках получил <b>точные средние, стандартные отклонения, медианы и&nbsp;межквартильные размахи</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Ruta M. R., Gaidici T. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+    <div class="rule t-gray st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Но</h3><p>Это результат одного исследования и&nbsp;одной модели. Не&nbsp;свойство любого сервиса с&nbsp;выполнением кода</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide" data-at="320" data-steps="324" data-title="Ruta и соавт.: статистические критерии – 32,5–92,5 %">
+  <p class="kick t-orange">Ruta и соавт. · со&nbsp;статистическими критериями иначе</p>
+  <div class="body" style="gap:24px">
+    <div class="t-teal" style="background:var(--ct);border-radius:20px;padding:26px 36px;display:grid;grid-template-columns:420px 1fr;gap:36px;align-items:center">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <b style="font-size:56px;line-height:1;color:var(--c);white-space:nowrap">в пределах 1&nbsp;%</b>
+        <span style="font-size:30px;font-weight:700;color:var(--ci)">Описательная статистика</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;color:var(--ci)"><b style="font-size:32px">Во&nbsp;всех попытках</b><span style="font-size:29px;line-height:1.22">средние, стандартные отклонения, медианы, межквартильные размахи</span></div>
+    </div>
+    <div class="t-orange" style="background:var(--ct);border-radius:20px;padding:26px 36px;display:grid;grid-template-columns:420px 1fr;gap:36px;align-items:center;box-shadow:0 0 0 3.8px var(--c)">
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <b style="font-size:56px;line-height:1;color:var(--c);white-space:nowrap">32,5–92,5&nbsp;%</b>
+        <span style="font-size:30px;font-weight:700;color:var(--ci)">Статистические критерии</span>
+        <span style="font-size:24px;color:var(--ci)">попыток, где статистика критерия и&nbsp;<span style="white-space:nowrap">p-значение</span> в&nbsp;пределах того&nbsp;же 1&nbsp;%</span>
+      </div>
+      <div class="bars st" style="--max:100;gap:14px">
+        <div class="bar" style="--v:32.5;grid-template-columns:220px 1fr 120px;gap:16px;font-size:26px"><span class="lb">простой запрос</span><i></i><b style="font-size:31px">32,5&nbsp;%</b></div>
+        <div class="bar" style="--v:81.3;grid-template-columns:220px 1fr 120px;gap:16px;font-size:26px"><span class="lb">подробнее</span><i></i><b style="font-size:31px">81,3&nbsp;%</b></div>
+        <div class="bar" style="--v:92.5;grid-template-columns:220px 1fr 120px;gap:16px;font-size:26px"><span class="lb">самый подробный</span><i></i><b style="font-size:31px">92,5&nbsp;%</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide dark" data-at="327" data-title="Ruta и соавт.: нужен контроль человека">
+  <p class="kick t-orange">Авторы предупреждают прямо</p>
+  <div class="body">
+    <figure class="quote t-orange">
+      <blockquote>Однако для точных результатов нужны<br><b>тщательно составленный запрос<br>и&nbsp;контроль человека</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Ruta M. R., Gaidici T. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ruta M. R. et al. Journal of Medical Internet Research, 2025 · doi.org/10.2196/63550</p>
+</section>
+
+<section class="slide" data-at="330">
+  <p class="kick">Другая проверка того же года · Li и соавт.</p>
+  <h2>Собственные числовые навыки моделей</h2>
+  <div class="body">
+    <p style="text-align:center;font-size:26px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Слабые места</p>
+    <div class="picts c3 t-red">
+      <div class="pict" style="font-size:33px"><svg class="i" style="width:160px;height:160px;font-size:90px;border-radius:36px"><use href="#i-calculator"/></svg><span>Базовая арифметика</span></div>
+      <div class="pict" style="font-size:33px"><svg class="i" style="width:160px;height:160px;font-size:90px;border-radius:36px"><use href="#i-text-search"/></svg><span>Поиск чисел в&nbsp;тексте</span></div>
+      <div class="pict" style="font-size:33px"><svg class="i" style="width:160px;height:160px;font-size:90px;border-radius:36px"><use href="#i-scale"/></svg><span>Сравнение величин</span></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Li H. et al. Findings of ACL 2025 · doi.org/10.18653/v1/2025.findings-acl.1026</p>
+</section>
+
+<section class="slide" data-at="334" data-title="Li и соавт.: слова авторов">
+  <p class="kick t-red">Li и соавт. · в&nbsp;переводе</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Однако их результаты в&nbsp;задачах с&nbsp;числами, таких как простая арифметика, поиск чисел и&nbsp;сравнение величин, <b>остаются на&nbsp;удивление слабыми</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Li H., Chen X. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Li H. et al. Findings of ACL 2025 · doi.org/10.18653/v1/2025.findings-acl.1026</p>
+</section>
+
+<section class="slide" data-at="339">
+  <p class="kick">Что из этого следует для работы</p>
+  <h2>Как считал сервис, по&nbsp;ответу не&nbsp;всегда видно</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 150px 1fr;gap:24px;align-items:stretch">
+      <div class="card row t-teal" style="padding:30px 30px"><span class="bdg"><svg class="i"><use href="#i-square-terminal"/></svg></span><h3 style="font-size:35px">Выполняет<br>вычисления кодом</h3></div>
+      <span style="align-self:center;justify-self:center;width:130px;height:130px;border-radius:50%;background:var(--surface2);color:var(--muted);font-size:84px;font-weight:700;display:flex;align-items:center;justify-content:center">?</span>
+      <div class="card row t-red" style="padding:30px 30px"><span class="bdg"><svg class="i"><use href="#i-type"/></svg></span><h3 style="font-size:35px">Пишет числа<br>как&nbsp;текст</h3></div>
+    </div>
+    <div class="rule t-gray"><svg class="i"><use href="#i-search-x"/></svg><div><p>Проверок именно наших сервисов на&nbsp;таблицах испытаний в&nbsp;открытых источниках не&nbsp;найдено</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="363" data-title="Числа для отчёта пересчитываем по исходной таблице">
+  <p class="kick t-orange">Поэтому</p>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
+      <span class="t-orange" style="width:190px;height:190px;border-radius:44px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:120px"><use href="#i-sheet"/></svg></span>
+      <p class="say md">Любые числа для&nbsp;отчёта<br><em>пересчитываем по&nbsp;исходной таблице</em></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="366">
+  <p class="kick t-orange">Даже если сервис считает кодом</p>
+  <h2>Проверьте, какие строки модель передала программе</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:28px 26px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:34px">Исходная таблица</h3></li>
+      <li class="step t-orange" style="padding:28px 26px 30px;gap:16px;box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><span class="bdg lg"><svg class="i"><use href="#i-list-filter"/></svg></span><h3 style="font-size:32px">Строки, которые<br>получила программа</h3><span class="tag" style="align-self:flex-start;font-size:24px">проверить</span></li>
+      <li class="step t-teal" style="padding:28px 26px 30px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:34px">Программа считает</h3></li>
+    </ol>
+    <div class="rule t-red" style="padding:24px 34px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Строки не&nbsp;те – программа аккуратно посчитает не&nbsp;ту задачу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="378">
+  <p class="kick t-orange">Если в&nbsp;вашей организации появится помощник для анализа протоколов</p>
+  <h2>Три вопроса разработчикам</h2>
+  <div class="body">
+    <div class="ask t-orange" style="grid-template-columns:200px 1fr;gap:46px">
+      <span class="q" style="width:200px;height:200px;font-size:140px">?</span>
+      <ul style="font-size:36px;gap:24px">
+        <li>Кто выполняет вычисления: модель или программа?</li>
+        <li>Видит ли пользователь подставленные значения и&nbsp;формулы или только итог?</li>
+        <li>Как помощник обращается с&nbsp;подозрительными значениями в&nbsp;таблице: отмечает или исправляет?</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="388">
+  <p class="kick">Теперь шаг дальше</p>
+  <h2>Одна таблица или целая папка протоколов</h2>
+  <div class="body">
+    <div class="vs" style="align-items:stretch">
+      <div class="col t-gray" style="padding:30px 36px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-message-square"/></svg>Одна таблица</h3>
+        <div style="display:flex;gap:16px;height:150px;align-items:flex-end">
+          <div class="doc" style="width:118px;padding:16px 16px 20px;gap:9px"><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+        </div>
+        <p style="font-size:33px">Проще разобрать в&nbsp;чате</p>
+      </div>
+      <div class="col t-teal" style="padding:30px 36px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-folder-open"/></svg>Папка протоколов</h3>
+        <div style="display:flex;gap:16px;height:150px;align-items:flex-end">
+          <div class="doc" style="width:118px;padding:16px 16px 20px;gap:9px"><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:118px;padding:16px 16px 20px;gap:9px"><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:118px;padding:16px 16px 20px;gap:9px"><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+          <div class="doc" style="width:118px;padding:16px 16px 20px;gap:9px"><i class="t"></i><i></i><i class="s"></i><i></i><i class="s"></i></div>
+        </div>
+        <p style="font-size:33px">Работа для агента в&nbsp;программе на&nbsp;компьютере</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="391">
+  <p class="kick">Папка протоколов · агент</p>
+  <h2>Он может написать небольшую программу</h2>
+  <div class="body">
+    <div class="rule sm t-red" style="padding:18px 32px"><svg class="i"><use href="#i-ban"/></svg><div><p>Читать все файлы в&nbsp;одном длинном запросе агенту не&nbsp;нужно</p></div></div>
+    <div class="picts t-teal" style="grid-template-columns:1fr 70px 1fr 70px 1fr;align-items:start">
+      <div class="pict" style="font-size:34px"><svg class="i" style="width:170px;height:170px;font-size:96px;border-radius:38px"><use href="#i-files"/></svg><b style="font-size:34px">Откроет<br>каждый файл</b></div>
+      <svg class="i" style="font-size:58px;color:var(--muted);margin-top:76px;justify-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="pict" style="font-size:34px"><svg class="i" style="width:170px;height:170px;font-size:96px;border-radius:38px"><use href="#i-table"/></svg><b style="font-size:34px">Соберёт<br>сводную таблицу</b></div>
+      <svg class="i" style="font-size:58px;color:var(--muted);margin-top:76px;justify-self:center"><use href="#i-arrow-right"/></svg>
+      <div class="pict" style="font-size:34px"><svg class="i" style="width:170px;height:170px;font-size:96px;border-radius:38px"><use href="#i-calculator"/></svg><b style="font-size:34px">Посчитает</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="393" data-steps="394">
+  <p class="kick">Препринт 2026 года · Zhu и соавт.</p>
+  <h2>Как агенты справляются с&nbsp;электронными таблицами</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:40px">
+      <div class="svc-hd t-teal" style="padding:36px 38px;gap:18px">
+        <i class="logo"><svg class="i"><use href="#i-sheet"/></svg></i>
+        <h3 style="font-size:46px">SpreadsheetBench&nbsp;2</h3>
+        <p style="font-size:28px">набор задач<br>для оценки агентов</p>
+      </div>
+      <div style="justify-content:center;gap:24px">
+        <div class="stat t-teal st" data-s="1" style="flex:none;flex-direction:row;align-items:center;gap:28px;padding:22px 32px"><b style="font-size:96px">8</b><span style="font-size:31px">сильных моделей работали агентами</span></div>
+        <div class="stat t-teal st" data-s="1" style="flex:none;flex-direction:row;align-items:center;gap:28px;padding:22px 32px"><b style="font-size:96px">321</b><span style="font-size:31px">задача – их составили эксперты по&nbsp;настоящим финансовым отчётам компаний</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhu J. et al. SpreadsheetBench 2, 2026, препринт arXiv · doi.org/10.48550/arXiv.2606.29955</p>
+</section>
+
+<section class="slide" data-at="396">
+  <p class="kick">Zhu и соавт. · лучшая модель · задачи на&nbsp;финансовое моделирование</p>
+  <h2>Что получилось</h2>
+  <div class="body" style="gap:34px">
+    <div class="bars" style="--max:100;gap:36px">
+      <div class="bar t-teal" style="--v:89.69;grid-template-columns:400px 1fr 200px;gap:24px;font-size:31px"><span class="lb">Нужных ячеек заполнено верно, в&nbsp;среднем<span style="display:block;font-size:26px;color:var(--muted);margin-top:4px">почти 9 из&nbsp;10</span></span><i style="height:66px"></i><b style="font-size:54px">89,69&nbsp;%</b></div>
+      <div class="bar t-red" style="--v:34;grid-template-columns:400px 1fr 200px;gap:24px;font-size:31px"><span class="lb">Задач, где верна вся&nbsp;таблица<span style="display:block;font-size:26px;color:var(--muted);margin-top:4px">треть задач</span></span><i style="height:66px"></i><b style="font-size:54px">34&nbsp;%</b></div>
+    </div>
+    <div class="rule sm t-gray" style="padding:20px 32px"><svg class="i"><use href="#i-info"/></svg><div><p>Задача засчитывалась, только если верна вся таблица до&nbsp;последней ячейки</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhu J. et al. SpreadsheetBench 2, 2026, препринт arXiv · doi.org/10.48550/arXiv.2606.29955</p>
+</section>
+
+<section class="slide" data-at="399" data-steps="401">
+  <p class="kick t-red">Zhu и соавт. · разбор неудачных попыток лучшей модели</p>
+  <h2>Чаще всего ошибки были двух видов</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-scan-search"/></svg></span><h3 style="font-size:35px">Недостаточно изучала таблицу</h3></div>
+      <div class="card row t-red" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-mouse-pointer-click"/></svg></span><h3 style="font-size:35px">Выбирала для изменения не&nbsp;те&nbsp;ячейки</h3></div>
+    </div>
+    <div class="rule t-gray st"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Оговорка авторов</h3><p>Задачи финансовые. На&nbsp;другие области, в&nbsp;том числе инженерную, выводы могут не&nbsp;переноситься</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhu J. et al. SpreadsheetBench 2, 2026, препринт arXiv · doi.org/10.48550/arXiv.2606.29955</p>
+</section>
+
+<section class="slide" data-at="402">
+  <p class="kick t-orange">Приём отсюда общий</p>
+  <h2>Скажите агенту</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:210px;font-size:40px;line-height:1.25;padding:30px 34px;gap:24px">
+      <p class="part t-teal"><span class="tg" style="font-size:21px;padding:8px 10px">Опись</span><span>Сначала составь опись. Какие файлы и&nbsp;листы есть, сколько строк в&nbsp;каждом, какие столбцы и&nbsp;единицы, что прочитать не&nbsp;удалось</span></p>
+      <p class="part t-orange"><span class="tg" style="font-size:21px;padding:8px 10px">Программа</span><span>И&nbsp;покажи программу, которой считаешь</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="406">
+  <p class="kick t-orange">Что проверяете вы</p>
+  <h2>Опись и&nbsp;числа сверяете с&nbsp;исходными файлами</h2>
+  <div class="body">
+    <ol class="list num big t-orange">
+      <li>Сверьте опись с&nbsp;исходной папкой<small>все ли файлы и&nbsp;листы в&nbsp;неё попали</small></li>
+      <li>Для каждого числа в&nbsp;выводе выясните, откуда оно взято</li>
+      <li>Две-три статистики пересчитайте выборочно</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide dark" data-at="409" data-title="Учебные таблицы и рабочие протоколы">
+  <p class="kick t-orange">Какие данные и&nbsp;где</p>
+  <div class="body">
+    <div class="vs" style="gap:40px;grid-template-columns:minmax(0,2fr) minmax(0,3fr)">
+      <div class="col t-teal" style="padding:48px 42px;gap:28px"><h3 style="font-size:38px"><svg class="i"><use href="#i-graduation-cap"/></svg>Учебные таблицы</h3><p style="font-size:40px;font-weight:700;line-height:1.15">Для упражнений</p></div>
+      <div class="col t-red" style="padding:48px 42px;gap:28px"><h3 style="font-size:38px"><svg class="i"><use href="#i-shield-check"/></svg>Рабочие протоколы</h3><p style="font-size:35px;font-weight:700;line-height:1.2"><span style="white-space:nowrap">Только в&nbsp;инструментах,</span><br><span style="white-space:nowrap">разрешённых вашей организацией</span><br><span style="white-space:nowrap">для&nbsp;таких данных</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="415" data-title="Где модель ошибается с таблицами">
+  <span class="no"><svg class="i"><use href="#i-bug"/></svg></span>
+  <p class="kick">Следующий раздел</p>
+  <h1>Где модель ошибается с&nbsp;таблицами</h1>
+  <p class="lead">При разборе таблиц стоит искать шесть видов ошибок</p>
+</section>
+
+<section class="slide" data-at="417" data-steps="421">
+  <p class="kick">При разборе таблиц</p>
+  <h2>Шесть видов ошибок</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:22px">
+      <div class="t-teal" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><b style="font-size:58px;line-height:1;color:var(--c)">1</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-bug"/></svg></div>
+      <div class="t-teal" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><b style="font-size:58px;line-height:1;color:var(--c)">2</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-bug"/></svg></div>
+      <div class="t-teal" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><b style="font-size:58px;line-height:1;color:var(--c)">3</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-bug"/></svg></div>
+      <div class="t-teal" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><b style="font-size:58px;line-height:1;color:var(--c)">4</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-bug"/></svg></div>
+      <div class="t-teal" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px"><b style="font-size:58px;line-height:1;color:var(--c)">5</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-bug"/></svg></div>
+      <div class="t-orange st" data-s="1" style="background:var(--ct);border-radius:22px;height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;box-shadow:0 0 0 3.8px var(--c)"><b style="font-size:58px;line-height:1;color:var(--c)">6</b><svg class="i" style="font-size:66px;color:var(--c)"><use href="#i-ruler"/></svg></div>
+    </div>
+    <div class="rule t-orange st" data-s="1"><svg class="i"><use href="#i-ruler"/></svg><div><h3>Ещё один вид ошибки</h3><p>Допуск, применённый не&nbsp;к&nbsp;тем условиям</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="423">
+  <p class="kick">Учебный ответ модели по&nbsp;таблице&nbsp;1</p>
+  <h2>Выглядит законченным</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center">
+      <div class="center">
+        <div class="doc t-teal" style="width:330px;gap:13px;padding:26px 28px 36px">
+          <h4 style="font-size:26px">Ответ модели</h4>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">
+            <i class="t"></i><i class="t"></i><i class="t"></i><i class="t"></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+            <i></i><i></i><i></i><i></i>
+          </div>
+          <i></i><i class="s"></i><i></i><i class="s"></i>
+          <b class="stamp">на вид готов</b>
+        </div>
+      </div>
+      <div style="gap:26px">
+        <div class="cards sm" style="gap:16px 18px">
+          <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:31px">Таблица</h3></div>
+          <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:31px">Оценки</h3></div>
+          <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-sigma"/></svg></span><h3 style="font-size:31px">Средний ток</h3></div>
+          <div class="card row t-gray"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><h3 style="font-size:31px">Вывод</h3></div>
+        </div>
+        <p class="say sm">Ничего не&nbsp;бросается в&nbsp;глаза</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="426" data-steps="431">
+  <p class="kick">Запрос, на&nbsp;который «отвечала модель»</p>
+  <h2>Таблица 1 и&nbsp;короткая просьба</h2>
+  <div class="body">
+    <div class="split" style="align-items:center;gap:44px">
+      <div class="chat">
+        <div class="msg user" style="max-width:100%;font-size:33px;padding:26px 30px"><span class="who" style="font-size:20px">Запрос</span><p><span class="tag t-gray" style="font-size:24px">Таблица 1</span></p><p>Оцени результаты испытаний по&nbsp;п.&nbsp;4.3 и&nbsp;4.5 ТЗ, посчитай средний ток и&nbsp;разброс, сделай&nbsp;вывод</p></div>
+      </div>
+      <div style="gap:18px">
+        <p class="st" data-s="1" style="font-size:24px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--red)">Чего в&nbsp;нём нет</p>
+        <ul class="list cross t-red" style="font-size:32px;gap:20px">
+          <li class="st" data-s="1">Просьбы проверить число строк</li>
+          <li class="st" data-s="1">Вопроса, по&nbsp;каким образцам&nbsp;считать</li>
+          <li class="st" data-s="1">Запрета исправлять значения и&nbsp;объяснять причины</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>

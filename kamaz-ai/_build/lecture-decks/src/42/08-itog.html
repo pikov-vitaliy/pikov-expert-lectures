@@ -1,0 +1,290 @@
+<!-- Лекция 4.2, строки 839–942 (39:31–45:00): раздел технического отчёта (структура из семи пунктов, запрос и ограничения), граница между работой с моделью и отпиской (Jakesch и соавт., Weber-Wulff и соавт., ICMJE), предвзятость автоматизации (Lyell, Coiera), итог лекции и главная мысль темы -->
+
+<section class="slide" data-at="839">
+  <p class="kick">Раздел технического отчёта</p>
+  <h2>Модель хорошо пишет черновик раздела</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:360px 1fr;gap:70px;align-items:center">
+      <div class="center">
+        <div class="doc t-teal" style="width:300px;gap:14px;padding:28px 28px 40px">
+          <h4 style="font-size:25px">Результаты испытаний</h4>
+          <i class="t"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i class="s"></i>
+          <b class="stamp" style="font-size:22px;padding:8px 18px">черновик</b>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <p style="font-size:28px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Если</p>
+        <div class="card row t-teal" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-list-ordered"/></svg></span><h3 style="font-size:38px">Дать ей структуру раздела</h3></div>
+        <div class="card row t-orange" style="padding:26px 30px"><span class="bdg lg"><svg class="i"><use href="#i-ban"/></svg></span><h3 style="font-size:38px">Запретить выходить за&nbsp;данные</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="842" data-steps="843,845,847,850,853,856,858">
+  <p class="kick">Удобная структура</p>
+  <h2>Раздел «Результаты испытаний»</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 64px;align-items:start">
+      <ol class="list num" style="font-size:30px;gap:20px">
+        <li class="st">Объект и условия испытаний<small style="font-size:23px">Что испытывали, сколько образцов, какие замеры, при&nbsp;каких условиях</small></li>
+        <li class="st">Применимые требования<small style="font-size:23px">Пункты ТЗ с&nbsp;допусками и&nbsp;условиями, к&nbsp;которым они&nbsp;относятся</small></li>
+        <li class="st">Результаты<small style="font-size:23px">Таблица или ссылка на&nbsp;протокол. Статистики – с&nbsp;указанием, по&nbsp;каким образцам</small></li>
+        <li class="st">Несоответствия<small style="font-size:23px">Поимённо: какой образец, какое значение, по&nbsp;какому пункту</small></li>
+      </ol>
+      <ol class="list num" style="font-size:30px;gap:20px;counter-reset:n 4">
+        <li class="st">Вопросы к&nbsp;данным<small style="font-size:23px">Подозрительные значения и&nbsp;пропуски, что с&nbsp;ними предлагается сделать</small></li>
+        <li class="st">Выводы<small style="font-size:23px">Только то, что следует из&nbsp;таблицы, с&nbsp;оговоркой об&nbsp;объёме выборки</small></li>
+        <li class="st t-orange">Как проверено<small style="font-size:23px">Что пересчитано и&nbsp;что сверено</small></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="861">
+  <p class="kick">Запрос к&nbsp;модели</p>
+  <h2>Роль, данные, задача, формат, ограничения</h2>
+  <div class="body" style="gap:40px">
+    <div class="picts" style="grid-template-columns:repeat(5,1fr);gap:22px;font-size:30px">
+      <div class="pict t-gray"><svg class="i"><use href="#i-user-round"/></svg><span style="font-size:30px">Роль</span></div>
+      <div class="pict t-gray"><svg class="i"><use href="#i-table"/></svg><span style="font-size:30px">Данные</span></div>
+      <div class="pict t-gray"><svg class="i"><use href="#i-target"/></svg><span style="font-size:30px">Задача</span></div>
+      <div class="pict t-gray"><svg class="i"><use href="#i-layout-list"/></svg><span style="font-size:30px">Формат</span></div>
+      <div class="pict t-orange" style="background:var(--surface);box-shadow:0 0 0 3.8px var(--c)"><svg class="i"><use href="#i-ban"/></svg><span style="font-size:30px"><b style="font-size:30px">Ограничения</b></span></div>
+    </div>
+    <p class="say sm" style="text-align:center;max-width:none">Здесь главные – <em>ограничения</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="864" data-steps="868">
+  <p class="kick t-orange">Ограничения в&nbsp;запросе</p>
+  <h2>Не выходить за&nbsp;данные таблицы</h2>
+  <div class="body">
+    <div class="prompt" style="--tw:230px;font-size:31px;line-height:1.24;padding:24px 30px;gap:14px">
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:19px;padding:8px 10px">Значения</span><span>Не добавляй значений, которых нет в&nbsp;таблице</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:19px;padding:8px 10px">Причины</span><span>Не объясняй причины</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:19px;padding:8px 10px">Подозрительное</span><span>Подозрительные значения не&nbsp;исправляй, а&nbsp;перечисли&nbsp;отдельно</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:19px;padding:8px 10px">Требования</span><span>Если по&nbsp;таблице нельзя оценить требование, так и&nbsp;напиши</span></p>
+      <p class="part t-red st" style="align-items:center"><span class="tg" style="font-size:19px;padding:8px 10px">Слова</span><span>Не используй слова «стабильно» и&nbsp;«надёжно», если это не&nbsp;следует из&nbsp;данных</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="870">
+  <p class="kick t-orange">После черновика</p>
+  <h2>Черновик модели – ещё не&nbsp;раздел отчёта</h2>
+  <div class="body" style="gap:34px">
+    <ol class="flow nonum">
+      <li class="step t-teal"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3>Черновик модели</h3></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3>Проверка по&nbsp;выборочному пересчёту</h3></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-pencil-line"/></svg></span><h3>Правка вручную</h3></li>
+      <li class="step t-orange"><span class="bdg"><svg class="i"><use href="#i-clipboard-check"/></svg></span><h3>Строка «Как&nbsp;проверено»</h3></li>
+    </ol>
+    <div class="rule t-orange"><svg class="i"><use href="#i-signature"/></svg><div><h3>Итог</h3><p>Раздел, который вы готовы подписать</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="877" data-title="Граница между работой с моделью и отпиской">
+  <p class="kick t-orange">Раздел, который готовила модель</p>
+  <div class="body">
+    <div class="split s73" style="align-items:center">
+      <div style="display:flex;flex-direction:column;gap:34px">
+        <p class="say md">Где граница между работой, сделанной <b>с&nbsp;моделью</b>, и&nbsp;<em>отпиской?</em></p>
+        <p class="sub">По тексту её не&nbsp;провести</p>
+      </div>
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:220px;color:var(--c)"><use href="#i-circle-help"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="880" data-steps="882">
+  <p class="kick">Jakesch, Hancock, Naaman · 2023 · кто написал короткий текст о&nbsp;себе</p>
+  <h2>Человек или модель?</h2>
+  <div class="body" style="gap:34px">
+    <div class="stats md">
+      <div class="stat t-teal"><b>6</b><span>экспериментов</span></div>
+      <div class="stat t-teal"><b>4600</b><span>участников</span></div>
+    </div>
+    <div class="st" style="display:flex;flex-direction:column;gap:10px">
+      <div class="bars" style="--max:100;--lbw:430px;gap:16px">
+        <div class="bar t-red" style="--v:52;font-size:30px"><span class="lb">Верные ответы участников</span><i style="height:50px"></i><b style="font-size:42px">50–52&nbsp;%</b></div>
+      </div>
+      <p class="note" style="padding-left:450px;font-size:27px">В трёх основных экспериментах – почти как при&nbsp;случайном&nbsp;выборе</p>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg><span>Jakesch M., Hancock J. T., Naaman M. Proceedings of the National Academy of Sciences, 2023 · <span style="white-space:nowrap">doi.org/10.1073/pnas.2208839120</span></span></p>
+</section>
+
+<section class="slide" data-at="883" data-steps="885">
+  <p class="kick">Weber-Wulff и&nbsp;соавт. · 2023</p>
+  <h2>Программы-детекторы тоже не&nbsp;выручают</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:330px 1fr;gap:56px;align-items:center">
+      <div class="stats"><div class="stat t-teal" style="justify-content:center;gap:10px;padding:30px 30px"><b style="font-size:150px">14</b><span style="font-size:30px">программ проверили авторы</span><span class="muted" style="font-size:24px">в&nbsp;том числе Turnitin и&nbsp;PlagiarismCheck</span></div></div>
+      <figure class="quote sm t-red st">
+        <blockquote>Доступные инструменты обнаружения <b>неточны и&nbsp;ненадёжны</b> и&nbsp;чаще относят текст к&nbsp;написанному человеком, чем выявляют текст, созданный&nbsp;ИИ</blockquote>
+        <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Weber-Wulff D. и&nbsp;соавт.</b>вывод авторов, перевод</span></figcaption>
+      </figure>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg><span>Weber-Wulff D., Anohina-Naumeca A., et al. International Journal for Educational Integrity, 2023 · <span style="white-space:nowrap">doi.org/10.1007/s40979-023-00146-z</span></span></p>
+</section>
+
+<section class="slide dark" data-at="886" data-title="Судить по тому, кто и что проверил и кто отвечает">
+  <p class="kick t-orange">Если по&nbsp;тексту не&nbsp;отличить</p>
+  <div class="body" style="gap:44px">
+    <p class="say md">Судить приходится по&nbsp;другому:</p>
+    <div class="cards" style="gap:34px">
+      <div class="card row t-teal" style="padding:28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:40px">Кто и&nbsp;что проверил</h3></div>
+      <div class="card row t-orange" style="padding:28px 32px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><h3 style="font-size:40px">Кто за&nbsp;это отвечает</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="887" data-steps="888,890">
+  <p class="kick">Похожее правило · редакторы медицинских журналов</p>
+  <h2>Чат-бот нельзя указывать автором</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red st" style="padding:30px 36px"><h3><svg class="i"><use href="#i-bot"/></svg>Чат-бот</h3><ul style="font-size:31px"><li>Автором не&nbsp;указывается</li><li>Не может отвечать за&nbsp;точность&nbsp;работы</li></ul></div>
+      <div class="col t-orange st" style="padding:30px 36px"><h3><svg class="i"><use href="#i-users"/></svg>Авторы</h3><ul style="font-size:31px"><li>Сами описывают, как пользовались ИИ</li><li>Отвечают за&nbsp;работу</li></ul></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg><span>International Committee of Medical Journal Editors (ICMJE). Recommendations, Updated January 2026, раздел V, пункт A · <span style="white-space:nowrap">icmje.org</span></span></p>
+</section>
+
+<section class="slide" data-at="891" data-steps="891,893,895">
+  <p class="kick t-orange">В отчёте по&nbsp;испытаниям</p>
+  <h2>Что сказать о&nbsp;работе с&nbsp;моделью</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:300px 1fr;gap:60px;align-items:center">
+      <div class="center">
+        <div class="doc t-orange" style="width:270px;gap:13px;padding:26px 26px 36px">
+          <h4 style="font-size:23px">Раздел отчёта</h4>
+          <i></i><i class="s"></i><i class="hl"></i><i></i><i class="s"></i><i></i><i class="hl"></i><i class="s"></i>
+          <b class="stamp">как проверено</b>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:26px">
+        <ul class="list num" style="font-size:33px;gap:24px">
+          <li class="st t-teal">Какую часть работы поручили модели<small style="font-size:26px">Например, черновик раздела по&nbsp;таблице</small></li>
+          <li class="st t-orange">Строка «Как проверено»<small style="font-size:26px">Что пересчитали и&nbsp;с&nbsp;чем сверили. Читатель сможет повторить&nbsp;проверку</small></li>
+        </ul>
+        <div class="rule sm t-gray st"><svg class="i"><use href="#i-book-open-text"/></svg><div><p>Если в&nbsp;организации установлен порядок оформления отчёта, следуйте ему</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="898" data-steps="900">
+  <p class="kick">И последнее в&nbsp;этом разделе</p>
+  <h2>Почему так важно сделать проверку простой?</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 260px;gap:60px;align-items:center">
+      <div class="term t-red st">
+        <dfn>Предвзятость автоматизации</dfn>
+        <p>Склонность принимать предложение автоматической системы без&nbsp;достаточной проверки</p>
+      </div>
+      <div class="center t-red"><svg class="i big-ic" style="font-size:200px;color:var(--c)"><use href="#i-circle-help"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="903" data-steps="913">
+  <p class="kick">Обзор Lyell и&nbsp;Coiera · 2017</p>
+  <h2>Склонность соглашаться с&nbsp;системой сильнее там, где проверка сложна</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 1fr;gap:56px;align-items:center">
+      <div class="card row t-gray" style="padding:28px 30px"><span class="bdg lg"><svg class="i"><use href="#i-book-open-text"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><p class="muted" style="font-size:25px">Систематический обзор</p><h3 style="font-size:33px">Предвзятость автоматизации и&nbsp;сложность проверки</h3></div></div>
+      <div class="st" style="display:flex;align-items:center;gap:40px">
+        <div class="doc t-teal" style="width:230px;gap:11px;padding:24px 24px 34px;flex:none">
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px"><i class="t"></i><i class="t"></i><i class="t"></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          <i></i><i class="s"></i><i></i>
+          <b class="stamp">на вид готов</b>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <h3 style="font-size:33px;line-height:1.15">Гладкий черновик вывода с&nbsp;аккуратной таблицей</h3>
+          <p style="font-size:28px;color:var(--muted)">С ним хочется согласиться</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg><span>Lyell D., Coiera E. Journal of the American Medical Informatics Association, 2017 · <span style="white-space:nowrap">doi.org/10.1093/jamia/ocw105</span></span></p>
+</section>
+
+<section class="slide" data-at="915" data-steps="916">
+  <p class="kick t-orange">Выборочный пересчёт</p>
+  <h2>Шесть шагов делают проверку простой</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:18px 24px">
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">1</span><h3 style="font-size:28px">Строки и&nbsp;идентификаторы</h3></div>
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">2</span><h3 style="font-size:28px">Каждое число&nbsp;– в&nbsp;таблице</h3></div>
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">3</span><h3 style="font-size:28px">Две-три статистики</h3></div>
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">4</span><h3 style="font-size:28px">Каждое «вне&nbsp;допуска»</h3></div>
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">5</span><h3 style="font-size:28px">Подозрительные значения</h3></div>
+      <div class="card row t-teal" style="padding:18px 22px;gap:18px"><span class="bdg" style="font-size:30px;font-weight:700">6</span><h3 style="font-size:28px">Формулировки выводов</h3></div>
+    </div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-clipboard-check"/></svg><div><h3>В отчёте</h3><p>Какие результаты подтвердила ваша проверка</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="920">
+  <p class="kick">Подведём итог</p>
+  <h2>Таблицу модели дают текстом</h2>
+  <div class="body" style="gap:34px">
+    <ul class="list check" style="font-size:40px;gap:26px">
+      <li>Одна строка – один образец</li>
+      <li>Заголовки с&nbsp;единицами</li>
+      <li>Идентификаторы строк</li>
+      <li>Условия и&nbsp;требования перед таблицей</li>
+    </ul>
+    <div class="rule t-red"><svg class="i"><use href="#i-lock"/></svg><div><p>Реальные результаты – только в&nbsp;сервис, соответствующий уровню данных</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="927">
+  <p class="kick">Подведём итог</p>
+  <h2>Что модель делает быстро</h2>
+  <div class="body">
+    <div class="picts c4" style="gap:28px">
+      <div class="pict t-teal" style="font-size:31px;gap:22px"><svg class="i" style="width:160px;height:160px;font-size:90px;padding:32px"><use href="#i-file-text"/></svg><span>Описывает данные</span></div>
+      <div class="pict t-teal" style="font-size:31px;gap:22px"><svg class="i" style="width:160px;height:160px;font-size:90px;padding:32px"><use href="#i-scan-search"/></svg><span>Находит явные отклонения и&nbsp;выбросы</span></div>
+      <div class="pict t-teal" style="font-size:31px;gap:22px"><svg class="i" style="width:160px;height:160px;font-size:90px;padding:32px"><use href="#i-chart-line"/></svg><span>Предлагает графики</span></div>
+      <div class="pict t-teal" style="font-size:31px;gap:22px"><svg class="i" style="width:160px;height:160px;font-size:90px;padding:32px"><use href="#i-file-pen-line"/></svg><span>Пишет черновик вывода</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="930" data-steps="933">
+  <p class="kick">Подведём итог</p>
+  <h2>Типичные ошибки и&nbsp;выборочная проверка</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red" style="padding:26px 32px"><h3><svg class="i"><use href="#i-triangle-alert"/></svg>Типичные ошибки</h3><ul style="font-size:29px;gap:10px"><li>Пропущенная строка</li><li>Выдуманное значение</li><li>Неверное среднее</li><li>Тихая правка</li><li>Не тот допуск</li><li>Вывод шире данных</li></ul></div>
+      <div class="col t-orange st" style="padding:26px 32px"><h3><svg class="i"><use href="#i-search-check"/></svg>Проверка по&nbsp;каждому виду</h3><ul style="font-size:29px;gap:10px"><li>Строки</li><li>Числа</li><li>Две-три статистики</li><li>Каждое «вне допуска»</li><li>Подозрительные значения</li><li>Формулировки</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="936">
+  <p class="kick">Подведём итог</p>
+  <h2>Маленькая выборка – ориентир</h2>
+  <div class="body" style="gap:34px">
+    <p class="say sm">В отчёте пишут:</p>
+    <div class="cards c3">
+      <div class="card t-orange" style="align-items:center;text-align:center;padding:44px 24px;gap:22px"><span class="bdg lg" style="transform:scale(1.3)"><svg class="i"><use href="#i-hash"/></svg></span><h3 style="font-size:42px">Объём</h3></div>
+      <div class="card t-orange" style="align-items:center;text-align:center;padding:44px 24px;gap:22px"><span class="bdg lg" style="transform:scale(1.3)"><svg class="i"><use href="#i-ruler"/></svg></span><h3 style="font-size:42px">Ограничения</h3></div>
+      <div class="card t-orange" style="align-items:center;text-align:center;padding:44px 24px;gap:22px"><span class="bdg lg" style="transform:scale(1.3)"><svg class="i"><use href="#i-clipboard-check"/></svg></span><h3 style="font-size:42px">Способ проверки</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="939" data-title="Модель быстро разбирает таблицу, ошибки модели в отчёт не попадают">
+  <p class="kick t-orange">И снова главная мысль темы</p>
+  <div class="body">
+    <div class="split s73">
+      <p class="say" style="font-size:80px;line-height:1.1">Модель <b>быстро<br>разбирает</b> таблицу.<br>Ошибки модели<br><em>в&nbsp;отчёт не&nbsp;попадают</em></p>
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:250px"><use href="#i-shield-check"/></svg></div>
+    </div>
+  </div>
+</section>

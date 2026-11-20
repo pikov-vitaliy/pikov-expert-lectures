@@ -1,0 +1,216 @@
+<!-- Лекция 4.1, строки 305–431 (16:08–21:35): постановка расчётной задачи (карточка и таблица для цепи фар, подстановка с единицами, запрет додумывать), расчётная схема и единицы – анализ размерностей, смешение кратных единиц, предел проверки, схема размерностей, Sasaki и соавт. о сравнении величин с разными единицами -->
+
+<section class="slide sect" data-at="305" data-title="Постановка расчётной задачи">
+  <span class="no"><svg class="i"><use href="#i-clipboard-list"/></svg></span>
+  <p class="kick">Что задаёт инженер</p>
+  <h1>Постановка<br>расчётной задачи</h1>
+  <p class="lead">Основа – карточка задачи из&nbsp;первого дня</p>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px">
+    <div class="t-gray" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-database"/></svg><b style="font-size:29px;line-height:1.15">Исходные данные</b></div>
+    <div class="t-gray" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-target"/></svg><b style="font-size:29px;line-height:1.15">Ожидаемый результат</b></div>
+    <div class="t-gray" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-list-checks"/></svg><b style="font-size:29px;line-height:1.15">Критерии приёмки</b></div>
+    <div class="t-gray" style="background:var(--ct);color:var(--ci);border-radius:16px;padding:18px 22px;border-top:6px solid var(--c);display:flex;flex-direction:column;gap:12px"><svg class="i" style="font-size:44px;color:var(--c)"><use href="#i-ban"/></svg><b style="font-size:29px;line-height:1.15">Ограничения</b></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="308" data-title="Всё, что модель додумывает, – возможная ошибка">
+  <p class="kick t-orange">Для расчёта карточка становится подробнее</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:230px"><use href="#i-dices"/></svg></div>
+      <div>
+        <p class="say md">Всё, что модель додумывает, – <em style="white-space:nowrap">возможная ошибка</em></p>
+        <p class="sub">Чем точнее поставлена задача, тем меньше модели приходится додумывать</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="311" data-steps="311,316,319">
+  <p class="kick">Постановка расчётной задачи · 1 из 2</p>
+  <h2>Что указать и как это выглядит для&nbsp;цепи&nbsp;фар</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:30%;padding:15px 24px">Что указать</th><th style="padding:15px 24px">Пример для цепи фар</th></tr></thead>
+      <tbody>
+        <tr class="st"><td style="padding:18px 24px">Исходные данные с&nbsp;единицами</td><td style="padding:18px 24px"><var style="font-family:Cambria,Georgia,serif">I</var> = 6&nbsp;А, <var style="font-family:Cambria,Georgia,serif">L</var> = 6&nbsp;м, <var style="font-family:Cambria,Georgia,serif">ρ</var> = 0,0175&nbsp;Ом·мм²/м, сеть 24&nbsp;В</td></tr>
+        <tr class="st"><td style="padding:18px 24px">Расчётная схема</td><td style="padding:18px 24px">Цепь двухпроводная: <var style="font-family:Cambria,Georgia,serif">l</var> = 2<var style="font-family:Cambria,Georgia,serif">L</var> – суммарная длина прямого и&nbsp;обратного провода<br>Возврат через раму не&nbsp;рассматривается</td></tr>
+        <tr class="st"><td style="padding:18px 24px">Допущения</td><td style="padding:18px 24px">Ток постоянный и&nbsp;не&nbsp;зависит от&nbsp;напряжения<br>Температура провода 20&nbsp;°C<br>Сопротивление контактов не&nbsp;учитывается</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="323" data-steps="323,326,329">
+  <p class="kick">Постановка расчётной задачи · 2 из 2</p>
+  <h2>Границы, формат результата и&nbsp;нехватка данных</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:30px">
+      <thead><tr><th style="width:30%;padding:14px 24px">Что указать</th><th style="padding:14px 24px">Пример для цепи фар</th></tr></thead>
+      <tbody>
+        <tr class="st"><td style="padding:16px 24px">Границы</td><td style="padding:16px 24px">Ряд сечений 0,75–4,0&nbsp;мм²<br>Падение напряжения не&nbsp;более 3&nbsp;% от&nbsp;24&nbsp;В<br>Предохранитель не&nbsp;больше допустимого тока провода</td></tr>
+        <tr class="st"><td style="padding:16px 24px">Формат результата</td><td style="padding:16px 24px">Таблица шагов: величина – формула – подстановка с&nbsp;единицами – результат с&nbsp;единицами<br>Отдельной строкой – все допущения</td></tr>
+        <tr class="st"><td style="padding:16px 24px">Если данных не&nbsp;хватает</td><td style="padding:16px 24px">Перечислить недостающие данные и&nbsp;не&nbsp;подставлять значения от&nbsp;себя</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="338" data-steps="338,341">
+  <p class="kick">Две строки таблицы особенно полезны · 1 из 2</p>
+  <h2>Подстановка с единицами</h2>
+  <div class="body">
+    <div class="st t-red" data-s="1" style="background:var(--surface);border-radius:20px;padding:20px 34px 24px;border-left:11px solid var(--c);display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Голые числа</p>
+      <p style="font-size:42px;font-weight:600;display:flex;align-items:center;gap:14px"><span><var style="font-family:Cambria,Georgia,serif">S</var><sub style="font-size:.6em">min</sub> =</span><i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i>×<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i>×<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i>/<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i></p>
+    </div>
+    <div class="st t-teal" data-s="2" style="background:var(--surface);border-radius:20px;padding:20px 34px 24px;border-left:11px solid var(--c);display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--c)">Каждое число – вместе с&nbsp;единицей</p>
+      <p style="font-size:42px;font-weight:600;display:flex;align-items:center;gap:14px"><span><var style="font-family:Cambria,Georgia,serif">S</var><sub style="font-size:.6em">min</sub> =</span><i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i><b style="color:var(--c)">Ом·мм²/м</b>×<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i><b style="color:var(--c)">м</b>×<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i><b style="color:var(--c)">А</b>/<i style="display:inline-block;width:62px;height:40px;border-radius:9px;background:var(--line)"></i><b style="color:var(--c)">В</b></p>
+    </div>
+    <div class="st" data-s="2" style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+      <div class="rule sm t-teal" style="padding:20px 30px"><svg class="i"><use href="#i-eye"/></svg><div><p>Ошибку в&nbsp;единицах видно сразу</p></div></div>
+      <div class="rule sm t-teal" style="padding:20px 30px"><svg class="i"><use href="#i-calculator"/></svg><div><p>Строку легко пересчитать на&nbsp;калькуляторе</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="345" data-steps="345,348">
+  <p class="kick">Две строки таблицы особенно полезны · 2 из 2</p>
+  <h2>Запрет додумывать</h2>
+  <div class="body">
+    <div class="chat st" data-s="1"><div class="msg user" style="align-self:stretch;max-width:100%;font-size:40px;padding:24px 36px"><span class="who" style="font-size:21px">Строка запроса</span><p style="color:var(--on_graphite)">Если данных не&nbsp;хватает, перечисли их</p></div></div>
+    <div class="st" data-s="2" style="display:grid;grid-template-columns:1fr 1fr;gap:28px">
+      <div class="card row t-teal" style="padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-trending-down"/></svg></span><h3 style="font-size:31px">Модель реже подставляет придуманное значение</h3></div>
+      <div class="card row t-red" style="padding:22px 28px"><span class="bdg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:31px">Но&nbsp;реже – не&nbsp;значит никогда</h3></div>
+    </div>
+    <div class="rule t-orange st" data-s="2" style="padding:22px 34px"><svg class="i"><use href="#i-list-checks"/></svg><div><p>Поэтому каждое число в&nbsp;ответе сверяется с&nbsp;условием</p></div></div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="353" data-title="Расчётная схема и единицы измерения">
+  <span class="no"><svg class="i"><use href="#i-pencil-ruler"/></svg></span>
+  <p class="kick">Самая дешёвая проверка</p>
+  <h1>Расчётная схема<br>и&nbsp;единицы измерения</h1>
+  <div class="term" style="margin-top:12px"><dfn style="font-size:46px">Анализ размерностей</dfn><p style="font-size:34px">Подставьте в&nbsp;формулу единицы вместо чисел<br>и&nbsp;посмотрите, что получится</p></div>
+</section>
+
+<section class="slide" data-at="356" data-steps="356,361,373,378">
+  <p class="kick">Анализ размерностей · единицы вместо чисел</p>
+  <h2>Формулы задачи о&nbsp;сечении провода</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:44%;padding:13px 24px">Формула</th><th style="padding:13px 24px">Единицы после подстановки</th></tr></thead>
+      <tbody>
+        <tr class="st"><td style="padding:12px 24px;font-weight:400"><small style="display:block;font-size:22px;color:var(--muted);font-weight:700">Сопротивление провода</small><span style="font-size:36px"><var style="font-family:Cambria,Georgia,serif">R</var> = <var style="font-family:Cambria,Georgia,serif">ρ</var> · <var style="font-family:Cambria,Georgia,serif">l</var> / <var style="font-family:Cambria,Georgia,serif">S</var></span></td><td style="padding:12px 24px;vertical-align:middle">Ом·мм²/м × м / мм² = <b style="color:var(--teal)">Ом</b> <svg class="i" style="color:var(--teal)"><use href="#i-check"/></svg></td></tr>
+        <tr class="st"><td style="padding:12px 24px;font-weight:400"><small style="display:block;font-size:22px;color:var(--muted);font-weight:700">Падение напряжения</small><span style="font-size:36px">Δ<var style="font-family:Cambria,Georgia,serif">U</var> = <var style="font-family:Cambria,Georgia,serif">I</var> · <var style="font-family:Cambria,Georgia,serif">R</var></span></td><td style="padding:12px 24px;vertical-align:middle">А × Ом = <b style="color:var(--teal)">В</b> <svg class="i" style="color:var(--teal)"><use href="#i-check"/></svg></td></tr>
+        <tr class="st"><td style="padding:12px 24px;font-weight:400"><small style="display:block;font-size:22px;color:var(--muted);font-weight:700">Минимальное сечение</small><span style="font-size:36px"><var style="font-family:Cambria,Georgia,serif">S</var><sub style="font-size:.6em">min</sub> = <var style="font-family:Cambria,Georgia,serif">ρ</var> · <var style="font-family:Cambria,Georgia,serif">l</var> · <var style="font-family:Cambria,Georgia,serif">I</var> / Δ<var style="font-family:Cambria,Georgia,serif">U</var><sub style="font-size:.6em">доп</sub></span></td><td style="padding:12px 24px;vertical-align:middle">Ом·мм²/м × м × А / В = <b style="color:var(--teal)">мм²</b> <svg class="i" style="color:var(--teal)"><use href="#i-check"/></svg><small style="display:block;font-size:22px;color:var(--muted)">после сокращения: Ом × А = В</small></td></tr>
+      </tbody>
+    </table>
+    <div class="rule sm t-orange st" style="padding:18px 30px"><svg class="i"><use href="#i-list-checks"/></svg><div><p><b>Сначала</b> назовите величину, которую хотите получить. <b>Затем</b> сверьте её единицу с&nbsp;той, что вышла после подстановки</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="380" data-steps="380,383">
+  <p class="kick t-red">Отдельная ловушка</p>
+  <h2>Смешение кратных единиц</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 60px 0.8fr 60px 1fr;align-items:stretch">
+      <div class="stat t-gray st" data-s="1" style="justify-content:center;gap:10px;padding:26px 30px"><span style="font-size:26px">Удельное сопротивление меди</span><b style="font-size:62px">≈&nbsp;1,7&nbsp;·&nbsp;10<sup style="font-size:.55em">−8</sup></b><span style="font-size:28px;font-weight:700">Ом·м</span></div>
+      <div class="st" data-s="2" style="display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:46px;color:var(--muted)"><use href="#i-plus"/></svg></div>
+      <div class="stat t-gray st" data-s="2" style="justify-content:center;gap:10px;padding:26px 30px"><span style="font-size:26px">Сечение</span><b style="font-size:62px">мм²</b><span style="font-size:26px">в той&nbsp;же формуле</span></div>
+      <div class="st" data-s="2" style="display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:46px;color:var(--muted)"><use href="#i-equal"/></svg></div>
+      <div class="stat t-red st" data-s="2" style="justify-content:center;gap:10px;padding:26px 30px"><span style="font-size:26px">Ошибка</span><b style="font-size:62px">в&nbsp;10<sup style="font-size:.55em">6</sup>&nbsp;раз</b><span style="font-size:28px;font-weight:700">в&nbsp;миллион раз</span></div>
+    </div>
+    <div class="rule sm t-gray st" data-s="2" style="padding:20px 32px"><svg class="i"><use href="#i-ruler"/></svg><div><p><b>Видно по&nbsp;порядку величины:</b> сечение провода фар не&nbsp;бывает ни&nbsp;микроскопическим, ни&nbsp;в&nbsp;квадратный метр</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="388" data-title="Предел анализа размерностей">
+  <p class="kick t-orange">Но у анализа размерностей есть предел</p>
+  <div class="body">
+    <div class="vs" style="gap:36px">
+      <div class="col t-teal" style="padding:32px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-check"/></svg>Ловит</h3><ul style="font-size:32px;gap:16px"><li>Ошибки в&nbsp;формуле</li><li>Ошибки в&nbsp;подстановке единиц</li></ul></div>
+      <div class="col t-red" style="padding:32px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-x"/></svg>Не ловит</h3><ul style="font-size:32px;gap:16px"><li>Арифметику</li></ul><p style="font-size:29px;color:var(--muted)">Ошибка в&nbsp;самом делении: единицы безупречны, а&nbsp;число неверное</p></div>
+    </div>
+    <p class="say sm">Размерности – лишь <em>одна из&nbsp;проверок</em></p>
+  </div>
+</section>
+
+<section class="slide" data-at="402" data-title="Анализ размерностей на схеме">
+  <p class="kick">Те же формулы на схеме · читается сверху вниз</p>
+  <h2 style="font-size:42px">Анализ размерностей в&nbsp;задаче о&nbsp;сечении провода</h2>
+  <div class="body" style="gap:0;padding-top:18px">
+    <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) 80px minmax(0,1.25fr) 80px minmax(0,1.5fr);grid-template-rows:auto 42px auto 42px auto;column-gap:14px">
+      <div class="t-gray" style="grid-column:1;grid-row:1;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px"><b style="font-size:27px;color:var(--ci)"><var style="font-family:Cambria,Georgia,serif">ρ</var> меди</b><span style="font-size:22px;color:var(--ci)">0,0175 Ом·мм²/м</span></div>
+      <div class="t-gray" style="grid-column:2;grid-row:1;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px"><b style="font-size:27px;color:var(--ci)">Длина цепи <var style="font-family:Cambria,Georgia,serif">l</var></b><span style="font-size:22px;color:var(--ci)"><var style="font-family:Cambria,Georgia,serif">l</var> = 2<var style="font-family:Cambria,Georgia,serif">L</var>, м</span></div>
+      <div class="t-gray" style="grid-column:3;grid-row:1;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px"><b style="font-size:27px;color:var(--ci)">Сечение <var style="font-family:Cambria,Georgia,serif">S</var></b><span style="font-size:22px;color:var(--ci)">мм², из&nbsp;ряда</span></div>
+      <div class="t-gray" style="grid-column:5;grid-row:1;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:12px 16px;display:flex;flex-direction:column;gap:4px"><b style="font-size:27px;color:var(--ci)">Ток <var style="font-family:Cambria,Georgia,serif">I</var></b><span style="font-size:22px;color:var(--ci)">6 А</span></div>
+      <div style="grid-column:7;grid-row:1;display:flex;align-items:center"><span style="font-size:22px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)">Исходные величины</span></div>
+      <div style="grid-column:1;grid-row:2;display:flex;justify-content:center;align-items:center;color:var(--muted)"><svg class="i" style="font-size:38px"><use href="#i-arrow-down"/></svg></div>
+      <div style="grid-column:2;grid-row:2;display:flex;justify-content:center;align-items:center;color:var(--muted)"><svg class="i" style="font-size:38px"><use href="#i-arrow-down"/></svg></div>
+      <div style="grid-column:3;grid-row:2;display:flex;justify-content:center;align-items:center;color:var(--muted)"><svg class="i" style="font-size:38px"><use href="#i-arrow-down"/></svg></div>
+      <div style="grid-column:5;grid-row:2;display:flex;justify-content:center;align-items:center;color:var(--muted)"><svg class="i" style="font-size:38px"><use href="#i-arrow-down"/></svg></div>
+      <div class="t-teal" style="grid-column:1/4;grid-row:3;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px"><b style="font-size:34px;color:var(--ci)"><var style="font-family:Cambria,Georgia,serif">R</var> = <var style="font-family:Cambria,Georgia,serif">ρ</var> · <var style="font-family:Cambria,Georgia,serif">l</var> / <var style="font-family:Cambria,Georgia,serif">S</var></b><span style="font-size:23px;color:var(--ci)">Ом·мм²/м × м / мм² = Ом</span></div>
+      <div class="t-teal" style="grid-column:4;grid-row:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--c)"><span class="tag" style="font-size:22px;background:var(--bg)">Ом</span><svg class="i" style="font-size:44px"><use href="#i-arrow-right"/></svg></div>
+      <div class="t-teal" style="grid-column:5;grid-row:3;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px"><b style="font-size:34px;color:var(--ci)">Δ<var style="font-family:Cambria,Georgia,serif">U</var> = <var style="font-family:Cambria,Georgia,serif">I</var> · <var style="font-family:Cambria,Georgia,serif">R</var></b><span style="font-size:23px;color:var(--ci)">А × Ом = В</span></div>
+      <div class="t-teal" style="grid-column:6;grid-row:3;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--c)"><span class="tag" style="font-size:22px;background:var(--bg)">В</span><svg class="i" style="font-size:44px"><use href="#i-arrow-right"/></svg></div>
+      <div class="t-teal" style="grid-column:7;grid-row:3;background:var(--ct);border:2.5px solid var(--c);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;text-align:center"><b style="font-size:34px;color:var(--ci)">Δ<var style="font-family:Cambria,Georgia,serif">U</var> / 24 В</b><span style="font-size:23px;color:var(--ci)">В / В, в&nbsp;процентах</span></div>
+      <div class="t-red" style="grid-column:7;grid-row:4;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--c)"><svg class="i" style="font-size:38px"><use href="#i-arrow-down"/></svg><span class="tag" style="font-size:22px;background:var(--bg)">%</span></div>
+      <div style="grid-column:1/6;grid-row:5;display:flex;align-items:center;gap:30px;font-size:22px;color:var(--muted)">
+        <span style="display:inline-flex;align-items:center;gap:10px"><i class="t-gray" style="width:30px;height:22px;border-radius:6px;background:var(--ct);border:2.5px solid var(--c)"></i>исходная величина</span>
+        <span style="display:inline-flex;align-items:center;gap:10px"><i class="t-teal" style="width:30px;height:22px;border-radius:6px;background:var(--ct);border:2.5px solid var(--c)"></i>расчёт по&nbsp;формуле</span>
+        <span style="display:inline-flex;align-items:center;gap:10px"><i class="t-red" style="width:30px;height:22px;border-radius:6px;background:var(--ct);border:2.5px dashed var(--c)"></i>сравнение с&nbsp;условием</span>
+      </div>
+      <div class="t-red" style="grid-column:7;grid-row:5;background:var(--ct);border:2.5px dashed var(--c);border-radius:14px;padding:14px 18px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;text-align:center"><b style="font-size:31px;color:var(--ci);white-space:nowrap">Не более 3&nbsp;%</b><span style="font-size:23px;color:var(--ci)">условие задачи</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="417" data-steps="417,420" data-title="Sasaki и соавт.: как модели сравнивают величины">
+  <p class="kick">А как с единицами обращаются сами модели?</p>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:370px 1fr;gap:40px">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-scale"/></svg></i>
+        <h3 style="font-size:44px">Sasaki и&nbsp;соавт.</h3>
+        <p>2026, препринт arXiv</p>
+      </div>
+      <dl class="kv" style="--kw:190px">
+        <div class="st" data-s="1" style="font-size:33px;padding:20px 15px"><dt>Что проверяли</dt><dd>Как модели сравнивают величины с&nbsp;разными единицами</dd></div>
+        <div class="st" data-s="2" style="font-size:33px;padding:20px 15px"><dt>Пример</dt><dd><b style="font-size:44px">110&nbsp;см</b> и&nbsp;<b style="font-size:44px">1,2&nbsp;м</b></dd></div>
+        <div class="st" data-s="2" style="font-size:33px;padding:20px 15px"><dt>Результат</dt><dd>Точность падает, когда значения близки. Ошибки систематические</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sasaki M. et al. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2606.03982</p>
+</section>
+
+<section class="slide" data-at="423" data-title="Sasaki и соавт.: вывод авторов">
+  <p class="kick">Вывод авторов</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>Результаты показывают, что языковые модели сравнивают величины с&nbsp;помощью <b>набора эвристик по&nbsp;числам и&nbsp;единицам</b>, а&nbsp;не&nbsp;переводят сначала оба выражения в&nbsp;точное представление в&nbsp;одних единицах</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Sasaki M. и соавт.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sasaki M. et al. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2606.03982</p>
+</section>
+
+<section class="slide h-sm" data-at="427">
+  <p class="kick t-orange">Для инженера вывод простой</p>
+  <h2>Сначала – одни единицы, потом – проверка перевода</h2>
+  <div class="body">
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap">
+      <span style="font-size:30px;color:var(--muted)">Если в&nbsp;задаче есть</span>
+      <span class="tag t-gray" style="font-size:32px;padding:8px 24px">мА и&nbsp;А</span>
+      <span class="tag t-gray" style="font-size:32px;padding:8px 24px">сутки и&nbsp;часы</span>
+      <span class="tag t-gray" style="font-size:32px;padding:8px 24px">мм и&nbsp;м</span>
+    </div>
+    <ol class="flow">
+      <li class="step t-teal" style="padding:24px 26px 28px;gap:14px"><h3 style="font-size:34px">Попросите модель перевести всё в&nbsp;одни единицы</h3></li>
+      <li class="step t-teal" style="padding:24px 26px 28px;gap:14px"><h3 style="font-size:34px">Перевод – отдельной&nbsp;строкой</h3></li>
+      <li class="step t-orange" style="padding:24px 26px 28px;gap:14px"><h3 style="font-size:34px">Потом проверьте перевод сами</h3></li>
+    </ol>
+  </div>
+</section>
