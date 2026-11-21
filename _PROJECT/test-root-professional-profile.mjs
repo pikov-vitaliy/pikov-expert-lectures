@@ -40,7 +40,11 @@ function educationGroup(labelId) {
 }
 
 test("public biography uses the approved neutral state-sector wording", () => {
-  assert.match(aboutText, /Последнее место службы.{0,160}научно-исследовательск.{0,80}государственного сектора/i);
+  // Решение владельца 21.11.2026: биография совпадает с LinkedIn – государственная
+  // компания, без «места службы» и испытательной лаборатории.
+  assert.match(aboutText, /С 2001 по 2022 год работал в государственной компании/i);
+  assert.match(rawRoot, /From 2001 to 2022 I worked at a state-owned company/);
+  assert.doesNotMatch(rawRoot, /мест[оа] службы|После службы|public service|testing laboratory|испытательной лаборатории/i);
   // Запрет на Минобороны — только в биографии. Раньше он стоял на весь файл,
   // и из-за этого из описания лекции по сертификации вырезали регулятора,
   // хотя вся лекция построена вокруг систем ФСТЭК, ФСБ и Минобороны.
