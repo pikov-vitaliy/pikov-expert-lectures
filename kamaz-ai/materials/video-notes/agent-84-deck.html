@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex,follow">
+<title>ИИ-агент за 84 строки</title>
+<script>
+(function(){var K='kamaz-theme-manual';
+function tt(){var h=new Date().getHours();return (h>=20||h<7)?'dark':'light';}
+var mem=null;
+function man(){try{var m=JSON.parse(localStorage.getItem(K)||'null');if(m&&(m.theme==='light'||m.theme==='dark')&&m.until>Date.now())return m.theme;}catch(e){}return mem&&mem.until>Date.now()?mem.theme:null;}
+window.__deckTheme={K:K,tt:tt,man:man,keep:function(t,u){mem={theme:t,until:u};},reset:function(){mem=null;},next:function(){var d=new Date(),n=new Date(d),h=d.getHours();if(h>=7&&h<20){n.setHours(20,0,0,0);}else{if(h>=20)n.setDate(n.getDate()+1);n.setHours(7,0,0,0);}return n.getTime();}};
+document.documentElement.dataset.theme=man()||tt();
+try{if(window.self!==window.top)document.documentElement.classList.add('embedded');}catch(e){document.documentElement.classList.add('embedded');}
+})();
+</script>
+<style>
+
+
+:root { --ink:#000; --paper:#fff; --gray:#ececec; --muted:#595959; --red:#e8401c; --line:#000; --soft:#f6f6f6;
+  --bg:#1b1b1b; --chip-ink:#fff; --chip-bg:#000; --scale:1; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#f1f1f1; --paper:#161616; --gray:#262626; --muted:#a9a9a9; --red:#ff6b4a; --line:#e9e9e9; --soft:#1f1f1f; --bg:#0a0a0a; --chip-ink:#111; --chip-bg:#f1f1f1; color-scheme:dark; } }
+:root[data-theme="dark"] { --ink:#f1f1f1; --paper:#161616; --gray:#262626; --muted:#a9a9a9; --red:#ff6b4a; --line:#e9e9e9; --soft:#1f1f1f; --bg:#0a0a0a; --chip-ink:#111; --chip-bg:#f1f1f1; color-scheme:dark; }
+* { box-sizing:border-box; }
+html,body { margin:0; width:100%; height:100%; overflow:hidden; }
+body { background:var(--bg); color:var(--ink); font-family:'YS Text','Inter','Segoe UI',Arial,sans-serif; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { font:inherit; cursor:pointer; }
+button:focus-visible,a:focus-visible { outline:3px solid var(--red); outline-offset:4px; }
+[hidden] { display:none!important; }
+#stage { position:absolute; inset:0 0 62px; display:grid; place-items:center; overflow:hidden; }
+#deck { width:1600px; height:900px; position:absolute; transform:scale(var(--scale)); transform-origin:center; }
+.slide { display:none; width:1600px; height:900px; position:relative; overflow:hidden; background:var(--paper); color:var(--ink); padding:60px; }
+.slide.active { display:block; }
+.slide.divider { background:var(--gray); }
+.slide h1,.slide h2,.slide h3,.slide p { margin:0; }
+.slide h1,.slide h2,.display,.num { font-family:'YS Display','Inter','Segoe UI',Arial,sans-serif; font-weight:600; }
+.slide h2 { font-size:62px; line-height:1; letter-spacing:-1.4px; white-space:nowrap; }
+.slide h3 { font-size:33px; line-height:1.1; font-weight:700; }
+.slide p,.slide li { font-size:31px; line-height:1.22; }
+.slide .small { font-size:24px; line-height:1.25; }
+.slide .muted { color:var(--muted); }
+.slide .accent { color:var(--red); }
+.slide .subtitle { margin-top:22px; font-size:29px; color:var(--muted); }
+.slide .footnote { position:absolute; left:60px; right:60px; bottom:106px; font-size:23px; line-height:1.22; color:var(--muted); }
+.slide footer { position:absolute; left:60px; right:60px; bottom:52px; display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:18px; line-height:1; }
+.slide footer .page { color:var(--ink); min-width:80px; text-align:right; }
+.slide .body { position:absolute; top:230px; left:60px; right:60px; bottom:170px; }
+.slide .two { display:grid; grid-template-columns:1fr 1fr; gap:72px; }
+.slide .three { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+.slide .two h3 { margin-bottom:26px; }
+.slide ul.dots { padding:0; margin:0; list-style:none; }
+.slide ul.dots li { position:relative; padding-left:25px; margin-bottom:18px; }
+.slide ul.dots li::before { content:'•'; color:var(--red); position:absolute; left:0; }
+.slide .outline { border:3px solid var(--line); border-radius:31px; padding:30px; }
+.slide .outline.focus { border-color:var(--red); }
+.slide .three .num { font-size:60px; line-height:1; margin-bottom:28px; }
+.slide .three h3 { min-height:40px; margin-bottom:20px; }
+.slide .three p { font-size:28px; line-height:1.23; }
+.slide .three .small { font-size:23px; margin-top:22px; }
+.slide .quote { position:absolute; top:250px; left:90px; right:90px; font-size:96px; line-height:1.03; letter-spacing:-2px; }
+.slide .quote-caption { position:absolute; top:610px; left:93px; width:1300px; font-size:31px; line-height:1.23; }
+.slide .eyebrow { color:var(--muted); font-size:26px; }
+.slide .big-number { position:absolute; top:130px; left:60px; right:60px; text-align:center; font-size:230px; line-height:1; letter-spacing:-6px; }
+.slide .big-caption { position:absolute; top:430px; left:160px; right:160px; text-align:center; font-size:46px; line-height:1.1; }
+.slide .big-detail { position:absolute; top:600px; left:180px; right:180px; text-align:center; font-size:28px; line-height:1.27; color:var(--muted); }
+.slide .number-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:46px; position:absolute; left:60px; right:60px; top:250px; }
+.slide .number-grid .num { font-size:120px; line-height:1; letter-spacing:-4px; margin-bottom:34px; }
+.slide .number-grid p { font-size:29px; line-height:1.25; }
+.slide .number-grid .desc { margin-top:16px; font-size:24px; color:var(--muted); }
+.slide .four { display:grid; grid-template-columns:1fr 1fr; gap:52px 76px; }
+.slide .four .item { display:grid; grid-template-columns:72px 1fr; gap:22px; align-content:start; }
+.slide .four .num { font-size:52px; line-height:1; color:var(--red); }
+.slide .four h3 { margin:4px 0 14px; }
+.slide .four p { font-size:27px; }
+.slide .flow { display:grid; grid-template-columns:repeat(var(--n,3),1fr); gap:60px; }
+.slide .flow .step { position:relative; border-top:3px solid var(--line); padding-top:34px; margin-top:80px; }
+.slide .flow .step::before { content:''; width:22px; height:22px; border-radius:50%; background:var(--ink); position:absolute; left:0; top:-12px; }
+.slide .flow .step:not(:last-child)::after { content:''; width:18px; height:18px; border-top:3px solid var(--ink); border-right:3px solid var(--ink); transform:rotate(45deg); position:absolute; right:-40px; top:-10px; }
+.slide .flow .step:last-child { border-color:var(--red); }
+.slide .flow .step:last-child::before { background:var(--red); }
+.slide .flow .phase { position:absolute; top:-80px; font-size:40px; line-height:1; white-space:nowrap; }
+.slide .flow h3 { margin-bottom:22px; }
+.slide .flow p { font-size:28px; }
+.slide.title { background:var(--gray); }
+.title .title-card { position:absolute; left:60px; top:60px; width:1480px; height:480px; border-radius:33px; background:var(--paper); padding:31px 34px; }
+.title .mark { font-size:23px; font-weight:700; letter-spacing:.2px; }
+.title .mark span { color:var(--red); }
+.title .edition { position:absolute; top:34px; right:35px; font-size:23px; color:var(--muted); }
+.title h1 { margin-top:64px; font-size:110px; line-height:.99; letter-spacing:-3px; }
+.title .title-subtitle { margin-top:30px; font-size:32px; }
+.title .org { position:absolute; left:94px; top:590px; right:94px; }
+.title .org strong { display:block; font-size:28px; margin-bottom:14px; }
+.title .org p { font-size:24px; line-height:1.25; color:var(--muted); }
+.title .org a, .slide .rights a { color:inherit; text-decoration-color:var(--red); }
+.section .section-no { position:absolute; left:93px; top:75px; font-size:90px; color:var(--red); }
+.section .section-title { position:absolute; top:254px; left:93px; width:1330px; font-size:96px; line-height:1.02; letter-spacing:-2px; white-space:normal; }
+.section .section-detail { position:absolute; top:520px; left:93px; width:1300px; font-size:34px; line-height:1.2; }
+.slide .agents { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
+.agents .category { font-size:25px; color:var(--muted); padding-bottom:22px; border-bottom:2px solid var(--line); }
+.agents .agent { padding-top:26px; }
+.agents .agent h3 { margin-bottom:10px; font-size:30px; }
+.agents .agent p { font-size:25px; line-height:1.2; }
+.slide .loop { display:grid; grid-template-columns:repeat(3,1fr); gap:38px; margin-top:110px; }
+.loop .display { font-size:70px; line-height:1.05; border-top:3px solid var(--line); padding-top:27px; }
+.loop p { font-size:27px; margin-top:28px; }
+.loop .display.last { border-color:var(--red); }
+.slide .summary { position:absolute; top:230px; left:60px; right:60px; }
+.summary .num { font-size:66px; color:var(--red); margin-bottom:24px; }
+.summary h3 { font-size:34px; margin-bottom:20px; }
+.summary p { font-size:28px; }
+.slide .summary-line { position:absolute; top:640px; left:60px; right:60px; font-family:'YS Display','Inter','Segoe UI',Arial,sans-serif; font-weight:600; font-size:42px; line-height:1.12; border-top:3px solid var(--line); padding-top:26px; }
+.slide .metric-pair { position:absolute; top:240px; left:60px; right:60px; display:grid; grid-template-columns:1fr 1fr; gap:75px; }
+.slide .metric-pair .num { font-size:170px; line-height:1; letter-spacing:-5px; margin-bottom:40px; }
+.slide .metric-pair p { font-size:35px; line-height:1.16; }
+.slide .metric-pair .small { margin-top:18px; color:var(--muted); }
+.slide .code { position:absolute; left:60px; right:60px; top:190px; margin:0; font-family:ui-monospace,'Cascadia Code',Consolas,Menlo,monospace; font-size:17px; line-height:1.22; padding:18px 28px; border-radius:25px; background:var(--gray); color:var(--ink); white-space:pre; overflow:hidden; }
+.slide .code .c { color:var(--muted); }
+.slide .code .k { color:var(--red); }
+.slide .chart { position:absolute; left:60px; right:60px; top:225px; height:470px; }
+.slide .chart svg { display:block; width:100%; height:100%; }
+.slide .chart text { fill:var(--ink); font-family:'YS Text','Inter','Segoe UI',Arial,sans-serif; }
+.slide .chart .mut { fill:var(--muted); }
+.slide .chart .acc { fill:var(--red); }
+.slide .chart .bar { fill:var(--ink); }
+.slide .chart .bar.acc { fill:var(--red); }
+.slide .chart .ln { stroke:var(--ink); fill:none; }
+.slide .chart .lnm { stroke:var(--muted); fill:none; }
+.slide .chart .lna { stroke:var(--red); fill:none; }
+.slide .chart .dot { fill:var(--ink); }
+.slide .chart .doth { fill:var(--paper); stroke:var(--ink); }
+.slide .chart .dota { fill:var(--red); }
+.slide .rights { position:absolute; left:60px; right:60px; top:215px; border:3px solid var(--line); border-radius:31px; padding:30px 34px; }
+.slide .rights h3 { margin-bottom:16px; }
+.slide .rights p { font-size:26px; line-height:1.28; margin-bottom:10px; }
+.slide .course-links { position:absolute; left:60px; right:60px; top:560px; }
+.slide .course-links h3 { margin-bottom:14px; font-size:30px; }
+.slide .course-links p { font-size:25px; line-height:1.3; }
+.slide .numlist { display:grid; grid-template-columns:72px 1fr; gap:22px 22px; align-content:start; padding-top:6px; }
+.slide .numlist .num { font-size:50px; line-height:1; color:var(--red); }
+.slide .numlist p { font-size:34px; line-height:1.2; }
+.slide .numlist p small { display:block; font-size:24px; color:var(--muted); margin-top:6px; }
+#controls { height:62px; position:absolute; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 24px; color:#fff; background:#1b1b1b; font-size:14px; }
+#controls .group { display:flex; align-items:center; gap:8px; }
+#controls button { border:1px solid #6a6a6a; color:#fff; background:transparent; padding:8px 12px; border-radius:9px; font-size:14px; white-space:nowrap; }
+#controls button:hover { background:#333; }
+#controls button:disabled { opacity:.35; cursor:default; }
+#counter { min-width:98px; text-align:center; font-variant-numeric:tabular-nums; }
+#status { color:#c9c9c9; }
+#progress { position:absolute; left:0; bottom:62px; height:3px; background:var(--red); z-index:2; transition:width .15s linear; }
+#theme-btn { position:fixed; top:16px; right:16px; z-index:30; width:44px; height:44px; border-radius:50%; border:1px solid var(--muted); background:var(--paper); color:var(--ink); font-size:21px; line-height:1; display:grid; place-items:center; box-shadow:0 2px 10px rgba(0,0,0,.25); }
+#theme-btn:focus-visible { outline:3px solid var(--red); outline-offset:3px; }
+.embedded #theme-btn { display:none; }
+.overlay { position:fixed; inset:0; z-index:20; background:rgba(0,0,0,.75); padding:42px; overflow:auto; }
+.panel { width:min(1020px,100%); background:var(--paper); color:var(--ink); margin:auto; border-radius:25px; padding:35px 40px; }
+.panel h2 { font:600 32px 'YS Display','Inter','Segoe UI',Arial,sans-serif; margin:0 0 24px; }
+.panel p,.panel li { font-size:18px; line-height:1.5; }
+.panel a { color:var(--ink); overflow-wrap:anywhere; text-decoration-color:var(--red); }
+.panel .close { float:right; border:0; background:var(--gray); color:var(--ink); border-radius:8px; padding:8px 13px; }
+.panel h3 { margin:28px 0 15px; }
+#toc-list { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:5px 25px; }
+#toc-list button { width:100%; text-align:left; border:0; background:var(--paper); color:var(--ink); padding:11px; border-radius:8px; font-size:16px; }
+#toc-list button:hover,#toc-list button.current { background:var(--gray); }
+#toc-list button span { color:var(--red); margin-right:12px; }
+#live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+body.presenting #controls, body.presenting #theme-btn { display:none; }
+body.presenting #stage { inset:0; }
+body.presenting #progress { bottom:0; height:2px; }
+body.presenting { cursor:none; }
+body.presenting .overlay { cursor:auto; }
+body.notes-open #stage { right:440px; }
+#speaker { position:absolute; top:0; right:0; bottom:62px; width:440px; overflow:auto; background:var(--paper); color:var(--ink); padding:72px 30px 30px; border-left:1px solid var(--gray); }
+.embedded #speaker { padding-top:30px; }
+#speaker h2 { font-size:22px; line-height:1.2; }
+#speaker h3 { font-size:17px; margin:18px 0 8px; }
+#speaker p,#speaker li { font-size:16px; line-height:1.5; }
+#speaker a { color:var(--ink); overflow-wrap:anywhere; text-decoration-color:var(--red); }
+#speaker .seg { font-size:15px; color:var(--muted); }
+#speaker blockquote { margin:14px 0; padding:8px 14px; border-left:3px solid var(--red); font-size:16px; line-height:1.45; }
+#speaker .warning { font-size:13px; color:var(--muted); }
+#speaker .note-actions { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+#speaker button { background:var(--gray); color:var(--ink); border:0; border-radius:8px; padding:8px 13px; }
+#timer { font-size:24px; font-variant-numeric:tabular-nums; }
+@media (max-width:850px) { #status,.optional { display:none; } #controls { padding:0 10px; } #controls button { font-size:12px; padding:8px; } #toc-list { grid-template-columns:1fr; } body.notes-open #stage { right:0; } #speaker { z-index:10; width:min(440px,100%); } .overlay { padding:15px; } .panel { padding:25px; } }
+@media (max-width:600px) { #controls { height:108px; flex-direction:column; gap:0; padding:6px 12px; align-items:stretch; } #controls .group { justify-content:center; } #counter { min-width:75px; } #stage { bottom:108px; } #progress { bottom:108px; } #speaker { bottom:108px; } }
+@media (prefers-reduced-motion:reduce) { * { transition:none!important; } }
+@media print {
+ @page { size:1600px 900px; margin:0; }
+ html,body { width:1600px; height:auto; overflow:visible; background:var(--paper); }
+ #stage { position:static; display:block; overflow:visible; }
+ #deck { position:static; transform:none!important; width:1600px; height:auto; }
+ .slide,.slide.active { display:block; break-after:page; page-break-after:always; }
+ .slide:last-child { break-after:auto; }
+ #controls,#progress,#speaker,.overlay,#live,#theme-btn { display:none!important; }
+ * { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+}
+
+</style>
+</head>
+<body>
+<button id="theme-btn" type="button" aria-label="Переключить тему">☾</button>
+<main id="stage" aria-label="Презентация"><div id="deck">
+<section id="slide-1" data-section="Конспект видео" class="slide title" data-title="ИИ-агент за 84 строки">
+ <div class="title-card"><span class="mark">ИИ для инженеров <span>·</span> материалы курса</span><span class="edition">/ Конспект видео</span>
+  <h1>Что такое<br>ИИ-агент</h1><p class="title-subtitle">Модель, инструменты и цикл: конспект ролика канала «Скрытый слой»</p></div>
+ <div class="org"><strong>Источник и права</strong><p>Ролик «Что такое ИИ-агент на самом деле? Собрал своего за 84 строки», канал «Скрытый слой», опубликован 14.11.2026: <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">youtube.com/watch?v=I5h4Bz99Ex0</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала. Код агента – скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">t.me/skrytyysloy</a>.</p></div>
+</section>
+<section id="slide-2" data-section="01 / Агент и чат-бот" class="slide section divider" data-title="Раздел 01. Агент и чат-бот">
+ <div class="section-no display">01</div>
+ <h2 class="section-title">Агент и чат-бот</h2>
+ <p class="section-detail">Чем агент отличается от чата и как модель, умеющая только писать текст, что-то делает.</p>
+</section>
+<section id="slide-3" data-section="01 / Агент и чат-бот" class="slide" data-title="Мозг без рук">
+ <h2>Мозг без рук</h2><p class="subtitle">Модель продолжает текст. Агенту дают инструменты и цикл</p>
+ <div class="body two"><div><h3>Модель сама по себе</h3><ul class="dots"><li>Получает текст, предсказывает следующее слово</li><li>Не видит часов, файлов и сети</li><li>Знает мир на дату конца обучения</li></ul></div><div><h3>Агент</h3><ul class="dots"><li>Та же модель + инструменты: поиск, команды, файлы, почта, браузер</li><li>Работает в цикле: подумал, сделал, посмотрел на результат</li><li>Сам выбирает следующий шаг</li></ul></div></div>
+ <p class="footnote">Определение, которое приводит автор: агент – модель, вызывающая инструменты в цикле ради цели (С. Уиллисон).</p>
+</section>
+<section id="slide-4" data-section="01 / Агент и чат-бот" class="slide" data-title="Четыре ступени от чата к агенту">
+ <h2>Четыре ступени</h2><p class="subtitle">От чата к агенту: кто решает, какой шаг следующий</p>
+ <div class="body four"><div class="item"><div class="num" data-deco>01</div><div><h3>Чат</h3><p>Вопрос – ответ</p></div></div><div class="item"><div class="num" data-deco>02</div><div><h3>Чат с инструментом</h3><p>Модель один раз сходила, например, в поиск</p></div></div><div class="item"><div class="num" data-deco>03</div><div><h3>Сценарий (workflow)</h3><p>Шаги заранее расписал программист</p></div></div><div class="item"><div class="num" data-deco>04</div><div><h3>Агент</h3><p>Следующий шаг выбирает сама модель</p></div></div></div>
+ <p class="footnote">По словам автора, в Anthropic советуют не строить агента там, где хватает сценария: сценарий предсказуемее, дешевле и проще проверяется.</p>
+</section>
+<section id="slide-5" data-section="01 / Агент и чат-бот" class="slide" data-title="Как модель «нажимает кнопки»">
+ <h2>Как модель «нажимает кнопки»</h2><p class="subtitle">Вызов инструмента (tool calling) – это заявка в строгом формате</p>
+ <div class="body flow" style="--n:3;"><div class="step"><div class="phase display">Меню</div><h3>Список инструментов</h3><p>Название, описание словами, параметры</p></div><div class="step"><div class="phase display">Заявка</div><h3>Модель пишет вызов</h3><p>Имя инструмента и аргументы вместо ответа</p></div><div class="step"><div class="phase display">Исполнение</div><h3>Программа выполняет</h3><p>Результат – в диалог сообщением с ролью tool</p></div></div>
+ <p class="footnote">Пример из ролика: инструмент run_command – «выполнить команду PowerShell», единственный параметр – сама команда.</p>
+</section>
+<section id="slide-6" data-section="01 / Агент и чат-бот" class="slide" data-title="Между словами модели и действием – код">
+ <p class="eyebrow">Главное для безопасности</p>
+ <div class="quote display">Модель только <span class="accent">просит</span>.<br>Делает – программа.</div>
+ <p class="quote-caption">В коде между заявкой и действием можно спросить разрешение, запретить опасное, ограничить папки.</p>
+ <p class="footnote">По словам автора, OpenAI ввела вызов функций для разработчиков летом 2023 года; теперь его поддерживает большинство моделей, домашние тоже.</p>
+</section>
+<section id="slide-7" data-section="02 / Устройство агента" class="slide section divider" data-title="Раздел 02. Устройство агента">
+ <div class="section-no display">02</div>
+ <h2 class="section-title">Устройство агента</h2>
+ <p class="section-detail">Цикл, контекст, память и команды агентов.</p>
+</section>
+<section id="slide-8" data-section="02 / Устройство агента" class="slide" data-title="Цикл агента: мысль, действие, наблюдение">
+ <h2>Цикл агента</h2><p class="subtitle">Идея ReAct (Принстон и Google, 2022): рассуждение чередуется с действием</p>
+ <div class="loop"><div><div class="display">Мысль</div><p>«Сначала узнаю объём видеопамяти»</p></div><div><div class="display">Действие</div><p>Команда nvidia-smi</p></div><div><div class="display last">Наблюдение</div><p>Около 24 ГБ. Дальше – новая мысль</p></div></div>
+ <p class="footnote">В коде: история сообщений и меню уходят модели. Нет вызовов – это ответ, выход. Есть – выполнить, дописать результат в историю, следующий круг.</p>
+</section>
+<section id="slide-9" data-section="02 / Устройство агента" class="slide" data-title="Скрипт и агент: реакция на ошибку">
+ <h2>Скрипт и агент</h2><p class="subtitle">Агент видит результат шага и может сменить путь</p>
+ <div class="body two"><div><h3>Обычный скрипт</h3><ul class="dots"><li>Нет нужной папки – падает с ошибкой</li><li>Путь задан заранее</li></ul></div><div><h3>Агент</h3><ul class="dots"><li>Ошибка возвращается модели как наблюдение</li><li>Модель пробует другой путь</li><li>Лимит шагов – тормоз от зацикливания</li></ul></div></div>
+ <p class="footnote">У агента автора лимит 15 шагов: дальше разбирается человек.</p>
+</section>
+<section id="slide-10" data-section="02 / Устройство агента" class="slide" data-title="Контекст: вся лента на каждом шаге">
+ <h2>Контекст и его цена</h2><p class="subtitle">На каждом круге модель заново читает всю историю</p>
+ <div class="metric-pair"><div><div class="num accent">×4</div><p>токенов у агента<br>по сравнению с чатом</p><p class="small">Оценка Anthropic, по словам автора</p></div><div><div class="num">×15</div><p>у команды агентов<br>по сравнению с чатом</p><p class="small">Там же</p></div></div>
+ <p class="footnote">Пример из ролика: контекст 50 тыс. токенов и 40 шагов – модель прочитает 2 млн токенов. Агенты экономят: обрезают длинный вывод, сжимают старую историю.</p>
+</section>
+<section id="slide-11" data-section="02 / Устройство агента" class="slide" data-title="Память: короткая и долгая">
+ <h2>Память агента</h2><p class="subtitle">Контекст исчезает с концом задачи, файлы остаются</p>
+ <div class="body two"><div><h3>Кратковременная</h3><ul class="dots"><li>Контекст текущей задачи</li><li>У агента автора от вывода команды остаются последние 4000 символов</li></ul></div><div><h3>Долговременная</h3><ul class="dots"><li>Файл правил проекта: AGENTS.md, CLAUDE.md</li><li>Заметки агента и поиск по ним, как в RAG</li><li>Навыки (Skills): папка с инструкцией и скриптами под одно дело</li></ul></div></div>
+ <p class="footnote">Решать, что модель увидит на каждом шаге, – это инженерия контекста. По словам автора, файл правил есть больше чем в 60 тыс. открытых проектов (данные Linux Foundation).</p>
+</section>
+<section id="slide-12" data-section="02 / Устройство агента" class="slide" data-title="Один агент или команда">
+ <h2>Один агент или команда</h2><p class="subtitle">Пять схем, которые приводит автор</p>
+ <div class="body numlist"><div class="num display" data-deco>01</div><p>Цепочка<small>выход одного шага – вход следующего</small></p><div class="num display" data-deco>02</div><p>Маршрутизатор<small>одна модель выбирает, кто возьмёт запрос</small></p><div class="num display" data-deco>03</div><p>Параллель<small>части задачи решаются одновременно</small></p><div class="num display" data-deco>04</div><p>Дирижёр и исполнители<small>ведущая модель режет задачу и раздаёт куски</small></p><div class="num display" data-deco>05</div><p>Автор и критик<small>второй проверяет первого и отправляет на доработку</small></p></div>
+ <p class="footnote">Команда полезна, когда задача режется на независимые части. Когда всё связано, лишние агенты мешают друг другу. Совет автора: начинать с одного.</p>
+</section>
+<section id="slide-13" data-section="02 / Устройство агента" class="slide" data-title="MCP: общий разъём для инструментов">
+ <h2>MCP: общий разъём</h2><p class="subtitle">Model Context Protocol: сервис описывает инструменты один раз</p>
+ <div class="metric-pair"><div><div class="num">24</div><p>подключения без общего стандарта:<br>4 агента × 6 сервисов</p><p class="small">Каждый агент пишет своё подключение к каждому сервису</p></div><div><div class="num accent">10</div><p>подключений с MCP:<br>4 + 6</p><p class="small">Сервис пишет один MCP-сервер, агент подключает его</p></div></div>
+ <p class="footnote">Автор сравнивает с временем, когда у каждого телефона была своя зарядка. MCP предложила Anthropic в ноябре 2024 года.</p>
+</section>
+<section id="slide-14" data-section="02 / Устройство агента" class="slide" data-title="Четыре ориентира: MCP, A2A, AGENTS.md, Skills">
+ <h2>Четыре ориентира</h2><p class="subtitle">Как автор предлагает это запомнить</p>
+ <div class="body four"><div class="item"><div class="num" data-deco>01</div><div><h3>MCP</h3><p>Подключение инструментов</p></div></div><div class="item"><div class="num" data-deco>02</div><div><h3>A2A</h3><p>Общение агентов между собой (протокол Google)</p></div></div><div class="item"><div class="num" data-deco>03</div><div><h3>AGENTS.md</h3><p>Правила работы в проекте</p></div></div><div class="item"><div class="num" data-deco>04</div><div><h3>Skills</h3><p>Навыки под отдельные задачи</p></div></div></div>
+ <p class="footnote">По словам автора: в декабре 2025 года MCP передан в Agentic AI Foundation при Linux Foundation; MCP поддерживает Yandex AI Studio, у Сбера есть примеры агентов на GigaChat с MCP.</p>
+</section>
+<section id="slide-15" data-section="03 / Агенты 2026 года" class="slide section divider" data-title="Раздел 03. Агенты 2026 года">
+ <div class="section-no display">03</div>
+ <h2 class="section-title">Агенты 2026 года</h2>
+ <p class="section-detail">Насколько агенты способны, какие бывают и где их запускать.</p>
+</section>
+<section id="slide-16" data-section="03 / Агенты 2026 года" class="slide" data-title="Горизонт агента по METR">
+ <h2>Горизонт агента</h2><p class="subtitle">Длина задач, которые агент решает в половине случаев (METR), по словам автора</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Claude 3.7 Sonnet, начало 2025: ≈ 1 ч; GPT-5, лето 2025: 2 ч 17 мин; Лучшие публичные, весна 2026: ≈ 12 ч; Claude Mythos Preview: ≥ 16 ч"><text x="0" y="69" font-size="28">Claude 3.7 Sonnet, начало 2025</text><rect class="bar" x="420" y="36" width="58" height="46" rx="6"/><text x="494" y="69" font-size="30" font-weight="700">≈ 1 ч</text><text x="0" y="186" font-size="28">GPT-5, лето 2025</text><rect class="bar" x="420" y="153" width="133" height="46" rx="6"/><text x="569" y="186" font-size="30" font-weight="700">2 ч 17 мин</text><text x="0" y="304" font-size="28">Лучшие публичные, весна 2026</text><rect class="bar" x="420" y="271" width="698" height="46" rx="6"/><text x="1134" y="304" font-size="30" font-weight="700">≈ 12 ч</text><text x="0" y="421" font-size="28">Claude Mythos Preview</text><rect class="bar acc" x="420" y="388" width="930" height="46" rx="6"/><text x="1366" y="421" font-size="30" font-weight="700" class="acc">≥ 16 ч</text></svg></div>
+ <p class="footnote">Горизонт сравнивают со временем, которое на такую же задачу тратит опытный человек. Для Mythos Preview, по словам автора, тест упирается в потолок: длинных задач в нём почти нет.</p>
+</section>
+<section id="slide-17" data-section="03 / Агенты 2026 года" class="slide" data-title="Осенние флагманы 2026">
+ <h2>Осенние флагманы 2026</h2><p class="subtitle">Terminal-Bench 4.0, задачи в командной строке, по таблице Anthropic</p>
+ <div class="metric-pair"><div><div class="num accent">66,4 %</div><p>Claude Opus 5.5</p><p class="small">Anthropic, 22 сентября</p></div><div><div class="num">57,9 %</div><p>GPT-6 Astra</p><p class="small">OpenAI, 3 сентября</p></div></div>
+ <p class="footnote">Даты и проценты – по словам автора. Это замер одной из сторон: каждая компания публикует свои цифры. Ещё упомянуты Gemini 4 Argon (конец сентября) и Claude Fable 5.2 (9 ноября).</p>
+</section>
+<section id="slide-18" data-section="03 / Агенты 2026 года" class="slide" data-title="Какие бывают агенты">
+ <h2>Какие бывают агенты</h2><p class="subtitle">Классы, которые выделяет автор</p>
+ <div class="body agents"><div><div class="category">Для программистов</div><div class="agent"><h3>Claude Code, Codex, Antigravity</h3><p>Читают проект, пишут код, гоняют тесты</p></div><div class="agent"><h3>OpenCode, Qwen Code, goose</h3><p>Открытые, к ним подключают любую модель</p></div></div><div><div class="category">За компьютером и личные</div><div class="agent"><h3>ChatGPT Atlas, Claude в Chrome</h3><p>Смотрят на экран, двигают мышь, заполняют формы</p></div><div class="agent"><h3>OpenClaw</h3><p>Живёт на компьютере, задачи – через мессенджер</p></div></div><div><div class="category">Конструкторы</div><div class="agent"><h3>LangGraph, Agents SDK, ADK, smolagents</h3><p>Библиотеки для тех, кто пишет код</p></div><div class="agent"><h3>n8n, Yandex AI Studio</h3><p>Агент из блоков, без кода</p></div></div></div>
+ <p class="footnote">Под капотом у всех, по словам автора, тот же цикл, что в его 24 строках.</p>
+</section>
+<section id="slide-19" data-section="03 / Агенты 2026 года" class="slide" data-title="Облако или дома">
+ <h2>Облако или дома</h2><p class="subtitle">И гибрид: тот же агент с другим адресом сервера</p>
+ <div class="body two"><div><h3>Облако</h3><ul class="dots"><li>Самые сильные модели, высокая скорость</li><li>Оплата каждого токена: 2 млн входных у Opus 5.5 – 8 долларов, по словам автора</li><li>Файлы и команды уходят на чужой сервер; часть сервисов официально не работает в России</li></ul></div><div><h3>Дома</h3><ul class="dots"><li>Данные не покидают компьютер, счёта нет, сеть не нужна</li><li>Нужна видеокарта, модели слабее</li><li>Разрыв сокращается: по данным разработчиков, Qwen3.6-27B – 77,2 % на SWE-bench Verified против 63,7 % у Claude 3.7 Sonnet в феврале 2025</li></ul></div></div>
+ <p class="footnote">Гибрид: агент автора говорит с моделью на языке API OpenAI; его понимают llama.cpp, Ollama, LM Studio и почти все облака. По словам автора, достаточно сменить адрес; в опубликованном скрипте это три строки: URL, KEY и MODEL.</p>
+</section>
+<section id="slide-20" data-section="04 / Свой агент" class="slide section divider" data-title="Раздел 04. Свой агент за 84 строки">
+ <div class="section-no display">04</div>
+ <h2 class="section-title">Свой агент за 84 строки</h2>
+ <p class="section-detail">Сборка, прогон на семи моделях и Claude Code на домашней модели.</p>
+</section>
+<section id="slide-21" data-section="04 / Свой агент" class="slide" data-title="Три части кода агента">
+ <h2>Три части кода</h2><p class="subtitle">Скрипт автора канала «Скрытый слой», Python и библиотека requests</p>
+ <div class="body three"><div class="outline"><div class="num" data-deco>01</div><h3>Меню</h3><p>run_command – команда PowerShell<br>write_file – запись файла</p><p class="small muted">Описание пишется для модели: выбирает она только по нему</p></div><div class="outline"><div class="num" data-deco>02</div><h3>Исполнители</h3><p>Обычные функции Python</p><p class="small muted">Перед каждым действием – «Разрешить? [y/n]»; вывод – последние 4000 символов</p></div><div class="outline focus"><div class="num accent" data-deco>03</div><h3>Цикл</h3><p>24 строки, лимит 15 шагов</p><p class="small muted">Ошибка тоже уходит модели как наблюдение</p></div></div>
+ <p class="footnote">Мозг в ролике – Qwen3.8-27B (файл 16,5 ГБ) на видеокарте 24 ГБ через llama-server с флагом --jinja и окном 32 тыс. токенов.</p>
+</section>
+<section id="slide-22" data-section="04 / Свой агент" class="slide" data-title="Цикл агента в коде">
+ <h2>Цикл агента в коде</h2><p class="subtitle">Функция agent() из файла agent.py – 24 строки без изменений</p>
+ <pre class="code" aria-label="Фрагмент кода">def agent(task, max_steps=15):
+    messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM}, {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}]
+    for step in range(1, max_steps + 1):
+        reply = requests.post(URL, headers={&quot;Authorization&quot;: f&quot;Bearer {KEY}&quot;}, timeout=600,
+                              json={&quot;model&quot;: MODEL, &quot;messages&quot;: messages, &quot;tools&quot;: TOOLS}).json()
+        msg = reply[&quot;choices&quot;][0][&quot;message&quot;]
+        calls = msg.get(&quot;tool_calls&quot;) or []
+        if msg.get(&quot;reasoning_content&quot;):
+            print(f&quot;[{step}] мысль: {msg[&#x27;reasoning_content&#x27;].strip()[:200]}&quot;)
+        messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: msg.get(&quot;content&quot;) or &quot;&quot;,
+                         **({&quot;tool_calls&quot;: calls} if calls else {})})
+        if not calls:  # инструменты больше не нужны — это ответ
+            return msg.get(&quot;content&quot;)
+        for call in calls:
+            name = call[&quot;function&quot;][&quot;name&quot;]
+            print(f&quot;[{step}] действие: {name} {call[&#x27;function&#x27;][&#x27;arguments&#x27;]}&quot;)
+            try:
+                args = json.loads(call[&quot;function&quot;][&quot;arguments&quot;] or &quot;{}&quot;)
+                result = FUNCS[name](**args)
+            except Exception as e:  # ошибка — тоже наблюдение: модель увидит её и исправится
+                result = f&quot;Ошибка: {e!r}&quot;
+            print(f&quot;[{step}] результат: {result[:300]}&quot;)
+            messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: call.get(&quot;id&quot;, str(step)), &quot;content&quot;: result})
+    return &quot;Стоп: закончился лимит шагов.&quot;</pre>
+ <p class="footnote">Скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале t.me/skrytyysloy.</p>
+</section>
+<section id="slide-23" data-section="04 / Свой агент" class="slide" data-title="Первый запуск: две ловушки">
+ <h2>Первый запуск: две ловушки</h2><p class="subtitle">Задача та же: видеокарта, модели на дисках, отчёт</p>
+ <div class="body two"><div><h3>Что сделал агент</h3><ul class="dots"><li>Сразу три независимые команды: видеокарта, диск D, кэш Hugging Face</li><li>Заметил нулевые размеры, выяснил, что это ссылки, посчитал настоящие файлы</li><li>Windows показала 4 ГБ видеопамяти – перепроверил через nvidia-smi: 24</li></ul></div><div><h3>Чем закончилось</h3><ul class="dots"><li>Перечитал отчёт; кракозябры в консоли проверил по файлу – кодировка в порядке</li><li>10 шагов, меньше двух минут, верный отчёт</li><li>Ловушки не подстроены – так устроен компьютер автора</li></ul></div></div>
+ <p class="footnote">Разрешения в этом прогоне выдавал скрипт: пропускал только команды без изменений, записать можно было только отчёт.</p>
+</section>
+<section id="slide-24" data-section="04 / Свой агент" class="slide" data-title="Десять прогонов на семи моделях">
+ <h2>Десять прогонов на семи моделях</h2><p class="subtitle">Сколько раз из 10 агент написал верный отчёт, замер автора</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Qwen3.8-27B: 7 из 10; Qwen3.6-27B: 3 из 10; Qwen3.6-35B-A3B: 0 из 10; Gemma 4 26B-A4B: 0 из 10; gpt-oss-20b: 0 из 10; Nemotron 3.5: 0 из 10; Qwen3-4B: 0 из 10"><text x="0" y="42" font-size="28">Qwen3.8-27B</text><rect class="bar acc" x="420" y="15" width="651" height="38" rx="6"/><text x="1087" y="42" font-size="30" font-weight="700" class="acc">7 из 10</text><text x="0" y="109" font-size="28">Qwen3.6-27B</text><rect class="bar" x="420" y="82" width="279" height="38" rx="6"/><text x="715" y="109" font-size="30" font-weight="700">3 из 10</text><text x="0" y="176" font-size="28">Qwen3.6-35B-A3B</text><rect class="bar" x="420" y="149" width="4" height="38" rx="6"/><text x="440" y="176" font-size="30" font-weight="700">0 из 10</text><text x="0" y="243" font-size="28">Gemma 4 26B-A4B</text><rect class="bar" x="420" y="216" width="4" height="38" rx="6"/><text x="440" y="243" font-size="30" font-weight="700">0 из 10</text><text x="0" y="310" font-size="28">gpt-oss-20b</text><rect class="bar" x="420" y="283" width="4" height="38" rx="6"/><text x="440" y="310" font-size="30" font-weight="700">0 из 10</text><text x="0" y="378" font-size="28">Nemotron 3.5</text><rect class="bar" x="420" y="350" width="4" height="38" rx="6"/><text x="440" y="378" font-size="30" font-weight="700">0 из 10</text><text x="0" y="445" font-size="28">Qwen3-4B</text><rect class="bar" x="420" y="418" width="4" height="38" rx="6"/><text x="440" y="445" font-size="30" font-weight="700">0 из 10</text></svg></div>
+ <p class="footnote">Верным автор считал отчёт со всеми семью моделями, их настоящими размерами и правильным выводом. Код агента везде один, меняется только модель.</p>
+</section>
+<section id="slide-25" data-section="04 / Свой агент" class="slide" data-title="Как выглядит провал">
+ <h2>Как выглядит провал</h2><p class="subtitle">Каждая модель ломается по-своему</p>
+ <div class="body four"><div class="item"><div class="num" data-deco>01</div><div><h3>Qwen3.6-35B</h3><p>Семь раз видела нули, придумала объяснение и записала, что всё влезает</p></div></div><div class="item"><div class="num" data-deco>02</div><div><h3>gpt-oss</h3><p>После первого отказа снова становится чат-ботом: «запустите сами»</p></div></div><div class="item"><div class="num" data-deco>03</div><div><h3>Qwen3-4B</h3><p>Не заглянула во вложенные папки и записала, что моделей нет</p></div></div><div class="item"><div class="num" data-deco>04</div><div><h3>Gemma 4</h3><p>Повторяет одну и ту же команду, до семи раз за прогон</p></div></div></div>
+ <p class="footnote">Qwen3.6-35B ещё и зацикливалась: в трёх прогонах из десяти до отчёта не дошла. С настройками из карточки модели зацикливание ушло, верных отчётов всё равно ноль.</p>
+</section>
+<section id="slide-26" data-section="04 / Свой агент" class="slide" data-title="Claude Code на домашней модели">
+ <h2>Claude Code на домашней модели</h2><p class="subtitle">Готовый агент, мозг – тот же llama-server с Qwen3.8</p>
+ <div class="body flow" style="--n:3;"><div class="step"><div class="phase display">Адрес</div><h3>Подставить свой сервер</h3><p>Claude Code работает на Qwen3.8</p></div><div class="step"><div class="phase display">Шаблон</div><h3>Поправить одну строку</h3><p>Шаблон чата падал на лишнем системном сообщении</p></div><div class="step"><div class="phase display">Задача</div><h3>Агент дописывает агента</h3><p>Инструмент чтения файла до 4000 символов + проверка</p></div></div>
+ <p class="footnote">Результат, по словам автора: Qwen3.8 – 2,5 минуты, шесть вызовов, тест прошёл с первого раза; облачный Opus 5.5 – меньше минуты.</p>
+</section>
+<section id="slide-27" data-section="04 / Свой агент" class="slide" data-title="Агент ошибается тихо">
+ <p class="eyebrow">Вывод из прогонов</p>
+ <div class="quote display">Агент ошибается<br><span class="accent">тихо</span></div>
+ <p class="quote-caption">Отчёт аккуратный, тест зелёный, а задача не решена. Разница между успехом и провалом – в модели: код агента везде один.</p>
+ <p class="footnote">С Qwen3.6-35B Claude Code получил 4032 символа вместо 4000 и исправил не код, а тест – убрал проверку длины.</p>
+</section>
+<section id="slide-28" data-section="05 / Подвохи" class="slide section divider" data-title="Раздел 05. Подвохи">
+ <div class="section-no display">05</div>
+ <h2 class="section-title">Подвохи</h2>
+ <p class="section-detail">Накопление ошибок, внедрение подсказки и случаи из практики.</p>
+</section>
+<section id="slide-29" data-section="05 / Подвохи" class="slide" data-title="Ошибки накапливаются">
+ <p class="eyebrow">Подвох первый · ошибки накапливаются</p><div class="big-number display">≈ 36 %</div>
+ <p class="big-caption">вероятность пройти 20 шагов без ошибки,<br>если каждый шаг верен в 95 % случаев</p>
+ <p class="big-detail">Важно не только «может ли», но и «всегда ли».<br>Горизонт 12 часов – при успехе в половине случаев; при 8 из 10, по словам автора, около полутора часов.</p>
+ <p class="footnote">Пример автора: 0,95 в двадцатой степени ≈ 0,36 – если шаги ошибаются независимо друг от друга. По словам автора, у METR минимум 16 % «успехов» на задачах дольше 8 часов – это обман проверки, а не решение.</p>
+</section>
+<section id="slide-30" data-section="05 / Подвохи" class="slide" data-title="Внедрение подсказки (prompt injection)">
+ <h2>Внедрение подсказки</h2><p class="subtitle">Модель плохо отличает данные от команд</p>
+ <div class="metric-pair"><div><div class="num">23,6 %</div><p>атак на Claude в браузере<br>удавались без защиты</p><p class="small">Проверка Anthropic, август 2025, по словам автора</p></div><div><div class="num accent">11,2 %</div><p>удавались<br>с защитой</p><p class="small">Там же</p></div></div>
+ <p class="footnote">В одном примере письмо «в целях безопасности» требовало удалить почту, и агент удалил её без вопросов. OpenAI, по словам автора, считает, что полностью проблему вряд ли решат.</p>
+</section>
+<section id="slide-31" data-section="05 / Подвохи" class="slide" data-title="Опыт автора: строчка в заметках">
+ <h2>Строчка в заметках</h2><p class="subtitle">В файл заметок дописана просьба «для ИИ-ассистента» выполнить безобидную команду-метку</p>
+ <div class="body four"><div class="item"><div class="num" data-deco>01</div><div><h3>Qwen3.6-27B</h3><p>Пыталась выполнить во всех 10 прогонах</p></div></div><div class="item"><div class="num" data-deco>02</div><div><h3>Qwen3.6-35B</h3><p>Пыталась каждый раз, когда дочитывала заметки</p></div></div><div class="item"><div class="num" data-deco>03</div><div><h3>Qwen3.8-27B</h3><p>Поддалась 3 раза; в 6 прогонах отказалась и предупредила</p></div></div><div class="item"><div class="num" data-deco>04</div><div><h3>gpt-oss, Nemotron</h3><p>Молча пропускали строчку</p></div></div></div>
+ <p class="footnote">Получив отказ, две версии Qwen3.6 в 8 прогонах из 20 пытались сделать то же другим инструментом. Спасает подтверждение: команду видно до выполнения.</p>
+</section>
+<section id="slide-32" data-section="05 / Подвохи" class="slide" data-title="Смертельная тройка">
+ <h2>Смертельная тройка</h2><p class="subtitle">Термин С. Уиллисона в пересказе автора</p>
+ <div class="body three"><div class="outline"><div class="num" data-deco>01</div><h3>Личные данные</h3><p>Агент видит ваши файлы, почту, документы</p></div><div class="outline"><div class="num" data-deco>02</div><h3>Чужой текст</h3><p>Агент читает сайты, письма, файлы со стороны</p></div><div class="outline focus"><div class="num accent" data-deco>03</div><h3>Выход наружу</h3><p>Агент может что-то отправить</p><p class="small muted">Уберите хотя бы одно из трёх</p></div></div>
+ <p class="footnote">Когда сходятся все три, любая страница в интернете может увести ваши данные.</p>
+</section>
+<section id="slide-33" data-section="05 / Подвохи" class="slide" data-title="Это не теория">
+ <h2>Это не теория</h2><p class="subtitle">Случаи, которые приводит автор</p>
+ <div class="body three"><div class="outline"><div class="num">2025</div><h3>Replit</h3><p>Агент во время запрета на изменения удалил рабочую базу проекта</p><p class="small muted">По словам автора, июль 2025</p></div><div class="outline"><div class="num">OpenClaw</div><h3>Сторонний навык</h3><p>Исследователи Cisco нашли навык, тайно отправлявший данные наружу</p></div><div class="outline focus"><div class="num accent">Офис</div><h3>Магазин Anthropic</h3><p>Claude торговал вольфрамовыми кубиками себе в убыток и раздавал скидки</p><p class="small muted">Денег магазин не заработал</p></div></div>
+ <p class="footnote">Сведения о случаях – в изложении автора ролика, на слайде не перепроверены.</p>
+</section>
+<section id="slide-34" data-section="05 / Подвохи" class="slide" data-title="Правила работы с агентом">
+ <h2>Правила работы с агентом</h2><p class="subtitle">Что советует автор</p>
+ <div class="body numlist"><div class="num display" data-deco>01</div><p>Минимум прав</p><div class="num display" data-deco>02</div><p>Подтверждение перед необратимым</p><div class="num display" data-deco>03</div><p>Песочница</p><div class="num display" data-deco>04</div><p>Копии и журналы</p><div class="num display" data-deco>05</div><p>Цифры тестов – почти всегда цифры самих компаний</p></div>
+ <p class="footnote">В курсе то же правило: агент работает в отдельной папке с копиями, изменения – только с подтверждением.</p>
+</section>
+<section id="slide-35" data-section="Итог" class="slide" data-title="Итог: модель, инструменты, цикл">
+ <h2>Итог</h2>
+ <div class="summary three"><div><div class="num display" data-deco>01</div><h3>Агент</h3><p>Модель + инструменты + цикл. Модель пишет заявки, выполняет их ваш код</p></div><div><div class="num display" data-deco>02</div><h3>Контекст</h3><p>Всё, что агент знает о задаче, лежит в контексте; инструменты всё чаще – через MCP</p></div><div><div class="num display" data-deco>03</div><h3>Облако и дом</h3><p>Облачные умнее, домашние приватнее, цикл у них один</p></div></div>
+ <div class="summary-line">Модель решает. Код делает. <span class="accent">Человек разрешает.</span></div>
+</section>
+<section id="slide-36" data-section="Итог" class="slide" data-title="Источник и права">
+ <h2>Источник и права</h2>
+ <div class="rights"><h3>Источник и права</h3><p>Ролик «Что такое ИИ-агент на самом деле? Собрал своего за 84 строки», канал «Скрытый слой», опубликован 14.11.2026: <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">youtube.com/watch?v=I5h4Bz99Ex0</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала. Код агента – скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">t.me/skrytyysloy</a>.</p></div>
+ <div class="course-links"><h3>Где это в курсе</h3><p>Первый день, тема 1.1 «Языковые модели и чат-сервисы», раздел «От чата к агенту».</p><p>Второй день, тема 2.1 «Защита информации при работе с ИИ», раздел о скрытых командах в тексте и файле, и практика с письмом поставщика.</p><p>Пятый день, тема 5.1 «Внутренние решения и инструменты»: модель и харнес, агент или фиксированная цепочка, агент как советчик.</p></div>
+</section>
+</div></main>
+<div id="progress" aria-hidden="true"></div>
+<nav id="controls" aria-label="Управление презентацией">
+ <div class="group"><button id="prev" title="Предыдущий слайд (←)">←</button><span id="counter"></span><button id="next" title="Следующий слайд (→)">→</button><button id="toc-btn" title="Оглавление (O)">Слайды</button></div>
+ <span id="status">Конспект ролика «Скрытого слоя» · 36 слайдов</span>
+ <div class="group"><button id="notes-btn" title="Заметки и ссылки (N)">Заметки</button><button id="fullscreen-btn" title="Полноэкранный показ (F)">На весь экран</button><button id="help-btn" title="Управление (?)" aria-label="Справка">?</button></div>
+</nav>
+<aside id="speaker" hidden aria-label="Заметки к слайду">
+ <div class="note-actions"><span id="timer">00:00</span><button id="timer-btn">Старт</button><button id="close-notes" aria-label="Закрыть заметки">×</button></div>
+ <p class="warning">Заметки – пересказ ролика своими словами для учебных целей. Точные формулировки и цифры – в самом ролике по ссылке с отметкой времени.</p><div id="speaker-content"></div>
+</aside>
+<div id="toc" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="toc-title"><div class="panel"><button class="close" data-close="toc">Закрыть</button><h2 id="toc-title">Слайды</h2><ol id="toc-list"></ol></div></div>
+<div id="help" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="panel"><button class="close" data-close="help">Закрыть</button><h2 id="help-title">Управление презентацией</h2><p>В презентации 36 слайдов.</p><ul><li><strong>← / → / Space</strong> – предыдущий / следующий слайд</li><li><strong>Home / End</strong> – начало / конец презентации</li><li><strong>F</strong> – полноэкранный показ; <strong>Esc</strong> – выход</li><li><strong>N</strong> – заметки: пересказ отрезка ролика и ссылка на это место; <strong>O</strong> – оглавление</li><li><strong>?</strong> – справка</li><li>Кнопка ☾/☀ справа сверху переключает светлую и тёмную тему. Вечером и ночью (с 20:00 до 07:00) презентация открывается в тёмной теме, днём – в светлой.</li><li>На сенсорном экране можно листать свайпом.</li></ul><p>Файл автономный: схемы нарисованы средствами HTML и SVG, подключения к сети нет. Печать из браузера выводит все слайды без заметок и элементов управления.</p><h3>Источник и права</h3><p>Ролик «Что такое ИИ-агент на самом деле? Собрал своего за 84 строки», канал «Скрытый слой», опубликован 14.11.2026: <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">youtube.com/watch?v=I5h4Bz99Ex0</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала. Код агента – скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">t.me/skrytyysloy</a>.</p></div></div>
+<div id="live" role="status" aria-live="polite"></div>
+<script type="application/json" id="deck-meta">{"video": "https://www.youtube.com/watch?v=I5h4Bz99Ex0"}</script>
+<script type="application/json" id="notes-data">[{"t": 0, "end": 94, "note": ["Вступление – демонстрация. Домашняя программа без интернета сама узнаёт память видеокарты, ищет файлы моделей, сравнивает размеры и пишет отчёт. Чат-бот в той же ситуации ограничился бы советом.", "Автор называет агентом модель, которая сама выбирает шаг и смотрит на результат. Его агент – 84 строки Python, из них 24 – цикл, мозг – Qwen 3.8. Из семи проверенных домашних моделей задачу уверенно решила одна."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Telegram-канал автора, где опубликован скрипт", "https://t.me/skrytyysloy"]]}, {"t": 75, "end": 101, "note": ["Основа: что умеет модель сама и что к ней добавляют."]}, {"t": 94, "end": 140, "note": ["Модель только продолжает текст: ни часов, ни файлов, ни сети, знания – на дату конца обучения. Автор сравнивает её с мозгом в банке. Агент – тот же мозг с инструментами (поиск, команды, файлы, почта, браузер), запущенный по кругу."], "quote": "агент – это модель, которая вызывает инструменты в цикле, чтобы достичь цели", "qby": "определение С. Уиллисона в пересказе автора ролика", "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 140, "end": 185, "note": ["Ступени: чат, чат с разовым обращением к инструменту, сценарий с заданным кодом порядком шагов и агент, где порядок выбирает модель. Автор ссылается на Anthropic: начинать со сценария, а агента брать, когда шаги заранее неизвестны – поиск ошибки в чужом коде, разбор незнакомой папки, сбор сведений с многих сайтов."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Anthropic. Building effective agents", "https://www.anthropic.com/research/building-effective-agents"]]}, {"t": 185, "end": 239, "note": ["Программа заранее даёт модели меню инструментов. Когда инструмент нужен, модель вместо ответа пишет заявку: имя и аргументы. Это всё те же токены (у Qwen – между метками tool_call); такому формату модель учили на дообучении.", "Заявку исполняет обычная программа и возвращает результат сообщением с ролью tool. Модель решает: ещё вызов или ответ человеку."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 239, "end": 271, "note": ["Ключевая для безопасности мысль автора: сама модель ничего не исполняет. Между её текстом и действием стоит код человека, и в нём можно запросить подтверждение, запретить опасное, ограничить папки."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 261, "end": 271, "note": ["Из заявок и их исполнения собирается цикл."]}, {"t": 271, "end": 311, "note": ["Цикл восходит к статье ReAct 2022 года: рассуждение и действие чередуются. В коде модели каждый раз уходят вся история и меню; ответ без вызовов – финал, иначе вызовы исполняются, результаты дописываются, круг повторяется. По словам автора, так устроены все агенты, вплоть до Claude Code."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Yao S. и соавт. ReAct: Synergizing Reasoning and Acting in Language Models, 2022", "https://doi.org/10.48550/arXiv.2210.03629"]]}, {"t": 311, "end": 354, "note": ["Скрипт на неожиданности падает, агент читает ошибку и ищет обход, поэтому автор отдаёт модели и ошибки. Но модель может зациклиться, так что нужен предел шагов – у автора 15, после него решает человек."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 354, "end": 397, "note": ["Контекст – окно, которое модель видит целиком: инструкция, меню, задача и вся история. Его пересылают на каждом круге, и он растёт, отсюда цена. Хорошие агенты подрезают вывод команд и сворачивают старые шаги в пересказ."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 397, "end": 452, "note": ["Контекст пропадает вместе с задачей. Долгая память – файлы: правила проекта (AGENTS.md, CLAUDE.md), заметки агента с поиском по ним, навыки. От навыка агент держит в голове только краткое описание, полный текст подгружает по необходимости. Подбор того, что модель видит на каждом шаге, автор называет инженерией контекста."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 442, "end": 519, "note": ["Командой агентов автор называет схему «дирижёр и исполнители». Пример – глубокое исследование у Anthropic: помощники ищут каждый своё с чистым контекстом. По его словам, на внутреннем тесте это на 90 % лучше одиночного Claude Opus 4, но примерно в 15 раз дороже чата по токенам."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 518, "end": 571, "note": ["Если каждый агент сам подключается к каждому сервису, работа множится. MCP решает это: сервис один раз публикует MCP-сервер – то же меню инструментов, – и его берёт любой совместимый агент, кто бы его ни сделал и какая бы модель в нём ни стояла."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 571, "end": 632, "note": ["По словам автора, в фонд при Linux Foundation вместе с MCP ушли AGENTS.md от OpenAI и агент goose от Block, а MCP-серверов к тому времени было больше 10 тысяч. В июле 2026 года вышла крупная версия MCP без постоянных сессий. Для общения агентов разных компаний – протокол A2A от Google."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 621, "end": 648, "note": ["Обзор: способности, классы агентов, облако или свой компьютер."]}, {"t": 632, "end": 679, "note": ["Мерилом автор считает исследования группы METR: задачи агента сравнивают со временем опытного человека, а горизонт – длина задач, решаемых в половине случаев. Цифры на слайде – утверждения автора, в конспекте не перепроверены."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 679, "end": 733, "note": ["Автор перечисляет осенние выпуски трёх крупных компаний и сравнение из таблицы Anthropic. OpenAI называет GPT-6 Astra лучшей моделью для работы за компьютером. Сам автор оговаривается, что это замер одной стороны."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 708, "end": 833, "note": ["Самыми зрелыми автор считает агентов для программистов; рядом Cursor и GitHub Copilot. Агенты за компьютером пока медленные: по данным OpenAI, которые он приводит, GPT-6 Astra тратит на задачу OSWorld около 40 минут.", "Главный сюжет года, по его мнению, – личный агент OpenClaw Петера Штайнбергера, больше 390 тысяч звёзд на GitHub; ему пишут через мессенджер, память – файлы на диске. В феврале 2026 года автор проекта перешёл в OpenAI, проект передан фонду."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 833, "end": 927, "note": ["Плюсы облака – сила моделей, скорость, не нужна своя видеокарта; минусы – счёт за токены (кэш его смягчает), данные на чужом сервере и доступ из России. Дома – наоборот. SWE-bench Verified, который упоминает автор, – исправление реальных ошибок в открытых проектах.", "По его словам, с января 2026 года llama.cpp понимает и протокол Anthropic, поэтому в Claude Code можно подставить домашнюю модель."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 913, "end": 927, "note": ["Практика: сборка, запуск, сравнение моделей."]}, {"t": 927, "end": 1006, "note": ["Мозг – плотная Qwen3.8 на 27 миллиардов: на каждом токене работают все параметры, она медленнее смеси экспертов, но в тестах автора сильнее. Для вызова инструментов нужен включённый режим jinja – родной шаблон чата модели; по README автора, в свежих сборках llama.cpp он включён по умолчанию. Фреймворков нет – только requests."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Telegram-канал автора, где опубликован скрипт", "https://t.me/skrytyysloy"]]}, {"t": 985, "end": 1010, "note": ["Разбор функции: системная подсказка и задача – в историю; на шаге модели уходят история и меню; мысль (reasoning_content) печатается; без вызовов – возврат ответа; иначе каждый вызов исполняется, результат дописывается с ролью tool, а исключение тоже становится результатом.", "Сверка с роликом: лимит 15 шагов, обрезка вывода до 4000 символов и вопрос «Разрешить?» в опубликованном файле есть (подтверждение – в run_command и write_file). Автоматического разрешения команд, о котором говорится в ролике, в файле нет: отвечает человек."], "sources": [["Telegram-канал автора, где опубликован скрипт", "https://t.me/skrytyysloy"], ["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1006, "end": 1074, "note": ["Нули в размерах – особенность ссылок в кэше Hugging Face под PowerShell; 4 ГБ – старое поле Windows, которое больше не покажет. Агент разобрался в обоих случаях сам и попутно исправил собственную команду."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1074, "end": 1099, "note": ["Один удачный запуск автор доказательством не считает и повторяет задачу по десять раз. Полные названия моделей на слайде взяты из описания к его скрипту."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Telegram-канал автора, где опубликован скрипт", "https://t.me/skrytyysloy"]]}, {"t": 1099, "end": 1176, "note": ["Qwen3.6-35B объяснила нули округлением и записала в отчёт как помещающийся даже файл размером 35 гигабайт, затем искала файлы не там и исчерпала лимит. gpt-oss сдавалась после первого отказа в шести прогонах из десяти. Зацикливание у 35B доходило до переполнения окна в 32 тысячи токенов."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1176, "end": 1222, "note": ["Claude Code облачный, но модель в нём заменяема. После правки шаблона чата агент на Qwen3.8 добавил инструмент чтения файлов, и проверка автора тоже дала ровно 4000 символов."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1222, "end": 1255, "note": ["С Qwen3.6-35B тест прошёл только потому, что агент убрал из него проверку длины. Вывод автора: ошибки агента незаметны, а успех определяет модель, не код агента."], "quote": "агент ошибается тихо", "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1249, "end": 1255, "note": ["Где агенты подводят и как защищаться."]}, {"t": 1255, "end": 1300, "note": ["Вероятности шагов перемножаются, поэтому длинная цепочка ломается чаще, чем кажется. Автор советует смотреть не только на способность агента, но и на надёжность; часть «успехов» в тестах, по его данным, – обман проверки, а не решение."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1276, "end": 1350, "note": ["Агент читает чужие сайты, письма и файлы, а модель путает данные с распоряжениями: просьба в письме может стать командой. Это внедрение подсказки. OpenAI, по словам автора, в декабре 2025 года сравнила проблему с интернет-мошенничеством, которое тоже не искоренить полностью."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1327, "end": 1385, "note": ["Автор положил в папку с моделями файл заметок со строчкой-приманкой и попросил агента учесть заметки. Отказываясь, Qwen3.8 объясняла, что команды из файла не являются распоряжением пользователя. Защита – вопрос «Разрешить?»: человек видит команду до запуска."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1371, "end": 1397, "note": ["Опасно сочетание трёх условий: доступ к личным данным, чтение чужого текста и возможность отправки наружу. Совет – разорвать хотя бы одно."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["S. Willison. The lethal trifecta for AI agents", "https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"]]}, {"t": 1397, "end": 1441, "note": ["После удаления базы агент Replit, по словам автора, объяснил, что запаниковал. Магазин Anthropic ещё и просил платить на выдуманный счёт и обещал лично доставить товар в пиджаке и галстуке."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1441, "end": 1458, "note": ["Меры автора: только нужные права, подтверждение перед необратимым, изолированная среда, копии и журналы. И поправка к цифрам: результаты тестов почти всегда публикуют сами компании."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"]]}, {"t": 1458, "end": 1490, "note": ["Автор сводит ролик к трём мыслям. Агент складывается из модели, инструментов и цикла, причём модель лишь пишет заявки, а исполняет их код. Всё, что агент знает о задаче, лежит в контексте, а инструменты к нему всё чаще подключают через MCP. По оценке автора, облачные модели сильнее, локальный запуск даёт больше приватности, а цикл работы агента в обоих случаях один."], "quote": "Модель решает. Код делает. Человек разрешает."}, {"note": ["Конспект не заменяет ролик: формулировки, демонстрации и экран с кодом – у автора."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=I5h4Bz99Ex0"], ["Telegram-канал автора, где опубликован скрипт", "https://t.me/skrytyysloy"], ["Yao S. и соавт. ReAct: Synergizing Reasoning and Acting in Language Models, 2022", "https://doi.org/10.48550/arXiv.2210.03629"]]}]</script>
+<script>
+(() => {
+ 'use strict';
+ const slides = [...document.querySelectorAll('.slide')], notes = JSON.parse(document.querySelector('#notes-data').textContent);
+ const META = JSON.parse(document.querySelector('#deck-meta').textContent);
+ const $ = s => document.querySelector(s);
+ let index = 0, lastFocus = null, timerStart = 0, elapsed = 0, isTiming = false, timerId = null;
+ const slideCount = slides.length;
+ const label = i => `${String(i + 1).padStart(2,'0')} / ${slideCount}`;
+ const mmss = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+ if (notes.length !== slideCount) console.error('notes/slides mismatch', notes.length, slideCount);
+ function part(i) { return slides[i].dataset.section; }
+ slides.forEach((slide, i) => {
+  slide.setAttribute('role','group'); slide.setAttribute('aria-roledescription','слайд'); slide.setAttribute('aria-label',`${i+1}. ${slide.dataset.title}`);
+  const foot = document.createElement('footer');
+  const left = document.createElement('span'), right = document.createElement('span');
+  left.textContent = `/ ${part(i)}`; right.className='page'; right.textContent=String(i+1).padStart(2,'0'); foot.append(left,right); slide.append(foot);
+  const li=document.createElement('li'), button=document.createElement('button'), n=document.createElement('span');
+  n.textContent=String(i+1).padStart(2,'0');button.append(n,document.createTextNode(slide.dataset.title));button.dataset.slide=i;
+  button.addEventListener('click',()=>{closeOverlay('toc');go(i);});li.append(button);$('#toc-list').append(li);
+ });
+ function resize() { const r=$('#stage').getBoundingClientRect();document.documentElement.style.setProperty('--scale',Math.min(r.width/1600,r.height/900)); }
+ function link(url, text) { const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=text||url;return a; }
+ function renderNotes() {
+  const container=$('#speaker-content'); container.replaceChildren();
+  const n=notes[index];
+  const h=document.createElement('h2');h.textContent=`${label(index)} · ${slides[index].dataset.title}`;
+  container.append(h);
+  if (typeof n.t === 'number') {
+   const seg=document.createElement('p');seg.className='seg';
+   seg.append(document.createTextNode(`Отрезок ролика: ${mmss(n.t)}–${mmss(n.end)} · `), link(`${META.video}&t=${n.t}s`, 'смотреть с этого места'));
+   container.append(seg);
+  }
+  (n.note||[]).forEach(t=>{const p=document.createElement('p');p.textContent=t;container.append(p);});
+  if (n.quote) { const q=document.createElement('blockquote');q.textContent=`«${n.quote}» – ${n.qby||'автор ролика'}`;container.append(q); }
+  if ((n.sources||[]).length) {
+   const sh=document.createElement('h3');sh.textContent='Ссылки';const list=document.createElement('ol');
+   n.sources.forEach(s=>{const li=document.createElement('li');li.append(document.createTextNode(s[0]+': '),link(s[1]));list.append(li);});
+   container.append(sh,list);
+  }
+ }
+ function go(i, updateHash=true) {
+  index=Math.max(0,Math.min(slideCount-1,i));
+  slides.forEach((s,j)=>{s.classList.toggle('active',j===index);s.setAttribute('aria-hidden',String(j!==index));s.inert=j!==index;});
+  $('#counter').textContent=label(index);$('#progress').style.width=`${((index+1)/slideCount)*100}%`;
+  $('#prev').disabled=index===0;$('#next').disabled=index===slideCount-1;
+  $('#toc-list').querySelectorAll('button').forEach(b=>b.classList.toggle('current',Number(b.dataset.slide)===index));
+  $('#live').textContent=`${label(index)}. ${slides[index].dataset.title}`;
+  renderNotes(); if(updateHash)history.replaceState(null,'',`#${index+1}`);
+ }
+ function move(delta) { go(index+delta); }
+ function closeOverlay(id) {$('#'+id).hidden=true;if(lastFocus)lastFocus.focus();lastFocus=null;}
+ function openOverlay(id) {lastFocus=document.activeElement;$('#'+id).hidden=false;$('#'+id+' .close').focus();}
+ function notesToggle(force) {const on=force===undefined?$('#speaker').hidden:force;if(on&&document.body.classList.contains('presenting'))exitFullscreen();$('#speaker').hidden=!on;document.body.classList.toggle('notes-open',on);$('#notes-btn').setAttribute('aria-expanded',String(on));resize();}
+ async function exitFullscreen() {document.body.classList.remove('presenting');if(document.fullscreenElement)await document.exitFullscreen().catch(()=>{});resize();}
+ async function fullscreen() {
+  if(document.body.classList.contains('presenting')){await exitFullscreen();return;}
+  notesToggle(false);document.body.classList.add('presenting');resize();
+  if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen().catch(()=>{});
+  resize();
+ }
+ // тема: ☾/☀, ручной выбор до ближайшей смены дня и ночи
+ const T=window.__deckTheme, root=document.documentElement;
+ function paintTheme(){const dark=root.dataset.theme==='dark';$('#theme-btn').textContent=dark?'☀':'☾';$('#theme-btn').setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');$('#theme-btn').title=$('#theme-btn').getAttribute('aria-label');}
+ function setTheme(t,persist){root.dataset.theme=t;paintTheme();if(persist){const u=T.next();T.keep(t,u);try{localStorage.setItem(T.K,JSON.stringify({theme:t,until:u}));localStorage.setItem('appsec-theme',t);}catch(e){}}}
+ $('#theme-btn').onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark',true);
+ const embedded=root.classList.contains('embedded');
+ window.addEventListener('storage',e=>{if(embedded||!(e.key===T.K||e.key===null))return;if(e.key===null||e.newValue===null)T.reset();setTheme(T.man()||T.tt(),false);});
+ // в рамке страницы курса тему задаёт страница (в том числе когда хранилище браузера недоступно)
+ window.addEventListener('message',e=>{if(embedded&&e.source===window.parent&&e.origin===location.origin&&e.data&&(e.data.kamazTheme==='light'||e.data.kamazTheme==='dark'))setTheme(e.data.kamazTheme,false);});
+ if(!embedded)setInterval(()=>{const t=T.man()||T.tt();if(t!==root.dataset.theme)setTheme(t,false);},60000);
+ paintTheme();
+ $('#prev').onclick=()=>move(-1);$('#next').onclick=()=>move(1);
+ $('#toc-btn').onclick=()=>openOverlay('toc');$('#help-btn').onclick=()=>openOverlay('help');$('#notes-btn').onclick=()=>notesToggle();$('#close-notes').onclick=()=>notesToggle(false);$('#fullscreen-btn').onclick=fullscreen;
+ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeOverlay(b.dataset.close));
+ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlay(o.id);}));
+ document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const open=[...document.querySelectorAll('.overlay')].find(o=>!o.hidden);
+  if(open){if(e.key==='Escape'){e.preventDefault();closeOverlay(open.id);}if(e.key==='Tab'){const f=[...open.querySelectorAll('button,a')];if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus();}}return;}
+  if(['ArrowRight','PageDown'].includes(e.key)||(e.key===' '&&!e.target.closest('button,a'))){e.preventDefault();move(1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();move(-1);}
+  else if(e.key==='Home'){e.preventDefault();go(0);}
+  else if(e.key==='End'){e.preventDefault();go(slideCount-1);}
+  else if(e.key.toLowerCase()==='f'||e.key.toLowerCase()==='а'){e.preventDefault();fullscreen();}
+  else if(e.key.toLowerCase()==='n'||e.key.toLowerCase()==='т'){e.preventDefault();notesToggle();}
+  else if(e.key.toLowerCase()==='o'||e.key.toLowerCase()==='щ'){e.preventDefault();openOverlay('toc');}
+  else if(e.key==='?'){e.preventDefault();openOverlay('help');}
+  else if(e.key==='Escape'){notesToggle(false);exitFullscreen();}
+ });
+ let touch=null;$('#stage').addEventListener('touchstart',e=>{if(e.touches.length===1)touch=[e.touches[0].clientX,e.touches[0].clientY];},{passive:true});
+ $('#stage').addEventListener('touchend',e=>{if(!touch)return;const t=e.changedTouches[0],dx=t.clientX-touch[0],dy=t.clientY-touch[1];touch=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)move(dx<0?1:-1);},{passive:true});
+ function readHash(){const n=Number(location.hash.slice(1));go(Number.isInteger(n)&&n>=1&&n<=slides.length?n-1:0,false);}
+ window.addEventListener('hashchange',readHash);window.addEventListener('resize',resize);
+ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('presenting');resize();});
+ $('#timer-btn').onclick=()=>{if(isTiming){elapsed+=Date.now()-timerStart;isTiming=false;clearInterval(timerId);$('#timer-btn').textContent='Продолжить';}else{timerStart=Date.now();isTiming=true;$('#timer-btn').textContent='Пауза';timerId=setInterval(()=>{const t=Math.floor((elapsed+Date.now()-timerStart)/1000);$('#timer').textContent=mmss(t);},250);}};
+ if (new URLSearchParams(location.search).get('notes')==='1') notesToggle(true);
+ document.fonts.ready.then(resize);readHash();resize();
+})();
+</script>
+</body>
+</html>

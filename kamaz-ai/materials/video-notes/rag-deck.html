@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; img-src data:; font-src data:; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<meta name="robots" content="noindex,follow">
+<title>Как работает RAG</title>
+<script>
+(function(){var K='kamaz-theme-manual';
+function tt(){var h=new Date().getHours();return (h>=20||h<7)?'dark':'light';}
+var mem=null;
+function man(){try{var m=JSON.parse(localStorage.getItem(K)||'null');if(m&&(m.theme==='light'||m.theme==='dark')&&m.until>Date.now())return m.theme;}catch(e){}return mem&&mem.until>Date.now()?mem.theme:null;}
+window.__deckTheme={K:K,tt:tt,man:man,keep:function(t,u){mem={theme:t,until:u};},reset:function(){mem=null;},next:function(){var d=new Date(),n=new Date(d),h=d.getHours();if(h>=7&&h<20){n.setHours(20,0,0,0);}else{if(h>=20)n.setDate(n.getDate()+1);n.setHours(7,0,0,0);}return n.getTime();}};
+document.documentElement.dataset.theme=man()||tt();
+try{if(window.self!==window.top)document.documentElement.classList.add('embedded');}catch(e){document.documentElement.classList.add('embedded');}
+})();
+</script>
+<style>
+
+
+:root { --ink:#000; --paper:#fff; --gray:#ececec; --muted:#595959; --red:#e8401c; --line:#000; --soft:#f6f6f6;
+  --bg:#1b1b1b; --chip-ink:#fff; --chip-bg:#000; --scale:1; color-scheme:light; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --ink:#f1f1f1; --paper:#161616; --gray:#262626; --muted:#a9a9a9; --red:#ff6b4a; --line:#e9e9e9; --soft:#1f1f1f; --bg:#0a0a0a; --chip-ink:#111; --chip-bg:#f1f1f1; color-scheme:dark; } }
+:root[data-theme="dark"] { --ink:#f1f1f1; --paper:#161616; --gray:#262626; --muted:#a9a9a9; --red:#ff6b4a; --line:#e9e9e9; --soft:#1f1f1f; --bg:#0a0a0a; --chip-ink:#111; --chip-bg:#f1f1f1; color-scheme:dark; }
+* { box-sizing:border-box; }
+html,body { margin:0; width:100%; height:100%; overflow:hidden; }
+body { background:var(--bg); color:var(--ink); font-family:'YS Text','Inter','Segoe UI',Arial,sans-serif; }
+button,a { -webkit-tap-highlight-color:transparent; }
+button { font:inherit; cursor:pointer; }
+button:focus-visible,a:focus-visible { outline:3px solid var(--red); outline-offset:4px; }
+[hidden] { display:none!important; }
+#stage { position:absolute; inset:0 0 62px; display:grid; place-items:center; overflow:hidden; }
+#deck { width:1600px; height:900px; position:absolute; transform:scale(var(--scale)); transform-origin:center; }
+.slide { display:none; width:1600px; height:900px; position:relative; overflow:hidden; background:var(--paper); color:var(--ink); padding:60px; }
+.slide.active { display:block; }
+.slide.divider { background:var(--gray); }
+.slide h1,.slide h2,.slide h3,.slide p { margin:0; }
+.slide h1,.slide h2,.display,.num { font-family:'YS Display','Inter','Segoe UI',Arial,sans-serif; font-weight:600; }
+.slide h2 { font-size:62px; line-height:1; letter-spacing:-1.4px; white-space:nowrap; }
+.slide h3 { font-size:33px; line-height:1.1; font-weight:700; }
+.slide p,.slide li { font-size:31px; line-height:1.22; }
+.slide .small { font-size:24px; line-height:1.25; }
+.slide .muted { color:var(--muted); }
+.slide .accent { color:var(--red); }
+.slide .subtitle { margin-top:22px; font-size:29px; color:var(--muted); }
+.slide .footnote { position:absolute; left:60px; right:60px; bottom:106px; font-size:23px; line-height:1.22; color:var(--muted); }
+.slide footer { position:absolute; left:60px; right:60px; bottom:52px; display:flex; align-items:center; justify-content:space-between; color:var(--muted); font-size:18px; line-height:1; }
+.slide footer .page { color:var(--ink); min-width:80px; text-align:right; }
+.slide .body { position:absolute; top:230px; left:60px; right:60px; bottom:170px; }
+.slide .two { display:grid; grid-template-columns:1fr 1fr; gap:72px; }
+.slide .three { display:grid; grid-template-columns:repeat(3,1fr); gap:30px; }
+.slide .two h3 { margin-bottom:26px; }
+.slide ul.dots { padding:0; margin:0; list-style:none; }
+.slide ul.dots li { position:relative; padding-left:25px; margin-bottom:18px; }
+.slide ul.dots li::before { content:'•'; color:var(--red); position:absolute; left:0; }
+.slide .outline { border:3px solid var(--line); border-radius:31px; padding:30px; }
+.slide .outline.focus { border-color:var(--red); }
+.slide .three .num { font-size:60px; line-height:1; margin-bottom:28px; }
+.slide .three h3 { min-height:40px; margin-bottom:20px; }
+.slide .three p { font-size:28px; line-height:1.23; }
+.slide .three .small { font-size:23px; margin-top:22px; }
+.slide .quote { position:absolute; top:250px; left:90px; right:90px; font-size:96px; line-height:1.03; letter-spacing:-2px; }
+.slide .quote-caption { position:absolute; top:610px; left:93px; width:1300px; font-size:31px; line-height:1.23; }
+.slide .eyebrow { color:var(--muted); font-size:26px; }
+.slide .big-number { position:absolute; top:130px; left:60px; right:60px; text-align:center; font-size:230px; line-height:1; letter-spacing:-6px; }
+.slide .big-caption { position:absolute; top:430px; left:160px; right:160px; text-align:center; font-size:46px; line-height:1.1; }
+.slide .big-detail { position:absolute; top:600px; left:180px; right:180px; text-align:center; font-size:28px; line-height:1.27; color:var(--muted); }
+.slide .number-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:46px; position:absolute; left:60px; right:60px; top:250px; }
+.slide .number-grid .num { font-size:120px; line-height:1; letter-spacing:-4px; margin-bottom:34px; }
+.slide .number-grid p { font-size:29px; line-height:1.25; }
+.slide .number-grid .desc { margin-top:16px; font-size:24px; color:var(--muted); }
+.slide .four { display:grid; grid-template-columns:1fr 1fr; gap:52px 76px; }
+.slide .four .item { display:grid; grid-template-columns:72px 1fr; gap:22px; align-content:start; }
+.slide .four .num { font-size:52px; line-height:1; color:var(--red); }
+.slide .four h3 { margin:4px 0 14px; }
+.slide .four p { font-size:27px; }
+.slide .flow { display:grid; grid-template-columns:repeat(var(--n,3),1fr); gap:60px; }
+.slide .flow .step { position:relative; border-top:3px solid var(--line); padding-top:34px; margin-top:80px; }
+.slide .flow .step::before { content:''; width:22px; height:22px; border-radius:50%; background:var(--ink); position:absolute; left:0; top:-12px; }
+.slide .flow .step:not(:last-child)::after { content:''; width:18px; height:18px; border-top:3px solid var(--ink); border-right:3px solid var(--ink); transform:rotate(45deg); position:absolute; right:-40px; top:-10px; }
+.slide .flow .step:last-child { border-color:var(--red); }
+.slide .flow .step:last-child::before { background:var(--red); }
+.slide .flow .phase { position:absolute; top:-80px; font-size:40px; line-height:1; white-space:nowrap; }
+.slide .flow h3 { margin-bottom:22px; }
+.slide .flow p { font-size:28px; }
+.slide.title { background:var(--gray); }
+.title .title-card { position:absolute; left:60px; top:60px; width:1480px; height:480px; border-radius:33px; background:var(--paper); padding:31px 34px; }
+.title .mark { font-size:23px; font-weight:700; letter-spacing:.2px; }
+.title .mark span { color:var(--red); }
+.title .edition { position:absolute; top:34px; right:35px; font-size:23px; color:var(--muted); }
+.title h1 { margin-top:64px; font-size:110px; line-height:.99; letter-spacing:-3px; }
+.title .title-subtitle { margin-top:30px; font-size:32px; }
+.title .org { position:absolute; left:94px; top:590px; right:94px; }
+.title .org strong { display:block; font-size:28px; margin-bottom:14px; }
+.title .org p { font-size:24px; line-height:1.25; color:var(--muted); }
+.title .org a, .slide .rights a { color:inherit; text-decoration-color:var(--red); }
+.section .section-no { position:absolute; left:93px; top:75px; font-size:90px; color:var(--red); }
+.section .section-title { position:absolute; top:254px; left:93px; width:1330px; font-size:96px; line-height:1.02; letter-spacing:-2px; white-space:normal; }
+.section .section-detail { position:absolute; top:520px; left:93px; width:1300px; font-size:34px; line-height:1.2; }
+.slide .agents { display:grid; grid-template-columns:repeat(3,1fr); gap:48px; }
+.agents .category { font-size:25px; color:var(--muted); padding-bottom:22px; border-bottom:2px solid var(--line); }
+.agents .agent { padding-top:26px; }
+.agents .agent h3 { margin-bottom:10px; font-size:30px; }
+.agents .agent p { font-size:25px; line-height:1.2; }
+.slide .loop { display:grid; grid-template-columns:repeat(3,1fr); gap:38px; margin-top:110px; }
+.loop .display { font-size:70px; line-height:1.05; border-top:3px solid var(--line); padding-top:27px; }
+.loop p { font-size:27px; margin-top:28px; }
+.loop .display.last { border-color:var(--red); }
+.slide .summary { position:absolute; top:230px; left:60px; right:60px; }
+.summary .num { font-size:66px; color:var(--red); margin-bottom:24px; }
+.summary h3 { font-size:34px; margin-bottom:20px; }
+.summary p { font-size:28px; }
+.slide .summary-line { position:absolute; top:640px; left:60px; right:60px; font-family:'YS Display','Inter','Segoe UI',Arial,sans-serif; font-weight:600; font-size:42px; line-height:1.12; border-top:3px solid var(--line); padding-top:26px; }
+.slide .metric-pair { position:absolute; top:240px; left:60px; right:60px; display:grid; grid-template-columns:1fr 1fr; gap:75px; }
+.slide .metric-pair .num { font-size:170px; line-height:1; letter-spacing:-5px; margin-bottom:40px; }
+.slide .metric-pair p { font-size:35px; line-height:1.16; }
+.slide .metric-pair .small { margin-top:18px; color:var(--muted); }
+.slide .code { position:absolute; left:60px; right:60px; top:190px; margin:0; font-family:ui-monospace,'Cascadia Code',Consolas,Menlo,monospace; font-size:17px; line-height:1.22; padding:18px 28px; border-radius:25px; background:var(--gray); color:var(--ink); white-space:pre; overflow:hidden; }
+.slide .code .c { color:var(--muted); }
+.slide .code .k { color:var(--red); }
+.slide .chart { position:absolute; left:60px; right:60px; top:225px; height:470px; }
+.slide .chart svg { display:block; width:100%; height:100%; }
+.slide .chart text { fill:var(--ink); font-family:'YS Text','Inter','Segoe UI',Arial,sans-serif; }
+.slide .chart .mut { fill:var(--muted); }
+.slide .chart .acc { fill:var(--red); }
+.slide .chart .bar { fill:var(--ink); }
+.slide .chart .bar.acc { fill:var(--red); }
+.slide .chart .ln { stroke:var(--ink); fill:none; }
+.slide .chart .lnm { stroke:var(--muted); fill:none; }
+.slide .chart .lna { stroke:var(--red); fill:none; }
+.slide .chart .dot { fill:var(--ink); }
+.slide .chart .doth { fill:var(--paper); stroke:var(--ink); }
+.slide .chart .dota { fill:var(--red); }
+.slide .rights { position:absolute; left:60px; right:60px; top:215px; border:3px solid var(--line); border-radius:31px; padding:30px 34px; }
+.slide .rights h3 { margin-bottom:16px; }
+.slide .rights p { font-size:26px; line-height:1.28; margin-bottom:10px; }
+.slide .course-links { position:absolute; left:60px; right:60px; top:560px; }
+.slide .course-links h3 { margin-bottom:14px; font-size:30px; }
+.slide .course-links p { font-size:25px; line-height:1.3; }
+.slide .numlist { display:grid; grid-template-columns:72px 1fr; gap:22px 22px; align-content:start; padding-top:6px; }
+.slide .numlist .num { font-size:50px; line-height:1; color:var(--red); }
+.slide .numlist p { font-size:34px; line-height:1.2; }
+.slide .numlist p small { display:block; font-size:24px; color:var(--muted); margin-top:6px; }
+#controls { height:62px; position:absolute; bottom:0; left:0; right:0; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:0 24px; color:#fff; background:#1b1b1b; font-size:14px; }
+#controls .group { display:flex; align-items:center; gap:8px; }
+#controls button { border:1px solid #6a6a6a; color:#fff; background:transparent; padding:8px 12px; border-radius:9px; font-size:14px; white-space:nowrap; }
+#controls button:hover { background:#333; }
+#controls button:disabled { opacity:.35; cursor:default; }
+#counter { min-width:98px; text-align:center; font-variant-numeric:tabular-nums; }
+#status { color:#c9c9c9; }
+#progress { position:absolute; left:0; bottom:62px; height:3px; background:var(--red); z-index:2; transition:width .15s linear; }
+#theme-btn { position:fixed; top:16px; right:16px; z-index:30; width:44px; height:44px; border-radius:50%; border:1px solid var(--muted); background:var(--paper); color:var(--ink); font-size:21px; line-height:1; display:grid; place-items:center; box-shadow:0 2px 10px rgba(0,0,0,.25); }
+#theme-btn:focus-visible { outline:3px solid var(--red); outline-offset:3px; }
+.embedded #theme-btn { display:none; }
+.overlay { position:fixed; inset:0; z-index:20; background:rgba(0,0,0,.75); padding:42px; overflow:auto; }
+.panel { width:min(1020px,100%); background:var(--paper); color:var(--ink); margin:auto; border-radius:25px; padding:35px 40px; }
+.panel h2 { font:600 32px 'YS Display','Inter','Segoe UI',Arial,sans-serif; margin:0 0 24px; }
+.panel p,.panel li { font-size:18px; line-height:1.5; }
+.panel a { color:var(--ink); overflow-wrap:anywhere; text-decoration-color:var(--red); }
+.panel .close { float:right; border:0; background:var(--gray); color:var(--ink); border-radius:8px; padding:8px 13px; }
+.panel h3 { margin:28px 0 15px; }
+#toc-list { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:1fr 1fr; gap:5px 25px; }
+#toc-list button { width:100%; text-align:left; border:0; background:var(--paper); color:var(--ink); padding:11px; border-radius:8px; font-size:16px; }
+#toc-list button:hover,#toc-list button.current { background:var(--gray); }
+#toc-list button span { color:var(--red); margin-right:12px; }
+#live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+body.presenting #controls, body.presenting #theme-btn { display:none; }
+body.presenting #stage { inset:0; }
+body.presenting #progress { bottom:0; height:2px; }
+body.presenting { cursor:none; }
+body.presenting .overlay { cursor:auto; }
+body.notes-open #stage { right:440px; }
+#speaker { position:absolute; top:0; right:0; bottom:62px; width:440px; overflow:auto; background:var(--paper); color:var(--ink); padding:72px 30px 30px; border-left:1px solid var(--gray); }
+.embedded #speaker { padding-top:30px; }
+#speaker h2 { font-size:22px; line-height:1.2; }
+#speaker h3 { font-size:17px; margin:18px 0 8px; }
+#speaker p,#speaker li { font-size:16px; line-height:1.5; }
+#speaker a { color:var(--ink); overflow-wrap:anywhere; text-decoration-color:var(--red); }
+#speaker .seg { font-size:15px; color:var(--muted); }
+#speaker blockquote { margin:14px 0; padding:8px 14px; border-left:3px solid var(--red); font-size:16px; line-height:1.45; }
+#speaker .warning { font-size:13px; color:var(--muted); }
+#speaker .note-actions { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+#speaker button { background:var(--gray); color:var(--ink); border:0; border-radius:8px; padding:8px 13px; }
+#timer { font-size:24px; font-variant-numeric:tabular-nums; }
+@media (max-width:850px) { #status,.optional { display:none; } #controls { padding:0 10px; } #controls button { font-size:12px; padding:8px; } #toc-list { grid-template-columns:1fr; } body.notes-open #stage { right:0; } #speaker { z-index:10; width:min(440px,100%); } .overlay { padding:15px; } .panel { padding:25px; } }
+@media (max-width:600px) { #controls { height:108px; flex-direction:column; gap:0; padding:6px 12px; align-items:stretch; } #controls .group { justify-content:center; } #counter { min-width:75px; } #stage { bottom:108px; } #progress { bottom:108px; } #speaker { bottom:108px; } }
+@media (prefers-reduced-motion:reduce) { * { transition:none!important; } }
+@media print {
+ @page { size:1600px 900px; margin:0; }
+ html,body { width:1600px; height:auto; overflow:visible; background:var(--paper); }
+ #stage { position:static; display:block; overflow:visible; }
+ #deck { position:static; transform:none!important; width:1600px; height:auto; }
+ .slide,.slide.active { display:block; break-after:page; page-break-after:always; }
+ .slide:last-child { break-after:auto; }
+ #controls,#progress,#speaker,.overlay,#live,#theme-btn { display:none!important; }
+ * { print-color-adjust:exact; -webkit-print-color-adjust:exact; }
+}
+
+</style>
+</head>
+<body>
+<button id="theme-btn" type="button" aria-label="Переключить тему">☾</button>
+<main id="stage" aria-label="Презентация"><div id="deck">
+<section id="slide-1" data-section="Конспект видео" class="slide title" data-title="Как работает RAG">
+ <div class="title-card"><span class="mark">ИИ для инженеров <span>·</span> материалы курса</span><span class="edition">/ Конспект видео</span>
+  <h1>Как работает<br>RAG</h1><p class="title-subtitle">Поиск по смыслу на всей «Войне и мире»: конспект ролика канала «Скрытый слой»</p></div>
+ <div class="org"><strong>Источник и права</strong><p>Ролик «Я спрятал фразу в «Войне и мире». Бот нашёл её за 117 мс. Как работает RAG», канал «Скрытый слой», опубликован 12.11.2026: <a href="https://www.youtube.com/watch?v=PIrubiKm480" target="_blank" rel="noopener">youtube.com/watch?v=PIrubiKm480</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала.</p></div>
+</section>
+<section id="slide-2" data-section="01 / Идея" class="slide" data-title="117 мс на поиск по всей книге">
+ <p class="eyebrow">Опыт автора · фраза, которой нет у Толстого</p><div class="big-number display">117 мс</div>
+ <p class="big-caption">поиск выдуманной фразы<br>среди почти 3000 кусков романа</p>
+ <p class="big-detail">Бот прочитал пять кусков, ответил и назвал главу.<br>Целиком книга в модель на видеокарте автора не помещается.</p>
+ <p class="footnote">Модели в опыте: Qwen3-30B-A3B и Qwen3.8-27B на RTX 3090 Ti, эмбеддинги bge-m3 (по описанию ролика).</p>
+</section>
+<section id="slide-3" data-section="01 / Идея" class="slide" data-title="Поиск по смыслу: эмбеддинги">
+ <h2>Поиск по смыслу</h2><p class="subtitle">Эмбеддинг – координаты текста на карте смыслов (условная схема)</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Условная карта смыслов: вопрос про кошку ложится рядом с пунктом договора о домашних животных; две фразы о предохранителе – рядом друг с другом">
+<rect x="1" y="1" width="1478" height="468" rx="28" class="lnm" stroke-width="2" stroke-dasharray="6 8"/>
+<g font-size="27">
+<circle class="dot" cx="250" cy="130" r="13"/><text x="275" y="139">Как заменить предохранитель</text>
+<circle class="dot" cx="300" cy="200" r="13"/><text x="325" y="209">Сгорела плавкая вставка в блоке</text>
+<circle class="doth" stroke-width="3" cx="880" cy="110" r="12"/><text x="905" y="119" class="mut">п. 2.1 Оплата</text>
+<circle class="doth" stroke-width="3" cx="1180" cy="190" r="12"/><text x="1080" y="240" class="mut">п. 6.2 Ремонт</text>
+<circle class="doth" stroke-width="3" cx="700" cy="380" r="12"/><text x="725" y="389" class="mut">п. 7.1 Срок</text>
+<circle class="dot" cx="960" cy="330" r="15"/><text x="985" y="339">п. 4.3 Домашние животные</text>
+<circle class="dota" cx="880" cy="400" r="17"/><text x="560" y="455" class="acc" font-weight="700">Вопрос: «Можно завести кошку?»</text>
+<path class="lna" stroke-width="4" d="M894 390 L946 342"/>
+</g></svg></div>
+ <p class="footnote">Пример автора: договор аренды из девяти пунктов. Ближе всех к вопросу про кошку – пункт 4.3 о домашних животных, хотя слова «кошка» в договоре нет. Пара фраз о предохранителе – пример курса.</p>
+</section>
+<section id="slide-4" data-section="01 / Идея" class="slide" data-title="Почему не отдать модели всю книгу">
+ <h2>Почему не отдать всю книгу</h2><p class="subtitle">Четыре причины, по словам автора</p>
+ <div class="body four"><div class="item"><div class="num" data-deco>01</div><div><h3>Окно</h3><p>Модель читает 32 тыс. токенов, с растяжкой 131 тыс. Роман – больше миллиона</p></div></div><div class="item"><div class="num" data-deco>02</div><div><h3>Память</h3><p>KV-кэш: по 96 КБ на токен. 32 тыс. – 3 ГБ, 131 тыс. – 12 ГБ, вся книга – 95,5 ГБ</p></div></div><div class="item"><div class="num" data-deco>03</div><div><h3>Время</h3><p>27 тыс. токенов – почти 11 секунд чтения. Вся книга, по оценке автора, – около 7 минут на вопрос</p></div></div><div class="item"><div class="num" data-deco>04</div><div><h3>Середина</h3><p>Даже то, что влезло, модель хуже замечает в середине текста</p></div></div></div>
+ <p class="footnote">Цифры – для Qwen3 на 30 млрд параметров и видеокарты на 24 ГБ из ролика.</p>
+</section>
+<section id="slide-5" data-section="01 / Идея" class="slide" data-title="Дообучить или дать прочитать">
+ <h2>Дообучить или дать прочитать</h2><p class="subtitle">Почему модель не учат на книге</p>
+ <div class="body two"><div><h3>Дообучение</h3><ul class="dots"><li>Факты запоминаются плохо</li><li>Модель не скажет, откуда взяла ответ</li></ul></div><div><h3>Поиск</h3><ul class="dots"><li>По словам автора, в исследовании 2023 года поиск стабильно выигрывал</li><li>И на знакомых модели фактах, и на новых</li></ul></div></div>
+ <p class="footnote">Модель не учат, ей дают прочитать нужное. Название исследования 2023 года в ролике не звучит.</p>
+</section>
+<section id="slide-6" data-section="02 / Три шага" class="slide section divider" data-title="Раздел 02. Три шага">
+ <div class="section-no display">02</div>
+ <h2 class="section-title">Три шага</h2>
+ <p class="section-detail">Нарезка, эмбеддинги и индекс, поиск и запрос к модели. Весь код – 43 строки.</p>
+</section>
+<section id="slide-7" data-section="02 / Три шага" class="slide" data-title="Два этапа RAG">
+ <h2>Два этапа</h2><p class="subtitle">Подготовка – один раз, поиск – на каждый вопрос</p>
+ <div class="body flow" style="--n:3;"><div class="step"><div class="phase display">Заранее</div><h3>Нарезать</h3><p>Книгу – на куски с адресом главы</p></div><div class="step"><div class="phase display">Заранее</div><h3>Проиндексировать</h3><p>Каждый кусок – в эмбеддинг, всё – в таблицу</p></div><div class="step"><div class="phase display">На вопрос</div><h3>Найти и прочитать</h3><p>Ближайшие куски – модели вместе с вопросом</p></div></div>
+ <p class="footnote">Модель в этой схеме – читатель найденного, а не хранилище фактов.</p>
+</section>
+<section id="slide-8" data-section="02 / Три шага" class="slide" data-title="Шаг 1: нарезка внахлёст">
+ <h2>Шаг 1: нарезка внахлёст</h2><p class="subtitle">Размер куска – главный выбор</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Нарезка внахлёст: куски по 200 слов, каждый следующий начинается на 160 слов позже, 40 слов общие">
+<g font-size="27">
+<rect x="40" y="70" width="800" height="70" rx="14" class="lnm" stroke-width="3"/><text x="60" y="116">Кусок 1 · слова 1–200</text>
+<rect x="680" y="170" width="800" height="70" rx="14" class="ln" stroke-width="3"/><text x="860" y="216">Кусок 2 · слова 161–360</text>
+<rect x="680" y="70" width="160" height="70" rx="0" class="acc" opacity=".22"/>
+<rect x="680" y="170" width="160" height="70" rx="0" class="acc" opacity=".22"/>
+<text x="682" y="290" class="acc" font-weight="700">40 общих слов</text>
+<path class="lnm" stroke-width="3" d="M40 330 H680 M40 316 V344 M680 316 V344"/><text x="250" y="380" class="mut">сдвиг 160 слов</text>
+<text x="40" y="450">Адрес на каждом куске: том · часть · глава. По нему бот ссылается на источник.</text>
+</g></svg></div>
+ <p class="footnote">Автор режет по 200 слов с шагом 160, каждую главу отдельно: 459 тыс. слов дают 2969 кусков. Без нахлёста кусок со словами «Я вас вызываю» потерял бы, кто кого вызывает.</p>
+</section>
+<section id="slide-9" data-section="02 / Три шага" class="slide" data-title="Шаг 2: эмбеддинги и индекс">
+ <h2>Шаг 2: эмбеддинги и индекс</h2><p class="subtitle">Индекс – просто таблица чисел</p>
+ <div class="metric-pair"><div><div class="num accent">1024</div><p>числа на каждый кусок:<br>таблица 2969 строк × 1024 столбца</p><p class="small">Модель bge-m3, больше 100 языков</p></div><div><div class="num">48 с</div><p>на всю книгу,<br>таблица – 12 МБ</p><p class="small">На видеокарте автора</p></div></div>
+ <p class="footnote">Векторные базы данных, по словам автора, нужны при миллионах кусков: они ищут приближённо, чтобы не сравнивать вопрос с каждым. Идея та же.</p>
+</section>
+<section id="slide-10" data-section="02 / Три шага" class="slide" data-title="Шаг 3: поиск и запрос к модели">
+ <h2>Шаг 3: поиск и запрос</h2><p class="subtitle">Вопрос сравнивается со всеми кусками одним умножением</p>
+ <div class="body flow" style="--n:3;"><div class="step"><div class="phase display">Вопрос</div><h3>В числа</h3><p>Та же модель bge-m3</p></div><div class="step"><div class="phase display">Поиск</div><h3>Косинус угла</h3><p>Около 3 млн умножений; 5 ближайших кусков</p></div><div class="step"><div class="phase display">Запрос</div><h3>Куски + инструкция</h3><p>Около 2400 токенов – в 437 раз меньше книги</p></div></div>
+ <p class="footnote">По словам автора, весь поиск – чуть больше 100 мс, почти всё время уходит на эмбеддинг вопроса; умножение с сортировкой – полмиллисекунды.</p>
+</section>
+<section id="slide-11" data-section="02 / Три шага" class="slide" data-title="Инструкция к запросу">
+ <p class="eyebrow">Шаг 3 · что модель получает вместе с кусками</p>
+ <div class="quote display">Отвечай только по фрагментам.<br>Укажи том, часть, главу.<br><span class="accent">Нет ответа – так и скажи.</span></div>
+ <p class="quote-caption">Последнее правило разрешает модели сказать «не знаю» вместо того, чтобы выдумывать.</p>
+</section>
+<section id="slide-12" data-section="02 / Три шага" class="slide" data-title="Весь код: 43 строки">
+ <h2>Весь код – 43 строки</h2><p class="subtitle">Python, numpy и две локальные модели в Ollama, без фреймворков</p>
+ <div class="body numlist"><div class="num display" data-deco>01</div><p>Нарезка<small>около десятка строк</small></p><div class="num display" data-deco>02</div><p>Эмбеддинги<small>запрос к Ollama с моделью bge-m3</small></p><div class="num display" data-deco>03</div><p>Индекс<small>таблица в файле</small></p><div class="num display" data-deco>04</div><p>Поиск<small>умножение и сортировка</small></p><div class="num display" data-deco>05</div><p>Ответ<small>второй запрос к Ollama, уже к модели Qwen</small></p></div>
+ <p class="footnote">Запуск – двумя командами: один раз построить индекс, дальше задавать вопросы. Код показан в ролике с 6:42.</p>
+</section>
+<section id="slide-13" data-section="03 / Проверка на книге" class="slide section divider" data-title="Раздел 03. Проверка на всей книге">
+ <div class="section-no display">03</div>
+ <h2 class="section-title">Проверка на всей книге</h2>
+ <p class="section-detail">Фраза про квас, десять вопросов по деталям и вопрос ко всей книге.</p>
+</section>
+<section id="slide-14" data-section="03 / Проверка на книге" class="slide" data-title="Фраза про квас">
+ <h2>Фраза про квас</h2><p class="subtitle">Один и тот же факт, два способа спросить</p>
+ <div class="body two"><div><h3>Прямой вопрос</h3><ul class="dots"><li>Кусок с фразой – второй из 2969</li><li>Первый – глава, где Денисов и Ростов въезжают в Москву</li><li>Бот ответил верно</li></ul></div><div><h3>Вопрос своими словами</h3><ul class="dots"><li>Без «Денисова» и «кваса» кусок оказался только 490-м</li><li>Бот честно ответил: во фрагментах ответа нет</li><li>Модель без поиска уверенно выдумала место</li></ul></div></div>
+ <p class="footnote">Выдуманного моделью ответа, по словам автора, нет ни у Толстого, ни во вписанной фразе.</p>
+</section>
+<section id="slide-15" data-section="03 / Проверка на книге" class="slide" data-title="Десять вопросов по деталям романа">
+ <h2>Десять вопросов по деталям</h2><p class="subtitle">Верных ответов из 10, по описанию ролика</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Qwen3-30B-A3B без поиска: 0 из 10; Qwen3.8-27B без поиска: 1 из 10; Qwen3-30B-A3B с поиском: 9 из 10; Qwen3.8-27B с поиском: 9 из 10"><text x="0" y="69" font-size="28">Qwen3-30B-A3B без поиска</text><rect class="bar" x="520" y="36" width="4" height="46" rx="6"/><text x="540" y="69" font-size="30" font-weight="700">0 из 10</text><text x="0" y="186" font-size="28">Qwen3.8-27B без поиска</text><rect class="bar" x="520" y="153" width="83" height="46" rx="6"/><text x="619" y="186" font-size="30" font-weight="700">1 из 10</text><text x="0" y="304" font-size="28">Qwen3-30B-A3B с поиском</text><rect class="bar acc" x="520" y="271" width="747" height="46" rx="6"/><text x="1283" y="304" font-size="30" font-weight="700" class="acc">9 из 10</text><text x="0" y="421" font-size="28">Qwen3.8-27B с поиском</text><rect class="bar acc" x="520" y="388" width="747" height="46" rx="6"/><text x="1283" y="421" font-size="30" font-weight="700" class="acc">9 из 10</text></svg></div>
+ <p class="footnote">Без поиска первая модель ошиблась во всех десяти вопросах о деталях. С поиском – каждый раз со ссылкой на главу.</p>
+</section>
+<section id="slide-16" data-section="03 / Проверка на книге" class="slide" data-title="Кусок книги целиком или поиск">
+ <h2>Кусок книги или поиск</h2><p class="subtitle">Отрывок на 27 тыс. токенов с фразой про квас</p>
+ <div class="metric-pair"><div><div class="num">≈ 11 с</div><p>чтения отрывка целиком,<br>20,5 ГБ видеопамяти</p><p class="small">Ответ верный; в окно 32 тыс. влезает около 1/32 романа</p></div><div><div class="num accent">< 1 с</div><p>с поиском: 2437 токенов,<br>18,2 ГБ видеопамяти</p><p class="small">Тот же ответ</p></div></div>
+ <p class="footnote">По словам автора, расход памяти почти совпал с его расчётом на KV-кэш.</p>
+</section>
+<section id="slide-17" data-section="03 / Проверка на книге" class="slide" data-title="Вопрос ко всей книге">
+ <h2>Вопрос ко всей книге</h2><p class="subtitle">«Как менялось отношение князя Андрея к Наполеону?»</p>
+ <div class="body two"><div><h3>Qwen3-30B с поиском</h3><ul class="dots"><li>Кусков, где рядом Андрей и Наполеон, – 66, из них 44 в первом томе</li><li>Поиск не взял оттуда ни одного</li><li>Бот ответил, что во фрагментах об этом ничего нет</li></ul></div><div><h3>Qwen3.8-27B</h3><ul class="dots"><li>Окно 262 тыс. токенов – всё равно меньше книги</li><li>Без поиска 1 из 10 по деталям; перепутала роман с книгой Ремарка</li><li>С поиском – те же 9 из 10; на этот вопрос без поиска ответила по сути верно</li></ul></div></div>
+ <p class="footnote">Вывод автора: общий сюжет модель помнит, детали – нет.</p>
+</section>
+<section id="slide-18" data-section="04 / Большие системы" class="slide section divider" data-title="Раздел 04. Как делают в больших системах">
+ <div class="section-no display">04</div>
+ <h2 class="section-title">Как делают в больших системах</h2>
+ <p class="section-detail">Три приёма улучшения и цифры исследований.</p>
+</section>
+<section id="slide-19" data-section="04 / Большие системы" class="slide" data-title="Три приёма больших систем">
+ <h2>Три приёма больших систем</h2><p class="subtitle">Чем улучшают простой RAG</p>
+ <div class="body three"><div class="outline"><div class="num" data-deco>01</div><h3>Поиск по словам</h3><p>BM25 рядом с поиском по смыслу; списки склеивают</p><p class="small muted">Ловит редкие имена, коды, номера: ошибку TS999</p></div><div class="outline"><div class="num" data-deco>02</div><h3>Переранжирование</h3><p>Набрать кандидатов с запасом, например 150</p><p class="small muted">Вторая модель читает пару «вопрос и кусок» вместе</p></div><div class="outline focus"><div class="num accent" data-deco>03</div><h3>Контекст куска</h3><p>Перед индексацией модель дописывает к куску 1–2 предложения</p><p class="small muted">Откуда кусок и о чём; Anthropic называет это контекстным поиском</p></div></div>
+ <p class="footnote">Пример автора: кусок «выручка выросла на 3 % за квартал» без контекста почти бесполезен – чья выручка, какой квартал?</p>
+</section>
+<section id="slide-20" data-section="04 / Большие системы" class="slide" data-title="Статья 2020 года: RAG и замена индекса">
+ <h2>Статья, где появилось слово RAG</h2><p class="subtitle">Lewis и соавт., 2020, по словам автора</p>
+ <div class="metric-pair"><div><div class="num accent">44,5 %</div><p>точных ответов на настоящие<br>вопросы из поиска Google</p><p class="small">Модель с поиском, пишущая часть – 400 млн параметров; T5 на 11 млрд без поиска – 34,5 %</p></div><div><div class="num">70 %</div><p>верных ответов о руководителях стран<br>2016 года с индексом 2016 года</p><p class="small">С индексом 2018 года – 12 %</p></div></div>
+ <p class="footnote">Знания поменялись без единого шага обучения – заменили таблицу. Википедию авторы статьи порезали на 21 млн кусков по 100 слов.</p>
+</section>
+<section id="slide-21" data-section="04 / Большие системы" class="slide" data-title="Контекстный поиск: доля промахов">
+ <h2>Контекстный поиск: промахи</h2><p class="subtitle">Как часто поиск не находил нужный кусок (Anthropic, по словам автора)</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Обычный поиск по смыслу: 5,7 %; + контекст куска: 3,7 %; + поиск по словам: 2,9 %; + переранжирование: 1,9 %"><text x="0" y="69" font-size="28">Обычный поиск по смыслу</text><rect class="bar" x="500" y="36" width="808" height="46" rx="6"/><text x="1324" y="69" font-size="30" font-weight="700">5,7 %</text><text x="0" y="186" font-size="28">+ контекст куска</text><rect class="bar" x="500" y="153" width="524" height="46" rx="6"/><text x="1040" y="186" font-size="30" font-weight="700">3,7 %</text><text x="0" y="304" font-size="28">+ поиск по словам</text><rect class="bar" x="500" y="271" width="411" height="46" rx="6"/><text x="927" y="304" font-size="30" font-weight="700">2,9 %</text><text x="0" y="421" font-size="28">+ переранжирование</text><rect class="bar acc" x="500" y="388" width="269" height="46" rx="6"/><text x="785" y="421" font-size="30" font-weight="700" class="acc">1,9 %</text></svg></div>
+ <p class="footnote">Промахов втрое меньше, чем у обычного поиска.</p>
+</section>
+<section id="slide-22" data-section="04 / Большие системы" class="slide" data-title="Потерянная середина">
+ <h2>Потерянная середина</h2><p class="subtitle">GPT-3.5, 20 документов, ответ только в одном: где он стоит</p>
+ <div class="chart"><svg viewBox="0 0 1480 470" role="img" aria-label="Верные ответы GPT-3.5 при 20 документах: нужный документ первым – 75,8 %, в середине – 53,8 %, последним – 63,2 %; без документов – 56,1 %">
+<g font-size="27">
+<path class="lnm" stroke-width="2" d="M140 40 V400 H1440"/>
+<text x="0" y="50" class="mut">80 %</text><text x="0" y="170" class="mut">70 %</text><text x="0" y="290" class="mut">60 %</text><text x="0" y="400" class="mut">50 %</text>
+<path class="lnm" stroke-width="3" stroke-dasharray="10 10" d="M140 327 H1440"/><text x="1080" y="361" class="mut">без документов · 56,1 %</text>
+<path class="ln" stroke-width="5" d="M240 90 L790 354 L1340 242"/>
+<circle class="dot" cx="240" cy="90" r="14"/><circle class="dota" cx="790" cy="354" r="16"/><circle class="dot" cx="1340" cy="242" r="14"/>
+<text x="262" y="82" font-weight="700" font-size="32">75,8 %</text><text x="740" y="309" font-weight="700" font-size="32" class="acc">53,8 %</text><text x="1240" y="216" font-weight="700" font-size="32">63,2 %</text>
+<text x="180" y="445">первым</text><text x="725" y="445">в середине</text><text x="1260" y="445">последним</text>
+</g></svg></div>
+ <p class="footnote">Документ с ответом в середине – хуже, чем совсем без документов. Больше кусков – не всегда лучше: каждый лишний отодвигает нужный к середине.</p>
+</section>
+<section id="slide-23" data-section="05 / Подвохи" class="slide section divider" data-title="Раздел 05. Подвохи">
+ <div class="section-no display">05</div>
+ <h2 class="section-title">Подвохи</h2>
+ <p class="section-detail">Где RAG ошибается и когда он не нужен.</p>
+</section>
+<section id="slide-24" data-section="05 / Подвохи" class="slide" data-title="Почему поиск промахнулся">
+ <h2>Почему поиск промахнулся</h2><p class="subtitle">«В каком городе умер князь Андрей?»</p>
+ <div class="body two"><div><h3>Что произошло</h3><ul class="dots"><li>Обе модели с поиском ответили «не знаю», без поиска – назвали неверные места</li><li>Фраза о смерти в Ярославле – в четвёртом томе, кусок с ней только 89-й</li><li>Кусок про Пьера: Пьер – 6 раз, Андрей – 1, нужная фраза – 22 слова из 200</li></ul></div><div><h3>Что помогло бы</h3><ul class="dots"><li>Эмбеддинг описывает кусок целиком, а не «есть ли в нём ответ»</li><li>Поиск по словам поднял главу о смерти на 3-е место, но города там нет; кусок с Ярославлем – 49-й</li><li>Шанс у переранжирования: кусок попадает в 150 кандидатов. Автор это не проверял</li></ul></div></div>
+ <p class="footnote">Бот отвечает, только если нашёл. Честное «не знаю» автор считает лучшим из плохих исходов; ссылку на главу стоит проверять всегда.</p>
+</section>
+<section id="slide-25" data-section="05 / Подвохи" class="slide" data-title="Ещё три подвоха">
+ <h2>Ещё три подвоха</h2><p class="subtitle">Где RAG спотыкается, кроме промаха поиска</p>
+ <div class="body three"><div class="outline"><div class="num" data-deco>02</div><h3>Вопросы ко всей книге</h3><p>О чём роман, как менялся герой, сколько раз что-то случилось</p><p class="small muted">Ответа нет ни в одном куске. Microsoft строит по тексту граф связей – GraphRAG</p></div><div class="outline"><div class="num" data-deco>03</div><h3>Мусор на входе</h3><p>Сканы, таблицы, сноски, колонтитулы</p><p class="small muted">Переводы французских реплик – в сносках в конце томов: перевод оказался бы далеко от фразы</p></div><div class="outline focus"><div class="num accent" data-deco>04</div><h3>RAG не нужен</h3><p>База меньше 200 тыс. токенов – около 500 страниц</p><p class="small muted">Совет Anthropic, по словам автора: отдать целиком, повторы удешевит кэш промпта</p></div></div>
+ <p class="footnote">Договор на девять пунктов из начала ролика – как раз случай, когда поиск не нужен.</p>
+</section>
+<section id="slide-26" data-section="05 / Подвохи" class="slide" data-title="Про цифры">
+ <p class="eyebrow">Оговорка автора</p>
+ <div class="quote display">Цифры исследований – цифры <span class="accent">самих авторов</span></div>
+ <p class="quote-caption">На их тестах и их моделях. У автора ролика – одна книга, одна видеокарта, две модели и 13 вопросов.</p>
+</section>
+<section id="slide-27" data-section="Итог" class="slide" data-title="Итог: три шага RAG">
+ <h2>Итог</h2>
+ <div class="summary three"><div><div class="num display" data-deco>01</div><h3>Нарезать</h3><p>Документ – внахлёст, каждый кусок подписать адресом</p></div><div><div class="num display" data-deco>02</div><h3>Проиндексировать</h3><p>Превратить куски в эмбеддинги</p></div><div><div class="num display" data-deco>03</div><h3>Найти и прочитать</h3><p>На вопрос – ближайшие куски, модель читает только их</p></div></div>
+ <div class="summary-line">Модель – читатель, память – поиск. <span class="accent">Ответ не бывает лучше поиска.</span></div>
+</section>
+<section id="slide-28" data-section="Итог" class="slide" data-title="Источник и права">
+ <h2>Источник и права</h2>
+ <div class="rights"><h3>Источник и права</h3><p>Ролик «Я спрятал фразу в «Войне и мире». Бот нашёл её за 117 мс. Как работает RAG», канал «Скрытый слой», опубликован 12.11.2026: <a href="https://www.youtube.com/watch?v=PIrubiKm480" target="_blank" rel="noopener">youtube.com/watch?v=PIrubiKm480</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала.</p></div>
+ <div class="course-links"><h3>Где это в курсе</h3><p>Второй день, тема 2.2 «Работа с технической документацией», раздел о корпоративных помощниках по документам (RAG) и о том, где RAG ошибается.</p><p>Второй день, тема 2.1: проверка ответа и ссылки на пункт документа обязательна.</p><p>Частые вопросы, вопрос 32: что такое RAG и как собрать свою базу знаний.</p></div>
+</section>
+</div></main>
+<div id="progress" aria-hidden="true"></div>
+<nav id="controls" aria-label="Управление презентацией">
+ <div class="group"><button id="prev" title="Предыдущий слайд (←)">←</button><span id="counter"></span><button id="next" title="Следующий слайд (→)">→</button><button id="toc-btn" title="Оглавление (O)">Слайды</button></div>
+ <span id="status">Конспект ролика «Скрытого слоя» · 28 слайдов</span>
+ <div class="group"><button id="notes-btn" title="Заметки и ссылки (N)">Заметки</button><button id="fullscreen-btn" title="Полноэкранный показ (F)">На весь экран</button><button id="help-btn" title="Управление (?)" aria-label="Справка">?</button></div>
+</nav>
+<aside id="speaker" hidden aria-label="Заметки к слайду">
+ <div class="note-actions"><span id="timer">00:00</span><button id="timer-btn">Старт</button><button id="close-notes" aria-label="Закрыть заметки">×</button></div>
+ <p class="warning">Заметки – пересказ ролика своими словами для учебных целей. Точные формулировки и цифры – в самом ролике по ссылке с отметкой времени.</p><div id="speaker-content"></div>
+</aside>
+<div id="toc" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="toc-title"><div class="panel"><button class="close" data-close="toc">Закрыть</button><h2 id="toc-title">Слайды</h2><ol id="toc-list"></ol></div></div>
+<div id="help" class="overlay" hidden role="dialog" aria-modal="true" aria-labelledby="help-title"><div class="panel"><button class="close" data-close="help">Закрыть</button><h2 id="help-title">Управление презентацией</h2><p>В презентации 28 слайдов.</p><ul><li><strong>← / → / Space</strong> – предыдущий / следующий слайд</li><li><strong>Home / End</strong> – начало / конец презентации</li><li><strong>F</strong> – полноэкранный показ; <strong>Esc</strong> – выход</li><li><strong>N</strong> – заметки: пересказ отрезка ролика и ссылка на это место; <strong>O</strong> – оглавление</li><li><strong>?</strong> – справка</li><li>Кнопка ☾/☀ справа сверху переключает светлую и тёмную тему. Вечером и ночью (с 20:00 до 07:00) презентация открывается в тёмной теме, днём – в светлой.</li><li>На сенсорном экране можно листать свайпом.</li></ul><p>Файл автономный: схемы нарисованы средствами HTML и SVG, подключения к сети нет. Печать из браузера выводит все слайды без заметок и элементов управления.</p><h3>Источник и права</h3><p>Ролик «Я спрятал фразу в «Войне и мире». Бот нашёл её за 117 мс. Как работает RAG», канал «Скрытый слой», опубликован 12.11.2026: <a href="https://www.youtube.com/watch?v=PIrubiKm480" target="_blank" rel="noopener">youtube.com/watch?v=PIrubiKm480</a>. Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала.</p></div></div>
+<div id="live" role="status" aria-live="polite"></div>
+<script type="application/json" id="deck-meta">{"video": "https://www.youtube.com/watch?v=PIrubiKm480"}</script>
+<script type="application/json" id="notes-data">[{"t": 0, "end": 57, "note": ["Автор вписал в середину «Войны и мира», в первую главу третьего тома, выдуманную фразу о квасе со слов Денисова и спросил о ней своего бота на видеокарте. Бот нашёл фразу, ответил и указал главу, прочитав всего пять кусков книги. Это и есть RAG – генерация, дополненная поиском.", "Дальше: почему нельзя отдать модели всю книгу, сборка RAG на 43 строках и разбор ошибок."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 21, "end": 49, "note": ["Масштаб опыта: почти три тысячи кусков, поиск за 117 миллисекунд, прочитано пять кусков. Оборудование и модели взяты из описания ролика."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 57, "end": 108, "note": ["Специальная модель переводит текст в набор чисел – эмбеддинг, своего рода координаты на карте смыслов. Близкие по смыслу тексты оказываются рядом даже без общих слов. Вывод автора: бот не читает документы, а ищет в них.", "Точки на схеме нарисованы для пояснения, это не данные ролика."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 108, "end": 189, "note": ["Роман почти в восемь раз больше окна модели даже с растяжкой. Пока модель читает, она копит в видеопамяти служебные заметки о каждом токене (KV-кэш), и уже при 131 тысяче токенов карта на 24 гигабайта переполняется. Чтение всей книги, если бы она поместилась, по оценке автора заняло бы почти семь минут на каждый вопрос.", "Четвёртая причина – провал середины: цифры исследования автор приводит ближе к концу ролика."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 189, "end": 211, "note": ["Дообучение на книге автор отвергает: факты так усваиваются плохо, а источник ответа модель не назовёт. Какое исследование 2023 года он имеет в виду, в ролике не сказано."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 205, "end": 227, "note": ["RAG работает в два этапа: подготовка книги и поиск на каждый вопрос."]}, {"t": 211, "end": 227, "note": ["Подготовка делается один раз, поиск – при каждом вопросе. При ответе модель получает только найденные фрагменты."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 227, "end": 288, "note": ["Мелкий кусок теряет смысл, крупный смешивает несколько тем и «расплывается» на карте смыслов. Обычно берут несколько сотен токенов. Нахлёст сохраняет связность: в примере с дуэлью в куске остаются и Пьер, и Долохов.", "Адрес главы поиску не нужен, но по нему бот ссылается на источник, а читатель может проверить ответ."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 285, "end": 335, "note": ["Каждый кусок пропускают через bge-m3; модель многоязычная, что важно для французских страниц романа. Получается таблица на 12 мегабайт. Векторная база, по словам автора, нужна при миллионах кусков, когда сравнивать вопрос с каждым слишком долго и ищут приближённо."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 335, "end": 391, "note": ["Пример вопроса – сколько Ростов проиграл Долохову. Вопрос переводится той же моделью в вектор, затем одно умножение даёт близость ко всем кускам сразу (косинус угла: чем ближе к единице, тем ближе смысл). Пять лучших кусков вклеиваются в запрос с инструкцией."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 379, "end": 402, "note": ["Последнее правило инструкции автор считает самым важным: модели разрешено признать, что ответа во фрагментах нет, и не сочинять."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 402, "end": 437, "note": ["Автор подчёркивает, что это настоящий рабочий файл, которым он проверял книгу, а не упрощение для слайда. Код автор показывает в ролике с 6:42."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 431, "end": 440, "note": ["Проверка на всём романе."]}, {"t": 437, "end": 475, "note": ["Вопрос, пересказанный своими словами, без имён и ключевого слова, опустил нужный кусок далеко вниз списка. Бот при этом не стал выдумывать, а модель без поиска сочинила место продажи, которого нет ни в романе, ни во вставке автора."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 475, "end": 504, "note": ["Вопросы касались мелких деталей: проигрыш Ростова, место дуэли Пьера и Долохова, прозвище Ахросимовой. По словам автора, роман модель встречала при обучении, но без поиска путала суммы, прозвища и возраст героини. С поиском ответы шли со ссылкой на главу.", "Точные ответы модели из примеров – в самом ролике."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Результат Qwen3.8 без поиска и с поиском – с 9:14", "https://www.youtube.com/watch?v=PIrubiKm480&t=554s"]]}, {"t": 495, "end": 533, "note": ["Целиком в окно на 32 тысячи токенов помещается лишь около тридцать второй части романа. Расход памяти при длинном отрывке, по словам автора, почти совпал с его расчётом."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 533, "end": 590, "note": ["Ответ на такой вопрос рассыпан по десяткам мест, а поиск возвращает пять кусков, и подходящих среди них не оказалось. Более новая Qwen3.8 с окном 262 тысячи токенов тоже не вмещает книгу; без поиска она даже спутала роман с «Тремя товарищами» Ремарка, а с поиском ошиблась на том же вопросе, что и первая модель.", "Вывод автора: общий сюжет модель помнит, детали – нет."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 590, "end": 596, "note": ["Как улучшают простой RAG в больших системах и что говорят исследования."]}, {"t": 590, "end": 663, "note": ["Поиск по словам (BM25) дополняет эмбеддинги там, где важны точные имена, коды и номера. Переранжирование медленнее сравнения векторов, но точнее, потому что модель видит вопрос и текст одновременно. Контекст куска решает проблему вырванных фраз вроде сообщения о росте выручки без указания компании и квартала."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Anthropic. Contextual retrieval in AI systems", "https://www.anthropic.com/research/contextual-retrieval"]]}, {"t": 663, "end": 715, "note": ["Пишущая часть RAG в статье была в десятки раз меньше T5, а отвечала точнее. Опыт с заменой индекса показывает главное для компаний: знания обновили без обучения, просто подставив другую таблицу."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Lewis P. и соавт. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks, 2020", "https://doi.org/10.48550/arXiv.2005.11401"]]}, {"t": 715, "end": 730, "note": ["Каждый приём сокращал долю промахов, а все три вместе, по словам автора, уменьшили её втрое."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Anthropic. Contextual retrieval in AI systems", "https://www.anthropic.com/research/contextual-retrieval"]]}, {"t": 730, "end": 763, "note": ["Модель хуже всего использует документ, стоящий в середине длинного списка, – настолько, что лишние документы могут навредить. Название исследования в ролике не прозвучало; по описанию оно похоже на работу «Lost in the Middle» (2023), это сопоставление сделано автором конспекта."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Liu N. F. и соавт. Lost in the Middle: How Language Models Use Long Contexts, 2023 (сопоставление с роликом – вывод автора конспекта)", "https://doi.org/10.48550/arXiv.2307.03172"]]}, {"t": 758, "end": 768, "note": ["Подвохи RAG."]}, {"t": 763, "end": 843, "note": ["Без поиска модели назвали неверные места смерти князя Андрея, с поиском честно признали незнание. Кусок с ответом проигрывал потому, что он о Пьере, а вопрос – об Андрее. Поиск по словам не помог: слово «город» на «Ярославль» не похоже. Переранжирование автор не проверял."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 842, "end": 915, "note": ["Вопросы ко всей книге: Microsoft, по словам автора, прямо пишет, что обычный RAG на них проваливается, и строит граф связей; этой теме автор обещает отдельный ролик. Мусор на входе: плохую нарезку хорошая модель не исправит. Совет Anthropic про небольшие базы автор передаёт со ссылкой на кэширование промпта: прочитанное повторно не перечитывается."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Edge D. и соавт. From Local to Global: A Graph RAG Approach to Query-Focused Summarization, 2024 (сопоставление – вывод автора конспекта)", "https://doi.org/10.48550/arXiv.2404.16130"]]}, {"t": 902, "end": 915, "note": ["Проценты исследований получены их авторами на своих тестах и моделях, а опыт автора ролика ограничен одной книгой, одной видеокартой, двумя моделями и тринадцатью вопросами."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"]]}, {"t": 915, "end": 937, "note": ["Итог автора: нарезать и подписать, перевести в эмбеддинги, на вопрос искать ближайшие куски и давать модели читать только их. Модель здесь читатель, память – поиск."], "quote": "Ответ не бывает лучше поиска."}, {"note": ["Ролик целиком – по ссылке ниже. Конспект не заменяет ролик: точные формулировки, демонстрации и экран с кодом – у автора."], "sources": [["Ролик целиком", "https://www.youtube.com/watch?v=PIrubiKm480"], ["Lewis P. и соавт. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks, 2020", "https://doi.org/10.48550/arXiv.2005.11401"]]}]</script>
+<script>
+(() => {
+ 'use strict';
+ const slides = [...document.querySelectorAll('.slide')], notes = JSON.parse(document.querySelector('#notes-data').textContent);
+ const META = JSON.parse(document.querySelector('#deck-meta').textContent);
+ const $ = s => document.querySelector(s);
+ let index = 0, lastFocus = null, timerStart = 0, elapsed = 0, isTiming = false, timerId = null;
+ const slideCount = slides.length;
+ const label = i => `${String(i + 1).padStart(2,'0')} / ${slideCount}`;
+ const mmss = t => `${String(Math.floor(t/60)).padStart(2,'0')}:${String(t%60).padStart(2,'0')}`;
+ if (notes.length !== slideCount) console.error('notes/slides mismatch', notes.length, slideCount);
+ function part(i) { return slides[i].dataset.section; }
+ slides.forEach((slide, i) => {
+  slide.setAttribute('role','group'); slide.setAttribute('aria-roledescription','слайд'); slide.setAttribute('aria-label',`${i+1}. ${slide.dataset.title}`);
+  const foot = document.createElement('footer');
+  const left = document.createElement('span'), right = document.createElement('span');
+  left.textContent = `/ ${part(i)}`; right.className='page'; right.textContent=String(i+1).padStart(2,'0'); foot.append(left,right); slide.append(foot);
+  const li=document.createElement('li'), button=document.createElement('button'), n=document.createElement('span');
+  n.textContent=String(i+1).padStart(2,'0');button.append(n,document.createTextNode(slide.dataset.title));button.dataset.slide=i;
+  button.addEventListener('click',()=>{closeOverlay('toc');go(i);});li.append(button);$('#toc-list').append(li);
+ });
+ function resize() { const r=$('#stage').getBoundingClientRect();document.documentElement.style.setProperty('--scale',Math.min(r.width/1600,r.height/900)); }
+ function link(url, text) { const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=text||url;return a; }
+ function renderNotes() {
+  const container=$('#speaker-content'); container.replaceChildren();
+  const n=notes[index];
+  const h=document.createElement('h2');h.textContent=`${label(index)} · ${slides[index].dataset.title}`;
+  container.append(h);
+  if (typeof n.t === 'number') {
+   const seg=document.createElement('p');seg.className='seg';
+   seg.append(document.createTextNode(`Отрезок ролика: ${mmss(n.t)}–${mmss(n.end)} · `), link(`${META.video}&t=${n.t}s`, 'смотреть с этого места'));
+   container.append(seg);
+  }
+  (n.note||[]).forEach(t=>{const p=document.createElement('p');p.textContent=t;container.append(p);});
+  if (n.quote) { const q=document.createElement('blockquote');q.textContent=`«${n.quote}» – ${n.qby||'автор ролика'}`;container.append(q); }
+  if ((n.sources||[]).length) {
+   const sh=document.createElement('h3');sh.textContent='Ссылки';const list=document.createElement('ol');
+   n.sources.forEach(s=>{const li=document.createElement('li');li.append(document.createTextNode(s[0]+': '),link(s[1]));list.append(li);});
+   container.append(sh,list);
+  }
+ }
+ function go(i, updateHash=true) {
+  index=Math.max(0,Math.min(slideCount-1,i));
+  slides.forEach((s,j)=>{s.classList.toggle('active',j===index);s.setAttribute('aria-hidden',String(j!==index));s.inert=j!==index;});
+  $('#counter').textContent=label(index);$('#progress').style.width=`${((index+1)/slideCount)*100}%`;
+  $('#prev').disabled=index===0;$('#next').disabled=index===slideCount-1;
+  $('#toc-list').querySelectorAll('button').forEach(b=>b.classList.toggle('current',Number(b.dataset.slide)===index));
+  $('#live').textContent=`${label(index)}. ${slides[index].dataset.title}`;
+  renderNotes(); if(updateHash)history.replaceState(null,'',`#${index+1}`);
+ }
+ function move(delta) { go(index+delta); }
+ function closeOverlay(id) {$('#'+id).hidden=true;if(lastFocus)lastFocus.focus();lastFocus=null;}
+ function openOverlay(id) {lastFocus=document.activeElement;$('#'+id).hidden=false;$('#'+id+' .close').focus();}
+ function notesToggle(force) {const on=force===undefined?$('#speaker').hidden:force;if(on&&document.body.classList.contains('presenting'))exitFullscreen();$('#speaker').hidden=!on;document.body.classList.toggle('notes-open',on);$('#notes-btn').setAttribute('aria-expanded',String(on));resize();}
+ async function exitFullscreen() {document.body.classList.remove('presenting');if(document.fullscreenElement)await document.exitFullscreen().catch(()=>{});resize();}
+ async function fullscreen() {
+  if(document.body.classList.contains('presenting')){await exitFullscreen();return;}
+  notesToggle(false);document.body.classList.add('presenting');resize();
+  if(document.documentElement.requestFullscreen)await document.documentElement.requestFullscreen().catch(()=>{});
+  resize();
+ }
+ // тема: ☾/☀, ручной выбор до ближайшей смены дня и ночи
+ const T=window.__deckTheme, root=document.documentElement;
+ function paintTheme(){const dark=root.dataset.theme==='dark';$('#theme-btn').textContent=dark?'☀':'☾';$('#theme-btn').setAttribute('aria-label',dark?'Включить светлую тему':'Включить тёмную тему');$('#theme-btn').title=$('#theme-btn').getAttribute('aria-label');}
+ function setTheme(t,persist){root.dataset.theme=t;paintTheme();if(persist){const u=T.next();T.keep(t,u);try{localStorage.setItem(T.K,JSON.stringify({theme:t,until:u}));localStorage.setItem('appsec-theme',t);}catch(e){}}}
+ $('#theme-btn').onclick=()=>setTheme(root.dataset.theme==='dark'?'light':'dark',true);
+ const embedded=root.classList.contains('embedded');
+ window.addEventListener('storage',e=>{if(embedded||!(e.key===T.K||e.key===null))return;if(e.key===null||e.newValue===null)T.reset();setTheme(T.man()||T.tt(),false);});
+ // в рамке страницы курса тему задаёт страница (в том числе когда хранилище браузера недоступно)
+ window.addEventListener('message',e=>{if(embedded&&e.source===window.parent&&e.origin===location.origin&&e.data&&(e.data.kamazTheme==='light'||e.data.kamazTheme==='dark'))setTheme(e.data.kamazTheme,false);});
+ if(!embedded)setInterval(()=>{const t=T.man()||T.tt();if(t!==root.dataset.theme)setTheme(t,false);},60000);
+ paintTheme();
+ $('#prev').onclick=()=>move(-1);$('#next').onclick=()=>move(1);
+ $('#toc-btn').onclick=()=>openOverlay('toc');$('#help-btn').onclick=()=>openOverlay('help');$('#notes-btn').onclick=()=>notesToggle();$('#close-notes').onclick=()=>notesToggle(false);$('#fullscreen-btn').onclick=fullscreen;
+ document.querySelectorAll('[data-close]').forEach(b=>b.onclick=()=>closeOverlay(b.dataset.close));
+ document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeOverlay(o.id);}));
+ document.addEventListener('keydown',e=>{
+  if(e.metaKey||e.ctrlKey||e.altKey)return;
+  const open=[...document.querySelectorAll('.overlay')].find(o=>!o.hidden);
+  if(open){if(e.key==='Escape'){e.preventDefault();closeOverlay(open.id);}if(e.key==='Tab'){const f=[...open.querySelectorAll('button,a')];if(e.shiftKey&&document.activeElement===f[0]){e.preventDefault();f.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===f.at(-1)){e.preventDefault();f[0].focus();}}return;}
+  if(['ArrowRight','PageDown'].includes(e.key)||(e.key===' '&&!e.target.closest('button,a'))){e.preventDefault();move(1);}
+  else if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();move(-1);}
+  else if(e.key==='Home'){e.preventDefault();go(0);}
+  else if(e.key==='End'){e.preventDefault();go(slideCount-1);}
+  else if(e.key.toLowerCase()==='f'||e.key.toLowerCase()==='а'){e.preventDefault();fullscreen();}
+  else if(e.key.toLowerCase()==='n'||e.key.toLowerCase()==='т'){e.preventDefault();notesToggle();}
+  else if(e.key.toLowerCase()==='o'||e.key.toLowerCase()==='щ'){e.preventDefault();openOverlay('toc');}
+  else if(e.key==='?'){e.preventDefault();openOverlay('help');}
+  else if(e.key==='Escape'){notesToggle(false);exitFullscreen();}
+ });
+ let touch=null;$('#stage').addEventListener('touchstart',e=>{if(e.touches.length===1)touch=[e.touches[0].clientX,e.touches[0].clientY];},{passive:true});
+ $('#stage').addEventListener('touchend',e=>{if(!touch)return;const t=e.changedTouches[0],dx=t.clientX-touch[0],dy=t.clientY-touch[1];touch=null;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5)move(dx<0?1:-1);},{passive:true});
+ function readHash(){const n=Number(location.hash.slice(1));go(Number.isInteger(n)&&n>=1&&n<=slides.length?n-1:0,false);}
+ window.addEventListener('hashchange',readHash);window.addEventListener('resize',resize);
+ document.addEventListener('fullscreenchange',()=>{if(!document.fullscreenElement)document.body.classList.remove('presenting');resize();});
+ $('#timer-btn').onclick=()=>{if(isTiming){elapsed+=Date.now()-timerStart;isTiming=false;clearInterval(timerId);$('#timer-btn').textContent='Продолжить';}else{timerStart=Date.now();isTiming=true;$('#timer-btn').textContent='Пауза';timerId=setInterval(()=>{const t=Math.floor((elapsed+Date.now()-timerStart)/1000);$('#timer').textContent=mmss(t);},250);}};
+ if (new URLSearchParams(location.search).get('notes')==='1') notesToggle(true);
+ document.fonts.ready.then(resize);readHash();resize();
+})();
+</script>
+</body>
+</html>

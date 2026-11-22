@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Конспекты и презентации по двум роликам канала «Скрытый слой»: как устроен ИИ-агент (агент за 84 строки) и как работает RAG на примере «Войны и мира». С источником, ссылками на главы роликов и кодом агента автора.">
+  <meta name="author" content="Виталий Александрович Пиков">
+  <meta name="robots" content="index,follow">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="ru_RU">
+  <meta property="og:title" content="Агенты и RAG в двух видео – ИИ для инженеров">
+  <meta property="og:description" content="Конспекты и презентации по двум роликам канала «Скрытый слой»: как устроен ИИ-агент (агент за 84 строки) и как работает RAG на примере «Войны и мира». С источником, ссылками на главы роликов и кодом агента автора.">
+  <meta property="og:url" content="https://kamaz-ai.pikov.expert/video-notes.html">
+  <meta property="og:image" content="https://kamaz-ai.pikov.expert/assets/hero.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="https://kamaz-ai.pikov.expert/video-notes.html">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%2307111f'/%3E%3Ccircle cx='32' cy='32' r='12' stroke='%2365e5ff' stroke-width='5' fill='none'/%3E%3C/svg%3E">
+  <title>Агенты и RAG в двух видео – ИИ для инженеров</title>
+  <link rel="stylesheet" href="assets/site.css?v=20261117a">
+  <link rel="stylesheet" href="assets/course.css?v=20261117a">
+  <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Course", "name": "Искусственный интеллект для инженеров", "inLanguage": "ru", "url": "https://kamaz-ai.pikov.expert/", "description": "Программа повышения квалификации, 56 академических часов", "provider": {"@type": "Person", "name": "Пиков Виталий Александрович", "url": "https://pikov.expert/"}, "author": {"@type": "Person", "name": "Виталий Александрович Пиков", "url": "https://pikov.expert/"}, "dateCreated": "2026-11-10"}</script>
+  <script>
+    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window, document, 'script', 'https://mc.yandex.ru/metrika/tag.js', 'ym');
+    ym(109116119, 'init', {clickmap:true, trackLinks:true, accurateTrackBounce:true, webvisor:false});
+  </script>
+  <script>
+    (function(){var K='kamaz-theme-manual',r=document.documentElement,mem=null;
+      function tt(){var h=new Date().getHours();return (h>=20||h<7)?'dark':'light';}
+      function man(){try{var m=JSON.parse(localStorage.getItem(K)||'null');if(m&&(m.theme==='light'||m.theme==='dark')&&m.until>Date.now())return m.theme;}catch(e){}
+        return mem&&mem.until>Date.now()?mem.theme:null;}
+      function want(){return man()||tt();}
+      function next(){var d=new Date(),n=new Date(d),h=d.getHours();if(h>=7&&h<20){n.setHours(20,0,0,0);}else{if(h>=20)n.setDate(n.getDate()+1);n.setHours(7,0,0,0);}return n.getTime();}
+      function paint(t){r.dataset.theme=t;try{localStorage.setItem('appsec-theme',t);}catch(e){}
+        var b=document.querySelector('.theme-toggle');if(b){var n=t==='light'?'dark':'light',i=b.querySelector('.theme-toggle-icon'),x=b.querySelector('.theme-toggle-text'),l='Включить '+(n==='light'?'светлую':'тёмную')+' тему';
+          if(i)i.textContent=n==='light'?'☀':'☾';if(x)x.textContent=n==='light'?'Светлая':'Тёмная';b.setAttribute('aria-label',l);b.title=l;}
+        document.querySelectorAll('iframe').forEach(function(f){try{f.contentWindow.postMessage({kamazTheme:t},location.origin);}catch(e){}});}
+      r.dataset.theme=want();try{localStorage.setItem('appsec-theme',r.dataset.theme);}catch(e){}
+      document.addEventListener('DOMContentLoaded',function(){
+        paint(want());
+        var b=document.querySelector('.theme-toggle');
+        if(b)b.addEventListener('click',function(){mem={theme:r.dataset.theme,until:next()};try{localStorage.setItem(K,JSON.stringify(mem));}catch(e){}paint(mem.theme);});
+        document.querySelectorAll('iframe').forEach(function(f){f.addEventListener('load',function(){paint(r.dataset.theme);});});
+        window.addEventListener('storage',function(e){if(e.key!==K&&e.key!==null)return;if(e.key===null||e.newValue===null)mem=null;paint(want());});
+        setInterval(function(){var t=want();if(t!==r.dataset.theme)paint(t);},60000);});
+    })();
+  </script>
+  <style>
+    .vn-rights { margin-top: 1.2rem; }
+    .vn-rights a { overflow-wrap: anywhere; }
+    .vn-chapters { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 19rem), 1fr)); gap: .35rem 1.4rem; margin: .8rem 0 0; padding: 0; list-style: none; }
+    .vn-chapters li { display: grid; grid-template-columns: 3.6rem 1fr; gap: .6rem; align-items: baseline; font-size: .95rem; }
+    .vn-chapters a { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-weight: 700; }
+    .vn-frame { position: relative; width: 100%; aspect-ratio: 16 / 10; margin-top: 1rem; border: 1px solid var(--line-strong, #8885); border-radius: 14px; overflow: hidden; background: #1b1b1b; }
+    .vn-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    .vn-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .9rem; }
+    .vn-block { margin-top: 2.2rem; }
+    .vn-block h3 { margin: 0 0 .5rem; }
+    .vn-code pre { max-height: 34rem; overflow: auto; }
+    .vn-code .code-card, .vn-code .download { min-width: 0; max-width: 100%; }
+    .vn-code .fine-print code { white-space: normal; overflow-wrap: anywhere; word-break: break-all; }
+    .vn-list { padding-left: 1.2rem; }
+    .vn-list li + li { margin-top: .35rem; }
+    @media (max-width: 640px) { .vn-frame { aspect-ratio: 4 / 3; } }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#main">К содержанию</a>
+  <div class="reading-line" aria-hidden="true"></div>
+  <header class="site-header"><div class="header-inner">
+    <a class="brand brand-back" href="https://pikov.expert/" aria-label="На главный сайт pikov.expert"><span class="brand-mark" aria-hidden="true">↗</span><span>ИИ для инженеров<br><small>pikov.expert</small></span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav" aria-label="Открыть навигацию">☰</button>
+    <nav class="nav" id="site-nav" aria-label="Основная навигация"><a href="index.html">Программа</a><a href="karta.html">Карта курса</a><a href="day-01.html">День 1</a><a href="day-02.html">День 2</a><a href="day-03.html">День 3</a><a href="day-04.html">День 4</a><a href="day-05.html">День 5</a><a href="faq.html">Вопросы</a><a href="glossary.html">Глоссарий</a></nav>
+  </div></header>
+  <main id="main">
+    <section class="hero compact-hero" aria-labelledby="hero-title"><div class="hero-grid"><div class="hero-copy reveal">
+      <p class="eyebrow">Дополнительные материалы · конспекты видео</p>
+      <h1 id="hero-title">Агенты и RAG <span class="accent">в двух видео</span></h1>
+      <div class="hero-lead"><p>Конспекты двух роликов канала «Скрытый слой»: как устроен ИИ-агент и как бот отвечает по большому документу с помощью поиска (RAG). К каждому ролику – презентация. В заметках к слайдам – пересказ соответствующего отрезка ролика и ссылка на это место. Ролики полезно посмотреть целиком: конспект не заменяет демонстраций автора.</p></div>
+      <div class="hero-actions"><a class="button primary" href="#agents">ИИ-агент ↓</a><a class="button primary" href="#rag">RAG ↓</a><a class="button ghost" href="faq.html#q27">Частые вопросы</a></div>
+      <div class="hero-meta"><span><b>2</b> ролика</span><span><b>64</b> слайдов</span></div>
+    </div></div></section>
+
+    <section class="section tight" id="vn-toc"><div class="content">
+      <nav class="toc reveal" aria-label="Содержание страницы"><p class="toc-title">На этой странице</p><ol class="toc-list">
+        <li><a href="#agents">Что такое ИИ-агент: агент за 84 строки</a></li>
+        <li><a href="#agents-deck">Презентация об агентах</a></li>
+        <li><a href="#agents-code">Код агента из ролика</a></li>
+        <li><a href="#rag">Как работает RAG: фраза в «Войне и мире»</a></li>
+        <li><a href="#rag-deck">Презентация о RAG</a></li>
+        <li><a href="#sources">Источники</a></li>
+      </ol></nav>
+    </div></section>
+
+    <section class="section section-band" id="agents" aria-labelledby="agents-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">01 · ролик</p><h2 id="agents-title">Что такое ИИ-агент: агент за 84 строки</h2></div>
+      <p>Автор объясняет, чем агент отличается от чат-бота, как модель вызывает инструменты, зачем нужен цикл и где агент держит память. Затем собирает своего агента на Python, сравнивает семь домашних моделей на одной задаче и проверяет агента на внедрение подсказки.</p></div>
+      <div class="callout vn-rights"><p class="callout-label">Источник и права</p><p>Ролик «Что такое ИИ-агент на самом деле? Собрал своего за 84 строки», канал «Скрытый слой», опубликован 14.11.2026: <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">youtube.com/watch?v=I5h4Bz99Ex0</a>.</p><p>Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала. Конспект и презентация пересказывают ролик своими словами; цифры, названия моделей и оценки на слайдах – утверждения автора ролика, если не сказано иное.</p><p>Код агента – скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">t.me/skrytyysloy</a> для зрителей ролика.</p></div>
+      <div class="vn-block"><h3>Главы ролика</h3><p>Отметки времени – по описанию ролика, ссылки открывают ролик с этого места.</p><ol class="vn-chapters"><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=0s" target="_blank" rel="noopener">0:00</a><span>Агент делает сам</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=94s" target="_blank" rel="noopener">1:34</a><span>Мозг без рук</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=185s" target="_blank" rel="noopener">3:05</a><span>Как модель нажимает кнопки</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=271s" target="_blank" rel="noopener">4:31</a><span>Цикл агента</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=354s" target="_blank" rel="noopener">5:54</a><span>Контекст и память</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=452s" target="_blank" rel="noopener">7:32</a><span>Один агент или команда</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=519s" target="_blank" rel="noopener">8:39</a><span>MCP: общий разъём</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=632s" target="_blank" rel="noopener">10:32</a><span>Агенты 2026 года</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=833s" target="_blank" rel="noopener">13:53</a><span>Облако или дома</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=927s" target="_blank" rel="noopener">15:27</a><span>Собираем агента</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=1010s" target="_blank" rel="noopener">16:50</a><span>Проверим сами</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=1255s" target="_blank" rel="noopener">20:55</a><span>Подвох</span></li><li><a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0&amp;t=1458s" target="_blank" rel="noopener">24:18</a><span>Итог</span></li></ol></div>
+      <div class="vn-block" id="agents-deck"><h3>Презентация: ИИ-агент за 84 строки</h3><p>36 слайдов. Листать – стрелками или кнопками внизу, «Заметки» – пересказ отрезка ролика и ссылка на это место, «Слайды» – оглавление. Тема презентации следует за темой страницы; полноэкранный показ – кнопка «На весь экран» в самой презентации или клавиша F.</p><div class="vn-frame"><iframe src="materials/video-notes/agent-84-deck.html" title="Презентация: ИИ-агент за 84 строки" loading="lazy" allowfullscreen></iframe></div><div class="vn-actions"><a class="button primary" href="materials/video-notes/agent-84-deck.html" target="_blank" rel="noopener">Открыть в новой вкладке ↗</a><a class="button ghost" href="materials/video-notes/agent-84-deck.html?notes=1" target="_blank" rel="noopener">Открыть с заметками ↗</a></div></div>
+      <div class="vn-block vn-code" id="agents-code"><h3>Код агента из ролика</h3>
+        <p>Цикл агента – функция <code>agent()</code> из файла <code>agent.py</code>, 24 строки без изменений. Модели на каждом шаге уходят вся история и меню инструментов; если вызовов нет – это ответ, иначе вызовы выполняются, результаты дописываются в историю. Перед каждой командой и записью файла скрипт спрашивает «Разрешить? [y/n]», вывод команды обрезается до последних 4000 символов, шагов – не больше 15.</p>
+        <div class="code-card"><div class="code-card-inner"><div class="code-card-header"><span>agent.py · строки 57–80</span><span>Python</span></div><pre><code>def agent(task, max_steps=15):
+    messages = [{&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: SYSTEM}, {&quot;role&quot;: &quot;user&quot;, &quot;content&quot;: task}]
+    for step in range(1, max_steps + 1):
+        reply = requests.post(URL, headers={&quot;Authorization&quot;: f&quot;Bearer {KEY}&quot;}, timeout=600,
+                              json={&quot;model&quot;: MODEL, &quot;messages&quot;: messages, &quot;tools&quot;: TOOLS}).json()
+        msg = reply[&quot;choices&quot;][0][&quot;message&quot;]
+        calls = msg.get(&quot;tool_calls&quot;) or []
+        if msg.get(&quot;reasoning_content&quot;):
+            print(f&quot;[{step}] мысль: {msg[&#x27;reasoning_content&#x27;].strip()[:200]}&quot;)
+        messages.append({&quot;role&quot;: &quot;assistant&quot;, &quot;content&quot;: msg.get(&quot;content&quot;) or &quot;&quot;,
+                         **({&quot;tool_calls&quot;: calls} if calls else {})})
+        if not calls:  # инструменты больше не нужны — это ответ
+            return msg.get(&quot;content&quot;)
+        for call in calls:
+            name = call[&quot;function&quot;][&quot;name&quot;]
+            print(f&quot;[{step}] действие: {name} {call[&#x27;function&#x27;][&#x27;arguments&#x27;]}&quot;)
+            try:
+                args = json.loads(call[&quot;function&quot;][&quot;arguments&quot;] or &quot;{}&quot;)
+                result = FUNCS[name](**args)
+            except Exception as e:  # ошибка — тоже наблюдение: модель увидит её и исправится
+                result = f&quot;Ошибка: {e!r}&quot;
+            print(f&quot;[{step}] результат: {result[:300]}&quot;)
+            messages.append({&quot;role&quot;: &quot;tool&quot;, &quot;tool_call_id&quot;: call.get(&quot;id&quot;, str(step)), &quot;content&quot;: result})
+    return &quot;Стоп: закончился лимит шагов.&quot;</code></pre></div></div>
+        <p class="fine-print">Скрипт автора канала «Скрытый слой», опубликован в его Telegram-канале <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">t.me/skrytyysloy</a>. Ролик: <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">youtube.com/watch?v=I5h4Bz99Ex0</a>.</p>
+        <div class="download-grid"><article class="download reveal"><span class="file-type">ZIP · скрипт автора ролика</span><h3>Архив agent.zip</h3>
+          <p>Файлы agent.py, README.txt и requirements.txt в том виде, в каком автор опубликовал их в Telegram-канале «Скрытый слой». Скрипт выполняет настоящие команды на компьютере: читайте каждую команду, прежде чем разрешить, и не запускайте его от имени администратора – так советует и сам автор в README.</p>
+          <p class="fine-print">SHA-256: <code>75a42c00540f62cfb1f858b95a53a524c8f998ba0a303edfb3f7759301dfb900</code></p>
+          <a class="button primary" href="materials/video-notes/agent.zip" download>Скачать agent.zip ↓</a></article></div>
+      </div>
+      <div class="vn-block"><h3>Где это в курсе</h3><ul class="vn-list">
+        <li>Первый день, <a href="materials/day-01/lectures/2026-11-16-Тема-1.1-Языковые-модели-и-чат-сервисы.html">тема 1.1 «Языковые модели и чат-сервисы»</a>: раздел «От чата к агенту».</li>
+        <li>Второй день, <a href="materials/day-02/lectures/2026-11-18-Тема-2.1-Защита-информации-при-работе-с-ИИ.html">тема 2.1 «Защита информации при работе с ИИ»</a>: скрытые команды в тексте и файле – то же внедрение подсказки, что в ролике.</li>
+        <li>Пятый день, <a href="materials/day-05/lectures/2026-11-25-Тема-5.1-Внутренние-решения-и-инструменты.html">тема 5.1 «Внутренние решения и инструменты»</a>: модель и харнес, агент или фиксированная цепочка, агент как советчик.</li>
+        <li>Частые вопросы: <a href="faq.html#q27">что такое агент</a>, <a href="faq.html#q28">скиллы</a>, <a href="faq.html#q29">MCP</a>, <a href="faq.html#q31">оркестрация агентов</a>.</li>
+      </ul></div>
+    </div></section>
+
+    <section class="section" id="rag" aria-labelledby="rag-title"><div class="content">
+      <div class="section-top reveal"><div><p class="caption">02 · ролик</p><h2 id="rag-title">Как работает RAG: фраза в «Войне и мире»</h2></div>
+      <p>Автор вписывает в роман выдуманную фразу и показывает, как бот на домашней видеокарте находит её поиском по смыслу. По шагам: нарезка книги, эмбеддинги и индекс, поиск и запрос к модели. Затем проверка на всём романе, приёмы больших систем, цифры исследований и разбор, где такой поиск ошибается.</p></div>
+      <div class="callout vn-rights"><p class="callout-label">Источник и права</p><p>Ролик «Я спрятал фразу в «Войне и мире». Бот нашёл её за 117 мс. Как работает RAG», канал «Скрытый слой», опубликован 12.11.2026: <a href="https://www.youtube.com/watch?v=PIrubiKm480" target="_blank" rel="noopener">youtube.com/watch?v=PIrubiKm480</a>.</p><p>Материал подготовлен по видео для учебных целей; права на видео принадлежат автору канала. Конспект и презентация пересказывают ролик своими словами; цифры, названия моделей и оценки на слайдах – утверждения автора ролика, если не сказано иное.</p></div>
+      <div class="vn-block"><h3>Главы ролика</h3><p>Отметки времени – по описанию ролика, ссылки открывают ролик с этого места.</p><ol class="vn-chapters"><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=0s" target="_blank" rel="noopener">0:00</a><span>Фраза, которой у Толстого нет</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=61s" target="_blank" rel="noopener">1:01</a><span>Поиск по смыслу</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=108s" target="_blank" rel="noopener">1:48</a><span>Почему не отдать модели всю книгу</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=211s" target="_blank" rel="noopener">3:31</a><span>Шаг 1: режем книгу на куски</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=288s" target="_blank" rel="noopener">4:48</a><span>Шаг 2: эмбеддинги и индекс</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=335s" target="_blank" rel="noopener">5:35</a><span>Шаг 3: поиск и запрос к модели</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=402s" target="_blank" rel="noopener">6:42</a><span>Весь код – 43 строки</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=437s" target="_blank" rel="noopener">7:17</a><span>Проверим сами: фраза про квас</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=475s" target="_blank" rel="noopener">7:55</a><span>Проверим сами: 10 вопросов по деталям</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=533s" target="_blank" rel="noopener">8:53</a><span>Вопрос ко всей книге и Qwen3.8</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=590s" target="_blank" rel="noopener">9:50</a><span>Как делают в больших системах</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=663s" target="_blank" rel="noopener">11:03</a><span>Что показали исследования</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=763s" target="_blank" rel="noopener">12:43</a><span>Подвох: почему поиск промахнулся</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=843s" target="_blank" rel="noopener">14:03</a><span>Ещё три подвоха</span></li><li><a href="https://www.youtube.com/watch?v=PIrubiKm480&amp;t=915s" target="_blank" rel="noopener">15:15</a><span>Итог</span></li></ol></div>
+      <div class="vn-block" id="rag-deck"><h3>Презентация: Как работает RAG</h3><p>28 слайдов. Листать – стрелками или кнопками внизу, «Заметки» – пересказ отрезка ролика и ссылка на это место, «Слайды» – оглавление. Тема презентации следует за темой страницы; полноэкранный показ – кнопка «На весь экран» в самой презентации или клавиша F.</p><div class="vn-frame"><iframe src="materials/video-notes/rag-deck.html" title="Презентация: Как работает RAG" loading="lazy" allowfullscreen></iframe></div><div class="vn-actions"><a class="button primary" href="materials/video-notes/rag-deck.html" target="_blank" rel="noopener">Открыть в новой вкладке ↗</a><a class="button ghost" href="materials/video-notes/rag-deck.html?notes=1" target="_blank" rel="noopener">Открыть с заметками ↗</a></div></div>
+      <div class="vn-block"><h3>Где это в курсе</h3><ul class="vn-list">
+        <li>Второй день, <a href="materials/day-02/lectures/2026-11-18-Тема-2.2-Работа-с-технической-документацией.html">тема 2.2 «Работа с технической документацией»</a>: корпоративные помощники по документам (RAG) и где RAG ошибается.</li>
+        <li>Частые вопросы: <a href="faq.html#q32">что такое RAG и как собрать базу знаний</a>.</li>
+      </ul></div>
+    </div></section>
+
+    <section class="section section-band" id="sources"><div class="content"><div class="section-top reveal"><div><p class="caption">Ссылки</p><h2>Источники</h2></div><p>Все ссылки страницы. Научные работы – через doi.org.</p></div>
+      <div class="faq-sources reveal">
+        <h3>Ролики и материалы автора</h3><ol>
+          <li>«Скрытый слой». Что такое ИИ-агент на самом деле? Собрал своего за 84 строки, 14.11.2026. <a href="https://www.youtube.com/watch?v=I5h4Bz99Ex0" target="_blank" rel="noopener">https://www.youtube.com/watch?v=I5h4Bz99Ex0</a></li>
+          <li>«Скрытый слой». Я спрятал фразу в «Войне и мире». Бот нашёл её за 117 мс. Как работает RAG, 12.11.2026. <a href="https://www.youtube.com/watch?v=PIrubiKm480" target="_blank" rel="noopener">https://www.youtube.com/watch?v=PIrubiKm480</a></li>
+          <li>Telegram-канал «Скрытый слой», где опубликован скрипт агента. <a href="https://t.me/skrytyysloy" target="_blank" rel="noopener">https://t.me/skrytyysloy</a></li>
+        </ol>
+        <h3>Научные публикации, названные в описаниях роликов</h3><ol start="4">
+          <li>Yao S., Zhao J. и соавт. ReAct: Synergizing Reasoning and Acting in Language Models, 2022 (препринт arXiv, ICLR 2023). <a href="https://doi.org/10.48550/arXiv.2210.03629" target="_blank" rel="noopener">https://doi.org/10.48550/arXiv.2210.03629</a></li>
+          <li>Lewis P., Perez E. и соавт. Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks // NeurIPS 2020. <a href="https://doi.org/10.48550/arXiv.2005.11401" target="_blank" rel="noopener">https://doi.org/10.48550/arXiv.2005.11401</a></li>
+        </ol>
+        <h3>Работы, на которые ролики ссылаются без названия (сопоставление – вывод автора конспекта)</h3><ol start="6">
+          <li>Liu N. F., Lin K. и соавт. Lost in the Middle: How Language Models Use Long Contexts, 2023. <a href="https://doi.org/10.48550/arXiv.2307.03172" target="_blank" rel="noopener">https://doi.org/10.48550/arXiv.2307.03172</a></li>
+          <li>Edge D., Trinh H. и соавт. From Local to Global: A Graph RAG Approach to Query-Focused Summarization, 2024. <a href="https://doi.org/10.48550/arXiv.2404.16130" target="_blank" rel="noopener">https://doi.org/10.48550/arXiv.2404.16130</a></li>
+        </ol>
+        <h3>Страницы разработчиков и авторов, упомянутые в роликах</h3><ol start="8">
+          <li>Anthropic. Building effective agents. <a href="https://www.anthropic.com/research/building-effective-agents" target="_blank" rel="noopener">https://www.anthropic.com/research/building-effective-agents</a></li>
+          <li>Anthropic. Contextual retrieval in AI systems. <a href="https://www.anthropic.com/research/contextual-retrieval" target="_blank" rel="noopener">https://www.anthropic.com/research/contextual-retrieval</a></li>
+          <li>S. Willison. The lethal trifecta for AI agents, 16.06.2025. <a href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/" target="_blank" rel="noopener">https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/</a></li>
+        </ol>
+      </div></div></section>
+  </main>
+  <footer class="site-footer"><div class="footer-inner"><div><p class="footer-title">ИИ для инженеров</p><p>Материалы курса повышения квалификации: лекции, практика, учебный кейс, слайды и схемы. Автор – Виталий Александрович Пиков.</p></div><div><p class="footer-title">Дни курса</p><ul><li><a href="day-01.html">День 1</a></li><li><a href="day-02.html">День 2</a></li><li><a href="day-03.html">День 3</a></li><li><a href="day-04.html">День 4</a></li><li><a href="day-05.html">День 5</a></li></ul></div><div><p class="footer-title">Материалы</p><ul><li><a href="karta.html">Интерактивная карта курса</a></li><li><a href="faq.html">Частые вопросы</a></li><li><a href="glossary.html">Глоссарий</a></li><li><a href="downloads/kamaz-ai-course.zip" download>Весь курс одним архивом</a></li><li><a class="quiet-link" href="teachers.html">Преподавателю</a></li></ul></div></div><div class="footer-bottom">© <span data-year>2026</span> Виталий Александрович Пиков · <a href="https://pikov.expert/">pikov.expert</a></div></footer>
+  <script src="assets/site.js?v=20261117a" defer></script>
+  <script src="assets/live-schedule.js?v=20261117a" defer></script>
+</body>
+</html>

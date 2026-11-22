@@ -427,7 +427,11 @@ $script:ReviewedNestedDistributables = @{
     'downloads\kamaz-ai-day-04.zip',
     'downloads\kamaz-ai-day-05.zip',
     'downloads\kamaz-ai-course.zip',
-    'downloads\kamaz-ai-workbook.zip'
+    'downloads\kamaz-ai-workbook.zip',
+    # Script archive published by the author of the "Skrytyy sloy" channel for
+    # viewers of his AI-agent video; kept byte-for-byte (SHA-256 on video-notes.html),
+    # tracked in Git, published with attribution by the course author's decision.
+    'materials\video-notes\agent.zip'
   )
 }
 
