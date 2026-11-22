@@ -43,6 +43,25 @@ transcripts, participant materials and laboratory results). It is not an
 official Kaspersky resource. The external name is used for factual attribution
 and does not imply endorsement.
 
+## «Скрытый слой» Video Notes and Script (kamaz-ai)
+
+`kamaz-ai/materials/video-notes/agent.zip` (`agent_84_stroki/`: `agent.py`,
+`README.txt`, `requirements.txt`) is a script by the author of the YouTube
+channel «Скрытый слой». The author published it in his Telegram channel
+https://t.me/skrytyysloy for viewers of the video «Что такое ИИ-агент на самом
+деле? Собрал своего за 84 строки»
+(https://www.youtube.com/watch?v=I5h4Bz99Ex0). It is included unchanged, with
+attribution; all rights belong to its author, and the author has not stated a
+license. It will be removed at the request of the rights holder.
+
+The presentations and notes on `kamaz-ai/video-notes.html`
+(`kamaz-ai/materials/video-notes/agent-84-deck.html`, `rag-deck.html`) were
+prepared for educational purposes from two videos of the same channel:
+https://www.youtube.com/watch?v=I5h4Bz99Ex0 and
+https://www.youtube.com/watch?v=PIrubiKm480. They retell the videos in the
+course author's own words, contain no frames from the videos, and link to the
+originals. Rights to the videos belong to the channel's author.
+
 ## Contact
 
 For questions about educational content ownership or removal of third-party material, contact the repository owner.
