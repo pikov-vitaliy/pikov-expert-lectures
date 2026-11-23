@@ -1,0 +1,222 @@
+<!-- Лекция 5.2, строки 576–649 (34:18–39:20): перед подключением ИИ-инструмента – 11 вопросов в пяти пунктах; путь идеи по полосам схемы; совет С. Скидана, пилот и контрольный набор; сценарий без привязки к одной модели – снятие моделей с поддержки (Anthropic, срок для платформ компании), Chen, Zaharia, Zou и их вывод, разбор трёх сбоев Anthropic, раздел «Сервис» паспорта, Echterhoff и соавт. -->
+
+<section class="slide" data-at="576">
+  <p class="kick t-orange">Если предложение дойдёт до&nbsp;подключения</p>
+  <h2>Перед подключением ИИ-инструмента</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46" style="grid-template-columns:330px 1fr;gap:56px;align-items:stretch">
+      <div class="t-orange" style="background:var(--ct);border-radius:22px;align-items:center;justify-content:center;gap:18px;padding:24px">
+        <svg class="i" style="font-size:170px;color:var(--c)"><use href="#i-plug"/></svg>
+        <p style="font-size:27px;line-height:1.2;text-align:center;color:var(--ci)">В&nbsp;организации согласуют <b>11&nbsp;вопросов</b></p>
+      </div>
+      <ul class="list num sm" style="font-size:29px;gap:12px;justify-content:center">
+        <li>Инструмент, поставщик, версия; модель и&nbsp;условия: хранение данных, обучение на&nbsp;них</li>
+        <li>Где обрабатываются данные и&nbsp;что именно уходит в&nbsp;инструмент</li>
+        <li>Как технически исключено попадание паролей и&nbsp;персональных данных</li>
+        <li>Права: чтение – да, изменение и&nbsp;отправка – по&nbsp;отдельному решению</li>
+        <li>Журнал, ответственный за&nbsp;инцидент, откат, срок пилота</li>
+      </ul>
+    </div>
+    <p class="note" style="font-size:27px;color:var(--muted);text-align:center">Список полезно знать и&nbsp;тому, кто предлагает</p>
+  </div>
+</section>
+
+<section class="slide" data-at="580" data-steps="580,583">
+  <p class="kick">Перед подключением · вопросы 1–5 из&nbsp;11</p>
+  <h2>Инструмент, модель и&nbsp;данные</h2>
+  <div class="body" style="text-wrap:balance">
+    <table class="tbl" style="font-size:30px">
+      <tbody>
+        <tr class="st" data-s="1"><td style="width:70px;padding:18px 22px;font-weight:700;color:var(--teal)">1</td><td style="padding:18px 22px">Какой инструмент, кто его поставщик, какая версия</td></tr>
+        <tr class="st" data-s="1"><td style="padding:18px 22px;font-weight:700;color:var(--teal)">2</td><td style="padding:18px 22px">Какая модель и&nbsp;на&nbsp;каких условиях: хранение данных, обучение на&nbsp;них<br><span style="font-size:25px;color:var(--muted)">условия цитируются из&nbsp;документов, а&nbsp;не&nbsp;пересказываются по&nbsp;памяти</span></td></tr>
+        <tr class="st" data-s="2"><td style="padding:18px 22px;font-weight:700;color:var(--teal)">3</td><td style="padding:18px 22px">Где обрабатываются данные</td></tr>
+        <tr class="st" data-s="2"><td style="padding:18px 22px;font-weight:700;color:var(--teal)">4</td><td style="padding:18px 22px">Что именно уходит в&nbsp;инструмент</td></tr>
+        <tr class="st" data-s="2"><td style="padding:18px 22px;font-weight:700;color:var(--teal)">5</td><td style="padding:18px 22px">Могут&nbsp;ли туда попасть пароли и&nbsp;персональные данные и&nbsp;как это исключается технически</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="586" data-steps="586,591">
+  <p class="kick">Перед подключением · вопросы 6–11 из&nbsp;11</p>
+  <h2>Агент, доступ, права, ответственность</h2>
+  <div class="body">
+    <div class="cards c3" style="gap:22px 24px">
+      <div class="card t-teal st" data-s="1" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-server"/></svg></span><h3 style="font-size:28px">6 · Где работает агент, если он есть</h3></div>
+      <div class="card t-teal st" data-s="1" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-id-card"/></svg></span><h3 style="font-size:28px">7 · На&nbsp;кого оформлен&nbsp;доступ</h3></div>
+      <div class="card t-teal st" data-s="1" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-scroll-text"/></svg></span><h3 style="font-size:28px">8 · Что записывается в&nbsp;журнал и&nbsp;кто его видит</h3></div>
+      <div class="card t-orange st" data-s="1" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-key-round"/></svg></span><h3 style="font-size:28px">9 · Права инструмента</h3><p style="font-size:25px">Чтение – да, изменение и&nbsp;отправка – только по&nbsp;отдельному решению</p></div>
+      <div class="card t-red st" data-s="2" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-undo-2"/></svg></span><h3 style="font-size:28px">10 · Кто отвечает за&nbsp;инцидент и&nbsp;как откатить изменения</h3></div>
+      <div class="card t-red st" data-s="2" style="padding:18px 22px;gap:10px"><span class="bdg"><svg class="i"><use href="#i-calendar-clock"/></svg></span><h3 style="font-size:28px">11 · Срок пилота и&nbsp;условия, при&nbsp;которых его останавливают</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="595" data-steps="595,602" data-end="608">
+  <p class="kick">Схема по&nbsp;полосам</p>
+  <h2>Путь идеи: от&nbsp;рутинной задачи до&nbsp;внедрения</h2>
+  <div class="body" style="gap:8px">
+    <div style="width:960px;margin:0 auto;display:flex;flex-direction:column;flex:none">
+      <img class="st" data-s="1" src="@day/08-Схемы/d5-put-idei.png" alt="Верхняя полоса схемы: сотрудник – рутинная задача, паспорт сценария, проба, расчёт эффекта" style="display:block;width:960px;height:134px;max-width:none;object-fit:fill;object-view-box:inset(600px 236px 1656px 340px);border-radius:12px 12px 0 0">
+      <img class="st" data-s="2" src="@day/08-Схемы/d5-put-idei.png" alt="Средняя полоса схемы: руководитель – предложение, пилот и внедрение" style="display:block;width:960px;height:140.3px;max-width:none;object-fit:fill;object-view-box:inset(1072px 236px 1162px 340px)">
+      <img class="st" data-s="2" src="@day/08-Схемы/d5-put-idei.png" alt="Нижняя полоса схемы: профильные подразделения – проработка, возврат к паспорту или одобрение" style="display:block;width:960px;height:134.6px;max-width:none;object-fit:fill;object-view-box:inset(1566px 236px 688px 340px);border-radius:0 0 12px 12px">
+    </div>
+    <p class="st" data-s="2" style="font-size:26px;text-align:center;line-height:1.25;text-wrap:balance">Защита информации – <b>данные и&nbsp;маршрут</b> · ИТ – <b>инструмент и&nbsp;подключения</b> · владелец процесса – <b>польза</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="610" data-title="С. Скидан: запускать сценарий поэтапно">
+  <p class="kick t-orange">Пилот и&nbsp;внедрение</p>
+  <div class="body" style="text-wrap:balance;gap:40px">
+    <figure class="quote md t-orange">
+      <blockquote>Запускать новый сценарий <b>поэтапно</b>, заранее записывать, что должно улучшиться, и&nbsp;проверять это <b>до&nbsp;и&nbsp;после</b> запуска</blockquote>
+      <figcaption><i class="ava">СС</i><span><b>С. Скидан</b>доклад «Как создать Агента-оператора», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+    <div style="display:flex;align-items:center;gap:26px;font-size:30px">
+      <span style="font-weight:700;color:var(--muted);white-space:nowrap">Для службы:</span>
+      <ol class="flow nonum" style="flex:1;gap:42px">
+        <li class="step t-gray" style="flex-direction:row;align-items:center;gap:16px;padding:16px 20px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-users"/></svg><h3 style="font-size:27px">Пилот на&nbsp;нескольких сотрудниках</h3></li>
+        <li class="step t-teal" style="flex-direction:row;align-items:center;gap:16px;padding:16px 20px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-timer"/></svg><h3 style="font-size:27px">Замер</h3></li>
+        <li class="step t-orange" style="flex-direction:row;align-items:center;gap:16px;padding:16px 20px"><svg class="i" style="font-size:38px;color:var(--c)"><use href="#i-scale"/></svg><h3 style="font-size:27px">Решение</h3></li>
+      </ol>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Скидан С. «Как создать Агента-оператора». Доклад на&nbsp;ИИ-митапе ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide" data-at="615" data-steps="615,618" data-title="Контрольный набор сценария">
+  <p class="kick">Сценарию полезен</p>
+  <div class="body" style="text-wrap:balance;gap:22px">
+    <div class="term st" data-s="1"><dfn style="font-size:50px">Контрольный набор</dfn><p style="font-size:33px">От&nbsp;5 до&nbsp;10 примеров с&nbsp;заранее известным правильным результатом</p></div>
+    <div class="docs st" data-s="1" style="flex-wrap:nowrap;gap:30px;padding:0 16px 10px 0">
+      <div class="doc t-teal" style="width:140px;padding:18px 18px 24px"><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp" style="font-size:22px">✓</b></div>
+      <div class="doc t-teal" style="width:140px;padding:18px 18px 24px"><i></i><i></i><i class="s"></i><i></i><b class="stamp" style="font-size:22px">✓</b></div>
+      <div class="doc t-teal" style="width:140px;padding:18px 18px 24px"><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp" style="font-size:22px">✓</b></div>
+      <div class="doc t-teal" style="width:140px;padding:18px 18px 24px"><i></i><i class="s"></i><i></i><i></i><b class="stamp" style="font-size:22px">✓</b></div>
+      <div class="doc t-red" style="width:340px;padding:18px 18px 24px;border-color:var(--red)"><h4 style="font-size:22px;color:var(--red)">С&nbsp;подвохом</h4><p style="font-size:20px;line-height:1.2">противоречивые данные или&nbsp;посторонняя строка-команда в&nbsp;тексте</p><i class="r s"></i></div>
+    </div>
+    <div class="cards st" data-s="2" style="gap:24px">
+      <div class="card row t-teal" style="padding:18px 26px"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><p style="font-size:28px">Сценарий прогоняют и&nbsp;записывают, <b>сколько примеров прошло</b></p></div>
+      <div class="card row t-orange" style="padding:18px 26px"><span class="bdg"><svg class="i"><use href="#i-refresh-cw"/></svg></span><p style="font-size:28px">Перепроверка после смены <b>модели или&nbsp;сервиса</b></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="624" data-title="Сценарий без привязки к одной модели">
+  <p class="kick t-orange">Сценарий без привязки к&nbsp;одной модели</p>
+  <div class="body" style="gap:36px">
+    <p class="say sm">Набор пригодится не&nbsp;только тогда, когда вы&nbsp;сами решите <em>сменить модель</em></p>
+    <div class="picts c3">
+      <div class="pict"><svg class="i"><use href="#i-archive-x"/></svg><b>Модель сняли с&nbsp;поддержки</b></div>
+      <div class="pict"><svg class="i"><use href="#i-wifi-off"/></svg><b>Пропал доступ к&nbsp;сервису</b></div>
+      <div class="pict"><svg class="i"><use href="#i-credit-card"/></svg><b>Для работы нужна подписка</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="627" data-steps="629">
+  <p class="kick">Anthropic · снятие моделей с&nbsp;поддержки</p>
+  <h2>Дату отключения объявляют заранее</h2>
+  <div class="body" style="text-wrap:balance;gap:30px">
+    <ol class="timeline" style="padding-top:42.5px">
+      <li class="t-teal"><b>Объявление</b><span>компания заранее называет дату отключения устаревшей модели</span></li>
+      <li class="now t-orange st" data-s="1"><b>Не&nbsp;меньше 60&nbsp;дней</b><span>предупреждение клиенту, у&nbsp;которого публичная модель работает в&nbsp;действующем приложении</span></li>
+      <li class="now t-red"><b>Отключение</b><span>запросы к&nbsp;модели перестают работать</span></li>
+    </ol>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:26px">
+      <div class="rule sm t-gray st" data-s="1" style="padding:18px 26px"><svg class="i"><use href="#i-server"/></svg><div><p style="font-size:27px">Срок касается платформ, которыми управляет сам Anthropic. У&nbsp;партнёрских платформ свои даты отключения</p></div></div>
+      <div class="rule sm t-orange st" data-s="1" style="padding:18px 26px"><svg class="i"><use href="#i-flask-conical"/></svg><div><h3 style="font-size:26px">Совет компании</h3><p style="font-size:27px">Заранее проверить задачи своего приложения на&nbsp;модели, которая придёт на&nbsp;замену</p></div></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. Model deprecations, документация для&nbsp;разработчиков</p>
+</section>
+
+<section class="slide" data-at="631" data-steps="631,635,636">
+  <p class="kick">Chen, Zaharia, Zou · GPT-4, 2023</p>
+  <h2>Новая версия модели может вести себя иначе</h2>
+  <div class="body" style="gap:20px">
+    <dl class="kv st" data-s="1" style="--kw:250px">
+      <div style="font-size:27px;padding:10px 15px"><dt>Что сравнили</dt><dd>Мартовскую и&nbsp;июньскую версии GPT-4 2023&nbsp;года</dd></div>
+      <div style="font-size:27px;padding:10px 15px"><dt>Задача</dt><dd>Определить, простое число или&nbsp;составное, и&nbsp;рассуждать по&nbsp;шагам</dd></div>
+    </dl>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:12px">
+      <div class="bars" style="--max:100;gap:14px">
+        <div class="bar t-teal" style="--v:84;font-size:28px;grid-template-columns:330px 1fr 150px"><span class="lb">GPT-4, март 2023</span><i style="height:46px"></i><b style="font-size:40px">84&nbsp;%</b></div>
+        <div class="bar t-red" style="--v:51;font-size:28px;grid-template-columns:330px 1fr 150px"><span class="lb">GPT-4, июнь 2023</span><i style="height:46px"></i><b style="font-size:40px">51&nbsp;%</b></div>
+      </div>
+      <p style="font-size:24px;color:var(--muted);text-align:center">Доля верных ответов</p>
+    </div>
+    <div class="rule sm t-orange st" data-s="3" style="padding:14px 26px"><svg class="i"><use href="#i-activity"/></svg><div><p style="font-size:26px;font-weight:700;color:var(--ci)">Младшая модель, GPT-3.5, за&nbsp;те&nbsp;же месяцы на&nbsp;этой задаче стала лучше</p><p style="font-size:24px">Вывод авторов: поведение одного и&nbsp;того&nbsp;же сервиса на&nbsp;языковой модели может заметно измениться за&nbsp;сравнительно короткое время – модели нужно постоянно отслеживать</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Chen L., Zaharia M., Zou J. Harvard Data Science Review, 2024 · doi.org/10.1162/99608f92.5317da47</p>
+</section>
+
+<section class="slide dark" data-at="637" data-title="Ответы портятся и без смены модели">
+  <p class="kick t-orange">Ответы портятся и&nbsp;без смены модели</p>
+  <div class="body" style="text-wrap:balance;gap:38px">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:22px 24px"><h3 style="font-size:30px">2025 год: три сбоя в&nbsp;инфраструктуре Anthropic</h3></li>
+      <li class="step t-red" style="padding:22px 24px"><h3 style="font-size:30px">Ответы моделей компании временами становились хуже</h3></li>
+      <li class="step t-orange" style="padding:22px 24px"><h3 style="font-size:30px">Сообщать начали пользователи</h3></li>
+    </ol>
+    <figure class="quote sm t-orange">
+      <blockquote>Проверки, которые мы проводили, просто <b>не&nbsp;уловили ухудшения</b>, о&nbsp;котором сообщали пользователи</blockquote>
+      <figcaption><i class="ava">A</i><span><b>Anthropic</b>разбор трёх сбоев, 17.09.2025</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. A postmortem of three recent issues, 17.09.2025 · anthropic.com/research/a-postmortem-of-three-recent-issues</p>
+</section>
+
+<section class="slide" data-at="643">
+  <p class="kick t-orange">Отсюда совет · паспорт, раздел 2</p>
+  <h2>В&nbsp;разделе «Сервис» – не&nbsp;только сервис</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 380px;gap:44px;align-items:center">
+      <div style="background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:22px 30px;box-shadow:0 6px 18px var(--shadow)">
+        <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal)">Паспорт сценария · 2. Сервис</p>
+        <dl class="kv" style="--kw:230px">
+          <div style="font-size:31px"><dt>Сервис</dt><dd>какой</dd></div>
+          <div style="font-size:31px"><dt>Модель</dt><dd>какая</dd></div>
+          <div style="font-size:31px"><dt>Версия</dt><dd>если сервис её показывает</dd></div>
+          <div style="font-size:31px"><dt>Дата пробы</dt><dd>когда пробовали</dd></div>
+        </dl>
+      </div>
+      <div class="rule t-orange" style="flex-direction:column;align-items:flex-start;gap:16px;padding:28px 30px"><svg class="i"><use href="#i-settings-2"/></svg><div><h3>Режим «авто»</h3><p>Так и&nbsp;запишите: модель выбирает программа</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="646" data-steps="646,648">
+  <p class="kick">После обновления модели</p>
+  <h2>Сравнивать две версии на&nbsp;каждом примере набора</h2>
+  <div class="body" style="text-wrap:balance;gap:16px">
+    <div class="split st" data-s="1" style="grid-template-columns:1fr 1fr;gap:28px;align-items:stretch">
+      <div class="rule sm t-gray" style="padding:20px 26px"><svg class="i"><use href="#i-sigma"/></svg><div><h3>Общего итога мало</h3><p style="font-size:24px">Результаты прежней и&nbsp;новой версии сравнивают по&nbsp;каждому примеру контрольного набора</p></div></div>
+      <div class="rule sm t-teal" style="padding:20px 26px"><svg class="i"><use href="#i-book-open-check"/></svg><div><h3>Echterhoff и&nbsp;соавт., 2024</h3><p style="font-size:24px">Открытые модели (Llama, Phi, Vicuna) с&nbsp;адаптерами, обученными под&nbsp;конкретную задачу</p></div></div>
+    </div>
+    <div class="st" data-s="2" style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:28px;font-weight:700;text-align:center">Общая точность росла, а&nbsp;часть прежде верных ответов становилась ошибочной</p>
+      <div class="stats">
+        <div class="stat sm t-gray" style="padding:12px 22px"><b style="font-size:50px">30,02&nbsp;%</b><span style="font-size:24px">Phi 1.5: верно решено задач по&nbsp;математике (GSM8K)</span></div>
+        <div class="stat sm t-teal" style="padding:12px 22px"><b style="font-size:50px">48,18&nbsp;%</b><span style="font-size:24px">Phi 2: тот&nbsp;же набор</span></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Echterhoff J. M., Faghri F., et al. Findings of EMNLP, 2024 · doi.org/10.18653/v1/2024.findings-emnlp.430</p>
+</section>
+
+<section class="slide" data-at="649">
+  <p class="kick t-orange">Паспорт сценария</p>
+  <h2>Потерю отметить рядом с&nbsp;конкретным примером</h2>
+  <div class="body" style="gap:28px">
+    <div class="split" style="grid-template-columns:330px 1fr;gap:40px;align-items:center">
+    <div class="stats"><div class="stat t-red" style="align-items:center;text-align:center;padding:26px 22px"><b style="font-size:78px">5,88&nbsp;%</b><span style="font-size:24px">примеров: верный ответ прежней версии сменился неверным</span></div></div>
+    <div class="prompt" style="--tw:210px;font-size:34px;line-height:1.25;padding:30px 34px;gap:22px">
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:25px;padding:12px 12px">Пример</span><span>Какой пример контрольного набора</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:25px;padding:12px 12px">Раньше</span><span>Какой ответ проходил проверку</span></p>
+      <p class="part t-red" style="align-items:center"><span class="tg" style="font-size:25px;padding:12px 12px">Теперь</span><span>Где появилась ошибка</span></p>
+    </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Echterhoff J. M., Faghri F., et al. Findings of EMNLP, 2024 · doi.org/10.18653/v1/2024.findings-emnlp.430</p>
+</section>

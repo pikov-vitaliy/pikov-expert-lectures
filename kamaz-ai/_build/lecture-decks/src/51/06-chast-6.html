@@ -1,0 +1,279 @@
+<!-- Лекция 5.1, строки 515–608 (28:50–34:40): модель-«судья», точные проверки, стоп-условия, подтверждение человеком, окно подтверждения -->
+<section class="slide dark" data-at="515" data-title="Проверка действий агента без большой модели">
+  <p class="kick t-orange">Модель-«судья»</p>
+  <div class="body" style="gap:46px">
+    <p class="say md">Проверку действий агента не&nbsp;обязательно поручать <em>большой модели</em></p>
+    <div class="picts c3 t-gray">
+      <div class="pict"><svg class="i"><use href="#i-brain"/></svg><b style="font-size:34px">Пишет рассуждение</b></div>
+      <div class="pict"><svg class="i"><use href="#i-timer"/></svg><b style="font-size:34px">Тратит секунды</b></div>
+      <div class="pict"><svg class="i"><use href="#i-message-square-text"/></svg><b style="font-size:34px">Отвечает свободным текстом, который ещё надо разобрать</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="518">
+  <p class="kick">Онлайн-конференция форума All-over-IP &amp;&nbsp;AI&nbsp;2026 · слайды А.&nbsp;Мирошкина</p>
+  <h2>Модель-«судья» получает закрытый вопрос</h2>
+  <div class="body" style="gap:40px">
+    <p class="say md center" style="text-align:center;max-width:none">Что сделать с&nbsp;действием?</p>
+    <div class="cards c3">
+      <div class="card t-teal" style="align-items:center;text-align:center;padding:34px 28px;gap:18px"><span class="bdg"><svg class="i"><use href="#i-circle-check"/></svg></span><h3 style="font-size:40px">Пропустить</h3></div>
+      <div class="card t-red" style="align-items:center;text-align:center;padding:34px 28px;gap:18px"><span class="bdg"><svg class="i"><use href="#i-ban"/></svg></span><h3 style="font-size:40px">Заблокировать</h3></div>
+      <div class="card t-orange" style="align-items:center;text-align:center;padding:34px 28px;gap:18px"><span class="bdg"><svg class="i"><use href="#i-user-round-check"/></svg></span><h3 style="font-size:40px">Передать человеку</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Мирошкин А. Модели, которые не&nbsp;пишут, а&nbsp;решают: как работает быстрый «судья» для&nbsp;ИИ-агентов · форум All-over-IP &amp;&nbsp;AI&nbsp;2026, 11.11.2026</p>
+</section>
+
+<section class="slide" data-at="522" data-steps="522,524">
+  <p class="kick">Модель-«судья» · вопрос и&nbsp;ответ</p>
+  <h2>Что передают судье и&nbsp;что он возвращает</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:stretch;gap:40px">
+      <div class="prompt" style="--tw:190px;font-size:31px;padding:26px 28px;gap:16px;justify-content:center">
+        <p class="part st t-teal" data-s="1"><span class="tg">Кто</span><span>Кто и&nbsp;зачем действует</span></p>
+        <p class="part st t-teal" data-s="1"><span class="tg">Действие</span><span>Что именно делает агент</span></p>
+        <p class="part st t-teal" data-s="1"><span class="tg">Факты</span><span>Что проверила программа</span></p>
+        <p class="part st t-teal" data-s="1"><span class="tg">Правило</span><span>Одна строка</span></p>
+      </div>
+      <div class="card t-orange st" data-s="2" style="justify-content:center;gap:22px;padding:34px 34px"><span class="bdg"><svg class="i"><use href="#i-gavel"/></svg></span><h3 style="font-size:40px">Ответ судьи</h3><p style="font-size:32px">Один вариант и&nbsp;уверенность</p><p style="font-size:32px">На ответ – <b>доли секунды</b>, по&nbsp;слайдам</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Мирошкин А., слайды на&nbsp;форуме All-over-IP &amp;&nbsp;AI&nbsp;2026, 11.11.2026</p>
+</section>
+
+<section class="slide" data-at="526">
+  <p class="kick">Модель-«судья» · порог</p>
+  <h2>Порог уверенности задаёт политика</h2>
+  <div class="body" style="gap:34px">
+    <div style="display:grid;grid-template-columns:300px 1fr;gap:22px 28px;align-items:center">
+      <p style="font-size:31px;font-weight:700;text-align:right;line-height:1.15">Ошибка обходится дёшево</p>
+      <div class="segbar" style="font-size:28px"><i class="t-orange" style="flex:1">человеку</i><i class="t-teal solid" style="flex:3">решает судья</i></div>
+      <p style="font-size:31px;font-weight:700;text-align:right;line-height:1.15;color:var(--red)">Ошибка обходится дорого</p>
+      <div class="segbar" style="font-size:28px"><i class="t-orange" style="flex:3">человеку</i><i class="t-teal solid" style="flex:1">судья</i></div>
+    </div>
+    <div class="rule t-orange"><svg class="i"><use href="#i-gauge"/></svg><div><p>Чем дороже ошибка, тем выше порог. Остальное уходит человеку</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Числа на&nbsp;слайдах А.&nbsp;Мирошкина иллюстративные, так и&nbsp;указано</p>
+</section>
+
+<section class="slide" data-at="530">
+  <p class="kick t-red">Ограничения – на&nbsp;тех же слайдах</p>
+  <h2>Чего быстрый судья не&nbsp;гарантирует</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red" style="padding:48px 44px;gap:30px"><span class="bdg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:50px">Гарантирован формат ответа, а&nbsp;не&nbsp;его правота</h3></div>
+      <div class="card t-red" style="padding:48px 44px;gap:30px"><span class="bdg"><svg class="i"><use href="#i-eye-off"/></svg></span><h3 style="font-size:50px">Чего нет в&nbsp;запросе – того судья не&nbsp;учтёт</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Мирошкин А., слайды на&nbsp;форуме All-over-IP &amp;&nbsp;AI&nbsp;2026, 11.11.2026</p>
+</section>
+
+<section class="slide" data-at="533" data-title="А. Мирошкин: быстрый судья и архитектура защиты">
+  <p class="kick">Итог автора слайдов</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:58px">Быстрый судья <b>не&nbsp;заменяет</b> архитектуру защиты. Он делает контроль <b>дешёвым</b> на&nbsp;каждом шаге агента</blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>А. Мирошкин</b>онлайн-конференция форума All-over-IP &amp;&nbsp;AI&nbsp;2026, 11.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="536" data-title="Правило курса: права – программа, необратимое – человек">
+  <p class="kick t-orange">Для курса правило не&nbsp;меняется</p>
+  <div class="body" style="gap:40px">
+    <div class="cards">
+      <div class="card t-teal" style="padding:38px 36px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:46px">Права проверяет программа</h3></div>
+      <div class="card t-orange" style="padding:38px 36px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-user-round-check"/></svg></span><h3 style="font-size:46px">Необратимое действие подтверждает человек</h3></div>
+    </div>
+    <p class="say sm">Какой бы уверенной ни&nbsp;была модель</p>
+  </div>
+</section>
+
+<section class="slide" data-at="540" data-title="Н. Галимова: риск агентов">
+  <p class="kick t-red">Риск агентов – как его описала Н.&nbsp;Галимова</p>
+  <div class="body">
+    <figure class="quote t-red">
+      <blockquote style="font-size:62px">Превращение <b>ошибки в&nbsp;данных</b> в&nbsp;автономно выполняемое <b>ошибочное действие</b></blockquote>
+      <figcaption><i class="ava">НГ</i><span><b>Н. Галимова, «Билайн»</b>доклад «Архитектура доверия: дата-контракты»<br>онлайн-конференция форума All-over-IP &amp;&nbsp;AI&nbsp;2026, 11.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="546">
+  <p class="kick">Какие проверки поручить программе</p>
+  <h2>Где модель сильна, а&nbsp;где нужна точность</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:34px 40px;gap:22px"><h3 style="font-size:38px"><svg class="i"><use href="#i-file-text"/></svg>Хорошо – с&nbsp;текстом</h3><ul style="font-size:36px;gap:16px"><li>Читает</li><li>Сопоставляет</li><li>Пересказывает</li><li>Предлагает</li></ul></div>
+      <div class="col t-red" style="padding:34px 40px;gap:22px"><h3 style="font-size:38px"><svg class="i"><use href="#i-ruler"/></svg>Плохо – где нужна точность</h3><ul style="font-size:36px;gap:16px"><li>Допуски</li><li>Арифметика</li><li>Единицы</li><li>Формат номера</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="549">
+  <p class="kick t-orange">Всё точное – не&nbsp;модели</p>
+  <h2>Кому отдают точные проверки</h2>
+  <div class="body" style="gap:34px">
+    <div class="picts c3 t-orange">
+      <div class="pict"><svg class="i"><use href="#i-code-xml"/></svg><b>Обычная программа</b></div>
+      <div class="pict"><svg class="i"><use href="#i-table"/></svg><b>Формула в&nbsp;таблице</b></div>
+      <div class="pict"><svg class="i"><use href="#i-list-checks"/></svg><b>Проверка по&nbsp;списку</b></div>
+    </div>
+    <div class="rule t-teal"><svg class="i"><use href="#i-regex"/></svg><div><h3>Например</h3><p>У&nbsp;обозначения документа есть заданный формат. Программа проверяет его по&nbsp;шаблону</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="553" data-steps="553,556">
+  <p class="kick">Исследователи агентов приходят к&nbsp;тому же</p>
+  <h2>Проверка до&nbsp;действия и&nbsp;проверка кода</h2>
+  <div class="body" style="padding-top:16px">
+    <div class="cards">
+      <div class="card t-teal st" data-s="1" style="padding:26px 32px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-search-check"/></svg></span><h3 style="font-size:35px">Проверка до&nbsp;выполнения действия</h3><p style="font-size:29px">Дешёвая детерминированная проверка – недооценённый способ надзора за&nbsp;агентом</p></div>
+      <div class="card t-orange st" data-s="2" style="padding:26px 32px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:35px">Программы для&nbsp;промышленных контроллеров</h3><p style="font-size:29px">Модели не&nbsp;дают гарантий правильности, поэтому работу строят вокруг формальной проверки кода</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Althoubi A. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2609.11957<br>Liu Z., Zeng R., et al. IEEE Transactions on Software Engineering, 2026 · doi.org/10.1109/TSE.2026.3667895</p>
+</section>
+
+<section class="slide" data-at="559" data-title="Обзор: модели в машиностроении">
+  <p class="kick">Чем ценны языковые модели в&nbsp;машиностроении · итог обзора 2026&nbsp;года</p>
+  <div class="body">
+    <figure class="quote md">
+      <blockquote>В большинстве инженерных задач их ценность не&nbsp;в&nbsp;замене средств моделирования, управления и&nbsp;численного анализа, а&nbsp;в&nbsp;том, что они <b>помогают инженерам эффективнее работать</b> с&nbsp;документами, источниками данных, программными средами и&nbsp;инструкциями на&nbsp;естественном языке</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>S. Sorour, A. Sahbel</b>обзор в&nbsp;Journal of Intelligent Manufacturing, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Sorour S., Sahbel A. Journal of Intelligent Manufacturing, 2026 · doi.org/10.1007/s10845-026-02927-y</p>
+</section>
+
+<section class="slide" data-at="566" data-title="С. Скидан: когда агент передаёт обращение оператору">
+  <p class="kick t-orange">Стоп-условия</p>
+  <h2>Когда агент передаёт обращение оператору</h2>
+  <div class="body" style="gap:30px">
+    <div class="card row t-gray" style="padding:22px 30px;gap:24px"><span class="bdg"><svg class="i"><use href="#i-headset"/></svg></span><p style="font-size:32px">С.&nbsp;Скидан описывал агента службы поддержки</p></div>
+    <div class="cards c3">
+      <div class="card t-red" style="padding:30px 30px;gap:18px;align-items:center;text-align:center"><span class="bdg lg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:36px">Не хватает данных</h3></div>
+      <div class="card t-red" style="padding:30px 30px;gap:18px;align-items:center;text-align:center"><span class="bdg lg"><svg class="i"><use href="#i-split"/></svg></span><h3 style="font-size:36px">Обнаружился конфликт</h3></div>
+      <div class="card t-red" style="padding:30px 30px;gap:18px;align-items:center;text-align:center"><span class="bdg lg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:36px">Возник риск</h3></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Скидан С. Как создать Агента-оператора. Доклад на&nbsp;ИИ-митапе ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide" data-at="571" data-title="С. Скидан: хороший агент">
+  <p class="kick">Формулировка С.&nbsp;Скидана</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:58px">Хороший агент не&nbsp;удерживает клиента любой ценой: он <b>собирает контекст</b> и&nbsp;<b>вовремя передаёт кейс</b></blockquote>
+      <figcaption><i class="ava">СС</i><span><b>С. Скидан</b>доклад «Как создать Агента-оператора», ИИ-митап ЦГУ, 06.11.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="576">
+  <p class="kick t-red">Пусть агент спрашивает человека обо всём?</p>
+  <h2>У&nbsp;внимания есть предел</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:56px">
+      <div style="position:relative;height:330px">
+        <div style="position:absolute;left:0px;top:0px;width:384px;background:var(--surface2);border:2px solid var(--line);border-radius:18px;padding:22px 28px;box-shadow:0 4px 12px var(--shadow)"><p style="font-size:28px;font-weight:700;color:var(--muted)">Подтвердить действие?</p><div style="display:flex;gap:14px;margin-top:18px;align-items:center;visibility:hidden"><span style="background:var(--line);color:var(--muted);border-radius:10px;padding:6px 24px;font-size:26px;font-weight:700">Да</span><span style="border:2px solid var(--line);border-radius:10px;padding:5px 22px;font-size:26px;color:var(--muted)">Нет</span></div></div>
+        <div style="position:absolute;left:30px;top:68px;width:384px;background:var(--surface);border:2px solid var(--line);border-radius:18px;padding:22px 28px;box-shadow:0 -2px 12px var(--shadow)"><p style="font-size:28px;font-weight:700;color:var(--muted)">Подтвердить действие?</p><div style="display:flex;gap:14px;margin-top:18px;align-items:center;visibility:hidden"><span style="background:var(--line);color:var(--muted);border-radius:10px;padding:6px 24px;font-size:26px;font-weight:700">Да</span><span style="border:2px solid var(--line);border-radius:10px;padding:5px 22px;font-size:26px;color:var(--muted)">Нет</span></div></div>
+        <div style="position:absolute;left:60px;top:136px;width:384px;background:var(--bg);border:2px solid var(--line);border-radius:18px;padding:22px 28px;box-shadow:0 -2px 18px var(--shadow)"><p style="font-size:28px;font-weight:700;color:var(--ink)">Подтвердить действие?</p><div style="display:flex;gap:14px;margin-top:18px;align-items:center"><span style="background:var(--teal);color:var(--chip-ink);border-radius:10px;padding:6px 24px;font-size:26px;font-weight:700">Да</span><svg class="i" style="font-size:48px;color:var(--red);margin-left:-38px;margin-top:38px"><use href="#i-mouse-pointer-click"/></svg><span style="border:2px solid var(--line);border-radius:10px;padding:5px 22px;font-size:26px;color:var(--ink)">Нет</span></div></div>
+      </div>
+      <div style="gap:22px">
+        <p class="say sm">Если агент просит подтверждения слишком часто, «да» начинают нажимать <em>не&nbsp;читая</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="580">
+  <p class="kick">Обзор производственных агентных систем · 2026</p>
+  <h2>Самые распространённые механизмы защиты – человеческие</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:48px">
+      <div class="stats"><div class="stat t-teal" style="padding:36px 38px"><b style="font-size:150px">21</b><span style="font-size:31px">производственная агентная система в&nbsp;разборе</span></div></div>
+      <ul class="list big t-orange" style="font-size:40px">
+        <li>Правила</li>
+        <li>Подтверждение во&nbsp;время работы</li>
+        <li>Ограничение области действия</li>
+      </ul>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wang P.-R., Li Y., Tian Y. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2605.24309</p>
+</section>
+
+<section class="slide" data-at="584" data-title="Wang, Li, Tian: недостаток механизмов участия человека">
+  <p class="kick t-red">Недостаток этих механизмов – по&nbsp;оценке авторов обзора</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Однако нынешние механизмы участия человека далеки от&nbsp;удовлетворительных. В&nbsp;них приходится выбирать между нагрузкой на&nbsp;человека и&nbsp;гарантиями безопасности, и&nbsp;пользователь оказывается между <b>усталостью от&nbsp;подтверждений</b> и&nbsp;<b>бесконтрольной самостоятельностью агента</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>P.-R. Wang, Y. Li, Y. Tian</b>препринт arXiv, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Wang P.-R., Li Y., Tian Y. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2605.24309</p>
+</section>
+
+<section class="slide" data-at="590">
+  <p class="kick">Эксперимент с&nbsp;агентом в&nbsp;браузере · 2026</p>
+  <h2>Что люди проверяют, наблюдая за&nbsp;агентом</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center;gap:48px">
+      <div class="stats"><div class="stat t-teal" style="padding:36px 38px"><b style="font-size:150px">48</b><span style="font-size:31px">участников наблюдали за&nbsp;агентом</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div class="card row t-teal" style="padding:26px 30px;gap:24px"><span class="bdg"><svg class="i"><use href="#i-circle-check"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><p class="muted" style="font-size:24px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Оценивали</p><h3 style="font-size:34px">Правильно ли агент сделал дело</h3></div></div>
+        <div class="card row t-red" style="padding:26px 30px;gap:24px"><span class="bdg"><svg class="i"><use href="#i-circle-x"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><p class="muted" style="font-size:24px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Не оценивали</p><h3 style="font-size:34px">Безопасно ли его действие</h3></div></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Chen C.-R., Zhang Z.-P., et al. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2604.04918</p>
+</section>
+
+<section class="slide" data-at="592">
+  <p class="kick t-red">Расчётная модель · 2026</p>
+  <h2>Больше запросов на&nbsp;подтверждение – не&nbsp;всегда безопаснее</h2>
+  <div class="body">
+    <div class="rule sm t-gray" style="align-self:flex-start;padding:18px 30px"><svg class="i"><use href="#i-hourglass"/></svg><div><p style="font-size:32px;font-weight:700">Условие: проверяющий устал</p></div></div>
+    <ol class="flow nonum">
+      <li class="step t-orange" style="padding:32px 34px;gap:18px"><span class="bdg"><svg class="i"><use href="#i-repeat"/></svg></span><h3 style="font-size:40px">Больше запросов на&nbsp;подтверждение</h3></li>
+      <li class="step t-red" style="padding:32px 34px;gap:18px"><span class="bdg"><svg class="i"><use href="#i-shield"/></svg></span><h3 style="font-size:40px">Система может стать менее безопасной</h3></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Turan E. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2606.08919</p>
+</section>
+
+<section class="slide dark" data-at="594" data-title="Вывод для практики: где и как подтверждать">
+  <p class="kick t-orange">Это препринты, но&nbsp;вывод для&nbsp;практики понятный</p>
+  <div class="body" style="gap:44px">
+    <div class="rule t-orange" style="padding:34px 40px"><svg class="i"><use href="#i-hand"/></svg><div><p style="font-size:44px;font-weight:700">Подтверждение ставят там, где действие необратимо</p></div></div>
+    <div class="rule t-teal" style="padding:34px 40px"><svg class="i"><use href="#i-scan-search"/></svg><div><p style="font-size:44px;font-weight:700">Человеку показывают точные параметры действия, а&nbsp;не&nbsp;пересказ агента</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="597" data-title="X. Weng: человек одобряет пересказ агента">
+  <p class="kick t-red">Почему пересказа мало</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Агенты для&nbsp;программирования запрашивают подтверждение человека перед действиями с&nbsp;существенными последствиями, но&nbsp;текст в&nbsp;окне подтверждения <b>пишет сам агент</b>: человек одобряет <b>его пересказ</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>X. Weng</b>препринт arXiv, 2026</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Weng X. What You Approve Is What Executes: Consent Integrity for Black-Box LLM Agents. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2606.02668</p>
+</section>
+
+<section class="slide" data-at="602">
+  <p class="kick t-orange">Окно подтверждения</p>
+  <h2>Точные параметры, которые сформировала программа</h2>
+  <div class="body">
+    <div class="split s64" style="align-items:center;gap:44px">
+      <div style="background:var(--surface);border:2px solid var(--line);border-radius:20px;padding:26px 32px;box-shadow:0 8px 22px var(--shadow);display:flex;flex-direction:column;gap:6px">
+        <p style="font-size:26px;font-weight:700;display:flex;gap:14px;align-items:center;margin-bottom:6px"><svg class="i" style="color:var(--teal)"><use href="#i-shield-check"/></svg>Подтверждение действия</p>
+        <p class="muted" style="font-size:24px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-top:6px">Параметры действия</p>
+        <div style="display:flex;flex-direction:column;gap:16px;padding:10px 0 8px"><i style="display:block;height:16px;width:84%;border-radius:8px;background:var(--surface2)"></i><i style="display:block;height:16px;width:62%;border-radius:8px;background:var(--surface2)"></i><i style="display:block;height:16px;width:92%;border-radius:8px;background:var(--surface2)"></i><i style="display:block;height:16px;width:70%;border-radius:8px;background:var(--surface2)"></i></div>
+        <div style="display:flex;gap:14px;margin-top:10px"><span style="background:var(--teal);color:var(--chip-ink);border-radius:10px;padding:8px 24px;font-size:24px;font-weight:700">Подтвердить</span><span style="border:2px solid var(--line);border-radius:10px;padding:7px 22px;font-size:24px">Отклонить</span></div>
+      </div>
+      <div class="rule t-red" style="flex-direction:column;align-items:flex-start;padding:32px 32px;gap:18px"><svg class="i"><use href="#i-refresh-cw"/></svg><div><p style="font-size:34px">Параметры изменились&nbsp;– подтверждение нужно&nbsp;заново</p></div></div>
+    </div>
+  </div>
+</section>

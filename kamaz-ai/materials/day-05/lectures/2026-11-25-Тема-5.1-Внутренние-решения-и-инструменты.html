@@ -190,6 +190,36 @@ h2[id], h3[id] { scroll-margin-top: 16px; }
 <p>А. Субботин на митапе предложил аналогию: «Модель это повар. Харнес это кухня». Если повар заболел, выходит другой, и кафе работает дальше, потому что рецепты, продукты и порядок на кухне остались [39]. По его мысли, задачу чаще решает не самая умная модель, а хорошо устроенное окружение. Отсюда его итоговый совет: «Не ждите самую умную модель. Соберите харнес, в котором справится та модель, что у вас уже есть» [39]. В первый день мы вспоминали другое его сравнение: модель похожа на толкового стажёра, которому нужны инструкция, доступ к документам и руководитель, принимающий работу. Харнес и есть всё это вместе.</p>
 <p>Для внутренних решений аналогия особенно полезна. Внутренняя модель может быть слабее зарубежной, но если инструкция написана ясно, документы подобраны, а результат проверяется, её хватает на многие рутинные задачи. Инструкции стоит сразу писать так, чтобы с ними справилась и более простая модель: тогда смена модели не ломает работу.</p>
 <p>Субботин добавлял ещё одно правило: сначала описать работу, потом звать агента [39]. Вывод для службы: если процесс не описан, агент его не исправит, а будет быстро повторять ту же путаницу.</p>
+<h3>Харнесы без привязки к поставщику модели</h3>
+<p>На схеме «Модель и харнес» модель – сменная часть. Есть программы, в которых эту часть выбирает сам пользователь: оболочку для агента развивает одна команда, а модель к ней подключают от разных поставщиков – облачную по своему ключу, через шлюз или локальную.</p>
+<p>Один из примеров – OpenCode, открытый агент для программирования с интерфейсом в терминале, лицензия MIT. Есть также приложение для компьютера, веб-режим и SDK [59]. На 23.11.2026 у репозитория около 229 тыс. звёзд на GitHub [60]. Проект заявляет не меньше двухсот провайдеров моделей: «200+ LLM providers through Models.dev, including local models» [59]. Модели Ollama и LM Studio на своём компьютере OpenCode находит сам. Если сервер поддерживает OpenAI-совместимый API, но его нет в каталоге, его добавляют вручную и перечисляют модели. У автоматически найденных моделей vLLM инструменты по умолчанию отключены: определить их поддержку при поиске OpenCode не может [61].</p>
+<p>Kilo Code – расширения для VS Code и JetBrains, командная строка <code>kilo</code>, приложение Kilo Desktop и мобильный клиент [62], [63]. На главной странице проекта: «500+ models, zero markup: frontier, open weight, or your own keys» и «Models at cost. No markup. No lock-in.» – «Модели по себестоимости. Без наценки. Без привязки» [62].</p>
+<p>Другие проекты того же класса:</p>
+<ul>
+<li>Cline – расширение для редактора кода, CLI и SDK. В списке провайдеров есть Ollama, LM Studio и «Any OpenAI-compatible API». Лицензия Apache-2.0 относится к опубликованному репозиторию: исходный код плагинов для JetBrains разработчики не публикуют [64].</li>
+<li>Aider – помощник в терминале, который «can connect to almost any LLM, including local models» [65]. По умолчанию каждую свою правку он фиксирует коммитом в Git, ключ <code>--no-auto-commits</code> это отключает [66]. Значит, правку агента можно откатить штатными средствами Git (вывод автора).</li>
+<li>Goose – агент общего назначения: код, исследования, автоматизация. Подключается к «over 85 providers», входит в Agentic AI Foundation при Linux Foundation [67].</li>
+</ul>
+<p>Открытый код не гарантирует, что продукт будет жить. Расширение Roo Code закрыли 15.05.2026, репозиторий переведён в архив [68]. Разработчики Continue пишут в README, что прекратили активное сопровождение: репозиторий «no longer actively maintained and is read-only for all users» [69]. После объявления о закрытии Roo Code участники сообщества создали форк Zoo Code: «Continuing where Roo Code left off» [70]; README Roo Code сам отсылает пользователей к Zoo Code и к Cline [68]. Kilo Code в 2025 году начинался как форк Roo Code, который, в свою очередь, был форком Cline [71], а командная строка Kilo – форк OpenCode [63]. В июле 2026 года Kilo Code приобрела компания Anaconda [72].</p>
+<p>Вывод автора: открытый проект тоже может закрыться, но другие разработчики могут взять исходный код и продолжить работу над проектом – так сообщество поступило с Roo Code.</p>
+<h3>Российские варианты и подключение моделей</h3>
+<p>Выбор модели у российских помощников устроен по-разному: в одном подключают своего провайдера по ключу, в другом модель выбирают из предложенного набора, в третьем подключение другого провайдера разработчики не описывают.</p>
+<p><strong>SourceCraft Code Assistant (Яндекс)</strong> работает в VS Code, VSCodium и JetBrains IDE. Агентный режим, по документации, «is also available in the SourceCraft CLI with built-in OpenCode» [73]. Расширение SourceCraft Code Assistant для VS Code, по той же документации, использует код Roo Code (лицензия Apache-2.0) [74]. В Visual Studio Code можно создать профиль конфигурации, выбрать в нём провайдера (Yandex Cloud и другие) и подключить его по своему ключу API. Чтобы выбрать другую модель из каталога SourceCraft, нужна платная подписка организации, с которой списываются нейрокредиты; модель должен одобрить администратор или владелец организации [75].</p>
+<p><strong>GigaCode (Сбер, GitVerse)</strong> – плагин для GigaIDE и JetBrains, CLI и приложение GigaCode Desktop. На странице продукта: «GLM, MiniMax, Kimi, DeepSeek, Qwen – в одном плагине для GigaIDE и JetBrains», «Выбирайте оптимальную модель под конкретную задачу»; для бизнеса доступна установка на серверы заказчика [76]. Можно ли подключить к самому помощнику свой ключ API или свою модель, на странице не сказано.</p>
+<p><strong>Kodify (MWS AI)</strong>. Kodify 2 – «on-premise сервис генерации и автодополнения кода»; Kodify Nano – открытая модель на 1,5 млрд параметров с плагинами для VS Code и JetBrains [77]. По словам разработчиков, «Kodify Nano и Kodify 2 основаны на Qwen Coder 2.5» [78]. Подключение другого провайдера ни на странице продукта, ни в публикации разработчиков не описано [77], [78].</p>
+<p>К открытому харнесу российскую или открытую модель можно подключить, если она поддерживает API в формате OpenAI: у Kilo Code, OpenCode и Cline для этого есть отдельный тип провайдера [89], [61], [64].</p>
+<ul>
+<li>Yandex AI Studio. Яндекс опубликовал инструкцию «Подключение модели Yandex AI Studio в OpenCode»: OpenAI-совместимый Completions API и управление Yandex Cloud через MCP-сервер. Адрес и способ входа зависят от того, работает ли организация по подписке или с оплатой по потреблению [79].</li>
+<li>GigaChat. «…формат сообщений GigaChat API частично совместим с OpenAI API», «Токен доступа действует 30 минут» [80]. Открытый прокси gpt2giga (MIT) переводит в GigaChat запросы в форматах OpenAI, Anthropic и Gemini; в README: «GigaChat не является drop-in заменой OpenAI или Anthropic API» [81].</li>
+<li>DeepSeek. «The DeepSeek API uses an API format compatible with OpenAI/Anthropic» [82].</li>
+<li>Локальные модели – через Ollama или LM Studio. Для Kilo Code документация рекомендует <code>qwen3-coder:30b</code> [83].</li>
+</ul>
+<p>Оговорки.</p>
+<ul>
+<li>От выбранной модели зависит, насколько надёжно агент вызывает инструменты. Документация Kilo Code о локальных моделях: они «much more likely to get stuck in loops, fail to use tools properly or produce syntax errors in code». При работе через Ollama для нормального результата Kilo советует окно контекста не меньше 32 тыс. токенов («at least 32k»), а для приемлемой скорости моделей, рассмотренных в инструкции, нужна видеокарта минимум с 24 ГБ видеопамяти или MacBook минимум с 32 ГБ объединённой памяти [83].</li>
+<li>Запрос к облачной модели обрабатывает её провайдер. В документации SourceCraft: «Requests are processed by the provider of the selected model»; внешние модели обрабатывают запросы вне инфраструктуры Yandex Cloud [73]. Локальная модель оставляет внутри контура вычисление ответа, но у оболочки бывают свои сетевые каналы. В Kilo CLI и Kilo Desktop продуктовая телеметрия (использование функций, производительность, ошибки) по умолчанию включена, в плагине для JetBrains она включена всегда [84]; серверы MCP бывают и локальными, и удалёнными [85]. Их проверяют отдельно.</li>
+</ul>
+<p>Вывод автора. Для организации это продолжение темы «Покупать или делать самим»: в OpenCode провайдера модели можно сменить, не меняя саму оболочку. После смены модели набор контрольных случаев прогоняют заново (дополнительный материал «Простой ИИ-агент: права, данные, проверка», раздел 6). Права по умолчанию у харнесов разные (подраздел «Права в открытых харнесах» ниже). На рабочем компьютере – только инструменты и модели, разрешённые организацией (тема 2.1); попробовать такие программы можно дома, на учебных данных.</p>
 <h3>Агент или фиксированная цепочка</h3>
 <p>Не каждой задаче нужен агент. В руководстве разработчиков Anthropic по построению агентов различаются цепочки, где шаги заранее заданы программой, и агенты, где модель сама выбирает следующий шаг [37]. Совет оттуда же:</p>
 <blockquote>
@@ -215,6 +245,11 @@ h2[id], h3[id] { scroll-margin-top: 16px; }
 <p><strong>Модель-«судья» – дешёвая проверка шага.</strong> Проверку действий агента не обязательно поручать большой модели: она пишет рассуждение, тратит секунды и отвечает свободным текстом, который ещё надо разобрать. На онлайн-конференции форума All-over-IP в ноябре 2026 года А. Мирошкин показывал слайды о «моделях принятия решений» [57]. Такая модель получает закрытый вопрос («что сделать с действием?») и варианты с определениями: пропустить, заблокировать, передать человеку. Вместе с вопросом ей передают, кто и зачем действует, что именно делает агент, факты, которые проверила программа, и правило одной строкой. В ответ она выбирает один вариант и сообщает уверенность. Порог уверенности задаёт политика: чем дороже ошибка, тем выше порог, остальное уходит человеку. Числа на этих слайдах иллюстративные, так и указано.</p>
 <p>Ограничения там же: «Гарантирован формат ответа, а не его правота», «Чего нет в запросе – того судья не учтёт» [57]. Итог автора: «Быстрый судья не заменяет архитектуру защиты. Он делает контроль дешёвым на каждом шаге агента» [57]. Для курса правило не меняется: права проверяет программа, а необратимое действие подтверждает человек, какой бы уверенной ни была модель.</p>
 <p>О том, почему это важно, говорила на той же конференции Н. Галимова («Билайн»). Риск агентов она описала так: «превращение ошибки в данных в автономно выполняемое ошибочное действие» [56].</p>
+<h3>Права в открытых харнесах</h3>
+<p>Правило «права проверяет код, а не модель» в открытых харнесах видно прямо в настройках. В Kilo CLI каждое правило разрешений даёт один из трёх ответов: <code>allow</code> – выполнить без вопроса, <code>ask</code> – спросить, <code>deny</code> – запретить; при нескольких совпадениях действует последнее подходящее правило [86].</p>
+<p>Настройки по умолчанию у программ разные. В OpenCode V2 базовые правила разрешают большинство действий. Для чтения файлов <code>*.env</code> и <code>*.env.*</code> (кроме <code>*.env.example</code>) есть отдельное правило: перед чтением запрашивается подтверждение. Доступ за пределы рабочей папки разрешён без вопроса [87]. У встроенных агентов бывают свои ограничения. Так в документации описан <code>plan</code>: «Explores and plans without editing normal project files.» [90]. На странице о правах есть и предупреждение: «<code>shell</code> runs with the host user’s filesystem, process, and network authority.» [87]. Значит, правило на чтение <code>.env</code> не мешает агенту прочитать тот же файл командой оболочки (вывод автора).</p>
+<p>В README Cline сказано: «Every file edit and terminal command requires your approval, so you stay in control of what actually changes» [64]. Следом README упоминает режим автоодобрения [64]. В исходном коде расширения для VS Code (ревизия 34c104e) настройка автоодобрения правок <code>editFiles</code> по умолчанию равна <code>true</code>, а <code>executeSafeCommands</code> – <code>false</code>, и при <code>editFiles: true</code> запись, применение патча и удаление файла проходят проверку автоодобрения [88]. Иначе говоря, по умолчанию правки файлов могут выполняться без вопроса, а команды – нет (вывод по исходному коду; сам обработчик окна подтверждения в этих файлах не виден).</p>
+<p>Вывод автора: умолчания проверяют до первого запуска на настоящем проекте – отдельно правку файлов, выполнение команд и выход за рабочую папку.</p>
 <h3>Что оставить точным проверкам</h3>
 <p>Модель хорошо работает с текстом: читает, сопоставляет, пересказывает, предлагает. Плохо – там, где нужна точность: допуски, арифметика, единицы, формат номера. Всё точное отдают обычной программе, формуле в таблице, проверке по списку.</p>
 <ul>
@@ -312,6 +347,41 @@ h2[id], h3[id] { scroll-margin-top: 16px; }
 <li>[51] Anthropic. Models overview. https://platform.claude.com/docs/en/models/overview</li>
 <li>[52] Anthropic. Claude Fable 5.2 (страница модели). https://platform.claude.com/docs/en/models/fable-5-2/overview</li>
 <li>[53] Anthropic. Supported Regions Policy (на странице указана дата вступления в силу 12.11.2026). https://www.anthropic.com/legal/supported-regions</li>
+</ul>
+<p><strong>Харнесы и подключение моделей</strong> (страницы открыты 23.11.2026)</p>
+<ul>
+<li>[59] OpenCode. Главная страница. https://opencode.ai/ ; документация (платформы: терминал, приложение, веб-режим, SDK). https://opencode.ai/docs/</li>
+<li>[60] anomalyco/opencode. Репозиторий GitHub. https://github.com/anomalyco/opencode</li>
+<li>[61] OpenCode. Providers. https://opencode.ai/docs/providers/</li>
+<li>[62] Kilo. Главная страница. https://kilo.ai/</li>
+<li>[63] Kilo. Install. https://kilo.ai/install ; Kilo-Org/kilocode, репозиторий GitHub. https://github.com/Kilo-Org/kilocode</li>
+<li>[64] cline/cline. Репозиторий GitHub, README. https://github.com/cline/cline</li>
+<li>[65] Aider-AI/aider. Репозиторий GitHub, README. https://github.com/Aider-AI/aider</li>
+<li>[66] Aider. Git integration. https://aider.chat/docs/git.html</li>
+<li>[67] aaif-goose/goose. Репозиторий GitHub, README. https://github.com/aaif-goose/goose</li>
+<li>[68] RooCodeInc/Roo-Code. Репозиторий GitHub (в архиве с 15.05.2026). https://github.com/RooCodeInc/Roo-Code</li>
+<li>[69] continuedev/continue. Репозиторий GitHub, README. https://github.com/continuedev/continue</li>
+<li>[70] Zoo Code. Главная страница. https://www.zoocode.dev/</li>
+<li>[71] O'Leary B., Posma J. Roo or Cline? We're building a superset. Блог Kilo, 10.04.2025. https://blog.kilo.ai/p/roo-or-cline-were-building-a-superset</li>
+<li>[72] Anaconda. Anaconda Acquires Kilo Code to Power the Trillion-Token Enterprise. Пресс-релиз, 15.07.2026. https://www.anaconda.com/press/anaconda-acquires-kilo-code</li>
+<li>[73] Yandex SourceCraft. Code Assistant: concepts. https://sourcecraft.dev/portal/docs/en/code-assistant/concepts/</li>
+<li>[74] Yandex SourceCraft. Code Assistant. https://sourcecraft.dev/portal/docs/en/code-assistant/</li>
+<li>[75] Yandex SourceCraft. Models and configuration profiles. https://sourcecraft.dev/portal/docs/en/code-assistant/operations/agent/api-configuration-profiles</li>
+<li>[76] GitVerse. GigaCode. https://gitverse.ru/features/gigacode/</li>
+<li>[77] MWS AI. Kodify. https://mts.ai/ru/product/kodify/</li>
+<li>[78] MWS AI. Как мы сделали новых ИИ-помощников для программистов компактными и при этом могучими. Хабр, 11.06.2025. https://habr.com/ru/companies/mts_ai/articles/914938/</li>
+<li>[79] Yandex AI Studio. Использование подписки. https://aistudio.yandex.ru/ru/docs/ai-studio/manage/concepts/subscription-usage</li>
+<li>[80] Сбер. GigaChat API: совместимость с OpenAI. https://developers.sber.ru/docs/ru/gigachat/guides/compatible-openai</li>
+<li>[81] ai-forever/gpt2giga. Репозиторий GitHub, README. https://github.com/ai-forever/gpt2giga</li>
+<li>[82] DeepSeek API Docs. https://api-docs.deepseek.com/</li>
+<li>[83] Kilo Docs. Ollama. https://kilo.ai/docs/ai-providers/ollama</li>
+<li>[84] Kilo Docs. Product telemetry. https://kilo.ai/docs/getting-started/settings/product-telemetry</li>
+<li>[85] Kilo Docs. Automate (MCP). https://kilo.ai/docs/automate</li>
+<li>[86] Kilo Docs. Kilo CLI. https://kilo.ai/docs/code-with-ai/platforms/cli</li>
+<li>[87] OpenCode. Permissions. https://opencode.ai/docs/permissions/</li>
+<li>[88] cline/cline, исходный код расширения для VS Code, ревизия 34c104e. https://github.com/cline/cline/blob/34c104e6fc49781cda4adcd73ffdccd8f029fef9/apps/vscode/src/shared/AutoApprovalSettings.ts ; https://github.com/cline/cline/blob/34c104e6fc49781cda4adcd73ffdccd8f029fef9/apps/vscode/src/sdk/sdk-tool-policies.ts</li>
+<li>[89] Kilo Docs. AI Providers (в том числе OpenAI Compatible, Ollama, LM Studio). https://kilo.ai/docs/ai-providers</li>
+<li>[90] OpenCode. Agents (встроенные агенты build, plan, general, explore). https://opencode.ai/docs/agents/</li>
 </ul>
 <p><strong>Выступления и вебинары</strong></p>
 <ul>

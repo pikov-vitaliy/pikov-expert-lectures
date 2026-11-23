@@ -1,0 +1,364 @@
+<!-- Лекция 5.1, строки 401–512 (22:32–28:50): агент как советчик – цикл агента, роли модели, программы и человека, правило В. Малаканова, обратимые и необратимые действия, схема «Агент-советчик», права проверяет код (А. Субботин), узкие инструменты, учётная запись агента, права в открытых харнесах (DeepSeek Harness, Kilo Code, OpenCode, Cline), общий принцип и цитата Narisetty и соавт., исследование Pacella и соавт., промышленная архитектура (Graul и соавт.), слова А. Морозова -->
+
+<section class="slide sect" data-at="401" data-title="Агент как советчик">
+  <span class="no"><svg class="i"><use href="#i-bot"/></svg></span>
+  <p class="kick">Агент как советчик</p>
+  <h1>Что поручать модели, а&nbsp;что&nbsp;нет</h1>
+  <p class="lead">Модель предлагает, программа проверяет, человек решает</p>
+</section>
+
+<section class="slide" data-at="403" data-steps="403,405">
+  <p class="kick">Агент-советчик</p>
+  <h2>Агент – это цикл</h2>
+  <div class="body">
+    <div class="split" style="grid-template-columns:500px 1fr;gap:56px">
+      <div class="st" data-s="1" style="align-items:center">
+        <svg viewBox="0 0 500 420" width="450" height="378" role="img" aria-label="Цикл агента: модель выбирает действие, программа его выполняет, результат возвращается модели" style="display:block;overflow:visible">
+          <defs><marker id="ar51-5" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" style="fill:var(--muted)"/></marker></defs>
+          <rect x="110" y="8" width="370" height="100" rx="20" style="fill:var(--teal_t);stroke:var(--teal);stroke-width:4"/>
+          <text x="295" y="50" text-anchor="middle" style="fill:var(--teal_ink);font-size:32px;font-weight:700">Модель</text>
+          <text x="295" y="88" text-anchor="middle" style="fill:var(--teal_ink);font-size:26px">выбирает действие</text>
+          <rect x="110" y="160" width="370" height="100" rx="20" style="fill:var(--orange_t);stroke:var(--orange);stroke-width:4"/>
+          <text x="295" y="202" text-anchor="middle" style="fill:var(--orange_ink);font-size:32px;font-weight:700">Программа</text>
+          <text x="295" y="240" text-anchor="middle" style="fill:var(--orange_ink);font-size:26px">выполняет его</text>
+          <rect x="110" y="312" width="370" height="100" rx="20" style="fill:var(--surface);stroke:var(--gray);stroke-width:4"/>
+          <text x="295" y="354" text-anchor="middle" style="fill:var(--ink);font-size:32px;font-weight:700">Результат</text>
+          <text x="295" y="392" text-anchor="middle" style="fill:var(--ink);font-size:26px">возвращается модели</text>
+          <path d="M295 110V152" style="stroke:var(--muted);stroke-width:5;fill:none" marker-end="url(#ar51-5)"/>
+          <path d="M295 262V304" style="stroke:var(--muted);stroke-width:5;fill:none" marker-end="url(#ar51-5)"/>
+          <path d="M108 362H50Q30 362 30 342V78Q30 58 50 58H100" style="stroke:var(--muted);stroke-width:5;fill:none" marker-end="url(#ar51-5)"/>
+        </svg>
+      </div>
+      <div class="st" data-s="2" style="gap:18px">
+        <p style="font-size:34px;font-weight:700;line-height:1.18">Безопасный агент для&nbsp;инженерной работы устроен как&nbsp;<span style="color:var(--teal)">советчик</span></p>
+        <dl class="kv" style="--kw:150px">
+          <div class="t-teal" style="font-size:28px"><dt style="color:var(--teal)">Модель</dt><dd>разбирает текст и&nbsp;предлагает следующий&nbsp;шаг</dd></div>
+          <div style="font-size:28px"><dt style="color:var(--orange)">Программа</dt><dd>проверяет, разрешено&nbsp;ли действие, над&nbsp;каким объектом и&nbsp;с&nbsp;какими параметрами</dd></div>
+          <div style="font-size:28px"><dt style="color:var(--ink)">Человек</dt><dd>подтверждает то, что&nbsp;нельзя отменить</dd></div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="410">
+  <p class="kick">Что сразу, что со спросом · правило В. Малаканова</p>
+  <h2>Одни действия агент выполняет сразу, для&nbsp;других нужно согласие человека</h2>
+  <div class="body">
+    <div class="cards" style="gap:32px">
+      <div class="card t-teal" style="padding:34px 34px 38px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-undo-2"/></svg></span><h3 style="font-size:40px">Делает сразу</h3><p style="font-size:31px">Действие, которое человек отменит одной кнопкой</p></div>
+      <div class="card t-orange" style="padding:34px 34px 38px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><h3 style="font-size:40px">Всегда согласует</h3><p style="font-size:31px">Действие, которое вносит что-то в&nbsp;личный кабинет человека</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Малаканов В. «Код, Jev, LLM, WebMCP». Доклад на ИИ-митапе ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide" data-at="414" data-title="В. Малаканов: напоминание без спроса не ставим">
+  <p class="kick">В. Малаканов добавил</p>
+  <div class="body" style="gap:44px">
+    <figure class="quote md">
+      <blockquote>Модель может быть уверена хоть на&nbsp;100&nbsp;%. <b>Напоминание без&nbsp;спроса мы всё&nbsp;равно не&nbsp;ставим</b></blockquote>
+      <figcaption><i class="ava">ВМ</i><span><b>В. Малаканов</b>доклад «Код, Jev, LLM, WebMCP», ИИ-митап ЦГУ</span></figcaption>
+    </figure>
+    <div class="rule t-orange" style="padding:24px 34px"><svg class="i"><use href="#i-undo-dot"/></svg><div><h3>Его совет тем, кто начинает</h3><p>Начните с&nbsp;действия, которое легко отменить</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="419">
+  <p class="kick">В инженерной работе</p>
+  <h2>Что агент делает сам, а&nbsp;что – после подтверждения</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="gap:22px">
+        <h3><svg class="i"><use href="#i-rotate-ccw"/></svg>Обратимые</h3>
+        <ul style="font-size:34px;gap:18px"><li>Создать черновик</li><li>Выполнить расчёт</li><li>Найти пункт</li></ul>
+        <p class="muted" style="font-size:27px">Агент делает сам</p>
+      </div>
+      <div class="col t-red" style="gap:22px">
+        <h3><svg class="i"><use href="#i-user-check"/></svg>Нужно подтверждение человека</h3>
+        <ul style="font-size:34px;gap:18px"><li>Отправка письма</li><li>Изменение статуса замечания</li><li>Правка в&nbsp;рабочем документе</li></ul>
+        <p class="muted" style="font-size:27px">Перед действием</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="423" data-title="Схема «Агент-советчик»">
+  <p class="kick">Схема «Агент-советчик» · полосы: человек, модель, программа агента, системы</p>
+  <div class="body" style="padding-top:12px">
+    <svg viewBox="340 590 3210 1955" width="878" height="535" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема агента-советчика: человек ставит задачу, модель предлагает действие, программа агента проверяет его кодом, необратимое действие подтверждает человек, выполненное действие попадает в журнал">
+      <foreignObject x="0" y="0" width="3792" height="3224"><img src="@day/08-Схемы/d5-agent-sovetchik.png" width="3792" height="3224" alt="" style="display:block"></foreignObject>
+    </svg>
+  </div>
+</section>
+
+<section class="slide" data-at="426" data-title="Схема: модель предлагает, программа проверяет кодом">
+  <p class="kick">Схема «Агент-советчик» · проверка до&nbsp;действия</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:660px 1fr;gap:40px">
+      <div>
+        <svg viewBox="370 626 2076 1384" width="660" height="440" style="display:block;flex:none" role="img" aria-label="Фрагмент схемы: задача, предложение модели, проверка кодом, остановка с передачей вопроса человеку">
+          <foreignObject x="0" y="0" width="3792" height="3224"><img src="@day/08-Схемы/d5-agent-sovetchik.png" width="3792" height="3224" alt="" style="display:block"></foreignObject>
+          <path style="fill:var(--bg)" fill-opacity=".74" d="M1797 1062H2446V2010H1797Z"/>
+          <rect x="868" y="1264" width="390" height="229" rx="34" style="fill:none;stroke:var(--teal);stroke-width:14"/>
+          <rect x="1285" y="1759" width="517" height="232" rx="34" style="fill:none;stroke:var(--ink);stroke-width:14"/>
+          <rect x="2032" y="767" width="392" height="229" rx="34" style="fill:none;stroke:var(--red);stroke-width:14"/>
+        </svg>
+      </div>
+      <ul class="list" style="font-size:29px;gap:24px">
+        <li class="t-teal"><b>Модель</b> предлагает действие и&nbsp;объясняет, зачем оно&nbsp;нужно</li>
+        <li class="t-gray"><b>Программа агента</b> проверяет кодом права, объект и&nbsp;параметры</li>
+        <li class="t-red">Запрет или&nbsp;нет&nbsp;данных – <b>остановка</b>: вопрос передаётся человеку</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="430" data-steps="430,433">
+  <p class="kick">Схема «Агент-советчик» · действие разрешено</p>
+  <h2>Программа смотрит по&nbsp;списку действий</h2>
+  <div class="body" style="gap:34px">
+    <div class="tree" style="--n:2">
+      <div class="root" style="font-size:36px">Можно&nbsp;ли его отменить?</div>
+      <div class="kids" style="gap:40px">
+        <div class="kid t-teal st" data-s="1" style="padding:24px 28px"><h3 style="font-size:34px">Можно</h3><p style="font-size:28px">Выполняется сразу</p></div>
+        <div class="kid t-orange st" data-s="1" style="padding:24px 28px"><h3 style="font-size:34px">Нельзя</h3><p style="font-size:28px">Сначала подтверждение человека: он видит точные параметры действия</p></div>
+      </div>
+    </div>
+    <div class="rule sm t-gray st" data-s="2" style="padding:22px 32px"><svg class="i"><use href="#i-scroll-text"/></svg><div><p>Каждое выполненное действие попадает в&nbsp;<b>журнал</b> вместе с&nbsp;основанием</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="437" data-title="Права проверяет код, а не модель">
+  <p class="kick t-orange">Главное в этом устройстве</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-teal"><svg class="i big-ic" style="font-size:220px"><use href="#i-code"/></svg></div>
+      <div>
+        <p class="say md">Права проверяет <em>код</em>, а&nbsp;не&nbsp;модель</p>
+        <p class="sub">Правило «не&nbsp;отправляй наружу» только в&nbsp;инструкции модель может нарушить: она не&nbsp;выполняет правила, а&nbsp;продолжает текст</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="440" data-title="А. Субботин: спасёт запрет">
+  <p class="kick">Как сформулировал А. Субботин</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote style="font-size:72px">Просьба в&nbsp;тексте не&nbsp;спасёт, <b>спасёт запрет</b></blockquote>
+      <figcaption><i class="ava">АС</i><span><b>А. Субботин</b>доклад «Платформы для совместной работы с&nbsp;ИИ-агентами», ИИ-митап ЦГУ</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="445">
+  <p class="kick t-orange">Как ограничить действия агента · инструменты</p>
+  <h2>Узкие инструменты вместо универсальных</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="gap:18px">
+        <h3><svg class="i"><use href="#i-file-search"/></svg>Узкий</h3>
+        <p style="font-size:32px;font-weight:600">«Найти пункт технического задания по&nbsp;номеру»</p>
+      </div>
+      <div class="col t-red" style="gap:18px">
+        <h3><svg class="i"><use href="#i-triangle-alert"/></svg>Универсальные</h3>
+        <ul style="font-size:32px;gap:14px"><li>«Выполнить любую команду»</li><li>«Открыть любой адрес в&nbsp;интернете»</li></ul>
+      </div>
+    </div>
+    <div class="rule t-teal" style="padding:24px 34px"><svg class="i"><use href="#i-shield-check"/></svg><div><p style="font-size:31px">Узкий инструмент сам ограничивает, что агент может сделать, даже если модель ошиблась или&nbsp;её&nbsp;сбили с&nbsp;толку</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="451">
+  <p class="kick">Права задаются учётной записью, а&nbsp;не&nbsp;текстом инструкции</p>
+  <h2>У агента своя учётная запись</h2>
+  <div class="body">
+    <div class="svc t-orange" style="grid-template-columns:360px 1fr;gap:42px">
+      <div class="svc-hd" style="padding:34px 32px;gap:18px">
+        <i class="logo"><svg class="i"><use href="#i-user-cog"/></svg></i>
+        <h3 style="font-size:44px">Учётная запись агента</h3>
+        <p style="font-size:28px">с&nbsp;минимальными правами</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div style="font-size:32px;padding:22px 15px"><dt>Читать</dt><dd>нужные документы</dd></div>
+        <div style="font-size:32px;padding:22px 15px"><dt>Писать</dt><dd>только в&nbsp;свою область черновиков</dd></div>
+        <div style="font-size:32px;padding:22px 15px"><dt>Проверяет права</dt><dd>сервис, к&nbsp;которому агент обращается</dd></div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="457" data-steps="457,460">
+  <p class="kick">Права в открытых харнесах</p>
+  <h2>В открытых харнесах это видно прямо в&nbsp;настройках</h2>
+  <div class="body">
+    <div class="cards" style="gap:32px">
+      <div class="card t-teal st" style="padding:28px 32px 32px;gap:16px">
+        <div style="display:flex;gap:18px;align-items:center"><span class="bdg"><svg class="i"><use href="#i-sliders-horizontal"/></svg></span><h3 style="font-size:36px">DeepSeek Harness</h3></div>
+        <p style="font-size:29px">Выбирают уровень доступа:</p>
+        <p style="font-size:36px;font-weight:700;line-height:1.2;color:var(--c)">один общий на&nbsp;всю работу</p>
+        <div class="center" style="flex:1"><svg class="i" style="font-size:120px;color:var(--c)"><use href="#i-key-round"/></svg></div>
+      </div>
+      <div class="card t-orange st" style="padding:28px 32px 32px;gap:16px">
+        <div style="display:flex;gap:18px;align-items:center"><span class="bdg"><svg class="i"><use href="#i-square-terminal"/></svg></span><h3 style="font-size:36px">Kilo Code, командная строка</h3></div>
+        <p style="font-size:29px">Ответ задают для&nbsp;каждого вида действия:</p>
+        <div style="display:flex;flex-direction:column;gap:12px;font-size:28px">
+          <span><span class="tag t-teal" style="font-size:24px;font-family:Consolas,'Cascadia Mono',monospace">allow</span> разрешить</span>
+          <span><span class="tag t-orange" style="font-size:24px;font-family:Consolas,'Cascadia Mono',monospace">ask</span> спросить</span>
+          <span><span class="tag t-red" style="font-size:24px;font-family:Consolas,'Cascadia Mono',monospace">deny</span> запретить</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kilo Code: документация Kilo CLI · kilo.ai/docs/code-with-ai/platforms/cli</p>
+</section>
+
+<section class="slide" data-at="463">
+  <p class="kick t-red">Настройки по умолчанию у&nbsp;программ разные · осень 2026</p>
+  <h2>OpenCode, вторая версия</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:31px">
+      <thead><tr><th style="width:44%;padding:18px 26px">Что</th><th style="padding:18px 26px">Правило по&nbsp;умолчанию</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:20px 26px">Большинство действий</td><td class="no" style="padding:20px 26px">Разрешено базовыми правилами</td></tr>
+        <tr><td style="padding:20px 26px">Чтение файлов с&nbsp;настройками окружения</td><td style="padding:20px 26px">Отдельное правило: подтверждение</td></tr>
+        <tr><td style="padding:20px 26px">Режим планирования</td><td style="padding:20px 26px">Нельзя править обычные файлы проекта</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="font-size:28px;color:var(--ink)">У&nbsp;каждого режима могут быть дополнительные ограничения</p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>OpenCode. Permissions; Agents · opencode.ai/docs/permissions/ · opencode.ai/docs/agents/</p>
+</section>
+
+<section class="slide dark" data-at="467" data-title="OpenCode: команда оболочки – с правами пользователя">
+  <p class="kick t-orange">Документация OpenCode предупреждает</p>
+  <div class="body" style="gap:40px">
+    <div class="split s46" style="grid-template-columns:300px 1fr;gap:50px">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:210px"><use href="#i-square-terminal"/></svg></div>
+      <div>
+        <p class="say sm">Команда оболочки выполняется <em>с&nbsp;правами пользователя</em> на&nbsp;файлы, процессы и&nbsp;сеть</p>
+      </div>
+    </div>
+    <div class="rule t-red"><svg class="i"><use href="#i-file-lock"/></svg><div><h3>Значит</h3><p>Файл окружения агент может прочитать и&nbsp;обычной командой</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="473" data-steps="473,476">
+  <p class="kick">Cline · по&nbsp;исходному коду расширения для&nbsp;VS&nbsp;Code</p>
+  <h2>Автоматическое одобрение действий по&nbsp;умолчанию</h2>
+  <div class="body">
+    <div class="cards st" data-s="1" style="gap:32px">
+      <div class="card row t-orange" style="padding:34px 34px"><span class="bdg lg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:40px">Правка файлов</h3><p style="font-size:34px;font-weight:700;color:var(--orange)">включено</p><p class="muted" style="font-size:24px;font-family:Consolas,'Cascadia Mono',monospace">editFiles: true</p></div></div>
+      <div class="card row t-teal" style="padding:34px 34px"><span class="bdg lg"><svg class="i"><use href="#i-square-terminal"/></svg></span><div style="display:flex;flex-direction:column;gap:10px"><h3 style="font-size:40px">Команды</h3><p style="font-size:34px;font-weight:700;color:var(--teal)">выключено</p><p class="muted" style="font-size:24px;font-family:Consolas,'Cascadia Mono',monospace">executeSafeCommands: false</p></div></div>
+    </div>
+    <div class="rule t-orange st" data-s="2" style="padding:24px 34px"><svg class="i"><use href="#i-settings-2"/></svg><div><h3>До первого запуска</h3><p style="font-size:31px">Откройте настройки прав и&nbsp;отдельно проверьте правку файлов и&nbsp;выполнение команд</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>cline/cline, исходный код расширения для&nbsp;VS&nbsp;Code, ревизия 34c104e · github.com/cline/cline</p>
+</section>
+
+<section class="slide" data-at="479" data-title="Общий принцип: права агента определяет программа вне модели">
+  <p class="kick">У&nbsp;этих примеров общий принцип</p>
+  <div class="body">
+    <div class="split s46" style="grid-template-columns:330px 1fr;gap:50px">
+      <div class="center t-teal"><svg class="i big-ic" style="font-size:200px"><use href="#i-shield-check"/></svg></div>
+      <div>
+        <p class="say md">Какие действия разрешены агенту, определяет <em>программа вне модели</em></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="480" data-steps="486" data-title="Narisetty и соавт.: политика безопасности вне модели">
+  <p class="kick">Narisetty и соавторы, 2026 · препринт</p>
+  <div class="body" style="gap:28px">
+    <figure class="quote sm">
+      <blockquote>В работах последних лет (2024–2026) сформировалась общая стратегия защиты агентов с&nbsp;инструментами от&nbsp;косвенного внедрения команд: вместо обучения модели отказу от&nbsp;вредоносных указаний предлагается применять <b>вне модели детерминированную политику безопасности</b>, которая контролирует действия агента</blockquote>
+      <figcaption style="margin-top:20px"><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>P. Narisetty, S. Kore и&nbsp;соавторы</b>препринт arXiv, 2026</span></figcaption>
+    </figure>
+    <div class="rule sm t-red st" style="padding:20px 30px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><p>Такие защиты проверены в&nbsp;основном на&nbsp;постоянных наборах атак. Против атакующего, который подстраивается под&nbsp;защиту, их нужно испытывать отдельно</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Narisetty P., Kore S., et al. Adaptive Evaluation of Out-of-Band Defenses Against Prompt Injection in LLM Agents. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2606.26479</p>
+</section>
+
+<section class="slide" data-at="489">
+  <p class="kick t-red">Pacella и соавторы, 2026</p>
+  <h2>Что бывает, когда права оставлены модели</h2>
+  <div class="body">
+    <div class="split s46" style="grid-template-columns:330px 1fr;gap:50px">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:200px"><use href="#i-users"/></svg></div>
+      <div>
+        <p class="say md">Модель решала, когда кадровый процесс требует <b>обязательного согласования человеком</b></p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Pacella M., Papadia G., Giliberti V. Algorithms, 2026 · doi.org/10.3390/a19080627</p>
+</section>
+
+<section class="slide" data-at="493" data-title="Pacella и соавт.: ни одного из 43 случаев">
+  <p class="kick t-red">Вывод авторов</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:1fr 340px;gap:44px;align-items:stretch">
+      <figure class="quote sm t-red" style="align-self:center">
+        <blockquote style="font-size:35px">Модель Qwen2.5 без&nbsp;внешних ограничений распознала повышенный риск, но&nbsp;не&nbsp;передала на&nbsp;обязательное согласование человеку <b>ни&nbsp;одного из&nbsp;43</b> чувствительных случаев: доля случаев, переданных человеку, оказалась равна нулю</blockquote>
+        <figcaption style="margin-top:26px"><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Pacella M. и&nbsp;соавторы</b>Algorithms, 2026</span></figcaption>
+      </figure>
+      <div class="stats"><div class="stat t-red" style="justify-content:center;align-items:center;text-align:center;gap:16px"><b style="font-size:120px">0</b><span style="font-size:29px">из&nbsp;43 чувствительных случаев передано человеку</span></div></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Pacella M., Papadia G., Giliberti V. Algorithms, 2026 · doi.org/10.3390/a19080627</p>
+</section>
+
+<section class="slide" data-at="497">
+  <p class="kick t-orange">Как авторы это исправили · так&nbsp;же советуют докладчики митапа</p>
+  <h2>Минимум согласования – правило в&nbsp;программе</h2>
+  <div class="body" style="gap:0">
+    <div class="card row t-teal" style="padding:34px 36px;border-radius:18px 18px 0 0;box-shadow:none"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><p style="font-size:36px">Модель решает, передать&nbsp;ли случай на&nbsp;согласование</p></div>
+    <div style="height:16px;background:var(--orange);border-radius:8px;margin:24px 0"></div>
+    <div class="rule t-orange" style="padding:32px 36px"><svg class="i"><use href="#i-code"/></svg><div><h3>Минимальный уровень согласования</h3><p style="font-size:38px">Задаётся правилом в&nbsp;программе. Модель не&nbsp;может опуститься ниже&nbsp;него</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Pacella M., Papadia G., Giliberti V. Algorithms, 2026 · doi.org/10.3390/a19080627</p>
+</section>
+
+<section class="slide h-sm" data-at="500">
+  <p class="kick">Промышленная архитектура · работа того&nbsp;же года</p>
+  <h2>Действия с&nbsp;оборудованием – только через проверенный слой управления</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="align-items:center;text-align:center;padding:26px 24px 28px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:34px">Агент</h3></li>
+      <li class="step t-orange" style="align-items:center;text-align:center;padding:26px 24px 28px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-shield-check"/></svg></span><h3 style="font-size:34px">Проверенный слой управления</h3></li>
+      <li class="step t-gray" style="align-items:center;text-align:center;padding:26px 24px 28px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-factory"/></svg></span><h3 style="font-size:34px">Оборудование</h3></li>
+    </ol>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-fingerprint"/></svg><div><p style="font-size:30px">Без документированного разрешения человека действие не&nbsp;выполняется. Точка согласования защищена криптографически</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Graul C., Żarski W., et al. Applied Sciences, 2026 · doi.org/10.3390/app16115428</p>
+</section>
+
+<section class="slide dark" data-at="505" data-title="А. Морозов: опасность агента">
+  <p class="kick t-orange">А. Морозов на том же митапе</p>
+  <div class="body">
+    <figure class="quote t-orange">
+      <blockquote style="font-size:64px;line-height:1.14">Опасность агента пропорциональна тому, что&nbsp;он умеет делать <b>без&nbsp;подтверждения</b></blockquote>
+      <figcaption><i class="ava">АМ</i><span><b>А. Морозов</b>доклад «AI в&nbsp;безопасности и&nbsp;безопасность в&nbsp;AI», ИИ-митап ЦГУ</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="507" data-steps="507,512">
+  <p class="kick">Опасность растёт с&nbsp;самостоятельностью</p>
+  <h2>Чем больше агент может сам, тем дороже ошибка</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" style="gap:16px">
+        <h3><svg class="i"><use href="#i-notebook-pen"/></svg>Читает и&nbsp;пишет черновики</h3>
+        <p>Меньше возможностей напрямую изменить рабочие системы</p>
+        <p style="font-weight:700">Черновик всё равно проверяют:</p>
+        <ul><li>нет&nbsp;ли в&nbsp;нём ошибок</li><li>не&nbsp;попали&nbsp;ли туда сведения, которые получателю видеть не&nbsp;положено</li></ul>
+      </div>
+      <div class="col t-red st" style="gap:16px">
+        <h3><svg class="i"><use href="#i-send"/></svg>Отправляет, удаляет, меняет данные в&nbsp;системах</h3>
+        <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;color:var(--red)"><svg class="i" style="font-size:110px"><use href="#i-triangle-alert"/></svg><p style="font-size:50px;font-weight:700;color:var(--red)">Ошибается дорого</p></div>
+      </div>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,240 @@
+<!-- Лекция 5.1, строки 616–681 (34:40–38:50): агент-советчик – данные агента, журнал вызовов, проверка набором контрольных случаев; шлюз безопасности ИИ (М. Горшков, А. Морозов), схема шлюза, возврат данных в системе Casper (Chong и соавт.), утечка через запросы (Li и соавт.) -->
+
+<section class="slide" data-at="616" data-title="Агент-советчик: данные и проверка">
+  <p class="kick">Агент-советчик · вернёмся к схеме</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:700px 1fr;gap:40px;align-items:center">
+      <svg viewBox="340 590 3210 1960" width="700" height="427" style="display:block;flex:none" role="img" aria-label="Схема агента-советчика: человек ставит задачу, модель предлагает действие, программа агента проверяет права и обратимость, системы выполняют действие и пишут журнал">
+        <foreignObject x="0" y="0" width="3792" height="3224"><img src="@day/08-Схемы/d5-agent-sovetchik.png" width="3792" height="3224" alt="" style="display:block"></foreignObject>
+      </svg>
+      <div style="display:flex;flex-direction:column;gap:26px">
+        <div class="card row t-teal" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-file-search"/></svg></span><h3 style="font-size:33px;line-height:1.15">Какие данные нужны агенту</h3></div>
+        <div class="card row t-orange" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:33px;line-height:1.15">Как проверяют его работу</h3></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="619">
+  <p class="kick">Данные агента · пример: разбор замечаний по&nbsp;учебному узлу</p>
+  <h2>Агенту дают только то, что нужно для&nbsp;задачи</h2>
+  <div class="body">
+    <div class="docs" style="flex-wrap:nowrap;gap:26px;align-items:stretch">
+      <div class="doc" style="width:205px;gap:16px;padding:28px 24px 40px"><h4 style="font-size:28px;min-height:3.45em">Раздел&nbsp;4 технического задания</h4><i></i><i class="hl"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp t-teal">нужен</b></div>
+      <div class="doc" style="width:205px;gap:16px;padding:28px 24px 40px"><h4 style="font-size:28px;min-height:3.45em">Описание узла</h4><i></i><i></i><i class="s"></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp t-teal">нужно</b></div>
+      <div class="doc" style="width:205px;gap:16px;padding:28px 24px 40px"><h4 style="font-size:28px;min-height:3.45em">Перечень замечаний</h4><i class="hl"></i><i></i><i class="hl"></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp t-teal">нужен</b></div>
+      <div class="doc" style="width:205px;gap:16px;padding:28px 24px 40px"><h4 style="font-size:28px;min-height:3.45em">Протоколы этого узла</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp t-teal">нужны</b></div>
+      <div class="doc" style="width:205px;gap:16px;padding:28px 24px 40px;opacity:.55;border-style:dashed"><h4 style="font-size:28px;min-height:3.45em">Остальной архив</h4><i></i><i></i><i></i><i class="s"></i><i></i><b class="stamp t-red">не нужен</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="623" data-steps="623,626">
+  <p class="kick">Данные агента</p>
+  <h2>Чего агент не видит и чему не подчиняется</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red st" style="padding:30px 34px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-key-round"/></svg></span><h3 style="font-size:36px">Пароли и ключи – вне контекста</h3><p style="font-size:29px">Агент не должен видеть то, что ему не&nbsp;нужно. Тогда он не&nbsp;сможет это и&nbsp;выдать</p></div>
+      <div class="card t-orange st" style="padding:30px 34px;gap:16px"><span class="bdg"><svg class="i"><use href="#i-file-warning"/></svg></span><h3 style="font-size:36px">Чужой текст – данные, а&nbsp;не&nbsp;команды</h3><p style="font-size:29px">Протокол, письмо, страница из&nbsp;интернета</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="628">
+  <p class="kick">Журнал</p>
+  <h2>В журнал попадает каждый вызов инструмента</h2>
+  <div class="body">
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-wrench"/></svg><b>Что вызвано</b></div>
+      <div class="pict"><svg class="i"><use href="#i-sliders-horizontal"/></svg><b>С какими параметрами</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-search"/></svg><b>На каком основании</b></div>
+      <div class="pict"><svg class="i"><use href="#i-circle-check"/></svg><b>С каким результатом</b></div>
+    </div>
+    <div class="rule t-red" style="padding:22px 32px"><svg class="i"><use href="#i-key-round"/></svg><div><p>Паролей и ключей в журнале нет</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="632">
+  <p class="kick t-orange">Проверка агента</p>
+  <h2>Проверяют итоговый текст и&nbsp;то, что агент сделал по&nbsp;дороге</h2>
+  <div class="body">
+    <div class="term t-orange"><dfn style="font-size:48px">Набор контрольных случаев</dfn><p style="font-size:33px">Случаи с&nbsp;заранее известным правильным исходом</p></div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <p class="note" style="font-size:25px">Например, для&nbsp;агента разбора замечаний</p>
+      <div style="display:flex;flex-wrap:wrap;gap:14px 16px">
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">норма</span>
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">расхождение</span>
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">посторонняя строка в&nbsp;протоколе</span>
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">попытка записи в&nbsp;чужую область</span>
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">повтор после сбоя</span>
+        <span class="tag t-gray" style="font-size:27px;padding:8px 22px">противоречие в&nbsp;данных</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="636">
+  <p class="kick t-orange">Проверка агента · две оценки</p>
+  <h2>Полезность и безопасность оценивают отдельно</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:30px 36px"><h3 style="font-size:40px"><svg class="i"><use href="#i-circle-check"/></svg>Полезность</h3><p style="font-size:34px">Задача решена</p></div>
+      <div class="col t-orange" style="padding:30px 36px"><h3 style="font-size:40px"><svg class="i"><use href="#i-shield-check"/></svg>Безопасность</h3><p style="font-size:34px">Ничего лишнего не&nbsp;сделано</p></div>
+    </div>
+    <div class="rule t-red" style="padding:24px 32px"><svg class="i"><use href="#i-circle-off"/></svg><div><p>Агент, который ничего не&nbsp;делает, безопасен, но&nbsp;бесполезен</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="639" data-steps="639,642">
+  <p class="kick t-orange">Проверка агента · работа с&nbsp;набором</p>
+  <h2>Как работают с&nbsp;набором случаев</h2>
+  <div class="body">
+    <ul class="list num big">
+      <li class="st" data-s="1"><b>Сменили модель, инструкцию или инструменты</b>&nbsp;– весь набор прогоняют заново</li>
+      <li class="st" data-s="1"><b>Случаи с&nbsp;правами и&nbsp;повторами</b>&nbsp;– на&nbsp;стенде с&nbsp;настоящими правами<small>в чате их можно только обсудить</small></li>
+      <li class="st" data-s="2"><b>Сохраняют вызовы инструментов и&nbsp;итоговое состояние</b><small>по одному финальному ответу не&nbsp;видно лишних действий, сделанных по&nbsp;дороге</small></li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide dark" data-at="644" data-title="Модель предлагает, программа проверяет, человек решает">
+  <p class="kick t-orange">Агент-советчик</p>
+  <div class="body">
+    <p class="say md">Модель <em>предлагает</em>, программа <em>проверяет</em>, человек <em>решает</em></p>
+    <div class="picts c3">
+      <div class="pict t-teal"><svg class="i"><use href="#i-bot"/></svg><b>Модель</b></div>
+      <div class="pict t-red"><svg class="i"><use href="#i-shield-check"/></svg><b>Программа</b></div>
+      <div class="pict t-orange"><svg class="i"><use href="#i-user-round-check"/></svg><b>Человек</b></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="648">
+  <p class="kick">Шлюзы безопасности ИИ · обзорно</p>
+  <h2>Шлюз – программа между сотрудником и&nbsp;моделью</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-user-round"/></svg></span><h3 style="font-size:38px">Сотрудник</h3></li>
+      <li class="step t-orange" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-shield-half"/></svg></span><h3 style="font-size:38px">Шлюз безопасности</h3><p style="font-size:28px;color:var(--ink)">Все запросы идут через&nbsp;него</p></li>
+      <li class="step t-teal" style="padding:32px 30px 34px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:38px">Модель</h3></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="651" data-steps="651,653">
+  <p class="kick">Шлюз безопасности ИИ</p>
+  <h2>Что делает шлюз</h2>
+  <div class="body">
+    <div class="cards c4">
+      <div class="card t-red st" data-s="1" style="padding:26px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-scan-search"/></svg></span><h3 style="font-size:31px">Находит</h3><p style="font-size:26px">фамилии, номера договоров, ключи доступа</p></div>
+      <div class="card t-orange st" data-s="1" style="padding:26px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-replace"/></svg></span><h3 style="font-size:31px">Заменяет метками</h3><p style="font-size:26px">и&nbsp;отправляет модели текст с&nbsp;метками</p></div>
+      <div class="card t-teal st" data-s="2" style="padding:26px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-undo-2"/></svg></span><h3 style="font-size:31px">Возвращает</h3><p style="font-size:26px">исходные значения в&nbsp;ответ модели</p></div>
+      <div class="card t-gray st" data-s="2" style="padding:26px 24px;gap:14px"><span class="bdg"><svg class="i"><use href="#i-notebook-pen"/></svg></span><h3 style="font-size:31px">Заодно</h3><p style="font-size:26px">ведёт журнал, считает расход, блокирует запрещённые запросы</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="657">
+  <p class="kick">Готовые средства</p>
+  <h2>Проверяют то, что входит в&nbsp;модель и&nbsp;выходит из&nbsp;неё</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-red" style="padding:28px 30px 30px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-log-in"/></svg></span><h3 style="font-size:36px">Проверка входа</h3><p style="font-size:27px;color:var(--ink)">запрос до&nbsp;модели</p></li>
+      <li class="step t-teal" style="padding:28px 30px 30px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:36px">Модель</h3></li>
+      <li class="step t-red" style="padding:28px 30px 30px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-log-out"/></svg></span><h3 style="font-size:36px">Проверка выхода</h3><p style="font-size:27px;color:var(--ink)">ответ после модели</p></li>
+    </ol>
+    <p style="font-size:30px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">Например: <span class="tag t-gray" style="font-size:27px;padding:6px 20px">NeMo Guardrails</span><span class="tag t-gray" style="font-size:27px;padding:6px 20px">Llama Guard</span></p>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>А. Морозов, доклад «AI в&nbsp;безопасности и&nbsp;безопасность в&nbsp;AI», ИИ-митап ЦГУ, 06.11.2026</p>
+</section>
+
+<section class="slide" data-at="661" data-title="Шлюз безопасности ИИ: схема">
+  <p class="kick">Шлюз безопасности ИИ · схема</p>
+  <div class="body">
+    <svg viewBox="240 560 4210 1610" width="1100" height="421" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема шлюза безопасности: запрос сотрудника, маскирование на входе шлюза, модель видит только метки, возврат данных на выходе, ответ сотруднику">
+      <foreignObject x="0" y="0" width="4688" height="2664"><img src="@day/08-Схемы/d5-shlyuz.png" width="4688" height="2664" alt="" style="display:block"></foreignObject>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Читается <b>слева направо</b>: сотрудник – вход шлюза – модель – выход шлюза – сотрудник</p>
+  </div>
+</section>
+
+<section class="slide" data-at="664" data-title="Схема: вход шлюза">
+  <p class="kick t-red">Схема · вход шлюза</p>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:540px 1fr;gap:50px;align-items:center">
+      <svg viewBox="340 880 1400 1240" width="540" height="478" style="display:block;flex:none" role="img" aria-label="Фрагмент схемы: запрос с фамилией и номером, маскирование по правилам, отказ при нарушении">
+        <foreignObject x="0" y="0" width="4688" height="2664"><img src="@day/08-Схемы/d5-shlyuz.png" width="4688" height="2664" alt="" style="display:block"></foreignObject>
+      </svg>
+      <ul class="list" style="gap:30px">
+        <li><b>Запрос</b> сотрудника – в&nbsp;нём есть фамилия и&nbsp;номер</li>
+        <li><b>Маскирование</b> по&nbsp;правилам: что убрать, а&nbsp;что запретить</li>
+        <li><b>Отказ</b>, если запрос нарушает правила</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="666" data-title="Схема: модель видит только метки">
+  <p class="kick">Схема · модель и&nbsp;таблица замен</p>
+  <div class="body">
+    <svg viewBox="1230 1290 2200 840" width="1100" height="420" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Фрагмент схемы: модель получает текст с метками, пары замен хранятся в таблице внутри шлюза">
+      <foreignObject x="0" y="0" width="4688" height="2664"><img src="@day/08-Схемы/d5-shlyuz.png" width="4688" height="2664" alt="" style="display:block"></foreignObject>
+      <rect x="2090" y="1359" width="476" height="260" rx="44" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="2090" y="1815" width="476" height="260" rx="44" fill="none" stroke="var(--ink)" stroke-width="10"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Пары замен хранятся в&nbsp;<b>таблице внутри шлюза</b>. <b>Модель</b> видит только текст с&nbsp;метками и&nbsp;отвечает тоже с&nbsp;метками</p>
+  </div>
+</section>
+
+<section class="slide" data-at="668" data-title="Схема: выход шлюза">
+  <p class="kick t-teal">Схема · выход шлюза</p>
+  <div class="body">
+    <svg viewBox="2912 1290 1480 840" width="740" height="420" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Фрагмент схемы: возврат данных по таблице замен, ответ сотруднику с исходными данными, запись в журнал и учёт">
+      <foreignObject x="0" y="0" width="4688" height="2664"><img src="@day/08-Схемы/d5-shlyuz.png" width="4688" height="2664" alt="" style="display:block"></foreignObject>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Шлюз возвращает исходные данные, сотрудник получает ответ уже с&nbsp;ними.<br>В&nbsp;<b>журнале и&nbsp;учёте</b> остаётся, кто, когда и&nbsp;сколько обращался</p>
+  </div>
+</section>
+
+<section class="slide" data-at="671" data-title="Casper: возврат данных">
+  <p class="kick">Как работает возврат данных</p>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:400px 1fr;gap:40px">
+      <div class="svc-hd" style="padding:36px 34px;gap:18px">
+        <i class="logo" style="width:120px;height:120px;font-size:64px"><svg class="i"><use href="#i-shield-half"/></svg></i>
+        <h3 style="font-size:52px">Casper</h3>
+        <p style="font-size:30px">исследовательская система</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div style="font-size:33px;padding:22px 18px"><dt>Авторы</dt><dd>Chong и&nbsp;соавторы</dd></div>
+        <div style="font-size:33px;padding:22px 18px"><dt>Год</dt><dd>2025</dd></div>
+        <div style="font-size:33px;padding:22px 18px"><dt>Задача</dt><dd>Убрать персональные данные из&nbsp;запросов к&nbsp;сервисам моделей</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Chong C.-J., Hou C., et al. Casper: Prompt Sanitization for Protecting User Privacy in Web-Based Large Language Models. IEEE CSCloud, 2025 · doi.org/10.1109/CSCloud66326.2025.00027</p>
+</section>
+
+<section class="slide" data-at="674" data-title="Chong и соавторы: как Casper возвращает данные">
+  <p class="kick">Описание системы Casper</p>
+  <div class="body">
+    <figure class="quote sm">
+      <blockquote>Casper убирает персональные данные из&nbsp;запросов, заменяя их <b>уникальными метками</b> до&nbsp;отправки в&nbsp;сервис. Сервис получает только метки и&nbsp;может дать полезный ответ, не&nbsp;зная исходных персональных данных. Когда сервис возвращает ответ, Casper заменяет метки в&nbsp;нём <b>на&nbsp;исходные значения</b> и&nbsp;только после этого показывает ответ пользователю</blockquote>
+      <figcaption><i class="ava">CC</i><span><b>C.-J. Chong и&nbsp;соавторы</b>IEEE CSCloud, 2025</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide dark" data-at="679" data-title="Утечка через сами запросы">
+  <p class="kick t-orange">Зачем это нужно</p>
+  <div class="body">
+    <div class="split" style="grid-template-columns:330px 1fr">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:210px"><use href="#i-message-square-warning"/></svg></div>
+      <div>
+        <p class="say md">Сведения случайно утекают <em>через сами запросы</em></p>
+        <p class="sub">Одна из главных опасностей при&nbsp;работе сотрудников с&nbsp;внешними моделями, по&nbsp;оценке авторов другой системы</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Li Q., Wen J.-H., Jin H.-J. Governing Open Vocabulary Data Leaks Using an Edge LLM through Programming by Example. Proc. ACM IMWUT, 2024 · doi.org/10.1145/3699760</p>
+</section>
