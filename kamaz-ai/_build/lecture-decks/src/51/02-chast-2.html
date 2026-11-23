@@ -1,0 +1,264 @@
+<!-- Лекция 5.1, строки 94–190 (05:15–10:56): почему данные организации не отправляются в зарубежные сервисы (списки стран OpenAI, Google, Anthropic; данные уходят из-под контроля; зависимость, рассказ А. Субботина), виды внутренних решений, внутренний чат на локальной модели (Dennstädt и соавт., Kernan Freire и соавт., Curington и Lano, Ibrahim и соавт.) -->
+
+<section class="slide sect t-red" data-at="94">
+  <span class="no"><svg class="i"><use href="#i-ban"/></svg></span>
+  <p class="kick">Сильные зарубежные модели</p>
+  <h1>Почему данные организации туда не&nbsp;отправляются</h1>
+  <p class="lead">Причин три: формальная, данные уходят из-под&nbsp;контроля, зависимость от&nbsp;сервиса</p>
+</section>
+
+<section class="slide" data-at="97">
+  <p class="kick t-red">Причина 1 из 3 · формальная</p>
+  <h2>Списки стран, где разработчики открывают доступ к&nbsp;моделям</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:42px">
+      <thead><tr><th style="width:55%;padding:20px 28px">Разработчик</th><th style="padding:20px 28px">Россия в&nbsp;списке</th></tr></thead>
+      <tbody>
+        <tr><td style="padding:24px 28px;font-weight:700">OpenAI</td><td class="no" style="padding:24px 28px">нет</td></tr>
+        <tr><td style="padding:24px 28px;font-weight:700">Google</td><td class="no" style="padding:24px 28px">нет</td></tr>
+        <tr><td style="padding:24px 28px;font-weight:700">Anthropic</td><td class="no" style="padding:24px 28px">нет</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="99" data-title="OpenAI: работа за пределами списка стран">
+  <p class="kick t-red">Причина 1 из 3 · страница OpenAI со&nbsp;списком стран</p>
+  <div class="body">
+    <figure class="quote md t-red">
+      <blockquote>Доступ к&nbsp;нашим сервисам или предоставление доступа к&nbsp;ним за&nbsp;пределами перечисленных ниже стран и&nbsp;территорий может привести <b>к&nbsp;блокировке или приостановке вашей учётной записи</b></blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-globe"/></svg></i><span><b>OpenAI</b>страница Supported countries and territories</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>OpenAI. Supported countries and territories · developers.openai.com/api/docs/supported-countries</p>
+</section>
+
+<section class="slide" data-at="103" data-title="Anthropic: важно, где человек находится физически">
+  <p class="kick t-red">Причина 1 из 3 · отдельная оговорка Anthropic</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:260px"><use href="#i-map-pin-off"/></svg></div>
+      <div style="gap:30px">
+        <p class="say sm">Важно, где человек находится&nbsp;<b>физически</b></p>
+        <p class="sub" style="color:var(--ink);font-size:36px;line-height:1.25">Из&nbsp;неподдерживаемого региона пользоваться сервисом нельзя, даже&nbsp;если организации доступ в&nbsp;остальном открыт</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. Supported Regions Policy · anthropic.com/legal/supported-regions</p>
+</section>
+
+<section class="slide dark" data-at="107" data-title="Рабочий путь – разрешённые и внутренние сервисы">
+  <p class="kick t-orange">Что из этого следует</p>
+  <div class="body" style="gap:30px">
+    <div class="rule t-red" style="padding:30px 40px"><svg class="i"><use href="#i-ban"/></svg><div><p style="font-size:44px">Из России данные организации в&nbsp;эти сервисы не&nbsp;отправляют</p></div></div>
+    <div class="rule t-gray" style="padding:30px 40px"><svg class="i"><use href="#i-route-off"/></svg><div><p style="font-size:44px">Обход ограничений курс не&nbsp;рассматривает</p></div></div>
+    <div class="rule t-orange" style="padding:30px 40px"><svg class="i"><use href="#i-route"/></svg><div><p style="font-size:44px">Рабочий путь – разрешённые и&nbsp;внутренние&nbsp;сервисы</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="111">
+  <p class="kick t-red">Причина 2 из 3</p>
+  <h2>Данные уходят из-под&nbsp;контроля</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-gray" style="padding:44px 34px 48px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-send"/></svg></span><h3 style="font-size:44px">Отправленный текст</h3></li>
+      <li class="step t-red" style="padding:44px 34px 48px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-server"/></svg></span><h3 style="font-size:44px">Обрабатывается</h3><p style="font-size:34px;color:var(--ink)">на&nbsp;серверах разработчика</p></li>
+      <li class="step t-red" style="padding:44px 34px 48px;gap:22px"><span class="bdg lg"><svg class="i"><use href="#i-scale"/></svg></span><h3 style="font-size:44px">Хранится</h3><p style="font-size:34px;color:var(--ink)">по&nbsp;его правилам и&nbsp;по&nbsp;праву его&nbsp;страны</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="114">
+  <p class="kick t-red">Причина 2 из 3 · пример</p>
+  <h2>Как это устроено у&nbsp;DeepSeek и&nbsp;Qwen</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-red" style="padding:34px 36px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:46px">DeepSeek</h3><p style="font-size:34px">Хранит данные в&nbsp;<b>Китае</b></p><p style="font-size:34px">Может использовать их для&nbsp;обучения</p></div>
+      <div class="card t-red" style="padding:34px 36px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-database"/></svg></span><h3 style="font-size:46px">Qwen</h3><p style="font-size:34px">Хранит данные в&nbsp;<b>Сингапуре</b></p><p style="font-size:34px">Может использовать их для&nbsp;обучения</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="117" data-steps="117,119">
+  <p class="kick t-orange">Причина 2 из 3 · кто решает</p>
+  <h2>У зарубежных платных сервисов свои условия</h2>
+  <div class="body" style="gap:30px">
+    <div class="rule t-orange st"><svg class="i"><use href="#i-building-2"/></svg><div><h3>Можно ли ими пользоваться</h3><p style="font-size:38px">определяют правила вашей организации, а&nbsp;не&nbsp;сам&nbsp;сотрудник</p></div></div>
+    <div class="rule t-orange st"><svg class="i"><use href="#i-file-lock"/></svg><div><h3>Что относится к&nbsp;коммерческой тайне и&nbsp;конструкторской&nbsp;документации</h3><p style="font-size:38px">определяют перечни организации</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="123" data-title="Зависимость: сервис может пропасть в любой момент">
+  <p class="kick t-red">Причина 3 из 3 · зависимость</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:260px"><use href="#i-unlink"/></svg></div>
+      <div style="gap:30px">
+        <p class="say sm">Сервис, с&nbsp;которым у&nbsp;организации нет договора, может <b>пропасть в&nbsp;любой&nbsp;момент</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="129" data-title="А. Субботин: доступ пропал за одну ночь">
+  <p class="kick t-red">Причина 3 из 3 · случай из&nbsp;доклада</p>
+  <div class="body">
+    <div class="card t-red" style="max-width:1200px">
+      <p style="font-size:1.45em;line-height:1.35;margin:0 0 .6em">Знакомые докладчика за&nbsp;одну ночь потеряли доступ к&nbsp;зарубежной модели <b>и&nbsp;так и&nbsp;не&nbsp;узнали причины</b></p>
+      <p class="muted" style="margin:0">Из рассказа А.&nbsp;Субботина на&nbsp;ИИ-митапе ЦГУ, 06.11.2026</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="131" data-steps="131,134" data-title="Сильные модели знать, данные – во внутренние решения">
+  <p class="kick t-orange">Что из этого следует на&nbsp;практике</p>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" style="padding:34px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-telescope"/></svg>Сильные зарубежные&nbsp;модели</h3><p style="font-size:40px;font-weight:700;line-height:1.18">полезно знать</p><p style="font-size:32px;line-height:1.25">На&nbsp;открытых задачах они показывают, чего ждать от&nbsp;ИИ через год-два</p></div>
+      <div class="col t-orange st" style="padding:34px 38px;gap:22px"><h3 style="font-size:40px"><svg class="i"><use href="#i-building-2"/></svg>Данные организации</h3><p style="font-size:40px;font-weight:700;line-height:1.18">путь один</p><p style="font-size:32px;line-height:1.25">Разрешённые сервисы и&nbsp;внутренние решения</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="139">
+  <span class="no"><svg class="i"><use href="#i-building-2"/></svg></span>
+  <p class="kick">Внутри организации</p>
+  <h1>Какие решения бывают внутри организации</h1>
+  <p class="lead">Во&nbsp;многих организациях, где внедряют искусственный интеллект, есть несколько видов внутренних решений</p>
+</section>
+
+<section class="slide" data-at="142" data-steps="145">
+  <p class="kick">Виды внутренних решений</p>
+  <h2>Что бывает внутри организации</h2>
+  <div class="body" style="gap:30px">
+    <div class="cards c5">
+      <div class="card" style="gap:12px;padding:22px 22px 26px"><span class="bdg"><svg class="i"><use href="#i-messages-square"/></svg></span><h3 style="font-size:26px;line-height:1.15">Внутренний чат</h3><p style="font-size:24px">на&nbsp;локальных моделях: текст не&nbsp;уходит наружу</p></div>
+      <div class="card" style="gap:12px;padding:22px 22px 26px"><span class="bdg"><svg class="i"><use href="#i-file-search"/></svg></span><h3 style="font-size:26px;line-height:1.15">Помощник по&nbsp;документам</h3><p style="font-size:24px">отвечает по&nbsp;базе документов со&nbsp;ссылками</p></div>
+      <div class="card" style="gap:12px;padding:22px 22px 26px"><span class="bdg"><svg class="i"><use href="#i-blocks"/></svg></span><h3 style="font-size:26px;line-height:1.15">Конструктор агентов</h3><p style="font-size:24px">сотрудник собирает сам, не&nbsp;программируя</p></div>
+      <div class="card" style="gap:12px;padding:22px 22px 26px"><span class="bdg"><svg class="i"><use href="#i-plug"/></svg></span><h3 style="font-size:26px;line-height:1.15">Подключаемые инструменты</h3><p style="font-size:24px">поиск, расчёт, запрос в&nbsp;систему</p></div>
+      <div class="card" style="gap:12px;padding:22px 22px 26px"><span class="bdg"><svg class="i"><use href="#i-square-code"/></svg></span><h3 style="font-size:26px;line-height:1.15">Инфраструктура</h3><p style="font-size:24px">для&nbsp;тех, кто программирует</p></div>
+    </div>
+    <div class="rule sm t-orange st" style="padding:20px 32px"><svg class="i"><use href="#i-search"/></svg><div><p>Это виды решений, а&nbsp;не&nbsp;конкретные продукты. Есть&nbsp;ли они у&nbsp;вас и&nbsp;как называются – уточните в&nbsp;своей организации</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="150">
+  <p class="kick">Внутренний чат</p>
+  <h2>Модель работает на&nbsp;серверах организации</h2>
+  <div class="body" style="gap:34px">
+    <div style="position:relative;margin-top:14px;border:4px dashed var(--teal);border-radius:26px;padding:40px 34px 24px;display:grid;grid-template-columns:1fr 60px 1fr 60px 1.25fr;align-items:center">
+      <span class="tag t-teal" style="position:absolute;top:-22px;left:34px;font-size:24px;background:var(--bg);padding:4px 16px">Организация</span>
+      <div class="pict"><svg class="i"><use href="#i-user"/></svg><b>Сотрудник</b></div>
+      <svg class="i" style="font-size:48px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+      <div class="pict"><svg class="i"><use href="#i-messages-square"/></svg><b>Привычное окно&nbsp;чата</b></div>
+      <svg class="i" style="font-size:48px;color:var(--muted)"><use href="#i-arrow-right"/></svg>
+      <div class="pict"><svg class="i"><use href="#i-server"/></svg><b>Модель с&nbsp;открытыми&nbsp;весами</b></div>
+    </div>
+    <div class="rule sm t-orange"><svg class="i"><use href="#i-cloud-off"/></svg><div><p>Текст не&nbsp;уходит за&nbsp;пределы организации. Это главный ответ на&nbsp;вопрос, где работать с&nbsp;документами, которые нельзя отправлять наружу</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="155" data-steps="159,161">
+  <p class="kick">У такого решения есть цена · Dennstädt и&nbsp;соавт., 2025</p>
+  <h2>Закрытые и&nbsp;открытые модели</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-red st" style="padding:30px 36px"><h3><svg class="i"><use href="#i-lock"/></svg>Закрытые модели частных&nbsp;компаний</h3><ul style="font-size:32px"><li>Легко внедрить</li><li>Риски для конфиденциальности&nbsp;данных</li><li>Зависимость от&nbsp;поставщика</li></ul></div>
+      <div class="col t-teal st" style="padding:30px 36px"><h3><svg class="i"><use href="#i-hard-drive"/></svg>Открытые модели на&nbsp;своём&nbsp;оборудовании</h3><ul style="font-size:32px"><li>Больше возможностей&nbsp;настройки</li><li>Требуют ресурсов и&nbsp;технической&nbsp;квалификации</li></ul></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Dennstädt F., Hastings J., et al. npj Digital Medicine, 2025 · doi.org/10.1038/s41746-025-01476-7</p>
+</section>
+
+<section class="slide" data-at="164" data-title="Локальные модели часто уступают лучшим закрытым">
+  <p class="kick">Внутренний чат · ограничение</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-gray"><svg class="i big-ic" style="font-size:260px"><use href="#i-trending-down"/></svg></div>
+      <div style="gap:30px">
+        <p class="say sm">Модели, которые можно развернуть у&nbsp;себя, часто <b>уступают лучшим закрытым</b></p>
+        <p class="sub" style="font-size:38px">Насколько – зависит от&nbsp;задачи</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="166" data-steps="169">
+  <p class="kick">Исследование на&nbsp;заводе · 2024 год</p>
+  <h2>Помощник для&nbsp;операторов по&nbsp;документации цеха</h2>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:330px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-factory"/></svg></i>
+        <h3 style="font-size:36px">Kernan Freire и&nbsp;соавт.</h3>
+        <p>Frontiers in Artificial Intelligence, 2024</p>
+      </div>
+      <dl class="kv" style="--kw:230px">
+        <div style="font-size:30px;padding:14px 15px"><dt>Что сравнивали</dt><dd>Модели для помощника, который отвечает операторам по&nbsp;документации цеха</dd></div>
+        <div class="st" data-s="1" style="font-size:30px;padding:14px 15px"><dt>Результат</dt><dd>Лучшая закрытая модель того времени стабильно опережала остальные, но&nbsp;открытые отставали&nbsp;ненамного</dd></div>
+        <div class="st" data-s="1" style="font-size:30px;padding:14px 15px"><dt>Вывод авторов</dt><dd>Открытые модели привлекательны из-за защиты данных и&nbsp;возможности&nbsp;настройки</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kernan Freire S., Wang C.-F., et al. Frontiers in Artificial Intelligence, 2024 · doi.org/10.3389/frai.2024.1293084</p>
+</section>
+
+<section class="slide" data-at="173" data-steps="178">
+  <p class="kick">Работа 2026 года · локальный запуск</p>
+  <h2>Для локального запуска не&nbsp;всегда нужен дорогой&nbsp;сервер</h2>
+  <div class="body">
+    <div class="split" style="align-items:stretch;gap:44px">
+      <div style="justify-content:center;gap:16px">
+        <div class="picts" style="grid-template-columns:1fr 40px 1fr;align-items:start">
+          <div class="pict"><svg class="i"><use href="#i-monitor"/></svg><b>Устаревшая рабочая станция</b><span>одна потребительская видеокарта</span></div>
+          <svg class="i" style="font-size:44px;color:var(--muted);margin-top:56px"><use href="#i-arrow-right"/></svg>
+          <div class="pict"><svg class="i"><use href="#i-server"/></svg><b>Сервер для&nbsp;модели</b><span>без выхода данных&nbsp;наружу</span></div>
+        </div>
+      </div>
+      <div class="stats st"><div class="stat t-teal" style="justify-content:center;gap:12px"><b style="font-size:96px">29–65</b><span style="font-size:30px">токенов в&nbsp;секунду на&nbsp;задачах помощника по&nbsp;документам и&nbsp;программам</span></div></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Curington I., Lano K. Frontiers in Computer Science, 2026 · doi.org/10.3389/fcomp.2026.1911927</p>
+</section>
+
+<section class="slide" data-at="180">
+  <p class="kick t-orange">Вывод</p>
+  <h2>Хватит ли такой рабочей станции</h2>
+  <div class="body">
+    <div class="cards" style="gap:40px">
+      <div class="card t-teal" style="padding:48px 44px 54px;gap:26px;align-items:center;text-align:center"><svg class="i" style="font-size:120px;color:var(--c)"><use href="#i-monitor"/></svg><h3 style="font-size:48px">Небольшая служба</h3><p style="font-size:38px">такого может хватить</p></div>
+      <div class="card t-orange" style="padding:48px 44px 54px;gap:26px;align-items:center;text-align:center"><svg class="i" style="font-size:120px;color:var(--c)"><use href="#i-server-cog"/></svg><h3 style="font-size:48px">Вся организация</h3><p style="font-size:38px">нужны серверы мощнее</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="183" data-steps="186">
+  <p class="kick t-red">Ещё одна оговорка · препринт 2026 года</p>
+  <h2>Локальная модель сама по&nbsp;себе не&nbsp;гарантирует конфиденциальность</h2>
+  <div class="body" style="gap:26px">
+    <div class="rule sm t-gray" style="padding:20px 30px"><svg class="i"><use href="#i-file-text"/></svg><div><p style="font-size:30px"><b>The Illusion of Local Privacy</b> – «Иллюзия локальной приватности»</p></div></div>
+    <div class="st" style="display:flex;flex-direction:column;gap:12px">
+      <p style="font-size:30px;font-weight:700">Запросы могут сохраняться и&nbsp;утекать через программы, которые обслуживают&nbsp;модель:</p>
+      <div class="picts c4 sm t-red">
+        <div class="pict"><svg class="i"><use href="#i-upload"/></svg><b>при загрузке</b></div>
+        <div class="pict"><svg class="i"><use href="#i-memory-stick"/></svg><b>в&nbsp;памяти</b></div>
+        <div class="pict"><svg class="i"><use href="#i-scroll-text"/></svg><b>в&nbsp;журналах</b></div>
+        <div class="pict"><svg class="i"><use href="#i-panel-top"/></svg><b>через интерфейс</b></div>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Ibrahim Y., Ikram M., Salama M. Препринт arXiv, 2026 · doi.org/10.48550/arXiv.2609.18526</p>
+</section>
+
+<section class="slide dark" data-at="189" data-title="Внутренний чат проверяют как любую другую систему">
+  <p class="kick t-orange">Поэтому</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:250px"><use href="#i-shield-check"/></svg></div>
+      <div>
+        <p class="say md">Внутренний чат проверяют и&nbsp;настраивают <em>специалисты по&nbsp;защите&nbsp;информации</em></p>
+        <p class="sub">как любую другую систему</p>
+      </div>
+    </div>
+  </div>
+</section>

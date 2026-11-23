@@ -113,10 +113,11 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   '55975c249f0b145d1414aa93b499fb9f948b496832d2c36114d86a81448018b5', # kamaz-ai: 2026-11-20-Слайды-Тема-3.2-Анализ-отказов.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '7d2e45c2539dc40053668fd3873718d99efa0a1c069966df031ef199a6e7829b', # kamaz-ai: 2026-11-23-Слайды-Тема-4.1-Расчёты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '6ff286efb733e93ca542afee8a6eee760c3c591bfb87460b952b36c3316e9ef2', # kamaz-ai: 2026-11-23-Слайды-Тема-4.2-Испытания.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
-  '3d1442010859411bd0113770c7b952197b267166eb44fd3f5d65fdd05b19c1de', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
+  '2c25b20ab1f87784401c3fe08691454658a21d15171bd6e7bc7ec57e7f17ebc0', # kamaz-ai: 2026-11-25-Слайды-Тема-5.1-Инструменты.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '863b5886773eba25cdf6ca793ee6454fd3289cede923665467df51786062e1ed', # kamaz-ai: 2026-11-25-Слайды-Тема-5.2-Свой-сценарий.pdf - author slides exported by PowerPoint from the reviewed PPTX deck; text checked against the deck source,
   '80a682977349574a308da47f93114f5f761c23f603710cf6e78370b760a5b113', # kamaz-ai: 2026-11-16-Рабочая-тетрадь-итогового-проекта.pdf - course workbook exported by Word from the reviewed DOCX; text checked against the workbook source,
-  '58dba7bb073d65d1c280ae92ce913cf177cc025a10217f465b71fa55dbb56ddd' # kamaz-ai: 2026-11-16-Источники-дня.pdf - author print of the day sources page (Prince); text checked against the published sources MD
+  '58dba7bb073d65d1c280ae92ce913cf177cc025a10217f465b71fa55dbb56ddd', # kamaz-ai: 2026-11-16-Источники-дня.pdf - author print of the day sources page (Prince); text checked against the published sources MD,
+  '0acff084bbf133579a8900a4fd08e4d84ea95b67e1ec91973d55d378fb555bac' # kamaz-ai: 2026-11-23-Агент-AutoClaw-деловой-ответ.pdf - author PDF of the AutoClaw agent guide handed out in class; text read and checked against the published MD
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()

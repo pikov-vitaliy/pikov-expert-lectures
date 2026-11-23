@@ -1,0 +1,318 @@
+<!-- Лекция 5.1, строки 277–397 (16:00–22:32): схема «Модель и харнес», открытые харнесы без привязки к поставщику (OpenCode, Kilo Code, Cline, Aider, Goose, судьба Roo Code и Continue, форки), российские помощники SourceCraft, GigaCode, Kodify, подключение моделей, оговорки, агент или цепочка по руководству Anthropic, вывод Н. Галкина, итог части -->
+
+<section class="slide" data-at="277" data-title="Модель и харнес: схема">
+  <p class="kick">Модель и харнес · схема</p>
+  <div class="body">
+    <svg viewBox="317 405 4536 1856" width="1135" height="464" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема: инженер ставит задачу модели, вокруг модели в рамке харнес – инструкция, документы, инструменты, проверки, журнал; справа приёмка человеком">
+      <foreignObject x="0" y="0" width="5176" height="2696"><img src="@day/08-Схемы/d5-model-harness.png" width="5176" height="2696" alt="" style="display:block"></foreignObject>
+      <path d="M3725 1345V2165Q3725 2213 3677 2213H1493Q1445 2213 1445 2165V1345M1445 1250V493Q1445 445 1493 445H3677Q3725 445 3725 493V1250" fill="none" stroke="var(--orange)" stroke-width="14"/>
+      <rect x="353" y="1193" width="864" height="312" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="1553" y="1193" width="864" height="312" rx="38" fill="none" stroke="var(--teal)" stroke-width="12"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Инженер ставит задачу. <b>Модель</b> – сменная часть. Всё, что в&nbsp;рамке вокруг неё, – <b>харнес</b></p>
+  </div>
+</section>
+
+<section class="slide" data-at="281">
+  <p class="kick">Модель и харнес · что задаёт работу модели</p>
+  <h2>Инструкция сверху, документы снизу</h2>
+  <div class="body">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:4px;width:860px;margin:0 auto">
+      <div class="card row t-orange" style="width:100%;padding:18px 28px"><span class="bdg"><svg class="i"><use href="#i-list-checks"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Инструкция задачи</h3><p style="font-size:27px">Шаги, формат, запреты</p></div></div>
+      <div class="t-orange" style="display:flex;align-items:center;gap:14px;color:var(--c);font-size:25px;font-weight:700"><svg class="i" style="font-size:44px"><use href="#i-arrow-down"/></svg>говорит модели, как работать</div>
+      <div class="card row t-teal" style="width:100%;padding:18px 28px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Модель</h3><p style="font-size:27px">Сменная часть</p></div></div>
+      <div class="t-gray" style="display:flex;align-items:center;gap:14px;color:var(--c);font-size:25px;font-weight:700"><svg class="i" style="font-size:44px"><use href="#i-arrow-up"/></svg>фрагменты</div>
+      <div class="card row t-gray" style="width:100%;padding:18px 28px"><span class="bdg"><svg class="i"><use href="#i-file-text"/></svg></span><div style="display:flex;flex-direction:column;gap:4px"><h3 style="font-size:34px">Разрешённые документы</h3><p style="font-size:27px">Только нужные для&nbsp;задачи</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="285" data-title="Схема: инструменты и точные проверки">
+  <p class="kick">Схема · справа вверху – инструменты</p>
+  <div class="body">
+    <svg viewBox="1533 549 2104 976" width="900" height="417" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Фрагмент схемы: модель вызывает инструменты, черновик модели идёт в точные проверки">
+      <foreignObject x="0" y="0" width="5176" height="2696"><img src="@day/08-Схемы/d5-model-harness.png" width="5176" height="2696" alt="" style="display:block"></foreignObject>
+      <path fill="var(--bg)" fill-opacity=".74" fill-rule="evenodd" d="M1533 549H3637V1525H1533Z M1533 1173H3637V1525H1533Z M2437 645H2733V1173H2437Z M2733 549H3637V885H2733Z"/>
+      <rect x="2753" y="557" width="864" height="304" rx="34" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="2753" y="1193" width="864" height="312" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Модель вызывает <b>инструменты</b>: поиск, расчёт, черновик. Её черновик идёт не&nbsp;сразу к&nbsp;человеку, а&nbsp;в&nbsp;<b>точные проверки</b>: формулы, допуски, формат</p>
+  </div>
+</section>
+
+<section class="slide" data-at="287" data-title="Схема: журнал решений и приёмка человеком">
+  <p class="kick t-red">Схема · после проверки</p>
+  <div class="body">
+    <svg viewBox="2733 1173 2104 992" width="900" height="424" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Фрагмент схемы: итог точных проверок попадает в журнал решений, затем приёмка человеком">
+      <foreignObject x="0" y="0" width="5176" height="2696"><img src="@day/08-Схемы/d5-model-harness.png" width="5176" height="2696" alt="" style="display:block"></foreignObject>
+      <rect x="2753" y="1833" width="864" height="312" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+      <rect x="3953" y="1193" width="864" height="312" rx="38" fill="none" stroke="var(--ink)" stroke-width="10"/>
+    </svg>
+    <p class="note" style="color:var(--ink);text-align:center;font-size:30px">Итог проверки попадает в&nbsp;<b>журнал решений</b>: что сделано и&nbsp;почему. И&nbsp;только потом – <b>приёмка человеком</b>: решение и&nbsp;подпись</p>
+  </div>
+</section>
+
+<section class="slide" data-at="289" data-title="Схема «Модель и харнес»: легенда цветов">
+  <p class="kick">Модель и харнес · цвета по&nbsp;легенде внизу</p>
+  <div class="body" style="gap:18px">
+    <svg viewBox="317 405 4536 2060" width="940" height="427" style="display:block;margin:0 auto;flex:none" role="img" aria-label="Схема «Модель и харнес» целиком, внизу легенда цветов">
+      <foreignObject x="0" y="0" width="5176" height="2696"><img src="@day/08-Схемы/d5-model-harness.png" width="5176" height="2696" alt="" style="display:block"></foreignObject>
+      <rect x="330" y="2275" width="3420" height="180" rx="30" fill="none" stroke="var(--orange)" stroke-width="12"/>
+    </svg>
+    <p style="font-size:27px;line-height:1.4;text-align:center;text-wrap:balance"><span style="white-space:nowrap"><b style="color:var(--teal)">Зелёный</b> – модель</span> · <span style="white-space:nowrap"><b>фиолетовый</b> – данные и инструменты</span><br><span style="white-space:nowrap"><b style="color:var(--red)">красный</b> – проверки и подтверждение</span> · <span style="white-space:nowrap"><b style="color:var(--orange)">оранжевый</b> – инструкция и журнал</span> · <span style="white-space:nowrap"><b style="color:var(--gray)">серый</b> – человек</span></p>
+  </div>
+</section>
+
+<section class="slide dark" data-at="299" data-title="Харнесы без привязки к поставщику модели">
+  <p class="kick t-orange">Харнесы без привязки к поставщику модели</p>
+  <div class="body">
+    <div class="split s46">
+      <div class="center t-teal"><svg class="i big-ic" style="font-size:220px"><use href="#i-blocks"/></svg></div>
+      <div>
+        <p class="say md">Кроме харнесов от&nbsp;разработчиков моделей есть <em>открытые</em></p>
+        <p class="sub">Их делают отдельные команды, а&nbsp;модель к&nbsp;ним подключают от&nbsp;разных поставщиков</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="301" data-title="OpenCode">
+  <p class="kick">Открытый харнес · пример 1</p>
+  <div class="body">
+    <div class="svc t-teal" style="grid-template-columns:400px 1fr;gap:40px">
+      <div class="svc-hd" style="padding:36px 34px;gap:18px">
+        <i class="logo" style="width:120px;height:120px;font-size:64px"><svg class="i"><use href="#i-terminal"/></svg></i>
+        <h3 style="font-size:52px">OpenCode</h3>
+        <p style="font-size:30px">открытый агент для&nbsp;программирования</p>
+      </div>
+      <dl class="kv" style="--kw:190px">
+        <div style="font-size:33px;padding:22px 18px"><dt>Где</dt><dd>В терминале и&nbsp;в&nbsp;приложении для&nbsp;компьютера</dd></div>
+        <div style="font-size:33px;padding:22px 18px"><dt>Модели</dt><dd>Не меньше <b>200 поставщиков</b> – заявление проекта на&nbsp;осень 2026&nbsp;года</dd></div>
+        <div style="font-size:33px;padding:22px 18px"><dt>Локально</dt><dd>Модели Ollama на&nbsp;компьютере находит сам</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>OpenCode, главная страница и документация · opencode.ai</p>
+</section>
+
+<section class="slide" data-at="308" data-title="Kilo Code">
+  <p class="kick">Открытый харнес · пример 2</p>
+  <div class="body">
+    <div class="split s46" style="align-items:stretch;gap:44px">
+      <div class="svc-hd t-teal" style="background:var(--ct);border-radius:20px;padding:36px 34px;gap:22px;justify-content:center">
+        <h3 style="font-size:52px;color:var(--c)">Kilo Code</h3>
+        <ul class="list sm" style="font-size:30px;gap:14px;color:var(--ci)">
+          <li>Расширения для&nbsp;редакторов кода</li>
+          <li>Своя командная строка</li>
+          <li>Приложение для&nbsp;компьютера</li>
+        </ul>
+      </div>
+      <div style="justify-content:center;gap:26px">
+        <p style="font-size:24px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">На главной странице проекта</p>
+        <p class="say md">Модели по&nbsp;себестоимости. Без&nbsp;наценки. <em>Без&nbsp;привязки</em></p>
+        <p class="sub">«Models at cost. No&nbsp;markup. No&nbsp;lock-in.»</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kilo, главная страница · kilo.ai</p>
+</section>
+
+<section class="slide" data-at="312" data-steps="312,315">
+  <p class="kick">Открытые харнесы · ещё три проекта</p>
+  <h2>Cline, Aider и Goose</h2>
+  <div class="body">
+    <div class="cards c3">
+      <div class="card t-teal st" data-s="1" style="gap:16px"><span class="bdg"><svg class="i"><use href="#i-code-xml"/></svg></span><h3 style="font-size:38px">Cline</h3><p style="font-size:30px">Работает в&nbsp;<span style="white-space:nowrap">редакторе кода</span></p><p style="font-size:30px">Модели – через Ollama или интерфейс <span style="white-space:nowrap">в формате OpenAI</span></p></div>
+      <div class="card t-teal st" data-s="2" style="gap:16px"><span class="bdg"><svg class="i"><use href="#i-git-commit-horizontal"/></svg></span><h3 style="font-size:38px">Aider</h3><p style="font-size:30px">Для терминала</p><p style="font-size:30px">Свои правки по&nbsp;умолчанию сохраняет в&nbsp;Git</p><p style="font-size:30px">Каждую правку <span style="white-space:nowrap">можно отменить</span></p></div>
+      <div class="card t-teal st" data-s="2" style="gap:16px"><span class="bdg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:38px">Goose</h3><p style="font-size:30px">Агент не&nbsp;только для&nbsp;кода</p><p style="font-size:30px">Больше 85 <span style="white-space:nowrap">поставщиков моделей</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="318">
+  <p class="kick t-red">Обратная сторона</p>
+  <h2>Открытый код не&nbsp;гарантирует, <span style="white-space:nowrap">что проект будет жить</span></h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center">
+        <div class="doc" style="width:240px;flex:none"><h4 style="font-size:28px">Roo Code</h4><i></i><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-red">в архиве</b></div>
+        <p style="font-size:33px;line-height:1.25">Расширение закрыли весной 2026&nbsp;года, репозиторий переведён в&nbsp;архив</p>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:26px;text-align:center">
+        <div class="doc" style="width:240px;flex:none"><h4 style="font-size:28px">Continue</h4><i></i><i class="s"></i><i></i><i></i><i class="s"></i><b class="stamp t-red">только чтение</b></div>
+        <p style="font-size:33px;line-height:1.25">Разработчики прекратили активное сопровождение, репозиторий доступен только для&nbsp;чтения</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="323" data-steps="323,326">
+  <p class="kick t-teal">Зато открытый код можно подхватить</p>
+  <h2>Форк – копия проекта с&nbsp;собственным развитием</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 90px 1fr 90px 1fr;grid-template-rows:auto 70px auto;align-items:center;gap:6px 0">
+      <div class="card row t-gray st" data-s="2" style="grid-column:1;grid-row:1;padding:26px 28px"><span class="bdg"><svg class="i"><use href="#i-code-xml"/></svg></span><h3 style="font-size:38px">Cline</h3></div>
+      <div class="st t-gray" data-s="2" style="grid-column:2;grid-row:1;display:flex;justify-content:center;color:var(--c)"><svg class="i" style="font-size:64px"><use href="#i-arrow-right"/></svg></div>
+      <div class="card row t-red" style="grid-column:3;grid-row:1;padding:26px 28px"><span class="bdg"><svg class="i"><use href="#i-archive"/></svg></span><h3 style="font-size:38px">Roo Code</h3></div>
+      <div class="st t-gray" data-s="2" style="grid-column:4;grid-row:1;display:flex;justify-content:center;color:var(--c)"><svg class="i" style="font-size:64px"><use href="#i-arrow-right"/></svg></div>
+      <div class="card row t-teal st" data-s="2" style="grid-column:5;grid-row:1;padding:26px 28px"><span class="bdg"><svg class="i"><use href="#i-git-fork"/></svg></span><h3 style="font-size:38px">Kilo Code</h3></div>
+      <div class="st t-teal" data-s="1" style="grid-column:3;grid-row:2;display:flex;justify-content:center;color:var(--c)"><svg class="i" style="font-size:64px"><use href="#i-arrow-down"/></svg></div>
+      <div class="card row t-teal st" data-s="1" style="grid-column:3 / span 3;grid-row:3;padding:26px 28px"><span class="bdg"><svg class="i"><use href="#i-git-fork"/></svg></span><div style="display:flex;flex-direction:column;gap:6px"><h3 style="font-size:38px">Zoo Code</h3><p style="font-size:27px">Форк сообщества. На&nbsp;него ссылаются и&nbsp;сами разработчики Roo&nbsp;Code</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="333" data-title="SourceCraft">
+  <p class="kick">Российские агентные помощники · с&nbsp;выбором модели по-разному</p>
+  <div class="body">
+    <div class="svc t-orange" style="grid-template-columns:400px 1fr;gap:40px">
+      <div class="svc-hd" style="padding:36px 34px;gap:18px">
+        <i class="logo" style="width:120px;height:120px;font-size:64px">Я</i>
+        <h3 style="font-size:50px">SourceCraft</h3>
+        <p style="font-size:30px">Яндекс</p>
+      </div>
+      <dl class="kv" style="--kw:230px">
+        <div style="font-size:32px;padding:22px 18px"><dt>Агентный режим</dt><dd>Есть и&nbsp;в&nbsp;командной строке, со&nbsp;встроенным OpenCode</dd></div>
+        <div style="font-size:32px;padding:22px 18px"><dt>Для VS&nbsp;Code</dt><dd>Расширение SourceCraft Code Assistant использует код Roo&nbsp;Code</dd></div>
+        <div style="font-size:32px;padding:22px 18px"><dt>Модель</dt><dd>В профилях настроек выбирают поставщика и&nbsp;вписывают свой ключ</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Документация SourceCraft Code Assistant · sourcecraft.dev/portal/docs/en/code-assistant/</p>
+</section>
+
+<section class="slide" data-at="339" data-steps="339,342">
+  <p class="kick">Российские агентные помощники</p>
+  <h2>GigaCode и Kodify</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card t-orange st" data-s="1" style="gap:18px;padding:30px 34px"><span class="bdg"><svg class="i"><use href="#i-boxes"/></svg></span><h3 style="font-size:40px">GigaCode <span class="muted" style="font-weight:400;font-size:30px">Сбер</span></h3><p>Модель выбирают под&nbsp;задачу из&nbsp;нескольких семейств, среди них DeepSeek и&nbsp;Qwen</p><p>Для бизнеса – установка <span style="white-space:nowrap">на серверы заказчика</span></p></div>
+      <div class="card t-orange st" data-s="2" style="gap:18px;padding:30px 34px"><span class="bdg"><svg class="i"><use href="#i-server"/></svg></span><h3 style="font-size:40px">Kodify <span class="muted" style="font-weight:400;font-size:30px">MWS AI</span></h3><p>Помощник, который ставится внутри компании. Модели, по&nbsp;словам разработчиков, основаны на&nbsp;Qwen Coder&nbsp;2.5</p><p style="color:var(--red)">Подключение другого поставщика не&nbsp;описано</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="348" data-steps="348,350">
+  <p class="kick">Подключение моделей</p>
+  <h2>Российскую модель можно подключить к&nbsp;открытому харнесу</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal st" data-s="1"><h3><svg class="i"><use href="#i-plug"/></svg>Yandex AI&nbsp;Studio</h3><ul><li>Интерфейс в&nbsp;формате OpenAI</li><li>Яндекс сам опубликовал инструкцию для&nbsp;OpenCode</li></ul></div>
+      <div class="col t-orange st" data-s="2"><h3><svg class="i"><use href="#i-plug-zap"/></svg>GigaChat</h3><ul><li>Формат совместим <span style="white-space:nowrap">с OpenAI</span> <span style="white-space:nowrap">лишь частично</span></li><li>Токен доступа живёт <b>30&nbsp;минут</b></li><li>Открытый посредник gpt2giga переводит запросы</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="354">
+  <p class="kick t-red">Оговорка 1</p>
+  <h2>От модели зависит, насколько надёжно агент вызывает инструменты</h2>
+  <div class="body">
+    <div class="split s46" style="align-items:center">
+      <div class="center t-red"><svg class="i big-ic" style="font-size:200px"><use href="#i-refresh-cw"/></svg></div>
+      <div style="gap:22px">
+        <p style="font-size:24px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)">Документация Kilo Code о&nbsp;локальных моделях</p>
+        <p class="say sm">Гораздо чаще <em>зацикливаются</em> и&nbsp;неправильно вызывают инструменты</p>
+      </div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kilo Docs, раздел об Ollama · kilo.ai/docs/ai-providers/ollama</p>
+</section>
+
+<section class="slide" data-at="358" data-steps="358,360">
+  <p class="kick t-red">Оговорка 2 · где обрабатывается запрос</p>
+  <h2>Модель и&nbsp;оболочка – это разные каналы</h2>
+  <div class="body">
+    <div class="cards st" data-s="1">
+      <div class="card row t-gray" style="padding:30px 32px"><span class="bdg"><svg class="i"><use href="#i-cloud"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:38px">Облачная модель</h3><p style="font-size:30px">Запрос обрабатывает <span style="white-space:nowrap">её поставщик</span></p></div></div>
+      <div class="card row t-teal" style="padding:30px 32px"><span class="bdg"><svg class="i"><use href="#i-laptop"/></svg></span><div style="display:flex;flex-direction:column;gap:8px"><h3 style="font-size:38px">Модель на&nbsp;своём компьютере</h3><p style="font-size:30px">Ответ вычисляется там</p></div></div>
+    </div>
+    <div class="rule t-red st" data-s="2"><svg class="i"><use href="#i-radio-tower"/></svg><div><h3>У самой оболочки могут быть внешние подключения</h3><p>Командная строка Kilo Code по&nbsp;умолчанию отправляет сведения об&nbsp;использовании и&nbsp;ошибках. Сервер MCP, через который агент вызывает инструменты, может работать на&nbsp;другой машине</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="364" data-steps="364,366">
+  <p class="kick t-orange">Если пробуете такие программы</p>
+  <h2>Сменили модель – проверьте заново</h2>
+  <div class="body">
+    <ul class="list check big" style="gap:34px">
+      <li class="st" data-s="1"><b>После смены поставщика модели</b> – прогнать агента на&nbsp;контрольных примерах</li>
+      <li class="st" data-s="2"><b>На рабочем компьютере</b> – только то, что <span style="white-space:nowrap">разрешила организация</span></li>
+      <li class="st" data-s="2"><b>Пробовать</b> – дома, на&nbsp;учебных данных</li>
+    </ul>
+  </div>
+</section>
+
+<section class="slide" data-at="371">
+  <p class="kick">Агент или фиксированная цепочка</p>
+  <h2>Не каждой задаче нужен агент</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-gray" style="padding:56px 48px;gap:30px;min-height:400px;justify-content:center"><h3 style="font-size:48px"><svg class="i"><use href="#i-workflow"/></svg>Цепочка</h3><p style="font-size:46px;font-weight:600;line-height:1.2">Шаги заранее задаёт программа</p></div>
+      <div class="col t-teal" style="padding:56px 48px;gap:30px;min-height:400px;justify-content:center"><h3 style="font-size:48px"><svg class="i"><use href="#i-bot"/></svg>Агент</h3><p style="font-size:46px;font-weight:600;line-height:1.2">Следующий шаг выбирает модель</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. Building effective agents, 19.12.2024 · anthropic.com/research/building-effective-agents</p>
+</section>
+
+<section class="slide dark" data-at="376" data-title="Anthropic: начинать с самого простого">
+  <p class="kick t-orange">Совет из руководства</p>
+  <div class="body" style="justify-content:flex-start;padding-top:40px">
+    <figure class="quote">
+      <blockquote style="font-size:60px">При создании приложений на&nbsp;языковых моделях мы рекомендуем искать <b>самое простое решение</b> и&nbsp;усложнять его, только когда это необходимо</blockquote>
+      <figcaption><i class="ava">A</i><span><b>Anthropic</b>руководство Building effective agents, 2024</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="379">
+  <p class="kick">То же руководство · цена самостоятельности</p>
+  <h2>Самостоятельность агента обходится дороже</h2>
+  <div class="body">
+    <div class="cards">
+      <div class="card row t-red" style="padding:40px 36px"><span class="bdg lg"><svg class="i"><use href="#i-coins"/></svg></span><h3 style="font-size:44px">Более высокие затраты</h3></div>
+      <div class="card row t-red" style="padding:40px 36px"><span class="bdg lg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:44px">Накопление ошибок</h3></div>
+    </div>
+    <div class="rule t-orange" style="padding:30px 36px"><svg class="i"><use href="#i-flask-conical"/></svg><div><h3>Совет разработчиков</h3><p style="font-size:36px">Тщательно испытывать агентов в&nbsp;изолированной среде, с&nbsp;защитными ограничениями</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. Building effective agents, 19.12.2024 · anthropic.com/research/building-effective-agents</p>
+</section>
+
+<section class="slide" data-at="384" data-steps="384,387">
+  <p class="kick t-orange">Для службы</p>
+  <h2>Что выбрать под&nbsp;задачу</h2>
+  <div class="body">
+    <table class="tbl" style="font-size:38px">
+      <thead><tr><th style="width:42%;padding:24px 32px">Вариант</th><th style="padding:24px 32px">Когда подходит</th></tr></thead>
+      <tbody>
+        <tr class="st"><td style="padding:26px 32px;font-weight:700">Шаблон запросов или цепочка в&nbsp;конструкторе</td><td style="padding:26px 32px">Задача укладывается в&nbsp;три одинаковых шага</td></tr>
+        <tr class="st"><td style="padding:26px 32px;font-weight:700">Агент</td><td style="padding:26px 32px">Порядок шагов заранее неизвестен: следующий зависит от&nbsp;того, что&nbsp;найдено на&nbsp;предыдущем</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="389" data-title="Н. Галкин: линейный процесс – роботу">
+  <p class="kick">Тот же вывод – в&nbsp;«Кофемании»</p>
+  <div class="body">
+    <figure class="quote">
+      <blockquote>Если это линейный процесс, то&nbsp;дешевле использовать <b>робота</b></blockquote>
+      <figcaption><i class="ava">НГ</i><span><b>Н. Галкин</b>директор департамента ИТ сети ресторанов «Кофемания» · онлайн-конференция форума All-over-IP &amp; AI 2026, 11.11.2026</span></figcaption>
+    </figure>
+    <div class="rule sm t-teal"><svg class="i"><use href="#i-sparkles"/></svg><div><p>ИИ там поручают задачи, где нужно понимать контекст и&nbsp;составлять текст</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="394" data-title="Из чего складывается внутреннее решение">
+  <p class="kick t-orange">Коротко по этой части</p>
+  <div class="body" style="gap:40px">
+    <p class="say sm">Внутреннее решение складывается из</p>
+    <div class="picts c5" style="grid-template-columns:repeat(5,1fr)">
+      <div class="pict"><svg class="i"><use href="#i-bot"/></svg><b>Модели</b></div>
+      <div class="pict"><svg class="i"><use href="#i-file-text"/></svg><b>Документов</b></div>
+      <div class="pict"><svg class="i"><use href="#i-wrench"/></svg><b>Инструментов</b></div>
+      <div class="pict"><svg class="i"><use href="#i-shield-check"/></svg><b>Проверок</b></div>
+      <div class="pict"><svg class="i"><use href="#i-user-check"/></svg><b>Правил, кто&nbsp;что решает</b></div>
+    </div>
+    <p class="sub">Начинают с&nbsp;самого простого устройства, а&nbsp;усложняют, только когда задача этого требует</p>
+  </div>
+</section>

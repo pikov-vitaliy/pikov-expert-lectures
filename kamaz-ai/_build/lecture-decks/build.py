@@ -28,7 +28,7 @@ _bx = os.path.join(WORK, 'ban-extra.txt')
 if os.path.exists(_bx):
     BAN += [(w.strip(), 'запрещённое слово') for w in open(_bx, encoding='utf-8') if w.strip()]
 BAN_RE = [(r'ФСТЭК(?!\s+России)', '«ФСТЭК» без «России»'),
-          (r'(?i)диктофон|расшифровк|транскрип|\bвольт|Claude|Codex|Consensus|нейросеть сгенерировала', 'след подготовки')]
+          (r'(?i)диктофон|расшифровк|транскрип|\bвольт|Claude(?! (?:Fable|Opus|Sonnet|Haiku|Code))|Codex(?! CLI)|Consensus|нейросеть сгенерировала', 'след подготовки')]  # 23.11.2026: названия моделей и харнесов (Claude Fable 5.2, Claude Code) в лекциях дня 5 – не след подготовки
 
 EXPAND_JS = r"""
 ([times, total, minHold]) => {

@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Как создать своего ИИ-агента: пример в AutoClaw</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+img, svg, video { max-width: 100%; height: auto; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF (02.11.2026, замечание Виталия: заголовок не должен оставаться внизу страницы без текста) */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Как создать своего ИИ-агента: пример в AutoClaw</h1>
+<p>Агент – это модель с постоянными инструкциями под одну задачу. Его настраивают один раз, а потом просто дают ему
+задание: «вот письмо, ответь». Ниже весь путь на примере агента, который пишет ответ на деловое письмо: создать,
+описать правила, проверить и довести до нужного качества.</p>
+<p>Пример сделан в AutoClaw – настольном приложении для работы с ИИ-агентами. Его выпускает компания Zhipu, разработчик
+моделей GLM. AutoClaw построен на открытой платформе агентов OpenClaw. Документация AutoClaw – на китайском языке,
+интерфейс приложения – на английском. Тот же подход – роль, правила, пример, проверка на настоящем письме – подходит
+для агентов в любой другой программе.</p>
+<h2>1. Что понадобится</h2>
+<ul>
+<li>Установленное приложение AutoClaw: сайт и документация разработчика – https://autoclaw.zhipuai.cn/docs/.</li>
+<li>Модель. Для этого примера хватит встроенной: в AutoClaw уже есть GLM-5.3, GLM-5-Turbo, GLM-5V-Turbo и режим Auto.
+  Свою модель подключают через выбор модели под полем ввода: кнопка добавления своей модели ведёт в
+  <strong>Settings &gt; Models &amp; API</strong>, там вводится ключ API (<a href="https://autoclaw.zhipuai.cn/docs/advanced/models/">документация: модели</a>).</li>
+<li>Письмо для проверки – подойдёт любое рабочее письмо без конфиденциальных сведений. Учебное письмо есть в разделе 5.</li>
+</ul>
+<p>Модель обрабатывает текст письма. Письма с персональными данными, коммерческой тайной или служебными сведениями
+давайте агенту, только если это разрешают правила вашей организации.</p>
+<h2>2. Создаём агента</h2>
+<ol>
+<li>Откройте <strong>Settings</strong> (слева внизу) и раздел <strong>Agent</strong>.</li>
+<li>Нажмите <strong>Create Agent</strong> справа вверху. Откроется форма агента.</li>
+<li>Заполните поля (таблица ниже) и нажмите <strong>Save</strong>. Если форма в вашей версии выглядит иначе, ищите поля с теми же
+   названиями: приложение обновляется быстрее документации.</li>
+<li>Найдите карточку нового агента в списке раздела <strong>Agent</strong> и нажмите на ней <strong>New Chat</strong> – это новый разговор именно
+   с этим агентом.</li>
+</ol>
+<p>Порядок действий описан в документации разработчика: <a href="https://autoclaw.zhipuai.cn/docs/advanced/agents/">агенты</a>.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Поле</th>
+<th>Что писать</th>
+<th>Пример</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>NAME</td>
+<td>имя агента в списке</td>
+<td>Деловой ответ</td>
+</tr>
+<tr>
+<td>AGENT ID</td>
+<td>постоянный идентификатор латиницей, без пробелов; можно оставить предложенный</td>
+<td>business-reply</td>
+</tr>
+<tr>
+<td>DESCRIPTION</td>
+<td>одна-две фразы: что агент делает и что получает на вход</td>
+<td>Пишет ответ на сообщение в деловом стиле. На вход – сообщение и пожелания к ответу.</td>
+</tr>
+<tr>
+<td>EXPERTISE</td>
+<td>область, в которой агент силён</td>
+<td>Writing</td>
+</tr>
+<tr>
+<td>MODEL</td>
+<td>модель, на которой работает агент</td>
+<td>любая из встроенных, например GLM-5.3</td>
+</tr>
+<tr>
+<td>WORKSPACE</td>
+<td>рабочая папка агента; можно оставить предложенную, но путь запишите – он понадобится в разделе 4</td>
+<td>не менять</td>
+</tr>
+<tr>
+<td>WHO CAN HELP</td>
+<td>каких агентов этот агент может позвать на помощь</td>
+<td>для писем помощники не нужны – если где-то стоит галочка, снимите её</td>
+</tr>
+</tbody>
+</table></div>
+<p>Поля NAME, DESCRIPTION, MODEL и WORKSPACE описаны в документации AutoClaw. AGENT ID, EXPERTISE и WHO CAN HELP в ней
+пока не описаны: их смысл в таблице выведен из интерфейса и устройства OpenClaw, официального описания нет.</p>
+<p>Совет из документации: делите агентов по постоянным обязанностям, а не создавайте нового под каждую разовую задачу.
+Пример разработчика – «помощник по проверке договоров».</p>
+<h2>3. Где хранятся инструкции агента</h2>
+<p>Поле DESCRIPTION – это короткая подпись. Подробные правила в него не помещаются. Инструкции агента хранятся
+текстовыми файлами в его рабочей папке (WORKSPACE). У каждого агента своя рабочая папка и своя память.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Файл</th>
+<th>Что в нём</th>
+<th>Нужно ли править</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AGENTS.md</td>
+<td>рабочие правила агента – что он делает и как</td>
+<td>да: сюда пишем задачу и правила</td>
+</tr>
+<tr>
+<td>SOUL.md</td>
+<td>характер: тон, манера, границы</td>
+<td>по желанию</td>
+</tr>
+<tr>
+<td>USER.md</td>
+<td>сведения о пользователе и его пожелания</td>
+<td>да: дописать подпись</td>
+</tr>
+<tr>
+<td>IDENTITY.md</td>
+<td>имя и краткое описание агента; в AutoClaw заполняется из формы</td>
+<td>нет</td>
+</tr>
+<tr>
+<td>TOOLS.md</td>
+<td>заметки об инструментах и окружении</td>
+<td>для писем не нужен</td>
+</tr>
+<tr>
+<td>HEARTBEAT.md</td>
+<td>служебный файл для периодических проверок</td>
+<td>не трогать</td>
+</tr>
+</tbody>
+</table></div>
+<p>Назначение AGENTS.md, SOUL.md и USER.md взято из документации OpenClaw
+(<a href="https://docs.openclaw.ai/concepts/agent-workspace">рабочая папка агента</a>,
+<a href="https://docs.openclaw.ai/concepts/system-prompt">что получает модель</a>). Остальное видно по тексту самих файлов в
+папке агента. Модель получает эти файлы в начале каждого разговора. У файлов есть пределы длины (для USER.md –
+4 000 знаков), правила из раздела 4 и подпись намного короче.</p>
+<p>Почему правила задачи – в AGENTS.md, а не в SOUL.md. Документация OpenClaw советует держать рабочие правила в
+AGENTS.md, а в SOUL.md – тон и манеру. Кроме того, агент-помощник, по той же документации, получает только AGENTS.md:
+правила, записанные там, сработают и тогда, когда агента позовут на помощь.</p>
+<h2>4. Пишем правила: агент «Деловой ответ»</h2>
+<ol>
+<li>Откройте рабочую папку агента: скопируйте путь из поля WORKSPACE формы агента, вставьте его в адресную строку
+   Проводника и нажмите Enter.</li>
+<li>Откройте файл AGENTS.md в Блокноте: правой кнопкой мыши &gt; «Открыть с помощью» &gt; «Блокнот».</li>
+<li>Вставьте весь текст из рамки ниже (от «## Моя задача» до «С уважением, Иван Петров») сразу после первой строки
+   файла, которая начинается со знака #.</li>
+<li>Сохраните файл: Ctrl+S.</li>
+</ol>
+<p>Остальной текст файла не удаляйте: там общие правила осторожности – например, что о действиях вовне, которых вы не
+просили, агент сначала спрашивает вас.</p>
+<pre><code>## Моя задача: деловой ответ на сообщение
+
+Ты получаешь сообщение (письмо, сообщение в мессенджере), на которое нужно ответить, и иногда - пожелания к ответу.
+Пиши готовый ответ от имени пользователя.
+
+Правила:
+- Язык - русский, обращение на «Вы», тон вежливый и деловой, без канцелярита и шаблонных фраз
+  («важно отметить», «надеюсь, это поможет», «буду рад ответить на вопросы»).
+- Сначала суть, потом подробности. Коротко: обычно 3-8 предложений.
+- Ответь на каждый вопрос из сообщения. Если для ответа не хватает сведений - не выдумывай,
+  поставь в тексте пометку [уточнить: …].
+- Не обещай сроков, сумм и решений, которых нет в пожеланиях.
+- Если в пожеланиях сказано «пока не обещать» (темы, длительность, условия), не ставь пометку, а спроси автора
+  письма о том, что поможет подготовить предложение: уровень и задачи группы, ожидаемый результат.
+- Не ссылайся на то, чего нет в сообщении: «указанные даты», «как мы договорились» - только если это там есть.
+- Не придумывай обещаний и причин сверх пожеланий («вернусь после уточнения…»). Где сведений нет у тебя, но они
+  есть у автора письма, - задай ему встречный вопрос.
+- Пометка [уточнить: …] - только для сведений, которые знает пользователь, а не автор письма. Одно и то же место не
+  закрывай одновременно обещанием и пометкой.
+- Вместо тире ставь дефис с пробелами: &quot; - &quot;. Длинное тире не используй. Кавычки - «ёлочки».
+- В конце ответа - подпись отдельной строкой: С уважением, Иван Петров
+- Выдай только текст ответа, без пояснений до и после. Если пожелания противоречат сообщению -
+  одной строкой перед ответом спроси, как поступить.
+
+Пример.
+Сообщение: «Добрый день! Сможете ли провести лекцию 3 декабря? И пришлите, пожалуйста, тему.»
+Пожелания: 3 декабря могу, тему пока не выбрал.
+Ответ: «Добрый день! 3 декабря провести лекцию смогу. Чтобы предложить тему, подскажите, пожалуйста,
+кто будет на лекции и что для слушателей сейчас важнее всего.
+С уважением, Иван Петров»
+</code></pre>
+<p>Замените «Иван Петров» на своё имя в обоих местах: в правиле о подписи и в примере ответа.</p>
+<p>Ту же подпись запишите в USER.md – он лежит в той же папке. Допишите строку в раздел <code>## Context</code>, а если такого
+раздела нет – в конец файла, и сохраните:</p>
+<pre><code>- Подпись в деловых письмах: «С уважением, Иван Петров» - отдельной строкой в конце ответа.
+</code></pre>
+<p>Из чего состоят хорошие правила:</p>
+<ul>
+<li>Роль и вход: кто агент и что он получает («ты получаешь сообщение и пожелания»).</li>
+<li>Конкретные запреты: вместо «пиши профессионально» – «без фраз "важно отметить", "надеюсь, это поможет"».
+  Документация OpenClaw приводит фразу «maintain professionalism at all times» как пример слабого правила: она ничего
+  не меняет в ответах (<a href="https://docs.openclaw.ai/concepts/soul">SOUL.md</a>).</li>
+<li>Что делать, когда не знаешь: пометка [уточнить: …] или встречный вопрос вместо выдумки.</li>
+<li>Пример: один короткий пример «сообщение – пожелания – ответ» объясняет модели больше, чем абзац описаний.</li>
+<li>Формат выдачи: «только текст ответа, без пояснений», иначе модель часто добавляет «Вот ваш ответ:».</li>
+</ul>
+<h2>5. Проверяем на письме</h2>
+<p>Правки модели, правил и рабочей папки действуют только с новых задач, поэтому после каждой правки сохраните файл и
+начинайте <strong>новый</strong> разговор: кнопка <strong>New Chat</strong> на карточке агента. Так советует документация AutoClaw
+(<a href="https://autoclaw.zhipuai.cn/docs/advanced/agents/">агенты</a>).</p>
+<p>Вставьте в поле ввода одним сообщением сначала письмо, а под ним строку пожеланий, и отправьте:</p>
+<pre><code>Добрый день!
+
+Меня зовут Анна, я координатор программы повышения квалификации в учебном центре.
+Мы хотим пригласить Вас провести занятие по безопасной разработке для группы
+разработчиков (около 20 человек) в декабре.
+
+Подскажите, пожалуйста:
+1. Какие даты в декабре Вам удобны?
+2. Можете ли провести занятие очно или только онлайн?
+3. Сколько длится занятие и какие темы Вы бы предложили?
+4. Какие документы нужны для оформления договора?
+
+Будем благодарны за ответ до конца недели.
+
+С уважением,
+Анна Сергеевна
+
+Пожелания: удобно 10 или 17 декабря, лучше онлайн; длительность и темы пока не обещать.
+</code></pre>
+<p>Что проверить в ответе:</p>
+<ul>
+<li>обращение на «Вы», коротко, без шаблонных фраз;</li>
+<li>ответ на все четыре вопроса: даты и формат – из пожеланий;</li>
+<li>длительность и темы не придуманы – вместо них вопрос об уровне и задачах группы;</li>
+<li>про документы – либо пометка [уточнить: …], если документы готовите вы, либо встречный вопрос Анне, какие
+  документы центр запрашивает; оба варианта верные, выдуманный перечень – нет;</li>
+<li>в конце подпись, никаких пояснений вокруг текста.</li>
+</ul>
+<p>Пометки [уточнить: …] вы заполняете сами перед отправкой. Агент готовит черновик, отправляет письмо человек.</p>
+<h2>6. Доводим агента: три круга</h2>
+<p>В нашем примере понадобилось три круга проверки: после первых двух правила дописывали, третий прошёл без замечаний.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Круг</th>
+<th>Что было не так в ответе</th>
+<th>Какое правило добавили</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>«Из указанных дат мне удобны…» – Анна дат не указывала; «вернусь с предложением после уточнения программы» – обещание придумано; про документы одновременно «пришлю» и [уточнить]</td>
+<td>не ссылаться на то, чего нет в письме; не придумывать обещаний; пометка – только для того, что знает пользователь, и не вместе с обещанием</td>
+</tr>
+<tr>
+<td>2</td>
+<td>длинное тире вместо дефиса; на «пока не обещать» – пометки вместо вопроса</td>
+<td>правило о тире переписано, и в самом тексте правил длинные тире заменены дефисами; при «пока не обещать» – вопрос автору письма</td>
+</tr>
+<tr>
+<td>3</td>
+<td>замечаний по правилам нет</td>
+<td>–</td>
+</tr>
+</tbody>
+</table></div>
+<p>Второй круг показал: модель берёт пример не только с того, что написано в правилах, но и с того, как они написаны.
+Само правило о тире было набрано длинным тире, и агент ставил длинное.</p>
+<p>Порядок работы:</p>
+<ol>
+<li>Дайте агенту настоящее письмо в новом разговоре.</li>
+<li>Выпишите, что в ответе не так.</li>
+<li>Для каждой ошибки добавьте в правила одну конкретную строку и сохраните файл.</li>
+<li>Начните новый разговор (New Chat), вставьте то же письмо с пожеланиями и сравните новый ответ с прежним.</li>
+</ol>
+<h2>7. Что ещё полезно знать</h2>
+<ul>
+<li><strong>Hermes Evolution Board</strong> (Settings &gt; Hermes Evolution Board). AutoClaw предлагает изменения в память, правила,
+  навыки и настройки инструментов агентов. Каждое предложение нужно одобрить или отклонить; одобренное записывается в
+  файлы агента и действует во всех следующих разговорах. Читайте такие предложения внимательно: они могут изменить
+  ваши правила (<a href="https://autoclaw.zhipuai.cn/docs/advanced/hermes/">документация: Hermes</a>).</li>
+<li><strong>Совместная работа агентов.</strong> С версии 2.1.0 AutoClaw сам выбирает подходящих агентов под задачу
+  (<a href="https://autoclaw.zhipuai.cn/blog/news/Weekly-Perks-M10W3/">новости версии 2.1.0</a>). Для больших задач есть режим
+  нескольких агентов: сначала строится план по шагам, а если задачу можно разделить, несколько ролей работают
+  одновременно; их число система подбирает по сложности задачи
+  (<a href="https://autoclaw.zhipuai.cn/docs/advanced/cluster-mode/">документация: кластерный режим</a>). Как выбирается
+  конкретный агент-помощник, разработчик не описывает.</li>
+<li><strong>Доступ к файлам.</strong> В Settings &gt; Workspace задаётся папка проектов по умолчанию и есть ограничение области доступа
+  к файлам. Документация советует его включить: тогда агент читает и пишет файлы преимущественно внутри рабочей папки
+  (<a href="https://autoclaw.zhipuai.cn/docs/advanced/workspace/">документация: рабочая папка</a>).</li>
+<li><strong>Удаление агента.</strong> Если у агента накопились важные правила, память или результаты, перед удалением скопируйте его
+  рабочую папку (<a href="https://autoclaw.zhipuai.cn/docs/advanced/agents/">документация: агенты</a>).</li>
+<li><strong>Резервная копия правил.</strong> Перед крупной правкой AGENTS.md сохраните копию файла рядом – так проще вернуться.</li>
+</ul>
+<h2>Источники</h2>
+<p>Документация и материалы разработчика AutoClaw (на китайском языке):</p>
+<ul>
+<li>Документация AutoClaw: https://autoclaw.zhipuai.cn/docs/</li>
+<li>Что такое AutoClaw: https://autoclaw.zhipuai.cn/docs/getting-started/what-is-autoclaw/</li>
+<li>Агенты: https://autoclaw.zhipuai.cn/docs/advanced/agents/</li>
+<li>Рабочая папка: https://autoclaw.zhipuai.cn/docs/advanced/workspace/</li>
+<li>Модели: https://autoclaw.zhipuai.cn/docs/advanced/models/</li>
+<li>Кластерный режим: https://autoclaw.zhipuai.cn/docs/advanced/cluster-mode/</li>
+<li>Hermes Evolution Board: https://autoclaw.zhipuai.cn/docs/advanced/hermes/</li>
+<li>Новости версии 2.1.0: https://autoclaw.zhipuai.cn/blog/news/Weekly-Perks-M10W3/</li>
+<li>Журнал версий: https://autoclaw.zhipuai.cn/changelog/</li>
+</ul>
+<p>Документация OpenClaw – платформы, на которой построен AutoClaw (на английском языке):</p>
+<ul>
+<li>Рабочая папка агента: https://docs.openclaw.ai/concepts/agent-workspace</li>
+<li>Что получает модель: https://docs.openclaw.ai/concepts/system-prompt</li>
+<li>Файл SOUL.md и как писать правила: https://docs.openclaw.ai/concepts/soul</li>
+<li>Шаблон AGENTS.md: https://docs.openclaw.ai/reference/templates/AGENTS</li>
+<li>Несколько агентов: https://docs.openclaw.ai/concepts/multi-agent</li>
+</ul>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

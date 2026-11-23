@@ -1,0 +1,359 @@
+<!-- Лекция 5.1, строки 684–779 (38:50–45:00): чего шлюз не делает (Agyemang и соавт. 2026; Zhan и соавт. 2025; отделение управления от данных; Beurer-Kellner и соавт. 2025), направления развития (самостоятельность агентов, модели в производстве по обзорам Mustapha и Sorour, Sahbel, внутренние решения, К. Овчинников), отдельные пилоты, итог лекции и вся лекция в одной фразе -->
+
+<section class="slide" data-at="684">
+  <p class="kick t-red">Шлюз безопасности</p>
+  <h2>Чего шлюз не&nbsp;делает</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:34px 40px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-search-check"/></svg>Найти легко</h3>
+        <ul style="font-size:36px;gap:18px"><li>Фамилию</li><li>Номер телефона</li><li>Ключ</li></ul>
+      </div>
+      <div class="col t-red" style="padding:34px 40px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-file-search"/></svg>Найти трудно</h3>
+        <p style="font-size:40px;font-weight:700;line-height:1.18">Технический смысл документа</p>
+        <div class="docs" style="justify-content:flex-start;gap:20px;margin-top:6px">
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i class="s"></i><i class="r"></i><i></i></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i class="s"></i><i></i><i></i><i class="r"></i></div>
+          <div class="doc" style="width:118px;padding:16px 14px 20px;gap:9px"><i></i><i class="r"></i><i class="s"></i><i></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="687" data-steps="689">
+  <p class="kick">Сравнение приёмов защиты запросов</p>
+  <h2>Ни один приём не&nbsp;лучше остальных во&nbsp;всём</h2>
+  <div class="body" style="gap:30px">
+    <p class="sub" style="color:var(--ink);font-weight:700">Лучшее сочетание мер</p>
+    <ol class="flow nonum">
+      <li class="step t-teal st" data-s="1" style="padding:30px 30px 34px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-server"/></svg></span><h3 style="font-size:36px">Обрабатывать локально</h3><p style="font-size:28px">где можно</p></li>
+      <li class="step t-orange st" data-s="1" style="padding:30px 30px 34px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-eye-off"/></svg></span><h3 style="font-size:36px">Маскировать</h3><p style="font-size:28px">остальное</p></li>
+      <li class="step t-orange st" data-s="1" style="padding:30px 30px 34px;gap:14px"><span class="bdg lg"><svg class="i"><use href="#i-pen-line"/></svg></span><h3 style="font-size:36px">Перефразировать</h3><p style="font-size:28px">остальное</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Agyemang J. O., Kponyo J. J., et al. LLM-Redactor, 2026, препринт arXiv · doi.org/10.48550/arXiv.2604.12064</p>
+</section>
+
+<section class="slide" data-at="692" data-steps="695">
+  <p class="kick t-red">Agyemang и соавт., 2026 · препринт</p>
+  <h2>Утечка при лучшем сочетании мер</h2>
+  <div class="body" style="gap:34px">
+    <p class="note" style="font-size:29px">Доля размеченных фрагментов, ушедших в&nbsp;облако целиком или частично</p>
+    <div class="bars" style="--max:40;--lbw:340px;gap:30px">
+      <div class="bar t-teal" style="font-size:31px;--v:0.6"><span class="lb">Персональные данные</span><i style="height:62px"></i><b style="font-size:44px">0,6 %</b></div>
+      <div class="bar t-red" style="font-size:31px;--v:31.3"><span class="lb">Служебный программный код</span><i style="height:62px"></i><b style="font-size:44px">31,3 %</b></div>
+    </div>
+    <div class="rule t-teal sm st" style="padding:22px 32px"><svg class="i"><use href="#i-user-round-check"/></svg><div><p style="text-wrap:balance">500 примеров с&nbsp;персональными данными: ни один такой фрагмент не&nbsp;ушёл целиком</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Agyemang J. O., Kponyo J. J., et al. LLM-Redactor, 2026, препринт arXiv · doi.org/10.48550/arXiv.2604.12064</p>
+</section>
+
+<section class="slide" data-at="697" data-steps="699">
+  <p class="kick t-orange">Для инженера</p>
+  <h2>Шлюз помогает с&nbsp;фамилией, но&nbsp;не&nbsp;с&nbsp;чертежом</h2>
+  <div class="body" style="gap:30px">
+    <div style="display:grid;grid-template-columns:1fr 1.45fr;gap:30px;align-items:stretch">
+      <div class="card t-teal" style="padding:30px 34px;gap:18px;justify-content:center"><span class="bdg lg"><svg class="i"><use href="#i-user-round"/></svg></span><h3 style="font-size:34px">Помогает</h3><p style="font-size:29px">если в&nbsp;запросе случайно оказалась фамилия</p></div>
+      <div class="card t-red" style="padding:30px 34px;gap:24px"><h3 style="font-size:34px">Не&nbsp;превращает в&nbsp;открытый документ</h3>
+        <div class="docs" style="gap:26px;justify-content:flex-start">
+          <div class="doc t-red" style="width:170px;padding:18px 18px 26px"><h4 style="font-size:23px">Чертёж</h4><i></i><i class="s"></i><i class="r"></i><b class="stamp">служебный</b></div>
+          <div class="doc t-red" style="width:170px;padding:18px 18px 26px"><h4 style="font-size:23px">Протокол испытаний</h4><i></i><i class="s"></i><b class="stamp">служебный</b></div>
+          <div class="doc t-red" style="width:170px;padding:18px 18px 26px"><h4 style="font-size:23px">Расчёт</h4><i></i><i class="r"></i><i class="s"></i><b class="stamp">служебный</b></div>
+        </div>
+      </div>
+    </div>
+    <div class="rule t-orange st" style="padding:22px 34px"><svg class="i"><use href="#i-lock"/></svg><div><p style="text-wrap:balance">Обезличивание не&nbsp;даёт права на&nbsp;передачу – правило темы 2.1 в&nbsp;силе</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="702">
+  <p class="kick t-red">Фильтры скрытых команд · Zhan и соавторы, 2025</p>
+  <h2>Подобранные атаки обошли все восемь проверенных защит</h2>
+  <div class="body" style="gap:26px">
+    <div class="t-red" style="display:grid;grid-template-columns:repeat(8,1fr);gap:20px">
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+          <span style="aspect-ratio:1;border-radius:26px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:76px"><use href="#i-shield-x"/></svg></span>
+    </div>
+    <div class="stats"><div class="stat t-red" style="flex-direction:row;align-items:center;gap:30px;padding:26px 40px"><b>8&nbsp;из&nbsp;8</b><span style="font-size:32px">защит от&nbsp;скрытых команд обойдены</span></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Zhan Q., Fang R., et al. Findings of the ACL: NAACL 2025 · doi.org/10.18653/v1/2025.findings-naacl.395</p>
+</section>
+
+<section class="slide" data-at="707" data-title="Фильтр – один из слоёв, а не замена ограниченным правам">
+  <p class="kick t-red">Фильтры скрытых команд</p>
+  <div class="body" style="gap:46px">
+    <p class="say md" style="text-wrap:balance">Фильтр – <b>один из&nbsp;слоёв</b>, а&nbsp;не&nbsp;замена <em>ограниченным правам</em></p>
+    <div class="rule t-teal" style="padding:28px 36px"><svg class="i"><use href="#i-shield-check"/></svg><div><h3>Один из подходов</h3><p style="text-wrap:balance">Защитный слой вокруг модели: недоверенные данные не&nbsp;могут изменить ход выполнения, даже если сама модель поддаётся атаке</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Debenedetti E., Shumailov I., et al. Defeating Prompt Injections by Design. IEEE SaTML, 2026 · doi.org/10.1109/SaTML68715.2026.00040</p>
+</section>
+
+<section class="slide" data-at="711">
+  <p class="kick">Смысл подхода</p>
+  <h2>Отделить управление от&nbsp;данных</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 130px 1fr 130px 1fr;align-items:stretch">
+      <div class="card t-teal" style="align-items:center;justify-content:center;text-align:center;padding:34px 22px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-user-round"/></svg></span><h3 style="font-size:32px">Запрос пользователя</h3></div>
+      <div class="t-teal" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--c)"><svg class="i" style="font-size:64px"><use href="#i-chevrons-right"/></svg><span style="font-size:22px;font-weight:700;text-align:center;line-height:1.1">строит</span></div>
+      <div class="card t-orange" style="align-items:center;justify-content:center;text-align:center;padding:34px 22px;gap:18px;box-shadow:0 0 0 3.8px var(--c),0 12.5px 32.5px var(--shadow)"><span class="bdg lg"><svg class="i"><use href="#i-list-checks"/></svg></span><h3 style="font-size:38px">План действий</h3></div>
+      <div class="t-red" style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--c)"><svg class="i" style="font-size:64px"><use href="#i-ban"/></svg><span style="font-size:22px;font-weight:700;text-align:center;line-height:1.1">не&nbsp;могут<br>изменить</span></div>
+      <div class="card t-red" style="align-items:center;justify-content:center;text-align:center;padding:34px 22px;gap:16px"><span class="bdg lg"><svg class="i"><use href="#i-files"/></svg></span><h3 style="font-size:30px">Документы, которые агент читает по&nbsp;дороге</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="714">
+  <p class="kick">Тем, кто будет проектировать такие системы</p>
+  <h2>Шаблоны архитектуры агентов, устойчивых к&nbsp;скрытым командам</h2>
+  <div class="body">
+    <div class="split s46" style="gap:60px">
+      <div style="align-items:center">
+        <div class="doc t-teal" style="width:330px;padding:28px 28px 40px;gap:13px"><h4 style="font-size:24px">Design Patterns for Securing LLM Agents against Prompt Injections</h4><i></i><i class="s"></i><i class="t"></i><i></i><i class="s"></i><b class="stamp">препринт, 2025</b></div>
+      </div>
+      <dl class="kv" style="--kw:190px">
+        <div><dt>Авторы</dt><dd>Beurer-Kellner L., Creţu A.-M. и&nbsp;соавт.</dd></div>
+        <div><dt>Вид</dt><dd>Препринт arXiv, 2025</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Beurer-Kellner L., Creţu A.-M., et al. 2025, препринт arXiv · doi.org/10.48550/arXiv.2506.08837</p>
+</section>
+
+<section class="slide dark" data-at="717" data-title="Шлюз – полезный слой защиты">
+  <p class="kick t-orange">Итак</p>
+  <div class="body" style="gap:44px">
+    <p class="say">Шлюз – <b>полезный слой</b> защиты</p>
+    <div>
+      <p class="sub" style="margin-bottom:22px">Остаются в&nbsp;силе:</p>
+      <div class="picts c3" style="gap:26px">
+        <div class="pict t-orange" style="flex-direction:row;text-align:left;gap:22px;font-size:31px;background:var(--surface)"><svg class="i" style="width:96px;height:96px;padding:20px;font-size:56px"><use href="#i-key-round"/></svg><b style="font-size:31px">Ограниченные права агента</b></div>
+        <div class="pict t-orange" style="flex-direction:row;text-align:left;gap:22px;font-size:31px;background:var(--surface)"><svg class="i" style="width:96px;height:96px;padding:20px;font-size:56px"><use href="#i-building-2"/></svg><b style="font-size:31px">Правила организации</b></div>
+        <div class="pict t-orange" style="flex-direction:row;text-align:left;gap:22px;font-size:31px;background:var(--surface)"><svg class="i" style="width:96px;height:96px;padding:20px;font-size:56px"><use href="#i-search-check"/></svg><b style="font-size:31px">Проверка результата</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide sect" data-at="722" data-title="Направления развития">
+  <span class="no"><svg class="i"><use href="#i-trending-up"/></svg></span>
+  <p class="kick">Последний раздел</p>
+  <h1>Направления развития</h1>
+  <p class="lead">Коротко</p>
+  <div style="display:grid;grid-template-columns:repeat(2,max-content);gap:16px 18px;margin-top:40px">
+    <span class="tag" style="font-size:30px;padding:9px 26px">Агенты самостоятельнее</span>
+    <span class="tag" style="font-size:30px;padding:9px 26px">Модели в&nbsp;производстве</span>
+    <span class="tag" style="font-size:30px;padding:9px 26px">Внутренние решения</span>
+    <span class="tag" style="font-size:30px;padding:9px 26px">Перестройка процессов</span>
+  </div>
+</section>
+
+<section class="slide" data-at="724">
+  <p class="kick">Агенты становятся самостоятельнее</p>
+  <h2>Агент для&nbsp;программистов за&nbsp;полгода 2025&nbsp;года</h2>
+  <div class="body" style="gap:30px">
+    <div class="cards">
+      <div class="card t-teal row" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-repeat"/></svg></span><div><h3 style="font-size:32px;white-space:nowrap">Больше действий подряд</h3><p style="font-size:28px">без участия человека</p></div></div>
+      <div class="card t-orange row" style="padding:30px 32px"><span class="bdg lg"><svg class="i"><use href="#i-hand"/></svg></span><div><h3 style="font-size:32px;white-space:nowrap">Люди реже вмешиваются</h3><p style="font-size:28px">в&nbsp;работу агента</p></div></div>
+    </div>
+    <div class="rule t-gray sm" style="padding:22px 32px"><svg class="i"><use href="#i-info"/></svg><div><p>Внутренний отчёт разработчика моделей: данные компании о&nbsp;своих сотрудниках. Направление видно и&nbsp;по&nbsp;другим источникам</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Anthropic. How AI is transforming work at Anthropic, 02.12.2025 (отчёт по опросу своих сотрудников)</p>
+</section>
+
+<section class="slide" data-at="729" data-steps="731,733">
+  <p class="kick">Модели приходят в&nbsp;производство</p>
+  <h2>Что описывают обзоры 2025–2026&nbsp;годов</h2>
+  <div class="body" style="gap:26px">
+    <div class="picts c4 sm" style="gap:20px">
+      <div class="pict st" data-s="1" style="font-size:25px;gap:14px"><svg class="i"><use href="#i-book-open-text"/></svg><span>Помощники по&nbsp;документации цеха</span></div>
+      <div class="pict st" data-s="1" style="font-size:25px;gap:14px"><svg class="i"><use href="#i-activity"/></svg><span>Диагностика отказов</span></div>
+      <div class="pict st" data-s="1" style="font-size:25px;gap:14px"><svg class="i"><use href="#i-workflow"/></svg><span>Планирование технологических процессов</span></div>
+      <div class="pict st" data-s="1" style="font-size:25px;gap:14px"><svg class="i"><use href="#i-boxes"/></svg><span>Связь с&nbsp;цифровыми двойниками</span></div>
+    </div>
+    <div class="rule t-red sm st" data-s="2" style="padding:20px 32px"><svg class="i"><use href="#i-triangle-alert"/></svg><div><h3>Оговорка обзоров</h3><p>Модели общего назначения хуже справляются с&nbsp;машиностроительными задачами: учились не&nbsp;на&nbsp;них</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Mustapha K. Advanced Engineering Informatics, 2025 · doi.org/10.1016/j.aei.2024.103066; Sorour S., Sahbel A. Journal of Intelligent Manufacturing, 2026 · doi.org/10.1007/s10845-026-02927-y</p>
+</section>
+
+<section class="slide" data-at="735">
+  <p class="kick">Растут и&nbsp;внутренние решения</p>
+  <h2>Открытые модели и&nbsp;недорогое оборудование</h2>
+  <div class="body" style="gap:34px">
+    <ul class="list big" style="gap:26px">
+      <li>В&nbsp;заводском исследовании открытые модели отставали от&nbsp;лучшей закрытой <b class="c">ненамного</b></li>
+      <li>Запустить модель можно и&nbsp;на&nbsp;<b class="c">недорогом оборудовании</b></li>
+    </ul>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-lock"/></svg><div><p>Для организаций с&nbsp;закрытыми данными это главный путь</p></div></div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Kernan Freire S., Wang C.-F., et al. Frontiers in AI, 2024 · doi.org/10.3389/frai.2024.1293084; Curington I., Lano K. Frontiers in Computer Science, 2026 · doi.org/10.3389/fcomp.2026.1911927</p>
+</section>
+
+<section class="slide" data-at="740" data-title="Процессы придётся перестраивать – К. Овчинников">
+  <p class="kick t-orange">Процессы придётся перестраивать</p>
+  <div class="body" style="gap:34px">
+    <figure class="quote md t-orange">
+      <blockquote>Добавление AI в&nbsp;старый процесс создаёт AI-assisted команду. <b>Чтобы появилась AI-native команда, её нужно перепроектировать</b></blockquote>
+      <figcaption><i class="ava">КО</i><span><b>К. Овчинников</b>доклад «Инженер после AI», ИИ-митап ЦГУ · позиция докладчика</span></figcaption>
+    </figure>
+    <div class="cards" style="gap:24px;margin-left:54px">
+      <div class="card t-gray" style="padding:20px 26px;gap:6px"><h3 style="font-size:28px">AI-assisted</h3><p style="font-size:25px;text-wrap:balance">пользуется ИИ внутри прежнего порядка работы</p></div>
+      <div class="card t-orange" style="padding:20px 26px;gap:6px"><h3 style="font-size:28px">AI-native</h3><p style="font-size:25px">изначально построена с&nbsp;ИИ</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="748" data-title="Практический вывод: ИИ в старом порядке работы даёт меньше, чем обещает">
+  <p class="kick t-orange">Практический вывод для&nbsp;инженерной задачи</p>
+  <div class="body">
+    <div class="split s73">
+      <p class="say md" style="line-height:1.16">ИИ, вставленный в&nbsp;старый порядок работы <em>без&nbsp;проверок</em> и&nbsp;<em>без&nbsp;описания задачи</em>, даёт <b>меньше, чем обещает</b></p>
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:220px"><use href="#i-trending-down"/></svg></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="752">
+  <p class="kick t-orange">Отдельные пилоты</p>
+  <h2>Задачи участников курса за&nbsp;рамками чата</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:1fr 110px 1fr;align-items:center">
+      <div class="card t-gray" style="align-items:center;text-align:center;padding:40px 30px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-box"/></svg></span><h3 style="font-size:36px">Проверка 3D-моделей и&nbsp;чертежей по&nbsp;геометрии и&nbsp;размерам</h3></div>
+      <svg class="i" style="font-size:66px;color:var(--muted);justify-self:center"><use href="#i-chevrons-right"/></svg>
+      <div class="card t-orange" style="align-items:center;text-align:center;padding:40px 30px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-drafting-compass"/></svg></span><h3 style="font-size:36px">Работа САПР и&nbsp;специализированных инструментов</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="756">
+  <p class="kick">Скан чертежа</p>
+  <h2>Модель прочитает, но&nbsp;ошибается</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:32px 40px;gap:20px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-scan-text"/></svg>Прочитает</h3>
+        <ul style="font-size:35px;gap:16px"><li>Штамп</li><li>Технические требования</li><li>Обозначения</li></ul>
+      </div>
+      <div class="col t-red" style="padding:32px 40px;gap:20px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-triangle-alert"/></svg>Ошибается</h3>
+        <ul style="font-size:35px;gap:16px"><li>В&nbsp;обозначениях</li><li>В&nbsp;номерах</li><li>В&nbsp;знаках</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="758">
+  <p class="kick t-orange">Отдельные пилоты</p>
+  <h2>Агент, подключённый к&nbsp;системам организации</h2>
+  <div class="body">
+    <div class="split s46" style="grid-template-columns:300px 1fr;gap:56px">
+      <div class="center t-orange"><span style="width:260px;height:260px;border-radius:64px;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:150px"><use href="#i-plug-zap"/></svg></span></div>
+      <ul class="list check big" style="gap:30px">
+        <li>Тоже отдельный пилот</li>
+        <li>Запуск согласуют в&nbsp;порядке, принятом в&nbsp;организации</li>
+        <li>На&nbsp;курсе учимся ставить такие задачи и&nbsp;проверять результат</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="764">
+  <p class="kick">Подведём итог</p>
+  <h2>Сильные зарубежные модели</h2>
+  <div class="body" style="gap:30px">
+    <div class="cards c3" style="gap:26px">
+      <div class="card t-gray" style="align-items:center;text-align:center;padding:30px 22px;gap:14px"><h3 style="font-size:40px">OpenAI</h3><p class="muted" style="font-size:25px">России нет в&nbsp;списке стран</p></div>
+      <div class="card t-gray" style="align-items:center;text-align:center;padding:30px 22px;gap:14px"><h3 style="font-size:40px">Google</h3><p class="muted" style="font-size:25px">России нет в&nbsp;списке стран</p></div>
+      <div class="card t-gray" style="align-items:center;text-align:center;padding:30px 22px;gap:14px"><h3 style="font-size:40px">Anthropic</h3><p class="muted" style="font-size:25px">России нет в&nbsp;списке стран</p></div>
+    </div>
+    <div class="rule t-red" style="padding:24px 36px"><svg class="i"><use href="#i-lock"/></svg><div><p style="font-size:38px">Данные организации в&nbsp;такие сервисы не&nbsp;отправляются</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="767">
+  <p class="kick">Подведём итог</p>
+  <h2>Что бывает внутри организаций</h2>
+  <div class="body" style="gap:30px">
+    <div class="picts" style="grid-template-columns:repeat(5,1fr);gap:14px">
+      <div class="pict t-teal" style="font-size:24px"><svg class="i" style="width:110px;height:110px;font-size:60px"><use href="#i-messages-square"/></svg><span>Внутренний чат на&nbsp;локальных моделях</span></div>
+      <div class="pict t-teal" style="font-size:24px"><svg class="i" style="width:110px;height:110px;font-size:60px"><use href="#i-files"/></svg><span>Помощник по&nbsp;документам</span></div>
+      <div class="pict t-teal" style="font-size:24px"><svg class="i" style="width:110px;height:110px;font-size:60px"><use href="#i-blocks"/></svg><span>Конструктор агентов</span></div>
+      <div class="pict t-teal" style="font-size:24px"><svg class="i" style="width:110px;height:110px;font-size:60px"><use href="#i-plug"/></svg><span>Подключаемые инструменты</span></div>
+      <div class="pict t-teal" style="font-size:24px"><svg class="i" style="width:110px;height:110px;font-size:60px"><use href="#i-code-xml"/></svg><span>Инфраструктура для&nbsp;программистов</span></div>
+    </div>
+    <div class="rule t-orange" style="padding:22px 34px"><svg class="i"><use href="#i-circle-help"/></svg><div><p>Что есть у&nbsp;вас – уточните</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="770">
+  <p class="kick">Подведём итог</p>
+  <h2>Результат зависит от&nbsp;харнеса не&nbsp;меньше, чем от&nbsp;модели</h2>
+  <div class="body">
+    <div style="display:grid;grid-template-columns:270px 90px 1fr;align-items:center">
+      <div class="card t-teal" style="align-items:center;text-align:center;padding:40px 20px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:40px">Модель</h3></div>
+      <svg class="i" style="font-size:56px;color:var(--muted);justify-self:center"><use href="#i-plus"/></svg>
+      <div class="card t-orange" style="padding:28px 32px;gap:20px"><h3 style="font-size:36px">Харнес</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:14px">
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Инструкция</span>
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Данные</span>
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Инструменты</span>
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Проверки</span>
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Журнал</span>
+          <span class="tag" style="font-size:27px;padding:10px 14px;text-align:center;display:flex;align-items:center;justify-content:center;white-space:nowrap">Решение человека</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="772">
+  <p class="kick">Подведём итог</p>
+  <h2>Кто что делает</h2>
+  <div class="body">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="padding:40px 34px 48px;gap:18px"><span class="bdg lg" style="transform:scale(1.15);transform-origin:left center"><svg class="i"><use href="#i-bot"/></svg></span><h3 style="font-size:46px">Модель</h3><p style="font-size:34px;color:var(--ink)">предлагает</p></li>
+      <li class="step t-gray" style="padding:40px 34px 48px;gap:18px"><span class="bdg lg" style="transform:scale(1.15);transform-origin:left center"><svg class="i"><use href="#i-cpu"/></svg></span><h3 style="font-size:46px">Программа</h3><p style="font-size:34px;color:var(--ink)">проверяет права и&nbsp;точные значения</p></li>
+      <li class="step t-orange" style="padding:40px 34px 48px;gap:18px"><span class="bdg lg" style="transform:scale(1.15);transform-origin:left center"><svg class="i"><use href="#i-user-round-check"/></svg></span><h3 style="font-size:46px">Человек</h3><p style="font-size:34px;color:var(--ink)">подтверждает необратимое</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="774">
+  <p class="kick">Подведём итог</p>
+  <h2>Шлюз безопасности</h2>
+  <div class="body">
+    <div class="vs">
+      <div class="col t-teal" style="padding:38px 44px;gap:24px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-eye-off"/></svg>Убирает и&nbsp;возвращает</h3>
+        <ul style="font-size:40px;gap:18px"><li>Фамилии</li><li>Номера</li></ul>
+        <div style="display:flex;gap:14px;margin-top:8px"><span class="tag" style="font-size:24px">замена на&nbsp;метки</span><span class="tag" style="font-size:24px">метки обратно</span></div>
+      </div>
+      <div class="col t-red" style="padding:38px 44px;gap:24px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-file-lock"/></svg>Не&nbsp;делает открытым</h3>
+        <ul style="font-size:40px;gap:18px"><li>Служебный документ</li></ul>
+        <div class="doc t-red" style="width:220px;padding:20px 20px 30px;margin-top:6px"><i></i><i class="s"></i><i class="r"></i><i></i><b class="stamp">служебный</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="777" data-title="Результат определяет не только модель, но и всё, что стоит вокруг неё">
+  <p class="kick t-orange">Вся лекция в&nbsp;одной фразе</p>
+  <div class="body">
+    <div class="split s73" style="gap:40px">
+      <p class="say" style="font-size:76px;line-height:1.1">Результат определяет не&nbsp;только <b>модель</b>, но&nbsp;и&nbsp;<em>всё, что стоит вокруг&nbsp;неё</em></p>
+      <div class="center" style="justify-content:center">
+        <span class="t-orange" style="width:330px;height:330px;border-radius:50%;border:10px dashed var(--c);display:flex;align-items:center;justify-content:center">
+          <span class="t-teal" style="width:170px;height:170px;border-radius:50%;background:var(--ct);color:var(--c);display:flex;align-items:center;justify-content:center"><svg class="i" style="font-size:96px"><use href="#i-bot"/></svg></span>
+        </span>
+      </div>
+    </div>
+  </div>
+</section>

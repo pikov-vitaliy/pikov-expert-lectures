@@ -1,0 +1,431 @@
+<!-- Лекция 5.2, строки 269–405 (14:48–23:31): паспорт сценария – девять разделов шаблона 5-2, общие правила данных, схема из четырёх ветвей, четыре правила заполнения, чек-лист Taş и соавт., правило агента П. Гагарина («агенты – конвейер, люди – границы»), два долгосрочных риска по Noessel -->
+
+<section class="slide sect" data-at="269" data-title="Паспорт сценария">
+  <span class="no"><svg class="i"><use href="#i-notebook-tabs"/></svg></span>
+  <p class="kick">Паспорт сценария</p>
+  <h1>Паспорт сценария</h1>
+  <p class="lead">Описание одной задачи, которую вы решаете с&nbsp;ИИ. Нужен, чтобы сценарий можно было</p>
+  <div style="display:flex;gap:20px;margin-top:34px">
+    <span class="tag" style="font-size:34px;padding:10px 30px">повторить</span>
+    <span class="tag" style="font-size:34px;padding:10px 30px">проверить</span>
+    <span class="tag" style="font-size:34px;padding:10px 30px">оценить</span>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="272">
+  <p class="kick">Шаблон паспорта · документ 5-2 дополнения к&nbsp;учебному кейсу</p>
+  <h2>Девять разделов</h2>
+  <div class="body" style="text-wrap:balance">
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px 20px">
+      <div class="card row t-teal" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">1</span><h3 style="font-size:31px">Задача</h3></div>
+      <div class="card row t-teal" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">2</span><h3 style="font-size:31px">Сервис</h3></div>
+      <div class="card row t-orange" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">3</span><h3 style="font-size:31px">Запросы</h3></div>
+      <div class="card row t-red" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">4</span><h3 style="font-size:31px">Данные и&nbsp;их&nbsp;уровень</h3></div>
+      <div class="card row t-red" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">5</span><h3 style="font-size:31px">Меры защиты</h3></div>
+      <div class="card row t-orange" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">6</span><h3 style="font-size:31px">Порядок проверки</h3></div>
+      <div class="card row t-orange" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">7</span><h3 style="font-size:31px">Ограничения</h3></div>
+      <div class="card row t-teal" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">8</span><h3 style="font-size:31px">Ожидаемый эффект</h3></div>
+      <div class="card row t-teal" style="padding:16px 22px;gap:18px"><span class="n" style="font-size:40px">9</span><h3 style="font-size:31px">Что дальше</h3></div>
+    </div>
+    <div class="rule sm t-orange" style="padding:18px 30px"><svg class="i"><use href="#i-users"/></svg><div><p>Заполняйте так, чтобы коллега мог повторить сценарий <b>без&nbsp;вас</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="275">
+  <p class="kick">Паспорт · раздел 1 из 9</p>
+  <h2>Задача</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="picts c4">
+      <div class="pict"><svg class="i"><use href="#i-log-in"/></svg><b>Что на входе</b></div>
+      <div class="pict"><svg class="i"><use href="#i-log-out"/></svg><b>Что на выходе</b></div>
+      <div class="pict"><svg class="i"><use href="#i-user"/></svg><b>Кто выполняет</b></div>
+      <div class="pict"><svg class="i"><use href="#i-calendar-clock"/></svg><b>Как часто</b></div>
+    </div>
+    <div class="cards" style="gap:24px;align-items:stretch">
+      <div class="card row t-teal" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-clipboard-list"/></svg></span><p style="font-size:29px">Карточка задачи уже есть – <b>перенесите её&nbsp;сюда</b></p></div>
+      <div class="card row t-orange" style="padding:22px 26px"><span class="bdg"><svg class="i"><use href="#i-list-todo"/></svg></span><p style="font-size:29px">Карточки нет – выберите задачу из&nbsp;учебного перечня в&nbsp;<b style="white-space:nowrap">документе 5-1</b> и&nbsp;заполните те&nbsp;же поля</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="279" data-steps="279,283">
+  <p class="kick">Раздел 1 · поля карточки задачи</p>
+  <h2>Те же четыре поля</h2>
+  <div class="body" style="text-wrap:balance;gap:22px">
+    <div class="prompt st" data-s="1" style="--tw:290px;font-size:29px;padding:18px 24px;gap:8px">
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Исходные данные</span><span>Документы, сведения и&nbsp;цифры на&nbsp;входе</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Ожидаемый результат</span><span>Что именно и&nbsp;в&nbsp;каком виде на&nbsp;выходе</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Критерии приёмки</span><span>По каким признакам результат принимают</span></p>
+      <p class="part t-red" style="align-items:center"><span class="tg" style="font-size:20px;padding:8px 10px">Ограничения</span><span>Чего делать нельзя, какие сведения нельзя использовать</span></p>
+    </div>
+    <div class="rule sm t-red st" data-s="2" style="padding:16px 30px"><svg class="i"><use href="#i-eye-off"/></svg><div><h3>Задачу описывают общими словами</h3><p>Без названий изделий, заказчиков, поставщиков, внутренних номеров и&nbsp;фамилий</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="285">
+  <p class="kick">Фильтр Субботина · примеры из инженерной работы</p>
+  <h2>Какие задачи подходят</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards" style="gap:18px 24px">
+      <div class="card row t-teal" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-clipboard-list"/></svg></span><h3 style="font-size:31px">Первичный разбор замечаний по&nbsp;испытаниям</h3></div>
+      <div class="card row t-teal" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-table"/></svg></span><h3 style="font-size:31px">Извлечение требований из&nbsp;ТЗ в&nbsp;таблицу</h3></div>
+      <div class="card row t-teal" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-sheet"/></svg></span><h3 style="font-size:31px">Сводка по&nbsp;таблице измерений</h3></div>
+      <div class="card row t-orange" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-file-pen-line"/></svg></span><h3 style="font-size:31px">Черновик служебной записки</h3></div>
+      <div class="card row t-orange" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-folder-check"/></svg></span><h3 style="font-size:31px">Проверка комплектности документации</h3></div>
+      <div class="card row t-orange" style="padding:18px 26px;gap:20px"><span class="bdg"><svg class="i"><use href="#i-message-square-reply"/></svg></span><h3 style="font-size:31px">Ответ на&nbsp;типовой запрос</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="292">
+  <p class="kick">Паспорт · раздел 2 из 9</p>
+  <h2>Сервис: какой и&nbsp;почему именно он</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="vs" style="align-items:stretch">
+      <div class="col t-teal" style="padding:34px 38px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-graduation-cap"/></svg>На учёбе</h3>
+        <p style="font-size:34px">Сервис, в&nbsp;котором вы пробовали сценарий</p>
+      </div>
+      <div class="col t-orange" style="padding:34px 38px;gap:22px">
+        <h3 style="font-size:38px"><svg class="i"><use href="#i-briefcase"/></svg>В работе</h3>
+        <p style="font-size:34px">Сервис или инструмент, который нужен в&nbsp;работе</p>
+      </div>
+    </div>
+    <div class="rule t-gray" style="padding:24px 34px"><svg class="i"><use href="#i-git-compare-arrows"/></svg><div><p>Если они различаются – укажите оба</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="295">
+  <p class="kick">Паспорт · раздел 3 из 9</p>
+  <h2>Запросы: полный текст</h2>
+  <div class="body" style="text-wrap:balance;gap:22px">
+    <div class="rule sm t-red" style="padding:16px 30px"><svg class="i"><use href="#i-x"/></svg><div><h3>Не так</h3><p style="font-size:33px;font-weight:600">«попросить модель разобрать»</p></div></div>
+    <div class="prompt" style="--tw:270px;font-size:31px;padding:20px 28px;gap:12px">
+      <p style="font-size:22px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);padding-left:10px">В запросе · формат – шаблон темы 1.2</p>
+      <p class="part t-gray" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 12px">Исходные данные</span><span class="muted">…</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 12px">Задача</span><span class="muted">…</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:21px;padding:8px 12px">Формат ответа</span><span class="muted">…</span></p>
+    </div>
+    <p class="note" style="font-size:28px;color:var(--ink)">Полный текст шаблона или цепочки запросов по&nbsp;шагам</p>
+  </div>
+</section>
+
+<section class="slide" data-at="300" data-steps="300,302">
+  <p class="kick">Раздел 3 · приём курса целиком</p>
+  <h2>Цепочка запросов</h2>
+  <div class="body" style="text-wrap:balance">
+    <div style="display:grid;grid-template-columns:1fr 130px 1fr 130px 1fr;align-items:center">
+      <div class="card t-teal st" data-s="1" style="padding:24px 26px;gap:10px"><h3 style="font-size:33px">Запрос 1</h3><p style="font-size:27px">Вход · вид ответа</p></div>
+      <div class="t-orange st" data-s="2" style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--c)"><svg class="i" style="font-size:60px"><use href="#i-search-check"/></svg><span style="font-size:24px;font-weight:700">проверка</span></div>
+      <div class="card t-teal st" data-s="1" style="padding:24px 26px;gap:10px"><h3 style="font-size:33px">Запрос 2</h3><p style="font-size:27px">Вход · вид ответа</p></div>
+      <div class="t-orange st" data-s="2" style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--c)"><svg class="i" style="font-size:60px"><use href="#i-search-check"/></svg><span style="font-size:24px;font-weight:700">проверка</span></div>
+      <div class="card t-teal st" data-s="1" style="padding:24px 26px;gap:10px"><h3 style="font-size:33px">Запрос 3</h3><p style="font-size:27px">Вход · вид ответа</p></div>
+    </div>
+    <div class="rule sm t-orange st" data-s="2" style="padding:18px 30px"><svg class="i"><use href="#i-list-checks"/></svg><div><p>Какую часть ответа вы проверите до&nbsp;того, как&nbsp;она&nbsp;пойдёт в&nbsp;следующий&nbsp;запрос</p></div></div>
+    <div class="rule sm t-teal st" data-s="2" style="padding:18px 30px"><svg class="i"><use href="#i-target"/></svg><div><p>Каждый шаг проще проверить, и&nbsp;ошибку видно там, где она появилась</p></div></div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="305" data-title="Шаблоны запросов – в файл">
+  <p class="kick t-orange">Раздел 3 · для повторяющейся работы</p>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46">
+      <div class="center">
+        <div class="doc" style="width:330px;gap:16px;padding:28px 30px 40px">
+          <h4 style="font-size:28px">Шаблоны запросов</h4>
+          <i class="t"></i><i></i><i class="s"></i><i class="t"></i><i></i><i class="s"></i>
+          <b class="stamp t-orange">в файле</b>
+        </div>
+      </div>
+      <div>
+        <p class="say md">Шаблоны запросов сохраните <em>в&nbsp;файл</em></p>
+        <p class="sub">Тогда сценарий повторит и&nbsp;коллега, и&nbsp;вы сами через месяц</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="307">
+  <p class="kick">Паспорт · раздел 4 из 9</p>
+  <h2>Данные и их уровень</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards" style="align-items:stretch">
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-file-text"/></svg></span><h3 style="font-size:32px">Какие документы и&nbsp;сведения используются</h3></div>
+      <div class="card row t-teal" style="padding:24px 28px"><span class="bdg lg"><svg class="i"><use href="#i-route"/></svg></span><h3 style="font-size:32px">Какой у&nbsp;них маршрут по&nbsp;правилам организации</h3></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <p style="font-size:30px">Уровень сведений в&nbsp;организации не&nbsp;установлен? Так и&nbsp;напишите:</p>
+      <div class="prompt" style="--tw:220px;font-size:32px;padding:20px 26px">
+        <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:21px;padding:9px 12px">Уровень</span><span>не установлено, уточнить у&nbsp;такого-то</span></p>
+      </div>
+      <p style="font-size:32px;font-weight:700;color:var(--teal)">Это тоже результат</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="313" data-steps="313,317,321">
+  <p class="kick">Паспорт · разделы 5–7 из 9</p>
+  <h2>Защита, проверка, ограничения</h2>
+  <div class="body" style="text-wrap:balance">
+    <table class="tbl" style="font-size:30px">
+      <thead><tr><th style="width:30%;padding:16px 24px">Раздел</th><th style="padding:16px 24px">Что написать</th></tr></thead>
+      <tbody>
+        <tr class="st t-red"><td style="padding:20px 24px">5. Меры защиты</td><td style="padding:20px 24px">Что заменяется или убирается перед отправкой, что не&nbsp;отправляется никогда, где хранится результат</td></tr>
+        <tr class="st t-orange"><td style="padding:20px 24px">6. Порядок проверки</td><td style="padding:20px 24px">Что проверяется: цифры, пункты, расчёты. Чем: документом, таблицей, измерением. Кто проверяет и&nbsp;сколько это занимает</td></tr>
+        <tr class="st t-gray"><td style="padding:20px 24px">7. Ограничения</td><td style="padding:20px 24px">Где сценарий не&nbsp;работает или работает плохо и&nbsp;чего он не&nbsp;делает ни&nbsp;при каких условиях</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section class="slide" data-at="324">
+  <p class="kick">Паспорт · раздел 8 из 9</p>
+  <h2>Ожидаемый эффект: что записать</h2>
+  <div class="body" style="text-wrap:balance">
+    <dl class="kv" style="--kw:330px">
+      <div style="font-size:31px;padding:16px 18px"><dt>Минуты до и&nbsp;после</dt><dd>На одну и&nbsp;ту же полную операцию; «после» – <b>вместе с&nbsp;проверкой</b></dd></div>
+      <div style="font-size:31px;padding:16px 18px"><dt>Замер или оценка</dt><dd>Что замерено, а&nbsp;что оценено – с&nbsp;пометкой <b>«оценка»</b></dd></div>
+      <div style="font-size:31px;padding:16px 18px"><dt>Объём</dt><dd>Число операций в&nbsp;месяц, число сотрудников</dd></div>
+      <div style="font-size:31px;padding:16px 18px"><dt>Расчёт</dt><dd>В&nbsp;часах и&nbsp;в&nbsp;деньгах</dd></div>
+      <div style="font-size:31px;padding:16px 18px"><dt>Затраты</dt><dd>Разовые и&nbsp;постоянные</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section class="slide" data-at="330">
+  <p class="kick">Раздел 8 · как замеряют время</p>
+  <h2>«До» и «после»</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="vs" style="align-items:stretch">
+      <div class="col t-gray" style="padding:28px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-timer"/></svg>Время «до»</h3>
+        <ul style="font-size:30px"><li>Замеряют два-три раза</li><li>Так, как вы делаете эту работу&nbsp;сейчас</li></ul>
+      </div>
+      <div class="col t-teal" style="padding:28px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-timer"/></svg>Время «после»</h3>
+        <ul style="font-size:30px"><li>По ходу работы на&nbsp;учебных материалах</li><li>Или на&nbsp;материалах, которые правила организации разрешают отправлять в&nbsp;выбранный сервис</li></ul>
+      </div>
+    </div>
+    <div class="rule t-orange" style="padding:20px 34px"><svg class="i"><use href="#i-notebook-pen"/></svg><div><p>В паспорт попадают только минуты, сами материалы – нет</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="334">
+  <p class="kick">Раздел 8 · короткая проба</p>
+  <h2>Полную операцию дважды за&nbsp;короткую пробу не&nbsp;повторить</h2>
+  <div class="body" style="text-wrap:balance">
+    <p style="font-size:31px">Поэтому одну и&nbsp;ту же часть операции пробуют на&nbsp;двух коротких примерах</p>
+    <div class="cards" style="gap:24px">
+      <div class="card row t-teal" style="padding:22px 26px"><span class="bdg lg"><svg class="i"><use href="#i-file-check"/></svg></span><h3 style="font-size:36px">Простой пример</h3></div>
+      <div class="card row t-orange" style="padding:22px 26px"><span class="bdg lg"><svg class="i"><use href="#i-file-search"/></svg></span><h3 style="font-size:36px">Трудный пример</h3></div>
+    </div>
+    <div class="rule t-red" style="padding:22px 32px"><svg class="i"><use href="#i-scale"/></svg><div><p>Время пробы в&nbsp;формулу эффекта напрямую не&nbsp;подставляют: сравнивать можно только <b>одинаковые единицы</b></p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="338">
+  <p class="kick">Раздел 8 · от пробы к&nbsp;замеру</p>
+  <h2>Сначала оценка, потом полный замер</h2>
+  <div class="body" style="text-wrap:balance">
+    <ol class="flow">
+      <li class="step t-gray" style="padding:26px 28px 30px;gap:14px"><h3 style="font-size:33px">Оценка по&nbsp;короткой пробе</h3><p style="font-size:28px;color:var(--ink)">Предварительное время полной операции. Рядом – пометка «оценка»</p></li>
+      <li class="step t-teal" style="padding:26px 28px 30px;gap:14px"><h3 style="font-size:33px">Полный замер</h3><p style="font-size:28px;color:var(--ink)">Полная операция с&nbsp;проверкой на&nbsp;двух-трёх примерах, затем пересчёт эффекта</p></li>
+      <li class="step t-orange" style="padding:26px 28px 30px;gap:14px"><h3 style="font-size:33px">Замер не&nbsp;удался</h3><p style="font-size:28px;color:var(--ink)">Оставьте пометку и&nbsp;объясните причину</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-at="341">
+  <p class="kick">Паспорт · раздел 9 из 9</p>
+  <h2>Что дальше</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="ladder">
+      <div class="rung t-gray" style="min-height:230px;padding:26px 28px;gap:12px"><span class="n" style="font-size:24px">Путь 1</span><h3 style="font-size:36px">Оставить как личный приём</h3></div>
+      <div class="rung t-teal" style="min-height:320px;padding:26px 28px;gap:12px"><span class="n" style="font-size:24px">Путь 2</span><h3 style="font-size:36px">Распространить на&nbsp;службу</h3></div>
+      <div class="rung t-orange" style="min-height:410px;padding:26px 28px;gap:12px"><span class="n" style="font-size:24px">Путь 3</span><h3 style="font-size:36px">Оформить предложение на&nbsp;автоматизацию</h3></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide dark" data-at="345" data-title="Только учебные или придуманные данные">
+  <p class="kick t-orange">Одно правило для всего паспорта</p>
+  <div class="body" style="text-wrap:balance">
+    <div class="split s46">
+      <div class="center t-orange"><svg class="i big-ic" style="font-size:210px"><use href="#i-shield-check"/></svg></div>
+      <div>
+        <p class="say md">Только <em>учебные или придуманные</em> данные</p>
+        <p class="sub">В паспорте и&nbsp;приложениях итоговой работы</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="347">
+  <p class="kick">Разделы о данных и мерах защиты</p>
+  <h2>Маршрут описывают, сведения не&nbsp;вставляют</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="vs" style="grid-template-columns:3fr 2fr;align-items:stretch">
+      <div class="col t-teal" style="padding:28px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-check"/></svg>В паспорт</h3>
+        <ul style="font-size:30px"><li>Маршрут настоящих сведений в&nbsp;работе</li><li>Учебные данные кейса</li><li>Придуманный пример того&nbsp;же вида: те&nbsp;же поля, те&nbsp;же единицы, придуманные значения</li></ul>
+      </div>
+      <div class="col t-red" style="padding:28px 34px;gap:16px">
+        <h3><svg class="i"><use href="#i-x"/></svg>Не в паспорт</h3>
+        <p style="font-size:32px;font-weight:600">Сами настоящие сведения</p>
+        <div class="center" style="flex:1;color:var(--c)"><svg class="i" style="font-size:130px"><use href="#i-file-lock"/></svg></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="351" data-steps="351,353">
+  <p class="kick t-red">Настоящие документы</p>
+  <h2>Даже обезличенные фрагменты не&nbsp;вставляются</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="split st" data-s="1" style="grid-template-columns:470px 1fr;align-items:center">
+      <div class="docs" style="flex-direction:row;flex-wrap:nowrap;gap:34px">
+        <div class="doc" style="width:200px"><h4>Документ</h4><i></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-red">настоящий</b></div>
+        <div class="doc" style="width:200px"><h4>Фрагмент</h4><i class="hl"></i><i class="s"></i><i></i><i class="s"></i><b class="stamp t-red">обезличен</b></div>
+      </div>
+      <p style="font-size:32px;line-height:1.28">Обезличенный фрагмент может содержать <b>служебные сведения</b>, а&nbsp;паспорт будут читать другие люди</p>
+    </div>
+    <div class="rule t-orange st" data-s="2" style="padding:20px 32px"><svg class="i"><use href="#i-ban"/></svg><div><p>Правила разрешают работать с&nbsp;настоящими материалами в&nbsp;сервисе? Это не&nbsp;разрешение передавать их преподавателю и&nbsp;загружать на&nbsp;Платформу</p></div></div>
+  </div>
+</section>
+
+<section class="slide h-sm" data-at="357" data-steps="357,360,363,364">
+  <p class="kick">Схема паспорта</p>
+  <h2>Четыре ветви</h2>
+  <div class="body" style="text-wrap:balance;gap:22px">
+    <div class="tree" style="--n:4">
+      <div class="root" style="font-size:30px">Паспорт сценария · одна задача подразделения</div>
+      <div class="kids" style="align-items:stretch">
+        <div class="kid t-teal st" data-s="1" style="padding:16px 18px;gap:8px"><h3 style="font-size:28px">Что делаем</h3><p style="font-size:24px">Задача</p><p style="font-size:24px">Сервис</p></div>
+        <div class="kid t-red st" data-s="1" style="padding:16px 18px;gap:8px"><h3 style="font-size:28px">С какими данными</h3><p style="font-size:24px">Данные и&nbsp;их уровень</p><p style="font-size:24px">Меры защиты</p></div>
+        <div class="kid t-orange st" data-s="2" style="padding:16px 18px;gap:8px"><h3 style="font-size:28px">Как делаем и&nbsp;проверяем</h3><p style="font-size:24px">Запросы</p><p style="font-size:24px">Порядок проверки</p><p style="font-size:24px">Ограничения</p></div>
+        <div class="kid t-teal st" data-s="2" style="padding:16px 18px;gap:8px"><h3 style="font-size:28px">Что это даёт</h3><p style="font-size:24px">Экономия: минуты до&nbsp;и&nbsp;после</p><p style="font-size:24px">Сотрудники</p><p style="font-size:24px">Эффект: часы в&nbsp;год и&nbsp;условные деньги</p></div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+      <div class="rule sm t-gray st" data-s="3" style="padding:14px 26px"><svg class="i"><use href="#i-signpost"/></svg><div><p style="font-size:24px">Следующий шаг после пробы – в&nbsp;последнем разделе самого паспорта</p></div></div>
+      <div class="rule sm t-teal st" data-s="4" style="padding:14px 26px"><svg class="i"><use href="#i-mouse-pointer-click"/></svg><div><p style="font-size:24px">Интерактивная версия схемы – в&nbsp;папке схем дня</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="367">
+  <p class="kick">Правила заполнения · 1 из 4</p>
+  <h2>Одна задача – один паспорт</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="rule t-red" style="padding:24px 34px"><svg class="i"><use href="#i-x"/></svg><div><h3>Не задача</h3><p style="font-size:36px">«Работа с&nbsp;документацией»</p></div></div>
+    <div class="rule t-teal" style="padding:24px 34px"><svg class="i"><use href="#i-check"/></svg><div><h3>Задача</h3><p style="font-size:36px">«Извлечение требований из&nbsp;технического задания в&nbsp;таблицу для&nbsp;проверки протокола испытаний»</p></div></div>
+  </div>
+</section>
+
+<section class="slide" data-at="371">
+  <p class="kick">Правила заполнения · 2 из 4</p>
+  <h2>Проверка описывается конкретно</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="chat">
+      <div class="msg bad" style="font-size:32px"><span class="who">Не годится</span><p>«Проверяю результат»</p></div>
+    </div>
+    <div class="prompt" style="--tw:250px;font-size:34px;padding:24px 30px;gap:14px">
+      <p style="font-size:23px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--teal);padding-left:10px">Годится так</p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:21px;padding:9px 12px">Числа</span><span>сверяю с&nbsp;протоколом</span></p>
+      <p class="part t-teal" style="align-items:center"><span class="tg" style="font-size:21px;padding:9px 12px">Пункты</span><span>сверяю с&nbsp;техническим заданием</span></p>
+      <p class="part t-orange" style="align-items:center"><span class="tg" style="font-size:21px;padding:9px 12px">Расчёт тока</span><span>повторяю в&nbsp;таблице</span></p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="375">
+  <p class="kick">Правила заполнения · 3 и 4 из 4</p>
+  <h2>Честные ограничения и&nbsp;кто принимает результат</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards" style="align-items:stretch">
+      <div class="card t-red" style="padding:32px 34px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-triangle-alert"/></svg></span><h3 style="font-size:38px">Ограничения – честно</h3><p style="font-size:30px">У каждого сценария они есть. Не&nbsp;нашли – значит, ещё не&nbsp;пробовали сценарий на&nbsp;трудном примере</p></div>
+      <div class="card t-orange" style="padding:32px 34px;gap:20px"><span class="bdg lg"><svg class="i"><use href="#i-user-check"/></svg></span><h3 style="font-size:38px">Кто принимает результат</h3><p style="font-size:30px">Из паспорта понятно, кто это и&nbsp;что именно он&nbsp;решает</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-at="381">
+  <p class="kick">Исследование · 2026 год</p>
+  <h2>Как специалисты сохраняют ответственность за&nbsp;текст модели</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="svc t-teal" style="grid-template-columns:420px 1fr">
+      <div class="svc-hd">
+        <i class="logo"><svg class="i"><use href="#i-list-checks"/></svg></i>
+        <h3 style="font-size:40px">Taş, Memmert, Bittner</h3>
+        <p>Electronic Markets, 2026</p>
+      </div>
+      <dl class="kv" style="--kw:200px">
+        <div style="font-size:33px;padding:20px 15px"><dt>Что изучали</dt><dd>Как специалисты проверяют текст модели и&nbsp;сохраняют ответственность за&nbsp;него</dd></div>
+        <div style="font-size:33px;padding:20px 15px"><dt>Итог</dt><dd>Чек-лист</dd></div>
+      </dl>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Taş E., Memmert L., Bittner E. A. C. Electronic Markets, 2026 · doi.org/10.1007/s12525-026-00915-x</p>
+</section>
+
+<section class="slide" data-at="384" data-title="Taş и соавт.: чек-лист из девяти шагов">
+  <p class="kick">Вывод авторов · в переводе</p>
+  <div class="body" style="text-wrap:balance">
+    <figure class="quote md">
+      <blockquote>Мы составили <b>чек-лист из&nbsp;девяти шагов</b>, который определяет, какие приёмы и&nbsp;когда применять, чтобы текст, подготовленный с&nbsp;помощью ИИ, был надёжным, его происхождение можно было проследить, а&nbsp;ответственность за&nbsp;него была определена</blockquote>
+      <figcaption><i class="ava"><svg class="i"><use href="#i-file-text"/></svg></i><span><b>Taş E., Memmert L., Bittner E. A. C.</b>авторы исследования</span></figcaption>
+    </figure>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Taş E., Memmert L., Bittner E. A. C. Electronic Markets, 2026 · doi.org/10.1007/s12525-026-00915-x</p>
+</section>
+
+<section class="slide" data-at="390">
+  <p class="kick">Если сценарий описывает агента, а&nbsp;не&nbsp;чат · правило П.&nbsp;Гагарина</p>
+  <h2>Агенты – конвейер, люди – границы</h2>
+  <div class="body" style="text-wrap:balance">
+    <ol class="flow nonum">
+      <li class="step t-teal" style="gap:18px;padding:32px 32px"><span class="bdg lg"><svg class="i"><use href="#i-scroll-text"/></svg></span><h3 style="font-size:36px">Мелкие решения</h3><p style="font-size:31px;color:var(--ink)">Агент принимает сам, но&nbsp;каждое записывает с&nbsp;причиной</p></li>
+      <li class="step t-orange" style="gap:18px;padding:32px 32px"><span class="bdg lg"><svg class="i"><use href="#i-hand"/></svg></span><h3 style="font-size:36px">План разошёлся с&nbsp;реальностью</h3><p style="font-size:31px;color:var(--ink)">Агент останавливается и&nbsp;спрашивает человека</p></li>
+    </ol>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Гагарин П. «Разработка с агентами: от постановки задачи до деплоя». Вебинар учебного центра «МАСКОМ», 28.07.2026</p>
+</section>
+
+<section class="slide dark" data-at="394" data-title="П. Гагарин: человека дёргаем по делу">
+  <p class="kick t-orange">Формулировка Гагарина</p>
+  <div class="body" style="text-wrap:balance">
+    <figure class="quote">
+      <blockquote style="font-size:64px;line-height:1.15">Человека дёргаем <b>по&nbsp;делу</b>, а&nbsp;каждое авто-решение он увидит <b>списком</b></blockquote>
+      <figcaption><i class="ava">ПГ</i><span><b>П. Гагарин</b>вебинар «Разработка с&nbsp;агентами: от&nbsp;постановки задачи до&nbsp;деплоя», 28.07.2026</span></figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="slide" data-at="397" data-steps="399,401">
+  <p class="kick t-red">Более долгий риск · Noessel, 2026</p>
+  <h2>Две долгосрочные опасности</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="cards" style="align-items:stretch">
+      <div class="card t-red st" style="padding:30px 32px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-trending-down"/></svg></span><h3 style="font-size:38px">Потеря навыка</h3><p style="font-size:30px">Человек перестаёт практиковаться в&nbsp;работе, которую передал модели, и&nbsp;теряет в&nbsp;ней компетентность</p></div>
+      <div class="card t-red st" style="padding:30px 32px;gap:18px"><span class="bdg lg"><svg class="i"><use href="#i-circle-check"/></svg></span><h3 style="font-size:38px">Чрезмерное доверие</h3><p style="font-size:30px">Результат модели принимают некритично и&nbsp;усиливают ошибки вместо того, чтобы их исправлять</p></div>
+    </div>
+  </div>
+  <p class="src"><svg class="i"><use href="#i-info"/></svg>Noessel C. AI Magazine, 2026 · doi.org/10.1002/aaai.70096</p>
+</section>
+
+<section class="slide" data-at="403" data-steps="403,405">
+  <p class="kick t-orange">Поэтому в хорошем сценарии</p>
+  <h2>Инженер делает то, что требует квалификации</h2>
+  <div class="body" style="text-wrap:balance">
+    <div class="vs" style="align-items:stretch">
+      <div class="col t-orange st" style="padding:32px 40px;gap:24px">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-user-check"/></svg>Инженер</h3>
+        <ul style="font-size:40px;gap:18px;font-weight:600"><li>решает</li><li>оценивает</li><li>проверяет</li></ul>
+      </div>
+      <div class="col t-teal st" style="padding:32px 40px;gap:24px">
+        <h3 style="font-size:40px"><svg class="i"><use href="#i-bot"/></svg>Модель</h3>
+        <ul style="font-size:40px;gap:18px;font-weight:600"><li>поиск</li><li>сопоставление</li><li>черновик</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
