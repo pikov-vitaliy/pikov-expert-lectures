@@ -431,7 +431,11 @@ $script:ReviewedNestedDistributables = @{
     # Script archive published by the author of the "Skrytyy sloy" channel for
     # viewers of his AI-agent video; kept byte-for-byte (SHA-256 on video-notes.html),
     # tracked in Git, published with attribution by the course author's decision.
-    'materials\video-notes\agent.zip'
+    'materials\video-notes\agent.zip',
+    # Easter egg on the course home page: sample filled workbook (PDF and Word), approved after review
+    # 24.11.2026; exact paths, PDF SHA-256 pinned in test-public-release-independence.ps1.
+    'x\681a72c4c4474658b43d\Рабочая-тетрадь-образец-заполнения.pdf',
+    'x\681a72c4c4474658b43d\Рабочая-тетрадь-образец-заполнения.docx'
   )
 }
 
