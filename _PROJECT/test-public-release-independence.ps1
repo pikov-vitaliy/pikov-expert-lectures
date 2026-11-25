@@ -119,8 +119,8 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   '58dba7bb073d65d1c280ae92ce913cf177cc025a10217f465b71fa55dbb56ddd', # kamaz-ai: День-1-Источники-дня.pdf - author print of the day sources page (Prince); text checked against the published sources MD,
   '0acff084bbf133579a8900a4fd08e4d84ea95b67e1ec91973d55d378fb555bac', # kamaz-ai: День-4-Агент-AutoClaw-деловой-ответ.pdf - author PDF of the AutoClaw agent guide handed out in class; text read and checked against the published MD,
   'e09a2d56160d6db3b5b118a2590a487a2f3ba4d3a3e96eef802f935e69c6d8a5', # kamaz-ai: Рабочая-тетрадь-образец-заполнения.pdf - sample filled course workbook exported by Word from the reviewed DOCX (easter egg); text checked, no personal data,
-  '1d52b1940c91d876f61d8a5dac9d4ef3e607969369bf9239a17a55e0d4416bdf', # kamaz-ai: Практические-советы-по-применению-ИИ-в-РФ.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
-  '9a73277f44ac83f5f8ba201965d0e11ef8a24a8ef1a4c9ee70e7293052b533cf' # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners
+  '23919baa174e500d01ead622db3d2bc25cb031ce999e1f2337efe88639dc7623', # kamaz-ai: Практические-советы-по-применению-ИИ-в-РФ.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
+  '136a84f22fb7282166f9c0267b5706d22a21370a4a4b5ef32a0759e5774cb3ba' # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
