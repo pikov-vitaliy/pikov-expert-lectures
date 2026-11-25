@@ -435,7 +435,13 @@ $script:ReviewedNestedDistributables = @{
     # Easter egg on the course home page: sample filled workbook (PDF and Word), approved after review
     # 24.11.2026; exact paths, PDF SHA-256 pinned in test-public-release-independence.ps1.
     'x\681a72c4c4474658b43d\Рабочая-тетрадь-образец-заполнения.pdf',
-    'x\681a72c4c4474658b43d\Рабочая-тетрадь-образец-заполнения.docx'
+    'x\681a72c4c4474658b43d\Рабочая-тетрадь-образец-заполнения.docx',
+    # Word template of the course workbook linked from praktika.html; the same file as in kamaz-ai-workbook.zip.
+    'materials\praktika\Рабочая-тетрадь-итогового-проекта.docx',
+    # "Practical advice" (sovety.html) as Word and PDF and the YCodex guide PDF, reviewed 25.11.2026.
+    'materials\sovety\Практические-советы-по-применению-ИИ-в-РФ.docx',
+    'materials\sovety\Практические-советы-по-применению-ИИ-в-РФ.pdf',
+    'materials\sovety\YCodex-установка-и-первый-запуск.pdf'
   )
 }
 
