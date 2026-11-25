@@ -128,3 +128,37 @@ table td a { text-decoration: none; }
 .egg-msg { min-height: 1.4em; margin: .7rem 0 0; color: var(--muted); }
 .egg-files p { margin: .6rem 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
 .egg-open { border-style: solid; border-color: var(--good); }
+/* 25.11.2026: меню группами */
+.nav { gap: .55rem; }
+.nav-group { display: flex; align-items: center; gap: .1rem; }
+.nav-days { gap: .05rem; padding: .12rem .25rem .12rem .6rem; border: 1px solid var(--line-strong); border-radius: 999px; background: var(--control-bg); }
+.nav-days-label { margin-right: .25rem; color: var(--muted); font-size: .74rem; font-weight: 700; letter-spacing: .02em; }
+.nav-days a { min-width: 1.9rem; padding: .3rem .3rem; border-radius: 999px; text-align: center; font-variant-numeric: tabular-nums; }
+.nav-days a[aria-current="page"] { background: var(--cyan); color: var(--chip-ink, #fff); }
+:root:not([data-theme="light"]) .nav-days a[aria-current="page"] { color: #06121f; }
+.nav-ref { position: relative; margin-left: .35rem; padding-left: .7rem; }
+.nav-ref::before { position: absolute; left: 0; top: 18%; bottom: 18%; width: 1px; background: var(--line-strong); content: ""; }
+.nav-ref a { color: var(--text); }
+@media (max-width: 1320px) {
+  .nav { gap: .35rem; }
+  .nav-group { flex-wrap: wrap; gap: .2rem .3rem; }
+  .nav-main, .nav-ref { flex-direction: column; align-items: stretch; }
+  .nav-days { align-self: flex-start; margin: .25rem 0; padding: .3rem .5rem .3rem .9rem; }
+  .nav-days a { min-width: 2.6rem; padding: .5rem; }
+  .nav-ref { margin: .25rem 0 0; padding: .45rem 0 0; }
+  .nav-ref::before { left: 0; right: 0; top: 0; bottom: auto; width: auto; height: 1px; }
+}
+/* 25.11.2026: шапка справочных страниц – во всю ширину страницы */
+.compact-hero.hero-wide { min-height: 0; padding: 2.6rem 0 2.4rem; }
+.hero-wide .hero-grid { grid-template-columns: minmax(0, 1fr); }
+.hero-wide .hero-copy { max-width: none; }
+.compact-hero.hero-wide #hero-title { max-width: none; margin-bottom: .9rem; font-size: clamp(2rem, 3.7vw, 3.35rem); text-wrap: balance; }
+.hero-wide .hero-lead { max-width: none; margin-bottom: 1.5rem; font-size: clamp(1rem, 1.25vw, 1.12rem); line-height: 1.6; }
+.hero-wide .hero-lead p { margin: 0; text-align: justify; hyphens: auto; text-wrap: pretty; }
+.hero-wide .hero-lead p + p { margin-top: .6rem; }
+.hero-wide .hero-foot { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: .9rem 1.6rem; }
+.hero-wide .hero-meta { margin-top: 0; }
+@media (max-width: 720px) { .hero-wide .hero-lead p { text-align: left; } }
+/* заголовок раздела с пояснением во всю ширину (страница «Преподавателю») */
+.section-top.top-wide { grid-template-columns: minmax(0, 1fr); gap: .8rem; }
+.section-top.top-wide h1 { max-width: none; margin-bottom: 0; font-size: clamp(2rem, 3.7vw, 3.35rem); }

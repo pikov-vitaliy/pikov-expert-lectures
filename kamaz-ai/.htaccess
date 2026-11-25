@@ -7,6 +7,16 @@ AddDefaultCharset UTF-8
 # HTTPS redirect is handled by the hosting layer. Duplicating it here can
 # create self-redirect loops when Apache runs behind a TLS terminator.
 
+# Former dated names of the course files.
+<IfModule mod_alias.c>
+  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-16-([^/]+)$" "/materials/$1День-1-$2"
+  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-18-([^/]+)$" "/materials/$1День-2-$2"
+  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-20-([^/]+)$" "/materials/$1День-3-$2"
+  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-23-([^/]+)$" "/materials/$1День-4-$2"
+  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-25-([^/]+)$" "/materials/$1День-5-$2"
+  RedirectMatch 301 "^/materials/faq/2026-11-15-([^/]+)$" "/materials/faq/$1"
+</IfModule>
+
 <IfModule mod_headers.c>
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
   Header always set X-Content-Type-Options "nosniff"

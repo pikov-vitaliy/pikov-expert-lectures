@@ -17,8 +17,11 @@ if (-not (Test-Path -LiteralPath $archiveHelper -PathType Leaf)) { throw "Determ
 
 $readme = Join-Path $srcRoot 'README.md'
 if (-not (Test-Path -LiteralPath $readme -PathType Leaf)) { throw "Missing $readme" }
-$days = @(Get-ChildItem -LiteralPath $srcRoot -Directory | Where-Object { $_.Name -match '^\S+-0[1-5]-2026-11-\d\d$' } | Sort-Object Name)
+$days = @(Get-ChildItem -LiteralPath $srcRoot -Directory | Where-Object { $_.Name -match '^\S+-0[1-5]$' } | Sort-Object Name)
 if ($days.Count -ne 5) { throw "Expected 5 day folders in $srcRoot, found $($days.Count)" }
+for ($i = 0; $i -lt 5; $i++) {
+  if (-not $days[$i].Name.EndsWith("-0$($i + 1)")) { throw "Unexpected day folder: $($days[$i].Name)" }
+}
 New-Item -ItemType Directory -Path $downloadsRoot -Force | Out-Null
 
 function New-CourseArchive {
@@ -39,7 +42,10 @@ for ($i = 0; $i -lt $days.Count; $i++) {
   $n = $i + 1
   New-CourseArchive -Destination (Join-Path $downloadsRoot ("kamaz-ai-day-0{0}.zip" -f $n)) -Folders @($days[$i])
 }
-New-CourseArchive -Destination (Join-Path $downloadsRoot 'kamaz-ai-course.zip') -Folders $days
+# Практика одним файлом и «Практические советы» идут в общий архив отдельными папками (06-…, 07-…) из _src.
+$extra = @(Get-ChildItem -LiteralPath $srcRoot -Directory | Where-Object { $_.Name -match '^0[67]-' } | Sort-Object Name)
+if ($extra.Count -ne 2 -or -not $extra[0].Name.StartsWith('06-') -or -not $extra[1].Name.StartsWith('07-')) { throw "Expected one 06-* and one 07-* folder in $srcRoot" }
+New-CourseArchive -Destination (Join-Path $downloadsRoot 'kamaz-ai-course.zip') -Folders @($days + $extra)
 
 # Рабочая тетрадь итогового проекта: Word для заполнения и PDF для просмотра – отдельным архивом
 # рядом с программой курса. Файлы берутся из самостоятельной работы первого дня.

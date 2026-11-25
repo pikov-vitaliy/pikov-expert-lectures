@@ -94,7 +94,7 @@ function Should-SkipSitemapPath([string]$RelativePath) {
   return $false
 }
 
-function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect, [switch]$WebpImages, [switch]$SameOriginFrames, [switch]$RevalidateCode) {
+function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRedirect, [switch]$WebpImages, [switch]$SameOriginFrames, [switch]$RevalidateCode, [switch]$LegacyDatedNames) {
   $lines = [System.Collections.ArrayList]@(
     '# pikov.expert static lecture site rules',
     '# Keep text and Markdown files readable as UTF-8 in browsers.',
@@ -140,6 +140,23 @@ function New-HtaccessLines([switch]$SpdxExtensionlessHtml, [switch]$RootLocaleRe
 
   if ($WebpImages) {
     [void]$lines.Insert($lines.IndexOf('AddType image/svg+xml .svg'), 'AddType image/webp .webp')
+  }
+
+  if ($LegacyDatedNames) {
+    # Course files used to carry the session date in their names (2026-11-16-...).
+    # The public names are undated now; old links keep working. The Cyrillic prefix
+    # is built from code points because this script has no BOM for PowerShell 5.1.
+    $dayWord = -join [char[]](0x0414, 0x0435, 0x043D, 0x044C)
+    $index = $lines.IndexOf('<IfModule mod_headers.c>')
+    if ($index -lt 0) { throw 'Legacy names insertion marker is missing from the common template' }
+    $legacy = @('# Former dated names of the course files.', '<IfModule mod_alias.c>')
+    $legacyDays = [ordered]@{ '16' = 1; '18' = 2; '20' = 3; '23' = 4; '25' = 5 }
+    foreach ($date in $legacyDays.Keys) {
+      $legacy += ('  RedirectMatch 301 "^/materials/((?:[^/]+/)*)2026-11-{0}-([^/]+)$" "/materials/$1{1}-{2}-$2"' -f $date, $dayWord, $legacyDays[$date])
+    }
+    $legacy += '  RedirectMatch 301 "^/materials/faq/2026-11-15-([^/]+)$" "/materials/faq/$1"'
+    $legacy += @('</IfModule>', '')
+    [void]$lines.InsertRange($index, [object[]]$legacy)
   }
 
   if ($RootLocaleRedirect) {
@@ -423,7 +440,7 @@ foreach ($folder in $uniqueFolders) {
     Write-Output "controlCustomHtaccess=$folder"
   } else {
     $hasWebpImages = $null -ne (Get-ChildItem -LiteralPath $folderPath -Filter '*.webp' -Recurse -File | Select-Object -First 1)
-    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -WebpImages:$hasWebpImages -SameOriginFrames:($folder -eq 'kamaz-ai') -RevalidateCode:($folder -eq 'neural-network-digit-recognition'))
+    Write-Utf8File -Path (Join-Path $folderPath '.htaccess') -Lines (New-HtaccessLines -WebpImages:$hasWebpImages -SameOriginFrames:($folder -eq 'kamaz-ai') -LegacyDatedNames:($folder -eq 'kamaz-ai') -RevalidateCode:($folder -eq 'neural-network-digit-recognition'))
   }
   Write-Utf8File -Path (Join-Path $folderPath 'robots.txt') -Lines (New-RobotsLines -SitemapUrl ($baseUrl + 'sitemap.xml'))
   Write-SitemapFile -Path (Join-Path $folderPath 'sitemap.xml') -Urls @($urls) -DefaultLastMod $lastMod
