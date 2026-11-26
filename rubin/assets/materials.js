@@ -18,19 +18,19 @@ window.RUBIN_MATERIALS = {
  },
  "pptx": {
   "href": "files/rubin-seminar-v005.pptx",
-  "bytes": 1752083
+  "bytes": 1749655
  },
  "prompter": {
   "href": "speaker/prompter-v005-1.html",
-  "bytes": 8545689
+  "bytes": 8545544
  },
  "prompter_video": {
   "href": "speaker/prompter-video-v005-1.html",
-  "bytes": 8554229
+  "bytes": 8554084
  },
  "script": {
   "href": "speaker/script-v005.html",
-  "bytes": 215521
+  "bytes": 215337
  },
  "timing": {
   "href": "speaker/timing-v005.html",

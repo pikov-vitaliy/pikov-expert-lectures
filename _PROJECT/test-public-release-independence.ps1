@@ -121,8 +121,8 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   'e09a2d56160d6db3b5b118a2590a487a2f3ba4d3a3e96eef802f935e69c6d8a5', # kamaz-ai: Рабочая-тетрадь-образец-заполнения.pdf - sample filled course workbook exported by Word from the reviewed DOCX (easter egg); text checked, no personal data,
   '23919baa174e500d01ead622db3d2bc25cb031ce999e1f2337efe88639dc7623', # kamaz-ai: Практические-советы-по-применению-ИИ-в-РФ.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
   '136a84f22fb7282166f9c0267b5706d22a21370a4a4b5ef32a0759e5774cb3ba', # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
-  '73030459c07ae28832152ccc9e1bb67b921208a188100018510add90a6455682', # rubin: rubin-seminar-v005.pdf - author seminar slides v.005 for participants exported by PowerPoint from the reviewed PPTX (slides 2, 4, 5 hidden), title date redacted; sources checked, no personal data of third parties,
-  'bbf931dee82215f783318ce85349621d86b9e3987604ec221971702430c7abe5' # rubin: rubin-seminar-v005-show.pdf - author seminar slides v.005 as shown, exported by PowerPoint from the reviewed PPTX, title date redacted; sources checked, no personal data of third parties
+  'd99a6ebca176784ab3b179526879ba3737ca25e574dd87e1de1c8f0d0892d17d', # rubin: rubin-seminar-v005.pdf - author seminar slides v.005 for participants exported by PowerPoint from the reviewed PPTX (slides 2, 4, 5 hidden), title date redacted; sources checked, no personal data of third parties,
+  '452272eba513bf90edae3cb1aefc8b76f7b8606af22aed519542656c78656382' # rubin: rubin-seminar-v005-show.pdf - author seminar slides v.005 as shown, exported by PowerPoint from the reviewed PPTX, title date redacted; sources checked, no personal data of third parties
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
