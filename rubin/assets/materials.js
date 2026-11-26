@@ -6,16 +6,6 @@ window.RUBIN_MATERIALS = {
   "bytes": 190631116,
   "minutes": 75.9
  },
- "handout": {
-  "href": "files/rubin-seminar-v005.pdf",
-  "bytes": 1586881,
-  "pages": 78
- },
- "show": {
-  "href": "files/rubin-seminar-v005-show.pdf",
-  "bytes": 1602540,
-  "pages": 81
- },
  "pptx": {
   "href": "files/rubin-seminar-v005.pptx",
   "bytes": 1749637
@@ -35,5 +25,10 @@ window.RUBIN_MATERIALS = {
  "timing": {
   "href": "speaker/timing-v005.html",
   "bytes": 23920
+ },
+ "pdf": {
+  "href": "files/rubin-seminar-v005.pdf",
+  "bytes": 1743971,
+  "pages": 94
  }
 };
