@@ -22,11 +22,11 @@ window.RUBIN_MATERIALS = {
  },
  "prompter": {
   "href": "speaker/prompter-v005-1.html",
-  "bytes": 8545505
+  "bytes": 8545571
  },
  "prompter_video": {
   "href": "speaker/prompter-video-v005-1.html",
-  "bytes": 8554045
+  "bytes": 8554111
  },
  "script": {
   "href": "speaker/script-v005.html",
