@@ -22,18 +22,18 @@ window.RUBIN_MATERIALS = {
  },
  "prompter": {
   "href": "speaker/prompter-v005-1.html",
-  "bytes": 8545571
+  "bytes": 8546878
  },
  "prompter_video": {
   "href": "speaker/prompter-video-v005-1.html",
-  "bytes": 8554111
+  "bytes": 8555418
  },
  "script": {
   "href": "speaker/script-v005.html",
-  "bytes": 214571
+  "bytes": 215497
  },
  "timing": {
   "href": "speaker/timing-v005.html",
-  "bytes": 22994
+  "bytes": 23920
  }
 };
