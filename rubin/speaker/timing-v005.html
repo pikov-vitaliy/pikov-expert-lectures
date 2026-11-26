@@ -1,0 +1,849 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Семинар, v.005: тайминг по озвучке</title>
+<style>
+:root {
+  --bg: #f6f7f9; --panel: #ffffff; --ink: #1d2433; --muted: #5b6475; --line: #dde1e8;
+  --accent: #c8102e; --accent-soft: #fbe9ec; --code-bg: #eef1f5; --chip: #44546a; --chip-ink: #ffffff;
+  --link: #0b5cad;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+    --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+    --link: #7db7ff;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #12151b; --panel: #1b2029; --ink: #e6e9ef; --muted: #a3abba; --line: #2c3340;
+  --accent: #ff5a6e; --accent-soft: #3a1f25; --code-bg: #232a35; --chip: #c7cfdb; --chip-ink: #12151b;
+  --link: #7db7ff;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); }
+body { font: 16px/1.6 "Segoe UI", system-ui, -apple-system, sans-serif; }
+main { max-width: 920px; margin: 0 auto; padding: 56px 16px 64px; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 0 0 .25rem; }
+h1 + p { color: var(--muted); margin-top: .25rem; }
+h2 { font-size: 1.3rem; margin: 2.2rem 0 .8rem; padding-top: .4rem; border-top: 3px solid var(--accent); }
+p, li { max-width: 76ch; overflow-wrap: break-word; }
+li { margin: .35rem 0; }
+a { color: var(--link); }
+strong { color: var(--ink); }
+code { background: var(--code-bg); padding: .08em .35em; border-radius: 4px; font-size: .92em;
+        font-family: Consolas, "Cascadia Mono", monospace; overflow-wrap: anywhere; }
+pre { background: var(--code-bg); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+pre code { background: none; padding: 0; }
+img, svg, video { max-width: 100%; height: auto; }
+.table-wrap { overflow-x: auto; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; }
+th, td { text-align: left; vertical-align: top; padding: 10px 12px; border-bottom: 1px solid var(--line); }
+th { background: var(--accent-soft); font-weight: 600; }
+tr:last-child td { border-bottom: 0; }
+ul, ol { padding-left: 1.3rem; }
+h2 + ul, h2 + ol { background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+                    padding: 14px 16px 14px 34px; }
+.theme-toggle { position: fixed; top: 16px; right: 16px; width: 40px; height: 40px; border-radius: 50%;
+                 border: 1px solid var(--line); background: var(--panel); color: var(--ink); font-size: 18px;
+                 cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.theme-toggle:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (max-width: 600px) { main { padding-top: 64px; } h1 { font-size: 1.45rem; } }
+h2[id], h3[id] { scroll-margin-top: 16px; }
+.toc { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px;
+        margin: 1.4rem 0; font-size: .95rem; }
+.toc-title { font-weight: 600; margin-bottom: .4rem; }
+.toc ol { margin: 0; padding-left: 0; list-style: none; }
+.toc ol ol { padding-left: 1rem; }
+.toc li { margin: .2rem 0; max-width: none; }
+.toc a { text-decoration: none; }
+.toc a:hover { text-decoration: underline; }
+.to-toc { position: fixed; right: 16px; bottom: 16px; padding: 8px 12px; border-radius: 18px; font-size: .85rem;
+           background: var(--panel); color: var(--link); border: 1px solid var(--line); text-decoration: none;
+           box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+.to-toc:focus-visible, .toc a:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+@media (min-width: 1560px) {
+  .toc { position: fixed; left: 16px; top: 16px; width: 280px; max-height: calc(100vh - 32px); overflow-y: auto;
+          margin: 0; }
+  .to-toc { display: none; }
+}
+/* Печать и PDF */
+@media print {
+  html, body { background: #fff !important; min-height: 0 !important; }
+  .theme-toggle, .to-toc, .toc { display: none !important; }
+  h1, h2, h3, h4 { break-after: avoid; page-break-after: avoid; break-inside: avoid; }
+  h2::after, h3::after, h4::after { content: ""; display: block; height: 140px; margin-bottom: -140px; }
+  li, tr, p { break-inside: avoid; }
+  thead { display: table-header-group; }
+}
+</style>
+<script>
+/* Тема по времени суток: ночью (20:00–07:00) тёмная, днём светлая. Ручной выбор действует до смены дня и ночи. */
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('report-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+</head>
+<body>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+<main>
+<h1>Семинар, v.005: тайминг по озвучке</h1>
+<p>Озвучка основного маршрута (69 слайдов) длится <strong>75,9 мин</strong>: 70,4 мин речи и 5,4 мин пауз на реплики зала. При начале в +0:00 она заканчивается в +1:16, до +2:00 остаётся <strong>44 мин на вопросы</strong>. Семинар с вопросами укладывается, сокращать по озвучке нечего.</p>
+<p>Живая речь медленнее ровной озвучки: смех, ответы зала, щелчки, переходы. Поэтому рядом – расчёт с запасом (вывод по расчёту, в зале не измерялось).</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Как говорить</th>
+<th>Речь, мин</th>
+<th>Реплики, мин</th>
+<th>Конец речи</th>
+<th>На вопросы до +2:00</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Как в озвучке</td>
+<td>70,4</td>
+<td>5,4</td>
+<td>+1:16</td>
+<td>44</td>
+</tr>
+<tr>
+<td>Темп озвучки, реплик 8 минут</td>
+<td>70,4</td>
+<td>8,0</td>
+<td>+1:18</td>
+<td>42</td>
+</tr>
+<tr>
+<td>На 15 % медленнее</td>
+<td>81,0</td>
+<td>8,0</td>
+<td>+1:29</td>
+<td>31</td>
+</tr>
+<tr>
+<td>На 25 % медленнее</td>
+<td>88,0</td>
+<td>8,0</td>
+<td>+1:36</td>
+<td>24</td>
+</tr>
+<tr>
+<td>План суфлёра</td>
+<td>89,5</td>
+<td>8,0</td>
+<td>+1:38</td>
+<td>22</td>
+</tr>
+</tbody>
+</table></div>
+<p>Шесть слайдов «можно пропустить» (13, 19, 23, 24, 52, 62) в озвучку не вошли; по плану это ещё 6,3 мин. Даже с ними и с темпом на 25 % медленнее на вопросы остаётся около 18 мин.</p>
+<nav class="toc" id="toc" aria-label="Оглавление"><div class="toc-title">Оглавление</div><ol><li><a href="#gde-vremya-mozhet-uyti">Где время может уйти</a></li><li><a href="#kontrolnye-tochki-po-ozvuchke">Контрольные точки по озвучке</a></li><li><a href="#po-slaydam">По слайдам</a></li><li><a href="#istochniki">Источники</a></li></ol></nav>
+<h2 id="gde-vremya-mozhet-uyti">Где время может уйти</h2>
+<p>По озвучке дольше плана идут только эти слайды. Если в зале опаздываете, сокращайте их первыми.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Слайд</th>
+<th>План, мин</th>
+<th>Озвучка, мин</th>
+<th>Что сократить</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>53. Светофор пилота: что показываем модели</td>
+<td>1,5</td>
+<td>2,2</td>
+<td>в игре назвать три документа вместо пяти, историю про ключи пропустить</td>
+</tr>
+<tr>
+<td>34. Восемь подразделений – восемь случаев</td>
+<td>0,2</td>
+<td>0,8</td>
+<td>поимённый опрос подразделений заменить одним вопросом</td>
+</tr>
+<tr>
+<td>67. Где человек нужен постоянно</td>
+<td>1,4</td>
+<td>1,8</td>
+<td>абзац о том, чему учить ребёнка</td>
+</tr>
+<tr>
+<td>12. Каждый раз – «всё пропало»</td>
+<td>2,0</td>
+<td>2,3</td>
+<td>приставку и тетрис – одной фразой</td>
+</tr>
+<tr>
+<td>70. Что сделать в понедельник</td>
+<td>1,0</td>
+<td>1,3</td>
+<td>вопрос залу – только если есть время</td>
+</tr>
+<tr>
+<td>61. Пилот – это не показ</td>
+<td>1,6</td>
+<td>1,7</td>
+<td>историю с 467 гигабайтами</td>
+</tr>
+<tr>
+<td>1. Интеллектуальная автоматизация бизнес‑процессов</td>
+<td>0,0</td>
+<td>0,1</td>
+<td>не нужно</td>
+</tr>
+<tr>
+<td>55. «Запретить всё» – тоже решение. Дорогое</td>
+<td>1,5</td>
+<td>1,6</td>
+<td>историю Samsung</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="kontrolnye-tochki-po-ozvuchke">Контрольные точки по озвучке</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Раздел</th>
+<th>Слайды</th>
+<th>План, мин</th>
+<th>Озвучка, мин</th>
+<th>Начало по озвучке</th>
+<th>Начало по плану суфлёра</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Заход</td>
+<td>1–12</td>
+<td>12,1</td>
+<td>9,5</td>
+<td>+0:00</td>
+<td>+0:00</td>
+</tr>
+<tr>
+<td>Почему не отсидеться</td>
+<td>14–15</td>
+<td>3,2</td>
+<td>3,0</td>
+<td>+0:09</td>
+<td>+0:13</td>
+</tr>
+<tr>
+<td>Общий язык</td>
+<td>16–25</td>
+<td>9,2</td>
+<td>7,6</td>
+<td>+0:12</td>
+<td>+0:17</td>
+</tr>
+<tr>
+<td>Рамка руководителя</td>
+<td>26–33</td>
+<td>10,2</td>
+<td>7,8</td>
+<td>+0:20</td>
+<td>+0:27</td>
+</tr>
+<tr>
+<td>Подразделения</td>
+<td>34–43</td>
+<td>16,1</td>
+<td>13,9</td>
+<td>+0:28</td>
+<td>+0:38</td>
+</tr>
+<tr>
+<td>Счёт поставщика</td>
+<td>44–50</td>
+<td>10,7</td>
+<td>9,0</td>
+<td>+0:42</td>
+<td>+0:55</td>
+</tr>
+<tr>
+<td>Риски, деньги, люди</td>
+<td>51–63</td>
+<td>15,3</td>
+<td>14,3</td>
+<td>+0:51</td>
+<td>+1:07</td>
+</tr>
+<tr>
+<td>Наши дети</td>
+<td>64–68</td>
+<td>6,3</td>
+<td>6,2</td>
+<td>+1:05</td>
+<td>+1:24</td>
+</tr>
+<tr>
+<td>Что делать</td>
+<td>69–71</td>
+<td>2,8</td>
+<td>2,2</td>
+<td>+1:11</td>
+<td>+1:31</td>
+</tr>
+<tr>
+<td>Финал</td>
+<td>72–75</td>
+<td>3,6</td>
+<td>2,3</td>
+<td>+1:14</td>
+<td>+1:34</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="po-slaydam">По слайдам</h2>
+<p>«Пауза» – время, оставленное залу, оно входит в озвучку слайда.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Слайд</th>
+<th>План, мин</th>
+<th>Озвучка, мин</th>
+<th>Пауза, мин</th>
+<th>Разница</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Интеллектуальная автоматизация бизнес‑процессов</td>
+<td>0,0</td>
+<td>0,1</td>
+<td>0,1</td>
+<td>+0,1</td>
+</tr>
+<tr>
+<td>2. Завтра вас всех уволят…</td>
+<td>2,2</td>
+<td>1,6</td>
+<td>0,6</td>
+<td>–0,6</td>
+</tr>
+<tr>
+<td>3. Вы потеряете работу не из-за ИИ, а из-за того, кто им…</td>
+<td>1,2</td>
+<td>0,6</td>
+<td>0,1</td>
+<td>–0,6</td>
+</tr>
+<tr>
+<td>4. Расходимся…)))</td>
+<td>0,3</td>
+<td>0,2</td>
+<td>0,1</td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>5. Завтра вас всех уволят…</td>
+<td>0,4</td>
+<td>0,3</td>
+<td></td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>6. ДИСКЛЕЙМЕР / DISCLAIMER</td>
+<td>0,5</td>
+<td>0,3</td>
+<td>0,1</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>7. Эксперт в области ИТ, ИБ, преподаватель</td>
+<td>1,0</td>
+<td>0,4</td>
+<td></td>
+<td>–0,6</td>
+</tr>
+<tr>
+<td>8. Что ИИ изменил в моей работе</td>
+<td>1,5</td>
+<td>1,5</td>
+<td></td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>9. Топ-10 вопросов, с которых всё начинается</td>
+<td>1,2</td>
+<td>0,9</td>
+<td>0,4</td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>10. Маршрут на два часа С остановками на вопросы</td>
+<td>0,6</td>
+<td>0,3</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>11. Найдите десять отличий</td>
+<td>1,2</td>
+<td>1,1</td>
+<td>0,1</td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>12. Каждый раз – «всё пропало»</td>
+<td>2,0</td>
+<td>2,3</td>
+<td>0,1</td>
+<td>+0,3</td>
+</tr>
+<tr>
+<td>14. Почему не получится отсидеться</td>
+<td>1,6</td>
+<td>1,6</td>
+<td>0,2</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>15. Год назад – не мог Сегодня – больше, чем просил</td>
+<td>1,6</td>
+<td>1,3</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>16. Говорим на одном языке</td>
+<td>0,2</td>
+<td>0,2</td>
+<td></td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>17. Три разных «ума» под одним словом ИИ</td>
+<td>1,4</td>
+<td>1,0</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>18. «Такого ГОСТа нет»</td>
+<td>1,3</td>
+<td>0,9</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>20. Чат – проект – агент: это не одно и то же</td>
+<td>1,6</td>
+<td>1,1</td>
+<td></td>
+<td>–0,5</td>
+</tr>
+<tr>
+<td>21. Задача ≠ процесс Ускорили шаг – замедлили целое</td>
+<td>1,5</td>
+<td>1,5</td>
+<td>0,1</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>22. Восемь классов решений Их сочетают; начинаем с простого</td>
+<td>1,4</td>
+<td>1,2</td>
+<td></td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>25. Вопрос залу: какой класс?</td>
+<td>1,8</td>
+<td>1,8</td>
+<td>0,6</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>26. Рамка руководителя</td>
+<td>0,2</td>
+<td>0,2</td>
+<td></td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>27. Жизнь инициативы: шесть шагов и двое ворот</td>
+<td>1,6</td>
+<td>1,3</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>28. Роли: у каждого агента должна быть фамилия</td>
+<td>1,6</td>
+<td>1,2</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>29. Данные важнее модели</td>
+<td>1,5</td>
+<td>1,3</td>
+<td>0,1</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>30. «Разобраться» – не результат</td>
+<td>1,4</td>
+<td>1,0</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>31. Признак номер один: сто одинаковых кликов</td>
+<td>1,2</td>
+<td>1,0</td>
+<td>0,2</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>32. Матрица отбора: учит говорить «нет»</td>
+<td>1,7</td>
+<td>1,4</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>33. Паспорт инициативы: девять строк</td>
+<td>1,0</td>
+<td>0,6</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>34. Восемь подразделений – восемь случаев</td>
+<td>0,2</td>
+<td>0,8</td>
+<td>0,1</td>
+<td>+0,6</td>
+</tr>
+<tr>
+<td>35. Продажи и маркетинг 1 из 8. Прогноз спроса и оттока,…</td>
+<td>1,5</td>
+<td>1,1</td>
+<td>0,1</td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>36. Производство 2 из 8. Предиктивное обслуживание, качество,…</td>
+<td>2,2</td>
+<td>1,9</td>
+<td>0,1</td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>37. Финансы 3 из 8. Аномалии расходов, денежный поток, бюджет</td>
+<td>1,5</td>
+<td>1,5</td>
+<td>0,1</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>38. Кадры 4 из 8. Прогноз текучести, вовлечённость, первичный…</td>
+<td>1,8</td>
+<td>1,6</td>
+<td></td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>39. Закупки и логистика 5 из 8. Потребность, запасы, выбор…</td>
+<td>1,5</td>
+<td>0,9</td>
+<td></td>
+<td>–0,6</td>
+</tr>
+<tr>
+<td>40. Клиентский сервис 6 из 8. Маршрутизация, база знаний,…</td>
+<td>1,5</td>
+<td>1,0</td>
+<td></td>
+<td>–0,5</td>
+</tr>
+<tr>
+<td>41. Риски и комплаенс 7 из 8. Мониторинг операций, отклонения,…</td>
+<td>1,5</td>
+<td>1,2</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>42. Инженеры 8 из 8. Расчёты, документы, поиск прежних решений</td>
+<td>2,2</td>
+<td>2,0</td>
+<td>0,1</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>43. Голосуем: какое решение? Масштабировать, доработать,…</td>
+<td>2,2</td>
+<td>2,0</td>
+<td>0,4</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>44. Сквозной пример: счёт поставщика</td>
+<td>0,2</td>
+<td>0,2</td>
+<td></td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>45. Как есть: 15 минут и шесть дней Учебный пример – подставьте…</td>
+<td>1,7</td>
+<td>1,3</td>
+<td>0,1</td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>46. Кому какой шаг: четыре исполнителя</td>
+<td>2,0</td>
+<td>1,8</td>
+<td>0,1</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>47. Как будет: спорное – человеку Обычное – быстро, спорное –…</td>
+<td>1,5</td>
+<td>1,3</td>
+<td></td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>48. Допуск ошибки – это решение директора</td>
+<td>1,7</td>
+<td>1,3</td>
+<td></td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>49. Счёт с сюрпризом</td>
+<td>1,8</td>
+<td>1,5</td>
+<td>0,2</td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>50. Что в бумагах поставщика нельзя терять</td>
+<td>1,8</td>
+<td>1,5</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>51. Риски, деньги, люди</td>
+<td>0,2</td>
+<td>0,1</td>
+<td></td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>53. Светофор пилота: что показываем модели</td>
+<td>1,5</td>
+<td>2,2</td>
+<td>0,3</td>
+<td>+0,7</td>
+</tr>
+<tr>
+<td>54. Что уже написано в законе</td>
+<td>1,4</td>
+<td>0,8</td>
+<td></td>
+<td>–0,6</td>
+</tr>
+<tr>
+<td>55. «Запретить всё» – тоже решение. Дорогое</td>
+<td>1,5</td>
+<td>1,6</td>
+<td>0,1</td>
+<td>+0,1</td>
+</tr>
+<tr>
+<td>56. Человек в контуре устаёт</td>
+<td>0,7</td>
+<td>0,4</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>57. «Готово!» – а где файл?</td>
+<td>1,6</td>
+<td>1,3</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>58. Две ловушки экономии «освободили время» и «стало быстрее»</td>
+<td>2,0</td>
+<td>1,8</td>
+<td>0,1</td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>59. Стоимость владения: айсберг</td>
+<td>1,2</td>
+<td>0,9</td>
+<td></td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>60. Окупаемость: что будет, если мы ошиблись? Учебный расчёт:…</td>
+<td>1,8</td>
+<td>1,8</td>
+<td>0,1</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>61. Пилот – это не показ</td>
+<td>1,6</td>
+<td>1,7</td>
+<td></td>
+<td>+0,1</td>
+</tr>
+<tr>
+<td>63. Новичков заменит модель? А кто вырастет?</td>
+<td>1,8</td>
+<td>1,7</td>
+<td></td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>64. Наши дети</td>
+<td>0,2</td>
+<td>0,2</td>
+<td>0,1</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>65. Альфа и бета: ИИ с детства</td>
+<td>1,6</td>
+<td>1,6</td>
+<td>0,1</td>
+<td>0,0</td>
+</tr>
+<tr>
+<td>66. Леса или костыль?</td>
+<td>1,8</td>
+<td>1,6</td>
+<td></td>
+<td>–0,2</td>
+</tr>
+<tr>
+<td>67. Где человек нужен постоянно</td>
+<td>1,4</td>
+<td>1,8</td>
+<td>0,1</td>
+<td>+0,4</td>
+</tr>
+<tr>
+<td>68. Через двадцать лет мы придём к ним</td>
+<td>1,3</td>
+<td>0,9</td>
+<td>0,1</td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>69. Рамка на одной странице</td>
+<td>0,8</td>
+<td>0,4</td>
+<td>0,2</td>
+<td>–0,4</td>
+</tr>
+<tr>
+<td>70. Что сделать в понедельник</td>
+<td>1,0</td>
+<td>1,3</td>
+<td>0,2</td>
+<td>+0,3</td>
+</tr>
+<tr>
+<td>71. Топ‑10: короткие ответы</td>
+<td>1,0</td>
+<td>0,5</td>
+<td>0,3</td>
+<td>–0,5</td>
+</tr>
+<tr>
+<td>72. Завтра вас всех</td>
+<td>0,5</td>
+<td>0,4</td>
+<td>0,1</td>
+<td>–0,1</td>
+</tr>
+<tr>
+<td>73. Куда дальше: приходите учиться!</td>
+<td>1,6</td>
+<td>1,1</td>
+<td></td>
+<td>–0,5</td>
+</tr>
+<tr>
+<td>74. Освобождайте в своей жизни время на жизнь</td>
+<td>1,0</td>
+<td>0,7</td>
+<td>0,1</td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td>75. СПАСИБО БОЛЬШОЕ ЗА ВНИМАНИЕ!</td>
+<td>0,5</td>
+<td>0,2</td>
+<td>0,1</td>
+<td>–0,3</td>
+</tr>
+<tr>
+<td><strong>Всего</strong></td>
+<td><strong>89,5</strong></td>
+<td><strong>75,9</strong></td>
+<td><strong>5,4</strong></td>
+<td><strong>–13,6</strong></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="istochniki">Источники</h2>
+<ul>
+<li>План по слайдам – заметки презентации v.005 (строка «Время»).</li>
+<li>Озвучка – длительность звука по слайдам в видео v.005.</li>
+<li>Суфлёр v.005: 8 минут на реплики зала, вопросы с +1:38.</li>
+</ul>
+<a class="to-toc" href="#toc">Оглавление</a>
+</main>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('report-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+</script>
+</body>
+</html>

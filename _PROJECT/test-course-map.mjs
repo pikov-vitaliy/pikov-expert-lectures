@@ -20,6 +20,8 @@ const courseStandard = read('_PROJECT/COURSE_DESIGN_STANDARD.md');
 const expectedTargets = ['https://pikov.expert/'];
 const seenFolders = new Set();
 for (const lecture of [...registry.lectures].sort((a, b) => a.position - b.position)) {
+  // catalogueHidden: сайт опубликован и доступен по ссылке, но пока не показан ни на главной, ни на карте курсов
+  if (lecture.catalogueHidden) continue;
   if (seenFolders.has(lecture.folder)) continue;
   seenFolders.add(lecture.folder);
   expectedTargets.push(lecture.url);
@@ -51,7 +53,8 @@ function cardsFrom(html) {
 }
 
 test('course map covers every registered release target', () => {
-  assert.equal(expectedTargets.length, registry.summary.thirdLevelDomains + 1);
+  const hiddenDomains = new Set(registry.lectures.filter(x => x.catalogueHidden).map(x => new URL(x.url).hostname)).size;
+  assert.equal(expectedTargets.length, registry.summary.thirdLevelDomains - hiddenDomains + 1);
   const cards = cardsFrom(page);
   assert.equal(cards.length, expectedTargets.length);
   assert.deepEqual(cards.map(card => card.target).sort(), [...expectedTargets].sort());
