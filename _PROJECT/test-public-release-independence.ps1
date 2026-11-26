@@ -121,7 +121,7 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   'e09a2d56160d6db3b5b118a2590a487a2f3ba4d3a3e96eef802f935e69c6d8a5', # kamaz-ai: Рабочая-тетрадь-образец-заполнения.pdf - sample filled course workbook exported by Word from the reviewed DOCX (easter egg); text checked, no personal data,
   '23919baa174e500d01ead622db3d2bc25cb031ce999e1f2337efe88639dc7623', # kamaz-ai: Практические-советы-по-применению-ИИ-в-РФ.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
   '136a84f22fb7282166f9c0267b5706d22a21370a4a4b5ef32a0759e5774cb3ba', # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
-  'ff33be8374494e50c0895f34f7977b5df8fa9adc2c8df4f9cf5a64965608944d' # rubin: rubin-seminar-v005.pdf - author seminar slides v.005, all 94 slides incl. hidden reserve and sources, exported by PowerPoint from the published PPTX (title date removed); sources checked, no personal data of third parties
+  'dcf82f953b06037630793b28d76ceb87820690f0c79448947382354c19d71959' # rubin: rubin-seminar-v005.pdf - author seminar slides v.005, all 94 slides incl. hidden reserve and sources, exported by PowerPoint from the published PPTX (title date removed); sources checked, no personal data of third parties
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
