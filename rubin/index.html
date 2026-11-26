@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Семинар для руководителей «Интеллектуальная автоматизация бизнес-процессов»: презентация, маршрут доклада, как доклад готовился с помощью ИИ, суфлёр и материалы для докладчика.">
+<title>Полётное задание: семинар для руководителей</title>
+<link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+<script>
+(function () {
+  var h = new Date().getHours(), theme = (h >= 20 || h < 7) ? 'dark' : 'light';
+  try {
+    var s = JSON.parse(localStorage.getItem('rubin-theme-choice') || 'null');
+    if (s && s.until > Date.now() && (s.theme === 'dark' || s.theme === 'light')) theme = s.theme;
+  } catch (e) {}
+  document.documentElement.setAttribute('data-theme', theme);
+})();
+</script>
+<style>
+:root {
+  --bg: #eaf2f8;
+  --sky-1: #b9d7ee;
+  --sky-2: #e3eef7;
+  --sky-3: #f4f8fb;
+  --ink: #0e2233;
+  --ink-2: #3d5568;
+  --ink-3: #6a7f90;
+  --line: rgba(14, 34, 51, .16);
+  --grid: rgba(14, 34, 51, .055);
+  --contour: rgba(14, 34, 51, .24);
+  --panel: #fbfdfe;
+  --panel-2: #f1f6fa;
+  --accent: #c2410c;
+  --accent-2: #0f6e78;
+  --chip-bg: #c2410c;
+  --chip-ink: #fff8f2;
+  --soft-bg: #fde9dc;
+  --soft-ink: #7a2a07;
+  --face: #fbfdfe;
+  --face-ink: #0e2233;
+  --tick: #0e2233;
+  --needle: #c2410c;
+  --glow: none;
+  --shadow: 0 1px 0 rgba(14, 34, 51, .06), 0 10px 30px -18px rgba(14, 34, 51, .35);
+  --glider: #0e2233;
+  --focus: #0f6e78;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #070b10; --sky-1: #0b1522; --sky-2: #080d14; --sky-3: #070b10;
+    --ink: #f1e8d4; --ink-2: #b9ae96; --ink-3: #8c826d;
+    --line: rgba(255, 180, 84, .2); --grid: rgba(255, 180, 84, .05); --contour: rgba(255, 180, 84, .22);
+    --panel: #0e141c; --panel-2: #111a24;
+    --accent: #ffb454; --accent-2: #63d2b7;
+    --chip-bg: #ffb454; --chip-ink: #1b1206;
+    --soft-bg: #2a1d0b; --soft-ink: #ffd49a;
+    --face: #05080c; --face-ink: #ffcf8a; --tick: #ffb454; --needle: #63d2b7;
+    --glow: 0 0 22px rgba(255, 180, 84, .18);
+    --shadow: 0 0 0 1px rgba(255, 180, 84, .12), 0 18px 40px -24px rgba(0, 0, 0, .9);
+    --glider: #ffcf8a; --focus: #63d2b7;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #070b10; --sky-1: #0b1522; --sky-2: #080d14; --sky-3: #070b10;
+  --ink: #f1e8d4; --ink-2: #b9ae96; --ink-3: #8c826d;
+  --line: rgba(255, 180, 84, .2); --grid: rgba(255, 180, 84, .05); --contour: rgba(255, 180, 84, .22);
+  --panel: #0e141c; --panel-2: #111a24;
+  --accent: #ffb454; --accent-2: #63d2b7;
+  --chip-bg: #ffb454; --chip-ink: #1b1206;
+  --soft-bg: #2a1d0b; --soft-ink: #ffd49a;
+  --face: #05080c; --face-ink: #ffcf8a; --tick: #ffb454; --needle: #63d2b7;
+  --glow: 0 0 22px rgba(255, 180, 84, .18);
+  --shadow: 0 0 0 1px rgba(255, 180, 84, .12), 0 18px 40px -24px rgba(0, 0, 0, .9);
+  --glider: #ffcf8a; --focus: #63d2b7;
+  color-scheme: dark;
+}
+:root[data-theme="light"] { color-scheme: light; }
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background:
+    linear-gradient(var(--grid) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0 / 48px 48px,
+    linear-gradient(180deg, var(--sky-1) 0, var(--sky-2) 520px, var(--sky-3) 1100px, var(--bg) 100%);
+  background-color: var(--bg);
+  color: var(--ink);
+  font: 16px/1.6 "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  overflow-x: hidden;
+}
+.display { font-family: Bahnschrift, "DIN Alternate", "DIN Condensed", "Arial Narrow", "Segoe UI", sans-serif; font-stretch: condensed; }
+.mono { font-family: "Cascadia Mono", Consolas, "SFMono-Regular", Menlo, monospace; }
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+.skip { position: absolute; left: -999px; top: 8px; background: var(--chip-bg); color: var(--chip-ink); padding: 8px 12px; border-radius: 8px; z-index: 30; }
+.skip:focus { left: 16px; }
+
+/* top bar */
+.top { display: flex; align-items: center; gap: 14px; padding: 16px 72px 0 0; font-size: 14px; }
+.brand-back { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: var(--ink-2); padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--panel) 70%, transparent); }
+.brand-back:hover { color: var(--ink); border-color: var(--accent); }
+.brand-back svg { width: 18px; height: 18px; }
+.callsign { color: var(--ink-3); letter-spacing: .14em; text-transform: uppercase; font-size: 12px; }
+.theme-toggle {
+  position: fixed; top: 16px; right: 16px; z-index: 20;
+  width: 44px; height: 44px; border-radius: 50%;
+  border: 1px solid var(--line); background: var(--panel); color: var(--ink);
+  font-size: 20px; line-height: 1; cursor: pointer; box-shadow: var(--shadow);
+}
+.theme-toggle:hover { border-color: var(--accent); }
+
+/* hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); gap: 24px; align-items: center; padding: 28px 0 8px; }
+.strip { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: var(--panel); box-shadow: var(--shadow); margin: 0 0 22px; }
+.strip div { padding: 8px 12px; border-left: 1px solid var(--line); min-width: 0; }
+.strip div:first-child { border-left: 0; background: var(--chip-bg); color: var(--chip-ink); }
+.strip dt { font-size: 11px; letter-spacing: .12em; text-transform: uppercase; opacity: .75; }
+.strip dd { margin: 0; font-size: 17px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+h1 { font-size: clamp(34px, 6vw, 62px); line-height: 1.02; margin: 0 0 14px; letter-spacing: -.01em; font-weight: 700; }
+h1 span { color: var(--accent); text-shadow: var(--glow); }
+.lead { font-size: 19px; color: var(--ink-2); margin: 0 0 8px; max-width: 34em; }
+.author { color: var(--ink-3); margin: 0 0 22px; }
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn { display: inline-flex; align-items: center; gap: 10px; padding: 12px 18px; border-radius: 10px; text-decoration: none; font-weight: 600; border: 1px solid var(--line); background: var(--panel); color: var(--ink); }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--chip-bg); color: var(--chip-ink); border-color: var(--chip-bg); box-shadow: var(--glow); }
+.btn small { font-weight: 400; opacity: .85; }
+.hero .btn.primary { flex-direction: column; align-items: flex-start; gap: 2px; }
+.hero .btn.primary small { font-size: 13px; }
+.sky { width: 100%; height: auto; display: block; }
+.sky .contour { fill: none; stroke: var(--contour); stroke-width: 1.2; }
+.sky .thermal { fill: none; stroke: var(--accent-2); stroke-width: 1.6; stroke-dasharray: 3 6; opacity: .9; }
+.sky .track { fill: none; stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 2 7; stroke-linecap: round; }
+.sky .glider { fill: var(--glider); }
+.sky .lbl { font: 600 11px/1 "Cascadia Mono", Consolas, monospace; fill: var(--ink-3); letter-spacing: .12em; }
+
+/* gauges */
+.panel { margin: 28px 0 8px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.gauge { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px 14px 16px; box-shadow: var(--shadow); text-align: center; margin: 0; }
+.gauge .dial { position: relative; width: 132px; max-width: 100%; aspect-ratio: 1; margin: 0 auto 8px; }
+.gauge svg { width: 100%; height: 100%; display: block; }
+.gauge .face { fill: var(--face); stroke: var(--line); stroke-width: 2; }
+.gauge .ticks line { stroke: var(--tick); stroke-width: 1.4; opacity: .7; }
+.gauge .ticks line.major { stroke-width: 2.6; opacity: 1; }
+.gauge .needle { stroke: var(--needle); stroke-width: 3; stroke-linecap: round; transform-origin: 60px 60px; transition: transform 1.4s cubic-bezier(.2, .8, .2, 1); }
+.gauge .hub { fill: var(--needle); }
+.gauge .read { position: absolute; inset: 0; display: grid; place-items: center; padding-top: 46%; }
+.gauge .num { font-size: 30px; font-weight: 700; color: var(--face-ink); text-shadow: var(--glow); line-height: 1; }
+.gauge figcaption b { display: block; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--accent); }
+.gauge figcaption span { font-size: 14px; color: var(--ink-2); }
+
+/* toc */
+.toc { margin: 26px 0 6px; display: flex; flex-wrap: wrap; gap: 8px; padding: 0; list-style: none; counter-reset: wp; }
+.toc li { counter-increment: wp; }
+.toc a { display: inline-flex; gap: 8px; align-items: center; padding: 7px 12px; border: 1px dashed var(--line); border-radius: 999px; text-decoration: none; color: var(--ink-2); font-size: 15px; background: color-mix(in srgb, var(--panel) 60%, transparent); }
+.toc a::before { content: "ТП" counter(wp); font: 600 11px/1 "Cascadia Mono", Consolas, monospace; color: var(--accent); }
+.toc a:hover { color: var(--ink); border-style: solid; border-color: var(--accent); }
+
+section { padding: 34px 0 10px; scroll-margin-top: 12px; }
+.sec-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; border-bottom: 1px solid var(--line); padding-bottom: 10px; margin-bottom: 18px; }
+.sec-head .code { font: 600 12px/1 "Cascadia Mono", Consolas, monospace; letter-spacing: .14em; color: var(--chip-ink); background: var(--chip-bg); padding: 6px 8px; border-radius: 6px; }
+h2 { font-size: clamp(26px, 4vw, 38px); margin: 0; line-height: 1.1; font-weight: 700; }
+.sec-head p { margin: 0; color: var(--ink-3); flex-basis: 100%; }
+h3 { font-size: 20px; margin: 0 0 6px; line-height: 1.25; }
+.muted { color: var(--ink-3); }
+
+/* documents */
+.docs { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 14px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+.doc { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 16px; align-items: start; }
+.doc .sheet { width: 64px; height: 84px; border: 1.5px solid var(--ink-2); border-radius: 4px; position: relative; background: var(--panel-2); }
+.doc .sheet::after { content: "PDF"; position: absolute; left: 6px; bottom: 6px; font: 700 12px/1 "Cascadia Mono", Consolas, monospace; color: var(--chip-ink); background: var(--chip-bg); padding: 3px 5px; border-radius: 3px; }
+.doc .sheet i { position: absolute; left: 8px; right: 8px; height: 2px; background: var(--line); }
+.meta { font-size: 14px; color: var(--ink-3); margin: 2px 0 12px; }
+.note { border-left: 3px solid var(--accent-2); padding: 2px 0 2px 12px; color: var(--ink-2); margin: 0; }
+
+/* route */
+.timebar { display: flex; height: 26px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); margin: 6px 0 6px; background: var(--panel-2); }
+.timebar span { display: block; height: 100%; border-right: 1px solid var(--panel); }
+.timebar .s0 { background: color-mix(in srgb, var(--accent) 92%, transparent); }
+.timebar .s1 { background: color-mix(in srgb, var(--accent) 62%, transparent); }
+.timebar .re { background: color-mix(in srgb, var(--accent-2) 55%, transparent); }
+.timebar .qa { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 35%, transparent) 0 6px, transparent 6px 12px); }
+.timescale { display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3); margin-bottom: 4px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 14px; color: var(--ink-2); margin: 4px 0 22px; padding: 0; list-style: none; }
+.legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 6px; }
+.route { list-style: none; margin: 0; padding: 0 0 0 34px; position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 28px; }
+.route::before { content: ""; position: absolute; left: 11px; top: 6px; bottom: 6px; border-left: 2px dashed var(--accent); opacity: .6; }
+.leg { position: relative; padding: 0 0 22px; min-width: 0; }
+.leg::before { content: ""; position: absolute; left: -31px; top: 4px; width: 16px; height: 16px; transform: rotate(45deg); background: var(--panel); border: 2px solid var(--accent); }
+.leg.ends::before { border-radius: 50%; transform: none; background: var(--chip-bg); }
+.leg .wp { font: 600 12px/1 "Cascadia Mono", Consolas, monospace; letter-spacing: .1em; color: var(--accent); }
+.leg h3 { margin: 4px 0 2px; }
+.leg p { margin: 0 0 6px; color: var(--ink-2); }
+.leg .dist { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--ink-3); }
+.leg .dist b { display: block; height: 6px; border-radius: 3px; background: var(--accent); opacity: .8; min-width: 8px; }
+.takeaway { margin: 6px 0 0; padding: 14px 16px; border-radius: 12px; background: var(--soft-bg); color: var(--soft-ink); }
+
+/* log */
+.log { counter-reset: rec; display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
+.rec { counter-increment: rec; display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; box-shadow: var(--shadow); }
+.rec .stamp { font: 600 12px/1.4 "Cascadia Mono", Consolas, monospace; color: var(--ink-3); letter-spacing: .08em; }
+.rec .stamp::before { content: "ЗАПИСЬ " counter(rec, decimal-leading-zero); display: block; color: var(--accent); }
+.rec h3 { font-size: 18px; }
+.rec p { margin: 0; color: var(--ink-2); }
+.crew { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 16px; }
+.crew h3 { display: flex; align-items: center; gap: 10px; }
+.crew h3 .tag { font: 600 11px/1 "Cascadia Mono", Consolas, monospace; padding: 5px 7px; border-radius: 5px; background: var(--chip-bg); color: var(--chip-ink); letter-spacing: .1em; }
+.crew ul { margin: 8px 0 0; padding-left: 20px; color: var(--ink-2); }
+.crew li { margin: 3px 0; }
+.motto { margin: 16px 0 0; font-size: 20px; text-align: center; color: var(--ink); }
+.motto span { color: var(--accent); }
+
+/* cockpit */
+.zone { border: 1px solid var(--line); border-radius: 18px; padding: 18px; background: linear-gradient(180deg, var(--panel-2), var(--panel)); box-shadow: var(--shadow); }
+.modes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 18px; }
+.mode { border: 1px dashed var(--line); border-radius: 12px; padding: 12px 14px; }
+.mode b { display: block; font: 600 12px/1.2 "Cascadia Mono", Consolas, monospace; letter-spacing: .12em; color: var(--accent); text-transform: uppercase; margin-bottom: 4px; }
+.mode p { margin: 0; color: var(--ink-2); font-size: 15px; }
+.switches { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.sw { display: grid; grid-template-rows: auto 1fr auto; gap: 6px; text-decoration: none; color: var(--ink); background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px 14px 46px; position: relative; min-width: 0; }
+.sw::before { content: ""; position: absolute; left: 16px; top: 18px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent-2); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-2) 25%, transparent), var(--glow); }
+.sw:hover { border-color: var(--accent); transform: translateY(-1px); }
+.sw strong { font-size: 18px; }
+.sw span { color: var(--ink-2); font-size: 15px; }
+.sw em { font-style: normal; font: 12px/1.3 "Cascadia Mono", Consolas, monospace; color: var(--ink-3); }
+.sw.off::before { background: var(--ink-3); box-shadow: none; }
+.offline { margin: 16px 0 0; }
+
+/* contacts */
+.contacts { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px; align-items: center; }
+.contacts .mark { width: 76px; height: 76px; border-radius: 18px; background: var(--chip-bg); color: var(--chip-ink); display: grid; place-items: center; box-shadow: var(--glow); }
+.contacts .mark svg { width: 56px; height: 56px; }
+.contacts ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.contacts a { text-decoration-color: var(--accent); text-underline-offset: 3px; }
+footer { padding: 30px 0 40px; color: var(--ink-3); font-size: 14px; border-top: 1px solid var(--line); margin-top: 30px; }
+
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero .sky { max-width: 520px; margin: 0 auto; }
+  .panel { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .docs, .crew { grid-template-columns: 1fr; }
+  .route { grid-template-columns: 1fr; }
+  .switches, .modes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 560px) {
+  body { font-size: 15.5px; }
+  .top { padding-right: 60px; }
+  .callsign { display: none; }
+  .strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .strip div:nth-child(3) { border-left: 0; }
+  .strip div:nth-child(n+3) { border-top: 1px solid var(--line); }
+  .switches, .modes { grid-template-columns: 1fr; }
+  .rec { grid-template-columns: 1fr; gap: 6px; }
+  .gauge .dial { width: 112px; }
+  .gauge .num { font-size: 26px; }
+  .doc { grid-template-columns: 48px minmax(0, 1fr); }
+  .doc .sheet { width: 48px; height: 64px; }
+  .contacts { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .gauge .needle { transition: none; }
+  .sw:hover { transform: none; }
+}
+@media print {
+  .theme-toggle, .toc, .skip { display: none; }
+  body { background: #fff; }
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">К содержанию</a>
+<button class="theme-toggle" id="theme-toggle" type="button" aria-label="Переключить тему">☾</button>
+
+<div class="wrap">
+  <div class="top">
+    <a class="brand-back" href="https://pikov.expert" title="Сайт автора">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 7.5 L6.4 5.6 L12 3.5 L17.6 5.6 L17.6 7.5"/><path d="M6.8 14.6 C7.6 17.2 9.5 19.1 12 20.4 C14.5 19.1 16.4 17.2 17.2 14.6"/><path d="M2.9 10 C6.2 11.6 9.1 12.2 12 12.2 C14.9 12.2 17.8 11.6 21.1 10"/><path d="M12 12.2 L12 8.1"/><path d="M10.1 8.1 L13.9 8.1"/></g><circle cx="12" cy="13.2" r="2" fill="currentColor"/></svg>
+      pikov.expert
+    </a>
+    <span class="callsign mono">rubin.pikov.expert · полётное задание</span>
+  </div>
+</div>
+
+<main id="main">
+<div class="wrap">
+  <header class="hero">
+    <div>
+      <dl class="strip mono" aria-label="Сведения о семинаре">
+        <div><dt>Тип</dt><dd>семинар</dd></div>
+        <div><dt>Полёт</dt><dd>2 часа</dd></div>
+        <div><dt>Маршрут</dt><dd>7 частей</dd></div>
+        <div><dt>Формат</dt><dd>очно</dd></div>
+      </dl>
+      <h1 class="display">Интеллектуальная автоматизация <span>бизнес‑процессов</span></h1>
+      <p class="lead">Семинар для руководителей ПАО АК «Рубин». Управленческая рамка, применение по подразделениям и риски.</p>
+      <p class="author">Виталий Пиков, архитектор информационной безопасности, лектор и автор образовательных программ</p>
+      <div class="actions">
+        <a class="btn primary" data-m="handout" href="files/rubin-seminar-v005.pdf" download>Скачать презентацию <small data-info="handout">PDF</small></a>
+        <a class="btn" href="#log">Как готовился доклад</a>
+      </div>
+    </div>
+    <svg class="sky" viewBox="0 0 520 420" role="img" aria-label="Планер набирает высоту в восходящем потоке над топографической картой">
+      <g>
+        <path class="contour" d="M20 360 C90 300 170 330 230 300 C300 266 380 300 500 250"/>
+        <path class="contour" d="M20 392 C110 340 190 372 260 338 C330 306 410 340 500 300"/>
+        <path class="contour" d="M60 300 C120 250 190 270 240 240 C300 206 360 226 420 196 C455 180 480 186 500 176"/>
+        <path class="contour" d="M110 240 C160 205 215 218 255 192 C300 164 350 178 395 156"/>
+        <path class="contour" d="M150 196 C190 172 228 178 262 160 C292 144 320 150 346 140"/>
+        <ellipse class="contour" cx="250" cy="160" rx="38" ry="12"/>
+      </g>
+      <g aria-hidden="true">
+        <ellipse class="thermal" cx="250" cy="330" rx="120" ry="26"/>
+        <ellipse class="thermal" cx="252" cy="268" rx="104" ry="22"/>
+        <ellipse class="thermal" cx="255" cy="208" rx="88" ry="19"/>
+        <ellipse class="thermal" cx="258" cy="150" rx="72" ry="16"/>
+        <ellipse class="thermal" cx="261" cy="96" rx="56" ry="13"/>
+        <path class="track" id="climb" d="M250 356 C380 352 380 304 252 290 C126 278 132 236 255 228 C356 220 352 180 258 170 C170 160 178 124 261 114 C330 106 330 78 261 72"/>
+        <g class="glider" id="glider">
+          <path d="M-46 0 L-4 -2.2 L-3 -9 L3 -9 L4 -2.2 L46 0 L4 2.4 L2.5 15 L9 17 L9 19.5 L0 18.6 L-9 19.5 L-9 17 L-2.5 15 L-4 2.4 Z" transform="rotate(90) scale(.85)"/>
+        </g>
+        <text class="lbl" x="300" y="392">СТАРТ</text>
+        <text class="lbl" x="300" y="60">ФИНИШ</text>
+      </g>
+    </svg>
+  </header>
+
+  <div class="panel" role="list" aria-label="Приборы: главные числа доклада">
+    <figure class="gauge" role="listitem" data-value="94" data-max="100">
+      <div class="dial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="face" cx="60" cy="60" r="56"/><g class="ticks"></g><line class="needle" x1="60" y1="60" x2="60" y2="16"/><circle class="hub" cx="60" cy="60" r="4"/></svg><div class="read"><span class="num display">94</span></div></div>
+      <figcaption><b>слайда</b><span>в колоде, 19 из них – запас и источники</span></figcaption>
+    </figure>
+    <figure class="gauge" role="listitem" data-value="128" data-max="140">
+      <div class="dial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="face" cx="60" cy="60" r="56"/><g class="ticks"></g><line class="needle" x1="60" y1="60" x2="60" y2="16"/><circle class="hub" cx="60" cy="60" r="4"/></svg><div class="read"><span class="num display">128</span></div></div>
+      <figcaption><b>источников</b><span>ссылка стоит рядом с числом</span></figcaption>
+    </figure>
+    <figure class="gauge" role="listitem" data-value="120" data-max="120">
+      <div class="dial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="face" cx="60" cy="60" r="56"/><g class="ticks"></g><line class="needle" x1="60" y1="60" x2="60" y2="16"/><circle class="hub" cx="60" cy="60" r="4"/></svg><div class="read"><span class="num display">120</span></div></div>
+      <figcaption><b>минут</b><span>с остановками на вопросы</span></figcaption>
+    </figure>
+    <figure class="gauge" role="listitem" data-value="5" data-max="6">
+      <div class="dial"><svg viewBox="0 0 120 120" aria-hidden="true"><circle class="face" cx="60" cy="60" r="56"/><g class="ticks"></g><line class="needle" x1="60" y1="60" x2="60" y2="16"/><circle class="hub" cx="60" cy="60" r="4"/></svg><div class="read"><span class="num display">5</span></div></div>
+      <figcaption><b>редакций</b><span>v.001–v.005, за два дня</span></figcaption>
+    </figure>
+  </div>
+
+  <nav aria-label="Маршрут страницы">
+    <ol class="toc">
+      <li><a href="#docs">Документы</a></li>
+      <li><a href="#route">Маршрут доклада</a></li>
+      <li><a href="#log">Как готовился доклад</a></li>
+      <li><a href="#cockpit">Для докладчика</a></li>
+      <li><a href="#contacts">Связь</a></li>
+    </ol>
+  </nav>
+
+  <section id="docs" aria-labelledby="docs-h">
+    <div class="sec-head"><span class="code">ТП1</span><h2 id="docs-h" class="display">Документы на борт</h2><p>Слайды доклада для просмотра и печати.</p></div>
+    <div class="docs">
+      <div class="card doc">
+        <div class="sheet" aria-hidden="true"><i style="top:12px"></i><i style="top:20px"></i><i style="top:28px;right:20px"></i><i style="top:40px"></i></div>
+        <div>
+          <h3>Презентация семинара</h3>
+          <p class="meta mono"><span data-info="handout">PDF</span> · редакция <span data-ver>v.005</span></p>
+          <p class="muted" style="margin:0 0 14px">Слайды доклада и шесть страниц источников в конце: у каждого источника адрес указан полностью.</p>
+          <a class="btn primary" data-m="handout" href="files/rubin-seminar-v005.pdf" download>Скачать PDF</a>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Как читать цифры</h3>
+        <p class="note">Чужая цифра – не обещание.</p>
+        <p class="muted" style="margin:12px 0 0">Номер в квадратных скобках рядом с числом ведёт к источнику в списке в конце презентации.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="route" aria-labelledby="route-h">
+    <div class="sec-head"><span class="code">ТП2</span><h2 id="route-h" class="display">Маршрут доклада</h2><p>Семь частей, как поворотные пункты. Минуты – по плану к каждому слайду.</p></div>
+    <div class="timescale mono" aria-hidden="true"><span>0 мин</span><span>60 мин</span><span>120 мин</span></div>
+    <div class="timebar" role="img" aria-label="Время семинара: 89,5 минуты речи по плану, 8 минут на реплики зала, около 22 минут на вопросы"></div>
+    <ul class="legend">
+      <li><i style="background:var(--accent)"></i>речь по частям, 89,5 мин</li>
+      <li><i style="background:color-mix(in srgb, var(--accent-2) 55%, transparent)"></i>реплики зала, 8 мин</li>
+      <li><i style="background:repeating-linear-gradient(135deg, color-mix(in srgb, var(--accent-2) 45%, transparent) 0 4px, transparent 4px 8px)"></i>вопросы, около 22 мин</li>
+    </ul>
+    <ol class="route" id="route-list"></ol>
+    <p class="takeaway">Унесёте с собой одну страницу, по которой отбирают процессы, считают деньги и останавливают пилоты.</p>
+  </section>
+
+  <section id="log" aria-labelledby="log-h">
+    <div class="sec-head"><span class="code">ТП3</span><h2 id="log-h" class="display">Бортовой журнал: как готовился доклад</h2><p>Доклад собран вместе с ИИ: помощник – Claude, рецензент – Codex. Ниже порядок работы.</p></div>
+    <ol class="log">
+      <li class="rec"><div class="stamp">задание</div><div><h3>Задача и рамки</h3><p>Автор задал тему, аудиторию и формат: два часа для руководителей, примеры по подразделениям, удачные и неудачные. Стиль – как в его прежних докладах.</p></div></li>
+      <li class="rec"><div class="stamp">источники</div><div><h3>128 источников, каждый открыт</h3><p>Законы сверены с текстами в правовых базах, статьи – по doi.org, отчёты – по страницам компаний и ведомств. Источник стоит рядом с числом на слайде, а полный список с адресами – в конце презентации.</p></div></li>
+      <li class="rec"><div class="stamp">сценарий</div><div><h3>Текст речи к каждому слайду</h3><p>Для каждого слайда написан текст речи и время по плану. Истории с пометкой «Из моего опыта» взяты из практики автора.</p></div></li>
+      <li class="rec"><div class="stamp">слайды</div><div><h3>Колода собрана программой</h3><p>94 слайда собраны на Python из текстовых исходников, с графиками и 15 анимациями. Правка одной строки пересобирает колоду с той же вёрсткой. Отдельно собирается PDF для организатора.</p></div></li>
+      <li class="rec"><div class="stamp">проверка</div><div><h3>Рецензент в разных ролях</h3><p>Отдельная модель читала доклад глазами директора, фактчекера и редактора речи. Кругов проверки было шесть: два до сборки колоды и четыре после. По каждому замечанию решение принималось отдельно: исправить или оставить.</p></div></li>
+      <li class="rec"><div class="stamp">редакции</div><div><h3>Пять редакций за два дня</h3><p>Две редакции в первый день, три во второй. Каждая сохранена отдельным файлом, прежние не перезаписаны.</p></div></li>
+      <li class="rec"><div class="stamp">репетиция</div><div><h3>Суфлёр, тайминг, видео-прогон</h3><p>Суфлёр показывает слайд, текст и секундомер. Тайминг подсказывает, где время может уйти. Видео-прогон проигрывает доклад целиком.</p></div></li>
+    </ol>
+    <div class="crew">
+      <div class="card"><h3><span class="tag">ИИ</span>Готовил</h3><ul><li>искал и сводил источники, проверял числа по первоисточникам</li><li>писал черновики речи и слайдов</li><li>собирал колоду, PDF, суфлёр и тайминг</li><li>критиковал доклад в чужих ролях</li></ul></div>
+      <div class="card"><h3><span class="tag">ЧЕЛОВЕК</span>Решал</h3><ul><li>ставил задачу и границы</li><li>выбирал, что оставить, а что убрать</li><li>рассказывал свои истории и вносил правки</li><li>выходит к залу и отвечает за каждое слово</li></ul></div>
+    </div>
+    <p class="motto display">Машина готовит, <span>человек проверяет и подписывает.</span></p>
+  </section>
+
+  <section id="cockpit" aria-labelledby="cockpit-h">
+    <div class="sec-head"><span class="code">ТП4</span><h2 id="cockpit-h" class="display">Для докладчика</h2><p>Подготовка к выступлению в трёх режимах. Слайды – редакция <span data-ver>v.005</span>, суфлёр – <span data-pver>v.005.1</span>.</p></div>
+    <div class="zone">
+      <div class="modes">
+        <div class="mode"><b>Без видео</b><p>Суфлёр и секундомер: читать вслух и сверяться с планом по минутам.</p></div>
+        <div class="mode"><b>С видео</b><p>Суфлёр с видео: прогон идёт, слайды и текст листаются вслед за ним.</p></div>
+        <div class="mode"><b>Только видео</b><p>Прослушать доклад целиком, например в дороге.</p></div>
+      </div>
+      <div class="switches">
+        <a class="sw" data-m="prompter" href="speaker/prompter-v005-1.html"><strong>Суфлёр <span data-pver>v.005.1</span></strong><span>Слайд, текст речи, план и секундомер. Кнопки ‹ ›, «Только речь», шрифт А+ и А−, список слайдов.</span><em data-info="prompter">HTML</em></a>
+        <a class="sw" data-m="prompter_video" data-video href="speaker/prompter-video-v005-1.html"><strong>Суфлёр с видео <span data-pver>v.005.1</span></strong><span>То же с видео-прогоном. Кнопка «Листать за видео» синхронизирует слайды и текст.</span><em data-info="prompter_video">HTML</em></a>
+        <a class="sw" data-m="video" data-video><strong>Видео-прогон</strong><span>Доклад целиком для репетиции: речь и паузы на реплики зала.</span><em data-info="video">MP4</em></a>
+        <a class="sw" data-m="script" href="speaker/script-v005.html"><strong>Сценарий</strong><span>Полный текст речи по слайдам с источниками.</span><em data-info="script">HTML</em></a>
+        <a class="sw" data-m="timing" href="speaker/timing-v005.html"><strong>Тайминг</strong><span>Контрольные точки по времени и что сократить, если опаздываем.</span><em data-info="timing">HTML</em></a>
+        <a class="sw" data-m="pptx" href="files/rubin-seminar-v005.pptx" download><strong>Презентация PowerPoint</strong><span>Рабочая колода с заметками и скрытым запасом.</span><em data-info="pptx">PPTX</em></a>
+        <a class="sw" data-m="show" href="files/rubin-seminar-v005-show.pdf" download><strong>PDF показа</strong><span>Все слайды основного маршрута с источниками, как на экране.</span><em data-info="show">PDF</em></a>
+      </div>
+      <p class="note offline">Сеть не нужна: папку сайта можно скопировать на флешку и открыть index.html. Для видео без сети положите файл в папку media рядом со страницей.</p>
+    </div>
+  </section>
+
+  <section id="contacts" aria-labelledby="contacts-h">
+    <div class="sec-head"><span class="code">ТП5</span><h2 id="contacts-h" class="display">Связь</h2></div>
+    <div class="card contacts">
+      <div class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6.4 7.5 L6.4 5.6 L12 3.5 L17.6 5.6 L17.6 7.5"/><path d="M6.8 14.6 C7.6 17.2 9.5 19.1 12 20.4 C14.5 19.1 16.4 17.2 17.2 14.6"/><path d="M2.9 10 C6.2 11.6 9.1 12.2 12 12.2 C14.9 12.2 17.8 11.6 21.1 10"/><path d="M12 12.2 L12 8.1"/><path d="M10.1 8.1 L13.9 8.1"/></g><circle cx="12" cy="13.2" r="2" fill="currentColor"/></svg></div>
+      <div>
+        <h3>Пиков Виталий Александрович</h3>
+        <p class="muted" style="margin:0">Архитектор информационной безопасности · РБПО · DevSecOps · AppSec. Лектор и автор образовательных программ по ИБ и РБПО.</p>
+        <ul>
+          <li><a href="tel:+79637829278">+7 (963) 782-92-78</a></li>
+          <li><a href="mailto:vitaly@pikov.expert">vitaly@pikov.expert</a></li>
+          <li><a href="https://pikov.expert">pikov.expert</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+</main>
+
+<footer>
+  <div class="wrap">Безопасность. Парю над высокими технологиями, как планер над просторами. · Редакция материалов <span data-ver>v.005</span></div>
+</footer>
+
+<script src="assets/materials.js"></script>
+<script>
+(function () {
+  var root = document.documentElement, btn = document.getElementById('theme-toggle');
+  function current() {
+    var t = root.getAttribute('data-theme');
+    if (t) return t;
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  function paint() {
+    var dark = current() === 'dark';
+    btn.textContent = dark ? '☀' : '☾';
+    btn.setAttribute('aria-label', dark ? 'Включить светлую тему' : 'Включить тёмную тему');
+  }
+  paint();
+  btn.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.setAttribute('data-theme', next);
+    try {
+      var now = new Date(), until = new Date(now), h = now.getHours();
+      if (h >= 20) { until.setDate(until.getDate() + 1); until.setHours(7, 0, 0, 0); }
+      else if (h < 7) until.setHours(7, 0, 0, 0);
+      else until.setHours(20, 0, 0, 0);
+      localStorage.setItem('rubin-theme-choice', JSON.stringify({ theme: next, until: until.getTime() }));
+    } catch (e) {}
+    paint();
+  });
+})();
+
+(function () {
+  var M = window.RUBIN_MATERIALS;
+  function fmt(n) {
+    if (n >= 1048576) return (n / 1048576).toFixed(1).replace('.', ',') + ' МБ';
+    return Math.max(1, Math.round(n / 1024)) + ' КБ';
+  }
+  function pages(p) {
+    var m10 = p % 10, m100 = p % 100;
+    var w = (m10 === 1 && m100 !== 11) ? 'страница' : (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) ? 'страницы' : 'страниц';
+    return p + ' ' + w;
+  }
+  if (M) {
+    document.querySelectorAll('[data-ver]').forEach(function (el) { el.textContent = M.version; });
+    document.querySelectorAll('[data-pver]').forEach(function (el) { el.textContent = M.prompter_version || M.version; });
+    document.querySelectorAll('[data-m]').forEach(function (a) {
+      var it = M[a.getAttribute('data-m')];
+      if (it && it.href) a.setAttribute('href', it.href);
+    });
+    document.querySelectorAll('[data-info]').forEach(function (el) {
+      var key = el.getAttribute('data-info'), it = M[key];
+      if (!it) return;
+      var ext = it.href.split('.').pop().toUpperCase(), parts = [ext];
+      if (it.pages) parts.push(pages(it.pages));
+      if (it.minutes) parts.push(String(it.minutes).replace('.', ',') + ' мин');
+      if (it.bytes) parts.push(fmt(it.bytes));
+      el.textContent = parts.join(' · ');
+    });
+    if (M.video && M.video.enabled === false) {
+      document.querySelectorAll('[data-video]').forEach(function (a) {
+        a.classList.add('off'); a.removeAttribute('href'); a.setAttribute('aria-disabled', 'true');
+        var em = a.querySelector('em'); if (em) em.textContent = 'видео пока не выложено';
+      });
+    }
+  }
+
+  var legs = [
+    ['Старт', 'Заход', 'Топ-10 вопросов руководителя, что ИИ изменил в работе автора, «каждый раз – всё пропало»', '1–12', 12.1, 1],
+    ['ТП1', 'Почему не получится отсидеться', 'Нехватка людей, государство, свои же люди', '14–15', 3.2],
+    ['ТП2', 'Говорим на одном языке', 'От кнопки до агента: восемь классов решений', '16–25', 9.2],
+    ['ТП3', 'Рамка руководителя', 'Назначить ответственного, поставить задачу, отобрать процесс', '26–33', 10.2],
+    ['ТП4', 'Восемь подразделений – восемь случаев', 'Продажи, производство, финансы, кадры, закупки, сервис, комплаенс, инженеры; голосование', '34–43', 16.1],
+    ['ТП5', 'Сквозной пример: счёт поставщика', 'Что роботу, что модели, что человеку', '44–50', 10.7],
+    ['ТП6', 'Риски, деньги, люди', 'Риски, стоимость, окупаемость, условия пилота', '51–63', 15.3],
+    ['ТП7', 'Наши дети', 'Те, кто растёт вместе с ИИ', '64–68', 6.3],
+    ['Финиш', 'Что делать в понедельник', 'Рамка на одной странице, первые шаги, куда дальше', '69–75', 6.4, 1]
+  ];
+  var list = document.getElementById('route-list'), bar = document.querySelector('.timebar');
+  var max = 16.1, total = 120;
+  legs.forEach(function (l, i) {
+    var li = document.createElement('li');
+    li.className = 'leg' + (l[5] ? ' ends' : '');
+    li.innerHTML = '<span class="wp">' + l[0] + '</span><h3></h3><p></p><div class="dist mono"><b></b><span></span></div>';
+    li.querySelector('h3').textContent = l[1];
+    li.querySelector('p').textContent = l[2];
+    li.querySelector('.dist b').style.width = Math.round(l[4] / max * 140) + 'px';
+    li.querySelector('.dist span').textContent = 'слайды ' + l[3] + ' · ' + String(l[4]).replace('.', ',') + ' мин';
+    list.appendChild(li);
+    var s = document.createElement('span');
+    s.className = i % 2 ? 's1' : 's0';
+    s.style.width = (l[4] / total * 100) + '%';
+    s.title = l[1] + ': ' + String(l[4]).replace('.', ',') + ' мин';
+    bar.appendChild(s);
+  });
+  var re = document.createElement('span'); re.className = 're'; re.style.width = (8 / total * 100) + '%'; re.title = 'Реплики зала: 8 мин'; bar.appendChild(re);
+  var qa = document.createElement('span'); qa.className = 'qa'; qa.style.flex = '1'; qa.title = 'Вопросы: около 22 мин'; bar.appendChild(qa);
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  document.querySelectorAll('.gauge').forEach(function (g) {
+    var ticks = g.querySelector('.ticks'), ns = 'http://www.w3.org/2000/svg';
+    for (var k = 0; k <= 30; k++) {
+      var a = (-135 + k * 9) * Math.PI / 180, major = k % 5 === 0;
+      var r1 = major ? 41 : 45, r2 = 51, ln = document.createElementNS(ns, 'line');
+      ln.setAttribute('x1', 60 + r1 * Math.sin(a)); ln.setAttribute('y1', 60 - r1 * Math.cos(a));
+      ln.setAttribute('x2', 60 + r2 * Math.sin(a)); ln.setAttribute('y2', 60 - r2 * Math.cos(a));
+      if (major) ln.setAttribute('class', 'major');
+      ticks.appendChild(ln);
+    }
+    var v = +g.getAttribute('data-value'), mx = +g.getAttribute('data-max');
+    var needle = g.querySelector('.needle'), deg = -135 + 270 * Math.min(1, v / mx);
+    needle.style.transform = 'rotate(-135deg)';
+    var set = function () { needle.style.transform = 'rotate(' + deg + 'deg)'; };
+    if (reduce) set(); else setTimeout(set, 250);
+  });
+
+  var glider = document.getElementById('glider'), path = document.getElementById('climb');
+  if (glider && path && path.getTotalLength) {
+    var L = path.getTotalLength();
+    var place = function (t) {
+      var d = t * L, p = path.getPointAtLength(d), q = path.getPointAtLength(Math.min(L, d + 1));
+      var ang = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+      glider.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ') rotate(' + ang + ')');
+    };
+    if (reduce) { place(.82); }
+    else {
+      var t0 = null;
+      var step = function (ts) {
+        if (t0 === null) t0 = ts;
+        var t = ((ts - t0) / 26000) % 1;
+        place(t);
+        requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+  }
+})();
+</script>
+</body>
+</html>

@@ -120,7 +120,9 @@ $reviewedPdfHashes = [System.Collections.Generic.HashSet[string]]::new([System.S
   '0acff084bbf133579a8900a4fd08e4d84ea95b67e1ec91973d55d378fb555bac', # kamaz-ai: День-4-Агент-AutoClaw-деловой-ответ.pdf - author PDF of the AutoClaw agent guide handed out in class; text read and checked against the published MD,
   'e09a2d56160d6db3b5b118a2590a487a2f3ba4d3a3e96eef802f935e69c6d8a5', # kamaz-ai: Рабочая-тетрадь-образец-заполнения.pdf - sample filled course workbook exported by Word from the reviewed DOCX (easter egg); text checked, no personal data,
   '23919baa174e500d01ead622db3d2bc25cb031ce999e1f2337efe88639dc7623', # kamaz-ai: Практические-советы-по-применению-ИИ-в-РФ.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
-  '136a84f22fb7282166f9c0267b5706d22a21370a4a4b5ef32a0759e5774cb3ba' # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners
+  '136a84f22fb7282166f9c0267b5706d22a21370a4a4b5ef32a0759e5774cb3ba', # kamaz-ai: YCodex-установка-и-первый-запуск.pdf - author course advice printed by Chrome from the reviewed source; facts checked, no personal data of listeners,
+  'df44f35416b90229385d8b8584d4ebbda622ad25a339e99e11f5c8bc9a010a24', # rubin: rubin-seminar-v005.pdf - author seminar slides v.005 for participants exported by PowerPoint from the reviewed PPTX (slides 2, 4, 5 hidden), title date redacted; sources checked, no personal data of third parties,
+  'b294334d5aa705fb44ae64f3c928e804db6d55edaa953541622e34fe9de3a826' # rubin: rubin-seminar-v005-show.pdf - author seminar slides v.005 as shown, exported by PowerPoint from the reviewed PPTX, title date redacted; sources checked, no personal data of third parties
 ) | ForEach-Object { [void]$reviewedPdfHashes.Add($_) }
 
 $failures = [System.Collections.Generic.List[string]]::new()
