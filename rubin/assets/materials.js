@@ -1,6 +1,6 @@
 window.RUBIN_MATERIALS = {
  "version": "v.005",
- "prompter_version": "v.005.1",
+ "prompter_version": "v.005.2",
  "video": {
   "href": "media/rubin-v005.mp4",
   "bytes": 190631116,
@@ -11,12 +11,12 @@ window.RUBIN_MATERIALS = {
   "bytes": 1749637
  },
  "prompter": {
-  "href": "speaker/prompter-v005-1.html",
-  "bytes": 8546869
+  "href": "speaker/prompter-v005-2.html",
+  "bytes": 8730116
  },
  "prompter_video": {
-  "href": "speaker/prompter-video-v005-1.html",
-  "bytes": 8564363
+  "href": "speaker/prompter-video-v005-2.html",
+  "bytes": 8747610
  },
  "script": {
   "href": "speaker/script-v005.html",
@@ -30,5 +30,9 @@ window.RUBIN_MATERIALS = {
   "href": "files/rubin-seminar-v005.pdf",
   "bytes": 1740426,
   "pages": 94
+ },
+ "prompter_offline": {
+  "href": "files/rubin-prompter-offline-v005-2.html",
+  "bytes": 8730343
  }
 };
