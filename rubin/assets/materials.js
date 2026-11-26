@@ -8,29 +8,29 @@ window.RUBIN_MATERIALS = {
  },
  "handout": {
   "href": "files/rubin-seminar-v005.pdf",
-  "bytes": 1224378,
+  "bytes": 1586881,
   "pages": 78
  },
  "show": {
   "href": "files/rubin-seminar-v005-show.pdf",
-  "bytes": 1231647,
+  "bytes": 1602540,
   "pages": 81
  },
  "pptx": {
   "href": "files/rubin-seminar-v005.pptx",
-  "bytes": 1752277
+  "bytes": 1752083
  },
  "prompter": {
   "href": "speaker/prompter-v005-1.html",
-  "bytes": 8552959
+  "bytes": 8545689
  },
  "prompter_video": {
   "href": "speaker/prompter-video-v005-1.html",
-  "bytes": 8561499
+  "bytes": 8554229
  },
  "script": {
   "href": "speaker/script-v005.html",
-  "bytes": 215769
+  "bytes": 215521
  },
  "timing": {
   "href": "speaker/timing-v005.html",
