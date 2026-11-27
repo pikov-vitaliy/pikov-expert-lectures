@@ -34,7 +34,6 @@ const short = url => url.replace('https://', '').replace('.pikov.expert', '').re
 const found = (query, kind = '') => Array.from(engine.search(query, kind).results, r => short(r.item.url)).sort();
 
 test('every card carries the material kind used by /new/ and only known tags', () => {
-  assert.equal(LECTURES.length, 46);
   const tags = new Set(SEARCH_SYNONYMS.filter(g => g.tag).map(g => g.tag));
   for (const item of LECTURES) {
     const { kind, ...rest } = item;
@@ -70,11 +69,37 @@ test('typing letter by letter narrows without noise', () => {
   assert.equal(engine.search('Р', '').active, false);
   assert.deepEqual(found('Руб'), ['rubin']);
   assert.deepEqual(found('нейр'), ['kamaz-ai', 'neural-network-digit-recognition', 'rubin']);
+  // Пока набирается первое слово многословного термина, выдача не обнуляется.
+  for (const group of SEARCH_SYNONYMS) for (const term of group.terms) {
+    if (!term.includes(' ') || !found(term).length) continue;
+    for (let k = 4; k <= term.length; k++) {
+      const prefix = term.slice(0, k);
+      if (prefix.endsWith(' ')) continue;
+      assert.ok(found(prefix).length > 0, `«${prefix}» from «${term}» gives nothing`);
+    }
+  }
+});
+
+test('word forms, abbreviations and addresses', () => {
+  const ai = ['kamaz-ai', 'neural-network-digit-recognition', 'rubin'];
+  for (const q of ['нейросетями', 'нейросетей', 'искусственного интеллекта', 'языковыми моделями', 'neural networks']) assert.deepEqual(found(q), ai, q);
+  assert.ok(!found('ИИ ОС').includes('rubin'), 'ОС must not match «остановки» in the prefix fallback');
+  assert.deepEqual(found('rubin.pikov.expert'), ['rubin']);
+  assert.deepEqual(found('https://kamaz-ai.pikov.expert/'), ['kamaz-ai']);
+  assert.deepEqual(found('ГОСТ'), found('GOST'));
+  assert.deepEqual(found('license'), found('licenses'));
+  assert.ok(found('courses').length > 0);
+  const ranked = Array.from(engine.search('искусственный интеллект', '').results, r => short(r.item.url));
+  assert.equal(ranked[0], 'kamaz-ai', 'exact title match goes first');
+  assert.deepEqual(found('ИИ' + ' '.repeat(130) + 'xyzzy'), ai, 'queries are cut to MAX_QUERY like the field and the address');
 });
 
 test('kind filter applies with and without a query', () => {
   assert.equal(found('', 'course').length, LECTURES.filter(l => l.kind === 'course').length);
   assert.deepEqual(found('ИИ', 'course'), ['kamaz-ai']);
+  // Запасной поиск по началу слова выбирается уже внутри выбранного типа.
+  assert.ok(found('se', 'course').length > 0);
+  assert.ok(found('As', 'practice').length > 0);
 });
 
 test('quick topics: Russian and English labels find the same non-empty set', () => {
