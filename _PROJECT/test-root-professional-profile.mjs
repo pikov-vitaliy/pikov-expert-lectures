@@ -25,16 +25,96 @@ test("bilingual markup keeps both language branches present", () => {
   assert.doesNotMatch(rawRoot, /<span data-l="(?:ru|en)">(?:(?!<\/span>)[\s\S])*<span\b/);
 });
 
-// Видимый текст: без тегов и с декодированными сущностями (&#69; и т. п.), чтобы запрет не обходился кодированием.
-function visibleText(html) {
+// ── Проверка «нет прежнего работодателя» (слово владельца 27.11.2026) ─────────────
+// Страница проверяется в трёх слоях: исходный HTML (адреса и имена файлов), видимый
+// текст (как его прочтёт человек) и значения атрибутов (подсказки, alt, ссылки).
+const INLINE_TAGS = "a|abbr|b|bdi|bdo|cite|code|data|del|dfn|em|font|i|ins|kbd|label|mark|q|s|samp|small|span|strong|sub|sup|time|u|var|wbr";
+const NAMED_ENTITIES = { nbsp: " ", laquo: "«", raquo: "»", bdquo: "„", ldquo: "“", rdquo: "”", quot: '"', apos: "'", amp: "&", lt: "<", gt: ">", ndash: "–", mdash: "—", shy: "" };
+
+// Сущности раскрываются за один проход: «&#x26;#69;» даёт буквальное «&#69;», а не «E».
+function decodeEntities(text) {
+  return text.replace(/&(?:#x([0-9a-f]+)|#(\d+)|([a-z]+));/gi, (all, hex, dec, name) => {
+    if (hex) return String.fromCodePoint(parseInt(hex, 16));
+    if (dec) return String.fromCodePoint(Number(dec));
+    const key = name.toLowerCase();
+    return key in NAMED_ENTITIES ? NAMED_ENTITIES[key] : all;
+  });
+}
+
+function stripInvisible(html) {
   return html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&#x([0-9a-f]+);?/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
-    .replace(/&#(\d+);?/g, (_, d) => String.fromCodePoint(Number(d)))
-    .replace(/&nbsp;/gi, " ").replace(/&laquo;/gi, "«").replace(/&raquo;/gi, "»").replace(/&quot;/gi, '"').replace(/&apos;|&#39;/gi, "'").replace(/&amp;/gi, "&")
+    .replace(/<!--[\s\S]*?-->/g, " ")
+    .replace(/<(script|style|template|noscript)\b[\s\S]*?<\/\1\s*>/gi, " ")
+    .replace(/data:[^"'\s)]*/gi, " ");
+}
+
+function textLayers(html) {
+  const clean = stripInvisible(html);
+  const attributes = [...clean.matchAll(/\s(?:title|alt|aria-[\w-]+|content|value|placeholder|data-[\w-]+|href|src|srcset|action)\s*=\s*("([^"]*)"|'([^']*)')/gi)]
+    .map(m => decodeEntities(m[2] ?? m[3] ?? ""));
+  const visible = decodeEntities(clean
+    .replace(new RegExp(`</?(?:${INLINE_TAGS})\\b[^>]*>`, "gi"), "")
+    .replace(/<[^>]+>/g, " "))
     .replace(/\s+/g, " ");
+  return { visible, attributes: attributes.join(" \n ") };
+}
+
+// Слово целиком: «Vermietung» и «listCache» не совпадают, «МИЭТ» и «MIET» совпадают.
+const EMPLOYER_WORD = /(?<![\p{L}\p{N}])(?:МНТЦ|МИЭТ|MNTC|MIET|ISTC)(?![\p{L}\p{N}])/iu;
+const EMPLOYER_SOURCE = /istc-miet|mntc-logo/i;
+
+function employerMentions(html) {
+  const { visible, attributes } = textLayers(html);
+  const found = [];
+  if (EMPLOYER_SOURCE.test(stripInvisible(html))) found.push("source");
+  if (EMPLOYER_WORD.test(visible)) found.push("visible");
+  if (EMPLOYER_WORD.test(attributes) || EMPLOYER_SOURCE.test(attributes)) found.push("attribute");
+  return found;
+}
+
+// Все обозначения «АО «…»» в видимом тексте, кавычки приведены к ёлочкам.
+function joinStockCompanies(html) {
+  const text = textLayers(html).visible;
+  return [...text.matchAll(/АО\s*[«„"“]\s*([^«»„“”"]{1,40}?)\s*[»“”"]/g)].map(m => m[1]);
+}
+
+const HIDDEN_ATTR = /\shidden(?=[\s=>/]|$)|aria-hidden\s*=\s*["']true|display\s*:\s*none|visibility\s*:\s*hidden/i;
+
+// Абзац о сервисе SCA/SBOM в «Обо мне»: виден, на обоих языках и с согласованными цифрами.
+function serviceParagraph(html) {
+  const section = stripInvisible(html).match(/<section\b[^>]*\bid="about"[^>]*>([\s\S]*?)<\/section>/i);
+  if (!section) return { error: "about section not found" };
+  if (HIDDEN_ATTR.test(section[0].match(/^<section\b[^>]*>/i)[0])) return { error: "about section is hidden" };
+  const articles = [...section[1].matchAll(/<article\b([^>]*)>([\s\S]*?)<\/article>/gi)];
+  const article = articles.find(a => /SCA\/SBOM/.test(a[2]) && /Единолично создал/.test(a[2]));
+  if (!article) return { error: "service article not found" };
+  if (HIDDEN_ATTR.test(article[1])) return { error: "service article is hidden" };
+  const paragraph = [...article[2].matchAll(/<p\b([^>]*)>([\s\S]*?)<\/p>/gi)].find(p => /Единолично создал/.test(p[2]));
+  if (!paragraph) return { error: "service paragraph not found" };
+  if (HIDDEN_ATTR.test(paragraph[1])) return { error: "service paragraph is hidden" };
+  const branch = lang => [...paragraph[2].matchAll(new RegExp(`<span\\b([^>]*)data-l="${lang}"([^>]*)>([\\s\\S]*?)</span>`, "g"))]
+    .filter(m => !HIDDEN_ATTR.test(m[1] + m[2])).map(m => textLayers(m[3]).visible).join(" ");
+  return { ru: branch("ru"), en: branch("en") };
+}
+
+function serviceClaimProblems(html) {
+  const p = serviceParagraph(html);
+  if (p.error) return [p.error];
+  const problems = [];
+  const expect = (cond, msg) => { if (!cond) problems.push(msg); };
+  expect(/Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/.test(p.ru), "ru: achievement sentence");
+  expect(/I independently built and deployed an SCA\/SBOM service/.test(p.en), "en: achievement sentence");
+  const ruMoney = p.ru.match(/\d[\d\s,.]*\s*млн[^.,;)]*/g) ?? [];
+  const enMoney = p.en.match(/RUB\s*\d[\d\s,.]*\s*million[^.,;)]*/gi) ?? [];
+  const ruCode = p.ru.match(/\d[\d\s,.]*\s*тыс\.\s*строк[^.;)]*/g) ?? [];
+  const enCode = p.en.match(/\d[\d\s,.]*\s*lines of code/gi) ?? [];
+  expect(ruMoney.length === 1 && /^18 млн ₽ в год$/.test(ruMoney[0].trim()), `ru: one amount «18 млн ₽ в год» (got ${JSON.stringify(ruMoney)})`);
+  expect(enMoney.length === 1 && /^RUB 18 million a year$/.test(enMoney[0].trim()), `en: one amount «RUB 18 million a year» (got ${JSON.stringify(enMoney)})`);
+  expect(ruCode.length === 1 && /^130 тыс\. строк кода$/.test(ruCode[0].trim()), `ru: one code size «130 тыс. строк кода» (got ${JSON.stringify(ruCode)})`);
+  expect(enCode.length === 1 && /^130,000 lines of code$/.test(enCode[0].trim()), `en: one code size «130,000 lines of code» (got ${JSON.stringify(enCode)})`);
+  expect(/оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год/.test(p.ru), "ru: amount is the vendor's estimate");
+  expect(/about RUB 18 million a year, vendor's estimate/.test(p.en), "en: amount is the vendor's estimate");
+  return problems;
 }
 
 const about = root.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
@@ -164,17 +244,8 @@ test("credentials are accurate and the personal site is explicitly independent",
   assert.match(aboutText, /независимо от прежних работодателей и учебных центров/i);
   // Слово владельца 27.11.2026: про сервис SCA/SBOM – «как в резюме, с цифрами», но как достижение,
   // без названия работодателя; сумма – только как оценка поставщика сопоставимого решения.
-  assert.match(aboutText, /Единолично создал.{0,80}сервис SCA\/SBOM/i);
-  assert.match(aboutText, /около 130 тыс\. строк кода/);
-  assert.match(aboutText, /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/);
-  // Английская ветка вырезается из aboutText: собираем её текст отдельно, с декодированием сущностей.
-  const aboutRaw = rawRoot.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
-  assert.ok(aboutRaw.length > 1000, "the about section must be found in index.html");
-  const aboutEn = [...aboutRaw.matchAll(/<span data-l="en">([\s\S]*?)<\/span>/g)].map(m => visibleText(m[1])).join(" ");
-  assert.match(aboutEn, /I independently built and deployed an SCA\/SBOM service/);
-  assert.match(aboutEn, /about 130,000 lines of code/);
-  assert.match(aboutEn, /\(about RUB 18 million a year, vendor's estimate\)/);
-  assert.doesNotMatch(visibleText(aboutRaw), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, "no employer name in either language");
+  assert.deepEqual(serviceClaimProblems(rawRoot), [], "service paragraph in index.html");
+  assert.deepEqual(serviceClaimProblems(readFileSync(resolve(projectDir, "..", "ru", "index.html"), "utf8")), [], "service paragraph in ru/index.html");
 });
 
 test("every public page lists the same Microsoft certifications", () => {
@@ -225,6 +296,66 @@ test("hero and Person schema use language-consistent professional positioning", 
   }
 });
 
+test("former-employer guard catches disguised names and ignores look-alikes", () => {
+  // Уловки, найденные Codex 27.11 (круги 3–4 и ревью плана): каждая должна срабатывать.
+  const caught = {
+    plain: "<p>Проект MIET</p>",
+    cyrillic: "<p>АО МНТЦ МИЭТ</p>",
+    entity: "<p>MI&#69;T</p>",
+    hexEntity: "<p>MI&#x45;T</p>",
+    splitByTag: "<p>MI<strong>ET</strong></p>",
+    splitByIns: "<p>МИ<ins>ЭТ</ins></p>",
+    titleEntity: '<p title="MI&#69;T">x</p>',
+    hrefEntity: '<a href="https://istc-mi&#101;t.ru/">x</a>',
+    altText: '<img alt="Логотип МНТЦ" src="x.png">',
+    domainInSource: '<link href="https://istc-miet.ru/">',
+    logoFile: '<img src="assets/mntc-logo.png" alt="">',
+  };
+  for (const [name, html] of Object.entries(caught)) {
+    assert.ok(employerMentions(html).length > 0, `${name} must be caught: ${html}`);
+  }
+  // Допустимое: слова и идентификаторы с теми же буквами, данные data:, литерал сущности, текст в скриптах.
+  const allowed = {
+    germanWord: "<p>Vermietung</p>",
+    identifier: "<p>listCache</p>",
+    dataUri: '<img src="data:image/png;base64,QUJDTUlFVERFRg==" alt="">',
+    literalEntity: "<p>MI&#x26;#69;T</p>",
+    commented: "<!-- MIET --><p>текст</p>",
+    script: "<script>const miet = 1;</script><p>текст</p>",
+    style: "<style>.mntc{}</style><p>текст</p>",
+    template: "<template><p>MIET</p></template><p>текст</p>",
+  };
+  for (const [name, html] of Object.entries(allowed)) {
+    assert.deepEqual(employerMentions(html), [], `${name} must not be flagged: ${html}`);
+  }
+});
+
+test("service paragraph guard rejects hidden, commented and contradictory variants", () => {
+  const good = rawRoot;
+  assert.deepEqual(serviceClaimProblems(good), [], "the published index.html passes");
+  const paragraphStart = good.indexOf("<p><span data-l=\"ru\">Выстраиваю РБПО");
+  assert.ok(paragraphStart > 0, "service paragraph anchor");
+  const variants = {
+    commentedEnglish: good.replace(/(<span data-l="en">I build a secure development lifecycle[\s\S]*?<\/span>)/, "<!-- $1 -->"),
+    hiddenParagraph: good.replace("<p><span data-l=\"ru\">Выстраиваю РБПО", "<p hidden><span data-l=\"ru\">Выстраиваю РБПО"),
+    hiddenEnglish: good.replace("<span data-l=\"en\">I build a secure development lifecycle", "<span aria-hidden=\"true\" data-l=\"en\">I build a secure development lifecycle"),
+    wrongAmountTooRu: good.replace("порядка 18 млн ₽ в год)", "порядка 18 млн ₽ в год; позже 118 млн ₽ в месяц)"),
+    wrongAmountEn: good.replace("about RUB 18 million a year", "about RUB 118 million a month"),
+    extraCodeSize: good.replace("около 130 тыс. строк кода", "около 130 тыс. строк кода, позже 230 тыс. строк кода"),
+    wrongCodeEn: good.replace("about 130,000 lines of code", "about 13,000 lines of code"),
+  };
+  for (const [name, html] of Object.entries(variants)) {
+    assert.notEqual(html, good, `${name}: mutation applied`);
+    assert.ok(serviceClaimProblems(html).length > 0, `${name} must be rejected`);
+  }
+});
+
+test("case decks use one pseudonym; quote styles are normalised", () => {
+  assert.deepEqual(joinStockCompanies("<p>АО «Альфа» и АО „Альфа“</p>"), ["Альфа", "Альфа"]);
+  assert.deepEqual(joinStockCompanies("<p>АО «Альфа», затем АО „Бета“</p>"), ["Альфа", "Бета"]);
+  assert.deepEqual(joinStockCompanies("<!-- АО «Альфа» --><p>АО «Бета»</p>"), ["Бета"]);
+});
+
 test("the former employer is not named on any page of the SCA/SBOM case", () => {
   // Слово владельца 27.11.2026: кейс – «АО «Альфа»», прямой отсылки к названию организации нигде нет.
   const pages = [
@@ -235,11 +366,13 @@ test("the former employer is not named on any page of the SCA/SBOM case", () => 
   for (const page of pages) {
     const html = readFileSync(resolve(projectDir, "..", page), "utf8");
     assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
-    assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer`);
-    assert.doesNotMatch(visibleText(html), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text`);
+    assert.deepEqual(employerMentions(html), [], `${page} names the former employer`);
   }
+  // Три презентации – исторические (слово владельца 27.11): проверяем, но не правим.
   for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {
     const html = readFileSync(resolve(projectDir, "..", deck, "index.html"), "utf8");
-    assert.match(html, /АО «Альфа»/, `${deck} uses the agreed pseudonym`);
+    const names = joinStockCompanies(html);
+    assert.ok(names.length > 0, `${deck} shows the pseudonym`);
+    assert.deepEqual([...new Set(names)], ["Альфа"], `${deck} uses only «АО «Альфа»» (got ${[...new Set(names)].join(", ")})`);
   }
 });
