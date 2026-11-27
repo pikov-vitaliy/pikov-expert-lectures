@@ -157,6 +157,7 @@ test("credentials are accurate and the personal site is explicitly independent",
   assert.match(aboutText, /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/);
   // Английская ветка вырезается из aboutText, поэтому проверяем исходную разметку раздела целиком.
   const aboutRaw = rawRoot.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
+  assert.ok(aboutRaw.length > 1000, "the about section must be found in index.html");
   assert.match(aboutRaw, /I independently built and deployed an SCA\/SBOM service/);
   assert.match(aboutRaw, /about 130,000 lines of code/);
   assert.match(aboutRaw, /\(about RUB 18 million a year, vendor's estimate\)/);
@@ -208,5 +209,23 @@ test("hero and Person schema use language-consistent professional positioning", 
     assert.ok(Array.isArray(list), `${lang}: affiliation must be a list`);
     assert.ok(list.every(item => item["@type"] === "CollegeOrUniversity"), `${lang}: every affiliation is a university`);
     assert.deepEqual(list.map(item => item.name), universities[lang], `${lang}: MAI, Moscow Polytech and RosNOU`);
+  }
+});
+
+test("the former employer is not named on any page of the SCA/SBOM case", () => {
+  // Слово владельца 27.11.2026: кейс – «АО «Альфа»», прямой отсылки к названию организации нигде нет.
+  const pages = [
+    "index.html", "ru/index.html",
+    "new/index.html", "new/ru/index.html", "new/about/index.html", "new/ru/about/index.html",
+    "rbpo-audit/index.html", "rbpo-audit-start-result/index.html", "sbom-license-audit/index.html",
+  ];
+  for (const page of pages) {
+    const html = readFileSync(resolve(projectDir, "..", page), "utf8");
+    assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
+    assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer`);
+  }
+  for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {
+    const html = readFileSync(resolve(projectDir, "..", deck, "index.html"), "utf8");
+    assert.match(html, /АО «Альфа»/, `${deck} uses the agreed pseudonym`);
   }
 });
