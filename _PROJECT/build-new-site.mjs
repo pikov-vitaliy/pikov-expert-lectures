@@ -21,7 +21,7 @@ const arrow = '<span aria-hidden="true">↗</span>';
 const copy = {
   en: {
     name:'Vitaliy Pikov', title:'Secure development.\nEngineering practice.', role:'Information security architect', regalia:['Information security architect','• SSDLC • DevSecOps • AppSec','Lecturer and author of educational programmes in information security and SSDLC'], affiliation:['Moscow Aviation Institute (MAI)','Moscow Polytechnic University','Russian New University (RosNOU)'], lectureFilter:'Lectures and seminars',
-    lead:'I help teams build secure software and teach the people behind it. Explore my lectures, practical workshops and resources for everyday engineering.',
+    lead:'I help teams build secure software and teach the people behind it. I teach at MAI, Moscow Polytechnic University and RosNOU. Explore my lectures, practical workshops and resources for everyday engineering.',
     materials:'Materials', paths:'Where to start', about:'About me', contact:'Contact', browse:'Explore the materials', discuss:'Discuss training',
     classic:'Current website', version:'New website version', skip:'Skip to materials', switchLanguage:'Переключить на русский',
     theme:'Switch colour theme', light:'Use light theme', dark:'Use dark theme',
@@ -49,7 +49,7 @@ const copy = {
   },
   ru: {
     name:'Виталий Пиков', title:'Безопасная разработка.\nИнженерная практика.', role:'Архитектор информационной безопасности', regalia:['Архитектор информационной безопасности','• РБПО • DevSecOps • AppSec','Лектор и автор образовательных программ по ИБ и РБПО'], affiliation:['Московский авиационный институт (МАИ)','Московский политехнический университет','Российский новый университет (РосНОУ)'], lectureFilter:'Лекции и семинары',
-    lead:'Помогаю командам выстраивать безопасную разработку ПО и обучаю специалистов. Здесь — мои лекции, практикумы и материалы для повседневной инженерной работы.',
+    lead:'Помогаю командам выстраивать безопасную разработку ПО и обучаю специалистов. Преподаю в МАИ, Московском Политехе и РосНОУ. Здесь — мои лекции, практикумы и материалы для повседневной инженерной работы.',
     materials:'Материалы', paths:'С чего начать', about:'Обо мне', contact:'Контакты', browse:'Изучить материалы', discuss:'Обсудить обучение',
     classic:'Текущая версия сайта', version:'Новая версия сайта', skip:'Перейти к материалам', switchLanguage:'Switch to English',
     theme:'Переключить цветовую тему', light:'Включить светлую тему', dark:'Включить тёмную тему',

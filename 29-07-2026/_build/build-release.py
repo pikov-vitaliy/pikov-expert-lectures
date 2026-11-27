@@ -13,7 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 RELEASE_DIR = ROOT / "release"
-RELEASE_NAME = "29-07-2026.pikov.expert-release-2026-07-28.zip"
+RELEASE_NAME = "secure-sql.pikov.expert-release-2026-07-28.zip"
 RELEASE_ZIP = RELEASE_DIR / RELEASE_NAME
 FIXED_TIME = (2026, 7, 28, 0, 0, 0)
 CONTENT_DATE = "2026-07-28T00:00:00Z"
