@@ -119,7 +119,7 @@ const HIDDEN_ATTR = /\shidden(?=[\s=>/]|$)|\sinert(?=[\s=>/]|$)|aria-hidden\s*=\
 
 // Абзац о сервисе SCA/SBOM в «Обо мне»: виден, на обоих языках и с согласованными цифрами.
 function serviceParagraph(html) {
-  const section = removeComments(html).replace(/<(script|style|template)[\s\S]*?<\/\1\s*>/gi, " ").match(/<section\b[^>]*\bid="about"[^>]*>([\s\S]*?)<\/section>/i);
+  const section = removeComments(html).replace(/<(script|style|template)\b[\s\S]*?<\/\1\s*>/gi, " ").match(/<section\b[^>]*\bid="about"[^>]*>([\s\S]*?)<\/section>/i);
   if (!section) return { error: "about section not found" };
   if (HIDDEN_ATTR.test(section[0].match(/^<section\b[^>]*>/i)[0])) return { error: "about section is hidden" };
   const articles = [...section[1].matchAll(/<article\b([^>]*)>([\s\S]*?)<\/article>/gi)];
