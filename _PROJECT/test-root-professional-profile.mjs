@@ -48,8 +48,9 @@ function decodeEntities(text) {
 // Для сравнения: NFKC, без невидимых символов (U+00AD, U+200B…, \p{Cf}), похожие буквы
 // кириллицы сведены к латинице – «MИЭT», «MНТЦ» и полноширинные формы ловятся.
 const CYR_TO_LAT = { А: "A", В: "B", Е: "E", К: "K", М: "M", Н: "H", О: "O", Р: "P", С: "C", Т: "T", Х: "X", У: "Y", а: "a", е: "e", о: "o", р: "p", с: "c", у: "y", х: "x", і: "i", І: "I", ј: "j", ѕ: "s" };
-function normaliseForMatch(text) {
-  return text.toUpperCase().normalize("NFKC").toUpperCase().replace(/[\p{Cf}­͏ᅟᅠ឴឵᠎ㅤﾠ]/gu, "")
+function normaliseForMatch(text, upper = true) {
+  const t = upper ? text.toUpperCase().normalize("NFKC").toUpperCase() : text.normalize("NFKC");
+  return t.replace(/[\p{Cf}­͏ᅟᅠ឴឵᠎ㅤﾠ]/gu, "")
     .replace(/[А-Яа-яЁёІіЈјЅѕ]/g, ch => CYR_TO_LAT[ch] ?? ch);
 }
 // Те же слова после свёртки: МНТЦ → MHTЦ, МИЭТ → MИЭT.
@@ -109,7 +110,7 @@ function employerMentions(html) {
 // вставляется скриптом); кавычки и пробелы приведены к одному виду.
 function joinStockCompanies(html) {
   const layers = textLayers(html);
-  const text = normaliseForMatch(layers.visible + " \n " + layers.scripts).replace(/[   ]/g, " ");
+  const text = normaliseForMatch(layers.visible + " \n " + layers.scripts, false).replace(/[   ]/g, " ");
   return [...text.matchAll(/(?<![\p{L}])AO\s*[«„"“]\s*([^«»„“”"]{1,40}?)\s*[»“”"]/gu)]
     .map(m => m[1].replace(/[A-Za-z]/g, ch => ({ A: "А", B: "В", E: "Е", K: "К", M: "М", H: "Н", O: "О", P: "Р", C: "С", T: "Т", X: "Х", Y: "У", a: "а", e: "е", o: "о", p: "р", c: "с", y: "у", x: "х" })[ch] ?? ch));
 }
