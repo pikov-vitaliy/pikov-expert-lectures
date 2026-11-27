@@ -49,11 +49,12 @@ function decodeEntities(text) {
 // кириллицы сведены к латинице – «MИЭT», «MНТЦ» и полноширинные формы ловятся.
 const CYR_TO_LAT = { А: "A", В: "B", Е: "E", К: "K", М: "M", Н: "H", О: "O", Р: "P", С: "C", Т: "T", Х: "X", У: "Y", а: "a", е: "e", о: "o", р: "p", с: "c", у: "y", х: "x", і: "i", І: "I", ј: "j", ѕ: "s" };
 function normaliseForMatch(text) {
-  return text.normalize("NFKC").replace(/[\p{Cf}­͏ᅟᅠ឴឵᠎ㅤﾠ]/gu, "")
+  return text.toUpperCase().normalize("NFKC").toUpperCase().replace(/[\p{Cf}­͏ᅟᅠ឴឵᠎ㅤﾠ]/gu, "")
     .replace(/[А-Яа-яЁёІіЈјЅѕ]/g, ch => CYR_TO_LAT[ch] ?? ch);
 }
 // Те же слова после свёртки: МНТЦ → MHTЦ, МИЭТ → MИЭT.
-const EMPLOYER_WORD = /(?<![\p{L}\p{N}])(?:MHTЦ|MИЭT|MNTC|MIET|ISTC)(?![\p{L}\p{N}])/iu;
+// Кириллические аббревиатуры – с падежными окончаниями («МИЭТа»), латинские – целым словом.
+const EMPLOYER_WORD = /(?<![\p{L}\p{N}])(?:M\.?H\.?T\.?Ц|M\.?И\.?Э\.?T|(?:M\.?N\.?T\.?C|M\.?I\.?E\.?T|I\.?S\.?T\.?C)(?![\p{L}\p{N}]))/iu;
 const EMPLOYER_SOURCE = /istc-miet|mntc-logo/i;
 const hasEmployerWord = text => EMPLOYER_WORD.test(normaliseForMatch(text));
 
@@ -117,7 +118,7 @@ const HIDDEN_ATTR = /\shidden(?=[\s=>/]|$)|\sinert(?=[\s=>/]|$)|aria-hidden\s*=\
 
 // Абзац о сервисе SCA/SBOM в «Обо мне»: виден, на обоих языках и с согласованными цифрами.
 function serviceParagraph(html) {
-  const section = removeComments(html).replace(/<(script|style|template)[\s\S]*?<\/\s*>/gi, " ").match(/<section\b[^>]*\bid="about"[^>]*>([\s\S]*?)<\/section>/i);
+  const section = removeComments(html).replace(/<(script|style|template)[\s\S]*?<\/\1\s*>/gi, " ").match(/<section\b[^>]*\bid="about"[^>]*>([\s\S]*?)<\/section>/i);
   if (!section) return { error: "about section not found" };
   if (HIDDEN_ATTR.test(section[0].match(/^<section\b[^>]*>/i)[0])) return { error: "about section is hidden" };
   const articles = [...section[1].matchAll(/<article\b([^>]*)>([\s\S]*?)<\/article>/gi)];
