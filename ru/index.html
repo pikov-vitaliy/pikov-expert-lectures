@@ -1484,7 +1484,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
     }
     /* Вставленный адрес материала: rubin.pikov.expert, https://tests.pikov.expert/. */
     function byAddress(query, pool){
-      const match = String(query).match(/(?:^|\s)(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(?::\d+)?(?![a-z0-9.-])(\/[^\s?#]*)?(?:\?[^\s#]*)?(#\S*)?/i);
+      const match = String(query).match(/(?:^|\s)(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(?::\d+)?(?![a-z0-9.@:-])(\/[^\s?#]*)?(?:\?[^\s#]*)?(#\S*)?/i);
       if(!match) return null;
       const host = match[1].toLowerCase() + ".pikov.expert";
       const parts = url => url.match(/^https:\/\/([^/#]+)(\/[^#]*)?(#.*)?$/) || [];
