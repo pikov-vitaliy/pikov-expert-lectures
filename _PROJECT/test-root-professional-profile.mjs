@@ -25,6 +25,18 @@ test("bilingual markup keeps both language branches present", () => {
   assert.doesNotMatch(rawRoot, /<span data-l="(?:ru|en)">(?:(?!<\/span>)[\s\S])*<span\b/);
 });
 
+// Видимый текст: без тегов и с декодированными сущностями (&#69; и т. п.), чтобы запрет не обходился кодированием.
+function visibleText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&#x([0-9a-f]+);?/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);?/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&nbsp;/gi, " ").replace(/&laquo;/gi, "«").replace(/&raquo;/gi, "»").replace(/&quot;/gi, '"').replace(/&apos;|&#39;/gi, "'").replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ");
+}
+
 const about = root.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
 const aboutText = about
   .replace(/<script\b[\s\S]*?<\/script>/gi, " ")
@@ -150,7 +162,19 @@ test("credentials are accurate and the personal site is explicitly independent",
   assert.doesNotMatch(aboutText, /Microsoft Certified Trainer.{0,60}201\d/i);
   assert.match(aboutText, /независимый авторский образовательный проект/i);
   assert.match(aboutText, /независимо от прежних работодателей и учебных центров/i);
-  assert.doesNotMatch(aboutText, /18\s*млн|130\s*тыс.{0,20}строк|142\s+тестов|33\s+ADR/i);
+  // Слово владельца 27.11.2026: про сервис SCA/SBOM – «как в резюме, с цифрами», но как достижение,
+  // без названия работодателя; сумма – только как оценка поставщика сопоставимого решения.
+  assert.match(aboutText, /Единолично создал.{0,80}сервис SCA\/SBOM/i);
+  assert.match(aboutText, /около 130 тыс\. строк кода/);
+  assert.match(aboutText, /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/);
+  // Английская ветка вырезается из aboutText: собираем её текст отдельно, с декодированием сущностей.
+  const aboutRaw = rawRoot.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
+  assert.ok(aboutRaw.length > 1000, "the about section must be found in index.html");
+  const aboutEn = [...aboutRaw.matchAll(/<span data-l="en">([\s\S]*?)<\/span>/g)].map(m => visibleText(m[1])).join(" ");
+  assert.match(aboutEn, /I independently built and deployed an SCA\/SBOM service/);
+  assert.match(aboutEn, /about 130,000 lines of code/);
+  assert.match(aboutEn, /\(about RUB 18 million a year, vendor's estimate\)/);
+  assert.doesNotMatch(visibleText(aboutRaw), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, "no employer name in either language");
 });
 
 test("every public page lists the same Microsoft certifications", () => {
@@ -198,5 +222,24 @@ test("hero and Person schema use language-consistent professional positioning", 
     assert.ok(Array.isArray(list), `${lang}: affiliation must be a list`);
     assert.ok(list.every(item => item["@type"] === "CollegeOrUniversity"), `${lang}: every affiliation is a university`);
     assert.deepEqual(list.map(item => item.name), universities[lang], `${lang}: MAI, Moscow Polytech and RosNOU`);
+  }
+});
+
+test("the former employer is not named on any page of the SCA/SBOM case", () => {
+  // Слово владельца 27.11.2026: кейс – «АО «Альфа»», прямой отсылки к названию организации нигде нет.
+  const pages = [
+    "index.html", "ru/index.html",
+    "new/index.html", "new/ru/index.html", "new/about/index.html", "new/ru/about/index.html",
+    "rbpo-audit/index.html", "rbpo-audit-start-result/index.html", "sbom-license-audit/index.html",
+  ];
+  for (const page of pages) {
+    const html = readFileSync(resolve(projectDir, "..", page), "utf8");
+    assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
+    assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer`);
+    assert.doesNotMatch(visibleText(html), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text`);
+  }
+  for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {
+    const html = readFileSync(resolve(projectDir, "..", deck, "index.html"), "utf8");
+    assert.match(html, /АО «Альфа»/, `${deck} uses the agreed pseudonym`);
   }
 });
