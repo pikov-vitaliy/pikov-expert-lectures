@@ -153,8 +153,14 @@ test("credentials are accurate and the personal site is explicitly independent",
   // Слово владельца 27.11.2026: про сервис SCA/SBOM – «как в резюме, с цифрами», но как достижение,
   // без названия работодателя; сумма – только как оценка поставщика сопоставимого решения.
   assert.match(aboutText, /Единолично создал.{0,80}сервис SCA\/SBOM/i);
-  assert.match(aboutText, /оценка поставщика.{0,60}18\s*млн/i);
-  assert.doesNotMatch(aboutText, /МНТЦ|МИЭТ|istc|miet/i);
+  assert.match(aboutText, /около 130 тыс\. строк кода/);
+  assert.match(aboutText, /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/);
+  // Английская ветка вырезается из aboutText, поэтому проверяем исходную разметку раздела целиком.
+  const aboutRaw = rawRoot.match(/<section class="about" id="about">([\s\S]*?)<\/section>/i)?.[1] ?? "";
+  assert.match(aboutRaw, /I independently built and deployed an SCA\/SBOM service/);
+  assert.match(aboutRaw, /about 130,000 lines of code/);
+  assert.match(aboutRaw, /\(about RUB 18 million a year, vendor's estimate\)/);
+  assert.doesNotMatch(aboutRaw, /МНТЦ|МИЭТ|MNTC|MIET|istc/i, "no employer name in either language");
 });
 
 test("every public page lists the same Microsoft certifications", () => {
