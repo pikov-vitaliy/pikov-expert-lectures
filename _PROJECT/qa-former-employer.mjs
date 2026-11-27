@@ -6,17 +6,19 @@
 // обхода регулярной проверки. Здесь страницу разбирает Chromium, а проверка читает то,
 // что получит читатель, в нескольких слоях сразу.
 //
-// Модель угроз. Ловится: название в любом слое – DOM целиком через CDP (включая закрытый
-// Shadow DOM, iframe, template: текст, атрибуты и их имена, комментарии), текст скрытых
-// элементов отдельно от соседей, видимый текст с CSS ::before/::after и bidi-override,
-// дерево доступности (CSS-счётчики, закрытые корни), значения полей, декодированные
-// компоненты адресов, заголовок – во всех состояниях: системная светлая/тёмная тема,
-// data-theme (нет, light, dark), язык ru/en (data-lang и :lang). Нормализация: NFKC,
-// регистр, невидимые символы, гомоглифы кириллица/греческий/латиница, точки между
-// буквами, падежные окончания кириллических аббревиатур. Псевдоним презентаций и абзац о
-// сервисе должны быть видны (попадание точкой, ненулевой цвет и заливка букв) в каждом
-// состоянии. Не ловится: перестановка частей слова средствами вёрстки (CSS order,
-// row-reverse, абсолютное позиционирование, наложение) – это видно только на картинке и
+// Модель угроз. Ловится: название в любом слое – DOM целиком через CDP (закрытый Shadow
+// DOM, iframe, template: текст с границами блоков, атрибуты с именами и декодированными
+// адресами, комментарии), текст скрытых элементов отдельно от соседей, видимый текст с
+// CSS ::before/::after и bidi-override, дерево доступности каждого фрейма (CSS-счётчики),
+// значения полей, заголовок. Состояния: исходный документ в системной светлой и тёмной
+// теме (тема задаётся до загрузки), затем data-theme (нет, light, dark) × язык ru/en
+// (data-lang и :lang), с JavaScript и без. Нормализация: NFKC, регистр, невидимые символы,
+// гомоглифы кириллица/греческий/латиница, точки между буквами, падежные окончания
+// кириллических аббревиатур. Псевдоним презентаций и абзац о сервисе должны быть
+// отрисованы в каждом состоянии (попадание точкой, цвет и заливка букв, opacity, filter,
+// clip-path, нулевая обёртка). Не ловится: перестановка частей слова средствами вёрстки
+// (CSS order, row-reverse, абсолютное позиционирование, наложение) и подмена встроенных
+// функций браузера скриптом страницы – это видно только на картинке или в коде и
 // закрывается ревью изменений.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
@@ -31,9 +33,14 @@ const require = createRequire(import.meta.url), {chromium} = require(path.join(p
 const PAGES = ['/', '/ru/', '/new/', '/new/ru/', '/new/about/', '/new/ru/about/', '/rbpo-audit/', '/rbpo-audit-start-result/', '/sbom-license-audit/'];
 const DECKS = new Set(['/rbpo-audit/', '/rbpo-audit-start-result/', '/sbom-license-audit/']);
 const SERVICE_PAGES = ['/', '/ru/'];
-// Состояния: системная тема × data-theme × язык.
-const STATES = [];
-for (const [scheme, theme] of [['light', null], ['dark', null], ['light', 'dark'], ['dark', 'light']]) for (const lang of ['ru', 'en']) STATES.push({scheme, theme, lang});
+const SCHEMES = ['light', 'dark'];
+// Состояния одной загрузки: исходный документ, затем data-theme × язык.
+const statesFor = scheme => [{scheme, original: true}, ...[null, 'light', 'dark'].flatMap(theme => ['ru', 'en'].map(lang => ({scheme, theme, lang})))];
+const stateLabel = s => s.original ? `[${s.scheme}/original]` : `[${s.scheme}/${s.theme ?? '-'}/${s.lang}]`;
+
+// Предел времени всего прогона: зависание в CI должно краснеть с указанием места.
+let current = 'start';
+const watchdog = setTimeout(() => { console.error(`FORMER EMPLOYER QA TIMEOUT at ${current}`); process.exit(2); }, 10 * 60 * 1000);
 
 // ── Нормализация ───────────────────────────────────────────────────────────────
 const UPPER_TO_LATIN = {
@@ -47,7 +54,8 @@ const mapLatin = s => s.toUpperCase().replace(/./gu, ch => UPPER_TO_LATIN[ch] ??
 const foldLatin = s => mapLatin(base(mapLatin(s)));
 const toCyrillic = s => base(s).replace(/[A-Za-z]/g, ch => LATIN_TO_CYRILLIC[ch] ?? ch).replace(/[\u00A0\u2007\u202F]/g, ' ');
 
-const D = '\\.?\\s?';
+// Точка между буквами (М.Н.Т.Ц., М. Н. Т. Ц.); пробел без точки – граница слов и блоков.
+const D = '(?:\\.\\s?)?';
 const EMPLOYER_PATTERNS = [
   new RegExp(`(?<![\\p{L}\\p{N}])M${D}H${D}T${D}Ц`, 'u'),
   new RegExp(`(?<![\\p{L}\\p{N}])M${D}И${D}Э${D}T`, 'u'),
@@ -64,46 +72,71 @@ function employerHits(label, text) {
   }
   return [];
 }
+// Адрес и его компоненты, декодированные по отдельности (параметр «100%» не мешает пути).
+function decodeParts(v) {
+  const out = [];
+  for (const part of String(v).split(/[/?#&=;,]/)) {
+    let cur = part;
+    for (let i = 0; i < 3; i++) { try { const d = decodeURIComponent(cur.replace(/\+/g, ' ')); if (d === cur) break; out.push(d); cur = d; } catch { break; } }
+  }
+  return out;
+}
 
-// Обозначения юрлиц: аббревиатура формы (АО, ООО…) или полная форма в любом падеже;
-// имя – в кавычках целиком, без кавычек – подряд идущие слова с заглавной буквы.
-const QO = '«"„“”\'‘’‹›＂', QC = '»"“”\'’›＂';
-const LEGAL_FORM = new RegExp(
-  `(?<![\\p{L}])(?:(АО|ООО|ОАО|ПАО|ЗАО|НАО)|((?:[Аа]кционерн\\p{L}*\\s+[Оо]бществ\\p{L}*)|(?:[Оо]бществ\\p{L}*\\s+с\\s+ограниченной\\s+ответственностью)))(?![\\p{L}])` +
-  `\\s*(?:[${QO}]+\\s*([^${QO}${QC}]{1,60}?)\\s*[${QC}]|((?:\\p{Lu}[\\p{L}\\p{N}-]*)(?:\\s+\\p{Lu}[\\p{L}\\p{N}-]*){0,2}))`, 'gu');
+// Обозначения юрлиц: форма (АО, ООО… или полная, в любом регистре и падеже) и имя – в
+// кавычках целиком, без кавычек – слово и до двух следующих с заглавной. Служебные слова
+// после формы («АО обязано вести реестр») названием не считаются.
+const QO = '«"„“”\'‘’‹›＂', QC = '»"“”\'’›＂‘';
+const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао)|(акционерн\p{L}*\s+обществ\p{L}*|обществ\p{L}*\s+с\s+ограниченной\s+ответственностью))(?![\p{L}])/giu;
+const NAME_QUOTED = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60}?)\\s*[${QC}]`, 'u');
+const NAME_WORDS = /^\s*(\p{L}[\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
+const STOP = new Set('обязано обязан обязана обязаны должно должен должна должны является являются может могут вправе имеет имеют не и или а но в во на с со по для от до из к о об при как это был было будет есть'.split(' '));
 // Учебный пример владельца в исторической презентации sbom-license-audit – только эта фраза целиком.
 const ALLOWED_PHRASES = {'/sbom-license-audit/': ['У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.']};
 function legalNames(text, route) {
   const flat = x => toCyrillic(x).replace(/\s+/g, ' ');
   let t = flat(text);
   for (const phrase of ALLOWED_PHRASES[route] ?? []) t = t.split(flat(phrase)).join(' ');
-  return [...t.matchAll(LEGAL_FORM)].map(m => {
-    const form = m[1] ?? (/ограничен/i.test(m[2]) ? 'ООО' : 'АО');
-    return `${form} ${(m[3] ?? m[4]).replace(/\s+/g, ' ').trim().toUpperCase()}`;
-  });
+  const names = [];
+  for (const m of t.matchAll(FORM_RE)) {
+    const form = m[1] ? m[1].toUpperCase() : (/ограничен/i.test(m[2]) ? 'ООО' : 'АО');
+    const rest = t.slice(m.index + m[0].length, m.index + m[0].length + 160);
+    const q = rest.match(NAME_QUOTED);
+    if (q) { names.push(`${form} ${q[1].replace(/\s+/g, ' ').trim().toUpperCase()}`); continue; }
+    const w = rest.match(NAME_WORDS);
+    if (!w || STOP.has(w[1].toLowerCase())) continue;
+    const extra = [];
+    for (const word of w[2].trim().split(/\s+/).filter(Boolean)) { if (STOP.has(word.toLowerCase())) break; extra.push(word); }
+    names.push(`${form} ${[w[1], ...extra].join(' ').toUpperCase()}`);
+  }
+  return names;
 }
 
 // ── Слои страницы (выполняется во фрейме) ──────────────────────────────────────
 function collectLayers(scopeSelector) {
-  // Методы прототипа – страница не может их подменить (поле формы name="attributes").
+  // Методы прототипов: форма не может их подменить именованными полями
+  // (name="attributes", "checkVisibility", "childNodes", "parentElement").
+  const g = (proto, name) => Object.getOwnPropertyDescriptor(proto, name).get;
   const P = {
-    attrNames: Element.prototype.getAttributeNames, attr: Element.prototype.getAttribute,
+    attrNames: Element.prototype.getAttributeNames, attr: Element.prototype.getAttribute, checkVis: Element.prototype.checkVisibility,
     qsa: Element.prototype.querySelectorAll, dqsa: Document.prototype.querySelectorAll, fqsa: DocumentFragment.prototype.querySelectorAll,
-    text: Object.getOwnPropertyDescriptor(Node.prototype, 'textContent').get, local: Object.getOwnPropertyDescriptor(Element.prototype, 'localName').get,
-    shadow: Object.getOwnPropertyDescriptor(Element.prototype, 'shadowRoot').get,
-    content: Object.getOwnPropertyDescriptor(HTMLTemplateElement.prototype, 'content').get,
+    text: g(Node.prototype, 'textContent'), local: g(Element.prototype, 'localName'), shadow: g(Element.prototype, 'shadowRoot'),
+    content: g(HTMLTemplateElement.prototype, 'content'), kids: g(Node.prototype, 'childNodes'), parent: g(Node.prototype, 'parentElement'),
+    rootNode: Node.prototype.getRootNode, connected: g(Node.prototype, 'isConnected'),
   };
   const qsa = (rootNode, sel) => rootNode instanceof Document ? P.dqsa.call(rootNode, sel) : rootNode instanceof DocumentFragment ? P.fqsa.call(rootNode, sel) : P.qsa.call(rootNode, sel);
+  const kids = n => P.kids.call(n);
   const cssStrings = value => {
     if (!value || value === 'none' || value === 'normal') return '';
     return [...value.matchAll(/"((?:\\.|[^"\\])*)"/g)].map(m => m[1].replace(/\\([0-9a-f]{1,6})\s?/gi, (_, h) => String.fromCodePoint(parseInt(h, 16))).replace(/\\(.)/g, '$1')).join('');
   };
   const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
+  const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
   const shown = el => {
-    if (!el.checkVisibility({checkOpacity: true, checkVisibilityCSS: true})) return false;
-    for (let e = el; e && e.nodeType === 1; e = e.parentElement || e.getRootNode().host) {
+    if (!P.checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) return false;
+    for (let e = el; e && e.nodeType === 1; e = P.parent.call(e) || P.rootNode.call(e).host) {
       const cs = getComputedStyle(e);
       if (cs.clipPath && cs.clipPath !== 'none' && /inset\(\s*50%|circle\(\s*0|polygon\(\s*0[^,]*,\s*0[^,]*,\s*0/.test(cs.clipPath)) return false;
+      if (zeroFilter(cs.filter)) return false;
       if (cs.overflow !== 'visible' && e !== el) { const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; }
     }
     const cs = getComputedStyle(el);
@@ -114,32 +147,51 @@ function collectLayers(scopeSelector) {
   const unOverride = s => s.replace(/\u202E([^\u202C\u202D]*)(\u202C|$)/g, (_, x) => [...x].reverse().join(''));
   const isOverrideRtl = el => (P.local.call(el) === 'bdo' && (P.attr.call(el, 'dir') || '').toLowerCase() === 'rtl') ||
     (() => { const cs = getComputedStyle(el); return /bidi-override|isolate-override/.test(cs.unicodeBidi) && cs.direction === 'rtl'; })();
+  // Текст поддерева с границами блоков: строчная разметка склеивается («Ver<em>miet</em>ung»),
+  // блоки и скрытые элементы разделяются («<p>MI</p><p>ET</p>»).
+  const isBlock = el => { const d = P.connected.call(el) ? getComputedStyle(el).display : ''; return !/^(inline|contents|ruby)/.test(d); };
+  const boundaryText = rootNode => {
+    const out = [];
+    const rec = n => {
+      if (n.nodeType === 3) { out.push(n.data); return; }
+      if (n.nodeType !== 1 && n.nodeType !== 9 && n.nodeType !== 11) return;
+      const block = n.nodeType === 1 && isBlock(n);
+      if (block) out.push(' ');
+      for (const c of kids(n)) rec(c);
+      if (block) out.push(' ');
+    };
+    rec(rootNode);
+    return out.join('');
+  };
+  const textNodes = el => { const out = []; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); while (w.nextNode()) out.push(w.currentNode.data); return out; };
   const hiddenTexts = [];
   const walk = (node, out, parentShown) => {
     if (node.nodeType === Node.TEXT_NODE) {
-      if (node.parentElement && shown(node.parentElement)) out.s += unOverride(node.data);
+      const parent = P.parent.call(node);
+      if (parent && shown(parent)) out.s += unOverride(node.data);
       return;
     }
-    if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) { for (const c of node.childNodes) walk(c, out, parentShown); return; }
+    if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) { for (const c of kids(node)) walk(c, out, parentShown); return; }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const el = node, tag = P.local.call(el);
     if (tag === 'script' || tag === 'style' || tag === 'template' || tag === 'title') return;
     const cs = getComputedStyle(el);
-    const isShown = cs.display !== 'none' && el.checkVisibility({checkVisibilityCSS: true});
-    // Скрытый элемент внутри показанного родителя: его текст проверяется отдельно, без склейки с соседями.
-    if (!isShown && parentShown) hiddenTexts.push(unOverride(P.text.call(el)));
+    const isShown = cs.display !== 'none' && shown(el);
+    // Невидимый элемент внутри видимого: его текст проверяется отдельно – целиком с
+    // границами блоков и по каждому текстовому узлу, без склейки с соседями.
+    if (!isShown && parentShown) hiddenTexts.push(unOverride(boundaryText(el)), ...textNodes(el));
     if (cs.display === 'none') return;
     const inline = /^(inline|contents|ruby)/.test(cs.display);
     const buf = {s: ''};
-    if (shown(el)) buf.s += cssStrings(getComputedStyle(el, '::before').content);
+    if (isShown) buf.s += cssStrings(getComputedStyle(el, '::before').content);
     const sr = P.shadow.call(el);
     if (tag === 'slot') {
       const assigned = el.assignedNodes({flatten: true});
-      for (const c of (assigned.length ? assigned : el.childNodes)) walk(c, buf, isShown);
+      for (const c of (assigned.length ? assigned : kids(el))) walk(c, buf, isShown);
     } else {
-      for (const c of (sr ? sr.childNodes : el.childNodes)) walk(c, buf, isShown);
+      for (const c of kids(sr ?? el)) walk(c, buf, isShown);
     }
-    if (shown(el)) {
+    if (isShown) {
       buf.s += cssStrings(getComputedStyle(el, '::after').content);
       if ((tag === 'input' && !/^(hidden|password|checkbox|radio|file)$/i.test(el.type)) || tag === 'textarea') buf.s += ' ' + el.value + ' ';
       if (tag === 'select' && el.selectedOptions[0]) buf.s += ' ' + el.selectedOptions[0].text + ' ';
@@ -152,19 +204,20 @@ function collectLayers(scopeSelector) {
   const vis = {s: ''};
   walk(scope, vis, true);
   if (scopeSelector) return {visible: vis.s.replace(/\s+/g, ' ')};
-  const all = [], extraText = [], commentRoots = [document];
+  // Все элементы: документ, открытые теневые деревья, содержимое template.
+  const all = [], roots = [document];
   const gather = rootNode => {
     for (const el of qsa(rootNode, '*')) {
       all.push(el);
       const sr = P.shadow.call(el);
-      if (sr) { extraText.push(P.text.call(sr)); commentRoots.push(sr); gather(sr); }
+      if (sr) { roots.push(sr); gather(sr); }
       const content = P.local.call(el) === 'template' ? P.content.call(el) : null;
-      if (content) { extraText.push(P.text.call(content)); commentRoots.push(content); gather(content); }
+      if (content) { roots.push(content); gather(content); }
     }
   };
   gather(document);
   const urls = [], generated = [], attributes = [], comments = [];
-  const decodeParts = v => {
+  const decode = v => {
     const out = [v];
     for (const part of String(v).split(/[/?#&=;,]/)) {
       let cur = part;
@@ -173,20 +226,23 @@ function collectLayers(scopeSelector) {
     return out;
   };
   for (const el of all) {
-    for (const n of P.attrNames.call(el)) attributes.push(n, P.attr.call(el, n));
-    for (const n of P.attrNames.call(el)) if (/(?:href|src|action|data|poster|cite|srcset|url)$/i.test(n)) urls.push(...decodeParts(P.attr.call(el, n)));
+    for (const n of P.attrNames.call(el)) {
+      const v = P.attr.call(el, n);
+      attributes.push(n, v);
+      if (/(?:href|src|action|data|poster|cite|srcset|url)$/i.test(n)) urls.push(...decode(v));
+    }
     for (const prop of ['href', 'src', 'action', 'formAction', 'data', 'poster', 'cite']) {
       const v = el[prop];
-      if (typeof v === 'string' && v) urls.push(...decodeParts(v));
-      else if (v && typeof v.baseVal === 'string') urls.push(...decodeParts(v.baseVal));
+      if (typeof v === 'string' && v) urls.push(...decode(v));
+      else if (v && typeof v.baseVal === 'string') urls.push(...decode(v.baseVal));
     }
-    for (const pseudo of ['::before', '::after', '::marker']) { const g = cssStrings(getComputedStyle(el, pseudo).content); if (g) generated.push(g); }
+    for (const pseudo of ['::before', '::after', '::marker']) { const gtext = cssStrings(getComputedStyle(el, pseudo).content); if (gtext) generated.push(gtext); }
   }
-  for (const r of commentRoots) { const w = document.createTreeWalker(r, NodeFilter.SHOW_COMMENT); while (w.nextNode()) comments.push(w.currentNode.data); }
+  for (const r of roots) { const w = document.createTreeWalker(r, NodeFilter.SHOW_COMMENT); while (w.nextNode()) comments.push(w.currentNode.data); }
   return {
     attributes: attributes.join(' \n '),
     comments: comments.join(' \n '),
-    full: unOverride(P.text.call(document.documentElement) + ' ' + extraText.join(' ')),
+    full: unOverride(roots.map(boundaryText).join(' \n ')),
     hidden: hiddenTexts.join(' \n '),
     visible: vis.s.replace(/\s+/g, ' '),
     urls: urls.join(' \n '),
@@ -195,19 +251,31 @@ function collectLayers(scopeSelector) {
   };
 }
 
-// Весь DOM через CDP (pierce): документ, закрытые теневые корни, iframe, template. Текст
-// склеивается внутри каждого корня (как textContent: «Ver<em>miet</em>ung» – одно слово),
-// атрибуты с именами и комментарии – отдельно.
-async function cdpDomText(page) {
+// CDP: весь DOM (pierce: закрытые теневые корни, iframe, template) с границами блоков по
+// display из DOMSnapshot, атрибуты с именами и декодированными адресами, комментарии;
+// дерево доступности каждого фрейма (CSS-счётчики, сгенерированный текст).
+const INLINE = /^(inline|contents|ruby)/;
+async function cdpLayers(page) {
   const cdp = await page.context().newCDPSession(page);
   try {
+    const snap = await cdp.send('DOMSnapshot.captureSnapshot', {computedStyles: ['display']});
+    const display = new Map();
+    for (const d of snap.documents) {
+      const ids = d.nodes.backendNodeId;
+      d.layout.nodeIndex.forEach((ni, i) => { const si = d.layout.styles[i]?.[0]; display.set(ids[ni], si >= 0 ? snap.strings[si] : ''); });
+    }
+    const blockId = id => { const d = display.get(id); return d === undefined || !INLINE.test(d); };
+
     const {root: dom} = await cdp.send('DOM.getDocument', {depth: -1, pierce: true});
     const roots = [], attrs = [], comments = [];
     const visit = (n, acc) => {
-      if (n.nodeType === 3) acc.push(n.nodeValue);
-      else if (n.nodeType === 8) comments.push(n.nodeValue);
-      if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) attrs.push(n.attributes[i], n.attributes[i + 1]);
+      if (n.nodeType === 3) { acc.push(n.nodeValue); return; }
+      if (n.nodeType === 8) { comments.push(n.nodeValue); return; }
+      const block = n.nodeType === 1 && blockId(n.backendNodeId);
+      if (block) acc.push(' ');
+      if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) attrs.push(n.attributes[i], n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
       for (const k of n.children ?? []) visit(k, acc);
+      if (block) acc.push(' ');
       for (const r of [...(n.shadowRoots ?? []), ...(n.contentDocument ? [n.contentDocument] : []), ...(n.templateContent ? [n.templateContent] : [])]) {
         const a = [];
         roots.push(a);
@@ -217,71 +285,68 @@ async function cdpDomText(page) {
     const top = [];
     roots.push(top);
     visit(dom, top);
-    return [...roots.map(a => a.join('')), attrs.join(' \n '), comments.join(' \n ')].join(' \n ');
-  } finally { await cdp.detach(); }
-}
 
-// Дерево доступности: текст каждого блочного узла без разделителей между потомками
-// (CSS-счётчик «MI» в обёртке + «ET» рядом, закрытый Shadow DOM).
-async function accessibilityText(page) {
-  const cdp = await page.context().newCDPSession(page);
-  try {
-    // display каждого узла: текст строчных элементов уже входит в текст их блока.
-    const snap = await cdp.send('DOMSnapshot.captureSnapshot', {computedStyles: ['display']});
-    const display = new Map();
-    for (const d of snap.documents) {
-      const ids = d.nodes.backendNodeId;
-      d.layout.nodeIndex.forEach((ni, i) => { const si = d.layout.styles[i]?.[0]; display.set(ids[ni], si >= 0 ? snap.strings[si] : ''); });
-    }
-    const {nodes} = await cdp.send('Accessibility.getFullAXTree');
-    const byId = new Map(nodes.map(n => [n.nodeId, n]));
-    const memo = new Map();
-    const textOf = n => {
-      if (memo.has(n.nodeId)) return memo.get(n.nodeId);
-      memo.set(n.nodeId, '');
-      const t = n.role?.value === 'StaticText' ? (n.name?.value ?? '') : (n.childIds ?? []).map(id => byId.get(id)).filter(Boolean).map(textOf).join('');
-      memo.set(n.nodeId, t);
-      return t;
-    };
+    const {frameTree} = await cdp.send('Page.getFrameTree');
+    const frameIds = [];
+    const walkFrames = t => { frameIds.push(t.frame.id); for (const c of t.childFrames ?? []) walkFrames(c); };
+    walkFrames(frameTree);
     const parts = [];
-    for (const n of nodes) {
-      const role = n.role?.value;
-      for (const v of [n.value?.value, n.description?.value]) if (typeof v === 'string' && v) parts.push(v);
-      if (role === 'StaticText' || role === 'InlineTextBox' || role === 'RootWebArea') continue;
-      const disp = display.get(n.backendDOMNodeId);
-      if (disp === undefined || /^(inline|contents|ruby)/.test(disp)) continue;
-      const t = textOf(n);
-      if (t && t.length < 20000) parts.push(t);
+    for (const frameId of frameIds) {
+      const {nodes} = await cdp.send('Accessibility.getFullAXTree', {frameId});
+      const byId = new Map(nodes.map(n => [n.nodeId, n]));
+      const memo = new Map();
+      const isText = n => n.role?.value === 'StaticText' || n.role?.value === 'InlineTextBox';
+      const blockNode = n => !isText(n) && display.has(n.backendDOMNodeId) && !INLINE.test(display.get(n.backendDOMNodeId));
+      const textOf = n => {
+        if (memo.has(n.nodeId)) return memo.get(n.nodeId);
+        memo.set(n.nodeId, '');
+        const t = n.role?.value === 'StaticText' ? (n.name?.value ?? '')
+          : (n.childIds ?? []).map(id => byId.get(id)).filter(Boolean).map(k => blockNode(k) ? ` ${textOf(k)} ` : textOf(k)).join('');
+        memo.set(n.nodeId, t);
+        return t;
+      };
+      for (const n of nodes) {
+        for (const v of [n.value?.value, n.description?.value]) if (typeof v === 'string' && v) parts.push(v);
+        if (n.role?.value === 'RootWebArea' || !blockNode(n)) continue;
+        const t = textOf(n);
+        if (t) parts.push(t);
+      }
     }
-    return parts.join(' \n ');
+    return {dom: [...roots.map(a => a.join('')), attrs.join(' \n '), comments.join(' \n ')].join(' \n '), ax: parts.join(' \n ')};
   } finally { await cdp.detach(); }
 }
 
-async function setState(page, {scheme, theme, lang}) {
-  await page.emulateMedia({colorScheme: scheme});
+async function setState(page, state) {
+  if (state.original) return;
   for (const frame of page.frames()) {
     await frame.evaluate(([t, l]) => {
       const html = document.documentElement;
       if (t) html.setAttribute('data-theme', t); else html.removeAttribute('data-theme');
       html.setAttribute('data-lang', l);
       html.setAttribute('lang', l);
-    }, [theme, lang]);
+    }, [state.theme, state.lang]);
   }
 }
 
-// Текст отрисован: попадание точкой по строкам, видимые цвет и заливка букв. Кандидаты –
-// абзац о сервисе или самый вложенный элемент с псевдонимом; достаточно одного.
+// Текст отрисован: попадание точкой по строкам, видимые цвет и заливка букв, без
+// filter: opacity(0). Кандидаты – абзац о сервисе или самый вложенный элемент с
+// псевдонимом; достаточно одного.
 async function textRendered(page, mode) {
   return page.evaluate(m => {
+    const checkVis = Element.prototype.checkVisibility;
     const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
-    const PSEUDO = /АО\s*«Альфа»/;
+    const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
+    const PSEUDO = /А[ОO]\s*[«"„“”'‘’‹›＂]\s*Альфа\s*[»"“”'’›＂‘]/;
     const candidates = m === 'service'
       ? [...document.querySelectorAll('#about p')].filter(x => /Единолично создал|independently built and deployed/.test(x.textContent))
       : [...document.querySelectorAll('body *')].filter(e => PSEUDO.test(e.textContent) && ![...e.children].some(c => PSEUDO.test(c.textContent)));
     document.documentElement.style.scrollBehavior = 'auto';
     let last = {ok: false, why: 'not found'};
     for (const el of candidates) {
-      if (!el.checkVisibility({checkOpacity: true, checkVisibilityCSS: true})) { last = {ok: false, why: 'invisible'}; continue; }
+      if (!checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) { last = {ok: false, why: 'invisible'}; continue; }
+      let filtered = false;
+      for (let e = el; e; e = e.parentElement) if (zeroFilter(getComputedStyle(e).filter)) filtered = true;
+      if (filtered) { last = {ok: false, why: 'filter'}; continue; }
       el.scrollIntoView({block: 'center', behavior: 'instant'});
       const cs = getComputedStyle(el);
       if (transparent(cs.color) || transparent(cs.webkitTextFillColor || cs.color) || parseFloat(cs.fontSize) < 6) { last = {ok: false, why: 'color/size'}; continue; }
@@ -297,12 +362,14 @@ async function textRendered(page, mode) {
   }, mode);
 }
 
-async function pageProblems(page, label, {deck = false, route = ''} = {}) {
+// Одна загрузка (тема системы уже задана): все состояния этой загрузки.
+async function pageProblems(page, label, {deck = false, route = '', scheme = 'light'} = {}) {
   const problems = [];
   let deckAll = '';
-  for (const state of STATES) {
+  for (const state of statesFor(scheme)) {
     await setState(page, state);
-    const where = `${label} [${state.scheme}/${state.theme ?? '-'}/${state.lang}]`;
+    const where = `${label} ${stateLabel(state)}`;
+    current = where;
     for (const frame of page.frames()) {
       let layers;
       try { layers = await frame.evaluate(collectLayers, null); } catch (e) { problems.push(`${where}: collector failed in frame ${frame.url()}: ${e.message}`); continue; }
@@ -312,33 +379,36 @@ async function pageProblems(page, label, {deck = false, route = ''} = {}) {
       }
       if (deck) deckAll += [' \n ', layers.full, layers.hidden, layers.visible, layers.generated, layers.title].join(' \n ');
       if (deck && frame === page.mainFrame()) {
-        const names = legalNames(layers.visible, route);
-        if (!names.includes('АО АЛЬФА')) problems.push(`${where}: pseudonym «АО «Альфа»» is not shown`);
+        if (!legalNames(layers.visible, route).includes('АО АЛЬФА')) problems.push(`${where}: pseudonym «АО «Альфа»» is not shown`);
         else {
           const r = await textRendered(page, 'pseudonym');
           if (!r.ok) problems.push(`${where}: pseudonym «АО «Альфа»» is not rendered (${JSON.stringify(r)})`);
         }
       }
     }
-    const dom = await cdpDomText(page), ax = await accessibilityText(page);
+    const {dom, ax} = await cdpLayers(page);
     problems.push(...employerHits(`${where} dom`, dom), ...employerHits(`${where} accessibility`, ax));
     if (deck) deckAll += ' \n ' + dom + ' \n ' + ax;
   }
   if (deck) {
     const others = [...new Set(legalNames(deckAll, route))].filter(n => n !== 'АО АЛЬФА');
-    if (others.length) problems.push(`${label}: other legal names ${JSON.stringify(others)}`);
+    if (others.length) problems.push(`${label} [${scheme}]: other legal names ${JSON.stringify(others)}`);
   }
   return [...new Set(problems)];
 }
 
 // Абзац о сервисе: единственный, отрисован в каждом состоянии, утверждение и цифры с
 // единицами – в нём самом; в разделе нет других денежных сумм и объёмов кода.
-const CUR = '(?:RUB|USD|EUR|руб\\.?|₽|\\$|€)';
+const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€)';
 const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn)';
 const MONEY = new RegExp(`${CUR}\\s*\\d[\\d\\s.,]*\\d?(?:\\s*${MULT})?|\\d[\\d\\s.,]*(?:\\s*${MULT})?\\s*${CUR}`, 'giu');
-const CODE = /\d[\d\s.,]*\s*(?:тыс\.?|тысяч\p{L}*|к)?\s*строк|\d[\d\s.,]*\s*(?:k|K|thousand)?\s*(?:lines?\s+of\s+code|LOC|KLOC|SLOC)\b/gu;
+const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*\s+(?:исходного\s+|программного\s+)?код\p{L}*|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
 const clean = s => s.replace(/\s+/g, ' ').trim();
-async function serviceProblems(page, label) {
+const EXPECTED = {
+  ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк кода']},
+  en: {claim: /I independently built and deployed an SCA\/SBOM service/, size: /about 130,000 lines of code/, estimate: /\(about RUB 18 million a year, vendor's estimate\)/, digits: ['130,000', '18'], money: ['RUB 18 million'], code: ['130,000 lines of code']},
+};
+async function serviceProblems(page, label, scheme = 'light') {
   const problems = [];
   const structure = await page.evaluate(() => ({
     sections: document.querySelectorAll('[id="about"]').length,
@@ -346,9 +416,10 @@ async function serviceProblems(page, label) {
   }));
   if (structure.sections !== 1) problems.push(`${label}: sections id=about = ${structure.sections}`);
   if (structure.paragraphs !== 1) problems.push(`${label}: paragraphs with the service claim = ${structure.paragraphs}`);
-  for (const state of STATES) {
+  for (const state of statesFor(scheme)) {
     await setState(page, state);
-    const where = `${label} [${state.scheme}/${state.theme ?? '-'}/${state.lang}]`;
+    const where = `${label} ${stateLabel(state)}`;
+    current = where;
     const r = await textRendered(page, 'service');
     if (!r.ok) problems.push(`${where}: service paragraph is not rendered (${JSON.stringify(r)})`);
     await page.evaluate(() => [...document.querySelectorAll('#about p')].find(x => /Единолично создал|independently built and deployed/.test(x.textContent))?.setAttribute('data-qa-service', '1'));
@@ -356,23 +427,17 @@ async function serviceProblems(page, label) {
     await page.evaluate(() => document.querySelector('[data-qa-service]')?.removeAttribute('data-qa-service'));
     const section = await page.evaluate(collectLayers, '#about');
     const ptext = base(para?.visible ?? ''), stext = base(section?.visible ?? '');
+    // Исходный документ: язык – тот, что показан.
+    const lang = state.original ? (/Единолично создал/.test(ptext) ? 'ru' : 'en') : state.lang;
+    const want = EXPECTED[lang];
     const digits = [...ptext.matchAll(/\d[\d\s.,]*\d|\d/g)].map(m => m[0].replace(/\s+/g, '')).sort();
     const money = [...stext.matchAll(MONEY)].map(m => clean(m[0])), code = [...stext.matchAll(CODE)].map(m => clean(m[0]));
-    if (state.lang === 'ru') {
-      if (!/Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/.test(ptext)) problems.push(`${where}: achievement sentence is not in the visible paragraph`);
-      if (!/около 130 тыс\. строк кода/.test(ptext)) problems.push(`${where}: code size is not in the visible paragraph`);
-      if (!/\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/.test(ptext)) problems.push(`${where}: vendor's estimate is not in the visible paragraph`);
-      if (JSON.stringify(digits) !== JSON.stringify(['130', '18'])) problems.push(`${where}: numbers in the paragraph ${JSON.stringify(digits)}`);
-      if (JSON.stringify(money) !== JSON.stringify(['18 млн ₽'])) problems.push(`${where}: amounts in the section ${JSON.stringify(money)}`);
-      if (JSON.stringify(code) !== JSON.stringify(['130 тыс. строк'])) problems.push(`${where}: code sizes in the section ${JSON.stringify(code)}`);
-    } else {
-      if (!/I independently built and deployed an SCA\/SBOM service/.test(ptext)) problems.push(`${where}: achievement sentence is not in the visible paragraph`);
-      if (!/about 130,000 lines of code/.test(ptext)) problems.push(`${where}: code size is not in the visible paragraph`);
-      if (!/\(about RUB 18 million a year, vendor's estimate\)/.test(ptext)) problems.push(`${where}: vendor's estimate is not in the visible paragraph`);
-      if (JSON.stringify(digits) !== JSON.stringify(['130,000', '18'])) problems.push(`${where}: numbers in the paragraph ${JSON.stringify(digits)}`);
-      if (JSON.stringify(money) !== JSON.stringify(['RUB 18 million'])) problems.push(`${where}: amounts in the section ${JSON.stringify(money)}`);
-      if (JSON.stringify(code) !== JSON.stringify(['130,000 lines of code'])) problems.push(`${where}: code sizes in the section ${JSON.stringify(code)}`);
-    }
+    if (!want.claim.test(ptext)) problems.push(`${where}: achievement sentence is not in the visible paragraph`);
+    if (!want.size.test(ptext)) problems.push(`${where}: code size is not in the visible paragraph`);
+    if (!want.estimate.test(ptext)) problems.push(`${where}: vendor's estimate is not in the visible paragraph`);
+    if (JSON.stringify(digits) !== JSON.stringify(want.digits)) problems.push(`${where}: numbers in the paragraph ${JSON.stringify(digits)}`);
+    if (JSON.stringify(money) !== JSON.stringify(want.money)) problems.push(`${where}: amounts in the section ${JSON.stringify(money)}`);
+    if (JSON.stringify(code) !== JSON.stringify(want.code)) problems.push(`${where}: code sizes in the section ${JSON.stringify(code)}`);
   }
   return [...new Set(problems)];
 }
@@ -396,6 +461,8 @@ const MUST_CATCH = {
   bidiCss: '<b style="unicode-bidi:bidi-override;direction:rtl">TEIM</b>', isolateOverride: '<b style="unicode-bidi:isolate-override;direction:rtl">TEIM</b>',
   hiddenBetweenWords: '<p><span>предприятие</span><span hidden>MIET</span><span>город</span></p>',
   hiddenSplitBetweenWords: '<p><span>предприятие</span><span hidden>MI<strong>ET</strong></span><span>город</span></p>',
+  opacitySplitBetweenWords: '<p>предприятие<span style="opacity:0">MI<strong>ET</strong></span>город</p>',
+  hiddenNestedBetweenLetters: '<div hidden>предприятие<span>MIET</span>город</div>',
   dataNotAttribute: '<p>data:МИЭТ</p>', titleAttr: '<abbr title="MI&#69T">x</abbr>', altAttr: '<img src="x.png" alt="Логотип МИ&#1069Т">',
   attrName: '<div data-miet="1">x</div>', hrefEncoded: '<a href="https://&#105stc-mi&#101t.ru/">сайт</a>', hrefPercent: '<a href="https://istc-%6Diet.ru/">сайт</a>',
   pathPercent: '<a href="/clients/%4D%49%45%54/profile">x</a>', pathPercentWithQuery: '<a href="/clients/%4D%49%45%54/profile?progress=100%">x</a>',
@@ -405,28 +472,41 @@ const MUST_CATCH = {
   cssAttr: '<style>.x::after{content:attr(data-n)}</style><p class="x" data-n="MI&#69;T">a</p>',
   cssCounterP: '<style>@counter-style e{system:cyclic;symbols:"MI";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><p class="c">ET</p>',
   cssCounterDiv: '<style>@counter-style e{system:cyclic;symbols:"MI";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class="c">ET</div>',
+  cssCounterIframe: '<iframe srcdoc="<style>@counter-style e{system:cyclic;symbols:\'MI\';suffix:\'\'}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class=\'c\'>ET</div>"></iframe>',
   shadowOpen: '<x-h><template shadowrootmode="open"><p>MIET</p></template></x-h>',
   shadowClosedText: '<x-c></x-c><script>const n="M"+"IET";const r=document.querySelector("x-c").attachShadow({mode:"closed"});const p=document.createElement("p");p.textContent=n;r.append(p);</script>',
   shadowClosedAttr: '<x-d></x-d><script>const r=document.querySelector("x-d").attachShadow({mode:"closed"});const p=document.createElement("p");p.setAttribute("data-customer","M"+"IET");p.textContent="x";r.append(p);</script>',
+  shadowClosedHref: '<x-e></x-e><script>const r=document.querySelector("x-e").attachShadow({mode:"closed"});const a=document.createElement("a");a.href="/clients/%4D%49%45%54/";a.textContent="x";r.append(a);</script>',
   templateAttr: '<template><p title="MIET">x</p><!-- МНТЦ --></template><p>текст</p>', iframeSrcdoc: '<iframe srcdoc="<p>MI&amp;#69;T</p>"></iframe>',
   titleTag: '<title>&laquoМИЭТ&raquo</title><p>x</p>', noscriptText: '<noscript><p>MIET</p></noscript>', hiddenDiv: '<div hidden>MIET</div>', commentOnly: '<p>текст</p><!-- MIET -->',
   darkThemeOnly: '<style>:root[data-theme="dark"] .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
   systemDarkOnly: '<style>@media (prefers-color-scheme: dark){.t::after{content:"MI\\45 T"}}</style><p class="t">x</p>',
+  systemDarkExplicitDark: '<style>@media (prefers-color-scheme: dark){:root[data-theme="dark"] .t::after{content:"MI\\45 T"}}</style><p class="t">x</p>',
   langEnOnly: '<style>:root:lang(en) .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
+  originalOnly: '<style>:root:not([data-lang]) .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
+  loadScriptDark: '<p id="o">x</p><script>if (matchMedia("(prefers-color-scheme: dark)").matches) document.getElementById("o").textContent = "M" + "IET";</script>',
 };
-// Эти уловки видны только в небазовом состоянии: в базовом (системная светлая тема, без
-// data-theme, ru) находок быть не должно, иначе срабатывает не тот механизм.
-const STATE_ONLY = new Set(['darkThemeOnly', 'systemDarkOnly', 'langEnOnly']);
-const BASE_STATE = '[light/-/ru]';
+// Где уловка обязана сработать и где не должна: срабатывает именно проверяемое состояние.
+const STATE_MARKERS = {
+  darkThemeOnly: {must: '/dark/', mustNot: '[light/original]'},
+  systemDarkOnly: {must: '[dark/', mustNot: '[light/'},
+  systemDarkExplicitDark: {must: '[dark/dark/', mustNot: '[light/'},
+  langEnOnly: {must: '/en]', mustNot: '[light/original]'},
+  originalOnly: {must: '/original]', mustNot: '/ru]'},
+  loadScriptDark: {must: '[dark/', mustNot: '[light/'},
+};
 const MUST_PASS = {
   germanWord: '<p>Vermietung</p>', germanWordEm: '<p>Ver<em>miet</em>ung</p>', identifier: '<p>listCache</p>', literalEntity: '<p>MI&amp;#69;T</p>', plainReversedWord: '<p>TEIM</p>',
   scriptIdentifier: '<script>const mietCount = 1;</script><p>текст</p>', dataUri: '<img alt="" src="data:image/png;base64,QUJDTUlFVERFRg==">',
   styleSelector: '<style>.mntcLike{}</style><p>текст</p>', mitWord: '<p>MIT License, Mietvertrag, ISTCX</p>',
+  blockBoundary: '<p>MI</p><p>ET</p>', blockBoundaryNested: '<div><div>предприятие M</div><div>IET город</div></div>',
+  clobberedForm: '<form><input name="checkVisibility"><input name="childNodes"><input name="parentElement"><input name="attributes"></form><p>текст</p>',
 };
 const PSEUDONYM_CATCH = {
   otherName: '<p>АО «Альфа»</p><p>АО «Бета»</p>', otherNameEntities: '<p>АО «Альфа»</p><p>АО &laquoБета&raquo</p>',
   latinAO: '<p>АО «Альфа»</p><p>AO «Бета»</p>', ooo: '<p>АО «Альфа»</p><p>ООО «Бета»</p>', fullForm: '<p>АО «Альфа»</p><p>Акционерное общество «Бета»</p>',
-  declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>',
+  declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>', upperDeclinedForm: '<p>АО «Альфа»</p><p>АКЦИОНЕРНЫМ ОБЩЕСТВОМ «Бета»</p>',
+  lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerUnquoted: '<p>АО «Альфа»</p><p>АО бета</p>',
   noQuotes: '<p>АО «Альфа»</p><p>АО Бета</p>', noQuotesTwoWords: '<p>АО «Альфа»</p><p>АО Альфа Север</p>', qElement: '<p>АО «Альфа»</p><p>АО <q>Бета</q></p>', fullWidthQuote: '<p>АО «Альфа»</p><p>АО ＂Бета＂</p>',
   splitTag: '<p>АО «Альфа»</p><p>А<x-a>О</x-a> «Бета»</p>', scriptFooter: "<p>АО «Альфа»</p><script>document.body.append('АО «Бе'+'та»')</script>",
   hiddenAlphaVisibleBeta: '<p hidden>АО «Альфа»</p><p>АО «Бета»</p>', inAttribute: '<p>АО «Альфа»</p><input value="АО «Бета»">',
@@ -434,15 +514,20 @@ const PSEUDONYM_CATCH = {
   otherForm: '<p>АО «Альфа»</p><p>ООО «Альфа»</p>', longerName: '<p>АО «Альфа»</p><p>ПАО «Альфа Север»</p>',
   romashkaOutsidePhrase: '<p>АО «Альфа»</p><p>Заказчик проекта: ООО «Ромашка»</p>', romashkaPartialPhrase: '<p>АО «Альфа»</p><p>Платежи: у ООО «Ромашка» может быть много счетов</p>',
   hiddenPseudonymOnly: '<p hidden>АО «Альфа»</p><p>Заказчик проекта</p>', zeroHeightPseudonym: '<div style="height:0;overflow:hidden"><p>АО «Альфа»</p></div><p>Заказчик</p>',
-  transparentFill: '<p style="-webkit-text-fill-color:transparent">АО «Альфа»</p><p>Заказчик</p>',
+  transparentFill: '<p style="-webkit-text-fill-color:transparent">АО «Альфа»</p><p>Заказчик</p>', filterOpacity: '<p style="filter:opacity(0)">АО «Альфа»</p><p>Заказчик</p>',
   darkHidesPseudonym: '<style>:root[data-theme="dark"] .a{display:none}</style><p class="a">АО «Альфа»</p>',
+  darkDarkHidesPseudonym: '<style>@media (prefers-color-scheme: dark){:root[data-theme="dark"] .a{display:none}}</style><p class="a">АО «Альфа»</p>',
   iframeOtherName: '<p>АО «Альфа»</p><iframe srcdoc="<p>ООО «Бета»</p>"></iframe>',
 };
-const PSEUDONYM_PASS = {plainSentence: '<p>АО «Альфа»</p><p>АО обязано вести реестр акционеров</p>', romashkaExact: '<p>АО «Альфа»</p><p>У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.</p>'};
+const PSEUDONYM_PASS = {
+  plainSentence: '<p>АО «Альфа»</p><p>АО обязано вести реестр акционеров</p>', upperSentence: '<p>АО «Альфа»</p><p>АО ОБЯЗАНО ВЕСТИ РЕЕСТР</p>',
+  lowQuotes: '<p>АО „Альфа“</p>', romashkaExact: '<p>АО «Альфа»</p><p>У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.</p>',
+};
 
 const mime = {'.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.mjs': 'text/javascript', '.css': 'text/css', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.ico': 'image/x-icon', '.woff2': 'font/woff2', '.json': 'application/json'};
 const server = http.createServer((req, res) => {
-  let p = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+  let p;
+  try { p = decodeURIComponent(new URL(req.url, 'http://localhost').pathname); } catch { res.writeHead(400).end(); return; }
   if (p.endsWith('/')) p += 'index.html';
   const file = path.resolve(root, '.' + p);
   if (!file.startsWith(root + path.sep)) { res.writeHead(403).end(); return; }
@@ -455,88 +540,137 @@ await new Promise(r => server.listen(0, '127.0.0.1', r));
 const origin = 'http://127.0.0.1:' + server.address().port;
 const browser = await chromium.launch({headless: true});
 const failures = [];
-let cases = 0;
+let cases = 0, mutationCount = 0;
 // Внешние запросы (шрифты, счётчики) отключены: проверка не зависит от сети.
 const localOnly = (context, allowed) => context.route('**/*', route => {
   const url = route.request().url();
   return (allowed.some(a => url.startsWith(a)) || url.startsWith('about:') || url.startsWith('data:')) ? route.continue() : route.abort();
 });
+const newContext = async (options, allowed) => {
+  const context = await browser.newContext({viewport: {width: 1280, height: 900}, ...options});
+  context.setDefaultTimeout(30000);
+  context.setDefaultNavigationTimeout(30000);
+  await localOnly(context, allowed);
+  return context;
+};
 try {
-  // 1. Самопроверка на фрагментах.
-  const ctx = await browser.newContext({viewport: {width: 1280, height: 900}});
-  await localOnly(ctx, ['http://fixture.test/']);
-  const page = await ctx.newPage();
+  // 1. Самопроверка на фрагментах: каждая загрузка – в системной светлой и тёмной теме.
   let fixtureHtml = '';
-  await page.route('http://fixture.test/**', route => route.fulfill({contentType: 'text/html; charset=utf-8', body: fixtureHtml}));
-  const fixture = async (html, raw = false) => {
+  const fixturePage = async options => {
+    const context = await newContext(options, ['http://fixture.test/']);
+    const page = await context.newPage();
+    await page.route('http://fixture.test/**', route => route.fulfill({contentType: 'text/html; charset=utf-8', body: fixtureHtml}));
+    return page;
+  };
+  const page = await fixturePage({}), pageNoJs = await fixturePage({javaScriptEnabled: false});
+  const load = async (p, html, raw, scheme) => {
     fixtureHtml = raw ? html : `<!doctype html><html lang="ru"><head><meta charset="utf-8"></head><body>${html}</body></html>`;
-    const response = await page.goto('http://fixture.test/', {waitUntil: 'load'});
+    await p.emulateMedia({colorScheme: scheme});
+    const response = await p.goto('http://fixture.test/', {waitUntil: 'load'});
     assert.equal(response.status(), 200);
   };
+  const fixtureProblems = async (name, html, opts = {}) => {
+    const found = [];
+    for (const scheme of SCHEMES) {
+      current = `fixture ${name} [${scheme}]`;
+      await load(page, html, false, scheme);
+      found.push(...await pageProblems(page, `fixture ${name}`, {...opts, scheme}));
+    }
+    return found;
+  };
   for (const [name, html] of Object.entries(MUST_CATCH)) {
-    await fixture(html);
-    const found = await pageProblems(page, `fixture ${name}`);
+    const found = await fixtureProblems(name, html);
+    const marker = STATE_MARKERS[name];
     if (!found.length) failures.push(`self-test: «${name}» is not caught`);
-    else if (STATE_ONLY.has(name) && found.some(f => f.includes(BASE_STATE))) failures.push(`self-test: «${name}» is caught in the base state: ${found[0]}`);
+    else if (marker && !found.some(f => f.includes(marker.must))) failures.push(`self-test: «${name}» is not caught in ${marker.must}`);
+    else if (marker && found.some(f => f.includes(marker.mustNot))) failures.push(`self-test: «${name}» is caught in ${marker.mustNot}: ${found.find(f => f.includes(marker.mustNot))}`);
     cases++;
   }
   for (const [name, html] of Object.entries(MUST_PASS)) {
-    await fixture(html);
-    const found = await pageProblems(page, `fixture ${name}`);
+    const found = await fixtureProblems(name, html);
     if (found.length) failures.push(`self-test: «${name}» is a false positive: ${found[0]}`);
     cases++;
   }
   for (const [name, html] of Object.entries(PSEUDONYM_CATCH)) {
-    await fixture(html);
-    const found = await pageProblems(page, `fixture ${name}`, {deck: true, route: '/sbom-license-audit/'});
+    const found = await fixtureProblems(name, html, {deck: true, route: '/sbom-license-audit/'});
     if (!found.some(f => /other legal names|not shown|not rendered/.test(f))) failures.push(`self-test: pseudonym «${name}» is not caught`);
     cases++;
   }
   for (const [name, html] of Object.entries(PSEUDONYM_PASS)) {
-    await fixture(html);
-    const found = await pageProblems(page, `fixture ${name}`, {deck: true, route: '/sbom-license-audit/'});
+    const found = await fixtureProblems(name, html, {deck: true, route: '/sbom-license-audit/'});
     if (found.length) failures.push(`self-test: pseudonym «${name}» is a false positive: ${found[0]}`);
     cases++;
   }
-  // Абзац о сервисе: подмены в копии index.html должны отклоняться.
+  // Абзац о сервисе: каждая подмена в копии index.html должна дать свою диагностику.
   const index = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
   const anchorRu = '<p><span data-l="ru">Выстраиваю РБПО';
   assert.ok(index.includes(anchorRu), 'service paragraph anchor in index.html');
+  const extra = text => index.replace(anchorRu, `<p>${text}</p>` + anchorRu);
+  const HIDDEN = /not rendered|not in the visible paragraph/;
   const serviceMutations = {
-    clipPath: index.replace(anchorRu, '<p style="clip-path: inset(50%)"><span data-l="ru">Выстраиваю РБПО'),
-    transparentFill: index.replace(anchorRu, '<p style="-webkit-text-fill-color: transparent"><span data-l="ru">Выстраиваю РБПО'),
-    darkHides: index.replace('</head>', '<style>:root[data-theme="dark"] #about p:has(> [data-l]){display:none}</style></head>'),
-    extraAmountEn: index.replace("about RUB 18 million a year, vendor's estimate).", "about RUB 18 million a year, vendor's estimate). Annual cost: 28,000,000 USD. Code size: 250k LOC."),
-    wrongCodeRu: index.replace('около 130 тыс. строк кода', 'около 230 тыс. строк кода'),
-    unitMovedOut: index.replace('the service comprises about 130,000 lines of code', 'the service comprises about 130,000 tests'),
-    duplicate: index.replace(anchorRu, '<p><span data-l="ru">Единолично создал и ввёл в эксплуатацию сервис SCA/SBOM (дубль)</span></p>' + anchorRu),
+    clipPath: [index.replace(anchorRu, '<p style="clip-path: inset(50%)"><span data-l="ru">Выстраиваю РБПО'), HIDDEN],
+    transparentFill: [index.replace(anchorRu, '<p style="-webkit-text-fill-color: transparent"><span data-l="ru">Выстраиваю РБПО'), HIDDEN],
+    filterOpacity: [index.replace(anchorRu, '<p style="filter: opacity(0)"><span data-l="ru">Выстраиваю РБПО'), /not rendered/],
+    darkHides: [index.replace('</head>', '<style>:root[data-theme="dark"] #about p:has(> [data-l]){display:none}</style></head>'), HIDDEN],
+    wrongCodeRu: [index.replace('около 130 тыс. строк кода', 'около 230 тыс. строк кода'), /code size is not in the visible paragraph/],
+    unitMovedOut: [index.replace('the service comprises about 130,000 lines of code', 'the service comprises about 130,000 tests'), /code size is not in the visible paragraph/],
+    duplicate: [index.replace(anchorRu, '<p><span data-l="ru">Единолично создал и ввёл в эксплуатацию сервис SCA/SBOM (дубль)</span></p>' + anchorRu), /paragraphs with the service claim = 2/],
+    amountUsd: [extra('Annual cost: 28,000,000 USD.'), /amounts in the section/],
+    amountDollarWords: [extra('Annual cost: 28 million dollars.'), /amounts in the section/],
+    amountRubleWords: [extra('Экономия: 28 млн рублей в год.'), /amounts in the section/],
+    codeKloc: [extra('Code size: 250 kloc.'), /code sizes in the section/],
+    codeKstrok: [extra('Объём: 250 кстрок.'), /code sizes in the section/],
+    codeLinesRu: [extra('Ещё 250 тыс. строк кода.'), /code sizes in the section/],
   };
-  for (const [name, html] of Object.entries(serviceMutations)) {
+  for (const [name, [html, expected]] of Object.entries(serviceMutations)) {
     assert.notEqual(html, index, `service mutation ${name} applied`);
-    await fixture(html, true);
-    if (!(await serviceProblems(page, `service ${name}`)).length) failures.push(`self-test: service mutation «${name}» is not rejected`);
+    const found = [];
+    for (const scheme of SCHEMES) { current = `service ${name} [${scheme}]`; await load(page, html, true, scheme); found.push(...await serviceProblems(page, `service ${name}`, scheme)); }
+    if (!found.some(f => expected.test(f))) failures.push(`self-test: service mutation «${name}» is not rejected with ${expected}: ${found[0] ?? 'no problems'}`);
+    cases++;
+    mutationCount++;
+  }
+  // Без JavaScript: стиль в noscript прячет абзац.
+  {
+    const html = index.replace('</head>', '<noscript><style>#about p:has(> [data-l]){display:none}</style></noscript></head>');
+    const found = [];
+    for (const scheme of SCHEMES) { current = `service noscriptHides [${scheme}]`; await load(pageNoJs, html, true, scheme); found.push(...await serviceProblems(pageNoJs, 'service noscriptHides', scheme)); }
+    if (!found.some(f => HIDDEN.test(f))) failures.push(`self-test: service mutation «noscriptHides» is not rejected: ${found[0] ?? 'no problems'}`);
     cases++;
   }
-  await ctx.close();
+  // Безобидные числа рядом с абзацем не тревожат.
+  {
+    const html = extra('Processed 2 million records, 2 european records, 250 строк в таблице.');
+    const found = [];
+    for (const scheme of SCHEMES) { current = `service harmlessNumbers [${scheme}]`; await load(page, html, true, scheme); found.push(...await serviceProblems(page, 'service harmlessNumbers', scheme)); }
+    if (found.length) failures.push(`self-test: service «harmlessNumbers» is a false positive: ${found[0]}`);
+    cases++;
+  }
+  await page.context().close();
+  await pageNoJs.context().close();
 
-  // 2. Реальные страницы: с JavaScript и без (noscript), все состояния темы и языка.
+  // 2. Реальные страницы: с JavaScript и без, системная светлая и тёмная тема до загрузки,
+  // исходный документ и все состояния темы и языка.
   for (const route of PAGES) {
     for (const js of [true, false]) {
-      const context = await browser.newContext({javaScriptEnabled: js, viewport: {width: 1440, height: 900}});
-      await localOnly(context, [origin]);
-      const p = await context.newPage();
-      const response = await p.goto(origin + route, {waitUntil: 'load'});
-      const label = `${route}${js ? '' : ' [no JS]'}`;
-      if (!response || response.status() !== 200) { failures.push(`${label}: HTTP ${response?.status()}`); await context.close(); continue; }
-      failures.push(...await pageProblems(p, label, {deck: DECKS.has(route), route}));
-      if (js && SERVICE_PAGES.includes(route)) failures.push(...await serviceProblems(p, label));
-      await context.close();
-      cases++;
+      for (const scheme of SCHEMES) {
+        const label = `${route}${js ? '' : ' [no JS]'}`;
+        current = `${label} [${scheme}] load`;
+        const context = await newContext({javaScriptEnabled: js, viewport: {width: 1440, height: 900}, colorScheme: scheme}, [origin]);
+        const p = await context.newPage();
+        const response = await p.goto(origin + route, {waitUntil: 'load'});
+        if (!response || response.status() !== 200) { failures.push(`${label}: HTTP ${response?.status()}`); await context.close(); continue; }
+        failures.push(...await pageProblems(p, label, {deck: DECKS.has(route), route, scheme}));
+        if (SERVICE_PAGES.includes(route)) failures.push(...await serviceProblems(p, label, scheme));
+        await context.close();
+        cases++;
+      }
     }
   }
 } finally {
   await browser.close();
   server.close();
+  clearTimeout(watchdog);
 }
 assert.deepEqual(failures, [], `former-employer QA:\n- ${failures.join('\n- ')}`);
-console.log(`FORMER EMPLOYER QA OK: ${cases} cases, ${PAGES.length} pages × ${STATES.length} states, ${Object.keys(MUST_CATCH).length + Object.keys(PSEUDONYM_CATCH).length} disguises and 7 service mutations rejected`);
+console.log(`FORMER EMPLOYER QA OK: ${cases} cases, ${PAGES.length} pages × 2 JS modes × 2 schemes × 7 states, ${Object.keys(MUST_CATCH).length + Object.keys(PSEUDONYM_CATCH).length} disguises and ${mutationCount + 1} service mutations rejected`);
