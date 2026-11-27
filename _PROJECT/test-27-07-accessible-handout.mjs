@@ -41,7 +41,7 @@ test("public materials use a reproducible HTML handout instead of the ignored PD
   const handout = fs.readFileSync(handoutPath, "utf8");
   assert.match(
     handout,
-    /<link\s+rel="canonical"\s+href="https:\/\/27-07-2026\.pikov\.expert\/materials\/from-working-code-to-shippable-product\.html"\s*\/?\s*>/i,
+    /<link\s+rel="canonical"\s+href="https:\/\/secure-lifecycle\.pikov\.expert\/materials\/from-working-code-to-shippable-product\.html"\s*\/?\s*>/i,
     "accessible handout canonical URL is missing or incorrect",
   );
 
@@ -153,7 +153,9 @@ test("public lecture wording is evergreen while the dated hostname remains prove
     );
     assert.doesNotMatch(content, /(?:s3cr3t-admin|demo)-token-(?:2026|27-07-2026)/i, `${name} has a dated sample token`);
   }
-  assert.match(index, /https:\/\/27-07-2026\.pikov\.expert\//, "dated hostname provenance was lost");
+  // С 27.11.2026 учебный день живёт на secure-lifecycle.pikov.expert; старый адрес с датой – переадресация.
+  assert.match(index, /https:\/\/secure-lifecycle\.pikov\.expert\//, "canonical hostname was lost");
+  assert.doesNotMatch(index, /27-07-2026\.pikov\.expert/, "the dated hostname is only a redirect now");
   assert.doesNotMatch(index, /около\s+\d+\s*КБ/i, "download size copy will drift after rebuilds");
   assert.match(index, /компактный архив/i);
 });

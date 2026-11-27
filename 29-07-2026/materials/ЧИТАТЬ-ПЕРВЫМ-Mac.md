@@ -218,6 +218,6 @@ python3 -c "import sqlite3; print(sqlite3.sqlite_version)"
 - [SQLite — Foreign Key Support](https://www.sqlite.org/foreignkeys.html)
 - [SQLite — URI Filenames and read-only mode](https://www.sqlite.org/uri.html)
 
-Адрес онлайн-версии после публикации: **https://29-07-2026.pikov.expert/**
+Адрес онлайн-версии после публикации: **https://secure-sql.pikov.expert/**
 
 Преподаватель: Пиков Виталий Александрович.

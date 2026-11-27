@@ -129,9 +129,11 @@ test("education is presented as a substantial continuing professional path", () 
 test("teaching and research results are specific without overstating scope", () => {
   assert.match(aboutText, /более 25 лет/i);
   assert.match(aboutText, /более 10 лет.{0,80}препода/i);
-  assert.match(aboutText, /более 130.{0,80}(?:ВКР|бакалавр|специалист|магистр)/i);
+  // Числа – слово владельца 27.11.2026: более 200 защит ВКР, несколько сотен студентов в год.
+  assert.match(aboutText, /выпускных квалификационных работ.{0,20}более 200 студентов/i);
+  assert.match(aboutText, /несколько сотен студентов/i);
   assert.match(aboutText, /10 авторских курс/i);
-  assert.match(aboutText, /более 100 специалист/i);
+  assert.doesNotMatch(aboutText, /более 100 специалист/i);
   assert.match(aboutText, /более 40.{0,40}вебинар/i);
   assert.match(aboutText, /более 40.{0,40}научн.{0,20}публикац/i);
   assert.doesNotMatch(aboutText, /все (?:курсы|материалы|лекции).{0,100}согласован.{0,40}ФСТЭК/i);
@@ -139,7 +141,8 @@ test("teaching and research results are specific without overstating scope", () 
 
 test("credentials are accurate and the personal site is explicitly independent", () => {
   assert.match(aboutText, /Заслуженный доцент.{0,100}РосНОУ/i);
-  assert.match(aboutText, /Astra Linux Special Edition 1\.7\/1\.8/i);
+  assert.match(aboutText, /Astra Linux Special Edition 1\.8(?!\/)/i);
+  assert.doesNotMatch(aboutText, /Astra Linux Special Edition 1\.7\/1\.8/i);
   // Перечень подтверждён Виталием по его собственному слайду (2026-08-16):
   // MCT, MCITP, MCPS, MCSA, MCTS — без дат. Датировка «MCT в 2014–2016 годах»
   // была добавлена сторонним агентом и подтверждения не получила.

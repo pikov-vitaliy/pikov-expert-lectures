@@ -382,7 +382,7 @@ Write-SitemapFile -Path (Join-Path $rootPath 'sitemap.xml') -Urls @($rootUrls) -
 # common template. The 27001 deck unpacks its runtime into blob: URLs and needs
 # 'unsafe-eval' plus blob: in script-src; the shared policy drops both and the
 # slide navigation stops working. robots.txt and sitemap.xml are still generated.
-$customHtaccessFolders = @('27001', '29-07-2026', 'main-rbpo', 'dast', 'p18', 'rbpo-audit-start-result')
+$customHtaccessFolders = @('27001', '29-07-2026', 'main-rbpo', 'dast', 'p18', 'redirect-27-07-2026', 'redirect-29-07-2026', 'rbpo-audit-start-result')
 
 # Some sites intentionally curate all three controls. Scanner-VS publishes
 # selected Markdown materials in its sitemap, serves offline ZIP archives,
