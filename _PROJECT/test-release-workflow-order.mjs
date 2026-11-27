@@ -115,6 +115,7 @@ test('CI runs the static content and workflow regression tests', () => {
     'test-new-site-catalogue.mjs',
     'test-new-site.mjs',
     'qa-root-locale-routes.mjs',
+    'qa-former-employer.mjs',
     'test-public-affiliation-hygiene.mjs',
     'test-tz-landing.mjs',
     'qa-tz-navigation.mjs',
