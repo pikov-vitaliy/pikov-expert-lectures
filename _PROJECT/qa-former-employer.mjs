@@ -16,10 +16,16 @@
 // гомоглифы кириллица/греческий/латиница, точки между буквами, падежные окончания
 // кириллических аббревиатур. Псевдоним презентаций и абзац о сервисе должны быть
 // отрисованы в каждом состоянии (попадание точкой, цвет и заливка букв, opacity, filter,
-// clip-path, нулевая обёртка). Не ловится: перестановка частей слова средствами вёрстки
-// (CSS order, row-reverse, абсолютное позиционирование, наложение) и подмена встроенных
-// функций браузера скриптом страницы – это видно только на картинке или в коде и
-// закрывается ревью изменений.
+// clip-path, маска, нулевая обёртка). Скрытое содержимое проверяется строже видимого:
+// каждый текстовый узел и вложенный элемент отдельно, поэтому «Ver<em>miet</em>ung» в
+// скрытом блоке считается находкой (на девяти страницах кейса скрытых обрывков слов нет).
+// Сознательно не считаются: буквы через пробел без точки («M I E T» – иначе ложная тревога
+// на «<p>MI</p><p>ET</p>»), имя юрлица без кавычек со строчной буквы («АО ведёт реестр»),
+// число с множителем без валюты («2 million records»). Не ловится: перестановка частей
+// слова средствами вёрстки (CSS order, row-reverse, абсолютное позиционирование,
+// наложение) и подмена встроенных функций браузера скриптом страницы – это видно только
+// на картинке или в коде и закрывается ревью изменений. Открытые находки ревью – в
+// _PROJECT/employer-guard-backlog.md.
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -83,12 +89,15 @@ function decodeParts(v) {
 }
 
 // Обозначения юрлиц: форма (АО, ООО… или полная, в любом регистре и падеже) и имя – в
-// кавычках целиком, без кавычек – слово и до двух следующих с заглавной. Служебные слова
-// после формы («АО обязано вести реестр») названием не считаются.
+// кавычках целиком (в любом регистре), без кавычек – до трёх слов с заглавной. Строчное
+// слово после формы («АО ведёт реестр») и служебные слова капсом («АО ОБЯЗАНО») названием
+// не считаются.
 const QO = '«"„“”\'‘’‹›＂', QC = '»"“”\'’›＂‘';
 const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао)|(акционерн\p{L}*\s+обществ\p{L}*|обществ\p{L}*\s+с\s+ограниченной\s+ответственностью))(?![\p{L}])/giu;
-const NAME_QUOTED = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60}?)\\s*[${QC}]`, 'u');
-const NAME_WORDS = /^\s*(\p{L}[\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
+const NAME_QUOTED = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,200}?)\\s*[${QC}]`, 'u');
+// Открывающая кавычка без закрывающей: имя – до 60 знаков.
+const NAME_OPEN = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60})`, 'u');
+const NAME_WORDS = /^\s*(\p{Lu}[\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
 const STOP = new Set('обязано обязан обязана обязаны должно должен должна должны является являются может могут вправе имеет имеют не и или а но в во на с со по для от до из к о об при как это был было будет есть'.split(' '));
 // Учебный пример владельца в исторической презентации sbom-license-audit – только эта фраза целиком.
 const ALLOWED_PHRASES = {'/sbom-license-audit/': ['У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.']};
@@ -99,8 +108,8 @@ function legalNames(text, route) {
   const names = [];
   for (const m of t.matchAll(FORM_RE)) {
     const form = m[1] ? m[1].toUpperCase() : (/ограничен/i.test(m[2]) ? 'ООО' : 'АО');
-    const rest = t.slice(m.index + m[0].length, m.index + m[0].length + 160);
-    const q = rest.match(NAME_QUOTED);
+    const rest = t.slice(m.index + m[0].length, m.index + m[0].length + 260);
+    const q = rest.match(NAME_QUOTED) ?? rest.match(NAME_OPEN);
     if (q) { names.push(`${form} ${q[1].replace(/\s+/g, ' ').trim().toUpperCase()}`); continue; }
     const w = rest.match(NAME_WORDS);
     if (!w || STOP.has(w[1].toLowerCase())) continue;
@@ -121,7 +130,7 @@ function collectLayers(scopeSelector) {
     qsa: Element.prototype.querySelectorAll, dqsa: Document.prototype.querySelectorAll, fqsa: DocumentFragment.prototype.querySelectorAll,
     text: g(Node.prototype, 'textContent'), local: g(Element.prototype, 'localName'), shadow: g(Element.prototype, 'shadowRoot'),
     content: g(HTMLTemplateElement.prototype, 'content'), kids: g(Node.prototype, 'childNodes'), parent: g(Node.prototype, 'parentElement'),
-    rootNode: Node.prototype.getRootNode, connected: g(Node.prototype, 'isConnected'),
+    rootNode: Node.prototype.getRootNode, connected: g(Node.prototype, 'isConnected'), rect: Element.prototype.getBoundingClientRect,
   };
   const qsa = (rootNode, sel) => rootNode instanceof Document ? P.dqsa.call(rootNode, sel) : rootNode instanceof DocumentFragment ? P.fqsa.call(rootNode, sel) : P.qsa.call(rootNode, sel);
   const kids = n => P.kids.call(n);
@@ -131,13 +140,16 @@ function collectLayers(scopeSelector) {
   };
   const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
   const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
+  // CSS-маска может сделать текст невидимым при сохранённых размерах и цвете: считается скрытием.
+  const masked = cs => [cs.maskImage, cs.webkitMaskImage].some(v => v && v !== 'none');
   const shown = el => {
     if (!P.checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) return false;
     for (let e = el; e && e.nodeType === 1; e = P.parent.call(e) || P.rootNode.call(e).host) {
       const cs = getComputedStyle(e);
       if (cs.clipPath && cs.clipPath !== 'none' && /inset\(\s*50%|circle\(\s*0|polygon\(\s*0[^,]*,\s*0[^,]*,\s*0/.test(cs.clipPath)) return false;
       if (zeroFilter(cs.filter)) return false;
-      if (cs.overflow !== 'visible' && e !== el) { const r = e.getBoundingClientRect(); if (r.width < 1 || r.height < 1) return false; }
+      if (cs.overflow !== 'visible' && e !== el) { const r = P.rect.call(e); if (r.width < 1 || r.height < 1) return false; }
+      if (masked(cs)) return false;
     }
     const cs = getComputedStyle(el);
     if (parseFloat(cs.fontSize) < 4) return false;
@@ -149,7 +161,13 @@ function collectLayers(scopeSelector) {
     (() => { const cs = getComputedStyle(el); return /bidi-override|isolate-override/.test(cs.unicodeBidi) && cs.direction === 'rtl'; })();
   // Текст поддерева с границами блоков: строчная разметка склеивается («Ver<em>miet</em>ung»),
   // блоки и скрытые элементы разделяются («<p>MI</p><p>ET</p>»).
-  const isBlock = el => { const d = P.connected.call(el) ? getComputedStyle(el).display : ''; return !/^(inline|contents|ruby)/.test(d); };
+  const INLINE_TAGS = new Set('a abbr b bdi bdo big br cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
+  const isBlock = el => {
+    const tag = P.local.call(el);
+    const d = P.connected.call(el) ? getComputedStyle(el).display : '';
+    if (!d) return !(INLINE_TAGS.has(tag) || tag.includes('-'));
+    return !/^(inline|contents|ruby)/.test(d);
+  };
   const boundaryText = rootNode => {
     const out = [];
     const rec = n => {
@@ -163,7 +181,14 @@ function collectLayers(scopeSelector) {
     rec(rootNode);
     return out.join('');
   };
-  const textNodes = el => { const out = []; const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT); while (w.nextNode()) out.push(w.currentNode.data); return out; };
+  // Скрытое строже видимого: каждый текстовый узел и текст каждого вложенного элемента
+  // отдельно («<div hidden>текст<span>MI<b>ET</b></span>город</div>»).
+  const hiddenParts = el => {
+    const out = [];
+    const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
+    while (w.nextNode()) out.push(w.currentNode.nodeType === 3 ? w.currentNode.data : boundaryText(w.currentNode));
+    return out;
+  };
   const hiddenTexts = [];
   const walk = (node, out, parentShown) => {
     if (node.nodeType === Node.TEXT_NODE) {
@@ -179,7 +204,7 @@ function collectLayers(scopeSelector) {
     const isShown = cs.display !== 'none' && shown(el);
     // Невидимый элемент внутри видимого: его текст проверяется отдельно – целиком с
     // границами блоков и по каждому текстовому узлу, без склейки с соседями.
-    if (!isShown && parentShown) hiddenTexts.push(unOverride(boundaryText(el)), ...textNodes(el));
+    if (!isShown && parentShown) hiddenTexts.push(unOverride(boundaryText(el)), ...hiddenParts(el));
     if (cs.display === 'none') return;
     const inline = /^(inline|contents|ruby)/.test(cs.display);
     const buf = {s: ''};
@@ -251,6 +276,11 @@ function collectLayers(scopeSelector) {
   };
 }
 
+// Строчные по умолчанию теги HTML и пользовательские элементы (x-a): у узлов без
+// раскладки (template, скрытое) граница блока определяется по тегу.
+const INLINE_TAGS = new Set('a abbr b bdi bdo big br cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
+const inlineTag = tag => INLINE_TAGS.has(tag) || tag.includes('-');
+
 // CDP: весь DOM (pierce: закрытые теневые корни, iframe, template) с границами блоков по
 // display из DOMSnapshot, атрибуты с именами и декодированными адресами, комментарии;
 // дерево доступности каждого фрейма (CSS-счётчики, сгенерированный текст).
@@ -264,14 +294,14 @@ async function cdpLayers(page) {
       const ids = d.nodes.backendNodeId;
       d.layout.nodeIndex.forEach((ni, i) => { const si = d.layout.styles[i]?.[0]; display.set(ids[ni], si >= 0 ? snap.strings[si] : ''); });
     }
-    const blockId = id => { const d = display.get(id); return d === undefined || !INLINE.test(d); };
+    const blockNodeOf = n => { const d = display.get(n.backendNodeId); return d === undefined ? !inlineTag((n.localName || '').toLowerCase()) : !INLINE.test(d); };
 
     const {root: dom} = await cdp.send('DOM.getDocument', {depth: -1, pierce: true});
     const roots = [], attrs = [], comments = [];
     const visit = (n, acc) => {
       if (n.nodeType === 3) { acc.push(n.nodeValue); return; }
       if (n.nodeType === 8) { comments.push(n.nodeValue); return; }
-      const block = n.nodeType === 1 && blockId(n.backendNodeId);
+      const block = n.nodeType === 1 && blockNodeOf(n);
       if (block) acc.push(' ');
       if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) attrs.push(n.attributes[i], n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
       for (const k of n.children ?? []) visit(k, acc);
@@ -333,21 +363,23 @@ async function setState(page, state) {
 // псевдонимом; достаточно одного.
 async function textRendered(page, mode) {
   return page.evaluate(m => {
-    const checkVis = Element.prototype.checkVisibility;
+    const checkVis = Element.prototype.checkVisibility, children = Object.getOwnPropertyDescriptor(Element.prototype, 'children').get;
+    const parentOf = Object.getOwnPropertyDescriptor(Node.prototype, 'parentElement').get, scrollTo = Element.prototype.scrollIntoView;
+    const masked = cs => [cs.maskImage, cs.webkitMaskImage].some(v => v && v !== 'none');
     const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
     const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
     const PSEUDO = /А[ОO]\s*[«"„“”'‘’‹›＂]\s*Альфа\s*[»"“”'’›＂‘]/;
     const candidates = m === 'service'
       ? [...document.querySelectorAll('#about p')].filter(x => /Единолично создал|independently built and deployed/.test(x.textContent))
-      : [...document.querySelectorAll('body *')].filter(e => PSEUDO.test(e.textContent) && ![...e.children].some(c => PSEUDO.test(c.textContent)));
+      : [...document.querySelectorAll('body *')].filter(e => PSEUDO.test(e.textContent) && ![...children.call(e)].some(c => PSEUDO.test(c.textContent)));
     document.documentElement.style.scrollBehavior = 'auto';
     let last = {ok: false, why: 'not found'};
     for (const el of candidates) {
       if (!checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) { last = {ok: false, why: 'invisible'}; continue; }
       let filtered = false;
-      for (let e = el; e; e = e.parentElement) if (zeroFilter(getComputedStyle(e).filter)) filtered = true;
-      if (filtered) { last = {ok: false, why: 'filter'}; continue; }
-      el.scrollIntoView({block: 'center', behavior: 'instant'});
+      for (let e = el; e; e = parentOf.call(e)) { const ecs = getComputedStyle(e); if (zeroFilter(ecs.filter) || masked(ecs)) filtered = true; }
+      if (filtered) { last = {ok: false, why: 'filter/mask'}; continue; }
+      scrollTo.call(el, {block: 'center', behavior: 'instant'});
       const cs = getComputedStyle(el);
       if (transparent(cs.color) || transparent(cs.webkitTextFillColor || cs.color) || parseFloat(cs.fontSize) < 6) { last = {ok: false, why: 'color/size'}; continue; }
       const range = document.createRange();
@@ -400,26 +432,26 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
 // Абзац о сервисе: единственный, отрисован в каждом состоянии, утверждение и цифры с
 // единицами – в нём самом; в разделе нет других денежных сумм и объёмов кода.
 const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€)';
-const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn)';
+const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn|тыс\\.?|тысяч\\p{L}*|thousand|k(?![\\p{L}]))';
 const MONEY = new RegExp(`${CUR}\\s*\\d[\\d\\s.,]*\\d?(?:\\s*${MULT})?|\\d[\\d\\s.,]*(?:\\s*${MULT})?\\s*${CUR}`, 'giu');
-const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*\s+(?:исходного\s+|программного\s+)?код\p{L}*|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
+const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?!\s+(?:в\s+|из\s+)?(?:таблиц|данн|запис|текст|журнал|лог|файл|CSV|Excel))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
 const clean = s => s.replace(/\s+/g, ' ').trim();
 const EXPECTED = {
-  ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк кода']},
+  ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк']},
   en: {claim: /I independently built and deployed an SCA\/SBOM service/, size: /about 130,000 lines of code/, estimate: /\(about RUB 18 million a year, vendor's estimate\)/, digits: ['130,000', '18'], money: ['RUB 18 million'], code: ['130,000 lines of code']},
 };
 async function serviceProblems(page, label, scheme = 'light') {
   const problems = [];
-  const structure = await page.evaluate(() => ({
-    sections: document.querySelectorAll('[id="about"]').length,
-    paragraphs: [...document.querySelectorAll('#about p')].filter(p => /Единолично создал|independently built and deployed/.test(p.textContent)).length,
-  }));
-  if (structure.sections !== 1) problems.push(`${label}: sections id=about = ${structure.sections}`);
-  if (structure.paragraphs !== 1) problems.push(`${label}: paragraphs with the service claim = ${structure.paragraphs}`);
   for (const state of statesFor(scheme)) {
     await setState(page, state);
     const where = `${label} ${stateLabel(state)}`;
     current = where;
+    const structure = await page.evaluate(() => ({
+      sections: document.querySelectorAll('[id="about"]').length,
+      paragraphs: [...document.querySelectorAll('#about p')].filter(p => /Единолично создал|independently built and deployed/.test(p.textContent)).length,
+    }));
+    if (structure.sections !== 1) problems.push(`${where}: sections id=about = ${structure.sections}`);
+    if (structure.paragraphs !== 1) problems.push(`${where}: paragraphs with the service claim = ${structure.paragraphs}`);
     const r = await textRendered(page, 'service');
     if (!r.ok) problems.push(`${where}: service paragraph is not rendered (${JSON.stringify(r)})`);
     await page.evaluate(() => [...document.querySelectorAll('#about p')].find(x => /Единолично создал|independently built and deployed/.test(x.textContent))?.setAttribute('data-qa-service', '1'));
@@ -463,6 +495,9 @@ const MUST_CATCH = {
   hiddenSplitBetweenWords: '<p><span>предприятие</span><span hidden>MI<strong>ET</strong></span><span>город</span></p>',
   opacitySplitBetweenWords: '<p>предприятие<span style="opacity:0">MI<strong>ET</strong></span>город</p>',
   hiddenNestedBetweenLetters: '<div hidden>предприятие<span>MIET</span>город</div>',
+  hiddenNestedSplit: '<div hidden>текст<span>MI<b>ET</b></span>город</div>',
+  templateSplit: '<template><p>MI<em>ET</em></p></template><p>текст</p>',
+  closedShadowHiddenSplit: '<x-f></x-f><script>const r=document.querySelector("x-f").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("M","I");const em=document.createElement("em");em.textContent="E"+"T";p.append(em);r.append(p);</script>',
   dataNotAttribute: '<p>data:МИЭТ</p>', titleAttr: '<abbr title="MI&#69T">x</abbr>', altAttr: '<img src="x.png" alt="Логотип МИ&#1069Т">',
   attrName: '<div data-miet="1">x</div>', hrefEncoded: '<a href="https://&#105stc-mi&#101t.ru/">сайт</a>', hrefPercent: '<a href="https://istc-%6Diet.ru/">сайт</a>',
   pathPercent: '<a href="/clients/%4D%49%45%54/profile">x</a>', pathPercentWithQuery: '<a href="/clients/%4D%49%45%54/profile?progress=100%">x</a>',
@@ -500,20 +535,23 @@ const MUST_PASS = {
   scriptIdentifier: '<script>const mietCount = 1;</script><p>текст</p>', dataUri: '<img alt="" src="data:image/png;base64,QUJDTUlFVERFRg==">',
   styleSelector: '<style>.mntcLike{}</style><p>текст</p>', mitWord: '<p>MIT License, Mietvertrag, ISTCX</p>',
   blockBoundary: '<p>MI</p><p>ET</p>', blockBoundaryNested: '<div><div>предприятие M</div><div>IET город</div></div>',
-  clobberedForm: '<form><input name="checkVisibility"><input name="childNodes"><input name="parentElement"><input name="attributes"></form><p>текст</p>',
+  clobberedForm: '<form><input name="checkVisibility"><input name="childNodes"><input name="parentElement"><input name="attributes"><input name="getBoundingClientRect"><input name="children"><input name="localName"><input name="shadowRoot"><input name="textContent"><input name="getRootNode"></form><p>текст</p>',
+  hiddenTemplateWord: '<template><p>Ver<em>miet</em>ung</p></template><p>текст</p>',
 };
 const PSEUDONYM_CATCH = {
   otherName: '<p>АО «Альфа»</p><p>АО «Бета»</p>', otherNameEntities: '<p>АО «Альфа»</p><p>АО &laquoБета&raquo</p>',
   latinAO: '<p>АО «Альфа»</p><p>AO «Бета»</p>', ooo: '<p>АО «Альфа»</p><p>ООО «Бета»</p>', fullForm: '<p>АО «Альфа»</p><p>Акционерное общество «Бета»</p>',
   declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>', upperDeclinedForm: '<p>АО «Альфа»</p><p>АКЦИОНЕРНЫМ ОБЩЕСТВОМ «Бета»</p>',
-  lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerUnquoted: '<p>АО «Альфа»</p><p>АО бета</p>',
+  lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerQuoted: '<p>АО «Альфа»</p><p>АО «бета»</p>',
+  longQuoted: '<p>АО «Альфа»</p><p>ООО «Научно-производственное объединение перспективных информационных технологий и систем Бета»</p>',
+  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>',
   noQuotes: '<p>АО «Альфа»</p><p>АО Бета</p>', noQuotesTwoWords: '<p>АО «Альфа»</p><p>АО Альфа Север</p>', qElement: '<p>АО «Альфа»</p><p>АО <q>Бета</q></p>', fullWidthQuote: '<p>АО «Альфа»</p><p>АО ＂Бета＂</p>',
   splitTag: '<p>АО «Альфа»</p><p>А<x-a>О</x-a> «Бета»</p>', scriptFooter: "<p>АО «Альфа»</p><script>document.body.append('АО «Бе'+'та»')</script>",
   hiddenAlphaVisibleBeta: '<p hidden>АО «Альфа»</p><p>АО «Бета»</p>', inAttribute: '<p>АО «Альфа»</p><input value="АО «Бета»">',
   bdoReversed: '<p>АО «Альфа»</p><p><bdo dir="rtl">»атеБ« ОА</bdo></p>', zwsp: '<p>АО «Альфа»</p><p>АО \u200B«Бета»</p>',
   otherForm: '<p>АО «Альфа»</p><p>ООО «Альфа»</p>', longerName: '<p>АО «Альфа»</p><p>ПАО «Альфа Север»</p>',
   romashkaOutsidePhrase: '<p>АО «Альфа»</p><p>Заказчик проекта: ООО «Ромашка»</p>', romashkaPartialPhrase: '<p>АО «Альфа»</p><p>Платежи: у ООО «Ромашка» может быть много счетов</p>',
-  hiddenPseudonymOnly: '<p hidden>АО «Альфа»</p><p>Заказчик проекта</p>', zeroHeightPseudonym: '<div style="height:0;overflow:hidden"><p>АО «Альфа»</p></div><p>Заказчик</p>',
+  hiddenPseudonymOnly: '<p hidden>АО «Альфа»</p><p>Заказчик проекта</p>', maskedPseudonym: '<p style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">АО «Альфа»</p><p>Заказчик</p>', zeroHeightPseudonym: '<div style="height:0;overflow:hidden"><p>АО «Альфа»</p></div><p>Заказчик</p>',
   transparentFill: '<p style="-webkit-text-fill-color:transparent">АО «Альфа»</p><p>Заказчик</p>', filterOpacity: '<p style="filter:opacity(0)">АО «Альфа»</p><p>Заказчик</p>',
   darkHidesPseudonym: '<style>:root[data-theme="dark"] .a{display:none}</style><p class="a">АО «Альфа»</p>',
   darkDarkHidesPseudonym: '<style>@media (prefers-color-scheme: dark){:root[data-theme="dark"] .a{display:none}}</style><p class="a">АО «Альфа»</p>',
@@ -521,6 +559,7 @@ const PSEUDONYM_CATCH = {
 };
 const PSEUDONYM_PASS = {
   plainSentence: '<p>АО «Альфа»</p><p>АО обязано вести реестр акционеров</p>', upperSentence: '<p>АО «Альфа»</p><p>АО ОБЯЗАНО ВЕСТИ РЕЕСТР</p>',
+  verbSentence: '<p>АО «Альфа»</p><p>АО ведёт реестр акционеров</p>',
   lowQuotes: '<p>АО „Альфа“</p>', romashkaExact: '<p>АО «Альфа»</p><p>У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.</p>',
 };
 
@@ -579,8 +618,10 @@ try {
     return found;
   };
   for (const [name, html] of Object.entries(MUST_CATCH)) {
-    const found = await fixtureProblems(name, html);
+    const all = await fixtureProblems(name, html);
+    const broken = all.filter(f => /collector failed/.test(f)), found = all.filter(f => !/collector failed/.test(f));
     const marker = STATE_MARKERS[name];
+    if (broken.length) failures.push(`self-test: collector failed on «${name}»: ${broken[0]}`);
     if (!found.length) failures.push(`self-test: «${name}» is not caught`);
     else if (marker && !found.some(f => f.includes(marker.must))) failures.push(`self-test: «${name}» is not caught in ${marker.must}`);
     else if (marker && found.some(f => f.includes(marker.mustNot))) failures.push(`self-test: «${name}» is caught in ${marker.mustNot}: ${found.find(f => f.includes(marker.mustNot))}`);
@@ -621,6 +662,10 @@ try {
     codeKloc: [extra('Code size: 250 kloc.'), /code sizes in the section/],
     codeKstrok: [extra('Объём: 250 кстрок.'), /code sizes in the section/],
     codeLinesRu: [extra('Ещё 250 тыс. строк кода.'), /code sizes in the section/],
+    codeLinesCpp: [extra('Модуль содержит ещё 250 строк на C++.'), /code sizes in the section/],
+    amountThousandRub: [extra('Цена: 28 тыс. рублей.'), /amounts in the section/],
+    maskHides: [index.replace(anchorRu, '<p style="-webkit-mask-image: linear-gradient(transparent, transparent); mask-image: linear-gradient(transparent, transparent)"><span data-l="ru">Выстраиваю РБПО'), HIDDEN],
+    secondClaimLightRu: [index.replace('</body>', '<script>new MutationObserver(() => {}).observe(document.documentElement, {attributes: true}); const add = () => { const on = document.documentElement.dataset.theme === "light" && document.documentElement.dataset.lang === "ru"; const ex = document.getElementById("qa2"); if (on && !ex) { const p = document.createElement("p"); p.id = "qa2"; p.textContent = "Единолично создал и ввёл в эксплуатацию сервис SCA/SBOM (второй)"; document.getElementById("about").append(p); } if (!on && ex) ex.remove(); }; new MutationObserver(add).observe(document.documentElement, {attributes: true});</script></body>'), /paragraphs with the service claim = 2/],
   };
   for (const [name, [html, expected]] of Object.entries(serviceMutations)) {
     assert.notEqual(html, index, `service mutation ${name} applied`);
@@ -661,7 +706,12 @@ try {
         const response = await p.goto(origin + route, {waitUntil: 'load'});
         if (!response || response.status() !== 200) { failures.push(`${label}: HTTP ${response?.status()}`); await context.close(); continue; }
         failures.push(...await pageProblems(p, label, {deck: DECKS.has(route), route, scheme}));
-        if (SERVICE_PAGES.includes(route)) failures.push(...await serviceProblems(p, label, scheme));
+        if (SERVICE_PAGES.includes(route)) {
+          current = `${label} [${scheme}] reload for the service paragraph`;
+          const again = await p.goto(origin + route, {waitUntil: 'load'});
+          assert.equal(again?.status(), 200);
+          failures.push(...await serviceProblems(p, label, scheme));
+        }
         await context.close();
         cases++;
       }
