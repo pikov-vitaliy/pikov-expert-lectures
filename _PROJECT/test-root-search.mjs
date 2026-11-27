@@ -104,6 +104,7 @@ test('word forms, abbreviations and addresses', () => {
   assert.ok(!(found('https://example.org/tests.pikov.expert/').length === 1 && found('https://example.org/tests.pikov.expert/')[0] === 'tests'), 'a host inside a foreign path is not an address');
   assert.deepEqual(found('https://new-courses.pikov.expert:443/?x=1#pvsstat'), ['new-courses/#pvsstat']);
   assert.ok(!(found('https://tests.pikov.expert@example.org/').length === 1 && found('https://tests.pikov.expert@example.org/')[0] === 'tests'), 'user info before a foreign host is not an address');
+  for (const q of ['https://tests.pikov.expert%40example.org/', 'https://tests.pikov.expert_x.example.org/', 'https://tests.pikov.expert\@example.org/']) assert.ok(!(found(q).length === 1 && found(q)[0] === 'tests'), q);
   for (const q of ['гость', 'гостями', 'капая']) assert.deepEqual(found(q), [], q);
   assert.deepEqual(found('facility'), found('facilities'));
   assert.ok(found('facilities').length > 0, 'the exact English word is kept before stemming');
