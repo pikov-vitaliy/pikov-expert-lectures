@@ -48,7 +48,7 @@ const KIND_BY_URL = new Map([
   ['https://rubin.pikov.expert/', 'lecture'],
 ]);
 
-function classifyMaterial(item) {
+export function classifyMaterial(item) {
   if (KIND_BY_URL.has(item.url)) return KIND_BY_URL.get(item.url);
   const format = item.formatEn.toLowerCase();
   if (/\breference\b/.test(format)) return 'reference';
@@ -89,6 +89,7 @@ export function validateCatalogue({ categories, lectures }) {
     if (urls.has(url.href)) throw new Error(`Duplicate material URL: ${item.url}`);
     urls.add(url.href);
     if (item.kind !== undefined && !MATERIAL_KINDS.includes(item.kind)) throw new Error(`${context}: unsupported kind ${item.kind}`);
+    if (item.tags !== undefined && (!Array.isArray(item.tags) || item.tags.some(tag => typeof tag !== 'string' || !tag))) throw new Error(`${context}: tags must be an array of strings`);
   }
   return { categories, lectures };
 }
@@ -120,7 +121,7 @@ export function parseCatalogue(sourceHtml) {
   const categories = [...raw.categories]
     .sort((a, b) => CATEGORY_ORDER.indexOf(a.id) - CATEGORY_ORDER.indexOf(b.id))
     .map(category => ({ ...category, ...CATEGORY_PRESENTATION[category.id] }));
-  const lectures = raw.lectures.map(item => ({ ...item, kind: classifyMaterial(item) }));
+  const lectures = raw.lectures.map(item => ({ ...item, kind: item.kind ?? classifyMaterial(item) }));
   return validateCatalogue({ categories, lectures });
 }
 
