@@ -1366,7 +1366,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
   /* search-engine:start */
   /* Двуязычный поиск по каталогу: по началу слова, короткие слова и сокращения –
      только целым словом, словарь синонимов SEARCH_SYNONYMS, русские и английские
-     окончания. Не обращается к DOM. */
+     окончания, точный адрес материала. Не обращается к DOM. */
   function createCatalogSearch(items, synonyms){
     const STOP = new Set(["и","в","во","на","по","для","с","со","о","об","к","от","из","а","the","of","and","for","in","to","on","a","an","with"]);
     const WHOLE = new Set(["кии","cii","бду","тзи","sca","osa","вкр","маи","mai","ппк","смиб","isms","sdl","sql","cwe","edr","soc","wmi","dac","mac","tpm","efs","lsa","srm","sam"]);
@@ -1374,19 +1374,33 @@ function plural(n, forms){ // forms: ["материал","материала","�
     const MAX_QUERY = 120;
     const normalize = text => String(text).normalize("NFKC").toLowerCase().replace(/ё/g, "е");
     const words = text => normalize(text).match(/[\p{L}\p{N}]+(?:\+\+)?/gu) || [];
+    const cyrillic = word => /[а-я]/.test(word);
     const stem = word => {
-      if(/[а-я]/.test(word)){
+      if(cyrillic(word)){
         if(word.length < 5) return word;
         for(const ending of ENDINGS){ if(word.endsWith(ending) && word.length - ending.length >= 4) return word.slice(0, -ending.length); }
         return word;
       }
-      if(/^[a-z]{5,}$/.test(word) && !word.endsWith("ss")){
-        for(const ending of ["ies", "es", "s"]){ if(word.endsWith(ending) && word.length - ending.length >= 4) return word.slice(0, -ending.length); }
+      /* Английское множественное число: studies → study, processes → process,
+         grades → grade, courses → course; analysis и class не трогаются. */
+      if(/^[a-z]{5,}$/.test(word)){
+        if(word.endsWith("ies")) return word.slice(0, -3) + "y";
+        if(/(sses|shes|ches|xes)$/.test(word)) return word.slice(0, -2);
+        if(word.endsWith("s") && !/(ss|us|is)$/.test(word)) return word.slice(0, -1);
       }
       return word;
     };
-    /* Слово запроса и слово словаря: точно или с одной основой (нейросетями = нейросеть). */
-    const sameWord = (token, termWord) => token === termWord || (token.length >= 5 && termWord.length >= 5 && stem(token) === stem(termWord));
+    /* Слово запроса и слово словаря: одно и то же слово в другой форме
+       (нейронными = нейронные, сетей = сети, networks = network). */
+    const sameWord = (a, b) => {
+      if(a === b) return true;
+      if(cyrillic(a) && cyrillic(b) && Math.min(a.length, b.length) >= 4){
+        let k = 0;
+        while(k < a.length && k < b.length && a[k] === b[k]) k++;
+        return k >= Math.max(3, Math.min(a.length, b.length) - 2);
+      }
+      return a.length >= 5 && b.length >= 5 && stem(a) === stem(b);
+    };
     const FIELDS = [["title", 6], ["titleEn", 6], ["format", 3], ["formatEn", 3], ["description", 2], ["descriptionEn", 2]];
     const plainAddress = text => String(text).replace(/https?:\/\//gi, " ").replace(/\.pikov\.expert/gi, " ").replace(/\.html\b/gi, " ");
     const index = items.map(item => ({ item, fields: [...FIELDS.map(([field, weight]) => ({ weight, words: words(item[field] || "") })), { weight: 3, words: words(plainAddress(item.url)) }] }));
@@ -1408,6 +1422,16 @@ function plural(n, forms){ // forms: ["материал","материала","�
       for(const field of entry.fields) if(field.weight > best && matchPhrase(termWords, field.words, shortPrefix)) best = field.weight;
       return best;
     }
+    /* Хвост запроса – незаконченное начало более длинного термина словаря:
+       «машинное», «нейр», «fstec of ru». Возвращает группу, если она одна. */
+    function tailGroup(rest){
+      const last = rest[rest.length - 1];
+      if(last.length < (rest.length === 1 ? 4 : 1)) return null;
+      const found = groups.filter(group => group.terms.some(term => term.length >= rest.length &&
+        rest.slice(0, -1).every((word, k) => sameWord(word, term[k])) && term[rest.length - 1].startsWith(last) &&
+        !(term.length === rest.length && sameWord(last, term[rest.length - 1]))));
+      return found.length === 1 ? found[0] : null;
+    }
     function parse(query){
       const tokens = words(query), conditions = [];
       for(let i = 0; i < tokens.length;){
@@ -1415,17 +1439,10 @@ function plural(n, forms){ // forms: ["материал","материала","�
         for(const group of groups) for(const term of group.terms){
           if(term.length > length && i + term.length <= tokens.length && term.every((word, k) => sameWord(tokens[i + k], word))){ hit = group; length = term.length; }
         }
-        if(hit){ conditions.push({ group: hit, raw: tokens.slice(i, i + length).join(" ") }); i += length; continue; }
-        /* Хвост запроса – начало термина словаря («машинное», «нейр», «machine l»):
-           пока слово набирается, ищем всю группу и сам набранный текст. */
         const rest = tokens.slice(i);
-        const last = rest[rest.length - 1];
-        if(last.length >= (rest.length === 1 ? 4 : 1)){
-          const prefixed = groups.filter(group => group.terms.some(term => term.length >= rest.length &&
-            rest.slice(0, -1).every((word, k) => sameWord(word, term[k])) && term[rest.length - 1].startsWith(last) &&
-            !(term.length === rest.length && term[rest.length - 1] === last)));
-          if(prefixed.length === 1){ conditions.push({ group: prefixed[0], raw: rest.join(" "), plus: rest }); break; }
-        }
+        const tail = (!hit || length < rest.length) ? tailGroup(rest) : null;
+        if(tail){ conditions.push({ group: tail, raw: rest.join(" "), plus: rest }); break; }
+        if(hit){ conditions.push({ group: hit, raw: tokens.slice(i, i + length).join(" ") }); i += length; continue; }
         const token = tokens[i++];
         if(STOP.has(token) && tokens.length > 1) continue;
         if(token.length < 2 && !/\d/.test(token)) continue;
@@ -1433,24 +1450,41 @@ function plural(n, forms){ // forms: ["материал","материала","�
       }
       return conditions;
     }
+    function groupBest(entry, condition){
+      let best = 0;
+      for(const term of condition.group.terms) best = Math.max(best, bestField(entry, term, false) * (term.join(" ") === condition.raw ? 1 : 0.8));
+      if(condition.plus) best = Math.max(best, bestField(entry, condition.plus, false));
+      return best;
+    }
     function scoreCondition(entry, condition, shortPrefix){
       if(condition.group){
-        /* Слова словаря (ОС, ИИ, КИИ) всегда сравниваются по своим правилам: запасной
+        /* Слова словаря (ОС, ИИ, КИИ) сравниваются по своим правилам: запасной
            поиск по началу слова на них не распространяется. */
         const group = condition.group;
-        const literal = bestField(entry, condition.plus || words(condition.raw), false);
-        if(group.tag) return (entry.item.tags || []).includes(group.tag) ? 8 + literal / 2 : (condition.plus ? literal : 0);
-        let best = 0;
-        for(const term of group.terms) best = Math.max(best, bestField(entry, term, false) * (term.join(" ") === condition.raw ? 1 : 0.8));
-        if(condition.plus) best = Math.max(best, literal);
-        if(group.category && entry.item.category === group.category) best = Math.max(best, 1);
-        return best;
+        const text = groupBest(entry, condition);
+        /* Метка решает, попадает ли карточка в тему; текст – только порядок внутри темы. */
+        if(group.tag) return (entry.item.tags || []).includes(group.tag) ? 8 + text / 2 : (condition.plus ? bestField(entry, condition.plus, false) : 0);
+        return group.category && entry.item.category === group.category ? Math.max(text, 1) : text;
       }
       return bestField(entry, condition.term, shortPrefix);
     }
+    /* Вставленный адрес материала: rubin.pikov.expert, https://tests.pikov.expert/. */
+    function byAddress(query, pool){
+      const match = String(query).match(/(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(\/[^\s?#]*)?(#\S*)?/i);
+      if(!match) return null;
+      const host = match[1].toLowerCase() + ".pikov.expert";
+      const parts = url => url.match(/^https:\/\/([^/#]+)(\/[^#]*)?(#.*)?$/) || [];
+      const same = pool.filter(entry => parts(entry.item.url)[1] === host);
+      if(!same.length) return null;
+      const exact = same.filter(entry => { const [, , path, hash] = parts(entry.item.url); return (match[2] || "/") === (path || "/") && (match[3] || "") === (hash || ""); });
+      return (exact.length ? exact : same).map(entry => ({ item: entry.item, score: 100 }));
+    }
     function search(query, kind){
-      const conditions = parse(plainAddress(String(query).slice(0, MAX_QUERY)));
+      query = String(query).slice(0, MAX_QUERY);
       const pool = kind ? index.filter(entry => entry.item.kind === kind) : index;
+      const address = byAddress(query, pool);
+      if(address) return { active: true, results: address };
+      const conditions = parse(plainAddress(query));
       if(!conditions.length) return { active: false, results: pool.map(entry => ({ item: entry.item, score: 0 })) };
       const run = shortPrefix => pool.map(entry => {
         let score = 0;
@@ -1549,6 +1583,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
         esc(label) + '<span class="n">' + count + '</span></button>' : '';
     }).join("");
     topicBox.parentElement.setAttribute("aria-label", strings.topicsLabel);
+    delete topicBox.dataset.kind;
   }
 
   function activeTopic(){
@@ -1566,14 +1601,27 @@ function plural(n, forms){ // forms: ["материал","материала","�
     return params.toString();
   }
 
-  function writeUrl(active){
+  function flushUrl(active){
+    clearTimeout(urlTimer);
+    const query = searchParams(active);
+    const next = location.pathname + (query ? "?" + query : "") + location.hash;
+    if(next !== location.pathname + location.search + location.hash) history.replaceState(history.state, "", next);
+  }
+
+  /* Набор пишется в адрес с задержкой: частые replaceState Safari ограничивает.
+     Темы, тип, сброс и уход со страницы пишутся сразу. */
+  function writeUrl(active, now){
     updateLangHref(active);
     clearTimeout(urlTimer);
-    urlTimer = setTimeout(() => {
-      const query = searchParams(active);
-      const next = location.pathname + (query ? "?" + query : "") + location.hash;
-      if(next !== location.pathname + location.search + location.hash) history.replaceState(history.state, "", next);
-    }, 250);
+    if(now) flushUrl(active); else urlTimer = setTimeout(() => flushUrl(active), 250);
+  }
+
+  /* Якорь раздела, скрытого фильтром (#cat-os после поиска), – фильтры снимаются. */
+  function revealHashSection(){
+    const id = decodeURIComponent(location.hash.slice(1));
+    if(!/^cat-/.test(id)) return;
+    const section = document.getElementById(id);
+    if(section && section.hidden){ q.value = ""; fmtSel.value = ""; applyFilter({ immediate: true, now: true }); section.scrollIntoView(); }
   }
 
   function updateLangHref(active){
@@ -1599,6 +1647,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
     const topic = activeTopic();
     if(topic) q.value = lang() === "en" ? topic.nameEn : topic.name;
     applyFilter({ immediate: true, keepUrl: true });
+    revealHashSection();
   }
 
   function applyFilter(options = {}){
@@ -1633,9 +1682,12 @@ function plural(n, forms){ // forms: ["материал","материала","�
     });
     resetBtn.hidden = !(q.value.trim() || fmtSel.value);
     const topic = activeTopic();
+    const recount = topicBox.dataset.kind !== fmtSel.value;
+    topicBox.dataset.kind = fmtSel.value;
     topicBox.querySelectorAll(".chip").forEach(chip => {
       chip.setAttribute("aria-pressed", String(!!topic && chip.dataset.topic === topic.id));
-      /* Число на кнопке учитывает выбранный тип материала. */
+      if(!recount) return;
+      /* Число на кнопке учитывает выбранный тип материала; пересчёт – только при смене типа. */
       const item = QUICK_TOPICS.find(x => x.id === chip.dataset.topic);
       const counter = chip.querySelector(".n");
       if(item && counter) counter.textContent = String(engine.search(lang() === "en" ? item.nameEn : item.name, fmtSel.value).results.length);
@@ -1645,7 +1697,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
     if(!text || options.immediate) note.textContent = text; else noteTimer = setTimeout(() => { note.textContent = text; }, 350);
     clearTimeout(emptyTimer);
     if(shown) emptyNote.hidden = true; else emptyTimer = setTimeout(() => { emptyNote.hidden = false; }, 400);
-    if(options.keepUrl) updateLangHref(active); else writeUrl(active);
+    if(options.keepUrl) updateLangHref(active); else writeUrl(active, options.now);
   }
 
   function syncLanguageUrl(){
@@ -1770,25 +1822,27 @@ function plural(n, forms){ // forms: ["материал","материала","�
   const linkTopic = activeTopic();
   if(linkTopic) q.value = lang() === "en" ? linkTopic.nameEn : linkTopic.name;
   applyChromeLanguage();
-  if(q.value || fmtSel.value) applyFilter({ immediate: true });
+  if(q.value || fmtSel.value){ applyFilter({ immediate: true }); revealHashSection(); }
   window.addEventListener("popstate", restoreFromUrl);
 
   q.addEventListener("input", applyFilter);
   q.addEventListener("keydown", e => { if(e.key === "Escape" && q.value){ e.preventDefault(); q.value = ""; applyFilter(); } });
-  fmtSel.addEventListener("change", applyFilter);
-  resetBtn.addEventListener("click", () => { q.value = ""; fmtSel.value = ""; applyFilter(); q.focus(); });
+  fmtSel.addEventListener("change", () => applyFilter({ now: true }));
+  resetBtn.addEventListener("click", () => { q.value = ""; fmtSel.value = ""; applyFilter({ now: true }); q.focus(); });
+  window.addEventListener("pagehide", () => flushUrl(engine.search(q.value, "").active));
   topicBox.addEventListener("click", e => {
     const chip = e.target.closest(".chip");
     if(!chip) return;
     const topic = QUICK_TOPICS.find(x => x.id === chip.dataset.topic);
     const label = lang() === "en" ? topic.nameEn : topic.name;
     q.value = chip.getAttribute("aria-pressed") === "true" ? "" : label;
-    applyFilter();
+    applyFilter({ now: true });
   });
   /* Плитка раздела: сначала сбросить фильтры, иначе скрытый раздел не откроется. */
   document.getElementById("tiles").addEventListener("click", e => {
     if(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0) return;
-    if(e.target.closest(".tile") && (q.value || fmtSel.value)){ q.value = ""; fmtSel.value = ""; applyFilter(); }
+    /* Адрес очищается до перехода по якорю, иначе новая запись истории унесёт старый запрос. */
+    if(e.target.closest(".tile") && (q.value || fmtSel.value)){ q.value = ""; fmtSel.value = ""; applyFilter({ immediate: true, now: true }); }
   });
   document.addEventListener("keydown", e => {
     if(e.key === "/" && !e.ctrlKey && !e.metaKey && !e.altKey && !e.isComposing && !/^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName)){ e.preventDefault(); q.focus(); }

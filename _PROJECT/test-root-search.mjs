@@ -92,6 +92,12 @@ test('word forms, abbreviations and addresses', () => {
   const ranked = Array.from(engine.search('искусственный интеллект', '').results, r => short(r.item.url));
   assert.equal(ranked[0], 'kamaz-ai', 'exact title match goes first');
   assert.deepEqual(found('ИИ' + ' '.repeat(130) + 'xyzzy'), ai, 'queries are cut to MAX_QUERY like the field and the address');
+  for (const q of ['нейронными сетями', 'нейронных сетей', 'машинным обучением', 'нейросетям']) assert.deepEqual(found(q), ai, q);
+  assert.ok(found('FSTEC of ru', 'lecture').length > 0, 'unfinished phrase after a short synonym');
+  assert.ok(!found('studies').includes('new-courses/#pvsstat'), 'studies must not match Studio');
+  assert.ok(!found('grades').includes('vkr'), 'grades must not match graduation');
+  assert.deepEqual(found('https://tests.pikov.expert/'), ['tests']);
+  assert.deepEqual(found('https://new-courses.pikov.expert/#pvsstat'), ['new-courses/#pvsstat']);
 });
 
 test('kind filter applies with and without a query', () => {
@@ -107,6 +113,9 @@ test('quick topics: Russian and English labels find the same non-empty set', () 
     const ru = found(topic.name), en = found(topic.nameEn);
     assert.ok(ru.length > 0, topic.id);
     assert.deepEqual(en, ru, topic.id);
+    // Тема по метке (ИИ) упорядочена одинаково на обоих языках.
+    const order = label => Array.from(engine.search(label, '').results, r => short(r.item.url));
+    if (topic.id === 'ai') assert.deepEqual(order(topic.nameEn), order(topic.name), 'ai: the same order on both languages');
     assert.doesNotMatch(topic.nameEn, /[а-яё]/i, `${topic.id}: Cyrillic in the English label`);
   }
 });
