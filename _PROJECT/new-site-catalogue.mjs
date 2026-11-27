@@ -45,6 +45,7 @@ const KIND_BY_URL = new Map([
   ['https://appsec-lections.pikov.expert/', 'course'],
   ['https://is.pikov.expert/', 'course'],
   ['https://vkr.pikov.expert/', 'lecture'],
+  ['https://rubin.pikov.expert/', 'lecture'],
 ]);
 
 function classifyMaterial(item) {
