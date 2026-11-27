@@ -96,9 +96,25 @@ function textLayers(html) {
   };
 }
 
+// В адресах и именах файлов имя ищется подстрокой («/assets/logoMIET.svg»), как в
+// исходной проверке; data: не проверяется – в base64 возможны случайные совпадения.
+const URL_VALUE = /\s(?:href|src|srcset|action|poster|data|cite|background|formaction|xlink:href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
+const EMPLOYER_IN_URL = /MIET|MNTC|ISTC|MHTЦ|MИЭT/u;
+function urlMentions(html) {
+  for (const m of removeComments(html).matchAll(URL_VALUE)) {
+    const value = decodeEntities(m[1] ?? m[2] ?? m[3]);
+    if (/^\s*data:/i.test(value)) continue;
+    let decoded = value;
+    try { decoded = decodeURIComponent(value); } catch { /* «100%» – проверяется как есть */ }
+    if (EMPLOYER_IN_URL.test(normaliseForMatch(value)) || EMPLOYER_IN_URL.test(normaliseForMatch(decoded))) return true;
+  }
+  return false;
+}
+
 function employerMentions(html) {
   const layers = textLayers(html);
   const found = [];
+  if (urlMentions(html)) found.push("url");
   if (EMPLOYER_SOURCE.test(removeDataUris(removeComments(html)))) found.push("source");
   for (const [name, text] of Object.entries(layers)) {
     if (hasEmployerWord(text) || EMPLOYER_SOURCE.test(text)) found.push(name);
@@ -347,6 +363,7 @@ test("former-employer guard catches disguised names and ignores look-alikes", ()
     altText: '<img alt="Логотип МНТЦ" src="x.png">',
     domainInSource: '<link href="https://istc-miet.ru/">',
     logoFile: '<img src="assets/mntc-logo.png" alt="">',
+    logoFileCamel: '<img src="/assets/logoMIET.svg" alt="Логотип заказчика">',
     numericNoSemicolon: "<p>MI&#69T</p>",
     unquotedAttr: "<a title=MIET href=#>x</a>",
     otherAttr: '<div data-x="МНТЦ">x</div>',

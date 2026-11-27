@@ -78,6 +78,21 @@ function employerHits(label, text) {
   }
   return [];
 }
+// В адресах и именах файлов имя ищется подстрокой («/assets/logoMIET.svg»): там нет
+// обычных слов, в которых оно встретилось бы случайно. data: не проверяется – в base64
+// случайные совпадения возможны.
+const EMPLOYER_IN_URL = /MIET|MNTC|ISTC|MHTЦ|MИЭT/u;
+function employerUrlHits(label, values) {
+  for (const v of values) {
+    if (/^\s*data:/i.test(v)) continue;
+    const s = foldLatin(v);
+    const m = s.match(EMPLOYER_IN_URL);
+    if (m) return [`${label}: …${s.slice(Math.max(0, m.index - 30), m.index + 30)}…`];
+  }
+  return [];
+}
+const URL_ATTR = /(?:href|src|srcset|action|data|poster|cite|url|background|manifest|ping|formaction|codebase)$/i;
+
 // Адрес и его компоненты, декодированные по отдельности (параметр «100%» не мешает пути).
 function decodeParts(v) {
   const out = [];
@@ -97,7 +112,7 @@ const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао)|(ак�
 const NAME_QUOTED = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,200}?)\\s*[${QC}]`, 'u');
 // Открывающая кавычка без закрывающей: имя – до 60 знаков.
 const NAME_OPEN = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60})`, 'u');
-const NAME_WORDS = /^\s*(\p{Lu}[\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
+const NAME_WORDS = /^\s*([\p{Lu}\p{N}][\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
 const STOP = new Set('обязано обязан обязана обязаны должно должен должна должны является являются может могут вправе имеет имеют не и или а но в во на с со по для от до из к о об при как это был было будет есть'.split(' '));
 // Учебный пример владельца в исторической презентации sbom-license-audit – только эта фраза целиком.
 const ALLOWED_PHRASES = {'/sbom-license-audit/': ['У ООО «Ромашка» может быть много адресов, печатей и сокращений, но ИНН один.']};
@@ -140,8 +155,6 @@ function collectLayers(scopeSelector) {
   };
   const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
   const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
-  // CSS-маска может сделать текст невидимым при сохранённых размерах и цвете: считается скрытием.
-  const masked = cs => [cs.maskImage, cs.webkitMaskImage].some(v => v && v !== 'none');
   const shown = el => {
     if (!P.checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) return false;
     for (let e = el; e && e.nodeType === 1; e = P.parent.call(e) || P.rootNode.call(e).host) {
@@ -149,7 +162,6 @@ function collectLayers(scopeSelector) {
       if (cs.clipPath && cs.clipPath !== 'none' && /inset\(\s*50%|circle\(\s*0|polygon\(\s*0[^,]*,\s*0[^,]*,\s*0/.test(cs.clipPath)) return false;
       if (zeroFilter(cs.filter)) return false;
       if (cs.overflow !== 'visible' && e !== el) { const r = P.rect.call(e); if (r.width < 1 || r.height < 1) return false; }
-      if (masked(cs)) return false;
     }
     const cs = getComputedStyle(el);
     if (parseFloat(cs.fontSize) < 4) return false;
@@ -161,9 +173,10 @@ function collectLayers(scopeSelector) {
     (() => { const cs = getComputedStyle(el); return /bidi-override|isolate-override/.test(cs.unicodeBidi) && cs.direction === 'rtl'; })();
   // Текст поддерева с границами блоков: строчная разметка склеивается («Ver<em>miet</em>ung»),
   // блоки и скрытые элементы разделяются («<p>MI</p><p>ET</p>»).
-  const INLINE_TAGS = new Set('a abbr b bdi bdo big br cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
+  const INLINE_TAGS = new Set('a abbr b bdi bdo big cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
   const isBlock = el => {
     const tag = P.local.call(el);
+    if (tag === 'br') return true;
     const d = P.connected.call(el) ? getComputedStyle(el).display : '';
     if (!d) return !(INLINE_TAGS.has(tag) || tag.includes('-'));
     return !/^(inline|contents|ruby)/.test(d);
@@ -200,6 +213,7 @@ function collectLayers(scopeSelector) {
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const el = node, tag = P.local.call(el);
     if (tag === 'script' || tag === 'style' || tag === 'template' || tag === 'title') return;
+    if (tag === 'br') { out.s += ' '; return; }
     const cs = getComputedStyle(el);
     const isShown = cs.display !== 'none' && shown(el);
     // Невидимый элемент внутри видимого: его текст проверяется отдельно – целиком с
@@ -254,12 +268,12 @@ function collectLayers(scopeSelector) {
     for (const n of P.attrNames.call(el)) {
       const v = P.attr.call(el, n);
       attributes.push(n, v);
-      if (/(?:href|src|action|data|poster|cite|srcset|url)$/i.test(n)) urls.push(...decode(v));
+      if (/(?:href|src|srcset|action|data|poster|cite|url|background|manifest|ping|formaction|codebase)$/i.test(n) && !/^\s*data:/i.test(v)) urls.push(...decode(v));
     }
     for (const prop of ['href', 'src', 'action', 'formAction', 'data', 'poster', 'cite']) {
       const v = el[prop];
-      if (typeof v === 'string' && v) urls.push(...decode(v));
-      else if (v && typeof v.baseVal === 'string') urls.push(...decode(v.baseVal));
+      const sv = typeof v === 'string' ? v : (v && typeof v.baseVal === 'string' ? v.baseVal : '');
+      if (sv && !/^\s*data:/i.test(sv)) urls.push(...decode(sv));
     }
     for (const pseudo of ['::before', '::after', '::marker']) { const gtext = cssStrings(getComputedStyle(el, pseudo).content); if (gtext) generated.push(gtext); }
   }
@@ -271,6 +285,7 @@ function collectLayers(scopeSelector) {
     hidden: hiddenTexts.join(' \n '),
     visible: vis.s.replace(/\s+/g, ' '),
     urls: urls.join(' \n '),
+    urlList: urls,
     generated: generated.join(' \n '),
     title: document.title,
   };
@@ -278,7 +293,8 @@ function collectLayers(scopeSelector) {
 
 // Строчные по умолчанию теги HTML и пользовательские элементы (x-a): у узлов без
 // раскладки (template, скрытое) граница блока определяется по тегу.
-const INLINE_TAGS = new Set('a abbr b bdi bdo big br cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
+// br – перевод строки, он разделяет слова и в строчной разметке.
+const INLINE_TAGS = new Set('a abbr b bdi bdo big cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
 const inlineTag = tag => INLINE_TAGS.has(tag) || tag.includes('-');
 
 // CDP: весь DOM (pierce: закрытые теневые корни, iframe, template) с границами блоков по
@@ -297,13 +313,16 @@ async function cdpLayers(page) {
     const blockNodeOf = n => { const d = display.get(n.backendNodeId); return d === undefined ? !inlineTag((n.localName || '').toLowerCase()) : !INLINE.test(d); };
 
     const {root: dom} = await cdp.send('DOM.getDocument', {depth: -1, pierce: true});
-    const roots = [], attrs = [], comments = [];
+    const roots = [], attrs = [], comments = [], urlValues = [];
     const visit = (n, acc) => {
       if (n.nodeType === 3) { acc.push(n.nodeValue); return; }
       if (n.nodeType === 8) { comments.push(n.nodeValue); return; }
-      const block = n.nodeType === 1 && blockNodeOf(n);
+      const block = n.nodeType === 1 && ((n.localName || '').toLowerCase() === 'br' || blockNodeOf(n));
       if (block) acc.push(' ');
-      if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) attrs.push(n.attributes[i], n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
+      if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) {
+        attrs.push(n.attributes[i], n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
+        if (URL_ATTR.test(n.attributes[i]) && !/^\s*data:/i.test(n.attributes[i + 1])) urlValues.push(n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
+      }
       for (const k of n.children ?? []) visit(k, acc);
       if (block) acc.push(' ');
       for (const r of [...(n.shadowRoots ?? []), ...(n.contentDocument ? [n.contentDocument] : []), ...(n.templateContent ? [n.templateContent] : [])]) {
@@ -342,7 +361,7 @@ async function cdpLayers(page) {
         if (t) parts.push(t);
       }
     }
-    return {dom: [...roots.map(a => a.join('')), attrs.join(' \n '), comments.join(' \n ')].join(' \n '), ax: parts.join(' \n ')};
+    return {dom: [...roots.map(a => a.join('')), attrs.join(' \n '), comments.join(' \n ')].join(' \n '), ax: parts.join(' \n '), urls: urlValues};
   } finally { await cdp.detach(); }
 }
 
@@ -359,7 +378,8 @@ async function setState(page, state) {
 }
 
 // Текст отрисован: попадание точкой по строкам, видимые цвет и заливка букв, без
-// filter: opacity(0). Кандидаты – абзац о сервисе или самый вложенный элемент с
+// filter: opacity(0) и без CSS-маски. Для обязательного текста любая маска – сомнение, и
+// оно трактуется как «не отрисован»; для запрещённого текста маска ничего не скрывает. Кандидаты – абзац о сервисе или самый вложенный элемент с
 // псевдонимом; достаточно одного.
 async function textRendered(page, mode) {
   return page.evaluate(m => {
@@ -405,7 +425,9 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
     for (const frame of page.frames()) {
       let layers;
       try { layers = await frame.evaluate(collectLayers, null); } catch (e) { problems.push(`${where}: collector failed in frame ${frame.url()}: ${e.message}`); continue; }
+      problems.push(...employerUrlHits(`${where} url`, layers.urlList));
       for (const [name, text] of Object.entries(layers)) {
+        if (name === 'urlList') continue;
         const hit = employerHits(`${where} ${name}`, text);
         if (hit.length) { problems.push(...hit); break; }
       }
@@ -418,8 +440,8 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
         }
       }
     }
-    const {dom, ax} = await cdpLayers(page);
-    problems.push(...employerHits(`${where} dom`, dom), ...employerHits(`${where} accessibility`, ax));
+    const {dom, ax, urls} = await cdpLayers(page);
+    problems.push(...employerHits(`${where} dom`, dom), ...employerHits(`${where} accessibility`, ax), ...employerUrlHits(`${where} dom url`, urls));
     if (deck) deckAll += ' \n ' + dom + ' \n ' + ax;
   }
   if (deck) {
@@ -431,10 +453,10 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
 
 // Абзац о сервисе: единственный, отрисован в каждом состоянии, утверждение и цифры с
 // единицами – в нём самом; в разделе нет других денежных сумм и объёмов кода.
-const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€)';
+const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|GBP|CNY|JPY|CHF|KZT|BYN|AED|INR|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€|£|¥)';
 const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn|тыс\\.?|тысяч\\p{L}*|thousand|k(?![\\p{L}]))';
 const MONEY = new RegExp(`${CUR}\\s*\\d[\\d\\s.,]*\\d?(?:\\s*${MULT})?|\\d[\\d\\s.,]*(?:\\s*${MULT})?\\s*${CUR}`, 'giu');
-const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?!\s+(?:в\s+|из\s+)?(?:таблиц|данн|запис|текст|журнал|лог|файл|CSV|Excel))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
+const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?![\p{L}])(?!\s+(?:в\s+|из\s+)?(?:таблиц|данн|запис|текст|журнал|лог|файл|CSV|Excel))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
 const clean = s => s.replace(/\s+/g, ' ').trim();
 const EXPECTED = {
   ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк']},
@@ -496,6 +518,9 @@ const MUST_CATCH = {
   opacitySplitBetweenWords: '<p>предприятие<span style="opacity:0">MI<strong>ET</strong></span>город</p>',
   hiddenNestedBetweenLetters: '<div hidden>предприятие<span>MIET</span>город</div>',
   hiddenNestedSplit: '<div hidden>текст<span>MI<b>ET</b></span>город</div>',
+  closedShadowBr: '<x-g></x-g><script>const r=document.querySelector("x-g").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("Заказчик",document.createElement("br"),"M"+"IET",document.createElement("br"),"Москва");r.append(p);</script>',
+  visibleBr: '<p>Заказчик<br>MIET<br>Москва</p>',
+  fileNameCamel: '<img src="/assets/logoMIET.svg" alt="Логотип заказчика">',
   templateSplit: '<template><p>MI<em>ET</em></p></template><p>текст</p>',
   closedShadowHiddenSplit: '<x-f></x-f><script>const r=document.querySelector("x-f").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("M","I");const em=document.createElement("em");em.textContent="E"+"T";p.append(em);r.append(p);</script>',
   dataNotAttribute: '<p>data:МИЭТ</p>', titleAttr: '<abbr title="MI&#69T">x</abbr>', altAttr: '<img src="x.png" alt="Логотип МИ&#1069Т">',
@@ -537,6 +562,7 @@ const MUST_PASS = {
   blockBoundary: '<p>MI</p><p>ET</p>', blockBoundaryNested: '<div><div>предприятие M</div><div>IET город</div></div>',
   clobberedForm: '<form><input name="checkVisibility"><input name="childNodes"><input name="parentElement"><input name="attributes"><input name="getBoundingClientRect"><input name="children"><input name="localName"><input name="shadowRoot"><input name="textContent"><input name="getRootNode"></form><p>текст</p>',
   hiddenTemplateWord: '<template><p>Ver<em>miet</em>ung</p></template><p>текст</p>',
+  dataUriLong: '<img alt="" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext%3Elogomiet%3C/text%3E%3C/svg%3E">',
 };
 const PSEUDONYM_CATCH = {
   otherName: '<p>АО «Альфа»</p><p>АО «Бета»</p>', otherNameEntities: '<p>АО «Альфа»</p><p>АО &laquoБета&raquo</p>',
@@ -544,7 +570,7 @@ const PSEUDONYM_CATCH = {
   declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>', upperDeclinedForm: '<p>АО «Альфа»</p><p>АКЦИОНЕРНЫМ ОБЩЕСТВОМ «Бета»</p>',
   lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerQuoted: '<p>АО «Альфа»</p><p>АО «бета»</p>',
   longQuoted: '<p>АО «Альфа»</p><p>ООО «Научно-производственное объединение перспективных информационных технологий и систем Бета»</p>',
-  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>',
+  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>', digitName: '<p>АО «Альфа»</p><p>ООО 7 Холмов</p>',
   noQuotes: '<p>АО «Альфа»</p><p>АО Бета</p>', noQuotesTwoWords: '<p>АО «Альфа»</p><p>АО Альфа Север</p>', qElement: '<p>АО «Альфа»</p><p>АО <q>Бета</q></p>', fullWidthQuote: '<p>АО «Альфа»</p><p>АО ＂Бета＂</p>',
   splitTag: '<p>АО «Альфа»</p><p>А<x-a>О</x-a> «Бета»</p>', scriptFooter: "<p>АО «Альфа»</p><script>document.body.append('АО «Бе'+'та»')</script>",
   hiddenAlphaVisibleBeta: '<p hidden>АО «Альфа»</p><p>АО «Бета»</p>', inAttribute: '<p>АО «Альфа»</p><input value="АО «Бета»">',
@@ -664,6 +690,8 @@ try {
     codeLinesRu: [extra('Ещё 250 тыс. строк кода.'), /code sizes in the section/],
     codeLinesCpp: [extra('Модуль содержит ещё 250 строк на C++.'), /code sizes in the section/],
     amountThousandRub: [extra('Цена: 28 тыс. рублей.'), /amounts in the section/],
+    amountGbp: [extra('Fee: 40 GBP.'), /amounts in the section/],
+    amountUnderOpaqueMask: [extra('<span style="-webkit-mask-image: linear-gradient(black, black); mask-image: linear-gradient(black, black)">Цена: 28 млн рублей.</span>'), /amounts in the section/],
     maskHides: [index.replace(anchorRu, '<p style="-webkit-mask-image: linear-gradient(transparent, transparent); mask-image: linear-gradient(transparent, transparent)"><span data-l="ru">Выстраиваю РБПО'), HIDDEN],
     secondClaimLightRu: [index.replace('</body>', '<script>new MutationObserver(() => {}).observe(document.documentElement, {attributes: true}); const add = () => { const on = document.documentElement.dataset.theme === "light" && document.documentElement.dataset.lang === "ru"; const ex = document.getElementById("qa2"); if (on && !ex) { const p = document.createElement("p"); p.id = "qa2"; p.textContent = "Единолично создал и ввёл в эксплуатацию сервис SCA/SBOM (второй)"; document.getElementById("about").append(p); } if (!on && ex) ex.remove(); }; new MutationObserver(add).observe(document.documentElement, {attributes: true});</script></body>'), /paragraphs with the service claim = 2/],
   };
@@ -685,7 +713,7 @@ try {
   }
   // Безобидные числа рядом с абзацем не тревожат.
   {
-    const html = extra('Processed 2 million records, 2 european records, 250 строк в таблице.');
+    const html = extra('Processed 2 million records, 2 european records, 250 строк в таблице. Выгружены 2 строки таблицы, 3 строками данных.');
     const found = [];
     for (const scheme of SCHEMES) { current = `service harmlessNumbers [${scheme}]`; await load(page, html, true, scheme); found.push(...await serviceProblems(page, 'service harmlessNumbers', scheme)); }
     if (found.length) failures.push(`self-test: service «harmlessNumbers» is a false positive: ${found[0]}`);
