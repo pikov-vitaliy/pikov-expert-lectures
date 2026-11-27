@@ -234,6 +234,9 @@ test("the root catalogue card matches the deck it links to", () => {
   const root = readFileSync(resolve(rootDir, "index.html"), "utf8");
   const card = root.match(/\{[^{}]*url: "https:\/\/cert\.pikov\.expert\/"[\s\S]*?\},/)?.[0] ?? "";
   assert.ok(card, "cert card not found in the LECTURES array");
-  assert.match(card, /Минобороны/, "cert card must name the same regulators as cert/index.html");
-  assert.match(card, /Ministry of Defence/, "the English cert card must name the same regulators too");
+  // Слово владельца 27.11.2026: в карточке на главной – «государственные регуляторы»
+  // вместо Минобороны; сама лекция cert/index.html разбирает все системы сертификации.
+  assert.doesNotMatch(card, /Минобороны|Ministry of Defen/i, "the root cert card names government regulators, not the MoD");
+  assert.match(card, /ФСТЭК России и других государственных регуляторов/, "cert card must name FSTEC of Russia and other regulators");
+  assert.match(card, /FSTEC of Russia and other government regulators/, "the English cert card must name them too");
 });
