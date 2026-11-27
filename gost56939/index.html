@@ -143,7 +143,8 @@
     padding:6px 10px;border-radius:6px;white-space:nowrap}
 
   /* Кнопка автопоказа */
-  #play{position:fixed;right:1.2vw;bottom:2.4vh;z-index:50;border:1.5px solid var(--line);
+  /* Вверху справа, рядом с «Карты и схемы»: внизу кнопка закрывала текст слайдов. */
+  #play{position:fixed;right:calc(1.2vw + 8px);top:22px;z-index:50;border:1.5px solid var(--line);
     background:#fff;color:var(--muted);font:600 12px var(--f-head);border-radius:999px;
     padding:8px 14px;cursor:pointer}
   #play.on{background:var(--green);border-color:var(--green);color:#fff}
@@ -173,6 +174,21 @@
 
   /* ===== Экран 1: Уязвимости ===== */
   #s1 .cols{display:grid;grid-template-columns:1.05fr 1.15fr .95fr;gap:1.2vw;flex:1;min-height:0}
+  /* Слайд 01 на экране без прокрутки: шрифт учитывает и высоту экрана, третьей колонке
+     больше ширины – иначе на 1920x970, 1536x960 и похожих экранах низ колонки
+     наезжал на таймлайн «Путь уязвимости». */
+  @media (min-width:1181px) and (min-height:901px){
+    #s1 .cols{grid-template-columns:1fr 1.08fr 1.07fr}
+    #s1 .kbody{font-size:clamp(10.5px,min(.82vw,1.2vh),13.5px)}
+    #s1 .types{font-size:clamp(10.5px,min(.78vw,1.15vh),13px)}
+    #s1 .bases{font-size:clamp(10px,min(.78vw,1.12vh),13px);line-height:1.45}
+    #s1 .defcard p{font-size:clamp(10.5px,min(.82vw,1.2vh),13.5px)}
+    #s1 .klabel{margin:.75vh 0 .4vh}
+  }
+  /* Страховка: если колонки всё равно не помещаются, слайд растёт по высоте,
+     а не наезжает на таймлайн (класс ставит скрипт внизу страницы). */
+  #s1.fit-grow{height:auto;overflow:visible}
+  #s1.fit-grow .cols{flex:none}
   .defcard{border-left:4px solid var(--petrol);padding:.9vh .9vw;background:#fff;
     border-radius:0 12px 12px 0;border-top:1px solid var(--line);border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
   .defcard.z{border-left-color:var(--orange)}
@@ -390,7 +406,7 @@
   }
 </style>
 <style>
-.materials-link{position:fixed;z-index:100;top:12px;left:calc(1.2vw + 160px);display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:12px 24px;border:2px solid #a43b08;border-radius:14px;background:#ffb33d;color:#322008;font:800 20px/1.25 system-ui;text-decoration:none;box-shadow:0 5px 18px #a43b0826;transition:background .15s,box-shadow .15s}
+.materials-link{position:fixed;z-index:100;top:12px;right:calc(1.2vw + 136px);display:inline-flex;align-items:center;justify-content:center;min-height:52px;padding:12px 24px;border:2px solid #a43b08;border-radius:14px;background:#ffb33d;color:#322008;font:800 20px/1.25 system-ui;text-decoration:none;box-shadow:0 5px 18px #a43b0826;transition:background .15s,box-shadow .15s}
 .materials-link:hover{background:#ffc765;box-shadow:0 7px 24px #a43b0840}.materials-link:focus-visible{outline:3px solid #12314f;outline-offset:4px}
 @media(max-width:600px){.materials-link{left:auto;right:12px;top:10px;min-height:46px;padding:10px 12px;border-radius:12px;font-size:16px}}
 @media(prefers-reduced-motion:reduce){.materials-link{transition:none}}
@@ -877,6 +893,24 @@
     });
     window.scrollTo(0,0);
   }
+})();
+</script>
+<script>
+/* Слайд 01: проверка, помещаются ли колонки над таймлайном. */
+(function(){
+  var s1 = document.getElementById("s1");
+  var cols = s1 && s1.querySelector(".cols");
+  if(!cols) return;
+  function check(){
+    s1.classList.remove("fit-grow");
+    var over = cols.scrollHeight > cols.clientHeight + 2 || Array.prototype.some.call(cols.children, function(c){ return c.scrollHeight > c.clientHeight + 2; });
+    if(over) s1.classList.add("fit-grow");
+  }
+  var timer = 0;
+  window.addEventListener("resize", function(){ clearTimeout(timer); timer = setTimeout(check, 150); });
+  window.addEventListener("load", check);
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(check);
+  check();
 })();
 </script>
 </body>
