@@ -1826,7 +1826,9 @@ function plural(n, forms){ // forms: ["материал","материала","�
     const tile = e.target.closest(".tile");
     if(!tile || !(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) return false;
     e.preventDefault();
-    window.open(location.pathname + tile.getAttribute("href"), "_blank", "noopener");
+    /* Основа – известный путь языка, а не location.pathname (//host дал бы чужой сайт). */
+    const target = tile.getAttribute("href");
+    if(/^#cat-[a-z]+$/.test(target)) window.open((lang() === "ru" ? "/ru/" : "/") + target, "_blank", "noopener");
     return true;
   };
   document.getElementById("tiles").addEventListener("auxclick", openTileClean);
