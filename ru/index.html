@@ -1392,12 +1392,16 @@ function plural(n, forms){ // forms: ["материал","материала","�
     };
     /* Слово запроса и слово словаря: одно и то же слово в другой форме
        (нейронными = нейронные, сетей = сети, networks = network). */
+    const ENDING_SET = new Set(["", ...ENDINGS]);
     const sameWord = (a, b) => {
       if(a === b) return true;
       if(cyrillic(a) && cyrillic(b) && Math.min(a.length, b.length) >= 4){
         let k = 0;
         while(k < a.length && k < b.length && a[k] === b[k]) k++;
-        return k >= Math.max(3, Math.min(a.length, b.length) - 2);
+        for(let cut = k; cut >= 3; cut--){
+          if(ENDING_SET.has(a.slice(cut)) && ENDING_SET.has(b.slice(cut))) return true;
+        }
+        return false;
       }
       return a.length >= 5 && b.length >= 5 && stem(a) === stem(b);
     };
@@ -1411,7 +1415,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
         for(let j = 0; j < termWords.length; j++){
           const term = termWords[j], word = list[i + j];
           const mode = termWords.length > 1 && STOP.has(term) ? "whole" : modeOf(term, shortPrefix);
-          if(mode === "whole" ? (word !== term && word.replace(/\+\+$/, "") !== term) : !word.startsWith(stem(term))) continue outer;
+          if(mode === "whole" ? (word !== term && word.replace(/\+\+$/, "") !== term) : !(word.startsWith(term) || word.startsWith(stem(term)))) continue outer;
         }
         return true;
       }
@@ -1470,7 +1474,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
     }
     /* Вставленный адрес материала: rubin.pikov.expert, https://tests.pikov.expert/. */
     function byAddress(query, pool){
-      const match = String(query).match(/(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(\/[^\s?#]*)?(#\S*)?/i);
+      const match = String(query).match(/(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(?![a-z0-9.-])(\/[^\s?#]*)?(?:\?[^\s#]*)?(#\S*)?/i);
       if(!match) return null;
       const host = match[1].toLowerCase() + ".pikov.expert";
       const parts = url => url.match(/^https:\/\/([^/#]+)(\/[^#]*)?(#.*)?$/) || [];
@@ -1482,8 +1486,9 @@ function plural(n, forms){ // forms: ["материал","материала","�
     function search(query, kind){
       query = String(query).slice(0, MAX_QUERY);
       const pool = kind ? index.filter(entry => entry.item.kind === kind) : index;
-      const address = byAddress(query, pool);
-      if(address) return { active: true, results: address };
+      /* Адрес ищется по всему каталогу, тип применяется к найденной карточке. */
+      const address = byAddress(query, index);
+      if(address) return { active: true, results: kind ? address.filter(result => result.item.kind === kind) : address };
       const conditions = parse(plainAddress(query));
       if(!conditions.length) return { active: false, results: pool.map(entry => ({ item: entry.item, score: 0 })) };
       const run = shortPrefix => pool.map(entry => {
@@ -1583,7 +1588,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
         esc(label) + '<span class="n">' + count + '</span></button>' : '';
     }).join("");
     topicBox.parentElement.setAttribute("aria-label", strings.topicsLabel);
-    delete topicBox.dataset.kind;
+    topicBox.dataset.kind = "";
   }
 
   function activeTopic(){
@@ -1601,10 +1606,15 @@ function plural(n, forms){ // forms: ["материал","материала","�
     return params.toString();
   }
 
+  function liveHash(){
+    const target = /^#cat-[a-z]+$/.test(location.hash) ? document.getElementById(location.hash.slice(1)) : null;
+    return target && target.hidden ? "" : location.hash;
+  }
+
   function flushUrl(active){
     clearTimeout(urlTimer);
     const query = searchParams(active);
-    const next = location.pathname + (query ? "?" + query : "") + location.hash;
+    const next = location.pathname + (query ? "?" + query : "") + liveHash();
     if(next !== location.pathname + location.search + location.hash) history.replaceState(history.state, "", next);
   }
 
@@ -1618,8 +1628,8 @@ function plural(n, forms){ // forms: ["материал","материала","�
 
   /* Якорь раздела, скрытого фильтром (#cat-os после поиска), – фильтры снимаются. */
   function revealHashSection(){
-    const id = decodeURIComponent(location.hash.slice(1));
-    if(!/^cat-/.test(id)) return;
+    const id = location.hash.slice(1);
+    if(!/^cat-[a-z]+$/.test(id)) return;
     const section = document.getElementById(id);
     if(section && section.hidden){ q.value = ""; fmtSel.value = ""; applyFilter({ immediate: true, now: true }); section.scrollIntoView(); }
   }
@@ -1627,7 +1637,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
   function updateLangHref(active){
     const langBtn = document.getElementById("langToggle");
     const query = searchParams(active === undefined ? engine.search(q.value, "").active : active);
-    langBtn.setAttribute("href", (lang() === "ru" ? "/" : "/ru/") + (query ? "?" + query : "") + location.hash);
+    langBtn.setAttribute("href", (lang() === "ru" ? "/" : "/ru/") + (query ? "?" + query : "") + liveHash());
   }
 
   /* «Назад» и «Вперёд» без перезагрузки: состояние берётся из адреса. */
@@ -1826,7 +1836,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
   window.addEventListener("popstate", restoreFromUrl);
 
   q.addEventListener("input", applyFilter);
-  q.addEventListener("keydown", e => { if(e.key === "Escape" && q.value){ e.preventDefault(); q.value = ""; applyFilter(); } });
+  q.addEventListener("keydown", e => { if(e.key === "Escape" && q.value){ e.preventDefault(); q.value = ""; applyFilter({ now: true }); } });
   fmtSel.addEventListener("change", () => applyFilter({ now: true }));
   resetBtn.addEventListener("click", () => { q.value = ""; fmtSel.value = ""; applyFilter({ now: true }); q.focus(); });
   window.addEventListener("pagehide", () => flushUrl(engine.search(q.value, "").active));
@@ -1839,8 +1849,17 @@ function plural(n, forms){ // forms: ["материал","материала","�
     applyFilter({ now: true });
   });
   /* Плитка раздела: сначала сбросить фильтры, иначе скрытый раздел не откроется. */
+  const openTileClean = e => {
+    const tile = e.target.closest(".tile");
+    if(!tile || !(e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1)) return false;
+    e.preventDefault();
+    window.open(location.pathname + tile.getAttribute("href"), "_blank", "noopener");
+    return true;
+  };
+  document.getElementById("tiles").addEventListener("auxclick", openTileClean);
   document.getElementById("tiles").addEventListener("click", e => {
-    if(e.ctrlKey || e.metaKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    if(openTileClean(e) || e.altKey || e.button !== 0) return;
+    if(e.target.closest(".tile") && !(q.value || fmtSel.value)){ flushUrl(false); return; }
     /* Адрес очищается до перехода по якорю, иначе новая запись истории унесёт старый запрос. */
     if(e.target.closest(".tile") && (q.value || fmtSel.value)){ q.value = ""; fmtSel.value = ""; applyFilter({ immediate: true, now: true }); }
   });

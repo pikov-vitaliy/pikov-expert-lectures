@@ -98,6 +98,12 @@ test('word forms, abbreviations and addresses', () => {
   assert.ok(!found('grades').includes('vkr'), 'grades must not match graduation');
   assert.deepEqual(found('https://tests.pikov.expert/'), ['tests']);
   assert.deepEqual(found('https://new-courses.pikov.expert/#pvsstat'), ['new-courses/#pvsstat']);
+  assert.deepEqual(found('https://new-courses.pikov.expert/?utm_source=mail#pvsstat'), ['new-courses/#pvsstat']);
+  assert.deepEqual(found('https://tests.pikov.expert/', 'lecture'), [], 'the exact address keeps its own kind');
+  assert.ok(!found('https://tests.pikov.expert.example.org/').every(x => x === 'tests') || found('https://tests.pikov.expert.example.org/').length === 0, 'a foreign host is not a catalogue address');
+  assert.ok(found('facilities').length > 0, 'the exact English word is kept before stemming');
+  assert.deepEqual(found('капот'), [], 'капот is not a form of КАПО');
+  assert.deepEqual(found('гостиница'), [], 'гостиница is not a form of ГОСТ');
 });
 
 test('kind filter applies with and without a query', () => {
