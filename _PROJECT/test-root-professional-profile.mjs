@@ -181,5 +181,19 @@ test("hero and Person schema use language-consistent professional positioning", 
   const profile = JSON.parse(profileSource);
   const person = profile["@graph"].find(node => node["@type"] === "Person");
   assert.equal(person.jobTitle, jobEn, "the English default document must ship English static JSON-LD");
-  assert.ok(Array.isArray(person.affiliation) && person.affiliation.length === 3, "MAI, Moscow Polytech and RosNOU are listed");
+  const universities = {
+    en: ["Moscow Aviation Institute (MAI)", "Moscow Polytechnic University", "Russian New University (RosNOU)"],
+    ru: ["Московский авиационный институт (МАИ)", "Московский политехнический университет", "Российский новый университет (РосНОУ)"],
+  };
+  const affiliationOf = html => {
+    const source = html.match(/<script[^>]*id="ld-profile"[^>]*>([\s\S]*?)<\/script>/)?.[1];
+    const node = JSON.parse(source)["@graph"].find(item => item["@type"] === "Person");
+    return node.affiliation;
+  };
+  for (const [lang, html] of [["en", rawRoot], ["ru", readFileSync(resolve(projectDir, "..", "ru", "index.html"), "utf8")]]) {
+    const list = affiliationOf(html);
+    assert.ok(Array.isArray(list), `${lang}: affiliation must be a list`);
+    assert.ok(list.every(item => item["@type"] === "CollegeOrUniversity"), `${lang}: every affiliation is a university`);
+    assert.deepEqual(list.map(item => item.name), universities[lang], `${lang}: MAI, Moscow Polytech and RosNOU`);
+  }
 });

@@ -220,7 +220,7 @@ try {
     title: document.title,
   }));
   check("first visit opens in English", defaultLang.dataset === "en" && defaultLang.attr === "en", JSON.stringify(defaultLang));
-  check("hero role renders in English by default", /Expert in secure software development/.test(defaultLang.heroRole || ""), defaultLang.heroRole);
+  check("hero role renders in English by default", /Information security architect/.test(defaultLang.heroRole || ""), defaultLang.heroRole);
   check("document title is English by default", /Vitaliy Pikov/.test(defaultLang.title), defaultLang.title);
 
   // Ни одного русского слова не должно просочиться в английскую версию.
@@ -301,7 +301,7 @@ try {
     title: document.title,
   }));
   check("language switch flips the page to Russian", afterToggle.lang === "ru" && afterToggle.attr === "ru", JSON.stringify({ l: afterToggle.lang, a: afterToggle.attr }));
-  check("Russian view renders the Russian hero role", /Эксперт по безопасной разработке/.test(afterToggle.heroRole || ""), afterToggle.heroRole);
+  check("Russian view renders the Russian hero role", /Архитектор информационной безопасности/.test(afterToggle.heroRole || ""), afterToggle.heroRole);
   check("switching language keeps the card count", afterToggle.cards === lectures.length, `${afterToggle.cards} != ${lectures.length}`);
   check("switching language keeps the tile count", afterToggle.tiles === 5, String(afterToggle.tiles));
   check("switching language does not duplicate the ItemList", afterToggle.itemLists === 1, String(afterToggle.itemLists));
