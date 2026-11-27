@@ -1375,7 +1375,13 @@ function plural(n, forms){ // forms: ["материал","материала","�
     const normalize = text => String(text).normalize("NFKC").toLowerCase().replace(/ё/g, "е");
     const words = text => normalize(text).match(/[\p{L}\p{N}]+(?:\+\+)?/gu) || [];
     const cyrillic = word => /[а-я]/.test(word);
+    const stemCache = new Map();
     const stem = word => {
+      let base = stemCache.get(word);
+      if(base === undefined){ base = stemWord(word); stemCache.set(word, base); }
+      return base;
+    };
+    function stemWord(word){
       if(cyrillic(word)){
         if(word.length < 5) return word;
         for(const ending of ENDINGS){ if(word.endsWith(ending) && word.length - ending.length >= 4) return word.slice(0, -ending.length); }
@@ -1389,12 +1395,14 @@ function plural(n, forms){ // forms: ["материал","материала","�
         if(word.endsWith("s") && !/(ss|us|is)$/.test(word)) return word.slice(0, -1);
       }
       return word;
-    };
+    }
     /* Слово запроса и слово словаря: одно и то же слово в другой форме
        (нейронными = нейронные, сетей = сети, networks = network). */
     const ENDING_SET = new Set(["", ...ENDINGS]);
+    const ABBREVIATIONS = new Set([...WHOLE, "капо", "гост", "рбпо", "фстэк", "ии", "ос"]);
     const sameWord = (a, b) => {
       if(a === b) return true;
+      if(ABBREVIATIONS.has(a) || ABBREVIATIONS.has(b)) return false;
       if(cyrillic(a) && cyrillic(b) && Math.min(a.length, b.length) >= 4){
         let k = 0;
         while(k < a.length && k < b.length && a[k] === b[k]) k++;
@@ -1409,13 +1417,15 @@ function plural(n, forms){ // forms: ["материал","материала","�
     const plainAddress = text => String(text).replace(/https?:\/\//gi, " ").replace(/\.pikov\.expert/gi, " ").replace(/\.html\b/gi, " ");
     const index = items.map(item => ({ item, fields: [...FIELDS.map(([field, weight]) => ({ weight, words: words(item[field] || "") })), { weight: 3, words: words(plainAddress(item.url)) }] }));
     const groups = synonyms.map(group => ({ tag: group.tag, category: group.category, terms: group.terms.map(words) }));
+    /* Основа слова запроса, если она не совпадает с сокращением словаря (гость → не ГОСТ). */
+    const termStem = term => { const base = stem(term); return base !== term && ABBREVIATIONS.has(base) ? term : base; };
     const modeOf = (term, shortPrefix) => term.length <= 2 ? (shortPrefix ? "prefix" : "whole") : (WHOLE.has(term) ? "whole" : "prefix");
     function matchPhrase(termWords, list, shortPrefix){
       outer: for(let i = 0; i + termWords.length <= list.length; i++){
         for(let j = 0; j < termWords.length; j++){
           const term = termWords[j], word = list[i + j];
           const mode = termWords.length > 1 && STOP.has(term) ? "whole" : modeOf(term, shortPrefix);
-          if(mode === "whole" ? (word !== term && word.replace(/\+\+$/, "") !== term) : !(word.startsWith(term) || word.startsWith(stem(term)))) continue outer;
+          if(mode === "whole" ? (word !== term && word.replace(/\+\+$/, "") !== term) : !(word.startsWith(term) || word.startsWith(termStem(term)) || stem(word).startsWith(termStem(term)))) continue outer;
         }
         return true;
       }
@@ -1474,7 +1484,7 @@ function plural(n, forms){ // forms: ["материал","материала","�
     }
     /* Вставленный адрес материала: rubin.pikov.expert, https://tests.pikov.expert/. */
     function byAddress(query, pool){
-      const match = String(query).match(/(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(?![a-z0-9.-])(\/[^\s?#]*)?(?:\?[^\s#]*)?(#\S*)?/i);
+      const match = String(query).match(/(?:^|\s)(?:https?:\/\/)?([a-z0-9-]+)\.pikov\.expert(?::\d+)?(?![a-z0-9.-])(\/[^\s?#]*)?(?:\?[^\s#]*)?(#\S*)?/i);
       if(!match) return null;
       const host = match[1].toLowerCase() + ".pikov.expert";
       const parts = url => url.match(/^https:\/\/([^/#]+)(\/[^#]*)?(#.*)?$/) || [];
@@ -1606,8 +1616,15 @@ function plural(n, forms){ // forms: ["материал","материала","�
     return params.toString();
   }
 
+  /* Раздел каталога из якоря (#cat-os, в том числе закодированный); иначе пусто. */
+  function hashSection(){
+    let id = "";
+    try{ id = decodeURIComponent(location.hash.slice(1)); }catch(e){ return null; }
+    return /^cat-[a-z]+$/.test(id) ? document.getElementById(id) : null;
+  }
+
   function liveHash(){
-    const target = /^#cat-[a-z]+$/.test(location.hash) ? document.getElementById(location.hash.slice(1)) : null;
+    const target = hashSection();
     return target && target.hidden ? "" : location.hash;
   }
 
@@ -1626,12 +1643,10 @@ function plural(n, forms){ // forms: ["материал","материала","�
     if(now) flushUrl(active); else urlTimer = setTimeout(() => flushUrl(active), 250);
   }
 
-  /* Якорь раздела, скрытого фильтром (#cat-os после поиска), – фильтры снимаются. */
+  /* Якорь раздела, скрытого фильтром: фильтры из ссылки сохраняются, якорь убирается. */
   function revealHashSection(){
-    const id = location.hash.slice(1);
-    if(!/^cat-[a-z]+$/.test(id)) return;
-    const section = document.getElementById(id);
-    if(section && section.hidden){ q.value = ""; fmtSel.value = ""; applyFilter({ immediate: true, now: true }); section.scrollIntoView(); }
+    const section = hashSection();
+    if(section && section.hidden) flushUrl(engine.search(q.value, "").active);
   }
 
   function updateLangHref(active){

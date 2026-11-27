@@ -100,7 +100,11 @@ test('word forms, abbreviations and addresses', () => {
   assert.deepEqual(found('https://new-courses.pikov.expert/#pvsstat'), ['new-courses/#pvsstat']);
   assert.deepEqual(found('https://new-courses.pikov.expert/?utm_source=mail#pvsstat'), ['new-courses/#pvsstat']);
   assert.deepEqual(found('https://tests.pikov.expert/', 'lecture'), [], 'the exact address keeps its own kind');
-  assert.ok(!found('https://tests.pikov.expert.example.org/').every(x => x === 'tests') || found('https://tests.pikov.expert.example.org/').length === 0, 'a foreign host is not a catalogue address');
+  assert.ok(!found('https://tests.pikov.expert.example.org/').includes('tests') || found('https://tests.pikov.expert.example.org/').length > 1, 'a foreign host is not a catalogue address');
+  assert.ok(!(found('https://example.org/tests.pikov.expert/').length === 1 && found('https://example.org/tests.pikov.expert/')[0] === 'tests'), 'a host inside a foreign path is not an address');
+  assert.deepEqual(found('https://new-courses.pikov.expert:443/?x=1#pvsstat'), ['new-courses/#pvsstat']);
+  for (const q of ['гость', 'гостями', 'капая']) assert.deepEqual(found(q), [], q);
+  assert.deepEqual(found('facility'), found('facilities'));
   assert.ok(found('facilities').length > 0, 'the exact English word is kept before stemming');
   assert.deepEqual(found('капот'), [], 'капот is not a form of КАПО');
   assert.deepEqual(found('гостиница'), [], 'гостиница is not a form of ГОСТ');
