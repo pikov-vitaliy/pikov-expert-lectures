@@ -34,6 +34,23 @@ function Get-Web([string]$Url) {
   }
 }
 
+# Первый ответ без перехода по переадресации: сайты-переадресации должны отдавать
+# именно 301 на адрес из lectures.json, а не 200 от страницы-заглушки.
+function Get-FirstResponse([string]$Url) {
+  [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12
+  $request = [System.Net.HttpWebRequest]::Create($Url)
+  $request.AllowAutoRedirect = $false
+  $request.Method = 'GET'
+  $request.Timeout = 30000
+  $request.UserAgent = "pikov.expert hosting QA/$ReleaseDate"
+  $response = $null
+  try { $response = $request.GetResponse() } catch [System.Net.WebException] { $response = $_.Exception.Response }
+  if ($null -eq $response) { return [pscustomobject]@{ StatusCode = 0; Location = '' } }
+  $result = [pscustomobject]@{ StatusCode = [int]$response.StatusCode; Location = [string]$response.Headers['Location'] }
+  $response.Close()
+  $result
+}
+
 function Normalize-Base([string]$Url) {
   $uri = [Uri]$Url
   $path = $uri.AbsolutePath.TrimEnd('/')
@@ -106,6 +123,10 @@ if (-not (Test-Path -LiteralPath $indexPath)) {
 }
 
 $targets = @(Get-Content -LiteralPath $indexPath -Raw -Encoding UTF8 | ConvertFrom-Json | ForEach-Object { $_ })
+$redirectSites = @{}
+foreach ($site in @($lectureData.additionalSites | Where-Object { $null -ne $_ -and $_.redirectTo })) {
+  $redirectSites["$([string]$site.domain).pikov.expert"] = $site
+}
 $results = New-Object System.Collections.Generic.List[object]
 
 foreach ($target in $targets) {
@@ -144,6 +165,20 @@ foreach ($target in $targets) {
     Add-Result $results 'htaccess' $htaccessUrl 'OK' "blocked=$($htaccess.StatusCode)"
   } else {
     Add-Result $results 'htaccess' $htaccessUrl 'FAIL' ("status={0}; type={1}" -f $htaccess.StatusCode, $htaccess.ContentType)
+  }
+  if ($redirectSites.ContainsKey([string]$target.domain)) {
+    $site = $redirectSites[[string]$target.domain]
+    $checks = @(@{ Path = ''; Expected = [string]$site.redirectTo })
+    if ($site.redirectPreservesPath) { $checks += @{ Path = 'materials.zip'; Expected = ([string]$site.redirectTo + 'materials.zip') } }
+    foreach ($check in $checks) {
+      $redirectUrl = "$base/$($check.Path)"
+      $first = Get-FirstResponse $redirectUrl
+      if ($first.StatusCode -eq 301 -and $first.Location -ceq $check.Expected) {
+        Add-Result $results 'redirect' $redirectUrl 'OK' "301 -> $($first.Location)"
+      } else {
+        Add-Result $results 'redirect' $redirectUrl 'FAIL' ("status={0}; location={1}; expected 301 -> {2}" -f $first.StatusCode, $first.Location, $check.Expected)
+      }
+    }
   }
 }
 

@@ -79,7 +79,7 @@ def strip_metrika(data: bytes) -> bytes:
         raise RuntimeError("В офлайн-копии index.html остались следы Метрики")
     text = text.replace(
         'href="materials.zip"',
-        'href="https://29-07-2026.pikov.expert/materials.zip"',
+        'href="https://secure-sql.pikov.expert/materials.zip"',
     )
     return text.encode("utf-8")
 
