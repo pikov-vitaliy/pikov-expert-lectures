@@ -150,7 +150,11 @@ test("credentials are accurate and the personal site is explicitly independent",
   assert.doesNotMatch(aboutText, /Microsoft Certified Trainer.{0,60}201\d/i);
   assert.match(aboutText, /независимый авторский образовательный проект/i);
   assert.match(aboutText, /независимо от прежних работодателей и учебных центров/i);
-  assert.doesNotMatch(aboutText, /18\s*млн|130\s*тыс.{0,20}строк|142\s+тестов|33\s+ADR/i);
+  // Слово владельца 27.11.2026: про сервис SCA/SBOM – «как в резюме, с цифрами», но как достижение,
+  // без названия работодателя; сумма – только как оценка поставщика сопоставимого решения.
+  assert.match(aboutText, /Единолично создал.{0,80}сервис SCA\/SBOM/i);
+  assert.match(aboutText, /оценка поставщика.{0,60}18\s*млн/i);
+  assert.doesNotMatch(aboutText, /МНТЦ|МИЭТ|istc|miet/i);
 });
 
 test("every public page lists the same Microsoft certifications", () => {
