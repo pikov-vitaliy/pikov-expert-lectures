@@ -29,8 +29,8 @@ const CATEGORY_PRESENTATION = {
   },
   edu: {
     label: 'Учёба и справочники', labelEn: 'Study & references',
-    description: 'Проектирование информационных систем, выпускные работы и лицензии SPDX.',
-    descriptionEn: 'Information systems design, graduation projects and SPDX licences.',
+    description: 'Курс, семинар и лаборатория по ИИ, проектирование информационных систем, выпускные работы, лицензии SPDX и самопроверка.',
+    descriptionEn: 'An AI course, seminar and lab, information systems design, graduation projects, SPDX licences and a self-assessment.',
   },
 };
 

@@ -26,7 +26,7 @@ const copy = {
     classic:'Current website', version:'New website version', skip:'Skip to materials', switchLanguage:'Переключить на русский',
     theme:'Switch colour theme', light:'Use light theme', dark:'Use dark theme',
     portrait:'Vitaliy Pikov, secure software development expert and lecturer',
-    facts:['26 years in IT','10+ years of teaching','40+ research publications'],
+    facts:['25+ years in IT','10+ years of teaching','40+ research publications'],
     topics:'Explore by subject', topicsIntro:'Different disciplines. One engineering perspective.', topicAction:'View materials',
     selected:'A few places to begin', selectedIntro:'An introduction to how I approach security, teaching and practical work.',
     catalogue:'The material library', catalogueIntro:'Lectures, courses, practical assignments and references, all in one place.',
@@ -54,7 +54,7 @@ const copy = {
     classic:'Текущая версия сайта', version:'Новая версия сайта', skip:'Перейти к материалам', switchLanguage:'Switch to English',
     theme:'Переключить цветовую тему', light:'Включить светлую тему', dark:'Включить тёмную тему',
     portrait:'Виталий Пиков, эксперт по безопасной разработке ПО и преподаватель',
-    facts:['26 лет в ИТ','10+ лет преподавания','40+ научных публикаций'],
+    facts:['25+ лет в ИТ','10+ лет преподавания','40+ научных публикаций'],
     topics:'Выберите направление', topicsIntro:'Разные дисциплины. Общий инженерный подход.', topicAction:'Смотреть материалы',
     selected:'С чего можно начать', selectedIntro:'Несколько материалов для знакомства с моим подходом к безопасности и преподаванию.',
     catalogue:'Библиотека материалов', catalogueIntro:'Лекции, курсы, практические задания и справочники в одном месте.',
@@ -137,7 +137,7 @@ function homepage(lang) {
 <div class="filter-status" data-filter-status hidden><p role="status" aria-live="polite" data-results data-template="${esc(t.results)}"></p><button class="clear-filters" type="button" data-clear hidden>${t.reset} <span aria-hidden="true">×</span></button></div><div class="empty-state" data-empty hidden><h3>${t.empty}</h3><p>${t.emptyHelp}</p><button class="button-primary" type="button" data-clear>${t.reset}</button></div>
 ${categories.map(c => `<section class="catalogue-group topic-${c.id}" id="topic-${c.id}" data-group="${c.id}" aria-labelledby="heading-${c.id}"><div class="group-heading"><img src="${asset(`illustrations/${c.id}.webp`)}" width="960" height="640" alt="" loading="lazy"><div><h2 id="heading-${c.id}">${esc(label(c,'label',lang))}</h2><p>${esc(label(c,'description',lang))}</p></div><span data-group-count>${countText(lectures.filter(l => l.category === c.id).length,lang)}</span></div><div class="material-grid">${lectures.filter(l => l.category === c.id).map(l => card(l,lang)).join('')}</div></section>`).join('')}
 </div></section>
-<section class="paths-section wrap" id="paths"><div class="section-heading"><div><h2>${t.pathTitle}</h2><p>${t.pathIntro}</p></div></div><div class="paths-grid">${t.routes.map(route => `<article class="learning-path"><p class="path-audience">${route[0]}</p><h3>${route[1]}</h3><p>${route[2]}</p><a class="text-link" href="${route[4]}">${route[3]} ${arrow}</a></article>`).join('')}</div><div class="map-link"><a href="/course-map.html">${t.routeMore} ${arrow}</a><span>${t.routeNotice}</span></div></section>
+<section class="paths-section wrap" id="paths"><div class="section-heading"><div><h2>${t.pathTitle}</h2><p>${t.pathIntro}</p></div></div><div class="paths-grid">${t.routes.map(route => `<article class="learning-path"><p class="path-audience">${route[0]}</p><h3>${route[1]}</h3><p>${route[2]}</p><a class="text-link" href="${route[4]}">${route[3]} ${arrow}</a></article>`).join('')}</div><div class="map-link"><a href="${lang === 'en' ? '/course-map.html' : '/ru/course-map.html'}">${t.routeMore} ${arrow}</a><span>${t.routeNotice}</span></div></section>
 <section class="about-summary wrap"><div><span class="section-label">${t.about}</span><h2>${t.shortAbout}</h2></div><div><p>${t.shortAboutText}</p><ul class="expertise-list">${t.expertise.map(e=>`<li>${e}</li>`).join('')}</ul><a class="text-link" href="${about(lang)}">${t.background} ${arrow}</a></div></section>
 </main>`;
 }

@@ -88,6 +88,7 @@ function buildRussian(english) {
     ["aria-label=\"Materials for the developer pathway\"", "aria-label=\"Материалы маршрута разработчика\"", "developer pathway label"],
     ["placeholder=\"Search the catalogue\" aria-label=\"Search the catalogue\"", "placeholder=\"Поиск по лекциям\" aria-label=\"Поиск по лекциям\"", "search label"],
     ["aria-label=\"Filter by type\"", "aria-label=\"Фильтр по типу материала\"", "kind label"],
+    ["<a class=\"course-map-link\" href=\"/course-map.html\">", "<a class=\"course-map-link\" href=\"/ru/course-map.html\">", "course map link"],
     ["aria-label=\"Core professional areas\"", "aria-label=\"Основные профессиональные направления\"", "profile areas label"],
     ["aria-label=\"Standards and methodologies\"", "aria-label=\"Стандарты и методологии\"", "standards label"],
     ["aria-label=\"Educational project status\"", "aria-label=\"Статус образовательного проекта\"", "project status label"]
