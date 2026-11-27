@@ -20,7 +20,7 @@ const asset = name => {
 const arrow = '<span aria-hidden="true">↗</span>';
 const copy = {
   en: {
-    name:'Vitaliy Pikov', title:'Secure development.\nEngineering practice.', role:'Expert & lecturer',
+    name:'Vitaliy Pikov', title:'Secure development.\nEngineering practice.', role:'Information security architect',
     lead:'I help teams build secure software and teach the people behind it. Explore my lectures, practical workshops and resources for everyday engineering.',
     materials:'Materials', paths:'Where to start', about:'About me', contact:'Contact', browse:'Explore the materials', discuss:'Discuss training',
     classic:'Current website', version:'New website version', skip:'Skip to materials', switchLanguage:'Переключить на русский',
@@ -48,7 +48,7 @@ const copy = {
     aboutMeta:'Vitaliy Pikov: engineering practice, secure software development, teaching, research and professional background.',
   },
   ru: {
-    name:'Виталий Пиков', title:'Безопасная разработка.\nИнженерная практика.', role:'Эксперт и преподаватель',
+    name:'Виталий Пиков', title:'Безопасная разработка.\nИнженерная практика.', role:'Архитектор информационной безопасности',
     lead:'Помогаю командам выстраивать безопасную разработку ПО и обучаю специалистов. Здесь — мои лекции, практикумы и материалы для повседневной инженерной работы.',
     materials:'Материалы', paths:'С чего начать', about:'Обо мне', contact:'Контакты', browse:'Изучить материалы', discuss:'Обсудить обучение',
     classic:'Текущая версия сайта', version:'Новая версия сайта', skip:'Перейти к материалам', switchLanguage:'Switch to English',
@@ -116,10 +116,10 @@ function card(item, lang, featured = false) {
   const full = label(item, 'description', lang);
   const search = [item.title,item.titleEn,item.description,item.descriptionEn,item.url,item.format,item.formatEn].join(' ');
   return `<article class="material-card topic-${esc(item.category)}${featured ? ' featured-card' : ''}"${featured ? '' : ` data-material data-category="${esc(item.category)}" data-kind="${item.kind}" data-search="${esc(search)}"`}>
-<div class="material-meta"><span>${esc(t.kinds[item.kind])}</span><span>${esc(item.languages?.includes("en") ? t.bilingual : t.russian)}</span></div>
+<div class="material-meta"><span>${esc(item.display ? label(item.display, 'kind', lang) : t.kinds[item.kind])}</span><span>${esc(item.languages?.includes("en") ? t.bilingual : t.russian)}</span></div>
 <h3><a href="${esc(item.url)}">${esc(materialTitle(item, lang))}</a></h3><p>${esc(short)}</p>
 ${!featured && full !== short ? `<details><summary>${t.description}</summary><p>${esc(full)}</p></details>` : ''}
-<a class="material-action" href="${esc(item.url)}">${esc(t.opens[item.kind])} ${arrow}</a></article>`;
+<a class="material-action" href="${esc(item.url)}">${esc(item.display ? label(item.display, 'open', lang) : t.opens[item.kind])} ${arrow}</a></article>`;
 }
 function homepage(lang) {
   const t = copy[lang];

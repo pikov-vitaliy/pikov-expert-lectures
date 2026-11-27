@@ -37,12 +37,22 @@ function buildRussian(english) {
         "url": "https://pikov.expert/",
         "image": "https://pikov.expert/photo.jpg",
         "email": "mailto:vitaly@pikov.expert",
-        "jobTitle": "Эксперт по безопасной разработке ПО, DevSecOps и AppSec; преподаватель",
-        "affiliation": {
-          "@type": "CollegeOrUniversity",
-          "name": "Российский новый университет (РосНОУ)"
-        },
-        "knowsAbout": ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение"],
+        "jobTitle": "Архитектор информационной безопасности",
+        "affiliation": [
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "Московский авиационный институт (МАИ)"
+          },
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "Московский политехнический университет"
+          },
+          {
+            "@type": "CollegeOrUniversity",
+            "name": "Российский новый университет (РосНОУ)"
+          }
+        ],
+        "knowsAbout": ["Безопасная разработка ПО", "DevSecOps", "AppSec", "Security by Design", "Моделирование угроз", "SCA и SBOM", "Безопасность цепочки поставок ПО", "Безопасная разработка C/C++", "NIST SSDF", "OWASP", "CWE", "ISO/IEC 27001", "Техническая защита информации", "Astra Linux", "Тестирование на проникновение", "ИИ для инженеров"],
         "sameAs": ["https://t.me/UnderLineSecurity"]
       },
       {

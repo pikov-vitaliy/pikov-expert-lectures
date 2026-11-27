@@ -48,6 +48,11 @@ const KIND_BY_URL = new Map([
   ['https://rubin.pikov.expert/', 'lecture'],
 ]);
 
+// Подпись карточки, когда тип для фильтра и видимое название расходятся.
+const DISPLAY_BY_URL = new Map([
+  ['https://rubin.pikov.expert/', { kind: 'Семинар', kindEn: 'Seminar', open: 'Открыть семинар', openEn: 'Open the seminar' }],
+]);
+
 export function classifyMaterial(item) {
   if (KIND_BY_URL.has(item.url)) return KIND_BY_URL.get(item.url);
   const format = item.formatEn.toLowerCase();
@@ -121,7 +126,7 @@ export function parseCatalogue(sourceHtml) {
   const categories = [...raw.categories]
     .sort((a, b) => CATEGORY_ORDER.indexOf(a.id) - CATEGORY_ORDER.indexOf(b.id))
     .map(category => ({ ...category, ...CATEGORY_PRESENTATION[category.id] }));
-  const lectures = raw.lectures.map(item => ({ ...item, kind: item.kind ?? classifyMaterial(item) }));
+  const lectures = raw.lectures.map(item => ({ ...item, kind: item.kind ?? classifyMaterial(item), display: DISPLAY_BY_URL.get(item.url) }));
   return validateCatalogue({ categories, lectures });
 }
 
