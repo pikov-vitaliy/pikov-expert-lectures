@@ -598,7 +598,7 @@ const STATE_MARKERS = {
   loadScriptDark: {must: '[dark/', mustNot: '[light/'},
 };
 const MUST_PASS = {
-  germanWord: `<p>Ver${H.lower(LM)}ung</p>`, germanWordEm: `<p>Ver<em>${H.lower(LM)}</em>ung</p>`, identifier: `<p>l${H.lower(LS)}ache</p>`, literalEntity: `<p>${A}&amp;#${H.code(LM, 2)};${LM.slice(3)}</p>`, plainReversedWord: `<p>${H.rev(LM)}</p>`,
+  germanWord: `<p>Ver${H.lower(LM)}ung</p>`, germanWordEm: `<p>Ver<em>${H.lower(LM)}</em>ung</p>`, identifier: `<p>l${H.lower(LS).slice(0, 3)}${LS[3]}ache</p>`, literalEntity: `<p>${A}&amp;#${H.code(LM, 2)};${LM.slice(3)}</p>`, plainReversedWord: `<p>${H.rev(LM)}</p>`,
   scriptIdentifier: `<script>const ${H.lower(LM)}Count = 1;</script><p>текст</p>`, dataUri: `<img alt="" src="data:image/png;base64,${Buffer.from(`ABC${LM}DEF`).toString('base64')}">`,
   styleSelector: `<style>.${H.lower(LN)}Like{}</style><p>текст</p>`, mitWord: `<p>MIT License, ${H.cap(LM)}vertrag, ${LS}X</p>`,
   blockBoundary: `<p>${A}</p><p>${B}</p>`, blockBoundaryNested: `<div><div>предприятие ${LM[0]}</div><div>${LM.slice(1)} город</div></div>`,
@@ -779,7 +779,7 @@ try {
     download: `<a href="/r.pdf" download="Отчёт${LM}.pdf">отчёт</a>`,
     srcsetAfterData: `<img alt="" srcset="data:image/png;base64,AAAA 1x, /assets/logo${LM}.svg 2x">`,
     caption: `<p>Файл /assets/logo${LM}.svg</p>`,
-    visibleIstc: `<p>Artistic${LS}sample</p>`,
+    visibleAbbrevInWord: `<p>Artistic${LS}sample</p>`,
   })) {
     await load(page, html, false, 'light');
     if (!(await mainParityProblems(page, `parity ${name}`)).length) failures.push(`self-test: main parity «${name}» is not caught`);

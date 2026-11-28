@@ -405,7 +405,7 @@ test("former-employer guard catches disguised names and ignores look-alikes", ()
   // Допустимое: слова и идентификаторы с теми же буквами, данные data:, литерал сущности, текст в скриптах.
   const allowed = {
     germanWord: `<p>Ver${H.lower(LM)}ung</p>`,
-    identifier: `<p>l${H.lower(LS)}ache</p>`,
+    identifier: `<p>l${H.lower(LS).slice(0, 3)}${LS[3]}ache</p>`,
     dataUri: `<img src="data:image/png;base64,${Buffer.from(`ABC${LM}DEF`).toString("base64")}" alt="">`,
     literalEntity: `<p>${A}&#x26;#${H.code(LM, 2)};${LM.slice(3)}</p>`,
     commented: `<!-- ${LM} --><p>текст</p>`,
