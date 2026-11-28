@@ -434,6 +434,10 @@ test("the former employer is not named on any page of the SCA/SBOM case", () => 
     const html = readFileSync(resolve(projectDir, "..", page), "utf8");
     assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
     assert.deepEqual(employerMentions(html), [], `${page} names the former employer`);
+    // Проверка из main подстрокой по исходному HTML и видимому тексту – как была: ветка
+    // не должна ловить меньше main (имена файлов в url(), download, srcset и т. п.).
+    assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer (main parity)`);
+    assert.doesNotMatch(textLayers(html).visible, /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text (main parity)`);
   }
   // Три презентации – исторические (слово владельца 27.11): проверяем, но не правим.
   for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {

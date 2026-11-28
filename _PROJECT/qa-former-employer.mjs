@@ -93,6 +93,20 @@ function employerUrlHits(label, values) {
 }
 const URL_ATTR = /(?:href|src|srcset|action|data|poster|cite|url|background|manifest|ping|formaction|codebase)$/i;
 
+// Паритет с main: та же подстрока, что в исходной проверке, по сериализованному DOM
+// каждого фрейма (с изменениями скриптов). Только для реальных страниц: на синтетических
+// примерах вроде «Vermietung» она даёт ложную тревогу так же, как в main.
+const MAIN_PARITY = /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i;
+async function mainParityProblems(page, label) {
+  const problems = [];
+  for (const frame of page.frames()) {
+    const html = await frame.content();
+    const m = html.match(MAIN_PARITY);
+    if (m) problems.push(`${label}: main parity – serialized DOM of ${frame.url()} contains …${html.slice(Math.max(0, m.index - 30), m.index + 30)}…`);
+  }
+  return problems;
+}
+
 // Адрес и его компоненты, декодированные по отдельности (параметр «100%» не мешает пути).
 function decodeParts(v) {
   const out = [];
@@ -109,9 +123,9 @@ function decodeParts(v) {
 // не считаются.
 const QO = '«"„“”\'‘’‹›＂', QC = '»"“”\'’›＂‘';
 const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао)|(акционерн\p{L}*\s+обществ\p{L}*|обществ\p{L}*\s+с\s+ограниченной\s+ответственностью))(?![\p{L}])/giu;
-const NAME_QUOTED = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,200}?)\\s*[${QC}]`, 'u');
+const NAME_QUOTED = new RegExp(`^\\s*[:–-]?\\s*[${QO}]+\\s*([^${QO}${QC}]{1,200}?)\\s*[${QC}]`, 'u');
 // Открывающая кавычка без закрывающей: имя – до 60 знаков.
-const NAME_OPEN = new RegExp(`^\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60})`, 'u');
+const NAME_OPEN = new RegExp(`^\\s*[:–-]?\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60})`, 'u');
 const NAME_WORDS = /^\s*([\p{Lu}\p{N}][\p{L}\p{N}-]*)((?:\s+\p{Lu}[\p{L}\p{N}-]*){0,2})/u;
 const STOP = new Set('обязано обязан обязана обязаны должно должен должна должны является являются может могут вправе имеет имеют не и или а но в во на с со по для от до из к о об при как это был было будет есть'.split(' '));
 // Учебный пример владельца в исторической презентации sbom-license-audit – только эта фраза целиком.
@@ -155,10 +169,12 @@ function collectLayers(scopeSelector) {
   };
   const transparent = c => !c || /rgba\([^)]*,\s*0\)$|\/\s*0\)$|transparent/.test(c);
   const zeroFilter = f => !!f && f !== 'none' && /opacity\(\s*0(?:\.0*)?%?\s*\)/.test(f);
-  const shown = el => {
+  const masked = cs => [cs.maskImage, cs.webkitMaskImage].some(v => v && v !== 'none');
+  const shown = (el, strict = false) => {
     if (!P.checkVis.call(el, {checkOpacity: true, checkVisibilityCSS: true})) return false;
     for (let e = el; e && e.nodeType === 1; e = P.parent.call(e) || P.rootNode.call(e).host) {
       const cs = getComputedStyle(e);
+      if (strict && masked(cs)) return false;
       if (cs.clipPath && cs.clipPath !== 'none' && /inset\(\s*50%|circle\(\s*0|polygon\(\s*0[^,]*,\s*0[^,]*,\s*0/.test(cs.clipPath)) return false;
       if (zeroFilter(cs.filter)) return false;
       if (cs.overflow !== 'visible' && e !== el) { const r = P.rect.call(e); if (r.width < 1 || r.height < 1) return false; }
@@ -176,7 +192,7 @@ function collectLayers(scopeSelector) {
   const INLINE_TAGS = new Set('a abbr b bdi bdo big cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
   const isBlock = el => {
     const tag = P.local.call(el);
-    if (tag === 'br') return true;
+    if (tag === 'br') return !P.connected.call(el) || getComputedStyle(el).display !== 'none';
     const d = P.connected.call(el) ? getComputedStyle(el).display : '';
     if (!d) return !(INLINE_TAGS.has(tag) || tag.includes('-'));
     return !/^(inline|contents|ruby)/.test(d);
@@ -203,26 +219,31 @@ function collectLayers(scopeSelector) {
     return out;
   };
   const hiddenTexts = [];
+  // out.s – мягкий видимый слой (маска не скрывает), out.t – строгий (маска скрывает).
   const walk = (node, out, parentShown) => {
     if (node.nodeType === Node.TEXT_NODE) {
       const parent = P.parent.call(node);
       if (parent && shown(parent)) out.s += unOverride(node.data);
+      if (parent && shown(parent, true)) out.t += unOverride(node.data);
       return;
     }
     if (node.nodeType === Node.DOCUMENT_FRAGMENT_NODE) { for (const c of kids(node)) walk(c, out, parentShown); return; }
     if (node.nodeType !== Node.ELEMENT_NODE) return;
     const el = node, tag = P.local.call(el);
     if (tag === 'script' || tag === 'style' || tag === 'template' || tag === 'title') return;
-    if (tag === 'br') { out.s += ' '; return; }
     const cs = getComputedStyle(el);
-    const isShown = cs.display !== 'none' && shown(el);
-    // Невидимый элемент внутри видимого: его текст проверяется отдельно – целиком с
-    // границами блоков и по каждому текстовому узлу, без склейки с соседями.
-    if (!isShown && parentShown) hiddenTexts.push(unOverride(boundaryText(el)), ...hiddenParts(el));
+    // Видимый br – перевод строки; скрытый ничего не разделяет («U<br hidden>SD»).
+    if (tag === 'br') { if (cs.display !== 'none') { out.s += ' '; out.t += ' '; } return; }
+    const isShown = cs.display !== 'none' && shown(el), isShownStrict = isShown && shown(el, true);
+    // Невидимый (в том числе под маской) элемент внутри видимого: его текст проверяется
+    // отдельно – целиком с границами блоков и по каждому узлу, без склейки с соседями.
+    if (!isShownStrict && parentShown) hiddenTexts.push(unOverride(boundaryText(el)), ...hiddenParts(el));
     if (cs.display === 'none') return;
     const inline = /^(inline|contents|ruby)/.test(cs.display);
-    const buf = {s: ''};
-    if (isShown) buf.s += cssStrings(getComputedStyle(el, '::before').content);
+    const buf = {s: '', t: ''};
+    const before = cssStrings(getComputedStyle(el, '::before').content);
+    if (isShown) buf.s += before;
+    if (isShownStrict) buf.t += before;
     const sr = P.shadow.call(el);
     if (tag === 'slot') {
       const assigned = el.assignedNodes({flatten: true});
@@ -230,19 +251,25 @@ function collectLayers(scopeSelector) {
     } else {
       for (const c of kids(sr ?? el)) walk(c, buf, isShown);
     }
+    let tail = '';
     if (isShown) {
-      buf.s += cssStrings(getComputedStyle(el, '::after').content);
-      if ((tag === 'input' && !/^(hidden|password|checkbox|radio|file)$/i.test(el.type)) || tag === 'textarea') buf.s += ' ' + el.value + ' ';
-      if (tag === 'select' && el.selectedOptions[0]) buf.s += ' ' + el.selectedOptions[0].text + ' ';
+      tail += cssStrings(getComputedStyle(el, '::after').content);
+      if ((tag === 'input' && !/^(hidden|password|checkbox|radio|file)$/i.test(el.type)) || tag === 'textarea') tail += ' ' + el.value + ' ';
+      if (tag === 'select' && el.selectedOptions[0]) tail += ' ' + el.selectedOptions[0].text + ' ';
     }
-    const piece = isOverrideRtl(el) ? [...buf.s].reverse().join('') : buf.s;
-    out.s += inline ? piece : ' ' + piece + ' ';
+    buf.s += tail;
+    if (isShownStrict) buf.t += tail;
+    const rtl = isOverrideRtl(el);
+    for (const k of ['s', 't']) {
+      const piece = rtl ? [...buf[k]].reverse().join('') : buf[k];
+      out[k] += inline ? piece : ' ' + piece + ' ';
+    }
   };
   const scope = scopeSelector ? qsa(document, scopeSelector)[0] : document.documentElement;
   if (!scope) return null;
-  const vis = {s: ''};
+  const vis = {s: '', t: ''};
   walk(scope, vis, true);
-  if (scopeSelector) return {visible: vis.s.replace(/\s+/g, ' ')};
+  if (scopeSelector) return {visible: vis.s.replace(/\s+/g, ' '), visibleStrict: vis.t.replace(/\s+/g, ' ')};
   // Все элементы: документ, открытые теневые деревья, содержимое template.
   const all = [], roots = [document];
   const gather = rootNode => {
@@ -284,6 +311,7 @@ function collectLayers(scopeSelector) {
     full: unOverride(roots.map(boundaryText).join(' \n ')),
     hidden: hiddenTexts.join(' \n '),
     visible: vis.s.replace(/\s+/g, ' '),
+    visibleStrict: vis.t.replace(/\s+/g, ' '),
     urls: urls.join(' \n '),
     urlList: urls,
     generated: generated.join(' \n '),
@@ -314,16 +342,19 @@ async function cdpLayers(page) {
 
     const {root: dom} = await cdp.send('DOM.getDocument', {depth: -1, pierce: true});
     const roots = [], attrs = [], comments = [], urlValues = [];
-    const visit = (n, acc) => {
+    const visit = (n, acc, parent = null) => {
       if (n.nodeType === 3) { acc.push(n.nodeValue); return; }
       if (n.nodeType === 8) { comments.push(n.nodeValue); return; }
-      const block = n.nodeType === 1 && ((n.localName || '').toLowerCase() === 'br' || blockNodeOf(n));
+      // br без раскладки при родителе с раскладкой скрыт сам («U<br hidden>SD») и ничего не
+      // разделяет; внутри скрытого блока он остаётся переводом строки.
+      const isBr = (n.localName || '').toLowerCase() === 'br';
+      const block = n.nodeType === 1 && (isBr ? (display.has(n.backendNodeId) || !parent || !display.has(parent.backendNodeId)) : blockNodeOf(n));
       if (block) acc.push(' ');
       if (n.attributes) for (let i = 0; i < n.attributes.length; i += 2) {
         attrs.push(n.attributes[i], n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
         if (URL_ATTR.test(n.attributes[i]) && !/^\s*data:/i.test(n.attributes[i + 1])) urlValues.push(n.attributes[i + 1], ...decodeParts(n.attributes[i + 1]));
       }
-      for (const k of n.children ?? []) visit(k, acc);
+      for (const k of n.children ?? []) visit(k, acc, n);
       if (block) acc.push(' ');
       for (const r of [...(n.shadowRoots ?? []), ...(n.contentDocument ? [n.contentDocument] : []), ...(n.templateContent ? [n.templateContent] : [])]) {
         const a = [];
@@ -433,7 +464,7 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
       }
       if (deck) deckAll += [' \n ', layers.full, layers.hidden, layers.visible, layers.generated, layers.title].join(' \n ');
       if (deck && frame === page.mainFrame()) {
-        if (!legalNames(layers.visible, route).includes('АО АЛЬФА')) problems.push(`${where}: pseudonym «АО «Альфа»» is not shown`);
+        if (!legalNames(layers.visibleStrict, route).includes('АО АЛЬФА')) problems.push(`${where}: pseudonym «АО «Альфа»» is not shown`);
         else {
           const r = await textRendered(page, 'pseudonym');
           if (!r.ok) problems.push(`${where}: pseudonym «АО «Альфа»» is not rendered (${JSON.stringify(r)})`);
@@ -453,10 +484,10 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
 
 // Абзац о сервисе: единственный, отрисован в каждом состоянии, утверждение и цифры с
 // единицами – в нём самом; в разделе нет других денежных сумм и объёмов кода.
-const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|GBP|CNY|JPY|CHF|KZT|BYN|AED|INR|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€|£|¥)';
+const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|GBP|CNY|JPY|CHF|KZT|BYN|AED|INR|CAD|AUD|SEK|NOK|PLN|TRY|HKD|SGD|фунт\\p{L}*|франк\\p{L}*|юан\\p{L}*|иен\\p{L}*|йен\\p{L}*|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€|£|¥)';
 const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn|тыс\\.?|тысяч\\p{L}*|thousand|k(?![\\p{L}]))';
 const MONEY = new RegExp(`${CUR}\\s*\\d[\\d\\s.,]*\\d?(?:\\s*${MULT})?|\\d[\\d\\s.,]*(?:\\s*${MULT})?\\s*${CUR}`, 'giu');
-const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?![\p{L}])(?!\s+(?:в\s+|из\s+)?(?:таблиц|данн|запис|текст|журнал|лог|файл|CSV|Excel))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:source\s+)?code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
+const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?![\p{L}])(?!\s+(?:в\s+|из\s+)?(?:таблиц\p{L}*|данных|записей|журнал\p{L}*|лог(?:а|ов)?|текст\p{L}*|CSV|Excel)(?![\p{L}]))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:[\p{L}+#]+\s+){0,2}code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
 const clean = s => s.replace(/\s+/g, ' ').trim();
 const EXPECTED = {
   ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк']},
@@ -480,15 +511,15 @@ async function serviceProblems(page, label, scheme = 'light') {
     const para = await page.evaluate(collectLayers, '[data-qa-service="1"]');
     await page.evaluate(() => document.querySelector('[data-qa-service]')?.removeAttribute('data-qa-service'));
     const section = await page.evaluate(collectLayers, '#about');
-    const ptext = base(para?.visible ?? ''), stext = base(section?.visible ?? '');
+    const ptext = base(para?.visible ?? ''), pstrict = base(para?.visibleStrict ?? ''), stext = base(section?.visible ?? '');
     // Исходный документ: язык – тот, что показан.
-    const lang = state.original ? (/Единолично создал/.test(ptext) ? 'ru' : 'en') : state.lang;
+    const lang = state.original ? (/Единолично создал/.test(pstrict) ? 'ru' : 'en') : state.lang;
     const want = EXPECTED[lang];
     const digits = [...ptext.matchAll(/\d[\d\s.,]*\d|\d/g)].map(m => m[0].replace(/\s+/g, '')).sort();
     const money = [...stext.matchAll(MONEY)].map(m => clean(m[0])), code = [...stext.matchAll(CODE)].map(m => clean(m[0]));
-    if (!want.claim.test(ptext)) problems.push(`${where}: achievement sentence is not in the visible paragraph`);
-    if (!want.size.test(ptext)) problems.push(`${where}: code size is not in the visible paragraph`);
-    if (!want.estimate.test(ptext)) problems.push(`${where}: vendor's estimate is not in the visible paragraph`);
+    if (!want.claim.test(pstrict)) problems.push(`${where}: achievement sentence is not in the visible paragraph`);
+    if (!want.size.test(pstrict)) problems.push(`${where}: code size is not in the visible paragraph`);
+    if (!want.estimate.test(pstrict)) problems.push(`${where}: vendor's estimate is not in the visible paragraph`);
     if (JSON.stringify(digits) !== JSON.stringify(want.digits)) problems.push(`${where}: numbers in the paragraph ${JSON.stringify(digits)}`);
     if (JSON.stringify(money) !== JSON.stringify(want.money)) problems.push(`${where}: amounts in the section ${JSON.stringify(money)}`);
     if (JSON.stringify(code) !== JSON.stringify(want.code)) problems.push(`${where}: code sizes in the section ${JSON.stringify(code)}`);
@@ -520,6 +551,7 @@ const MUST_CATCH = {
   hiddenNestedSplit: '<div hidden>текст<span>MI<b>ET</b></span>город</div>',
   closedShadowBr: '<x-g></x-g><script>const r=document.querySelector("x-g").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("Заказчик",document.createElement("br"),"M"+"IET",document.createElement("br"),"Москва");r.append(p);</script>',
   visibleBr: '<p>Заказчик<br>MIET<br>Москва</p>',
+  maskSplitBetweenWords: '<p>Заказчик<span style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">MI<strong>ET</strong></span>Москва</p>',
   fileNameCamel: '<img src="/assets/logoMIET.svg" alt="Логотип заказчика">',
   templateSplit: '<template><p>MI<em>ET</em></p></template><p>текст</p>',
   closedShadowHiddenSplit: '<x-f></x-f><script>const r=document.querySelector("x-f").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("M","I");const em=document.createElement("em");em.textContent="E"+"T";p.append(em);r.append(p);</script>',
@@ -570,7 +602,8 @@ const PSEUDONYM_CATCH = {
   declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>', upperDeclinedForm: '<p>АО «Альфа»</p><p>АКЦИОНЕРНЫМ ОБЩЕСТВОМ «Бета»</p>',
   lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerQuoted: '<p>АО «Альфа»</p><p>АО «бета»</p>',
   longQuoted: '<p>АО «Альфа»</p><p>ООО «Научно-производственное объединение перспективных информационных технологий и систем Бета»</p>',
-  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>', digitName: '<p>АО «Альфа»</p><p>ООО 7 Холмов</p>',
+  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>', digitName: '<p>АО «Альфа»</p><p>ООО 7 Холмов</p>', colonQuoted: '<p>АО «Альфа»</p><p>ПАО: «Бета»</p>',
+  maskedChild: '<p>АО «<span style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">Альфа</span>»</p>',
   noQuotes: '<p>АО «Альфа»</p><p>АО Бета</p>', noQuotesTwoWords: '<p>АО «Альфа»</p><p>АО Альфа Север</p>', qElement: '<p>АО «Альфа»</p><p>АО <q>Бета</q></p>', fullWidthQuote: '<p>АО «Альфа»</p><p>АО ＂Бета＂</p>',
   splitTag: '<p>АО «Альфа»</p><p>А<x-a>О</x-a> «Бета»</p>', scriptFooter: "<p>АО «Альфа»</p><script>document.body.append('АО «Бе'+'та»')</script>",
   hiddenAlphaVisibleBeta: '<p hidden>АО «Альфа»</p><p>АО «Бета»</p>', inAttribute: '<p>АО «Альфа»</p><input value="АО «Бета»">',
@@ -691,6 +724,13 @@ try {
     codeLinesCpp: [extra('Модуль содержит ещё 250 строк на C++.'), /code sizes in the section/],
     amountThousandRub: [extra('Цена: 28 тыс. рублей.'), /amounts in the section/],
     amountGbp: [extra('Fee: 40 GBP.'), /amounts in the section/],
+    amountCad: [extra('Fee: 40 CAD.'), /amounts in the section/],
+    amountPounds: [extra('Цена: 40 фунтов стерлингов.'), /amounts in the section/],
+    amountHiddenBr: [extra('Цена 28 U<br hidden>SD.'), /amounts in the section/],
+    codeLinesLogic: [extra('Модуль содержит 252 строки логики обработки на C++.'), /code sizes in the section/],
+    codeLinesFile: [extra('Реализация парсера на C++ занимает 252 строки в файле parser.cpp.'), /code sizes in the section/],
+    codeLinesPython: [extra('Plus 25 lines of Python code.'), /code sizes in the section/],
+    maskedChildClaim: [index.replace('Единолично создал и ввёл в эксплуатацию', '<span style="-webkit-mask-image: linear-gradient(transparent, transparent); mask-image: linear-gradient(transparent, transparent)">Единолично создал и ввёл в эксплуатацию</span>'), /achievement sentence is not in the visible paragraph/],
     amountUnderOpaqueMask: [extra('<span style="-webkit-mask-image: linear-gradient(black, black); mask-image: linear-gradient(black, black)">Цена: 28 млн рублей.</span>'), /amounts in the section/],
     maskHides: [index.replace(anchorRu, '<p style="-webkit-mask-image: linear-gradient(transparent, transparent); mask-image: linear-gradient(transparent, transparent)"><span data-l="ru">Выстраиваю РБПО'), HIDDEN],
     secondClaimLightRu: [index.replace('</body>', '<script>new MutationObserver(() => {}).observe(document.documentElement, {attributes: true}); const add = () => { const on = document.documentElement.dataset.theme === "light" && document.documentElement.dataset.lang === "ru"; const ex = document.getElementById("qa2"); if (on && !ex) { const p = document.createElement("p"); p.id = "qa2"; p.textContent = "Единолично создал и ввёл в эксплуатацию сервис SCA/SBOM (второй)"; document.getElementById("about").append(p); } if (!on && ex) ex.remove(); }; new MutationObserver(add).observe(document.documentElement, {attributes: true});</script></body>'), /paragraphs with the service claim = 2/],
@@ -719,6 +759,17 @@ try {
     if (found.length) failures.push(`self-test: service «harmlessNumbers» is a false positive: ${found[0]}`);
     cases++;
   }
+  // Паритет с main: имена файлов в url(), download, srcset после data: и подпись с путём.
+  for (const [name, html] of Object.entries({
+    cssUrl: '<div style="background-image:url(\'/assets/logoMIET.svg\')">x</div>',
+    download: '<a href="/r.pdf" download="ОтчётMIET.pdf">отчёт</a>',
+    srcsetAfterData: '<img alt="" srcset="data:image/png;base64,AAAA 1x, /assets/logoMIET.svg 2x">',
+    caption: '<p>Файл /assets/logoMIET.svg</p>',
+  })) {
+    await load(page, html, false, 'light');
+    if (!(await mainParityProblems(page, `parity ${name}`)).length) failures.push(`self-test: main parity «${name}» is not caught`);
+    cases++;
+  }
   await page.context().close();
   await pageNoJs.context().close();
 
@@ -733,6 +784,7 @@ try {
         const p = await context.newPage();
         const response = await p.goto(origin + route, {waitUntil: 'load'});
         if (!response || response.status() !== 200) { failures.push(`${label}: HTTP ${response?.status()}`); await context.close(); continue; }
+        failures.push(...await mainParityProblems(p, label));
         failures.push(...await pageProblems(p, label, {deck: DECKS.has(route), route, scheme}));
         if (SERVICE_PAGES.includes(route)) {
           current = `${label} [${scheme}] reload for the service paragraph`;
