@@ -96,13 +96,16 @@ const URL_ATTR = /(?:href|src|srcset|action|data|poster|cite|url|background|mani
 // Паритет с main: та же подстрока, что в исходной проверке, по сериализованному DOM
 // каждого фрейма (с изменениями скриптов). Только для реальных страниц: на синтетических
 // примерах вроде «Vermietung» она даёт ложную тревогу так же, как в main.
-const MAIN_PARITY = /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i;
+const MAIN_PARITY = /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, MAIN_PARITY_VISIBLE = /МНТЦ|МИЭТ|MNTC|MIET|istc/i;
 async function mainParityProblems(page, label) {
   const problems = [];
   for (const frame of page.frames()) {
     const html = await frame.content();
     const m = html.match(MAIN_PARITY);
     if (m) problems.push(`${label}: main parity – serialized DOM of ${frame.url()} contains …${html.slice(Math.max(0, m.index - 30), m.index + 30)}…`);
+    const text = await frame.evaluate(() => document.body ? document.body.innerText : '');
+    const v = text.match(MAIN_PARITY_VISIBLE);
+    if (v) problems.push(`${label}: main parity – visible text of ${frame.url()} contains …${text.slice(Math.max(0, v.index - 30), v.index + 30)}…`);
   }
   return problems;
 }
@@ -122,7 +125,7 @@ function decodeParts(v) {
 // слово после формы («АО ведёт реестр») и служебные слова капсом («АО ОБЯЗАНО») названием
 // не считаются.
 const QO = '«"„“”\'‘’‹›＂', QC = '»"“”\'’›＂‘';
-const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао)|(акционерн\p{L}*\s+обществ\p{L}*|обществ\p{L}*\s+с\s+ограниченной\s+ответственностью))(?![\p{L}])/giu;
+const FORM_RE = /(?<![\p{L}])(?:(ао|ооо|оао|пао|зао|нао|ано)|(акционерн\p{L}*\s+обществ\p{L}*|обществ\p{L}*\s+с\s+ограниченной\s+ответственностью))(?![\p{L}])/giu;
 const NAME_QUOTED = new RegExp(`^\\s*[:–-]?\\s*[${QO}]+\\s*([^${QO}${QC}]{1,200}?)\\s*[${QC}]`, 'u');
 // Открывающая кавычка без закрывающей: имя – до 60 знаков.
 const NAME_OPEN = new RegExp(`^\\s*[:–-]?\\s*[${QO}]+\\s*([^${QO}${QC}]{1,60})`, 'u');
@@ -484,10 +487,10 @@ async function pageProblems(page, label, {deck = false, route = '', scheme = 'li
 
 // Абзац о сервисе: единственный, отрисован в каждом состоянии, утверждение и цифры с
 // единицами – в нём самом; в разделе нет других денежных сумм и объёмов кода.
-const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|GBP|CNY|JPY|CHF|KZT|BYN|AED|INR|CAD|AUD|SEK|NOK|PLN|TRY|HKD|SGD|фунт\\p{L}*|франк\\p{L}*|юан\\p{L}*|иен\\p{L}*|йен\\p{L}*|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€|£|¥)';
+const CUR = '(?:(?<![\\p{L}])(?:RUB|USD|EUR|GBP|CNY|JPY|CHF|KZT|BYN|AED|INR|CAD|AUD|SEK|NOK|PLN|TRY|HKD|SGD|NZD|MXN|BRL|ZAR|KRW|ILS|DKK|CZK|HUF|фунт\\p{L}*|франк\\p{L}*|юан\\p{L}*|иен\\p{L}*|йен\\p{L}*|руб\\.?|рубл\\p{L}*|долл\\p{L}*|евро|dollars?|euros?|rubles?|roubles?)(?![\\p{L}])|₽|\\$|€|£|¥)';
 const MULT = '(?:млн|миллион\\p{L}*|млрд|миллиард\\p{L}*|million|billion|mln|bn|тыс\\.?|тысяч\\p{L}*|thousand|k(?![\\p{L}]))';
 const MONEY = new RegExp(`${CUR}\\s*\\d[\\d\\s.,]*\\d?(?:\\s*${MULT})?|\\d[\\d\\s.,]*(?:\\s*${MULT})?\\s*${CUR}`, 'giu');
-const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?![\p{L}])(?!\s+(?:в\s+|из\s+)?(?:таблиц\p{L}*|данных|записей|журнал\p{L}*|лог(?:а|ов)?|текст\p{L}*|CSV|Excel)(?![\p{L}]))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:[\p{L}+#]+\s+){0,2}code|LOC|KLOC|SLOC)(?![\p{L}])/giu;
+const CODE = /\d[\d\s.,]*\s*(?:(?:тыс\.?|тысяч\p{L}*)\s*)?строк\p{L}*(?![\p{L}])(?!\s+(?:в\s+|из\s+)?(?:таблиц\p{L}*|данных|записей|журнал\p{L}*|лог(?:а|ов)?|текст\p{L}*|CSV|Excel)(?![\p{L}]))|\d[\d\s.,]*\s*кстрок\p{L}*|\d[\d\s.,]*\s*(?:k|thousand)?\s*(?:lines?\s+of\s+(?:[\p{L}+#]+\s+){0,2}code|source\s+lines?|LOC|KLOC|SLOC)(?![\p{L}])/giu;
 const clean = s => s.replace(/\s+/g, ' ').trim();
 const EXPECTED = {
   ru: {claim: /Единолично создал и ввёл в эксплуатацию сервис SCA\/SBOM/, size: /около 130 тыс\. строк кода/, estimate: /\(оценка поставщика сопоставимого on-prem-решения: порядка 18 млн ₽ в год\)/, digits: ['130', '18'], money: ['18 млн ₽'], code: ['130 тыс. строк']},
@@ -602,7 +605,7 @@ const PSEUDONYM_CATCH = {
   declinedForm: '<p>АО «Альфа»</p><p>Договор с акционерным обществом «Бета»</p>', upperDeclinedForm: '<p>АО «Альфа»</p><p>АКЦИОНЕРНЫМ ОБЩЕСТВОМ «Бета»</p>',
   lowerForm: '<p>АО «Альфа»</p><p>ооо «Бета»</p>', lowerQuoted: '<p>АО «Альфа»</p><p>АО «бета»</p>',
   longQuoted: '<p>АО «Альфа»</p><p>ООО «Научно-производственное объединение перспективных информационных технологий и систем Бета»</p>',
-  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>', digitName: '<p>АО «Альфа»</p><p>ООО 7 Холмов</p>', colonQuoted: '<p>АО «Альфа»</p><p>ПАО: «Бета»</p>',
+  unclosedQuote: '<p>АО «Альфа»</p><p>ООО «Бета</p>', digitName: '<p>АО «Альфа»</p><p>ООО 7 Холмов</p>', ano: '<p>АО «Альфа»</p><p>АНО «Бета»</p>', colonQuoted: '<p>АО «Альфа»</p><p>ПАО: «Бета»</p>',
   maskedChild: '<p>АО «<span style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">Альфа</span>»</p>',
   noQuotes: '<p>АО «Альфа»</p><p>АО Бета</p>', noQuotesTwoWords: '<p>АО «Альфа»</p><p>АО Альфа Север</p>', qElement: '<p>АО «Альфа»</p><p>АО <q>Бета</q></p>', fullWidthQuote: '<p>АО «Альфа»</p><p>АО ＂Бета＂</p>',
   splitTag: '<p>АО «Альфа»</p><p>А<x-a>О</x-a> «Бета»</p>', scriptFooter: "<p>АО «Альфа»</p><script>document.body.append('АО «Бе'+'та»')</script>",
@@ -693,6 +696,8 @@ try {
   }
   for (const [name, html] of Object.entries(PSEUDONYM_CATCH)) {
     const found = await fixtureProblems(name, html, {deck: true, route: '/sbom-license-audit/'});
+    const broken = found.filter(f => /collector failed/.test(f));
+    if (broken.length) failures.push(`self-test: collector failed on pseudonym «${name}»: ${broken[0]}`);
     if (!found.some(f => /other legal names|not shown|not rendered/.test(f))) failures.push(`self-test: pseudonym «${name}» is not caught`);
     cases++;
   }
@@ -725,6 +730,8 @@ try {
     amountThousandRub: [extra('Цена: 28 тыс. рублей.'), /amounts in the section/],
     amountGbp: [extra('Fee: 40 GBP.'), /amounts in the section/],
     amountCad: [extra('Fee: 40 CAD.'), /amounts in the section/],
+    amountNzd: [extra('Цена 40 NZD.'), /amounts in the section/],
+    codeSourceLines: [extra('Module length: 25 source lines.'), /code sizes in the section/],
     amountPounds: [extra('Цена: 40 фунтов стерлингов.'), /amounts in the section/],
     amountHiddenBr: [extra('Цена 28 U<br hidden>SD.'), /amounts in the section/],
     codeLinesLogic: [extra('Модуль содержит 252 строки логики обработки на C++.'), /code sizes in the section/],
@@ -765,6 +772,7 @@ try {
     download: '<a href="/r.pdf" download="ОтчётMIET.pdf">отчёт</a>',
     srcsetAfterData: '<img alt="" srcset="data:image/png;base64,AAAA 1x, /assets/logoMIET.svg 2x">',
     caption: '<p>Файл /assets/logoMIET.svg</p>',
+    visibleIstc: '<p>ArtisticISTCsample</p>',
   })) {
     await load(page, html, false, 'light');
     if (!(await mainParityProblems(page, `parity ${name}`)).length) failures.push(`self-test: main parity «${name}» is not caught`);
