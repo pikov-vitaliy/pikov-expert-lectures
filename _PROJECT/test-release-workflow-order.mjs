@@ -115,6 +115,7 @@ test('CI runs the static content and workflow regression tests', () => {
     'test-new-site-catalogue.mjs',
     'test-new-site.mjs',
     'qa-root-locale-routes.mjs',
+    'qa-former-employer.mjs',
     'test-public-affiliation-hygiene.mjs',
     'test-tz-landing.mjs',
     'qa-tz-navigation.mjs',
@@ -129,6 +130,8 @@ test('CI runs the static content and workflow regression tests', () => {
   }
 
   assert.match(workflow, /playwright(?:\.cmd)? install chromium/);
+  // Шаг должен исполняться, а не стоять в комментарии (ревью 27.11.2026).
+  assert.match(workflow, /^[ \t]+node \.\\_PROJECT\\qa-former-employer\.mjs[ \t]*\r?$/m, 'qa-former-employer.mjs must run as a workflow command');
   assert.match(workflow, /browser-qa\.mjs/);
   assert.match(
     workflow,
