@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
@@ -24,6 +25,19 @@ test("bilingual markup keeps both language branches present", () => {
   // Вложенный <span> внутри пары сломал бы нежадные регулярки выше.
   assert.doesNotMatch(rawRoot, /<span data-l="(?:ru|en)">(?:(?!<\/span>)[\s\S])*<span\b/);
 });
+
+// Функция из main – дословно, для паритета с исходной проверкой (ветка ловит не меньше main).
+// Видимый текст: без тегов и с декодированными сущностями (&#69; и т. п.), чтобы запрет не обходился кодированием.
+function visibleText(html) {
+  return html
+    .replace(/<script[\s\S]*?<\/script>/gi, " ")
+    .replace(/<style[\s\S]*?<\/style>/gi, " ")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/&#x([0-9a-f]+);?/gi, (_, h) => String.fromCodePoint(parseInt(h, 16)))
+    .replace(/&#(\d+);?/g, (_, d) => String.fromCodePoint(Number(d)))
+    .replace(/&nbsp;/gi, " ").replace(/&laquo;/gi, "«").replace(/&raquo;/gi, "»").replace(/&quot;/gi, '"').replace(/&apos;|&#39;/gi, "'").replace(/&amp;/gi, "&")
+    .replace(/\s+/g, " ");
+}
 
 // ── Проверка «нет прежнего работодателя» (слово владельца 27.11.2026) ─────────────
 // Это быстрый слой без браузера для обычных ошибок. Полную проверку, устойчивую к
@@ -434,10 +448,10 @@ test("the former employer is not named on any page of the SCA/SBOM case", () => 
     const html = readFileSync(resolve(projectDir, "..", page), "utf8");
     assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
     assert.deepEqual(employerMentions(html), [], `${page} names the former employer`);
-    // Проверка из main подстрокой по исходному HTML и видимому тексту – как была: ветка
+    // Проверка из main подстрокой по исходному HTML и видимому тексту – дословно: ветка
     // не должна ловить меньше main (имена файлов в url(), download, srcset и т. п.).
     assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer (main parity)`);
-    assert.doesNotMatch(textLayers(html).visible, /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text (main parity)`);
+    assert.doesNotMatch(visibleText(html), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text (main parity)`);
   }
   // Три презентации – исторические (слово владельца 27.11): проверяем, но не правим.
   for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {
@@ -445,5 +459,26 @@ test("the former employer is not named on any page of the SCA/SBOM case", () => 
     const names = joinStockCompanies(html);
     assert.ok(names.length > 0, `${deck} shows the pseudonym`);
     assert.deepEqual([...new Set(names)], ["Альфа"], `${deck} uses only «АО «Альфа»» (got ${[...new Set(names)].join(", ")})`);
+  }
+});
+
+// Три презентации кейса – исторические, по слову владельца 27.11.2026 их не трогаем.
+// Любое изменение файлов делает тест красным; хеш обновляется только по его слову.
+// Переводы строк нормализуются: CI работает на Windows.
+test("the three case decks are frozen by the owner's word", () => {
+  const FROZEN = {
+    "rbpo-audit/index.html": "9b8cd06ef575a72eca49d4c1f41aa1296ef0c33d9e954f30aeec872d7fcdbfa5",
+    "rbpo-audit/styles.css": "6596453a1d15a30bc633283631a5412956302e55b04be89c9b4f8b8f84a4a0d3",
+    "rbpo-audit/deck-stage.js": "3ae7ee68eac3c14d3a8c4f26550b57f98d54ceb63ac0322c60c4c6e9a8532f76",
+    "rbpo-audit-start-result/index.html": "955f7c623b32908b5ea5ba8b70f44678e8872e07c71e3b6cb778ae90b3529b81",
+    "rbpo-audit-start-result/styles.css": "138284a07bd696f5baed91dbabf9cbbf4e93a9d681f91ef208f70901643324d0",
+    "rbpo-audit-start-result/deck-stage.js": "3ae7ee68eac3c14d3a8c4f26550b57f98d54ceb63ac0322c60c4c6e9a8532f76",
+    "sbom-license-audit/index.html": "ae9493a61bf5bdc5ad6822e58055be5f4cdc139bee2422b51d82857887b821c7",
+    "sbom-license-audit/styles.css": "b3af530a245457c4fd2dbfb031c890fc13cfc3e818566a57fa7bf9f0b169e2d4",
+    "sbom-license-audit/deck-stage.js": "3ae7ee68eac3c14d3a8c4f26550b57f98d54ceb63ac0322c60c4c6e9a8532f76",
+  };
+  for (const [file, hash] of Object.entries(FROZEN)) {
+    const text = readFileSync(resolve(projectDir, "..", file), "utf8").replace(/\r\n/g, "\n");
+    assert.equal(createHash("sha256").update(text, "utf8").digest("hex"), hash, `${file} changed: the case decks are frozen by the owner's word (27.11.2026)`);
   }
 });
