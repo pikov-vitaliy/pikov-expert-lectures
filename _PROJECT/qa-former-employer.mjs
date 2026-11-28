@@ -17,21 +17,24 @@
 // кириллических аббревиатур. Псевдоним презентаций и абзац о сервисе должны быть
 // отрисованы в каждом состоянии (попадание точкой, цвет и заливка букв, opacity, filter,
 // clip-path, маска, нулевая обёртка). Скрытое содержимое проверяется строже видимого:
-// каждый текстовый узел и вложенный элемент отдельно, поэтому «Ver<em>miet</em>ung» в
-// скрытом блоке считается находкой (на девяти страницах кейса скрытых обрывков слов нет).
-// Сознательно не считаются: буквы через пробел без точки («M I E T» – иначе ложная тревога
-// на «<p>MI</p><p>ET</p>»), имя юрлица без кавычек со строчной буквы («АО ведёт реестр»),
+// каждый текстовый узел и вложенный элемент отдельно, поэтому немецкое слово с буквами
+// имени внутри, выделенными <em>, в скрытом блоке считается находкой (на девяти страницах
+// кейса скрытых обрывков слов нет). Сознательно не считаются: буквы имени через пробел без
+// точки (иначе ложная тревога на двух половинах имени в соседних абзацах), имя юрлица без
+// кавычек со строчной буквы («АО ведёт реестр»),
 // число с множителем без валюты («2 million records»). Не ловится: перестановка частей
 // слова средствами вёрстки (CSS order, row-reverse, абсолютное позиционирование,
 // наложение) и подмена встроенных функций браузера скриптом страницы – это видно только
 // на картинке или в коде и закрывается ревью изменений. Открытые находки ревью – в
-// _PROJECT/employer-guard-backlog.md.
+// _PROJECT/employer-guard-backlog.md. Названия в файле не записаны: они раскодируются из
+// _PROJECT/former-employer-terms.mjs (слово владельца 28.11.2026).
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import http from 'node:http';
 import {fileURLToPath} from 'node:url';
 import {createRequire} from 'node:module';
+import {TERMS, MAIN_PARITY_SOURCE, MAIN_PARITY_VISIBLE, escapeRe, fixtureHelpers} from './former-employer-terms.mjs';
 
 const project = path.dirname(fileURLToPath(import.meta.url)), root = path.dirname(project);
 const require = createRequire(import.meta.url), {chromium} = require(path.join(project, '.browser-node/node_modules/playwright'));
@@ -60,15 +63,15 @@ const mapLatin = s => s.toUpperCase().replace(/./gu, ch => UPPER_TO_LATIN[ch] ??
 const foldLatin = s => mapLatin(base(mapLatin(s)));
 const toCyrillic = s => base(s).replace(/[A-Za-z]/g, ch => LATIN_TO_CYRILLIC[ch] ?? ch).replace(/[\u00A0\u2007\u202F]/g, ' ');
 
-// Точка между буквами (М.Н.Т.Ц., М. Н. Т. Ц.); пробел без точки – граница слов и блоков.
+// Точка между буквами (буквы через точку, с пробелом и без); пробел без точки – граница
+// слов и блоков. Кириллические аббревиатуры – с падежными окончаниями, латинские – целым
+// словом. После свёртки кириллические похожие буквы стали латинскими.
 const D = '(?:\\.\\s?)?';
+const spaced = w => [...foldLatin(w)].map(escapeRe).join(D);
 const EMPLOYER_PATTERNS = [
-  new RegExp(`(?<![\\p{L}\\p{N}])M${D}H${D}T${D}Ц`, 'u'),
-  new RegExp(`(?<![\\p{L}\\p{N}])M${D}И${D}Э${D}T`, 'u'),
-  new RegExp(`(?<![\\p{L}\\p{N}])M${D}N${D}T${D}C\\.?(?![\\p{L}\\p{N}])`, 'u'),
-  new RegExp(`(?<![\\p{L}\\p{N}])M${D}I${D}E${D}T\\.?(?![\\p{L}\\p{N}])`, 'u'),
-  new RegExp(`(?<![\\p{L}\\p{N}])I${D}S${D}T${D}C\\.?(?![\\p{L}\\p{N}])`, 'u'),
-  /ISTC[\W_]*MIET|MNTC[\W_]*LOGO/u,
+  ...[TERMS.cyrA, TERMS.cyrB].map(w => new RegExp(`(?<![\\p{L}\\p{N}])${spaced(w)}`, 'u')),
+  ...[TERMS.latA, TERMS.latB, TERMS.latC].map(w => new RegExp(`(?<![\\p{L}\\p{N}])${spaced(w)}\\.?(?![\\p{L}\\p{N}])`, 'u')),
+  new RegExp(`${foldLatin(TERMS.latC)}[\\W_]*${foldLatin(TERMS.latB)}|${foldLatin(TERMS.latA)}[\\W_]*LOGO`, 'u'),
 ];
 function employerHits(label, text) {
   const s = foldLatin(text);
@@ -78,10 +81,10 @@ function employerHits(label, text) {
   }
   return [];
 }
-// В адресах и именах файлов имя ищется подстрокой («/assets/logoMIET.svg»): там нет
+// В адресах и именах файлов имя ищется подстрокой (имя внутри имени файла): там нет
 // обычных слов, в которых оно встретилось бы случайно. data: не проверяется – в base64
 // случайные совпадения возможны.
-const EMPLOYER_IN_URL = /MIET|MNTC|ISTC|MHTЦ|MИЭT/u;
+const EMPLOYER_IN_URL = new RegExp(Object.values(TERMS).map(w => escapeRe(foldLatin(w))).join('|'), 'u');
 function employerUrlHits(label, values) {
   for (const v of values) {
     if (/^\s*data:/i.test(v)) continue;
@@ -95,8 +98,9 @@ const URL_ATTR = /(?:href|src|srcset|action|data|poster|cite|url|background|mani
 
 // Паритет с main: та же подстрока, что в исходной проверке, по сериализованному DOM
 // каждого фрейма (с изменениями скриптов). Только для реальных страниц: на синтетических
-// примерах вроде «Vermietung» она даёт ложную тревогу так же, как в main.
-const MAIN_PARITY = /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, MAIN_PARITY_VISIBLE = /МНТЦ|МИЭТ|MNTC|MIET|istc/i;
+// примерах вроде немецкого слова с буквами имени внутри она даёт ложную тревогу так же,
+// как в main. Выражения – из former-employer-terms.mjs.
+const MAIN_PARITY = MAIN_PARITY_SOURCE;
 async function mainParityProblems(page, label) {
   const problems = [];
   for (const frame of page.frames()) {
@@ -190,8 +194,8 @@ function collectLayers(scopeSelector) {
   const unOverride = s => s.replace(/\u202E([^\u202C\u202D]*)(\u202C|$)/g, (_, x) => [...x].reverse().join(''));
   const isOverrideRtl = el => (P.local.call(el) === 'bdo' && (P.attr.call(el, 'dir') || '').toLowerCase() === 'rtl') ||
     (() => { const cs = getComputedStyle(el); return /bidi-override|isolate-override/.test(cs.unicodeBidi) && cs.direction === 'rtl'; })();
-  // Текст поддерева с границами блоков: строчная разметка склеивается («Ver<em>miet</em>ung»),
-  // блоки и скрытые элементы разделяются («<p>MI</p><p>ET</p>»).
+  // Текст поддерева с границами блоков: строчная разметка склеивается (слово, часть
+  // которого выделена <em>), блоки и скрытые элементы разделяются (два соседних абзаца).
   const INLINE_TAGS = new Set('a abbr b bdi bdo big cite code data del dfn em font i img ins kbd label mark q s samp small span strike strong sub sup time tt u var wbr'.split(' '));
   const isBlock = el => {
     const tag = P.local.call(el);
@@ -214,7 +218,7 @@ function collectLayers(scopeSelector) {
     return out.join('');
   };
   // Скрытое строже видимого: каждый текстовый узел и текст каждого вложенного элемента
-  // отдельно («<div hidden>текст<span>MI<b>ET</b></span>город</div>»).
+  // отдельно (имя во вложенном элементе скрытого блока между буквами соседних слов).
   const hiddenParts = el => {
     const out = [];
     const w = document.createTreeWalker(el, NodeFilter.SHOW_TEXT | NodeFilter.SHOW_ELEMENT);
@@ -533,53 +537,56 @@ async function serviceProblems(page, label, scheme = 'light') {
 // ── Самопроверка ───────────────────────────────────────────────────────────────
 // Приманки строят запрещённое имя так, чтобы его не было в исходном тексте скриптов и
 // стилей: срабатывать должен именно проверяемый механизм.
+const {cyrA: CN, cyrB: CM, latA: LN, latB: LM, latC: LS} = TERMS;
+const H = fixtureHelpers;
+const [A, B] = H.halves(LM);
 const MUST_CATCH = {
-  plain: '<p>Проект MIET</p>', cyrillic: '<p>АО МНТЦ МИЭТ</p>', lowercase: '<p>мнтц и миэт</p>', greekLunate: '<p>MNTϹ</p>',
-  caseEnding: '<p>Публикация МИЭТа</p>', dotted: '<p>М.Н.Т.Ц.</p>',
-  entityNoSemicolon: '<b>MI&#69T</b>', hexNoSemicolon: '<b>MI&#x45T</b>', allNumeric: '<b>&#77&#73&#69&#84</b>',
-  html5Named: '<b>&Mcy;&Icy;&Ecy;&Tcy;</b>', zeroWidthNamed: '<b>MI&ZeroWidthSpace;ET</b>', noBreak: '<b>MI&NoBreak;ET</b>',
-  softHyphen: '<b>MI&#173;ET</b>', zwsp: '<b>MI\u200BET</b>', wordJoiner: '<b>MI\u2060ET</b>', bom: '<b>MI\uFEFFET</b>',
-  allCyrillicLookalike: '<b>МІЕТ</b>', mixedScript: '<b>MIЕT</b>', greek: '<b>ΜΙΕΤ</b>', mixedMHTC: '<b>MHTЦ</b>', fullWidth: '<b>ＭＩＥＴ</b>', dotlessI: '<b style="text-transform:uppercase">mıet</b>',
-  splitComment: '<b>MI<!---->ET</b>', splitBig: '<b>MI<big>ET</big></b>', splitCustom: '<b>MI<x-a>ET</x-a></b>', splitScript: '<b>MI<script></script>ET</b>',
-  splitTemplate: '<b>MI<template></template>ET</b>', splitImg: '<b>MI<img alt="">ET</b>', splitInlineDiv: '<span>MI<div style="display:inline">ET</div></span>',
-  tagLike: '<b>&lt;МИЭТ&gt;</b>', tagLikeSpaced: '<b>1 &lt; MIET &gt; 0</b>',
-  abruptComment: '<b><!-->МИЭТ<!----></b>', bangComment: '<b><!-- x --!>МНТЦ<!-- y --></b>',
-  customElementNames: '<b><script-x>МИЭТ</script-x><script></script></b>',
-  bdo: '<b><bdo dir="rtl">TEIM</bdo></b>', partialBdo: '<b>MI<bdo dir="rtl">TE</bdo></b>', rlo: '<b>\u202ETEIM\u202C</b>',
-  bidiCss: '<b style="unicode-bidi:bidi-override;direction:rtl">TEIM</b>', isolateOverride: '<b style="unicode-bidi:isolate-override;direction:rtl">TEIM</b>',
-  hiddenBetweenWords: '<p><span>предприятие</span><span hidden>MIET</span><span>город</span></p>',
-  hiddenSplitBetweenWords: '<p><span>предприятие</span><span hidden>MI<strong>ET</strong></span><span>город</span></p>',
-  opacitySplitBetweenWords: '<p>предприятие<span style="opacity:0">MI<strong>ET</strong></span>город</p>',
-  hiddenNestedBetweenLetters: '<div hidden>предприятие<span>MIET</span>город</div>',
-  hiddenNestedSplit: '<div hidden>текст<span>MI<b>ET</b></span>город</div>',
-  closedShadowBr: '<x-g></x-g><script>const r=document.querySelector("x-g").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("Заказчик",document.createElement("br"),"M"+"IET",document.createElement("br"),"Москва");r.append(p);</script>',
-  visibleBr: '<p>Заказчик<br>MIET<br>Москва</p>',
-  maskSplitBetweenWords: '<p>Заказчик<span style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">MI<strong>ET</strong></span>Москва</p>',
-  fileNameCamel: '<img src="/assets/logoMIET.svg" alt="Логотип заказчика">',
-  templateSplit: '<template><p>MI<em>ET</em></p></template><p>текст</p>',
-  closedShadowHiddenSplit: '<x-f></x-f><script>const r=document.querySelector("x-f").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("M","I");const em=document.createElement("em");em.textContent="E"+"T";p.append(em);r.append(p);</script>',
-  dataNotAttribute: '<p>data:МИЭТ</p>', titleAttr: '<abbr title="MI&#69T">x</abbr>', altAttr: '<img src="x.png" alt="Логотип МИ&#1069Т">',
-  attrName: '<div data-miet="1">x</div>', hrefEncoded: '<a href="https://&#105stc-mi&#101t.ru/">сайт</a>', hrefPercent: '<a href="https://istc-%6Diet.ru/">сайт</a>',
-  pathPercent: '<a href="/clients/%4D%49%45%54/profile">x</a>', pathPercentWithQuery: '<a href="/clients/%4D%49%45%54/profile?progress=100%">x</a>',
-  clobberedAttributes: '<form><input name="attributes"><template><p title="MI&#69;T">x</p></template></form>',
-  inputValue: '<input value="MIET">', svgTspan: '<svg><text>М<tspan>ИЭТ</tspan></text></svg>',
-  cssBefore: '<style>.x::before{content:"MI\\45 T"}</style><p class="x">a</p>', cssEscape: "<style>.x::after{content:'MI\\45 T'}</style><p class=\"x\">a</p>",
-  cssAttr: '<style>.x::after{content:attr(data-n)}</style><p class="x" data-n="MI&#69;T">a</p>',
-  cssCounterP: '<style>@counter-style e{system:cyclic;symbols:"MI";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><p class="c">ET</p>',
-  cssCounterDiv: '<style>@counter-style e{system:cyclic;symbols:"MI";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class="c">ET</div>',
-  cssCounterIframe: '<iframe srcdoc="<style>@counter-style e{system:cyclic;symbols:\'MI\';suffix:\'\'}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class=\'c\'>ET</div>"></iframe>',
-  shadowOpen: '<x-h><template shadowrootmode="open"><p>MIET</p></template></x-h>',
-  shadowClosedText: '<x-c></x-c><script>const n="M"+"IET";const r=document.querySelector("x-c").attachShadow({mode:"closed"});const p=document.createElement("p");p.textContent=n;r.append(p);</script>',
-  shadowClosedAttr: '<x-d></x-d><script>const r=document.querySelector("x-d").attachShadow({mode:"closed"});const p=document.createElement("p");p.setAttribute("data-customer","M"+"IET");p.textContent="x";r.append(p);</script>',
-  shadowClosedHref: '<x-e></x-e><script>const r=document.querySelector("x-e").attachShadow({mode:"closed"});const a=document.createElement("a");a.href="/clients/%4D%49%45%54/";a.textContent="x";r.append(a);</script>',
-  templateAttr: '<template><p title="MIET">x</p><!-- МНТЦ --></template><p>текст</p>', iframeSrcdoc: '<iframe srcdoc="<p>MI&amp;#69;T</p>"></iframe>',
-  titleTag: '<title>&laquoМИЭТ&raquo</title><p>x</p>', noscriptText: '<noscript><p>MIET</p></noscript>', hiddenDiv: '<div hidden>MIET</div>', commentOnly: '<p>текст</p><!-- MIET -->',
-  darkThemeOnly: '<style>:root[data-theme="dark"] .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
-  systemDarkOnly: '<style>@media (prefers-color-scheme: dark){.t::after{content:"MI\\45 T"}}</style><p class="t">x</p>',
-  systemDarkExplicitDark: '<style>@media (prefers-color-scheme: dark){:root[data-theme="dark"] .t::after{content:"MI\\45 T"}}</style><p class="t">x</p>',
-  langEnOnly: '<style>:root:lang(en) .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
-  originalOnly: '<style>:root:not([data-lang]) .t::after{content:"MI\\45 T"}</style><p class="t">x</p>',
-  loadScriptDark: '<p id="o">x</p><script>if (matchMedia("(prefers-color-scheme: dark)").matches) document.getElementById("o").textContent = "M" + "IET";</script>',
+  plain: `<p>Проект ${LM}</p>`, cyrillic: `<p>АО ${CN} ${CM}</p>`, lowercase: `<p>${H.lower(CN)} и ${H.lower(CM)}</p>`, greekLunate: `<p>${LN.slice(0, -1)}${H.greek(LN.slice(-1))}</p>`,
+  caseEnding: `<p>Публикация ${CM}а</p>`, dotted: `<p>${[...CN].join('.')}.</p>`,
+  entityNoSemicolon: `<b>${H.ent(LM, 2)}</b>`, hexNoSemicolon: `<b>${H.hexEnt(LM, 2)}</b>`, allNumeric: `<b>${H.allEnt(LM)}</b>`,
+  html5Named: `<b>${H.cyrNamed(CM)}</b>`, zeroWidthNamed: `<b>${A}&ZeroWidthSpace;${B}</b>`, noBreak: `<b>${A}&NoBreak;${B}</b>`,
+  softHyphen: `<b>${A}&#173;${B}</b>`, zwsp: `<b>${A}\u200B${B}</b>`, wordJoiner: `<b>${A}\u2060${B}</b>`, bom: `<b>${A}\uFEFF${B}</b>`,
+  allCyrillicLookalike: `<b>${H.cyrLook(LM)}</b>`, mixedScript: `<b>${LM.slice(0, 2)}${H.cyrLook(LM[2])}${LM.slice(3)}</b>`, greek: `<b>${H.greek(LM)}</b>`, mixedMHTC: `<b>${foldLatin(CN)}</b>`, fullWidth: `<b>${H.wide(LM)}</b>`, dotlessI: `<b style="text-transform:uppercase">${H.lower(LM).replace('i', 'ı')}</b>`,
+  splitComment: `<b>${A}<!---->${B}</b>`, splitBig: `<b>${A}<big>${B}</big></b>`, splitCustom: `<b>${A}<x-a>${B}</x-a></b>`, splitScript: `<b>${A}<script></script>${B}</b>`,
+  splitTemplate: `<b>${A}<template></template>${B}</b>`, splitImg: `<b>${A}<img alt="">${B}</b>`, splitInlineDiv: `<span>${A}<div style="display:inline">${B}</div></span>`,
+  tagLike: `<b>&lt;${CM}&gt;</b>`, tagLikeSpaced: `<b>1 &lt; ${LM} &gt; 0</b>`,
+  abruptComment: `<b><!-->${CM}<!----></b>`, bangComment: `<b><!-- x --!>${CN}<!-- y --></b>`,
+  customElementNames: `<b><script-x>${CM}</script-x><script></script></b>`,
+  bdo: `<b><bdo dir="rtl">${H.rev(LM)}</bdo></b>`, partialBdo: `<b>${A}<bdo dir="rtl">${H.rev(B)}</bdo></b>`, rlo: `<b>\u202E${H.rev(LM)}\u202C</b>`,
+  bidiCss: `<b style="unicode-bidi:bidi-override;direction:rtl">${H.rev(LM)}</b>`, isolateOverride: `<b style="unicode-bidi:isolate-override;direction:rtl">${H.rev(LM)}</b>`,
+  hiddenBetweenWords: `<p><span>предприятие</span><span hidden>${LM}</span><span>город</span></p>`,
+  hiddenSplitBetweenWords: `<p><span>предприятие</span><span hidden>${A}<strong>${B}</strong></span><span>город</span></p>`,
+  opacitySplitBetweenWords: `<p>предприятие<span style="opacity:0">${A}<strong>${B}</strong></span>город</p>`,
+  hiddenNestedBetweenLetters: `<div hidden>предприятие<span>${LM}</span>город</div>`,
+  hiddenNestedSplit: `<div hidden>текст<span>${A}<b>${B}</b></span>город</div>`,
+  closedShadowBr: `<x-g></x-g><script>const r=document.querySelector("x-g").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("Заказчик",document.createElement("br"),"${LM[0]}"+"${LM.slice(1)}",document.createElement("br"),"Москва");r.append(p);</script>`,
+  visibleBr: `<p>Заказчик<br>${LM}<br>Москва</p>`,
+  maskSplitBetweenWords: `<p>Заказчик<span style="-webkit-mask-image:linear-gradient(transparent,transparent);mask-image:linear-gradient(transparent,transparent)">${A}<strong>${B}</strong></span>Москва</p>`,
+  fileNameCamel: `<img src="/assets/logo${LM}.svg" alt="Логотип заказчика">`,
+  templateSplit: `<template><p>${A}<em>${B}</em></p></template><p>текст</p>`,
+  closedShadowHiddenSplit: `<x-f></x-f><script>const r=document.querySelector("x-f").attachShadow({mode:"closed"});const p=document.createElement("p");p.hidden=true;p.append("${LM[0]}","${LM[1]}");const em=document.createElement("em");em.textContent="${LM[2]}"+"${LM[3]}";p.append(em);r.append(p);</script>`,
+  dataNotAttribute: `<p>data:${CM}</p>`, titleAttr: `<abbr title="${H.ent(LM, 2)}">x</abbr>`, altAttr: `<img src="x.png" alt="Логотип ${H.ent(CM, 2)}">`,
+  attrName: `<div data-${H.lower(LM)}="1">x</div>`, hrefEncoded: `<a href="https://${H.ent(H.lower(LS), 0)}-${H.ent(H.lower(LM), 2)}.ru/">сайт</a>`, hrefPercent: `<a href="https://${H.lower(LS)}-%${H.code(H.lower(LM), 0).toString(16).toUpperCase()}${H.lower(LM).slice(1)}.ru/">сайт</a>`,
+  pathPercent: `<a href="/clients/${H.pct(LM)}/profile">x</a>`, pathPercentWithQuery: `<a href="/clients/${H.pct(LM)}/profile?progress=100%">x</a>`,
+  clobberedAttributes: `<form><input name="attributes"><template><p title="${H.ent(LM, 2, ';')}">x</p></template></form>`,
+  inputValue: `<input value="${LM}">`, svgTspan: `<svg><text>${CM[0]}<tspan>${CM.slice(1)}</tspan></text></svg>`,
+  cssBefore: `<style>.x::before{content:"${H.cssEsc(LM, 2)}"}</style><p class="x">a</p>`, cssEscape: `<style>.x::after{content:'${H.cssEsc(LM, 2)}'}</style><p class="x">a</p>`,
+  cssAttr: `<style>.x::after{content:attr(data-n)}</style><p class="x" data-n="${H.ent(LM, 2, ';')}">a</p>`,
+  cssCounterP: `<style>@counter-style e{system:cyclic;symbols:"${A}";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><p class="c">${B}</p>`,
+  cssCounterDiv: `<style>@counter-style e{system:cyclic;symbols:"${A}";suffix:""}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class="c">${B}</div>`,
+  cssCounterIframe: `<iframe srcdoc="<style>@counter-style e{system:cyclic;symbols:'${A}';suffix:''}.c{counter-reset:k}.c::before{content:counter(k,e)}</style><div class='c'>${B}</div>"></iframe>`,
+  shadowOpen: `<x-h><template shadowrootmode="open"><p>${LM}</p></template></x-h>`,
+  shadowClosedText: `<x-c></x-c><script>const n="${LM[0]}"+"${LM.slice(1)}";const r=document.querySelector("x-c").attachShadow({mode:"closed"});const p=document.createElement("p");p.textContent=n;r.append(p);</script>`,
+  shadowClosedAttr: `<x-d></x-d><script>const r=document.querySelector("x-d").attachShadow({mode:"closed"});const p=document.createElement("p");p.setAttribute("data-customer","${LM[0]}"+"${LM.slice(1)}");p.textContent="x";r.append(p);</script>`,
+  shadowClosedHref: `<x-e></x-e><script>const r=document.querySelector("x-e").attachShadow({mode:"closed"});const a=document.createElement("a");a.href="/clients/${H.pct(LM)}/";a.textContent="x";r.append(a);</script>`,
+  templateAttr: `<template><p title="${LM}">x</p><!-- ${CN} --></template><p>текст</p>`, iframeSrcdoc: `<iframe srcdoc="<p>${A}&amp;#${H.code(LM, 2)};${LM.slice(3)}</p>"></iframe>`,
+  titleTag: `<title>&laquo${CM}&raquo</title><p>x</p>`, noscriptText: `<noscript><p>${LM}</p></noscript>`, hiddenDiv: `<div hidden>${LM}</div>`, commentOnly: `<p>текст</p><!-- ${LM} -->`,
+  darkThemeOnly: `<style>:root[data-theme="dark"] .t::after{content:"${H.cssEsc(LM, 2)}"}</style><p class="t">x</p>`,
+  systemDarkOnly: `<style>@media (prefers-color-scheme: dark){.t::after{content:"${H.cssEsc(LM, 2)}"}}</style><p class="t">x</p>`,
+  systemDarkExplicitDark: `<style>@media (prefers-color-scheme: dark){:root[data-theme="dark"] .t::after{content:"${H.cssEsc(LM, 2)}"}}</style><p class="t">x</p>`,
+  langEnOnly: `<style>:root:lang(en) .t::after{content:"${H.cssEsc(LM, 2)}"}</style><p class="t">x</p>`,
+  originalOnly: `<style>:root:not([data-lang]) .t::after{content:"${H.cssEsc(LM, 2)}"}</style><p class="t">x</p>`,
+  loadScriptDark: `<p id="o">x</p><script>if (matchMedia("(prefers-color-scheme: dark)").matches) document.getElementById("o").textContent = "${LM[0]}" + "${LM.slice(1)}";</script>`,
 };
 // Где уловка обязана сработать и где не должна: срабатывает именно проверяемое состояние.
 const STATE_MARKERS = {
@@ -591,13 +598,13 @@ const STATE_MARKERS = {
   loadScriptDark: {must: '[dark/', mustNot: '[light/'},
 };
 const MUST_PASS = {
-  germanWord: '<p>Vermietung</p>', germanWordEm: '<p>Ver<em>miet</em>ung</p>', identifier: '<p>listCache</p>', literalEntity: '<p>MI&amp;#69;T</p>', plainReversedWord: '<p>TEIM</p>',
-  scriptIdentifier: '<script>const mietCount = 1;</script><p>текст</p>', dataUri: '<img alt="" src="data:image/png;base64,QUJDTUlFVERFRg==">',
-  styleSelector: '<style>.mntcLike{}</style><p>текст</p>', mitWord: '<p>MIT License, Mietvertrag, ISTCX</p>',
-  blockBoundary: '<p>MI</p><p>ET</p>', blockBoundaryNested: '<div><div>предприятие M</div><div>IET город</div></div>',
+  germanWord: `<p>Ver${H.lower(LM)}ung</p>`, germanWordEm: `<p>Ver<em>${H.lower(LM)}</em>ung</p>`, identifier: `<p>l${H.lower(LS).slice(0, 3)}${LS[3]}ache</p>`, literalEntity: `<p>${A}&amp;#${H.code(LM, 2)};${LM.slice(3)}</p>`, plainReversedWord: `<p>${H.rev(LM)}</p>`,
+  scriptIdentifier: `<script>const ${H.lower(LM)}Count = 1;</script><p>текст</p>`, dataUri: `<img alt="" src="data:image/png;base64,${Buffer.from(`ABC${LM}DEF`).toString('base64')}">`,
+  styleSelector: `<style>.${H.lower(LN)}Like{}</style><p>текст</p>`, mitWord: `<p>MIT License, ${H.cap(LM)}vertrag, ${LS}X</p>`,
+  blockBoundary: `<p>${A}</p><p>${B}</p>`, blockBoundaryNested: `<div><div>предприятие ${LM[0]}</div><div>${LM.slice(1)} город</div></div>`,
   clobberedForm: '<form><input name="checkVisibility"><input name="childNodes"><input name="parentElement"><input name="attributes"><input name="getBoundingClientRect"><input name="children"><input name="localName"><input name="shadowRoot"><input name="textContent"><input name="getRootNode"></form><p>текст</p>',
-  hiddenTemplateWord: '<template><p>Ver<em>miet</em>ung</p></template><p>текст</p>',
-  dataUriLong: '<img alt="" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext%3Elogomiet%3C/text%3E%3C/svg%3E">',
+  hiddenTemplateWord: `<template><p>Ver<em>${H.lower(LM)}</em>ung</p></template><p>текст</p>`,
+  dataUriLong: `<img alt="" src="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%3E%3Ctext%3Elogo${H.lower(LM)}%3C/text%3E%3C/svg%3E">`,
 };
 const PSEUDONYM_CATCH = {
   otherName: '<p>АО «Альфа»</p><p>АО «Бета»</p>', otherNameEntities: '<p>АО «Альфа»</p><p>АО &laquoБета&raquo</p>',
@@ -768,11 +775,11 @@ try {
   }
   // Паритет с main: имена файлов в url(), download, srcset после data: и подпись с путём.
   for (const [name, html] of Object.entries({
-    cssUrl: '<div style="background-image:url(\'/assets/logoMIET.svg\')">x</div>',
-    download: '<a href="/r.pdf" download="ОтчётMIET.pdf">отчёт</a>',
-    srcsetAfterData: '<img alt="" srcset="data:image/png;base64,AAAA 1x, /assets/logoMIET.svg 2x">',
-    caption: '<p>Файл /assets/logoMIET.svg</p>',
-    visibleIstc: '<p>ArtisticISTCsample</p>',
+    cssUrl: `<div style="background-image:url('/assets/logo${LM}.svg')">x</div>`,
+    download: `<a href="/r.pdf" download="Отчёт${LM}.pdf">отчёт</a>`,
+    srcsetAfterData: `<img alt="" srcset="data:image/png;base64,AAAA 1x, /assets/logo${LM}.svg 2x">`,
+    caption: `<p>Файл /assets/logo${LM}.svg</p>`,
+    visibleAbbrevInWord: `<p>Artistic${LS}sample</p>`,
   })) {
     await load(page, html, false, 'light');
     if (!(await mainParityProblems(page, `parity ${name}`)).length) failures.push(`self-test: main parity «${name}» is not caught`);

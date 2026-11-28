@@ -4,6 +4,9 @@ import { readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
+// Названия прежнего работодателя в файле не записаны: они раскодируются из
+// former-employer-terms.mjs (слово владельца 28.11.2026).
+import { TERMS, DOMAIN_TOKEN, LOGO_TOKEN, MAIN_PARITY_SOURCE, MAIN_PARITY_VISIBLE, escapeRe, fixtureHelpers } from "./former-employer-terms.mjs";
 
 const projectDir = dirname(fileURLToPath(import.meta.url));
 const rawRoot = readFileSync(resolve(projectDir, "..", "index.html"), "utf8");
@@ -60,17 +63,19 @@ function decodeEntities(text) {
 }
 
 // Для сравнения: NFKC, без невидимых символов (U+00AD, U+200B…, \p{Cf}), похожие буквы
-// кириллицы сведены к латинице – «MИЭT», «MНТЦ» и полноширинные формы ловятся.
+// кириллицы сведены к латинице – смешение кириллицы и латиницы и полноширинные формы ловятся.
 const CYR_TO_LAT = { А: "A", В: "B", Е: "E", К: "K", М: "M", Н: "H", О: "O", Р: "P", С: "C", Т: "T", Х: "X", У: "Y", а: "a", е: "e", о: "o", р: "p", с: "c", у: "y", х: "x", і: "i", І: "I", ј: "j", ѕ: "s" };
 function normaliseForMatch(text, upper = true) {
   const t = upper ? text.toUpperCase().normalize("NFKC").toUpperCase() : text.normalize("NFKC");
   return t.replace(/[\p{Cf}­͏ᅟᅠ឴឵᠎ㅤﾠ]/gu, "")
     .replace(/[А-Яа-яЁёІіЈјЅѕ]/g, ch => CYR_TO_LAT[ch] ?? ch);
 }
-// Те же слова после свёртки: МНТЦ → MHTЦ, МИЭТ → MИЭT.
-// Кириллические аббревиатуры – с падежными окончаниями («МИЭТа»), латинские – целым словом.
-const EMPLOYER_WORD = /(?<![\p{L}\p{N}])(?:M\.?H\.?T\.?Ц|M\.?И\.?Э\.?T|(?:M\.?N\.?T\.?C|M\.?I\.?E\.?T|I\.?S\.?T\.?C)(?![\p{L}\p{N}]))/iu;
-const EMPLOYER_SOURCE = /istc-miet|mntc-logo/i;
+// Те же слова после свёртки (похожие кириллические буквы стали латинскими), буквы можно
+// разделять точкой. Кириллические аббревиатуры – с падежными окончаниями, латинские –
+// целым словом.
+const dotted = w => [...normaliseForMatch(w)].map(escapeRe).join("\\.?");
+const EMPLOYER_WORD = new RegExp(`(?<![\\p{L}\\p{N}])(?:${dotted(TERMS.cyrA)}|${dotted(TERMS.cyrB)}|(?:${dotted(TERMS.latA)}|${dotted(TERMS.latB)}|${dotted(TERMS.latC)})(?![\\p{L}\\p{N}]))`, "iu");
+const EMPLOYER_SOURCE = new RegExp(`${escapeRe(DOMAIN_TOKEN)}|${escapeRe(LOGO_TOKEN)}`, "i");
 const hasEmployerWord = text => EMPLOYER_WORD.test(normaliseForMatch(text));
 
 function removeComments(html) { return html.replace(/<!--[\s\S]*?-->/g, " "); }
@@ -110,10 +115,10 @@ function textLayers(html) {
   };
 }
 
-// В адресах и именах файлов имя ищется подстрокой («/assets/logoMIET.svg»), как в
+// В адресах и именах файлов имя ищется подстрокой (имя внутри имени файла), как в
 // исходной проверке; data: не проверяется – в base64 возможны случайные совпадения.
 const URL_VALUE = /\s(?:href|src|srcset|action|poster|data|cite|background|formaction|xlink:href)\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s>]+))/gi;
-const EMPLOYER_IN_URL = /MIET|MNTC|ISTC|MHTЦ|MИЭT/u;
+const EMPLOYER_IN_URL = new RegExp(Object.values(TERMS).map(w => escapeRe(normaliseForMatch(w))).join("|"), "u");
 function urlMentions(html) {
   for (const m of removeComments(html).matchAll(URL_VALUE)) {
     const value = decodeEntities(m[1] ?? m[2] ?? m[3]);
@@ -365,44 +370,47 @@ test("hero and Person schema use language-consistent professional positioning", 
 
 test("former-employer guard catches disguised names and ignores look-alikes", () => {
   // Уловки, найденные Codex 27.11 (круги 3–4 и ревью плана): каждая должна срабатывать.
+  const { cyrA: CN, cyrB: CM, latA: LN, latB: LM, latC: LS } = TERMS;
+  const H = fixtureHelpers;
+  const [A, B] = H.halves(LM);
   const caught = {
-    plain: "<p>Проект MIET</p>",
-    cyrillic: "<p>АО МНТЦ МИЭТ</p>",
-    entity: "<p>MI&#69;T</p>",
-    hexEntity: "<p>MI&#x45;T</p>",
-    splitByTag: "<p>MI<strong>ET</strong></p>",
-    splitByIns: "<p>МИ<ins>ЭТ</ins></p>",
-    titleEntity: '<p title="MI&#69;T">x</p>',
-    hrefEntity: '<a href="https://istc-mi&#101;t.ru/">x</a>',
-    altText: '<img alt="Логотип МНТЦ" src="x.png">',
-    domainInSource: '<link href="https://istc-miet.ru/">',
-    logoFile: '<img src="assets/mntc-logo.png" alt="">',
-    logoFileCamel: '<img src="/assets/logoMIET.svg" alt="Логотип заказчика">',
-    numericNoSemicolon: "<p>MI&#69T</p>",
-    unquotedAttr: "<a title=MIET href=#>x</a>",
-    otherAttr: '<div data-x="МНТЦ">x</div>',
-    zeroWidth: "<p>MI\u200BET</p>",
-    softHyphen: "<p>МИ&shy;ЭТ</p>",
-    mixedScript: "<p>MИЭТ</p>",
-    fullWidth: "<p>ＭＩＥＴ</p>",
-    noscript: "<noscript><p>MIET</p></noscript>",
-    template: "<template><p>MIET</p></template><p>текст</p>",
-    cssContent: "<style>.x::after{content:'MI\\45 T'}</style><p>x</p>",
-    styleAttr: '<p style="--a:1" data-c="x">x</p><style>.y::before{content:"МНТЦ"}</style>',
-    scriptText: "<script>footer.textContent = 'АО МНТЦ МИЭТ';</script>",
+    plain: `<p>Проект ${LM}</p>`,
+    cyrillic: `<p>АО ${CN} ${CM}</p>`,
+    entity: `<p>${H.ent(LM, 2, ";")}</p>`,
+    hexEntity: `<p>${H.hexEnt(LM, 2, ";")}</p>`,
+    splitByTag: `<p>${A}<strong>${B}</strong></p>`,
+    splitByIns: `<p>${CM.slice(0, 2)}<ins>${CM.slice(2)}</ins></p>`,
+    titleEntity: `<p title="${H.ent(LM, 2, ";")}">x</p>`,
+    hrefEntity: `<a href="https://${H.lower(LS)}-${H.ent(H.lower(LM), 2, ";")}.ru/">x</a>`,
+    altText: `<img alt="Логотип ${CN}" src="x.png">`,
+    domainInSource: `<link href="https://${DOMAIN_TOKEN}.ru/">`,
+    logoFile: `<img src="assets/${LOGO_TOKEN}.png" alt="">`,
+    logoFileCamel: `<img src="/assets/logo${LM}.svg" alt="Логотип заказчика">`,
+    numericNoSemicolon: `<p>${H.ent(LM, 2)}</p>`,
+    unquotedAttr: `<a title=${LM} href=#>x</a>`,
+    otherAttr: `<div data-x="${CN}">x</div>`,
+    zeroWidth: `<p>${A}\u200B${B}</p>`,
+    softHyphen: `<p>${CM.slice(0, 2)}&shy;${CM.slice(2)}</p>`,
+    mixedScript: `<p>${LM[0]}${CM.slice(1)}</p>`,
+    fullWidth: `<p>${H.wide(LM)}</p>`,
+    noscript: `<noscript><p>${LM}</p></noscript>`,
+    template: `<template><p>${LM}</p></template><p>текст</p>`,
+    cssContent: `<style>.x::after{content:'${H.cssEsc(LM, 2)}'}</style><p>x</p>`,
+    styleAttr: `<p style="--a:1" data-c="x">x</p><style>.y::before{content:"${CN}"}</style>`,
+    scriptText: `<script>footer.textContent = 'АО ${CN} ${CM}';</script>`,
   };
   for (const [name, html] of Object.entries(caught)) {
     assert.ok(employerMentions(html).length > 0, `${name} must be caught: ${html}`);
   }
   // Допустимое: слова и идентификаторы с теми же буквами, данные data:, литерал сущности, текст в скриптах.
   const allowed = {
-    germanWord: "<p>Vermietung</p>",
-    identifier: "<p>listCache</p>",
-    dataUri: '<img src="data:image/png;base64,QUJDTUlFVERFRg==" alt="">',
-    literalEntity: "<p>MI&#x26;#69;T</p>",
-    commented: "<!-- MIET --><p>текст</p>",
-    scriptIdentifier: "<script>const mietCount = 1;</script><p>текст</p>",
-    styleSelector: "<style>.mntcLike{}</style><p>текст</p>",
+    germanWord: `<p>Ver${H.lower(LM)}ung</p>`,
+    identifier: `<p>l${H.lower(LS).slice(0, 3)}${LS[3]}ache</p>`,
+    dataUri: `<img src="data:image/png;base64,${Buffer.from(`ABC${LM}DEF`).toString("base64")}" alt="">`,
+    literalEntity: `<p>${A}&#x26;#${H.code(LM, 2)};${LM.slice(3)}</p>`,
+    commented: `<!-- ${LM} --><p>текст</p>`,
+    scriptIdentifier: `<script>const ${H.lower(LM)}Count = 1;</script><p>текст</p>`,
+    styleSelector: `<style>.${H.lower(LN)}Like{}</style><p>текст</p>`,
   };
   for (const [name, html] of Object.entries(allowed)) {
     assert.deepEqual(employerMentions(html), [], `${name} must not be flagged: ${html}`);
@@ -448,10 +456,11 @@ test("the former employer is not named on any page of the SCA/SBOM case", () => 
     const html = readFileSync(resolve(projectDir, "..", page), "utf8");
     assert.ok(html.length > 1000, `${page} must exist and be non-empty`);
     assert.deepEqual(employerMentions(html), [], `${page} names the former employer`);
-    // Проверка из main подстрокой по исходному HTML и видимому тексту – дословно: ветка
-    // не должна ловить меньше main (имена файлов в url(), download, srcset и т. п.).
-    assert.doesNotMatch(html, /МНТЦ|МИЭТ|MNTC|MIET|istc-miet|mntc-logo/i, `${page} names the former employer (main parity)`);
-    assert.doesNotMatch(visibleText(html), /МНТЦ|МИЭТ|MNTC|MIET|istc/i, `${page} names the former employer in visible text (main parity)`);
+    // Проверки из main подстрокой по исходному HTML и видимому тексту – те же выражения,
+    // собранные из закодированных названий: ветка не должна ловить меньше main (имена
+    // файлов в url(), download, srcset и т. п.).
+    assert.doesNotMatch(html, MAIN_PARITY_SOURCE, `${page} names the former employer (main parity)`);
+    assert.doesNotMatch(visibleText(html), MAIN_PARITY_VISIBLE, `${page} names the former employer in visible text (main parity)`);
   }
   // Три презентации – исторические (слово владельца 27.11): проверяем, но не правим.
   for (const deck of ["rbpo-audit", "rbpo-audit-start-result", "sbom-license-audit"]) {
